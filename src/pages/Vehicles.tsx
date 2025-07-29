@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Search, Edit, Car, MapPin, Fuel, Gauge } from 'lucide-react';
+import { Plus, Search, Edit, Car, MapPin, Fuel, Gauge, Eye } from 'lucide-react';
 import VehicleForm from '@/components/vehicles/VehicleForm';
 
 interface Vehicle {
@@ -53,10 +55,12 @@ const statusLabels = {
 
 const Vehicles = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const { data: vehicles, isLoading } = useQuery({
     queryKey: ['vehicles'],
@@ -74,6 +78,19 @@ const Vehicles = () => {
 
       if (error) throw error;
       return data as Vehicle[];
+    },
+  });
+
+  const { data: categories } = useQuery({
+    queryKey: ['categories'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('categories')
+        .select('*')
+        .order('name', { ascending: true });
+
+      if (error) throw error;
+      return data;
     },
   });
 
@@ -102,11 +119,17 @@ const Vehicles = () => {
     },
   });
 
-  const filteredVehicles = vehicles?.filter(vehicle => 
-    vehicle.make.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    vehicle.model.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    vehicle.license_plate.toLowerCase().includes(searchTerm.toLowerCase())
-  ) || [];
+  const filteredVehicles = vehicles?.filter(vehicle => {
+    const matchesSearch = vehicle.make.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      vehicle.model.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      vehicle.license_plate.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesCategory = selectedCategory === 'all' || 
+      vehicle.category_id === selectedCategory ||
+      (!vehicle.category_id && selectedCategory === 'uncategorized');
+    
+    return matchesSearch && matchesCategory;
+  }) || [];
 
   const handleEdit = (vehicle: Vehicle) => {
     setSelectedVehicle(vehicle);
@@ -169,6 +192,20 @@ const Vehicles = () => {
             className="pl-10"
           />
         </div>
+        <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+          <SelectTrigger className="w-48">
+            <SelectValue placeholder="All Categories" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Categories</SelectItem>
+            <SelectItem value="uncategorized">Uncategorized</SelectItem>
+            {categories?.map((category) => (
+              <SelectItem key={category.id} value={category.id}>
+                {category.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         <div className="text-sm text-muted-foreground">
           {filteredVehicles.length} vehicle{filteredVehicles.length !== 1 ? 's' : ''}
         </div>
@@ -176,84 +213,111 @@ const Vehicles = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredVehicles.map((vehicle) => (
-          <Card key={vehicle.id} className="hover:shadow-lg transition-shadow">
-            <CardHeader className="pb-2">
-              <div className="flex justify-between items-start">
-                <div className="flex items-center gap-2">
-                  <Car className="h-5 w-5 text-primary" />
-                  <CardTitle className="text-lg">
-                    {vehicle.year} {vehicle.make} {vehicle.model}
-                  </CardTitle>
+          <Card key={vehicle.id} className="hover:shadow-lg transition-shadow cursor-pointer">
+            <div onClick={() => navigate(`/vehicles/${vehicle.id}`)}>
+              <CardHeader className="pb-2">
+                <div className="flex justify-between items-start">
+                  <div className="flex items-center gap-2">
+                    <Car className="h-5 w-5 text-primary" />
+                    <CardTitle className="text-lg">
+                      {vehicle.year} {vehicle.make} {vehicle.model}
+                    </CardTitle>
+                  </div>
+                  <Badge 
+                    variant="secondary" 
+                    className={`${statusColors[vehicle.status]} text-white`}
+                  >
+                    {statusLabels[vehicle.status]}
+                  </Badge>
                 </div>
-                <Badge 
-                  variant="secondary" 
-                  className={`${statusColors[vehicle.status]} text-white`}
-                >
-                  {statusLabels[vehicle.status]}
-                </Badge>
-              </div>
-              <p className="text-sm text-muted-foreground">{vehicle.license_plate}</p>
-            </CardHeader>
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-muted-foreground">{vehicle.license_plate}</p>
+                  {vehicle.categories && (
+                    <Badge variant="outline" className="text-xs">
+                      {vehicle.categories.name}
+                    </Badge>
+                  )}
+                </div>
+              </CardHeader>
             
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div className="flex items-center gap-2">
-                  <MapPin className="h-4 w-4 text-muted-foreground" />
-                  <span>{vehicle.location || 'No location'}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Fuel className="h-4 w-4 text-muted-foreground" />
-                  <span>{vehicle.fuel_level}%</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Gauge className="h-4 w-4 text-muted-foreground" />
-                  <span>{vehicle.odometer?.toLocaleString() || 0} mi</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-muted-foreground">Color:</span>
-                  <span>{vehicle.color || 'Not specified'}</span>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <div className="text-sm font-medium">Daily Rate</div>
-                <div className="text-2xl font-bold text-primary">
-                  ${vehicle.daily_rate || 0}/day
-                </div>
-              </div>
-
-              {vehicle.features && vehicle.features.length > 0 && (
-                <div className="space-y-2">
-                  <div className="text-sm font-medium">Features</div>
-                  <div className="flex flex-wrap gap-1">
-                    {vehicle.features.slice(0, 3).map((feature, index) => (
-                      <Badge key={index} variant="outline" className="text-xs">
-                        {feature}
-                      </Badge>
-                    ))}
-                    {vehicle.features.length > 3 && (
-                      <Badge variant="outline" className="text-xs">
-                        +{vehicle.features.length - 3} more
-                      </Badge>
-                    )}
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div className="flex items-center gap-2">
+                    <MapPin className="h-4 w-4 text-muted-foreground" />
+                    <span>{vehicle.location || 'No location'}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Fuel className="h-4 w-4 text-muted-foreground" />
+                    <span>{vehicle.fuel_level}%</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Gauge className="h-4 w-4 text-muted-foreground" />
+                    <span>{vehicle.odometer?.toLocaleString() || 0} mi</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-muted-foreground">Color:</span>
+                    <span>{vehicle.color || 'Not specified'}</span>
                   </div>
                 </div>
-              )}
 
-              <div className="flex gap-2 pt-2">
+                <div className="space-y-2">
+                  <div className="text-sm font-medium">Daily Rate</div>
+                  <div className="text-2xl font-bold text-primary">
+                    ${vehicle.daily_rate || 0}/day
+                  </div>
+                </div>
+
+                {vehicle.features && vehicle.features.length > 0 && (
+                  <div className="space-y-2">
+                    <div className="text-sm font-medium">Features</div>
+                    <div className="flex flex-wrap gap-1">
+                      {vehicle.features.slice(0, 3).map((feature, index) => (
+                        <Badge key={index} variant="outline" className="text-xs">
+                          {feature}
+                        </Badge>
+                      ))}
+                      {vehicle.features.length > 3 && (
+                        <Badge variant="outline" className="text-xs">
+                          +{vehicle.features.length - 3} more
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </div>
+            
+            <CardContent className="pt-0">
+              <div className="flex gap-2">
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  onClick={() => handleEdit(vehicle)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`/vehicles/${vehicle.id}`);
+                  }}
                   className="flex-1"
                 >
-                  <Edit className="mr-2 h-4 w-4" />
-                  Edit
+                  <Eye className="mr-2 h-4 w-4" />
+                  View Details
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleEdit(vehicle);
+                  }}
+                >
+                  <Edit className="h-4 w-4" />
                 </Button>
                 <Button 
                   variant="outline" 
                   size="sm"
-                  onClick={() => deleteVehicleMutation.mutate(vehicle.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteVehicleMutation.mutate(vehicle.id);
+                  }}
                   className="text-destructive hover:text-destructive"
                 >
                   Delete

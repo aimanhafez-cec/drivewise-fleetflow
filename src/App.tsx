@@ -12,6 +12,7 @@ import Dashboard from "./pages/Dashboard";
 import Reservations from "./pages/Reservations";
 import NewReservation from "./pages/NewReservation";
 import Vehicles from "./pages/Vehicles";
+import VehicleDetails from "./pages/VehicleDetails";
 import Customers from "./pages/Customers";
 import NotFound from "./pages/NotFound";
 
@@ -48,6 +49,7 @@ const App = () => (
               </ProtectedRoute>
             }>
               <Route index element={<Vehicles />} />
+              <Route path=":id" element={<VehicleDetails />} />
             </Route>
             <Route path="/customers" element={
               <ProtectedRoute>
