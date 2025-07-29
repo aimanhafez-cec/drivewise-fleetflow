@@ -12,6 +12,7 @@ import Dashboard from "./pages/Dashboard";
 import Reservations from "./pages/Reservations";
 import NewReservation from "./pages/NewReservation";
 import Vehicles from "./pages/Vehicles";
+import Customers from "./pages/Customers";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -53,7 +54,7 @@ const App = () => (
                 <AppLayout />
               </ProtectedRoute>
             }>
-              <Route index element={<div>Customers - Coming Soon</div>} />
+              <Route index element={<Customers />} />
             </Route>
             <Route path="/agreements" element={
               <ProtectedRoute>
