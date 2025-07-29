@@ -14,7 +14,726 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      agreements: {
+        Row: {
+          add_ons: Json | null
+          agreement_date: string
+          checkout_datetime: string | null
+          checkout_fuel: number | null
+          checkout_odometer: number | null
+          created_at: string
+          created_by: string | null
+          customer_id: string
+          id: string
+          notes: string | null
+          rate_overrides: Json | null
+          reservation_id: string | null
+          return_datetime: string | null
+          return_fuel: number | null
+          return_odometer: number | null
+          signed_timestamp: string | null
+          status: Database["public"]["Enums"]["agreement_status"]
+          total_amount: number | null
+          updated_at: string
+          vehicle_condition_checkout: Json | null
+          vehicle_condition_return: Json | null
+          vehicle_id: string
+        }
+        Insert: {
+          add_ons?: Json | null
+          agreement_date?: string
+          checkout_datetime?: string | null
+          checkout_fuel?: number | null
+          checkout_odometer?: number | null
+          created_at?: string
+          created_by?: string | null
+          customer_id: string
+          id?: string
+          notes?: string | null
+          rate_overrides?: Json | null
+          reservation_id?: string | null
+          return_datetime?: string | null
+          return_fuel?: number | null
+          return_odometer?: number | null
+          signed_timestamp?: string | null
+          status?: Database["public"]["Enums"]["agreement_status"]
+          total_amount?: number | null
+          updated_at?: string
+          vehicle_condition_checkout?: Json | null
+          vehicle_condition_return?: Json | null
+          vehicle_id: string
+        }
+        Update: {
+          add_ons?: Json | null
+          agreement_date?: string
+          checkout_datetime?: string | null
+          checkout_fuel?: number | null
+          checkout_odometer?: number | null
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string
+          id?: string
+          notes?: string | null
+          rate_overrides?: Json | null
+          reservation_id?: string | null
+          return_datetime?: string | null
+          return_fuel?: number | null
+          return_odometer?: number | null
+          signed_timestamp?: string | null
+          status?: Database["public"]["Enums"]["agreement_status"]
+          total_amount?: number | null
+          updated_at?: string
+          vehicle_condition_checkout?: Json | null
+          vehicle_condition_return?: Json | null
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agreements_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agreements_reservation_id_fkey"
+            columns: ["reservation_id"]
+            isOneToOne: false
+            referencedRelation: "reservations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agreements_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      categories: {
+        Row: {
+          created_at: string
+          description: string | null
+          example_models: string[] | null
+          icon: string | null
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          example_models?: string[] | null
+          icon?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          example_models?: string[] | null
+          icon?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      damage_records: {
+        Row: {
+          agreement_id: string | null
+          created_at: string
+          damage_type: Database["public"]["Enums"]["damage_type"]
+          description: string
+          diagram_coordinates: Json | null
+          id: string
+          location_on_vehicle: string | null
+          photos: string[] | null
+          recorded_at: string
+          recorded_by: string | null
+          repair_cost: number | null
+          repair_status: string | null
+          severity: string | null
+          vehicle_id: string
+        }
+        Insert: {
+          agreement_id?: string | null
+          created_at?: string
+          damage_type: Database["public"]["Enums"]["damage_type"]
+          description: string
+          diagram_coordinates?: Json | null
+          id?: string
+          location_on_vehicle?: string | null
+          photos?: string[] | null
+          recorded_at?: string
+          recorded_by?: string | null
+          repair_cost?: number | null
+          repair_status?: string | null
+          severity?: string | null
+          vehicle_id: string
+        }
+        Update: {
+          agreement_id?: string | null
+          created_at?: string
+          damage_type?: Database["public"]["Enums"]["damage_type"]
+          description?: string
+          diagram_coordinates?: Json | null
+          id?: string
+          location_on_vehicle?: string | null
+          photos?: string[] | null
+          recorded_at?: string
+          recorded_by?: string | null
+          repair_cost?: number | null
+          repair_status?: string | null
+          severity?: string | null
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "damage_records_agreement_id_fkey"
+            columns: ["agreement_id"]
+            isOneToOne: false
+            referencedRelation: "agreements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "damage_records_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      invoices: {
+        Row: {
+          agreement_id: string | null
+          created_at: string
+          created_by: string | null
+          customer_id: string
+          due_date: string | null
+          id: string
+          invoice_number: string
+          line_items: Json
+          notes: string | null
+          reservation_id: string | null
+          status: string | null
+          subtotal: number
+          tax_amount: number | null
+          total_amount: number
+          updated_at: string
+        }
+        Insert: {
+          agreement_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_id: string
+          due_date?: string | null
+          id?: string
+          invoice_number: string
+          line_items: Json
+          notes?: string | null
+          reservation_id?: string | null
+          status?: string | null
+          subtotal: number
+          tax_amount?: number | null
+          total_amount: number
+          updated_at?: string
+        }
+        Update: {
+          agreement_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string
+          due_date?: string | null
+          id?: string
+          invoice_number?: string
+          line_items?: Json
+          notes?: string | null
+          reservation_id?: string | null
+          status?: string | null
+          subtotal?: number
+          tax_amount?: number | null
+          total_amount?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoices_agreement_id_fkey"
+            columns: ["agreement_id"]
+            isOneToOne: false
+            referencedRelation: "agreements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_reservation_id_fkey"
+            columns: ["reservation_id"]
+            isOneToOne: false
+            referencedRelation: "reservations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payments: {
+        Row: {
+          amount: number
+          created_at: string
+          customer_id: string
+          gateway_response: Json | null
+          id: string
+          invoice_id: string | null
+          payment_method: string
+          payment_type: string
+          processed_at: string | null
+          processed_by: string | null
+          reservation_id: string | null
+          status: Database["public"]["Enums"]["payment_status"]
+          transaction_id: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          customer_id: string
+          gateway_response?: Json | null
+          id?: string
+          invoice_id?: string | null
+          payment_method: string
+          payment_type: string
+          processed_at?: string | null
+          processed_by?: string | null
+          reservation_id?: string | null
+          status?: Database["public"]["Enums"]["payment_status"]
+          transaction_id?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          customer_id?: string
+          gateway_response?: Json | null
+          id?: string
+          invoice_id?: string | null
+          payment_method?: string
+          payment_type?: string
+          processed_at?: string | null
+          processed_by?: string | null
+          reservation_id?: string | null
+          status?: Database["public"]["Enums"]["payment_status"]
+          transaction_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_reservation_id_fkey"
+            columns: ["reservation_id"]
+            isOneToOne: false
+            referencedRelation: "reservations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          address: Json | null
+          created_at: string
+          credit_rating: number | null
+          date_of_birth: string | null
+          email: string
+          emergency_contact: Json | null
+          full_name: string
+          id: string
+          license_expiry: string | null
+          license_number: string | null
+          notes: string[] | null
+          phone: string | null
+          profile_photo_url: string | null
+          total_rentals: number | null
+          total_spent: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address?: Json | null
+          created_at?: string
+          credit_rating?: number | null
+          date_of_birth?: string | null
+          email: string
+          emergency_contact?: Json | null
+          full_name: string
+          id?: string
+          license_expiry?: string | null
+          license_number?: string | null
+          notes?: string[] | null
+          phone?: string | null
+          profile_photo_url?: string | null
+          total_rentals?: number | null
+          total_spent?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: Json | null
+          created_at?: string
+          credit_rating?: number | null
+          date_of_birth?: string | null
+          email?: string
+          emergency_contact?: Json | null
+          full_name?: string
+          id?: string
+          license_expiry?: string | null
+          license_number?: string | null
+          notes?: string[] | null
+          phone?: string | null
+          profile_photo_url?: string | null
+          total_rentals?: number | null
+          total_spent?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      report_templates: {
+        Row: {
+          columns: Json
+          created_at: string
+          created_by: string | null
+          description: string | null
+          email_recipients: string[] | null
+          filters: Json | null
+          group_by: string[] | null
+          id: string
+          is_active: boolean | null
+          name: string
+          report_type: string
+          schedule_rule: string | null
+          sort_by: Json | null
+          updated_at: string
+        }
+        Insert: {
+          columns: Json
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          email_recipients?: string[] | null
+          filters?: Json | null
+          group_by?: string[] | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          report_type: string
+          schedule_rule?: string | null
+          sort_by?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          columns?: Json
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          email_recipients?: string[] | null
+          filters?: Json | null
+          group_by?: string[] | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          report_type?: string
+          schedule_rule?: string | null
+          sort_by?: Json | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      reservations: {
+        Row: {
+          add_ons: Json | null
+          airport_info: Json | null
+          billing_address: Json | null
+          created_at: string
+          created_by: string | null
+          customer_id: string
+          end_datetime: string
+          id: string
+          pickup_location: string
+          po_number: string | null
+          rate_plan: Json | null
+          referral_code: string | null
+          return_location: string
+          ro_number: string | null
+          special_requests: string | null
+          start_datetime: string
+          status: Database["public"]["Enums"]["reservation_status"]
+          taxes: Json | null
+          total_amount: number | null
+          updated_at: string
+          vehicle_id: string | null
+        }
+        Insert: {
+          add_ons?: Json | null
+          airport_info?: Json | null
+          billing_address?: Json | null
+          created_at?: string
+          created_by?: string | null
+          customer_id: string
+          end_datetime: string
+          id?: string
+          pickup_location: string
+          po_number?: string | null
+          rate_plan?: Json | null
+          referral_code?: string | null
+          return_location: string
+          ro_number?: string | null
+          special_requests?: string | null
+          start_datetime: string
+          status?: Database["public"]["Enums"]["reservation_status"]
+          taxes?: Json | null
+          total_amount?: number | null
+          updated_at?: string
+          vehicle_id?: string | null
+        }
+        Update: {
+          add_ons?: Json | null
+          airport_info?: Json | null
+          billing_address?: Json | null
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string
+          end_datetime?: string
+          id?: string
+          pickup_location?: string
+          po_number?: string | null
+          rate_plan?: Json | null
+          referral_code?: string | null
+          return_location?: string
+          ro_number?: string | null
+          special_requests?: string | null
+          start_datetime?: string
+          status?: Database["public"]["Enums"]["reservation_status"]
+          taxes?: Json | null
+          total_amount?: number | null
+          updated_at?: string
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reservations_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reservations_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      traffic_tickets: {
+        Row: {
+          agreement_id: string | null
+          court_date: string | null
+          created_at: string
+          created_by: string | null
+          customer_id: string
+          fine_amount: number
+          id: string
+          notes: string | null
+          status: string | null
+          ticket_date: string
+          updated_at: string
+          vehicle_id: string | null
+          violation_type: string
+        }
+        Insert: {
+          agreement_id?: string | null
+          court_date?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_id: string
+          fine_amount: number
+          id?: string
+          notes?: string | null
+          status?: string | null
+          ticket_date: string
+          updated_at?: string
+          vehicle_id?: string | null
+          violation_type: string
+        }
+        Update: {
+          agreement_id?: string | null
+          court_date?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string
+          fine_amount?: number
+          id?: string
+          notes?: string | null
+          status?: string | null
+          ticket_date?: string
+          updated_at?: string
+          vehicle_id?: string | null
+          violation_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "traffic_tickets_agreement_id_fkey"
+            columns: ["agreement_id"]
+            isOneToOne: false
+            referencedRelation: "agreements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "traffic_tickets_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "traffic_tickets_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          permissions: Json | null
+          role: Database["public"]["Enums"]["user_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          permissions?: Json | null
+          role: Database["public"]["Enums"]["user_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          permissions?: Json | null
+          role?: Database["public"]["Enums"]["user_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      vehicles: {
+        Row: {
+          category_id: string | null
+          color: string | null
+          created_at: string
+          daily_rate: number | null
+          engine_size: string | null
+          features: string[] | null
+          fuel_level: number | null
+          id: string
+          insurance_expiry: string | null
+          license_expiry: string | null
+          license_plate: string
+          location: string | null
+          make: string
+          model: string
+          monthly_rate: number | null
+          odometer: number | null
+          ownership_type: string | null
+          status: Database["public"]["Enums"]["vehicle_status"]
+          subtype: string | null
+          transmission: string | null
+          updated_at: string
+          vin: string
+          weekly_rate: number | null
+          year: number
+        }
+        Insert: {
+          category_id?: string | null
+          color?: string | null
+          created_at?: string
+          daily_rate?: number | null
+          engine_size?: string | null
+          features?: string[] | null
+          fuel_level?: number | null
+          id?: string
+          insurance_expiry?: string | null
+          license_expiry?: string | null
+          license_plate: string
+          location?: string | null
+          make: string
+          model: string
+          monthly_rate?: number | null
+          odometer?: number | null
+          ownership_type?: string | null
+          status?: Database["public"]["Enums"]["vehicle_status"]
+          subtype?: string | null
+          transmission?: string | null
+          updated_at?: string
+          vin: string
+          weekly_rate?: number | null
+          year: number
+        }
+        Update: {
+          category_id?: string | null
+          color?: string | null
+          created_at?: string
+          daily_rate?: number | null
+          engine_size?: string | null
+          features?: string[] | null
+          fuel_level?: number | null
+          id?: string
+          insurance_expiry?: string | null
+          license_expiry?: string | null
+          license_plate?: string
+          location?: string | null
+          make?: string
+          model?: string
+          monthly_rate?: number | null
+          odometer?: number | null
+          ownership_type?: string | null
+          status?: Database["public"]["Enums"]["vehicle_status"]
+          subtype?: string | null
+          transmission?: string | null
+          updated_at?: string
+          vin?: string
+          weekly_rate?: number | null
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicles_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +742,39 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      agreement_status: "active" | "completed" | "terminated" | "pending_return"
+      damage_type:
+        | "scratch"
+        | "dent"
+        | "crack"
+        | "missing_part"
+        | "interior_damage"
+        | "other"
+      payment_status:
+        | "pending"
+        | "processing"
+        | "completed"
+        | "failed"
+        | "refunded"
+      reservation_status:
+        | "pending"
+        | "confirmed"
+        | "checked_out"
+        | "completed"
+        | "cancelled"
+      user_role:
+        | "admin"
+        | "fleet_manager"
+        | "rental_agent"
+        | "customer"
+        | "maintenance"
+        | "finance"
+      vehicle_status:
+        | "available"
+        | "rented"
+        | "maintenance"
+        | "out_of_service"
+        | "reserved"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +901,45 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      agreement_status: ["active", "completed", "terminated", "pending_return"],
+      damage_type: [
+        "scratch",
+        "dent",
+        "crack",
+        "missing_part",
+        "interior_damage",
+        "other",
+      ],
+      payment_status: [
+        "pending",
+        "processing",
+        "completed",
+        "failed",
+        "refunded",
+      ],
+      reservation_status: [
+        "pending",
+        "confirmed",
+        "checked_out",
+        "completed",
+        "cancelled",
+      ],
+      user_role: [
+        "admin",
+        "fleet_manager",
+        "rental_agent",
+        "customer",
+        "maintenance",
+        "finance",
+      ],
+      vehicle_status: [
+        "available",
+        "rented",
+        "maintenance",
+        "out_of_service",
+        "reserved",
+      ],
+    },
   },
 } as const
