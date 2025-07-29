@@ -2,41 +2,76 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Car Rental Management System Design System */
 
 @layer base {
   :root {
+    /* Fleet Management Color Palette */
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --foreground: 213 27% 8%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 213 27% 8%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 213 27% 8%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Automotive Navy Primary */
+    --primary: 213 94% 12%;
+    --primary-foreground: 0 0% 98%;
+    --primary-light: 213 50% 25%;
+    --primary-glow: 213 60% 35%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Silver/Gray Secondary */
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 213 27% 8%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 215 16% 47%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 220 14% 96%;
+    --accent-foreground: 213 27% 8%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    /* Fleet Status Colors */
+    --available: 142 69% 38%;
+    --available-foreground: 0 0% 100%;
+    --maintenance: 48 96% 53%;
+    --maintenance-foreground: 213 27% 8%;
+    --reserved: 213 94% 12%;
+    --reserved-foreground: 0 0% 98%;
+    --rented: 25 95% 53%;
+    --rented-foreground: 0 0% 100%;
+    --out-of-service: 0 84% 60%;
+    --out-of-service-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    /* Automotive Accent Colors */
+    --orange-accent: 25 95% 53%;
+    --orange-accent-foreground: 0 0% 100%;
+    --blue-accent: 213 94% 50%;
+    --blue-accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 213 94% 12%;
 
     --radius: 0.5rem;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-dashboard: linear-gradient(180deg, hsl(var(--background)), hsl(220 14% 98%));
+    --gradient-fleet: linear-gradient(135deg, hsl(var(--available)), hsl(var(--blue-accent)));
+
+    /* Shadows */
+    --shadow-elegant: 0 10px 30px -10px hsl(var(--primary) / 0.2);
+    --shadow-fleet: 0 8px 25px -8px hsl(var(--blue-accent) / 0.3);
+    --shadow-card: 0 4px 12px -4px hsl(var(--primary) / 0.1);
+
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-dashboard: all 0.2s ease-out;
 
     --sidebar-background: 0 0% 98%;
 

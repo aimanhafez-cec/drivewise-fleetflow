@@ -26,7 +26,9 @@ export default {
 				foreground: 'hsl(var(--foreground))',
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
-					foreground: 'hsl(var(--primary-foreground))'
+					foreground: 'hsl(var(--primary-foreground))',
+					light: 'hsl(var(--primary-light))',
+					glow: 'hsl(var(--primary-glow))'
 				},
 				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',
@@ -51,6 +53,35 @@ export default {
 				card: {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
+				},
+				/* Fleet Status Colors */
+				available: {
+					DEFAULT: 'hsl(var(--available))',
+					foreground: 'hsl(var(--available-foreground))'
+				},
+				maintenance: {
+					DEFAULT: 'hsl(var(--maintenance))',
+					foreground: 'hsl(var(--maintenance-foreground))'
+				},
+				reserved: {
+					DEFAULT: 'hsl(var(--reserved))',
+					foreground: 'hsl(var(--reserved-foreground))'
+				},
+				rented: {
+					DEFAULT: 'hsl(var(--rented))',
+					foreground: 'hsl(var(--rented-foreground))'
+				},
+				'out-of-service': {
+					DEFAULT: 'hsl(var(--out-of-service))',
+					foreground: 'hsl(var(--out-of-service-foreground))'
+				},
+				'orange-accent': {
+					DEFAULT: 'hsl(var(--orange-accent))',
+					foreground: 'hsl(var(--orange-accent-foreground))'
+				},
+				'blue-accent': {
+					DEFAULT: 'hsl(var(--blue-accent))',
+					foreground: 'hsl(var(--blue-accent-foreground))'
 				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
