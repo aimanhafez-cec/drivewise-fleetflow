@@ -207,6 +207,69 @@ export type Database = {
           },
         ]
       }
+      inspections: {
+        Row: {
+          checklist: Json | null
+          created_at: string
+          fuel_level: number | null
+          id: string
+          inspection_date: string
+          notes: string | null
+          odometer: number | null
+          performed_by: string | null
+          photos: string[] | null
+          reservation_id: string | null
+          status: string | null
+          updated_at: string
+          vehicle_id: string
+        }
+        Insert: {
+          checklist?: Json | null
+          created_at?: string
+          fuel_level?: number | null
+          id?: string
+          inspection_date?: string
+          notes?: string | null
+          odometer?: number | null
+          performed_by?: string | null
+          photos?: string[] | null
+          reservation_id?: string | null
+          status?: string | null
+          updated_at?: string
+          vehicle_id: string
+        }
+        Update: {
+          checklist?: Json | null
+          created_at?: string
+          fuel_level?: number | null
+          id?: string
+          inspection_date?: string
+          notes?: string | null
+          odometer?: number | null
+          performed_by?: string | null
+          photos?: string[] | null
+          reservation_id?: string | null
+          status?: string | null
+          updated_at?: string
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inspections_reservation_id_fkey"
+            columns: ["reservation_id"]
+            isOneToOne: false
+            referencedRelation: "reservations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inspections_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       invoices: {
         Row: {
           agreement_id: string | null
@@ -412,6 +475,65 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      quotes: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          customer_id: string
+          id: string
+          items: Json
+          notes: string | null
+          quote_number: string
+          status: string
+          subtotal: number
+          tax_amount: number
+          total_amount: number
+          updated_at: string
+          valid_until: string | null
+          vehicle_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          customer_id: string
+          id?: string
+          items?: Json
+          notes?: string | null
+          quote_number: string
+          status?: string
+          subtotal?: number
+          tax_amount?: number
+          total_amount?: number
+          updated_at?: string
+          valid_until?: string | null
+          vehicle_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string
+          id?: string
+          items?: Json
+          notes?: string | null
+          quote_number?: string
+          status?: string
+          subtotal?: number
+          tax_amount?: number
+          total_amount?: number
+          updated_at?: string
+          valid_until?: string | null
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quotes_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       report_templates: {
         Row: {

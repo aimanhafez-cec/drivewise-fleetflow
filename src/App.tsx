@@ -89,6 +89,22 @@ const App = () => (
             }>
               <Route index element={<div>Settings - Coming Soon</div>} />
             </Route>
+            <Route path="/quotes" element={
+              <ProtectedRoute>
+                <AppLayout />
+              </ProtectedRoute>
+            }>
+              <Route index element={<Quotes />} />
+              <Route path="new" element={<NewQuote />} />
+            </Route>
+            <Route path="/inspections" element={
+              <ProtectedRoute>
+                <AppLayout />
+              </ProtectedRoute>
+            }>
+              <Route index element={<Inspections />} />
+              <Route path="new" element={<NewInspection />} />
+            </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

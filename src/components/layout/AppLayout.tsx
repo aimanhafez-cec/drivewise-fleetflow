@@ -7,6 +7,7 @@ import {
   CalendarRange,
   Users,
   FileText,
+  ClipboardCheck,
   CreditCard,
   Settings,
   LogOut,
@@ -57,6 +58,16 @@ const navigation = [
     title: 'Customers',
     url: '/customers',
     icon: Users,
+  },
+  {
+    title: 'Quotes',
+    url: '/quotes',
+    icon: FileText,
+  },
+  {
+    title: 'Inspections',
+    url: '/inspections',
+    icon: ClipboardCheck,
   },
   {
     title: 'Agreements',
