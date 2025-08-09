@@ -17,6 +17,10 @@ import Vehicles from "./pages/Vehicles";
 import VehicleDetails from "./pages/VehicleDetails";
 import Customers from "./pages/Customers";
 import NotFound from "./pages/NotFound";
+import Quotes from "./pages/Quotes";
+import NewQuote from "./pages/NewQuote";
+import Inspections from "./pages/Inspections";
+import NewInspection from "./pages/NewInspection";
 
 const queryClient = new QueryClient();
 
