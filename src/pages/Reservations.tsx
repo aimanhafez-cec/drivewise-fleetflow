@@ -65,10 +65,20 @@ const Reservations = () => {
             Manage customer reservations and bookings
           </p>
         </div>
-        <Button onClick={() => navigate('/reservations/new')}>
-          <Plus className="mr-2 h-4 w-4" />
-          New Reservation
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={() => navigate('/reservations/new')}>
+            <Plus className="mr-2 h-4 w-4" />
+            New Reservation
+          </Button>
+          <Button variant="secondary" onClick={() => navigate('/reservations/new-multi')}>
+            <Plus className="mr-2 h-4 w-4" />
+            Multi-Line
+          </Button>
+          <Button variant="outline" onClick={() => navigate('/planner')}>
+            <Calendar className="mr-2 h-4 w-4" />
+            Planner
+          </Button>
+        </div>
       </div>
 
       {/* Summary Cards */}

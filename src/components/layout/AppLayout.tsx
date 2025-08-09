@@ -4,6 +4,7 @@ import {
   LayoutDashboard,
   Car,
   Calendar,
+  CalendarRange,
   Users,
   FileText,
   CreditCard,
@@ -29,6 +30,7 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { NavLink } from 'react-router-dom';
+import QuickSearch from "@/components/search/QuickSearch";
 
 const navigation = [
   {
@@ -40,6 +42,11 @@ const navigation = [
     title: 'Reservations',
     url: '/reservations',
     icon: Calendar,
+  },
+  {
+    title: 'Planner',
+    url: '/planner',
+    icon: CalendarRange,
   },
   {
     title: 'Vehicles',
@@ -151,7 +158,8 @@ const AppLayout = () => {
           <header className="h-12 flex items-center justify-between border-b px-4">
             <SidebarTrigger />
             <div className="flex items-center gap-2">
-              <Button variant="ghost" size="icon">
+              <QuickSearch />
+              <Button variant="ghost" size="icon" aria-label="Notifications">
                 <Bell className="h-4 w-4" />
               </Button>
             </div>

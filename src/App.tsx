@@ -11,6 +11,8 @@ import { Navigate } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import Reservations from "./pages/Reservations";
 import NewReservation from "./pages/NewReservation";
+import ReservationsMulti from "./pages/ReservationsMulti";
+import Planner from "./pages/Planner";
 import Vehicles from "./pages/Vehicles";
 import VehicleDetails from "./pages/VehicleDetails";
 import Customers from "./pages/Customers";
@@ -35,14 +37,15 @@ const App = () => (
             }>
               <Route index element={<Dashboard />} />
             </Route>
-            <Route path="/reservations" element={
-              <ProtectedRoute>
-                <AppLayout />
-              </ProtectedRoute>
-            }>
-              <Route index element={<Reservations />} />
-              <Route path="new" element={<NewReservation />} />
-            </Route>
+              <Route path="/reservations" element={
+                <ProtectedRoute>
+                  <AppLayout />
+                </ProtectedRoute>
+              }>
+                <Route index element={<Reservations />} />
+                <Route path="new" element={<NewReservation />} />
+                <Route path="new-multi" element={<ReservationsMulti />} />
+              </Route>
             <Route path="/vehicles" element={
               <ProtectedRoute>
                 <AppLayout />
@@ -57,6 +60,13 @@ const App = () => (
               </ProtectedRoute>
             }>
               <Route index element={<Customers />} />
+            </Route>
+            <Route path="/planner" element={
+              <ProtectedRoute>
+                <AppLayout />
+              </ProtectedRoute>
+            }>
+              <Route index element={<Planner />} />
             </Route>
             <Route path="/agreements" element={
               <ProtectedRoute>
