@@ -1372,59 +1372,58 @@ const NewReservation = () => {
 
           {/* Reservation Lines Grid - Directly below Vehicle & Driver */}
           <div className="space-y-4">
-            {/* Show grid when there are lines or after first add */}
-            {(formData.reservationLines || []).length > 0 && (
-              <Card className="border rounded-lg">
-                <CardHeader className="px-6 py-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Car className="h-5 w-5" />
-                      <CardTitle className="text-lg">Reservation Lines</CardTitle>
+            <Card className="border rounded-lg">
+              <CardHeader className="px-6 py-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Car className="h-5 w-5" />
+                    <CardTitle className="text-lg">Reservation Lines</CardTitle>
+                    {(formData.reservationLines || []).length > 0 && (
                       <Badge variant="secondary" className="ml-2">
                         {(formData.reservationLines || []).length} lines
                       </Badge>
-                    </div>
-                    
-                    {/* Bulk actions */}
-                    {(formData.reservationLines || []).length > 0 && (
-                      <div className="flex items-center gap-2">
-                        <Select onValueChange={handleBulkAction}>
-                          <SelectTrigger id="lines-action" className="w-48">
-                            <SelectValue placeholder="Bulk actions" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="duplicate">Duplicate Selected</SelectItem>
-                            <SelectItem value="remove">Remove Selected</SelectItem>
-                            <SelectItem value="apply-rate">Apply Rate</SelectItem>
-                            <SelectItem value="apply-discount">Apply Discount</SelectItem>
-                            <SelectItem value="apply-misc">Apply Misc Charge</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleBulkAction('apply')}
-                          disabled={selectedLines.length === 0}
-                        >
-                          Apply
-                        </Button>
-                      </div>
                     )}
                   </div>
-                </CardHeader>
-                <CardContent className="px-6 pb-6">
-                  <ReservationLineGrid
-                    lines={formData.reservationLines || []}
-                    onLineUpdate={handleLineUpdate}
-                    onLineRemove={handleLineRemove}
-                    onLineDuplicate={handleLineDuplicate}
-                    onSelectionChange={setSelectedLines}
-                    selectedLines={selectedLines}
-                  />
-                </CardContent>
-              </Card>
-            )}
+                  
+                  {/* Bulk actions - only show when there are lines */}
+                  {(formData.reservationLines || []).length > 0 && (
+                    <div className="flex items-center gap-2">
+                      <Select onValueChange={handleBulkAction}>
+                        <SelectTrigger id="lines-action" className="w-48">
+                          <SelectValue placeholder="Bulk actions" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="duplicate">Duplicate Selected</SelectItem>
+                          <SelectItem value="remove">Remove Selected</SelectItem>
+                          <SelectItem value="apply-rate">Apply Rate</SelectItem>
+                          <SelectItem value="apply-discount">Apply Discount</SelectItem>
+                          <SelectItem value="apply-misc">Apply Misc Charge</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleBulkAction('apply')}
+                        disabled={selectedLines.length === 0}
+                      >
+                        Apply
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </CardHeader>
+              <CardContent className="px-6 pb-6">
+                <ReservationLineGrid
+                  lines={formData.reservationLines || []}
+                  onLineUpdate={handleLineUpdate}
+                  onLineRemove={handleLineRemove}
+                  onLineDuplicate={handleLineDuplicate}
+                  onSelectionChange={setSelectedLines}
+                  selectedLines={selectedLines}
+                />
+              </CardContent>
+            </Card>
           </div>
           
           {/* D) Airport Information */}
