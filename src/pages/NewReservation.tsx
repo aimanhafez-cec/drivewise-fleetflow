@@ -27,6 +27,7 @@ import { useReservationSummary } from '@/hooks/useReservationSummary';
 import { SummaryCard } from '@/components/reservation/SummaryCard';
 import { ReservationLineGrid } from '@/components/reservation/ReservationLineGrid';
 import { AddLineValidation, validateAddLine, ValidationError } from '@/components/reservation/AddLineValidation';
+import { PrefillChips } from '@/components/reservation/PrefillChips';
 
 const STORAGE_KEY = 'new-reservation-draft';
 
@@ -287,6 +288,32 @@ const NewReservation = () => {
   const [addLineErrors, setAddLineErrors] = useState<ValidationError[]>([]);
   const [selectedLines, setSelectedLines] = useState<string[]>([]);
 
+  // Prefill data for Add Line functionality
+  const getPrefillData = () => ({
+    reservationTypeId: formData.reservationTypeId,
+    vehicleClassId: formData.vehicleClassId,
+    vehicleId: formData.vehicleId,
+    checkOutDate: formData.checkOutDate,
+    checkOutLocationId: formData.checkOutLocationId,
+    checkInDate: formData.checkInDate,
+    checkInLocationId: formData.checkInLocationId,
+    priceListId: formData.priceListId,
+    promotionCode: formData.promotionCode
+  });
+
+  const isPrefillComplete = () => {
+    const prefill = getPrefillData();
+    return !!(
+      prefill.vehicleClassId &&
+      prefill.vehicleId &&
+      prefill.checkOutDate &&
+      prefill.checkOutLocationId &&
+      prefill.checkInDate &&
+      prefill.checkInLocationId &&
+      prefill.checkOutDate < prefill.checkInDate
+    );
+  };
+
   // Load draft from localStorage on mount
   useEffect(() => {
     const draft = localStorage.getItem(STORAGE_KEY);
@@ -501,7 +528,6 @@ const NewReservation = () => {
   // State for accordion sections
   const [accordionValues, setAccordionValues] = useState([
     'rental-info',
-    'reservation-lines',
     'vehicles-drivers',
     'airport-info',
     'rate-taxes',
@@ -512,6 +538,13 @@ const NewReservation = () => {
     'adjustments-deposits',
     'referral-info'
   ]);
+
+  // Auto-open reservation lines section when prefill is complete
+  useEffect(() => {
+    if (isPrefillComplete() && !accordionValues.includes('reservation-lines')) {
+      setAccordionValues(prev => [...prev, 'reservation-lines']);
+    }
+  }, [formData.vehicleClassId, formData.vehicleId, formData.checkOutDate, formData.checkInDate]);
 
   // Use the new summary hook
   const summary = useReservationSummary(formData);
@@ -531,6 +564,15 @@ const NewReservation = () => {
 
   // Helper functions
   const addReservationLine = () => {
+    if (!isPrefillComplete()) {
+      toast({
+        title: "Incomplete Information",
+        description: "Please complete vehicle and date information before adding a line.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     // Validate required fields
     const validationErrors = validateAddLine(formData);
     if (validationErrors.length > 0) {
@@ -577,7 +619,7 @@ const NewReservation = () => {
       reservationLines: [...prev.reservationLines, newLine]
     }));
 
-    // Reset editor with smart defaults (keep dates/locations/price list)
+    // Reset editor with smart defaults (keep dates/locations/price list, clear vehicle & driver)
     setFormData(prev => ({
       ...prev,
       vehicleId: '',
@@ -690,6 +732,14 @@ const NewReservation = () => {
     }
 
     switch (action) {
+      case 'duplicate':
+        selectedLines.forEach(lineId => handleLineDuplicate(lineId));
+        setSelectedLines([]);
+        toast({
+          title: "Lines duplicated",
+          description: `${selectedLines.length} lines have been duplicated.`,
+        });
+        break;
       case 'remove':
         selectedLines.forEach(lineId => handleLineRemove(lineId));
         setSelectedLines([]);
@@ -712,6 +762,13 @@ const NewReservation = () => {
           description: "Bulk discount application will be available soon.",
         });
         break;
+      case 'apply-misc':
+        // Implement bulk misc charge application
+        toast({
+          title: "Feature coming soon",
+          description: "Bulk misc charge application will be available soon.",
+        });
+        break;
       default:
         break;
     }
@@ -732,6 +789,17 @@ const NewReservation = () => {
       ...prev,
       drivers: [...prev.drivers, newDriver]
     }));
+  };
+
+  const handlePrefillEdit = () => {
+    // Focus on the first incomplete section (vehicles panel)
+    const vehiclesSection = document.querySelector('[value="vehicles-drivers"]');
+    if (vehiclesSection) {
+      vehiclesSection.scrollIntoView({ behavior: 'smooth' });
+      if (!accordionValues.includes('vehicles-drivers')) {
+        setAccordionValues(prev => [...prev, 'vehicles-drivers']);
+      }
+    }
   };
 
   return (
@@ -1966,21 +2034,55 @@ const NewReservation = () => {
             </AccordionTrigger>
             <AccordionContent className="px-6 pb-6">
               <div className="space-y-4">
-                {/* Toolbar */}
-                <div className="flex items-center gap-2">
-                  <Select onValueChange={handleBulkAction}>
-                    <SelectTrigger id="lines-action" className="w-48">
-                      <SelectValue placeholder="Select action" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="duplicate">Duplicate Selected</SelectItem>
-                      <SelectItem value="remove">Remove Selected</SelectItem>
-                      <SelectItem value="apply-rate">Apply Rate</SelectItem>
-                      <SelectItem value="apply-discount">Apply Discount</SelectItem>
-                      <SelectItem value="apply-misc">Apply Misc Charge</SelectItem>
-                    </SelectContent>
-                  </Select>
+                {/* Header toolbar with prefill chips and actions */}
+                <div className="flex flex-col md:flex-row md:items-center gap-4 p-4 bg-muted/30 rounded-lg">
+                  <div className="flex-1">
+                    <PrefillChips
+                      prefillData={getPrefillData()}
+                      onEditClick={handlePrefillEdit}
+                      isComplete={isPrefillComplete()}
+                    />
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <Button
+                      id="btn-add-line"
+                      onClick={addReservationLine}
+                      disabled={!isPrefillComplete()}
+                      className="gap-2"
+                    >
+                      <Plus className="h-4 w-4" />
+                      Add Line
+                    </Button>
+                    
+                    <div className="w-px h-6 bg-border" />
+                    
+                    <Select onValueChange={handleBulkAction}>
+                      <SelectTrigger id="lines-action" className="w-48">
+                        <SelectValue placeholder="Bulk actions" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="duplicate">Duplicate Selected</SelectItem>
+                        <SelectItem value="remove">Remove Selected</SelectItem>
+                        <SelectItem value="apply-rate">Apply Rate</SelectItem>
+                        <SelectItem value="apply-discount">Apply Discount</SelectItem>
+                        <SelectItem value="apply-misc">Apply Misc Charge</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleBulkAction('apply')}
+                      disabled={selectedLines.length === 0}
+                    >
+                      Apply
+                    </Button>
+                  </div>
                 </div>
+
+                {/* Validation errors */}
+                <AddLineValidation errors={addLineErrors} />
 
                 {/* Lines Grid */}
                 <ReservationLineGrid

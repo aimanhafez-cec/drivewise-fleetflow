@@ -5,8 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Trash2, Edit, Copy } from 'lucide-react';
+import { Trash2, Edit, Copy, Eye, MoreVertical } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { ReservationLine } from '@/pages/NewReservation';
+import { LineDetailsModal } from './LineDetailsModal';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 
@@ -29,6 +31,7 @@ export const ReservationLineGrid: React.FC<ReservationLineGridProps> = ({
 }) => {
   const [editingCell, setEditingCell] = useState<{ lineId: string; field: string } | null>(null);
   const [editValue, setEditValue] = useState('');
+  const [showMoreModal, setShowMoreModal] = useState<ReservationLine | null>(null);
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
@@ -107,7 +110,7 @@ export const ReservationLineGrid: React.FC<ReservationLineGridProps> = ({
             <TableHead>Line Net Price</TableHead>
             <TableHead>Tax Value</TableHead>
             <TableHead>Line Total</TableHead>
-            <TableHead className="w-24">Actions</TableHead>
+            <TableHead className="w-32">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -245,19 +248,40 @@ export const ReservationLineGrid: React.FC<ReservationLineGridProps> = ({
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => onLineDuplicate(line.id)}
+                      onClick={() => setShowMoreModal(line)}
                       className="h-8 w-8 p-0"
+                      id={`icon-show-more-${line.lineNo}`}
                     >
-                      <Copy className="h-4 w-4" />
+                      <Eye className="h-4 w-4" />
                     </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => onLineRemove(line.id)}
-                      className="h-8 w-8 p-0 text-destructive hover:text-destructive"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0"
+                        >
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => setShowMoreModal(line)}>
+                          <Eye className="h-4 w-4 mr-2" />
+                          Edit inline
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => onLineDuplicate(line.id)}>
+                          <Copy className="h-4 w-4 mr-2" />
+                          Duplicate
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          onClick={() => onLineRemove(line.id)}
+                          className="text-destructive"
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Remove
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 </TableCell>
               </TableRow>
@@ -265,6 +289,14 @@ export const ReservationLineGrid: React.FC<ReservationLineGridProps> = ({
           })}
         </TableBody>
       </Table>
+      
+      <LineDetailsModal
+        line={showMoreModal}
+        isOpen={!!showMoreModal}
+        onClose={() => setShowMoreModal(null)}
+        onSave={onLineUpdate}
+        onDelete={onLineRemove}
+      />
     </div>
   );
 };
