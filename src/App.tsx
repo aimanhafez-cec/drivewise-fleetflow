@@ -23,6 +23,8 @@ import Inspections from "./pages/Inspections";
 import NewInspection from "./pages/NewInspection";
 import ReservationDetails from "./pages/ReservationDetails";
 import ReservationDetailsPage from "./pages/ReservationDetailsPage";
+import Agreements from "./pages/Agreements";
+import AgreementDetails from "./pages/AgreementDetails";
 
 const queryClient = new QueryClient();
 
@@ -80,7 +82,8 @@ const App = () => (
                 <AppLayout />
               </ProtectedRoute>
             }>
-              <Route index element={<div>Agreements - Coming Soon</div>} />
+              <Route index element={<Agreements />} />
+              <Route path=":id" element={<AgreementDetails />} />
             </Route>
             <Route path="/payments" element={
               <ProtectedRoute>

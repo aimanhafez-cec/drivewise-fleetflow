@@ -12,6 +12,9 @@ import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { SummaryCard } from '@/components/reservation/SummaryCard';
 import { useReservationSummary } from '@/hooks/useReservationSummary';
+import { ConvertToAgreementModal } from '@/components/reservation/ConvertToAgreementModal';
+import { agreementsApi } from '@/lib/api/agreements';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface ReservationHeader {
   id: string;
@@ -67,6 +70,10 @@ const ReservationDetailsPage = () => {
   const [loading, setLoading] = useState(true);
   const [editMode, setEditMode] = useState(false);
   const [activeTab, setActiveTab] = useState('summary');
+  const [convertModalOpen, setConvertModalOpen] = useState(false);
+  const [converting, setConverting] = useState(false);
+  
+  const queryClient = useQueryClient();
   
   const [reservationData, setReservationData] = useState<{
     header: ReservationHeader | null;
@@ -193,11 +200,54 @@ const ReservationDetailsPage = () => {
   };
 
   const handleConvertToAgreement = () => {
-    toast({
-      title: "Convert to Agreement",
-      description: "Convert to agreement functionality would be implemented here.",
-    });
+    if (!reservationData.header || reservationData.lines.length === 0) {
+      toast({
+        title: "Cannot Convert",
+        description: "Reservation must have at least one line to convert to agreement.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setConvertModalOpen(true);
   };
+
+  const performConversion = async () => {
+    if (!reservationData.header || !id) return;
+
+    setConverting(true);
+    try {
+      const idempotencyKey = crypto.randomUUID();
+      const result = await agreementsApi.convertReservation(id, {}, idempotencyKey);
+      
+      toast({
+        title: "Agreement Created",
+        description: `Agreement ${result.agreementNo} created successfully.`,
+      });
+      
+      // Invalidate agreements list cache
+      queryClient.invalidateQueries({ queryKey: ['agreements:list'] });
+      
+      // Navigate to agreement details
+      navigate(`/agreements/${result.agreementId}?fromReservation=${id}`);
+      
+    } catch (error: any) {
+      console.error('Failed to convert reservation:', error);
+      toast({
+        title: "Conversion Failed", 
+        description: error.message || "Could not convert reservation. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setConverting(false);
+      setConvertModalOpen(false);
+    }
+  };
+
+  // Check if reservation is convertible
+  const isConvertible = reservationData.header && 
+    reservationData.lines.length > 0 && 
+    reservationData.header.status !== 'COMPLETED';
 
   if (loading || !reservationData.header) {
     return (
@@ -287,7 +337,13 @@ const ReservationDetailsPage = () => {
                 <Edit className="mr-2 h-4 w-4" />
                 {editMode ? 'Save' : 'Edit'}
               </Button>
-              <Button id="btn-convert" variant="outline" size="sm" onClick={handleConvertToAgreement}>
+              <Button 
+                id="btn-convert" 
+                variant="outline" 
+                size="sm" 
+                onClick={handleConvertToAgreement}
+                disabled={!isConvertible}
+              >
                 <FileText className="mr-2 h-4 w-4" />
                 Convert to Agreement
               </Button>
@@ -503,6 +559,25 @@ const ReservationDetailsPage = () => {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Convert to Agreement Modal */}
+      <ConvertToAgreementModal
+        open={convertModalOpen}
+        onOpenChange={setConvertModalOpen}
+        onConfirm={performConversion}
+        isConverting={converting}
+        reservation={{
+          reservationNo: reservationData.header?.reservationNo || '',
+          customer: reservationData.header?.customer || '',
+          priceList: 'Standard Price List',
+          linesCount: reservationData.lines.length,
+          checkOutDate: reservationData.lines[0]?.checkOutDate || '',
+          checkInDate: reservationData.lines[0]?.checkInDate || '',
+          grandTotal: summary.grandTotal,
+          advancePaid: summary.advancePaid,
+          balanceDue: summary.balanceDue,
+        }}
+      />
     </div>
   );
 };
