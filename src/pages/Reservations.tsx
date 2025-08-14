@@ -66,7 +66,7 @@ const Reservations = () => {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button onClick={() => navigate('/reservations/new')}>
+          <Button id="btn-new-reservation" onClick={() => navigate('/reservations/new')}>
             <Plus className="mr-2 h-4 w-4" />
             New Reservation
           </Button>

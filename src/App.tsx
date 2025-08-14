@@ -21,6 +21,7 @@ import Quotes from "./pages/Quotes";
 import NewQuote from "./pages/NewQuote";
 import Inspections from "./pages/Inspections";
 import NewInspection from "./pages/NewInspection";
+import ReservationDetails from "./pages/ReservationDetails";
 
 const queryClient = new QueryClient();
 
@@ -49,6 +50,7 @@ const App = () => (
                 <Route index element={<Reservations />} />
                 <Route path="new" element={<NewReservation />} />
                 <Route path="new-multi" element={<ReservationsMulti />} />
+                <Route path=":id" element={<ReservationDetails />} />
               </Route>
             <Route path="/vehicles" element={
               <ProtectedRoute>
