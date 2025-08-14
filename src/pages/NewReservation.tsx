@@ -23,6 +23,8 @@ import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { mockApi, DropdownOption, Customer, ReservationFormData } from '@/lib/api/reservations';
+import { useReservationSummary } from '@/hooks/useReservationSummary';
+import { SummaryCard } from '@/components/reservation/SummaryCard';
 
 const STORAGE_KEY = 'new-reservation-draft';
 
@@ -500,22 +502,8 @@ const NewReservation = () => {
     'referral-info'
   ]);
 
-  // Summary calculations
-  const calculateSummary = () => {
-    const reservationLines = formData.reservationLines || [];
-    const selectedMiscCharges = formData.selectedMiscCharges || [];
-    
-    const subtotal = reservationLines.reduce((sum, line) => sum + (line.lineNetPrice || 0), 0);
-    const charges = selectedMiscCharges.length * 50; // Mock calculation
-    const discounts = reservationLines.reduce((sum, line) => sum + (line.discountValue || 0), 0);
-    const tax = reservationLines.reduce((sum, line) => sum + (line.taxValue || 0), 0);
-    const deposits = (formData.securityDepositPaid || 0) + (formData.advancePayment || 0);
-    const grandTotal = subtotal + charges - discounts + tax - deposits + (formData.preAdjustment || 0) + (formData.cancellationCharges || 0);
-    
-    return { subtotal, charges, discounts, tax, deposits, grandTotal };
-  };
-
-  const summary = calculateSummary();
+  // Use the new summary hook
+  const summary = useReservationSummary(formData);
   const selectedCustomer = options.customers.find(c => c.id === formData.customerId);
 
   // Auto-save effect
@@ -575,9 +563,9 @@ const NewReservation = () => {
   };
 
   return (
-    <div className="flex gap-6">
+    <div className="flex flex-col lg:flex-row gap-6">
       {/* Main Content */}
-      <div className="flex-1 space-y-6">
+      <div className="flex-1 space-y-6 min-w-0">
         {/* Breadcrumbs */}
         <Breadcrumb>
           <BreadcrumbList>
@@ -1954,40 +1942,13 @@ const NewReservation = () => {
         </div>
       </div>
 
-      {/* Summary Panel */}
-      <div className="w-80 space-y-4 sticky top-6 h-fit">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Summary</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <div className="flex justify-between">
-              <span>Subtotal:</span>
-              <span>${summary.subtotal.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Charges:</span>
-              <span>${summary.charges.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Discounts:</span>
-              <span>-${summary.discounts.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Tax:</span>
-              <span>${summary.tax.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Deposits:</span>
-              <span>-${summary.deposits.toFixed(2)}</span>
-            </div>
-            <Separator />
-            <div className="flex justify-between font-semibold">
-              <span>Grand Total:</span>
-              <span>${summary.grandTotal.toFixed(2)}</span>
-            </div>
-          </CardContent>
-        </Card>
+      {/* Summary Panel - Desktop: Right sidebar, Mobile: Below form */}
+      <div className="lg:w-80 lg:sticky lg:top-6 lg:h-fit order-first lg:order-last">
+        <SummaryCard 
+          summary={summary} 
+          currencyCode={formData.currencyCode || 'USD'}
+          className="lg:sticky lg:top-6"
+        />
       </div>
     </div>
   );
