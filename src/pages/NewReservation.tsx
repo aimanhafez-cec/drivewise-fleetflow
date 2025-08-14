@@ -110,6 +110,31 @@ interface ExtendedFormData extends ReservationFormData {
   departureAirline: string;
   departurePassengers: number;
   
+  // Additional rental information fields
+  reservationMethodId: string;
+  reservationTypeId: string;
+  businessUnitId: string;
+  paymentTermsId: string;
+  validityDateTo: Date | null;
+  customerBillToId: string;
+  discountTypeId: string;
+  discountValue: number;
+  contractBillingPlanId: string;
+  taxLevelId: string;
+  taxCodeId: string;
+  leaseToOwn: boolean;
+}
+  arrivalDateTime: Date | null;
+  arrivalAirline: string;
+  arrivalPassengers: number;
+  departureFlightNo: string;
+  departureAirport: string;
+  departureCity: string;
+  departureZipCode: string;
+  departureDateTime: Date | null;
+  departureAirline: string;
+  departurePassengers: number;
+  
   // Rate & Taxes
   priceListId: string;
   promotionCode: string;
@@ -162,6 +187,9 @@ interface ExtendedFormData extends ReservationFormData {
   referralPhone: string;
   referralBenefitTypeId: string;
   referralValue: number;
+  
+  // Additional rental information fields
+  customerBillToId: string;
 }
 
 const NewReservation = () => {
@@ -178,13 +206,14 @@ const NewReservation = () => {
     businessUnitId: '',
     customerId: '',
     billToId: '',
+    customerBillToId: '',
     paymentTermsId: '',
     validityDateTo: null,
-    discountTypeId: null,
-    discountValue: null,
-    contractBillingPlanId: null,
-    taxLevelId: null,
-    taxCodeId: null,
+    discountTypeId: '',
+    discountValue: 0,
+    contractBillingPlanId: '',
+    taxLevelId: '',
+    taxCodeId: '',
     leaseToOwn: false,
     
     // Extended fields
@@ -1054,6 +1083,284 @@ const NewReservation = () => {
                     </PopoverContent>
                   </Popover>
                   {errors.customerId && <p className="text-sm text-destructive">{errors.customerId}</p>}
+                </div>
+
+                {/* Reservation Method */}
+                <div className="space-y-2">
+                  <RequiredLabel>Reservation Method</RequiredLabel>
+                  {loading.reservationMethods ? (
+                    <Skeleton className="h-10 w-full" />
+                  ) : (
+                    <Select 
+                      value={formData.reservationMethodId} 
+                      onValueChange={(value) => updateFormData('reservationMethodId', value)}
+                    >
+                      <SelectTrigger className={validation.getFieldError('header.reservationMethodId') ? "border-destructive" : ""}>
+                        <SelectValue placeholder="Select method" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {options.reservationMethods.map((option) => (
+                          <SelectItem key={option.id} value={option.id}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                  <FormError message={validation.getFieldError('header.reservationMethodId')} />
+                </div>
+
+                {/* Reservation Type */}
+                <div className="space-y-2">
+                  <RequiredLabel>Reservation Type</RequiredLabel>
+                  {loading.reservationTypes ? (
+                    <Skeleton className="h-10 w-full" />
+                  ) : (
+                    <Select 
+                      value={formData.reservationTypeId} 
+                      onValueChange={(value) => updateFormData('reservationTypeId', value)}
+                    >
+                      <SelectTrigger className={validation.getFieldError('header.reservationTypeId') ? "border-destructive" : ""}>
+                        <SelectValue placeholder="Select type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {options.reservationTypes.map((option) => (
+                          <SelectItem key={option.id} value={option.id}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                  <FormError message={validation.getFieldError('header.reservationTypeId')} />
+                </div>
+
+                {/* Business Unit */}
+                <div className="space-y-2">
+                  <RequiredLabel>Business Unit</RequiredLabel>
+                  {loading.businessUnits ? (
+                    <Skeleton className="h-10 w-full" />
+                  ) : (
+                    <Select 
+                      value={formData.businessUnitId} 
+                      onValueChange={(value) => updateFormData('businessUnitId', value)}
+                    >
+                      <SelectTrigger className={validation.getFieldError('header.businessUnitId') ? "border-destructive" : ""}>
+                        <SelectValue placeholder="Select business unit" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {options.businessUnits.map((option) => (
+                          <SelectItem key={option.id} value={option.id}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                  <FormError message={validation.getFieldError('header.businessUnitId')} />
+                </div>
+
+                {/* Payment Terms */}
+                <div className="space-y-2">
+                  <RequiredLabel>Payment Terms</RequiredLabel>
+                  {loading.paymentTerms ? (
+                    <Skeleton className="h-10 w-full" />
+                  ) : (
+                    <Select 
+                      value={formData.paymentTermsId} 
+                      onValueChange={(value) => updateFormData('paymentTermsId', value)}
+                    >
+                      <SelectTrigger className={validation.getFieldError('header.paymentTermsId') ? "border-destructive" : ""}>
+                        <SelectValue placeholder="Select payment terms" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {options.paymentTerms.map((option) => (
+                          <SelectItem key={option.id} value={option.id}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                  <FormError message={validation.getFieldError('header.paymentTermsId')} />
+                </div>
+
+                {/* Validity Date To */}
+                <div className="space-y-2">
+                  <Label>Validity Date To</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full justify-start text-left font-normal",
+                          !formData.validityDateTo && "text-muted-foreground",
+                          validation.getFieldError('header.validityDateTo') && "border-destructive"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {formData.validityDateTo ? format(formData.validityDateTo, "PPP") : <span>Select validity date</span>}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={formData.validityDateTo}
+                        onSelect={(date) => updateFormData('validityDateTo', date)}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <FormError message={validation.getFieldError('header.validityDateTo')} />
+                </div>
+
+                {/* Customer Bill To */}
+                <div className="space-y-2">
+                  <Label>Customer Bill To</Label>
+                  {loading.billTo ? (
+                    <Skeleton className="h-10 w-full" />
+                  ) : (
+                    <Select 
+                      value={formData.customerBillToId} 
+                      onValueChange={(value) => updateFormData('customerBillToId', value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select bill to" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {options.billTo.map((option) => (
+                          <SelectItem key={option.id} value={option.id}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                </div>
+
+                {/* Discount Type */}
+                <div className="space-y-2">
+                  <Label>Discount Type</Label>
+                  {loading.discountTypes ? (
+                    <Skeleton className="h-10 w-full" />
+                  ) : (
+                    <Select 
+                      value={formData.discountTypeId} 
+                      onValueChange={(value) => updateFormData('discountTypeId', value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select discount type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {options.discountTypes.map((option) => (
+                          <SelectItem key={option.id} value={option.id}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                </div>
+
+                {/* Discount Value */}
+                <div className="space-y-2">
+                  <Label>Discount Value</Label>
+                  <Input 
+                    type="number"
+                    value={formData.discountValue || ''} 
+                    onChange={(e) => updateFormData('discountValue', parseFloat(e.target.value) || 0)}
+                    placeholder="0.00"
+                  />
+                </div>
+
+                {/* Contract Billing Plan */}
+                <div className="space-y-2">
+                  <Label>Contract Billing Plan</Label>
+                  {loading.contractBillingPlans ? (
+                    <Skeleton className="h-10 w-full" />
+                  ) : (
+                    <Select 
+                      value={formData.contractBillingPlanId} 
+                      onValueChange={(value) => updateFormData('contractBillingPlanId', value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select billing plan" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {options.contractBillingPlans.map((option) => (
+                          <SelectItem key={option.id} value={option.id}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                </div>
+
+                {/* Tax Level */}
+                <div className="space-y-2">
+                  <Label>Tax Level</Label>
+                  {loading.taxLevels ? (
+                    <Skeleton className="h-10 w-full" />
+                  ) : (
+                    <Select 
+                      value={formData.taxLevelId} 
+                      onValueChange={(value) => updateFormData('taxLevelId', value)}
+                    >
+                      <SelectTrigger className={validation.getFieldError('header.taxLevelId') ? "border-destructive" : ""}>
+                        <SelectValue placeholder="Select tax level" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {options.taxLevels.map((option) => (
+                          <SelectItem key={option.id} value={option.id}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                  <FormError message={validation.getFieldError('header.taxLevelId')} />
+                </div>
+
+                {/* Tax Code */}
+                <div className="space-y-2">
+                  <Label className={formData.taxLevelId ? "flex items-center gap-1" : ""}>
+                    Tax Code
+                    {formData.taxLevelId && <span className="text-destructive">*</span>}
+                  </Label>
+                  {loading.taxCodes ? (
+                    <Skeleton className="h-10 w-full" />
+                  ) : (
+                    <Select 
+                      value={formData.taxCodeId} 
+                      onValueChange={(value) => updateFormData('taxCodeId', value)}
+                      disabled={!formData.taxLevelId}
+                    >
+                      <SelectTrigger className={validation.getFieldError('header.taxCodeId') ? "border-destructive" : ""}>
+                        <SelectValue placeholder={formData.taxLevelId ? "Select tax code" : "Select tax level first"} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {options.taxCodes.map((option) => (
+                          <SelectItem key={option.id} value={option.id}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                  <FormError message={validation.getFieldError('header.taxCodeId')} />
+                </div>
+
+                {/* Lease to Own */}
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="lease-to-own"
+                      checked={formData.leaseToOwn || false}
+                      onCheckedChange={(checked) => updateFormData('leaseToOwn', checked)}
+                    />
+                    <Label htmlFor="lease-to-own">Lease to Own</Label>
+                  </div>
                 </div>
               </div>
             </AccordionContent>
