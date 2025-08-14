@@ -570,6 +570,17 @@ const NewReservation = () => {
 
   // Helper functions
   const addReservationLine = () => {
+    console.log('addReservationLine called');
+    console.log('isPrefillComplete():', isPrefillComplete());
+    console.log('formData:', {
+      vehicleClassId: formData.vehicleClassId,
+      vehicleId: formData.vehicleId,
+      checkOutDate: formData.checkOutDate,
+      checkInDate: formData.checkInDate,
+      checkOutLocationId: formData.checkOutLocationId,
+      checkInLocationId: formData.checkInLocationId
+    });
+    
     if (!isPrefillComplete()) {
       toast({
         title: "Incomplete Information",
