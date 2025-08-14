@@ -496,12 +496,15 @@ const NewReservation = () => {
 
   // Summary calculations
   const calculateSummary = () => {
-    const subtotal = formData.reservationLines.reduce((sum, line) => sum + line.lineNetPrice, 0);
-    const charges = formData.selectedMiscCharges.length * 50; // Mock calculation
-    const discounts = formData.reservationLines.reduce((sum, line) => sum + line.discountValue, 0);
-    const tax = formData.reservationLines.reduce((sum, line) => sum + line.taxValue, 0);
-    const deposits = formData.securityDepositPaid + formData.advancePayment;
-    const grandTotal = subtotal + charges - discounts + tax - deposits + formData.preAdjustment + formData.cancellationCharges;
+    const reservationLines = formData.reservationLines || [];
+    const selectedMiscCharges = formData.selectedMiscCharges || [];
+    
+    const subtotal = reservationLines.reduce((sum, line) => sum + (line.lineNetPrice || 0), 0);
+    const charges = selectedMiscCharges.length * 50; // Mock calculation
+    const discounts = reservationLines.reduce((sum, line) => sum + (line.discountValue || 0), 0);
+    const tax = reservationLines.reduce((sum, line) => sum + (line.taxValue || 0), 0);
+    const deposits = (formData.securityDepositPaid || 0) + (formData.advancePayment || 0);
+    const grandTotal = subtotal + charges - discounts + tax - deposits + (formData.preAdjustment || 0) + (formData.cancellationCharges || 0);
     
     return { subtotal, charges, discounts, tax, deposits, grandTotal };
   };
