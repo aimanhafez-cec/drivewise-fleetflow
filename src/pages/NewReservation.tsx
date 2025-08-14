@@ -28,6 +28,7 @@ import { SummaryCard } from '@/components/reservation/SummaryCard';
 import { ReservationLineGrid } from '@/components/reservation/ReservationLineGrid';
 import { AddLineValidation, validateAddLine, ValidationError } from '@/components/reservation/AddLineValidation';
 import { PrefillChips } from '@/components/reservation/PrefillChips';
+import { DriverPicker } from '@/components/reservation/DriverPicker';
 
 const STORAGE_KEY = 'new-reservation-draft';
 
@@ -38,8 +39,11 @@ export interface ReservationLine {
   reservationTypeId: string;
   vehicleClassId: string;
   vehicleId: string;
-  driverId?: string;
-  driverName: string;
+  drivers: Array<{
+    driverId: string;
+    role: 'PRIMARY' | 'ADDITIONAL';
+    addlDriverFee?: number;
+  }>;
   outAt: Date | null;
   outLocationId: string;
   inAt: Date | null;
@@ -58,14 +62,15 @@ export interface ReservationLine {
   discounts: any[];
 }
 
-interface Driver {
+export interface Driver {
   id: string;
   fullName: string;
   licenseNo: string;
   phone: string;
   email: string;
   dob: Date | null;
-  vehicleLineId: string;
+  role?: 'PRIMARY' | 'ADDITIONAL';
+  addlDriverFee?: number;
 }
 
 interface ExtendedFormData extends ReservationFormData {
@@ -287,6 +292,7 @@ const NewReservation = () => {
   const [customerSearchQuery, setCustomerSearchQuery] = useState('');
   const [addLineErrors, setAddLineErrors] = useState<ValidationError[]>([]);
   const [selectedLines, setSelectedLines] = useState<string[]>([]);
+  const [selectedDrivers, setSelectedDrivers] = useState<Driver[]>([]);
 
   // Prefill data for Add Line functionality
   const getPrefillData = () => ({
@@ -584,7 +590,29 @@ const NewReservation = () => {
     setAddLineErrors([]);
 
     // Calculate pricing (mock calculation)
-    const basePrice = calculateLinePrice(formData);
+    let basePrice = calculateLinePrice(formData);
+    
+    // Apply driver-related charges
+    const driverLineData = selectedDrivers.map(driver => ({
+      driverId: driver.id,
+      role: driver.role || 'ADDITIONAL',
+      addlDriverFee: driver.role === 'ADDITIONAL' ? 15.00 : 0 // $15 per additional driver
+    }));
+    
+    // Add additional driver fees to base price
+    const additionalDriverFees = driverLineData.reduce((sum, driver) => sum + (driver.addlDriverFee || 0), 0);
+    basePrice += additionalDriverFees;
+    
+    // Add underage driver fees if applicable
+    const underageFees = selectedDrivers.reduce((sum, driver) => {
+      if (driver.dob) {
+        const age = new Date().getFullYear() - driver.dob.getFullYear();
+        return sum + (age < 25 ? 20.00 : 0); // $20 underage fee
+      }
+      return sum;
+    }, 0);
+    basePrice += underageFees;
+
     const taxValue = basePrice * 0.1; // 10% tax
     const lineTotal = basePrice + taxValue;
 
@@ -594,8 +622,7 @@ const NewReservation = () => {
       reservationTypeId: formData.reservationTypeId || 'standard',
       vehicleClassId: formData.vehicleClassId || '',
       vehicleId: formData.vehicleId || '',
-      driverId: undefined,
-      driverName: '',
+      drivers: driverLineData,
       outAt: formData.checkOutDate,
       outLocationId: formData.checkOutLocationId,
       inAt: formData.checkInDate,
@@ -622,14 +649,15 @@ const NewReservation = () => {
     // Reset editor with smart defaults (keep dates/locations/price list, clear vehicle & driver)
     setFormData(prev => ({
       ...prev,
-      vehicleId: '',
-      drivers: []
+      vehicleId: ''
     }));
+    setSelectedDrivers([]);
 
     // Show success toast
+    const driverCount = selectedDrivers.length;
     toast({
       title: "Line added",
-      description: `Line #${newLine.lineNo} has been added to the reservation.`,
+      description: `Line #${newLine.lineNo} added with ${driverCount} driver(s).`,
     });
 
     // Auto-save draft
@@ -705,7 +733,7 @@ const NewReservation = () => {
         id: Date.now().toString(),
         lineNo: formData.reservationLines.length + 1,
         vehicleId: '', // Clear vehicle for new selection
-        driverName: '', // Clear driver
+        drivers: [], // Clear drivers
         selected: false
       };
       
@@ -782,13 +810,9 @@ const NewReservation = () => {
       phone: '',
       email: '',
       dob: null,
-      vehicleLineId: '',
     };
     
-    setFormData(prev => ({
-      ...prev,
-      drivers: [...prev.drivers, newDriver]
-    }));
+    setSelectedDrivers(prev => [...prev, newDriver]);
   };
 
   const handlePrefillEdit = () => {
@@ -1128,100 +1152,129 @@ const NewReservation = () => {
                 </TabsList>
                 
                 <TabsContent value="vehicles" className="space-y-4">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-lg">Vehicle Information</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-                        <div className="space-y-2">
-                          <Label>Vehicle Class</Label>
-                          <Select value={formData.vehicleClassId} onValueChange={(value) => updateFormData('vehicleClassId', value)}>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select vehicle class" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="economy">Economy</SelectItem>
-                              <SelectItem value="compact">Compact</SelectItem>
-                              <SelectItem value="midsize">Midsize</SelectItem>
-                              <SelectItem value="fullsize">Full Size</SelectItem>
-                              <SelectItem value="luxury">Luxury</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <Label>Vehicle</Label>
-                          <Select value={formData.vehicleId} onValueChange={(value) => updateFormData('vehicleId', value)}>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select vehicle" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="car1">Toyota Camry</SelectItem>
-                              <SelectItem value="car2">Honda Accord</SelectItem>
-                              <SelectItem value="car3">Nissan Altima</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
+                  <div className="grid gap-6 lg:grid-cols-3">
+                    {/* Vehicle Information - Left Side */}
+                    <div className="lg:col-span-2">
+                      <Card>
+                        <CardHeader>
+                          <CardTitle className="text-lg">Vehicle Information</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
+                            <div className="space-y-2">
+                              <Label>Vehicle Class <span className="text-destructive">*</span></Label>
+                              <Select value={formData.vehicleClassId} onValueChange={(value) => updateFormData('vehicleClassId', value)}>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select vehicle class" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="economy">Economy</SelectItem>
+                                  <SelectItem value="compact">Compact</SelectItem>
+                                  <SelectItem value="midsize">Midsize</SelectItem>
+                                  <SelectItem value="fullsize">Full Size</SelectItem>
+                                  <SelectItem value="luxury">Luxury</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            
+                            <div className="space-y-2">
+                              <Label>Vehicle <span className="text-destructive">*</span></Label>
+                              <Select value={formData.vehicleId} onValueChange={(value) => updateFormData('vehicleId', value)}>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select vehicle" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="car1">Toyota Camry</SelectItem>
+                                  <SelectItem value="car2">Honda Accord</SelectItem>
+                                  <SelectItem value="car3">Nissan Altima</SelectItem>
+                                  <SelectItem value="car4">BMW 3 Series</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
 
-                        <div className="space-y-2">
-                          <Label>Check out Date</Label>
-                          <Input 
-                            type="datetime-local" 
-                            value={formData.checkOutDate ? format(formData.checkOutDate, "yyyy-MM-dd'T'HH:mm") : ''}
-                            onChange={(e) => updateFormData('checkOutDate', e.target.value ? new Date(e.target.value) : null)}
+                            <div className="space-y-2">
+                              <Label>Check out Date <span className="text-destructive">*</span></Label>
+                              <Input 
+                                type="datetime-local" 
+                                value={formData.checkOutDate ? format(formData.checkOutDate, "yyyy-MM-dd'T'HH:mm") : ''}
+                                onChange={(e) => updateFormData('checkOutDate', e.target.value ? new Date(e.target.value) : null)}
+                              />
+                            </div>
+
+                            <div className="space-y-2">
+                              <Label>Check out Location <span className="text-destructive">*</span></Label>
+                              <Select value={formData.checkOutLocationId} onValueChange={(value) => updateFormData('checkOutLocationId', value)}>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select location" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="loc1">Downtown</SelectItem>
+                                  <SelectItem value="loc2">Airport Terminal 1</SelectItem>
+                                  <SelectItem value="loc3">Airport Terminal 2</SelectItem>
+                                  <SelectItem value="loc4">City Center</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+
+                            <div className="space-y-2">
+                              <Label>Check in Date <span className="text-destructive">*</span></Label>
+                              <Input 
+                                type="datetime-local" 
+                                value={formData.checkInDate ? format(formData.checkInDate, "yyyy-MM-dd'T'HH:mm") : ''}
+                                onChange={(e) => updateFormData('checkInDate', e.target.value ? new Date(e.target.value) : null)}
+                              />
+                            </div>
+
+                            <div className="space-y-2">
+                              <Label>Check in Location <span className="text-destructive">*</span></Label>
+                              <Select value={formData.checkInLocationId} onValueChange={(value) => updateFormData('checkInLocationId', value)}>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select location" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="loc1">Downtown</SelectItem>
+                                  <SelectItem value="loc2">Airport Terminal 1</SelectItem>
+                                  <SelectItem value="loc3">Airport Terminal 2</SelectItem>
+                                  <SelectItem value="loc4">City Center</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+
+                    {/* Driver Picker - Right Side */}
+                    <div>
+                      <Card>
+                        <CardHeader>
+                          <CardTitle className="text-lg">Driver Assignment</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <DriverPicker
+                            selectedDrivers={selectedDrivers}
+                            onDriversChange={setSelectedDrivers}
                           />
-                        </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  </div>
 
-                        <div className="space-y-2">
-                          <Label>Check out Location</Label>
-                          <Select value={formData.checkOutLocationId} onValueChange={(value) => updateFormData('checkOutLocationId', value)}>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select location" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="downtown">Downtown</SelectItem>
-                              <SelectItem value="airport">Airport</SelectItem>
-                              <SelectItem value="suburban">Suburban</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label>Check in Date</Label>
-                          <Input 
-                            type="datetime-local" 
-                            value={formData.checkInDate ? format(formData.checkInDate, "yyyy-MM-dd'T'HH:mm") : ''}
-                            onChange={(e) => updateFormData('checkInDate', e.target.value ? new Date(e.target.value) : null)}
-                          />
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label>Check in Location</Label>
-                          <Select value={formData.checkInLocationId} onValueChange={(value) => updateFormData('checkInLocationId', value)}>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select location" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="downtown">Downtown</SelectItem>
-                              <SelectItem value="airport">Airport</SelectItem>
-                              <SelectItem value="suburban">Suburban</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-                      
-                      {/* Add Line Validation */}
-                      <AddLineValidation errors={addLineErrors} />
-                      
-                      <div className="mt-4">
-                        <Button id="btn-add-line" onClick={addReservationLine}>
-                          <Plus className="h-4 w-4 mr-2" />
-                          Add Line
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  {/* Add Line Validation */}
+                  <AddLineValidation errors={addLineErrors} />
+                  
+                  {/* Add Line Button */}
+                  <div className="flex justify-center pt-4">
+                    <Button 
+                      id="btn-add-line-vehicle" 
+                      onClick={addReservationLine}
+                      disabled={!isPrefillComplete()}
+                      size="lg"
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Line
+                    </Button>
+                  </div>
                 </TabsContent>
                 
                 <TabsContent value="drivers" className="space-y-4">
@@ -2034,29 +2087,9 @@ const NewReservation = () => {
             </AccordionTrigger>
             <AccordionContent className="px-6 pb-6">
               <div className="space-y-4">
-                {/* Header toolbar with prefill chips and actions */}
-                <div className="flex flex-col md:flex-row md:items-center gap-4 p-4 bg-muted/30 rounded-lg">
-                  <div className="flex-1">
-                    <PrefillChips
-                      prefillData={getPrefillData()}
-                      onEditClick={handlePrefillEdit}
-                      isComplete={isPrefillComplete()}
-                    />
-                  </div>
-                  
-                  <div className="flex items-center gap-2">
-                    <Button
-                      id="btn-add-line"
-                      onClick={addReservationLine}
-                      disabled={!isPrefillComplete()}
-                      className="gap-2"
-                    >
-                      <Plus className="h-4 w-4" />
-                      Add Line
-                    </Button>
-                    
-                    <div className="w-px h-6 bg-border" />
-                    
+                {/* Header toolbar with bulk actions only */}
+                {(formData.reservationLines || []).length > 0 && (
+                  <div className="flex justify-end items-center gap-2 p-4 bg-muted/30 rounded-lg">
                     <Select onValueChange={handleBulkAction}>
                       <SelectTrigger id="lines-action" className="w-48">
                         <SelectValue placeholder="Bulk actions" />
@@ -2079,10 +2112,7 @@ const NewReservation = () => {
                       Apply
                     </Button>
                   </div>
-                </div>
-
-                {/* Validation errors */}
-                <AddLineValidation errors={addLineErrors} />
+                )}
 
                 {/* Lines Grid */}
                 <ReservationLineGrid

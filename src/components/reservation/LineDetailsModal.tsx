@@ -10,8 +10,9 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { format } from 'date-fns';
-import { CalendarIcon, Trash2 } from 'lucide-react';
+import { CalendarIcon, Trash2, Plus } from 'lucide-react';
 import { ReservationLine } from '@/pages/NewReservation';
+import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
 interface LineDetailsModalProps {
@@ -77,8 +78,9 @@ export const LineDetailsModal: React.FC<LineDetailsModalProps> = ({
         </DialogHeader>
 
         <Tabs defaultValue="core" className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="core" id="tab-core">Core</TabsTrigger>
+            <TabsTrigger value="drivers" id="tab-drivers">Drivers</TabsTrigger>
             <TabsTrigger value="rates" id="tab-rates">Rates & Discounts</TabsTrigger>
             <TabsTrigger value="misc" id="tab-misc">Misc Charges</TabsTrigger>
             <TabsTrigger value="airport" id="tab-airport">Airport</TabsTrigger>
@@ -144,13 +146,14 @@ export const LineDetailsModal: React.FC<LineDetailsModalProps> = ({
                 </Select>
               </div>
 
-              {/* Driver Name */}
+              {/* Primary Driver Display */}
               <div className="space-y-2">
-                <Label>Driver Name</Label>
+                <Label>Primary Driver</Label>
                 <Input
-                  value={editedLine.driverName}
-                  onChange={(e) => updateEditedLine('driverName', e.target.value)}
-                  placeholder="Enter driver name"
+                  value={editedLine.drivers.find(d => d.role === 'PRIMARY')?.driverId || 'None'}
+                  disabled
+                  className="bg-muted"
+                  placeholder="No primary driver assigned"
                 />
               </div>
 
@@ -215,6 +218,49 @@ export const LineDetailsModal: React.FC<LineDetailsModalProps> = ({
                   </PopoverContent>
                 </Popover>
               </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="drivers" className="space-y-4 mt-4">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <Label className="text-base font-medium">Assigned Drivers</Label>
+                <Button variant="outline" size="sm">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Driver
+                </Button>
+              </div>
+              
+              {editedLine.drivers.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  No drivers assigned to this line
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {editedLine.drivers.map((driver, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div className="flex items-center space-x-3">
+                        <div className="flex flex-col">
+                          <span className="font-medium">Driver ID: {driver.driverId}</span>
+                          <div className="flex items-center gap-2">
+                            <Badge variant={driver.role === 'PRIMARY' ? 'default' : 'secondary'}>
+                              {driver.role}
+                            </Badge>
+                            {driver.addlDriverFee && driver.addlDriverFee > 0 && (
+                              <span className="text-sm text-muted-foreground">
+                                +${driver.addlDriverFee.toFixed(2)} fee
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <Button variant="ghost" size="sm">
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </TabsContent>
 

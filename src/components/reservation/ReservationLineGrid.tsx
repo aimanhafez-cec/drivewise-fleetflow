@@ -104,7 +104,7 @@ export const ReservationLineGrid: React.FC<ReservationLineGridProps> = ({
             <TableHead>Reservation Type</TableHead>
             <TableHead>Vehicle Class</TableHead>
             <TableHead>Vehicle</TableHead>
-            <TableHead>Driver Name</TableHead>
+            <TableHead>Primary Driver</TableHead>
             <TableHead>Check Out</TableHead>
             <TableHead>Check In</TableHead>
             <TableHead>Line Net Price</TableHead>
@@ -174,23 +174,22 @@ export const ReservationLineGrid: React.FC<ReservationLineGridProps> = ({
                   </Select>
                 </TableCell>
                 <TableCell>
-                  {editingCell?.lineId === line.id && editingCell?.field === 'driverName' ? (
-                    <Input 
-                      value={editValue}
-                      onChange={(e) => setEditValue(e.target.value)}
-                      onBlur={handleCellBlur}
-                      onKeyDown={handleKeyDown}
-                      className="w-32"
-                      autoFocus
-                    />
-                  ) : (
-                    <div 
-                      className="min-h-[40px] flex items-center px-2 cursor-pointer hover:bg-muted/50 rounded"
-                      onDoubleClick={() => handleCellDoubleClick(line.id, 'driverName', line.driverName)}
-                    >
-                      {line.driverName || 'Click to edit'}
-                    </div>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {line.drivers.length > 0 ? (
+                      <>
+                        <span className="text-sm">
+                          {line.drivers.find(d => d.role === 'PRIMARY')?.driverId || 'None'}
+                        </span>
+                        {line.drivers.length > 1 && (
+                          <Badge variant="secondary" className="text-xs">
+                            +{line.drivers.length - 1} more
+                          </Badge>
+                        )}
+                      </>
+                    ) : (
+                      <span className="text-sm text-muted-foreground">No drivers</span>
+                    )}
+                  </div>
                 </TableCell>
                 <TableCell className="text-sm">
                   {line.checkOutDate ? format(line.checkOutDate, 'MMM dd, yyyy HH:mm') : 'Not set'}
