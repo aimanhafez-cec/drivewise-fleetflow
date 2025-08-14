@@ -225,8 +225,9 @@ const ReservationDetailsPage = () => {
         description: `Agreement ${result.agreementNo} created successfully.`,
       });
       
-      // Invalidate agreements list cache
+      // Invalidate cache to refresh lists
       queryClient.invalidateQueries({ queryKey: ['agreements:list'] });
+      queryClient.invalidateQueries({ queryKey: ['reservations:open'] });
       
       // Navigate to agreement details
       navigate(`/agreements/${result.agreementId}?fromReservation=${id}`);
