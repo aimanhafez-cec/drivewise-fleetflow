@@ -18,7 +18,7 @@ import { Badge } from '@/components/ui/badge';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Separator } from '@/components/ui/separator';
 import { format } from 'date-fns';
-import { CalendarIcon, ChevronDown, Check, Plus, Trash2, Edit, Copy, Car, User, Plane, DollarSign, FileText, Shield, CreditCard, Users } from 'lucide-react';
+import { CalendarIcon, ChevronDown, Check, Plus, Trash2, Edit, Copy, Car, User, Plane, DollarSign, FileText, Shield, CreditCard, Users, Calculator } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
@@ -490,7 +490,13 @@ const NewReservation = () => {
     'rental-info',
     'reservation-lines',
     'vehicles-drivers',
+    'airport-info',
     'rate-taxes',
+    'misc-charges',
+    'billing',
+    'notes',
+    'insurance',
+    'adjustments-deposits',
     'referral-info'
   ]);
 
@@ -1185,8 +1191,731 @@ const NewReservation = () => {
             </AccordionContent>
           </AccordionItem>
 
-          {/* Continuation of accordion sections will be added in next part due to size constraints */}
           
+          {/* D) Airport Information */}
+          <AccordionItem value="airport-info" className="border rounded-lg">
+            <AccordionTrigger className="px-6 py-4 hover:no-underline">
+              <div className="flex items-center gap-2">
+                <Plane className="h-5 w-5" />
+                <span className="font-semibold">Airport Information</span>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="px-6 pb-6">
+              <div className="space-y-6">
+                <div>
+                  <h4 className="font-medium mb-4">Arrival Information</h4>
+                  <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                    <div className="space-y-2">
+                      <Label>Flight No.</Label>
+                      <Input 
+                        value={formData.arrivalFlightNo} 
+                        onChange={(e) => updateFormData('arrivalFlightNo', e.target.value)}
+                        placeholder="e.g., AA123"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Name of The Airport</Label>
+                      <Input 
+                        value={formData.arrivalAirport} 
+                        onChange={(e) => updateFormData('arrivalAirport', e.target.value)}
+                        placeholder="e.g., JFK International"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>City</Label>
+                      <Input 
+                        value={formData.arrivalCity} 
+                        onChange={(e) => updateFormData('arrivalCity', e.target.value)}
+                        placeholder="e.g., New York"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Zip Code</Label>
+                      <Input 
+                        value={formData.arrivalZipCode} 
+                        onChange={(e) => updateFormData('arrivalZipCode', e.target.value)}
+                        placeholder="e.g., 11430"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Flight Arrival Date & Time</Label>
+                      <Input 
+                        type="datetime-local"
+                        value={formData.arrivalDateTime ? format(formData.arrivalDateTime, "yyyy-MM-dd'T'HH:mm") : ''}
+                        onChange={(e) => updateFormData('arrivalDateTime', e.target.value ? new Date(e.target.value) : null)}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Airline</Label>
+                      <Input 
+                        value={formData.arrivalAirline} 
+                        onChange={(e) => updateFormData('arrivalAirline', e.target.value)}
+                        placeholder="e.g., American Airlines"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Number of Passengers</Label>
+                      <Input 
+                        type="number"
+                        min={0}
+                        value={formData.arrivalPassengers} 
+                        onChange={(e) => updateFormData('arrivalPassengers', parseInt(e.target.value) || 0)}
+                        placeholder="0"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div>
+                  <h4 className="font-medium mb-4">Departure Information</h4>
+                  <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                    <div className="space-y-2">
+                      <Label>Flight No.</Label>
+                      <Input 
+                        value={formData.departureFlightNo} 
+                        onChange={(e) => updateFormData('departureFlightNo', e.target.value)}
+                        placeholder="e.g., AA456"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Name of The Airport</Label>
+                      <Input 
+                        value={formData.departureAirport} 
+                        onChange={(e) => updateFormData('departureAirport', e.target.value)}
+                        placeholder="e.g., LAX International"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>City</Label>
+                      <Input 
+                        value={formData.departureCity} 
+                        onChange={(e) => updateFormData('departureCity', e.target.value)}
+                        placeholder="e.g., Los Angeles"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Zip Code</Label>
+                      <Input 
+                        value={formData.departureZipCode} 
+                        onChange={(e) => updateFormData('departureZipCode', e.target.value)}
+                        placeholder="e.g., 90045"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Flight Departure Date & Time</Label>
+                      <Input 
+                        type="datetime-local"
+                        value={formData.departureDateTime ? format(formData.departureDateTime, "yyyy-MM-dd'T'HH:mm") : ''}
+                        onChange={(e) => updateFormData('departureDateTime', e.target.value ? new Date(e.target.value) : null)}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Airline</Label>
+                      <Input 
+                        value={formData.departureAirline} 
+                        onChange={(e) => updateFormData('departureAirline', e.target.value)}
+                        placeholder="e.g., American Airlines"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Number of Passengers</Label>
+                      <Input 
+                        type="number"
+                        min={0}
+                        value={formData.departurePassengers} 
+                        onChange={(e) => updateFormData('departurePassengers', parseInt(e.target.value) || 0)}
+                        placeholder="0"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+
+          {/* E) Rate & Taxes */}
+          <AccordionItem value="rate-taxes" className="border rounded-lg">
+            <AccordionTrigger className="px-6 py-4 hover:no-underline">
+              <div className="flex items-center gap-2">
+                <Calculator className="h-5 w-5" />
+                <span className="font-semibold">Rate & Taxes</span>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="px-6 pb-6">
+              <div className="space-y-6">
+                <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label>Price List</Label>
+                    <Select value={formData.priceListId} onValueChange={(value) => updateFormData('priceListId', value)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select price list" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="standard">Standard Rates</SelectItem>
+                        <SelectItem value="premium">Premium Rates</SelectItem>
+                        <SelectItem value="corporate">Corporate Rates</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Promotion Code</Label>
+                    <div className="flex gap-2">
+                      <Input 
+                        value={formData.promotionCode} 
+                        onChange={(e) => updateFormData('promotionCode', e.target.value)}
+                        placeholder="Enter promo code"
+                      />
+                      <Button variant="outline" size="icon">
+                        <Check className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="space-y-4">
+                  <h4 className="font-medium">Rates</h4>
+                  <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+                    <div className="space-y-2">
+                      <Label>Hourly Rate</Label>
+                      <div className="flex gap-2">
+                        <Input 
+                          type="number"
+                          step="0.01"
+                          value={formData.hourlyRate}
+                          onChange={(e) => updateFormData('hourlyRate', parseFloat(e.target.value) || 0)}
+                          placeholder="0.00"
+                        />
+                        <Input 
+                          type="number"
+                          value={formData.hourlyQty}
+                          onChange={(e) => updateFormData('hourlyQty', parseInt(e.target.value) || 0)}
+                          placeholder="x qty"
+                          className="w-20"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Daily Rate</Label>
+                      <div className="flex gap-2">
+                        <Input 
+                          type="number"
+                          step="0.01"
+                          value={formData.dailyRate}
+                          onChange={(e) => updateFormData('dailyRate', parseFloat(e.target.value) || 0)}
+                          placeholder="0.00"
+                        />
+                        <Input 
+                          type="number"
+                          value={formData.dailyQty}
+                          onChange={(e) => updateFormData('dailyQty', parseInt(e.target.value) || 0)}
+                          placeholder="x qty"
+                          className="w-20"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Weekly Rate</Label>
+                      <div className="flex gap-2">
+                        <Input 
+                          type="number"
+                          step="0.01"
+                          value={formData.weeklyRate}
+                          onChange={(e) => updateFormData('weeklyRate', parseFloat(e.target.value) || 0)}
+                          placeholder="0.00"
+                        />
+                        <Input 
+                          type="number"
+                          value={formData.weeklyQty}
+                          onChange={(e) => updateFormData('weeklyQty', parseInt(e.target.value) || 0)}
+                          placeholder="x qty"
+                          className="w-20"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Monthly Rate</Label>
+                      <div className="flex gap-2">
+                        <Input 
+                          type="number"
+                          step="0.01"
+                          value={formData.monthlyRate}
+                          onChange={(e) => updateFormData('monthlyRate', parseFloat(e.target.value) || 0)}
+                          placeholder="0.00"
+                        />
+                        <Input 
+                          type="number"
+                          value={formData.monthlyQty}
+                          onChange={(e) => updateFormData('monthlyQty', parseInt(e.target.value) || 0)}
+                          placeholder="x qty"
+                          className="w-20"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                  <div className="space-y-2">
+                    <Label>Total Vehicle Price</Label>
+                    <Input 
+                      type="number"
+                      value={formData.totalVehiclePrice}
+                      readOnly
+                      className="bg-muted"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Kilometer Charge</Label>
+                    <Input 
+                      type="number"
+                      step="0.01"
+                      value={formData.kilometerCharge}
+                      onChange={(e) => updateFormData('kilometerCharge', parseFloat(e.target.value) || 0)}
+                      placeholder="0.00"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Daily Kilometer Allowed</Label>
+                    <Input 
+                      type="number"
+                      value={formData.dailyKilometerAllowed}
+                      onChange={(e) => updateFormData('dailyKilometerAllowed', parseInt(e.target.value) || 0)}
+                      placeholder="0"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Total Days</Label>
+                    <Input 
+                      type="number"
+                      value={formData.totalDays}
+                      readOnly
+                      className="bg-muted"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Total Kilometer Allowed</Label>
+                    <Input 
+                      type="number"
+                      value={formData.totalKilometerAllowed}
+                      readOnly
+                      className="bg-muted"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex gap-2">
+                  <Button variant="outline">Edit</Button>
+                  <Button>Save</Button>
+                </div>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+
+          {/* F) Miscellaneous Charges */}
+          <AccordionItem value="misc-charges" className="border rounded-lg">
+            <AccordionTrigger className="px-6 py-4 hover:no-underline">
+              <div className="flex items-center gap-2">
+                <Plus className="h-5 w-5" />
+                <span className="font-semibold">Miscellaneous Charges</span>
+                {formData.selectedMiscCharges.length > 0 && (
+                  <Badge variant="secondary" className="ml-2">
+                    {formData.selectedMiscCharges.length} selected
+                  </Badge>
+                )}
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="px-6 pb-6">
+              <div className="space-y-4">
+                {[
+                  { id: 'ldw', name: 'LDW (Per Day - No Tax)', amount: '25.00' },
+                  { id: 'drop-fee', name: 'Drop Fee (Fixed)', amount: '50.00' },
+                  { id: 'under-age', name: 'Under Age Fee (No Tax)', amount: '15.00' },
+                  { id: 'valet', name: 'Valet (Per Day)', amount: '10.00' },
+                  { id: 'sli', name: 'SLI (Fixed)', amount: '75.00' }
+                ].map((charge) => (
+                  <div key={charge.id} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <Checkbox 
+                        checked={formData.selectedMiscCharges.includes(charge.id)}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            updateFormData('selectedMiscCharges', [...formData.selectedMiscCharges, charge.id]);
+                          } else {
+                            updateFormData('selectedMiscCharges', formData.selectedMiscCharges.filter(id => id !== charge.id));
+                          }
+                        }}
+                      />
+                      <div>
+                        <p className="font-medium">{charge.name}</p>
+                      </div>
+                    </div>
+                    <span className="font-medium">${charge.amount}</span>
+                  </div>
+                ))}
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+
+          {/* G) Billing */}
+          <AccordionItem value="billing" className="border rounded-lg">
+            <AccordionTrigger className="px-6 py-4 hover:no-underline">
+              <div className="flex items-center gap-2">
+                <CreditCard className="h-5 w-5" />
+                <span className="font-semibold">Billing</span>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="px-6 pb-6">
+              <div className="space-y-6">
+                <div className="space-y-4">
+                  <div className="flex gap-4">
+                    <div className="flex items-center space-x-2">
+                      <input 
+                        type="radio" 
+                        id="billing-same" 
+                        name="billing" 
+                        checked={formData.billingCustomerName !== ''}
+                        onChange={() => updateFormData('billingCustomerName', '')}
+                      />
+                      <Label htmlFor="billing-same">Same As Customer</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input 
+                        type="radio" 
+                        id="billing-other" 
+                        name="billing" 
+                        checked={formData.billingCustomerName === ''}
+                        onChange={() => updateFormData('billingCustomerName', 'other')}
+                      />
+                      <Label htmlFor="billing-other">Other</Label>
+                    </div>
+                  </div>
+                </div>
+
+                {formData.billingCustomerName === 'other' && (
+                  <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label>Customer Name</Label>
+                      <Select value={formData.billingCustomerName} onValueChange={(value) => updateFormData('billingCustomerName', value)}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select customer" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {options.customers.map((customer) => (
+                            <SelectItem key={customer.id} value={customer.id}>
+                              {customer.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Mail</Label>
+                      <Input 
+                        type="email"
+                        value={formData.billingMail} 
+                        onChange={(e) => updateFormData('billingMail', e.target.value)}
+                        placeholder="customer@email.com"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Phone No.</Label>
+                      <Input 
+                        value={formData.billingPhone} 
+                        onChange={(e) => updateFormData('billingPhone', e.target.value)}
+                        placeholder="+1 (555) 123-4567"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Address</Label>
+                      <Textarea 
+                        value={formData.billingAddress} 
+                        onChange={(e) => updateFormData('billingAddress', e.target.value)}
+                        placeholder="123 Main St, City, State 12345"
+                        rows={2}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+
+          {/* H) Notes */}
+          <AccordionItem value="notes" className="border rounded-lg">
+            <AccordionTrigger className="px-6 py-4 hover:no-underline">
+              <div className="flex items-center gap-2">
+                <FileText className="h-5 w-5" />
+                <span className="font-semibold">Notes</span>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="px-6 pb-6">
+              <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label>Note</Label>
+                  <Textarea 
+                    value={formData.note} 
+                    onChange={(e) => updateFormData('note', e.target.value)}
+                    placeholder="General notes about the reservation..."
+                    rows={4}
+                    maxLength={500}
+                  />
+                  <p className="text-xs text-muted-foreground">{formData.note.length}/500 characters</p>
+                </div>
+                <div className="space-y-2">
+                  <Label>Special Note</Label>
+                  <Textarea 
+                    value={formData.specialNote} 
+                    onChange={(e) => updateFormData('specialNote', e.target.value)}
+                    placeholder="Special instructions or requirements..."
+                    rows={4}
+                    maxLength={500}
+                  />
+                  <p className="text-xs text-muted-foreground">{formData.specialNote.length}/500 characters</p>
+                </div>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+
+          {/* I) Insurance Information */}
+          <AccordionItem value="insurance" className="border rounded-lg">
+            <AccordionTrigger className="px-6 py-4 hover:no-underline">
+              <div className="flex items-center gap-2">
+                <Shield className="h-5 w-5" />
+                <span className="font-semibold">Insurance Information</span>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="px-6 pb-6">
+              <div className="grid gap-4 grid-cols-1 md:grid-cols-3">
+                <div className="space-y-2">
+                  <Label>Insurance / DW Level</Label>
+                  <Select value={formData.insuranceLevelId} onValueChange={(value) => updateFormData('insuranceLevelId', value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select level" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="basic">Basic Coverage</SelectItem>
+                      <SelectItem value="standard">Standard Coverage</SelectItem>
+                      <SelectItem value="premium">Premium Coverage</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Insurance / DW Group</Label>
+                  <Select value={formData.insuranceGroupId} onValueChange={(value) => updateFormData('insuranceGroupId', value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select group" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="group-a">Group A</SelectItem>
+                      <SelectItem value="group-b">Group B</SelectItem>
+                      <SelectItem value="group-c">Group C</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Insurance Provider</Label>
+                  <Select value={formData.insuranceProviderId} onValueChange={(value) => updateFormData('insuranceProviderId', value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select provider" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="provider-1">Provider 1</SelectItem>
+                      <SelectItem value="provider-2">Provider 2</SelectItem>
+                      <SelectItem value="provider-3">Provider 3</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+
+          {/* J) Adjustments & Deposits */}
+          <AccordionItem value="adjustments-deposits" className="border rounded-lg">
+            <AccordionTrigger className="px-6 py-4 hover:no-underline">
+              <div className="flex items-center gap-2">
+                <Calculator className="h-5 w-5" />
+                <span className="font-semibold">Adjustments & Deposits</span>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="px-6 pb-6">
+              <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                <div className="space-y-2">
+                  <Label>Pre-Adjustment</Label>
+                  <Input 
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={formData.preAdjustment} 
+                    onChange={(e) => updateFormData('preAdjustment', parseFloat(e.target.value) || 0)}
+                    placeholder="0.00"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Advance Payment</Label>
+                  <Input 
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={formData.advancePayment} 
+                    onChange={(e) => updateFormData('advancePayment', parseFloat(e.target.value) || 0)}
+                    placeholder="0.00"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Payment Method</Label>
+                  <Select value={formData.paymentMethodId} onValueChange={(value) => updateFormData('paymentMethodId', value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select method" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="cash">Cash</SelectItem>
+                      <SelectItem value="card">Credit Card</SelectItem>
+                      <SelectItem value="check">Check</SelectItem>
+                      <SelectItem value="transfer">Bank Transfer</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Security Deposit Paid</Label>
+                  <Input 
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={formData.securityDepositPaid} 
+                    onChange={(e) => updateFormData('securityDepositPaid', parseFloat(e.target.value) || 0)}
+                    placeholder="0.00"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Deposit Method</Label>
+                  <Select value={formData.depositMethodId} onValueChange={(value) => updateFormData('depositMethodId', value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select method" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="cash">Cash</SelectItem>
+                      <SelectItem value="card">Credit Card Hold</SelectItem>
+                      <SelectItem value="check">Check</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Deposit Payment Method</Label>
+                  <Select value={formData.depositPaymentMethodId} onValueChange={(value) => updateFormData('depositPaymentMethodId', value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select method" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="cash">Cash</SelectItem>
+                      <SelectItem value="card">Credit Card</SelectItem>
+                      <SelectItem value="check">Check</SelectItem>
+                      <SelectItem value="transfer">Bank Transfer</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Cancellation Charges</Label>
+                  <Input 
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={formData.cancellationCharges} 
+                    onChange={(e) => updateFormData('cancellationCharges', parseFloat(e.target.value) || 0)}
+                    placeholder="0.00"
+                  />
+                </div>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+
+          {/* K) Referral Information */}
+          <AccordionItem value="referral-info" className="border rounded-lg">
+            <AccordionTrigger className="px-6 py-4 hover:no-underline">
+              <div className="flex items-center gap-2">
+                <Users className="h-5 w-5" />
+                <span className="font-semibold">Referral Information</span>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="px-6 pb-6">
+              <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                <div className="space-y-2">
+                  <Label>Referral Name</Label>
+                  <Select value={formData.referralNameId} onValueChange={(value) => updateFormData('referralNameId', value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select referral" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="referral-1">Corporate Partner A</SelectItem>
+                      <SelectItem value="referral-2">Travel Agency B</SelectItem>
+                      <SelectItem value="referral-3">Hotel Chain C</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Contact Name</Label>
+                  <Select value={formData.referralContactNameId} onValueChange={(value) => updateFormData('referralContactNameId', value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select contact" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="contact-1">John Smith</SelectItem>
+                      <SelectItem value="contact-2">Jane Doe</SelectItem>
+                      <SelectItem value="contact-3">Bob Johnson</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Address</Label>
+                  <Input 
+                    value={formData.referralAddress} 
+                    onChange={(e) => updateFormData('referralAddress', e.target.value)}
+                    placeholder="Referral address"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Phone No.</Label>
+                  <Input 
+                    value={formData.referralPhone} 
+                    onChange={(e) => updateFormData('referralPhone', e.target.value)}
+                    placeholder="+1 (555) 123-4567"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Benefit Type</Label>
+                  <Select value={formData.referralBenefitTypeId} onValueChange={(value) => updateFormData('referralBenefitTypeId', value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select benefit type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="percentage">Percentage</SelectItem>
+                      <SelectItem value="fixed">Fixed Amount</SelectItem>
+                      <SelectItem value="commission">Commission</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Value</Label>
+                  <div className="relative">
+                    <Input 
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      max={formData.referralBenefitTypeId === 'percentage' ? 100 : undefined}
+                      value={formData.referralValue} 
+                      onChange={(e) => updateFormData('referralValue', parseFloat(e.target.value) || 0)}
+                      placeholder="0.00"
+                    />
+                    {formData.referralBenefitTypeId === 'percentage' && (
+                      <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">%</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+
         </Accordion>
 
         {/* Actions */}
