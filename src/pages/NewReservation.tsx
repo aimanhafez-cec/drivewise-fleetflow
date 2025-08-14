@@ -635,6 +635,60 @@ const NewReservation = () => {
     }
   };
 
+  const handleSave = async (status: 'DRAFT' | 'ACTIVE') => {
+    setLoading(prev => ({ ...prev, saving: true }));
+    
+    try {
+      // Basic validation for ACTIVE status
+      if (status === 'ACTIVE') {
+        const requiredFields = ['customerId', 'currencyCode', 'reservationMethodId'];
+        const missingFields = requiredFields.filter(field => !formData[field as keyof ExtendedFormData]);
+        
+        if (missingFields.length > 0) {
+          toast({
+            title: "Validation Error",
+            description: "Please fill in all required fields before continuing.",
+            variant: "destructive",
+          });
+          return;
+        }
+      }
+
+      // Create idempotency key
+      const idempotencyKey = `reservation-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      
+      // Mock API call to create reservation
+      const response = await mockApi.createReservation(formData, status);
+
+      if (response.id) {
+        toast({
+          title: status === 'DRAFT' ? "Draft Saved" : "Reservation Created",
+          description: status === 'DRAFT' 
+            ? "Your reservation draft has been saved." 
+            : `Reservation ${response.reservationNo} has been created successfully.`,
+        });
+
+        // Clear draft from localStorage if successfully created as ACTIVE
+        if (status === 'ACTIVE') {
+          localStorage.removeItem(STORAGE_KEY);
+          // Navigate to reservation details page
+          navigate(`/reservations/${response.id}?created=1`);
+        }
+      } else {
+        throw new Error('Failed to save reservation');
+      }
+    } catch (error) {
+      console.error('Save error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save reservation. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(prev => ({ ...prev, saving: false }));
+    }
+  };
+
   const addDriver = () => {
     const newDriver: Driver = {
       id: Date.now().toString(),
@@ -1481,6 +1535,27 @@ const NewReservation = () => {
           </AccordionItem>
 
         </Accordion>
+
+        {/* Action Buttons - Fixed Bottom */}
+        <div className="sticky bottom-0 bg-background border-t px-6 py-4 mt-8">
+          <div className="flex justify-end gap-4 max-w-7xl mx-auto">
+            <Button 
+              variant="outline" 
+              onClick={() => handleSave('DRAFT')}
+              disabled={loading.saving}
+            >
+              {loading.saving ? 'Saving...' : 'Save Draft'}
+            </Button>
+            <Button 
+              id="btn-save-continue"
+              onClick={() => handleSave('ACTIVE')}
+              disabled={loading.saving}
+              className="min-w-32"
+            >
+              {loading.saving ? 'Saving...' : 'Save & Continue'}
+            </Button>
+          </div>
+        </div>
       </div>
 
       {/* Right Sidebar - Summary */}
