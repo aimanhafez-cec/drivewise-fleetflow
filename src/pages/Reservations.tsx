@@ -4,41 +4,35 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Calendar, Car, User, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-
 const Reservations = () => {
   const navigate = useNavigate();
 
   // Mock data - in real app this would come from Supabase
-  const reservations = [
-    {
-      id: '1',
-      customer: 'John Smith',
-      vehicle: 'Toyota Camry 2023',
-      startDate: '2024-01-29',
-      endDate: '2024-02-05',
-      status: 'confirmed',
-      total: 420.00,
-    },
-    {
-      id: '2',
-      customer: 'Sarah Johnson',
-      vehicle: 'Honda Civic 2023',
-      startDate: '2024-01-30',
-      endDate: '2024-02-02',
-      status: 'pending',
-      total: 180.00,
-    },
-    {
-      id: '3',
-      customer: 'Mike Davis',
-      vehicle: 'Ford Explorer 2022',
-      startDate: '2024-01-28',
-      endDate: '2024-01-31',
-      status: 'active',
-      total: 350.00,
-    },
-  ];
-
+  const reservations = [{
+    id: '1',
+    customer: 'John Smith',
+    vehicle: 'Toyota Camry 2023',
+    startDate: '2024-01-29',
+    endDate: '2024-02-05',
+    status: 'confirmed',
+    total: 420.00
+  }, {
+    id: '2',
+    customer: 'Sarah Johnson',
+    vehicle: 'Honda Civic 2023',
+    startDate: '2024-01-30',
+    endDate: '2024-02-02',
+    status: 'pending',
+    total: 180.00
+  }, {
+    id: '3',
+    customer: 'Mike Davis',
+    vehicle: 'Ford Explorer 2022',
+    startDate: '2024-01-28',
+    endDate: '2024-01-31',
+    status: 'active',
+    total: 350.00
+  }];
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'confirmed':
@@ -55,9 +49,7 @@ const Reservations = () => {
         return 'bg-gray-100 text-gray-800';
     }
   };
-
-  return (
-    <div className="space-y-6">
+  return <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Reservations</h1>
@@ -70,10 +62,7 @@ const Reservations = () => {
             <Plus className="mr-2 h-4 w-4" />
             New Reservation
           </Button>
-          <Button variant="secondary" onClick={() => navigate('/reservations/new-multi')}>
-            <Plus className="mr-2 h-4 w-4" />
-            Multi-Line
-          </Button>
+          
           <Button variant="outline" onClick={() => navigate('/planner')}>
             <Calendar className="mr-2 h-4 w-4" />
             Planner
@@ -146,12 +135,7 @@ const Reservations = () => {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {reservations.map((reservation) => (
-              <div
-                key={reservation.id}
-                className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 cursor-pointer"
-                onClick={() => navigate(`/reservations/${reservation.id}`)}
-              >
+            {reservations.map(reservation => <div key={reservation.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 cursor-pointer" onClick={() => navigate(`/reservations/${reservation.id}`)}>
                 <div className="flex items-center space-x-4">
                   <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
                     <User className="h-5 w-5 text-primary" />
@@ -178,13 +162,10 @@ const Reservations = () => {
                 <Badge className={getStatusColor(reservation.status)}>
                   {reservation.status}
                 </Badge>
-              </div>
-            ))}
+              </div>)}
           </div>
         </CardContent>
       </Card>
-    </div>
-  );
+    </div>;
 };
-
 export default Reservations;
