@@ -109,7 +109,7 @@ export type Database = {
           updated_at: string
           vehicle_condition_checkout: Json | null
           vehicle_condition_return: Json | null
-          vehicle_id: string
+          vehicle_id: string | null
         }
         Insert: {
           add_ons?: Json | null
@@ -134,7 +134,7 @@ export type Database = {
           updated_at?: string
           vehicle_condition_checkout?: Json | null
           vehicle_condition_return?: Json | null
-          vehicle_id: string
+          vehicle_id?: string | null
         }
         Update: {
           add_ons?: Json | null
@@ -159,7 +159,7 @@ export type Database = {
           updated_at?: string
           vehicle_condition_checkout?: Json | null
           vehicle_condition_return?: Json | null
-          vehicle_id?: string
+          vehicle_id?: string | null
         }
         Relationships: [
           {
