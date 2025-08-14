@@ -7,17 +7,89 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "13.0.4"
   }
   public: {
     Tables: {
+      agreement_lines: {
+        Row: {
+          additions: Json | null
+          agreement_id: string
+          check_in_at: string | null
+          check_out_at: string | null
+          created_at: string
+          discount: Json | null
+          drivers: Json | null
+          id: string
+          in_location_id: string | null
+          line_net: number
+          line_total: number
+          out_location_id: string | null
+          rate_breakdown: Json | null
+          tax_id: string | null
+          tax_value: number | null
+          updated_at: string
+          vehicle_class_id: string | null
+          vehicle_id: string | null
+        }
+        Insert: {
+          additions?: Json | null
+          agreement_id: string
+          check_in_at?: string | null
+          check_out_at?: string | null
+          created_at?: string
+          discount?: Json | null
+          drivers?: Json | null
+          id?: string
+          in_location_id?: string | null
+          line_net?: number
+          line_total?: number
+          out_location_id?: string | null
+          rate_breakdown?: Json | null
+          tax_id?: string | null
+          tax_value?: number | null
+          updated_at?: string
+          vehicle_class_id?: string | null
+          vehicle_id?: string | null
+        }
+        Update: {
+          additions?: Json | null
+          agreement_id?: string
+          check_in_at?: string | null
+          check_out_at?: string | null
+          created_at?: string
+          discount?: Json | null
+          drivers?: Json | null
+          id?: string
+          in_location_id?: string | null
+          line_net?: number
+          line_total?: number
+          out_location_id?: string | null
+          rate_breakdown?: Json | null
+          tax_id?: string | null
+          tax_value?: number | null
+          updated_at?: string
+          vehicle_class_id?: string | null
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agreement_lines_agreement_id_fkey"
+            columns: ["agreement_id"]
+            isOneToOne: false
+            referencedRelation: "agreements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       agreements: {
         Row: {
           add_ons: Json | null
           agreement_date: string
+          agreement_no: string | null
           checkout_datetime: string | null
           checkout_fuel: number | null
           checkout_odometer: number | null
@@ -42,6 +114,7 @@ export type Database = {
         Insert: {
           add_ons?: Json | null
           agreement_date?: string
+          agreement_no?: string | null
           checkout_datetime?: string | null
           checkout_fuel?: number | null
           checkout_odometer?: number | null
@@ -66,6 +139,7 @@ export type Database = {
         Update: {
           add_ons?: Json | null
           agreement_date?: string
+          agreement_no?: string | null
           checkout_datetime?: string | null
           checkout_fuel?: number | null
           checkout_odometer?: number | null
@@ -591,6 +665,7 @@ export type Database = {
           add_ons: Json | null
           airport_info: Json | null
           billing_address: Json | null
+          converted_agreement_id: string | null
           created_at: string
           created_by: string | null
           customer_id: string
@@ -614,6 +689,7 @@ export type Database = {
           add_ons?: Json | null
           airport_info?: Json | null
           billing_address?: Json | null
+          converted_agreement_id?: string | null
           created_at?: string
           created_by?: string | null
           customer_id: string
@@ -637,6 +713,7 @@ export type Database = {
           add_ons?: Json | null
           airport_info?: Json | null
           billing_address?: Json | null
+          converted_agreement_id?: string | null
           created_at?: string
           created_by?: string | null
           customer_id?: string
@@ -657,6 +734,13 @@ export type Database = {
           vehicle_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "reservations_converted_agreement_id_fkey"
+            columns: ["converted_agreement_id"]
+            isOneToOne: false
+            referencedRelation: "agreements"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "reservations_customer_id_fkey"
             columns: ["customer_id"]
@@ -861,7 +945,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_agreement_no: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
     }
     Enums: {
       agreement_status: "active" | "completed" | "terminated" | "pending_return"
