@@ -483,6 +483,30 @@ const NewReservation = () => {
     }
   };
 
+  // Load tax codes when tax level changes
+  useEffect(() => {
+    const loadTaxCodes = async () => {
+      if (formData.taxLevelId) {
+        setLoading(prev => ({ ...prev, taxCodes: true }));
+        try {
+          const taxCodes = await mockApi.getTaxCodes(formData.taxLevelId);
+          setOptions(prev => ({ ...prev, taxCodes }));
+        } catch (error) {
+          console.error('Failed to load tax codes:', error);
+        } finally {
+          setLoading(prev => ({ ...prev, taxCodes: false }));
+        }
+      } else {
+        // Clear tax codes when no tax level is selected
+        setOptions(prev => ({ ...prev, taxCodes: [] }));
+        // Clear selected tax code
+        updateFormData('taxCodeId', '');
+      }
+    };
+
+    loadTaxCodes();
+  }, [formData.taxLevelId]);
+
   const updateFormData = (field: keyof ExtendedFormData, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (errors[field as keyof ReservationFormData]) {
@@ -1325,7 +1349,7 @@ const NewReservation = () => {
                       <SelectTrigger className={validation.getFieldError('header.taxCodeId') ? "border-destructive" : ""}>
                         <SelectValue placeholder={formData.taxLevelId ? "Select tax code" : "Select tax level first"} />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="bg-background border z-50 max-h-60 overflow-auto">
                         {options.taxCodes.map((option) => (
                           <SelectItem key={option.id} value={option.id}>
                             {option.label}
