@@ -44,7 +44,7 @@ const Reservations = () => {
   const { data: counts } = useQuery({
     queryKey: ['reservations:counts'],
     queryFn: async () => {
-      const [totalQuery, activeQuery, pendingQuery] = await Promise.all([
+      const [totalQuery, checkedOutQuery, pendingQuery] = await Promise.all([
         supabase
           .from('reservations')
           .select('id', { count: 'exact' })
@@ -64,7 +64,7 @@ const Reservations = () => {
 
       return {
         total: totalQuery.count || 0,
-        active: activeQuery.count || 0,
+        active: checkedOutQuery.count || 0,
         pending: pendingQuery.count || 0,
       };
     },
