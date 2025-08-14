@@ -25,19 +25,26 @@ import { cn } from '@/lib/utils';
 import { mockApi, DropdownOption, Customer, ReservationFormData } from '@/lib/api/reservations';
 import { useReservationSummary } from '@/hooks/useReservationSummary';
 import { SummaryCard } from '@/components/reservation/SummaryCard';
+import { ReservationLineGrid } from '@/components/reservation/ReservationLineGrid';
+import { AddLineValidation, validateAddLine, ValidationError } from '@/components/reservation/AddLineValidation';
 
 const STORAGE_KEY = 'new-reservation-draft';
 
 // Extended interfaces for new sections
-interface ReservationLine {
+export interface ReservationLine {
   id: string;
   lineNo: number;
   reservationTypeId: string;
   vehicleClassId: string;
   vehicleId: string;
+  driverId?: string;
   driverName: string;
-  checkOutDate: Date;
-  checkInDate: Date;
+  outAt: Date | null;
+  outLocationId: string;
+  inAt: Date | null;
+  inLocationId: string;
+  checkOutDate: Date | null;
+  checkInDate: Date | null;
   lineNetPrice: number;
   additionAmount: number;
   discountId: string;
@@ -46,6 +53,8 @@ interface ReservationLine {
   taxValue: number;
   lineTotal: number;
   selected: boolean;
+  additions: any[];
+  discounts: any[];
 }
 
 interface Driver {
@@ -275,6 +284,8 @@ const NewReservation = () => {
   const [errors, setErrors] = useState<Partial<Record<keyof ReservationFormData, string>>>({});
   const [customerSearchOpen, setCustomerSearchOpen] = useState(false);
   const [customerSearchQuery, setCustomerSearchQuery] = useState('');
+  const [addLineErrors, setAddLineErrors] = useState<ValidationError[]>([]);
+  const [selectedLines, setSelectedLines] = useState<string[]>([]);
 
   // Load draft from localStorage on mount
   useEffect(() => {
@@ -520,29 +531,190 @@ const NewReservation = () => {
 
   // Helper functions
   const addReservationLine = () => {
+    // Validate required fields
+    const validationErrors = validateAddLine(formData);
+    if (validationErrors.length > 0) {
+      setAddLineErrors(validationErrors);
+      return;
+    }
+
+    // Clear any previous errors
+    setAddLineErrors([]);
+
+    // Calculate pricing (mock calculation)
+    const basePrice = calculateLinePrice(formData);
+    const taxValue = basePrice * 0.1; // 10% tax
+    const lineTotal = basePrice + taxValue;
+
     const newLine: ReservationLine = {
       id: Date.now().toString(),
       lineNo: (formData.reservationLines || []).length + 1,
-      reservationTypeId: formData.vehicleClassId || '',
+      reservationTypeId: formData.reservationTypeId || 'standard',
       vehicleClassId: formData.vehicleClassId || '',
       vehicleId: formData.vehicleId || '',
+      driverId: undefined,
       driverName: '',
-      checkOutDate: formData.checkOutDate || new Date(),
-      checkInDate: formData.checkInDate || new Date(),
-      lineNetPrice: 0,
+      outAt: formData.checkOutDate,
+      outLocationId: formData.checkOutLocationId,
+      inAt: formData.checkInDate,
+      inLocationId: formData.checkInLocationId,
+      checkOutDate: formData.checkOutDate,
+      checkInDate: formData.checkInDate,
+      lineNetPrice: basePrice,
       additionAmount: 0,
       discountId: '',
       discountValue: 0,
-      taxId: '',
-      taxValue: 0,
-      lineTotal: 0,
+      taxId: 'standard',
+      taxValue: taxValue,
+      lineTotal: lineTotal,
       selected: false,
+      additions: [],
+      discounts: []
     };
     
     setFormData(prev => ({
       ...prev,
       reservationLines: [...prev.reservationLines, newLine]
     }));
+
+    // Reset editor with smart defaults (keep dates/locations/price list)
+    setFormData(prev => ({
+      ...prev,
+      vehicleId: '',
+      drivers: []
+    }));
+
+    // Show success toast
+    toast({
+      title: "Line added",
+      description: `Line #${newLine.lineNo} has been added to the reservation.`,
+    });
+
+    // Auto-save draft
+    saveDraftToStorage();
+  };
+
+  const calculateLinePrice = (data: any): number => {
+    // Mock pricing calculation
+    const vehiclePriceMap: Record<string, number> = {
+      'car1': 50,
+      'car2': 60,
+      'car3': 55,
+      'car4': 120
+    };
+    
+    const classPriceMultiplier: Record<string, number> = {
+      'economy': 1.0,
+      'compact': 1.2,
+      'midsize': 1.5,
+      'fullsize': 1.8,
+      'luxury': 2.5
+    };
+
+    const basePrice = vehiclePriceMap[data.vehicleId] || 50;
+    const multiplier = classPriceMultiplier[data.vehicleClassId] || 1.0;
+    
+    // Calculate days
+    if (data.checkOutDate && data.checkInDate) {
+      const diffTime = Math.abs(data.checkInDate.getTime() - data.checkOutDate.getTime());
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      return basePrice * multiplier * diffDays;
+    }
+    
+    return basePrice * multiplier;
+  };
+
+  const saveDraftToStorage = () => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
+  };
+
+  const handleLineUpdate = (lineId: string, updates: Partial<ReservationLine>) => {
+    setFormData(prev => ({
+      ...prev,
+      reservationLines: prev.reservationLines.map(line => 
+        line.id === lineId 
+          ? { 
+              ...line, 
+              ...updates,
+              // Recalculate totals if price changed
+              lineTotal: updates.lineNetPrice !== undefined 
+                ? (updates.lineNetPrice || 0) + (updates.taxValue || line.taxValue || 0)
+                : line.lineTotal
+            }
+          : line
+      )
+    }));
+  };
+
+  const handleLineRemove = (lineId: string) => {
+    setFormData(prev => ({
+      ...prev,
+      reservationLines: prev.reservationLines.filter(line => line.id !== lineId)
+        .map((line, index) => ({ ...line, lineNo: index + 1 })) // Renumber lines
+    }));
+    setSelectedLines(prev => prev.filter(id => id !== lineId));
+  };
+
+  const handleLineDuplicate = (lineId: string) => {
+    const lineToDuplicate = formData.reservationLines.find(line => line.id === lineId);
+    if (lineToDuplicate) {
+      const newLine: ReservationLine = {
+        ...lineToDuplicate,
+        id: Date.now().toString(),
+        lineNo: formData.reservationLines.length + 1,
+        vehicleId: '', // Clear vehicle for new selection
+        driverName: '', // Clear driver
+        selected: false
+      };
+      
+      setFormData(prev => ({
+        ...prev,
+        reservationLines: [...prev.reservationLines, newLine]
+      }));
+
+      toast({
+        title: "Line duplicated",
+        description: `Line #${newLine.lineNo} has been created as a copy.`,
+      });
+    }
+  };
+
+  const handleBulkAction = (action: string) => {
+    if (selectedLines.length === 0) {
+      toast({
+        title: "No lines selected",
+        description: "Please select lines to perform bulk actions.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    switch (action) {
+      case 'remove':
+        selectedLines.forEach(lineId => handleLineRemove(lineId));
+        setSelectedLines([]);
+        toast({
+          title: "Lines removed",
+          description: `${selectedLines.length} lines have been removed.`,
+        });
+        break;
+      case 'apply-rate':
+        // Implement bulk rate application
+        toast({
+          title: "Feature coming soon",
+          description: "Bulk rate application will be available soon.",
+        });
+        break;
+      case 'apply-discount':
+        // Implement bulk discount application
+        toast({
+          title: "Feature coming soon",
+          description: "Bulk discount application will be available soon.",
+        });
+        break;
+      default:
+        break;
+    }
   };
 
   const addDriver = () => {
@@ -871,136 +1043,8 @@ const NewReservation = () => {
             </AccordionContent>
           </AccordionItem>
 
-          {/* B) Reservation Lines */}
-          <AccordionItem value="reservation-lines" className="border rounded-lg">
-            <AccordionTrigger className="px-6 py-4 hover:no-underline">
-              <div className="flex items-center gap-2">
-                <Car className="h-5 w-5" />
-                <span className="font-semibold">Reservation Lines</span>
-                {(formData.reservationLines || []).length > 0 && (
-                  <Badge variant="secondary" className="ml-2">
-                    {(formData.reservationLines || []).length} lines
-                  </Badge>
-                )}
-              </div>
-            </AccordionTrigger>
-            <AccordionContent className="px-6 pb-6">
-              <div className="space-y-4">
-                {/* Toolbar */}
-                <div className="flex items-center gap-2">
-                  <Select>
-                    <SelectTrigger id="lines-action" className="w-48">
-                      <SelectValue placeholder="Select action" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="add-vehicle">Add Vehicle</SelectItem>
-                      <SelectItem value="duplicate">Duplicate Selected</SelectItem>
-                      <SelectItem value="remove">Remove Selected</SelectItem>
-                      <SelectItem value="apply-rate">Apply Rate</SelectItem>
-                      <SelectItem value="apply-discount">Apply Discount</SelectItem>
-                      <SelectItem value="apply-misc">Apply Misc Charge</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Button size="sm">Apply</Button>
-                  <div className="ml-auto">
-                    <Button size="sm" onClick={addReservationLine}>
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add Line
-                    </Button>
-                  </div>
-                </div>
 
-                {/* Lines Table */}
-                {(formData.reservationLines || []).length > 0 ? (
-                  <div className="border rounded-lg">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead className="w-12">
-                            <Checkbox />
-                          </TableHead>
-                          <TableHead>Line No.</TableHead>
-                          <TableHead>Reservation Type</TableHead>
-                          <TableHead>Vehicle Class</TableHead>
-                          <TableHead>Vehicle</TableHead>
-                          <TableHead>Driver Name</TableHead>
-                          <TableHead>Check Out</TableHead>
-                          <TableHead>Check In</TableHead>
-                          <TableHead>Line Net Price</TableHead>
-                          <TableHead>Line Total</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {(formData.reservationLines || []).map((line) => (
-                          <TableRow key={line.id}>
-                            <TableCell>
-                              <Checkbox />
-                            </TableCell>
-                            <TableCell>{line.lineNo}</TableCell>
-                            <TableCell>
-                              <Select>
-                                <SelectTrigger className="w-full">
-                                  <SelectValue placeholder="Type" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="standard">Standard</SelectItem>
-                                  <SelectItem value="premium">Premium</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </TableCell>
-                            <TableCell>
-                              <Select>
-                                <SelectTrigger className="w-full">
-                                  <SelectValue placeholder="Class" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="economy">Economy</SelectItem>
-                                  <SelectItem value="compact">Compact</SelectItem>
-                                  <SelectItem value="midsize">Midsize</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </TableCell>
-                            <TableCell>
-                              <Select>
-                                <SelectTrigger className="w-full">
-                                  <SelectValue placeholder="Vehicle" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="car1">Toyota Camry</SelectItem>
-                                  <SelectItem value="car2">Honda Accord</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </TableCell>
-                            <TableCell>
-                              <Input placeholder="Driver name" className="w-full" />
-                            </TableCell>
-                            <TableCell>
-                              <Input type="datetime-local" className="w-full" />
-                            </TableCell>
-                            <TableCell>
-                              <Input type="datetime-local" className="w-full" />
-                            </TableCell>
-                            <TableCell>
-                              <Input type="number" value={line.lineNetPrice} className="w-full" readOnly />
-                            </TableCell>
-                            <TableCell>
-                              <Input type="number" value={line.lineTotal} className="w-full" readOnly />
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-                ) : (
-                  <div className="text-center py-8 text-muted-foreground">
-                    No reservation lines added yet. Click "Add Line" to get started.
-                  </div>
-                )}
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-
-          {/* C) Vehicle(s) & Driver(s) */}
+          {/* B) Vehicle(s) & Driver(s) */}
           <AccordionItem value="vehicles-drivers" className="border rounded-lg">
             <AccordionTrigger className="px-6 py-4 hover:no-underline">
               <div className="flex items-center gap-2">
@@ -1099,10 +1143,13 @@ const NewReservation = () => {
                         </div>
                       </div>
                       
+                      {/* Add Line Validation */}
+                      <AddLineValidation errors={addLineErrors} />
+                      
                       <div className="mt-4">
-                        <Button onClick={addReservationLine}>
+                        <Button id="btn-add-line" onClick={addReservationLine}>
                           <Plus className="h-4 w-4 mr-2" />
-                          Add Vehicle
+                          Add Line
                         </Button>
                       </div>
                     </CardContent>
@@ -1900,6 +1947,50 @@ const NewReservation = () => {
                     )}
                   </div>
                 </div>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+
+          {/* L) Reservation Lines - Final Section */}
+          <AccordionItem value="reservation-lines" className="border rounded-lg">
+            <AccordionTrigger className="px-6 py-4 hover:no-underline">
+              <div className="flex items-center gap-2">
+                <Car className="h-5 w-5" />
+                <span className="font-semibold">Reservation Lines</span>
+                {(formData.reservationLines || []).length > 0 && (
+                  <Badge variant="secondary" className="ml-2">
+                    {(formData.reservationLines || []).length} lines
+                  </Badge>
+                )}
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="px-6 pb-6">
+              <div className="space-y-4">
+                {/* Toolbar */}
+                <div className="flex items-center gap-2">
+                  <Select onValueChange={handleBulkAction}>
+                    <SelectTrigger id="lines-action" className="w-48">
+                      <SelectValue placeholder="Select action" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="duplicate">Duplicate Selected</SelectItem>
+                      <SelectItem value="remove">Remove Selected</SelectItem>
+                      <SelectItem value="apply-rate">Apply Rate</SelectItem>
+                      <SelectItem value="apply-discount">Apply Discount</SelectItem>
+                      <SelectItem value="apply-misc">Apply Misc Charge</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Lines Grid */}
+                <ReservationLineGrid
+                  lines={formData.reservationLines || []}
+                  onLineUpdate={handleLineUpdate}
+                  onLineRemove={handleLineRemove}
+                  onLineDuplicate={handleLineDuplicate}
+                  onSelectionChange={setSelectedLines}
+                  selectedLines={selectedLines}
+                />
               </div>
             </AccordionContent>
           </AccordionItem>
