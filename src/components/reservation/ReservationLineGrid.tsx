@@ -175,7 +175,7 @@ export const ReservationLineGrid: React.FC<ReservationLineGridProps> = ({
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    {line.drivers.length > 0 ? (
+                    {line.drivers && line.drivers.length > 0 ? (
                       <>
                         <span className="text-sm">
                           {line.drivers.find(d => d.role === 'PRIMARY')?.driverId || 'None'}
