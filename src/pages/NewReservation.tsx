@@ -110,31 +110,6 @@ interface ExtendedFormData extends ReservationFormData {
   departureAirline: string;
   departurePassengers: number;
   
-  // Additional rental information fields
-  reservationMethodId: string;
-  reservationTypeId: string;
-  businessUnitId: string;
-  paymentTermsId: string;
-  validityDateTo: Date | null;
-  customerBillToId: string;
-  discountTypeId: string;
-  discountValue: number;
-  contractBillingPlanId: string;
-  taxLevelId: string;
-  taxCodeId: string;
-  leaseToOwn: boolean;
-}
-  arrivalDateTime: Date | null;
-  arrivalAirline: string;
-  arrivalPassengers: number;
-  departureFlightNo: string;
-  departureAirport: string;
-  departureCity: string;
-  departureZipCode: string;
-  departureDateTime: Date | null;
-  departureAirline: string;
-  departurePassengers: number;
-  
   // Rate & Taxes
   priceListId: string;
   promotionCode: string;
@@ -189,7 +164,18 @@ interface ExtendedFormData extends ReservationFormData {
   referralValue: number;
   
   // Additional rental information fields
+  reservationMethodId: string;
+  reservationTypeId: string;
+  businessUnitId: string;
+  paymentTermsId: string;
+  validityDateTo: Date | null;
   customerBillToId: string;
+  discountTypeId: string;
+  discountValue: number;
+  contractBillingPlanId: string;
+  taxLevelId: string;
+  taxCodeId: string;
+  leaseToOwn: boolean;
 }
 
 const NewReservation = () => {
