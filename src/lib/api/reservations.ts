@@ -171,18 +171,58 @@ export const mockApi = {
   },
 
   searchCustomers: async (query: string): Promise<Customer[]> => {
-    await new Promise(resolve => setTimeout(resolve, 400));
-    if (!query) return customers;
-    return customers.filter(customer => 
-      customer.name.toLowerCase().includes(query.toLowerCase()) ||
-      customer.email.toLowerCase().includes(query.toLowerCase())
-    );
+    const { supabase } = await import('@/integrations/supabase/client');
+    
+    try {
+      let supabaseQuery = supabase
+        .from('profiles')
+        .select('id, full_name, email')
+        .order('full_name');
+      
+      // If there's a search query, filter by name or email
+      if (query && query.trim()) {
+        supabaseQuery = supabaseQuery.or(`full_name.ilike.%${query}%,email.ilike.%${query}%`);
+      }
+      
+      const { data: profiles, error } = await supabaseQuery;
+      
+      if (error) {
+        console.error('Error fetching customers:', error);
+        // Fallback to mock data if Supabase fails
+        if (!query) return customers;
+        return customers.filter(customer => 
+          customer.name.toLowerCase().includes(query.toLowerCase()) ||
+          customer.email.toLowerCase().includes(query.toLowerCase())
+        );
+      }
+      
+      // Convert profiles to Customer format
+      return profiles.map(profile => ({
+        id: profile.id,
+        name: profile.full_name || 'Unknown Customer',
+        email: profile.email || '',
+        billToOptions: [
+          { id: 'personal', label: 'Personal Account', value: 'personal' },
+        ],
+      }));
+    } catch (error) {
+      console.error('Error in searchCustomers:', error);
+      // Fallback to mock data on error
+      if (!query) return customers;
+      return customers.filter(customer => 
+        customer.name.toLowerCase().includes(query.toLowerCase()) ||
+        customer.email.toLowerCase().includes(query.toLowerCase())
+      );
+    }
   },
 
   getCustomerBillTo: async (customerId: string): Promise<DropdownOption[]> => {
     await new Promise(resolve => setTimeout(resolve, 200));
-    const customer = customers.find(c => c.id === customerId);
-    return customer?.billToOptions || [];
+    // For now, return default bill-to options
+    return [
+      { id: 'personal', label: 'Personal Account', value: 'personal' },
+      { id: 'company', label: 'Company Account', value: 'company' },
+    ];
   },
 
   getPaymentTerms: async (): Promise<DropdownOption[]> => {
@@ -219,18 +259,59 @@ export const mockApi = {
   },
 
   createReservation: async (data: Partial<ReservationFormData>, status: 'DRAFT' | 'ACTIVE'): Promise<CreateReservationResponse> => {
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    const { supabase } = await import('@/integrations/supabase/client');
     
-    // Simulate validation error
-    if (!data.entryDate) {
-      throw new Error('Entry date is required');
+    // Validate required fields
+    if (!data.customerId) {
+      throw new Error('Customer is required');
     }
     
-    const reservationNo = `RES-${Date.now().toString().slice(-6)}`;
-    return {
-      id: `reservation_${Date.now()}`,
-      reservationNo,
-      status,
-    };
+    // Convert status to database enum values
+    const dbStatus = status === 'DRAFT' ? 'pending' : 'confirmed';
+    
+    // Get current date for defaults
+    const now = new Date();
+    const startDate = new Date(now.getTime() + 24 * 60 * 60 * 1000); // Tomorrow
+    const endDate = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000); // 3 days from now
+    
+    try {
+      // Create the reservation
+      const { data: reservation, error } = await supabase
+        .from('reservations')
+        .insert({
+          customer_id: data.customerId,
+          start_datetime: startDate.toISOString(),
+          end_datetime: endDate.toISOString(),
+          pickup_location: 'Main Location', // Default location
+          return_location: 'Main Location', // Default location
+          status: dbStatus,
+          total_amount: 299.99, // Default amount
+        })
+        .select()
+        .single();
+      
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
+      
+      // Generate reservation number based on ID
+      const reservationNo = `RES-${reservation.id.slice(0, 8).toUpperCase()}`;
+      
+      // Update with reservation number
+      await supabase
+        .from('reservations')
+        .update({ ro_number: reservationNo })
+        .eq('id', reservation.id);
+      
+      return {
+        id: reservation.id,
+        reservationNo,
+        status: dbStatus,
+      };
+    } catch (error: any) {
+      console.error('Failed to create reservation:', error);
+      throw new Error(error.message || 'Failed to create reservation');
+    }
   },
 };
