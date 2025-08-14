@@ -1488,6 +1488,7 @@ const NewReservation = () => {
         <div className="sticky top-6">
           <SummaryCard
             summary={summary}
+            currencyCode={formData.currencyCode}
           />
         </div>
       </div>
