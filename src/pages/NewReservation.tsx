@@ -534,7 +534,7 @@ const NewReservation = () => {
   const addReservationLine = () => {
     const newLine: ReservationLine = {
       id: Date.now().toString(),
-      lineNo: formData.reservationLines.length + 1,
+      lineNo: (formData.reservationLines || []).length + 1,
       reservationTypeId: formData.vehicleClassId || '',
       vehicleClassId: formData.vehicleClassId || '',
       vehicleId: formData.vehicleId || '',
@@ -889,9 +889,9 @@ const NewReservation = () => {
               <div className="flex items-center gap-2">
                 <Car className="h-5 w-5" />
                 <span className="font-semibold">Reservation Lines</span>
-                {formData.reservationLines.length > 0 && (
+                {(formData.reservationLines || []).length > 0 && (
                   <Badge variant="secondary" className="ml-2">
-                    {formData.reservationLines.length} lines
+                    {(formData.reservationLines || []).length} lines
                   </Badge>
                 )}
               </div>
@@ -923,7 +923,7 @@ const NewReservation = () => {
                 </div>
 
                 {/* Lines Table */}
-                {formData.reservationLines.length > 0 ? (
+                {(formData.reservationLines || []).length > 0 ? (
                   <div className="border rounded-lg">
                     <Table>
                       <TableHeader>
@@ -943,7 +943,7 @@ const NewReservation = () => {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {formData.reservationLines.map((line) => (
+                        {(formData.reservationLines || []).map((line) => (
                           <TableRow key={line.id}>
                             <TableCell>
                               <Checkbox />
@@ -1130,9 +1130,9 @@ const NewReservation = () => {
                     </Button>
                   </div>
                   
-                  {formData.drivers.length > 0 ? (
+                  {(formData.drivers || []).length > 0 ? (
                     <div className="space-y-4">
-                      {formData.drivers.map((driver, index) => (
+                      {(formData.drivers || []).map((driver, index) => (
                         <Card key={driver.id}>
                           <CardContent className="pt-6">
                             <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
@@ -1163,7 +1163,7 @@ const NewReservation = () => {
                                     <SelectValue placeholder="Select line" />
                                   </SelectTrigger>
                                   <SelectContent>
-                                    {formData.reservationLines.map((line) => (
+                                    {(formData.reservationLines || []).map((line) => (
                                       <SelectItem key={line.id} value={line.id}>
                                         Line {line.lineNo}
                                       </SelectItem>
@@ -1519,9 +1519,9 @@ const NewReservation = () => {
               <div className="flex items-center gap-2">
                 <Plus className="h-5 w-5" />
                 <span className="font-semibold">Miscellaneous Charges</span>
-                {formData.selectedMiscCharges.length > 0 && (
+                {(formData.selectedMiscCharges || []).length > 0 && (
                   <Badge variant="secondary" className="ml-2">
-                    {formData.selectedMiscCharges.length} selected
+                    {(formData.selectedMiscCharges || []).length} selected
                   </Badge>
                 )}
               </div>
@@ -1538,12 +1538,12 @@ const NewReservation = () => {
                   <div key={charge.id} className="flex items-center justify-between p-3 border rounded-lg">
                     <div className="flex items-center gap-3">
                       <Checkbox 
-                        checked={formData.selectedMiscCharges.includes(charge.id)}
+                        checked={(formData.selectedMiscCharges || []).includes(charge.id)}
                         onCheckedChange={(checked) => {
                           if (checked) {
-                            updateFormData('selectedMiscCharges', [...formData.selectedMiscCharges, charge.id]);
+                            updateFormData('selectedMiscCharges', [...(formData.selectedMiscCharges || []), charge.id]);
                           } else {
-                            updateFormData('selectedMiscCharges', formData.selectedMiscCharges.filter(id => id !== charge.id));
+                            updateFormData('selectedMiscCharges', (formData.selectedMiscCharges || []).filter(id => id !== charge.id));
                           }
                         }}
                       />
@@ -1661,7 +1661,7 @@ const NewReservation = () => {
                     rows={4}
                     maxLength={500}
                   />
-                  <p className="text-xs text-muted-foreground">{formData.note.length}/500 characters</p>
+                  <p className="text-xs text-muted-foreground">{(formData.note || '').length}/500 characters</p>
                 </div>
                 <div className="space-y-2">
                   <Label>Special Note</Label>
@@ -1672,7 +1672,7 @@ const NewReservation = () => {
                     rows={4}
                     maxLength={500}
                   />
-                  <p className="text-xs text-muted-foreground">{formData.specialNote.length}/500 characters</p>
+                  <p className="text-xs text-muted-foreground">{(formData.specialNote || '').length}/500 characters</p>
                 </div>
               </div>
             </AccordionContent>
