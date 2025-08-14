@@ -14,9 +14,10 @@ const Reservations = () => {
   const queryClient = useQueryClient();
 
   // Fetch open reservations (not converted/cancelled)
-  const { data: reservations, isLoading } = useQuery({
+  const { data: reservations, isLoading, error } = useQuery({
     queryKey: ['reservations:open'],
     queryFn: async () => {
+      console.log('Fetching reservations...');
       const { data, error } = await supabase
         .from('reservations')
         .select(`
@@ -35,7 +36,11 @@ const Reservations = () => {
         .is('converted_agreement_id', null)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      console.log('Reservations query result:', { data, error });
+      if (error) {
+        console.error('Reservations query error:', error);
+        throw error;
+      }
       return data;
     },
   });
