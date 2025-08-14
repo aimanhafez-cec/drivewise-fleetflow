@@ -662,6 +662,29 @@ const NewReservation = () => {
 
     // Auto-save draft
     saveDraftToStorage();
+
+    // Auto-scroll to the grid and highlight the new row
+    setTimeout(() => {
+      const gridElement = document.getElementById('grid-reservation-lines');
+      if (gridElement) {
+        gridElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        
+        // Highlight the new row
+        const newRowElement = document.querySelector(`[data-id="row-${newLine.lineNo}"]`);
+        if (newRowElement) {
+          newRowElement.classList.add('bg-primary/10', 'animate-pulse');
+          setTimeout(() => {
+            newRowElement.classList.remove('bg-primary/10', 'animate-pulse');
+          }, 1500);
+        }
+      }
+      
+      // Focus on vehicle field for next entry
+      const vehicleField = document.querySelector('[data-id="vehicle-select"]');
+      if (vehicleField) {
+        (vehicleField as HTMLElement).focus();
+      }
+    }, 100);
   };
 
   const calculateLinePrice = (data: any): number => {
@@ -1180,7 +1203,7 @@ const NewReservation = () => {
                             <div className="space-y-2">
                               <Label>Vehicle <span className="text-destructive">*</span></Label>
                               <Select value={formData.vehicleId} onValueChange={(value) => updateFormData('vehicleId', value)}>
-                                <SelectTrigger>
+                                <SelectTrigger data-id="vehicle-select">
                                   <SelectValue placeholder="Select vehicle" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -1347,6 +1370,62 @@ const NewReservation = () => {
             </AccordionContent>
           </AccordionItem>
 
+          {/* Reservation Lines Grid - Directly below Vehicle & Driver */}
+          <div className="space-y-4">
+            {/* Show grid when there are lines or after first add */}
+            {(formData.reservationLines || []).length > 0 && (
+              <Card className="border rounded-lg">
+                <CardHeader className="px-6 py-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Car className="h-5 w-5" />
+                      <CardTitle className="text-lg">Reservation Lines</CardTitle>
+                      <Badge variant="secondary" className="ml-2">
+                        {(formData.reservationLines || []).length} lines
+                      </Badge>
+                    </div>
+                    
+                    {/* Bulk actions */}
+                    {(formData.reservationLines || []).length > 0 && (
+                      <div className="flex items-center gap-2">
+                        <Select onValueChange={handleBulkAction}>
+                          <SelectTrigger id="lines-action" className="w-48">
+                            <SelectValue placeholder="Bulk actions" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="duplicate">Duplicate Selected</SelectItem>
+                            <SelectItem value="remove">Remove Selected</SelectItem>
+                            <SelectItem value="apply-rate">Apply Rate</SelectItem>
+                            <SelectItem value="apply-discount">Apply Discount</SelectItem>
+                            <SelectItem value="apply-misc">Apply Misc Charge</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleBulkAction('apply')}
+                          disabled={selectedLines.length === 0}
+                        >
+                          Apply
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </CardHeader>
+                <CardContent className="px-6 pb-6">
+                  <ReservationLineGrid
+                    lines={formData.reservationLines || []}
+                    onLineUpdate={handleLineUpdate}
+                    onLineRemove={handleLineRemove}
+                    onLineDuplicate={handleLineDuplicate}
+                    onSelectionChange={setSelectedLines}
+                    selectedLines={selectedLines}
+                  />
+                </CardContent>
+              </Card>
+            )}
+          </div>
           
           {/* D) Airport Information */}
           <AccordionItem value="airport-info" className="border rounded-lg">
@@ -2072,60 +2151,6 @@ const NewReservation = () => {
             </AccordionContent>
           </AccordionItem>
 
-          {/* L) Reservation Lines - Final Section */}
-          <AccordionItem value="reservation-lines" className="border rounded-lg">
-            <AccordionTrigger className="px-6 py-4 hover:no-underline">
-              <div className="flex items-center gap-2">
-                <Car className="h-5 w-5" />
-                <span className="font-semibold">Reservation Lines</span>
-                {(formData.reservationLines || []).length > 0 && (
-                  <Badge variant="secondary" className="ml-2">
-                    {(formData.reservationLines || []).length} lines
-                  </Badge>
-                )}
-              </div>
-            </AccordionTrigger>
-            <AccordionContent className="px-6 pb-6">
-              <div className="space-y-4">
-                {/* Header toolbar with bulk actions only */}
-                {(formData.reservationLines || []).length > 0 && (
-                  <div className="flex justify-end items-center gap-2 p-4 bg-muted/30 rounded-lg">
-                    <Select onValueChange={handleBulkAction}>
-                      <SelectTrigger id="lines-action" className="w-48">
-                        <SelectValue placeholder="Bulk actions" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="duplicate">Duplicate Selected</SelectItem>
-                        <SelectItem value="remove">Remove Selected</SelectItem>
-                        <SelectItem value="apply-rate">Apply Rate</SelectItem>
-                        <SelectItem value="apply-discount">Apply Discount</SelectItem>
-                        <SelectItem value="apply-misc">Apply Misc Charge</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleBulkAction('apply')}
-                      disabled={selectedLines.length === 0}
-                    >
-                      Apply
-                    </Button>
-                  </div>
-                )}
-
-                {/* Lines Grid */}
-                <ReservationLineGrid
-                  lines={formData.reservationLines || []}
-                  onLineUpdate={handleLineUpdate}
-                  onLineRemove={handleLineRemove}
-                  onLineDuplicate={handleLineDuplicate}
-                  onSelectionChange={setSelectedLines}
-                  selectedLines={selectedLines}
-                />
-              </div>
-            </AccordionContent>
-          </AccordionItem>
 
         </Accordion>
 

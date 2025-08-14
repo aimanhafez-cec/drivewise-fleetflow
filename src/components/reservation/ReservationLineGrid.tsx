@@ -117,7 +117,7 @@ export const ReservationLineGrid: React.FC<ReservationLineGridProps> = ({
           {lines.map((line) => {
             const isSelected = selectedLines.includes(line.id);
             return (
-              <TableRow key={line.id} className={cn(isSelected && "bg-muted/50")}>
+              <TableRow key={line.id} className={cn(isSelected && "bg-muted/50")} data-id={`row-${line.lineNo}`}>
                 <TableCell>
                   <Checkbox 
                     checked={isSelected}
