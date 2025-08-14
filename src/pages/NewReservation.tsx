@@ -652,10 +652,18 @@ const NewReservation = () => {
       discounts: []
     };
     
-    setFormData(prev => ({
-      ...prev,
-      reservationLines: [...prev.reservationLines, newLine]
-    }));
+    console.log('Before adding line, current reservationLines:', formData.reservationLines);
+    console.log('New line to add:', newLine);
+    
+    setFormData(prev => {
+      console.log('In setFormData, prev.reservationLines:', prev.reservationLines);
+      const updatedLines = [...(prev.reservationLines || []), newLine];
+      console.log('Updated lines array:', updatedLines);
+      return {
+        ...prev,
+        reservationLines: updatedLines
+      };
+    });
 
     // Reset editor with smart defaults (keep dates/locations/price list, clear vehicle & driver)
     setFormData(prev => ({
