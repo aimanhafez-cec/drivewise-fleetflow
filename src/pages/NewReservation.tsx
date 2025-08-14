@@ -35,6 +35,7 @@ import { DriverPicker } from '@/components/reservation/DriverPicker';
 import { usePricingContext, calculateLinePrice, PricingContext } from '@/hooks/usePricingContext';
 import { RepriceBanner } from '@/components/reservation/RepriceBanner';
 import { useFormValidation, ValidationRules } from '@/hooks/useFormValidation';
+import { useReservationValidation } from '@/hooks/useReservationValidation';
 
 const STORAGE_KEY = 'new-reservation-draft';
 
@@ -370,45 +371,41 @@ const NewReservation = () => {
     setLastPricingHash(pricingHash);
   }, [formData.priceListId, formData.promotionCode, formData.hourlyRate, formData.dailyRate, formData.weeklyRate, formData.monthlyRate, formData.kilometerCharge, formData.dailyKilometerAllowed, formData.reservationLines.length]);
 
-  // Validation rules
-  const validationRules: ValidationRules = {
-    entryDate: { required: true },
-    reservationMethod: { required: true },
-    currencyCode: { required: true },
-    reservationTypeId: { required: true },
-    businessUnitId: { required: true },
-    customerId: { required: true },
-    paymentTermsId: { required: true },
-    priceListId: { required: true },
-    vehicleClassId: { required: true },
-    vehicleId: { required: true },
-    checkOutDate: { required: true },
-    checkOutLocationId: { required: true },
-    checkInDate: { required: true },
-    checkInLocationId: { required: true }
-  };
+  // Use comprehensive validation system
+  const validation = useReservationValidation();
 
+  // Field labels for error mapping
   const fieldLabels = {
-    entryDate: 'Reservation Entry Date',
-    reservationMethod: 'Reservation Method',
-    currencyCode: 'Currency',
-    reservationTypeId: 'Reservation Type',
-    businessUnitId: 'Business Unit',
-    customerId: 'Customer Name',
-    paymentTermsId: 'Payment Terms',
-    priceListId: 'Price List',
-    vehicleClassId: 'Vehicle Class',
-    vehicleId: 'Vehicle',
-    checkOutDate: 'Check Out Date',
-    checkOutLocationId: 'Check Out Location',
-    checkInDate: 'Check In Date',
-    checkInLocationId: 'Check In Location'
+    'header.entryDate': 'Reservation Entry Date',
+    'header.reservationMethodId': 'Reservation Method',
+    'header.currencyCode': 'Currency',
+    'header.reservationTypeId': 'Reservation Type',
+    'header.businessUnitId': 'Business Unit',
+    'header.customerId': 'Customer Name',
+    'header.paymentTermsId': 'Payment Terms',
+    'header.priceListId': 'Price List',
+    'header.validityDateTo': 'Validity Date To',
+    'header.taxLevelId': 'Tax Level',
+    'header.taxCodeId': 'Tax Code',
+    'header.billingCustomerName': 'Billing Customer Name',
+    'header.billingMail': 'Billing Email',
+    'header.billingPhone': 'Billing Phone',
+    'header.billingAddress': 'Billing Address',
+    'header.arrivalFlightNo': 'Arrival Flight Number',
+    'header.arrivalDateTime': 'Arrival Date & Time',
+    'header.arrivalAirline': 'Arrival Airline',
+    'header.departureFlightNo': 'Departure Flight Number',
+    'header.departureDateTime': 'Departure Date & Time',
+    'header.departureAirline': 'Departure Airline',
+    'header.insuranceLevel': 'Insurance Level',
+    'header.insuranceProvider': 'Insurance Provider',
+    'header.paymentMethod': 'Payment Method',
+    'header.depositMethod': 'Deposit Method',
+    'header.depositPaymentMethod': 'Deposit Payment Method',
+    'header.benefitType': 'Benefit Type',
+    'header.benefitValue': 'Benefit Value',
+    'lines': 'Reservation Lines'
   };
-
-  const validation = useFormValidation({
-    rules: validationRules,
-    data: formData
-  });
 
   // Use the new summary hook and pricing context
   const summary = useReservationSummary(formData);
@@ -679,43 +676,72 @@ const NewReservation = () => {
     }
   };
 
+  // Validate form data before saving
+  const validateBeforeSave = (status: 'DRAFT' | 'ACTIVE') => {
+    if (status === 'DRAFT') return { success: true, errors: [] };
+
+    // Prepare data for validation
+    const validationData = {
+      header: {
+        entryDate: formData.entryDate,
+        reservationMethodId: formData.reservationMethodId,
+        currencyCode: formData.currencyCode,
+        reservationTypeId: formData.reservationTypeId,
+        businessUnitId: formData.businessUnitId,
+        customerId: formData.customerId,
+        paymentTermsId: formData.paymentTermsId,
+        priceListId: formData.priceListId,
+        validityDateTo: formData.validityDateTo ? format(formData.validityDateTo, 'yyyy-MM-dd') : undefined,
+        taxLevelId: formData.taxLevelId,
+        taxCodeId: formData.taxCodeId,
+        billingType: formData.billingType === 'other' ? 'OTHER' : 'SAME_AS_CUSTOMER',
+        billingCustomerName: formData.billingCustomerName,
+        billingMail: formData.billingMail,
+        billingPhone: formData.billingPhone,
+        billingAddress: formData.billingAddress,
+        arrivalFlightNo: formData.arrivalFlightNo,
+        arrivalDateTime: formData.arrivalDateTime ? formData.arrivalDateTime.toISOString() : undefined,
+        arrivalAirline: formData.arrivalAirline,
+        departureFlightNo: formData.departureFlightNo,
+        departureDateTime: formData.departureDateTime ? formData.departureDateTime.toISOString() : undefined,
+        departureAirline: formData.departureAirline,
+        insuranceLevel: formData.insuranceLevelId,
+        insuranceProvider: formData.insuranceProviderId,
+        advancePayment: formData.advancePayment,
+        paymentMethod: formData.paymentMethodId,
+        securityDepositPaid: formData.securityDepositPaid,
+        depositMethod: formData.depositMethodId,
+        depositPaymentMethod: formData.depositPaymentMethodId,
+        benefitType: formData.referralBenefitTypeId,
+        benefitValue: formData.referralValue,
+      },
+      lines: formData.reservationLines?.map(line => ({
+        vehicleClassId: line.vehicleClassId,
+        vehicleId: line.vehicleId,
+        checkOutDate: line.checkOutDate ? format(line.checkOutDate, 'yyyy-MM-dd') : '',
+        checkOutLocationId: line.outLocationId,
+        checkInDate: line.checkInDate ? format(line.checkInDate, 'yyyy-MM-dd') : '',
+        checkInLocationId: line.inLocationId,
+      })) || []
+    };
+
+    return validation.validateForm(validationData);
+  };
+
   const handleSave = async (status: 'DRAFT' | 'ACTIVE') => {
     setLoading(prev => ({ ...prev, saving: true }));
     
     try {
-      // For ACTIVE status, validate all required fields
-      if (status === 'ACTIVE') {
-        validation.markAllTouched();
-        
-        // Check basic validation
-        if (!validation.isValid) {
-          // Find first error field and focus it
-          const firstErrorField = Object.keys(validation.errors)[0];
-          if (firstErrorField) {
-            const element = document.getElementById(firstErrorField);
-            if (element) {
-              element.focus();
-              element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-          }
-          
-          toast({
-            title: "Validation Error",
-            description: "Please correct the errors before continuing",
-            variant: "destructive",
-          });
-          return;
-        }
-        
-        // Check for at least one reservation line
-        if (!formData.reservationLines || formData.reservationLines.length === 0) {
-          toast({
-            title: "Validation Error", 
-            description: "At least one reservation line is required to continue",
-            variant: "destructive",
-          });
-          return;
-        }
+      // Validate form before saving
+      const validationResult = validateBeforeSave(status);
+      
+      if (!validationResult.success) {
+        toast({
+          title: "Validation Error",
+          description: "Please correct the errors before continuing",
+          variant: "destructive",
+        });
+        return;
       }
 
       // Create idempotency key
@@ -741,13 +767,30 @@ const NewReservation = () => {
       } else {
         throw new Error('Failed to save reservation');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Save error:', error);
-      toast({
-        title: "Error",
-        description: "Failed to save reservation. Please try again.",
-        variant: "destructive",
-      });
+      
+      // Handle structured validation errors from server
+      if (error.status === 422 && error.errors) {
+        validation.applyServerErrors(error.errors);
+        toast({
+          title: "Validation Error",
+          description: "Please correct the errors highlighted below",
+          variant: "destructive",
+        });
+      } else if (error.status === 409) {
+        toast({
+          title: "Conflict Error",
+          description: "Vehicle not available for selected dates",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to save reservation. Please try again.",
+          variant: "destructive",
+        });
+      }
     } finally {
       setLoading(prev => ({ ...prev, saving: false }));
     }
@@ -764,6 +807,55 @@ const NewReservation = () => {
     };
     
     setSelectedDrivers(prev => [...prev, newDriver]);
+  };
+
+  // Handle validate now functionality
+  const handleValidateNow = () => {
+    const validationData = {
+      header: {
+        entryDate: formData.entryDate,
+        reservationMethodId: formData.reservationMethodId,
+        currencyCode: formData.currencyCode,
+        reservationTypeId: formData.reservationTypeId,
+        businessUnitId: formData.businessUnitId,
+        customerId: formData.customerId,
+        paymentTermsId: formData.paymentTermsId,
+        priceListId: formData.priceListId,
+        validityDateTo: formData.validityDateTo ? format(formData.validityDateTo, 'yyyy-MM-dd') : undefined,
+        taxLevelId: formData.taxLevelId,
+        taxCodeId: formData.taxCodeId,
+        billingType: formData.billingType === 'other' ? 'OTHER' : 'SAME_AS_CUSTOMER',
+        billingCustomerName: formData.billingCustomerName,
+        billingMail: formData.billingMail,
+        billingPhone: formData.billingPhone,
+        billingAddress: formData.billingAddress,
+        arrivalFlightNo: formData.arrivalFlightNo,
+        arrivalDateTime: formData.arrivalDateTime ? formData.arrivalDateTime.toISOString() : undefined,
+        arrivalAirline: formData.arrivalAirline,
+        departureFlightNo: formData.departureFlightNo,
+        departureDateTime: formData.departureDateTime ? formData.departureDateTime.toISOString() : undefined,
+        departureAirline: formData.departureAirline,
+        insuranceLevel: formData.insuranceLevelId,
+        insuranceProvider: formData.insuranceProviderId,
+        advancePayment: formData.advancePayment,
+        paymentMethod: formData.paymentMethodId,
+        securityDepositPaid: formData.securityDepositPaid,
+        depositMethod: formData.depositMethodId,
+        depositPaymentMethod: formData.depositPaymentMethodId,
+        benefitType: formData.referralBenefitTypeId,
+        benefitValue: formData.referralValue,
+      },
+      lines: formData.reservationLines?.map(line => ({
+        vehicleClassId: line.vehicleClassId,
+        vehicleId: line.vehicleId,
+        checkOutDate: line.checkOutDate ? format(line.checkOutDate, 'yyyy-MM-dd') : '',
+        checkOutLocationId: line.outLocationId,
+        checkInDate: line.checkInDate ? format(line.checkInDate, 'yyyy-MM-dd') : '',
+        checkInLocationId: line.inLocationId,
+      })) || []
+    };
+    
+    validation.validateForm(validationData);
   };
 
   return (
@@ -784,10 +876,42 @@ const NewReservation = () => {
         {/* Header */}
         <div>
           <h1 className="text-3xl font-bold tracking-tight">New Reservation</h1>
+          <p className="text-sm text-muted-foreground mt-2">
+            Fields marked with an asterisk (*) are required.
+          </p>
+        </div>
+
+        {/* Error Summary */}
+        {validation.hasErrors && (
+          <div id="error-summary">
+            <ErrorSummary
+              errors={validation.validationErrors}
+              fieldLabels={fieldLabels}
+              onFieldFocus={validation.focusField}
+            />
+          </div>
+        )}
+
+        {/* Validation Actions */}
+        <div className="flex justify-between items-center">
+          <Button
+            id="btn-validate"
+            variant="outline"
+            onClick={handleValidateNow}
+            className="flex items-center gap-2"
+          >
+            <Check className="h-4 w-4" />
+            Validate Now
+          </Button>
         </div>
 
         {/* Accordion Sections - REORDERED */}
-        <Accordion type="multiple" value={accordionValues} onValueChange={setAccordionValues} className="space-y-4">
+        <Accordion 
+          type="multiple" 
+          value={[...accordionValues, ...validation.expandedAccordions]} 
+          onValueChange={setAccordionValues} 
+          className="space-y-4"
+        >
           
           {/* 1) Rental Information */}
           <AccordionItem value="rental-info" className="border rounded-lg">
@@ -1615,7 +1739,7 @@ const NewReservation = () => {
               onClick={() => handleSave('ACTIVE')}
               disabled={loading.saving}
               className="min-w-32"
-              title={!validation.isValid || (formData.reservationLines || []).length === 0 ? "Complete required fields first" : undefined}
+              title={validation.hasErrors || (formData.reservationLines || []).length === 0 ? "Complete required fields first" : undefined}
             >
               {loading.saving ? 'Saving...' : 'Save & Continue'}
             </Button>
