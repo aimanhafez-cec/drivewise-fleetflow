@@ -1,8 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { RequiredLabel } from '@/components/ui/required-label';
+import { FormError } from '@/components/ui/form-error';
+import { ErrorSummary } from '@/components/ui/error-summary';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -31,6 +34,7 @@ import { PrefillChips } from '@/components/reservation/PrefillChips';
 import { DriverPicker } from '@/components/reservation/DriverPicker';
 import { usePricingContext, calculateLinePrice, PricingContext } from '@/hooks/usePricingContext';
 import { RepriceBanner } from '@/components/reservation/RepriceBanner';
+import { useFormValidation, ValidationRules } from '@/hooks/useFormValidation';
 
 const STORAGE_KEY = 'new-reservation-draft';
 
@@ -366,6 +370,46 @@ const NewReservation = () => {
     setLastPricingHash(pricingHash);
   }, [formData.priceListId, formData.promotionCode, formData.hourlyRate, formData.dailyRate, formData.weeklyRate, formData.monthlyRate, formData.kilometerCharge, formData.dailyKilometerAllowed, formData.reservationLines.length]);
 
+  // Validation rules
+  const validationRules: ValidationRules = {
+    entryDate: { required: true },
+    reservationMethod: { required: true },
+    currencyCode: { required: true },
+    reservationTypeId: { required: true },
+    businessUnitId: { required: true },
+    customerId: { required: true },
+    paymentTermsId: { required: true },
+    priceListId: { required: true },
+    vehicleClassId: { required: true },
+    vehicleId: { required: true },
+    checkOutDate: { required: true },
+    checkOutLocationId: { required: true },
+    checkInDate: { required: true },
+    checkInLocationId: { required: true }
+  };
+
+  const fieldLabels = {
+    entryDate: 'Reservation Entry Date',
+    reservationMethod: 'Reservation Method',
+    currencyCode: 'Currency',
+    reservationTypeId: 'Reservation Type',
+    businessUnitId: 'Business Unit',
+    customerId: 'Customer Name',
+    paymentTermsId: 'Payment Terms',
+    priceListId: 'Price List',
+    vehicleClassId: 'Vehicle Class',
+    vehicleId: 'Vehicle',
+    checkOutDate: 'Check Out Date',
+    checkOutLocationId: 'Check Out Location',
+    checkInDate: 'Check In Date',
+    checkInLocationId: 'Check In Location'
+  };
+
+  const validation = useFormValidation({
+    rules: validationRules,
+    data: formData
+  });
+
   // Use the new summary hook and pricing context
   const summary = useReservationSummary(formData);
   const selectedCustomer = options.customers.find(c => c.id === formData.customerId);
@@ -639,15 +683,35 @@ const NewReservation = () => {
     setLoading(prev => ({ ...prev, saving: true }));
     
     try {
-      // Basic validation for ACTIVE status
+      // For ACTIVE status, validate all required fields
       if (status === 'ACTIVE') {
-        const requiredFields = ['customerId', 'currencyCode', 'reservationMethodId'];
-        const missingFields = requiredFields.filter(field => !formData[field as keyof ExtendedFormData]);
+        validation.markAllTouched();
         
-        if (missingFields.length > 0) {
+        // Check basic validation
+        if (!validation.isValid) {
+          // Find first error field and focus it
+          const firstErrorField = Object.keys(validation.errors)[0];
+          if (firstErrorField) {
+            const element = document.getElementById(firstErrorField);
+            if (element) {
+              element.focus();
+              element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+          }
+          
           toast({
             title: "Validation Error",
-            description: "Please fill in all required fields before continuing.",
+            description: "Please correct the errors before continuing",
+            variant: "destructive",
+          });
+          return;
+        }
+        
+        // Check for at least one reservation line
+        if (!formData.reservationLines || formData.reservationLines.length === 0) {
+          toast({
+            title: "Validation Error", 
+            description: "At least one reservation line is required to continue",
             variant: "destructive",
           });
           return;
@@ -1551,6 +1615,7 @@ const NewReservation = () => {
               onClick={() => handleSave('ACTIVE')}
               disabled={loading.saving}
               className="min-w-32"
+              title={!validation.isValid || (formData.reservationLines || []).length === 0 ? "Complete required fields first" : undefined}
             >
               {loading.saving ? 'Saving...' : 'Save & Continue'}
             </Button>
