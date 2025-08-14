@@ -1,13 +1,7 @@
 import { z } from 'zod';
 
-// Helper function to check if date string is valid and after another date
-const isDateAfter = (dateStr: string, afterDateStr: string) => {
-  if (!dateStr || !afterDateStr) return true;
-  return new Date(dateStr) > new Date(afterDateStr);
-};
-
 export const headerValidationSchema = z.object({
-  entryDate: z.string().min(1, 'Reservation Entry Date is required'),
+  entryDate: z.date(),
   reservationMethodId: z.string().min(1, 'Reservation Method is required'),
   currencyCode: z.string().min(1, 'Currency is required'),
   reservationTypeId: z.string().min(1, 'Reservation Type is required'),
@@ -15,7 +9,7 @@ export const headerValidationSchema = z.object({
   customerId: z.string().min(1, 'Customer is required'),
   paymentTermsId: z.string().min(1, 'Payment Terms is required'),
   priceListId: z.string().min(1, 'Price List is required'),
-  validityDateTo: z.string().optional(),
+  validityDateTo: z.date().optional(),
   taxLevelId: z.string().optional(),
   taxCodeId: z.string().optional(),
   
@@ -28,10 +22,10 @@ export const headerValidationSchema = z.object({
   
   // Airport Information (conditionally required)
   arrivalFlightNo: z.string().optional(),
-  arrivalDateTime: z.string().optional(),
+  arrivalDateTime: z.date().optional(),
   arrivalAirline: z.string().optional(),
   departureFlightNo: z.string().optional(),
-  departureDateTime: z.string().optional(),
+  departureDateTime: z.date().optional(),
   departureAirline: z.string().optional(),
   
   // Insurance
@@ -50,11 +44,11 @@ export const headerValidationSchema = z.object({
   benefitValue: z.number().optional(),
 }).superRefine((data, ctx) => {
   // Validity date must be after entry date
-  if (data.validityDateTo && data.entryDate && !isDateAfter(data.validityDateTo, data.entryDate)) {
+  if (data.validityDateTo && data.entryDate && data.validityDateTo <= data.entryDate) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: ['validityDateTo'],
-      message: 'Validity Date must be on or after Entry Date'
+      message: 'Validity Date must be after Entry Date'
     });
   }
   
@@ -106,7 +100,6 @@ export const headerValidationSchema = z.object({
   }
   
   // Airport Information validation based on reservation method
-  const airportMethods = ['AIRPORT_PICKUP', 'AIRPORT_DROP', 'AIRPORT_PICKUP_DROP'];
   const needsArrival = data.reservationMethodId === 'AIRPORT_PICKUP' || data.reservationMethodId === 'AIRPORT_PICKUP_DROP';
   const needsDeparture = data.reservationMethodId === 'AIRPORT_DROP' || data.reservationMethodId === 'AIRPORT_PICKUP_DROP';
   
@@ -216,13 +209,13 @@ export const headerValidationSchema = z.object({
 export const lineValidationSchema = z.object({
   vehicleClassId: z.string().min(1, 'Vehicle Class is required'),
   vehicleId: z.string().min(1, 'Vehicle is required'),
-  checkOutDate: z.string().min(1, 'Check-out Date is required'),
+  checkOutDate: z.date(),
   checkOutLocationId: z.string().min(1, 'Check-out Location is required'),
-  checkInDate: z.string().min(1, 'Check-in Date is required'),
+  checkInDate: z.date(),
   checkInLocationId: z.string().min(1, 'Check-in Location is required'),
 }).superRefine((data, ctx) => {
   // Check-out must be before Check-in
-  if (data.checkOutDate && data.checkInDate && !isDateAfter(data.checkInDate, data.checkOutDate)) {
+  if (data.checkOutDate && data.checkInDate && data.checkOutDate >= data.checkInDate) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: ['checkOutDate'],
