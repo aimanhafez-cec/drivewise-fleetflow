@@ -30,12 +30,12 @@ export const useReservationValidation = () => {
     'header.billingAddress': 'billing',
     
     // Airport fields
-    'header.arrivalFlightNo': 'airport-information',
-    'header.arrivalDateTime': 'airport-information',
-    'header.arrivalAirline': 'airport-information',
-    'header.departureFlightNo': 'airport-information',
-    'header.departureDateTime': 'airport-information',
-    'header.departureAirline': 'airport-information',
+    'header.arrivalFlightNo': 'airport-info',
+    'header.arrivalDateTime': 'airport-info',
+    'header.arrivalAirline': 'airport-info',
+    'header.departureFlightNo': 'airport-info',
+    'header.departureDateTime': 'airport-info',
+    'header.departureAirline': 'airport-info',
     
     // Insurance fields
     'header.insuranceLevel': 'insurance-information',

@@ -1429,33 +1429,210 @@ const NewReservation = () => {
             </AccordionTrigger>
             <AccordionContent className="px-6 pb-6">
               <div className="space-y-6">
-                <h4 className="font-medium">Arrival Information</h4>
-                <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-                  <div className="space-y-2">
-                    <Label>Flight No.</Label>
-                    <Input 
-                      value={formData.arrivalFlightNo} 
-                      onChange={(e) => updateFormData('arrivalFlightNo', e.target.value)}
-                      placeholder="e.g., AA1234"
-                    />
+                {/* Show conditional message based on reservation method */}
+                {!['AIRPORT_PICKUP', 'AIRPORT_DROP', 'AIRPORT_PICKUP_DROP'].includes(formData.reservationMethodId) && (
+                  <div className="text-sm text-muted-foreground bg-muted/50 p-4 rounded-lg">
+                    Select a reservation method with airport service to configure flight information.
                   </div>
-                  <div className="space-y-2">
-                    <Label>Airport</Label>
-                    <Input 
-                      value={formData.arrivalAirport} 
-                      onChange={(e) => updateFormData('arrivalAirport', e.target.value)}
-                      placeholder="e.g., LAX International"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>City</Label>
-                    <Input 
-                      value={formData.arrivalCity} 
-                      onChange={(e) => updateFormData('arrivalCity', e.target.value)}
-                      placeholder="e.g., Los Angeles"
-                    />
-                  </div>
-                </div>
+                )}
+
+                {/* Arrival Information - Show when method includes pickup */}
+                {(formData.reservationMethodId === 'AIRPORT_PICKUP' || formData.reservationMethodId === 'AIRPORT_PICKUP_DROP') && (
+                  <>
+                    <div>
+                      <h4 className="font-medium mb-4">Arrival Information</h4>
+                      <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                        <div className="space-y-2">
+                          <RequiredLabel>Flight No.</RequiredLabel>
+                          <Input 
+                            value={formData.arrivalFlightNo} 
+                            onChange={(e) => updateFormData('arrivalFlightNo', e.target.value)}
+                            placeholder="e.g., AA1234"
+                            className={validation.getFieldError('header.arrivalFlightNo') ? "border-destructive" : ""}
+                          />
+                          <FormError message={validation.getFieldError('header.arrivalFlightNo')} />
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <RequiredLabel>Date & Time</RequiredLabel>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button
+                                variant="outline"
+                                className={cn(
+                                  "w-full justify-start text-left font-normal",
+                                  !formData.arrivalDateTime && "text-muted-foreground",
+                                  validation.getFieldError('header.arrivalDateTime') && "border-destructive"
+                                )}
+                              >
+                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                {formData.arrivalDateTime ? format(formData.arrivalDateTime, "PPP p") : <span>Select arrival date & time</span>}
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                              <Calendar
+                                mode="single"
+                                selected={formData.arrivalDateTime}
+                                onSelect={(date) => updateFormData('arrivalDateTime', date)}
+                                initialFocus
+                                className="p-3 pointer-events-auto"
+                              />
+                            </PopoverContent>
+                          </Popover>
+                          <FormError message={validation.getFieldError('header.arrivalDateTime')} />
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <RequiredLabel>Airline</RequiredLabel>
+                          <Input 
+                            value={formData.arrivalAirline} 
+                            onChange={(e) => updateFormData('arrivalAirline', e.target.value)}
+                            placeholder="e.g., American Airlines"
+                            className={validation.getFieldError('header.arrivalAirline') ? "border-destructive" : ""}
+                          />
+                          <FormError message={validation.getFieldError('header.arrivalAirline')} />
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label>Airport</Label>
+                          <Input 
+                            value={formData.arrivalAirport} 
+                            onChange={(e) => updateFormData('arrivalAirport', e.target.value)}
+                            placeholder="e.g., LAX International"
+                          />
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label>City</Label>
+                          <Input 
+                            value={formData.arrivalCity} 
+                            onChange={(e) => updateFormData('arrivalCity', e.target.value)}
+                            placeholder="e.g., Los Angeles"
+                          />
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label>Zip Code</Label>
+                          <Input 
+                            value={formData.arrivalZipCode} 
+                            onChange={(e) => updateFormData('arrivalZipCode', e.target.value)}
+                            placeholder="e.g., 90045"
+                          />
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label>Passengers</Label>
+                          <Input 
+                            type="number"
+                            value={formData.arrivalPassengers || ''} 
+                            onChange={(e) => updateFormData('arrivalPassengers', parseInt(e.target.value) || 0)}
+                            placeholder="Number of passengers"
+                            min="0"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {/* Departure Information - Show when method includes drop */}
+                {(formData.reservationMethodId === 'AIRPORT_DROP' || formData.reservationMethodId === 'AIRPORT_PICKUP_DROP') && (
+                  <>
+                    <div>
+                      <h4 className="font-medium mb-4">Departure Information</h4>
+                      <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                        <div className="space-y-2">
+                          <RequiredLabel>Flight No.</RequiredLabel>
+                          <Input 
+                            value={formData.departureFlightNo} 
+                            onChange={(e) => updateFormData('departureFlightNo', e.target.value)}
+                            placeholder="e.g., AA5678"
+                            className={validation.getFieldError('header.departureFlightNo') ? "border-destructive" : ""}
+                          />
+                          <FormError message={validation.getFieldError('header.departureFlightNo')} />
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <RequiredLabel>Date & Time</RequiredLabel>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button
+                                variant="outline"
+                                className={cn(
+                                  "w-full justify-start text-left font-normal",
+                                  !formData.departureDateTime && "text-muted-foreground",
+                                  validation.getFieldError('header.departureDateTime') && "border-destructive"
+                                )}
+                              >
+                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                {formData.departureDateTime ? format(formData.departureDateTime, "PPP p") : <span>Select departure date & time</span>}
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                              <Calendar
+                                mode="single"
+                                selected={formData.departureDateTime}
+                                onSelect={(date) => updateFormData('departureDateTime', date)}
+                                initialFocus
+                                className="p-3 pointer-events-auto"
+                              />
+                            </PopoverContent>
+                          </Popover>
+                          <FormError message={validation.getFieldError('header.departureDateTime')} />
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <RequiredLabel>Airline</RequiredLabel>
+                          <Input 
+                            value={formData.departureAirline} 
+                            onChange={(e) => updateFormData('departureAirline', e.target.value)}
+                            placeholder="e.g., American Airlines"
+                            className={validation.getFieldError('header.departureAirline') ? "border-destructive" : ""}
+                          />
+                          <FormError message={validation.getFieldError('header.departureAirline')} />
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label>Airport</Label>
+                          <Input 
+                            value={formData.departureAirport} 
+                            onChange={(e) => updateFormData('departureAirport', e.target.value)}
+                            placeholder="e.g., LAX International"
+                          />
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label>City</Label>
+                          <Input 
+                            value={formData.departureCity} 
+                            onChange={(e) => updateFormData('departureCity', e.target.value)}
+                            placeholder="e.g., Los Angeles"
+                          />
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label>Zip Code</Label>
+                          <Input 
+                            value={formData.departureZipCode} 
+                            onChange={(e) => updateFormData('departureZipCode', e.target.value)}
+                            placeholder="e.g., 90045"
+                          />
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label>Passengers</Label>
+                          <Input 
+                            type="number"
+                            value={formData.departurePassengers || ''} 
+                            onChange={(e) => updateFormData('departurePassengers', parseInt(e.target.value) || 0)}
+                            placeholder="Number of passengers"
+                            min="0"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             </AccordionContent>
           </AccordionItem>
