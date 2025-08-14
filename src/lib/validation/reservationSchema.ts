@@ -9,7 +9,7 @@ export const headerValidationSchema = z.object({
   customerId: z.string().min(1, 'Customer is required'),
   paymentTermsId: z.string().min(1, 'Payment Terms is required'),
   priceListId: z.string().min(1, 'Price List is required'),
-  validityDateTo: z.date().optional(),
+  validityDateTo: z.date().nullable().optional(),
   taxLevelId: z.string().optional(),
   taxCodeId: z.string().optional(),
   
@@ -22,10 +22,10 @@ export const headerValidationSchema = z.object({
   
   // Airport Information (conditionally required)
   arrivalFlightNo: z.string().optional(),
-  arrivalDateTime: z.date().optional(),
+  arrivalDateTime: z.date().nullable().optional(),
   arrivalAirline: z.string().optional(),
   departureFlightNo: z.string().optional(),
-  departureDateTime: z.date().optional(),
+  departureDateTime: z.date().nullable().optional(),
   departureAirline: z.string().optional(),
   
   // Insurance
