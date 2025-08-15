@@ -76,16 +76,24 @@ const QuoteDetails: React.FC = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("quotes")
-        .select(`
-          *,
-          profiles:customer_id(full_name, email, phone),
-          vehicles(make, model, year, license_plate)
-        `)
+        .select("*")
         .eq("id", id)
         .maybeSingle();
       
       if (error) throw error;
-      return data as any;
+      if (!data) return null;
+      
+      // Fetch related data
+      const [customerResult, vehicleResult] = await Promise.all([
+        supabase.from("profiles").select("full_name, email, phone").eq("id", data.customer_id).single(),
+        data.vehicle_id ? supabase.from("vehicles").select("make, model, year, license_plate").eq("id", data.vehicle_id).single() : Promise.resolve({ data: null })
+      ]);
+      
+      return {
+        ...data,
+        customer: customerResult.data,
+        vehicle: vehicleResult.data
+      } as any;
     },
     enabled: !!id,
   });
@@ -185,12 +193,12 @@ const QuoteDetails: React.FC = () => {
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
             <div className="flex items-center gap-1">
               <User className="h-4 w-4" />
-              {quote.profiles?.full_name}
+              {quote.customer?.full_name}
             </div>
-            {quote.vehicles && (
+            {quote.vehicle && (
               <div className="flex items-center gap-1">
                 <Car className="h-4 w-4" />
-                {quote.vehicles.year} {quote.vehicles.make} {quote.vehicles.model}
+                {quote.vehicle.year} {quote.vehicle.make} {quote.vehicle.model}
               </div>
             )}
             {quote.valid_until && (
@@ -323,10 +331,10 @@ const QuoteDetails: React.FC = () => {
                   <div>
                     <h4 className="font-semibold">Contact Details</h4>
                     <div className="mt-2 space-y-1">
-                      <p>{quote.profiles?.full_name}</p>
-                      <p className="text-muted-foreground">{quote.profiles?.email}</p>
-                      {quote.profiles?.phone && (
-                        <p className="text-muted-foreground">{quote.profiles.phone}</p>
+                      <p>{quote.customer?.full_name}</p>
+                      <p className="text-muted-foreground">{quote.customer?.email}</p>
+                      {quote.customer?.phone && (
+                        <p className="text-muted-foreground">{quote.customer.phone}</p>
                       )}
                     </div>
                   </div>
@@ -340,13 +348,13 @@ const QuoteDetails: React.FC = () => {
                   <CardTitle>Vehicle Information</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {quote.vehicles ? (
+                  {quote.vehicle ? (
                     <div className="space-y-2">
                       <h4 className="font-semibold">
-                        {quote.vehicles.year} {quote.vehicles.make} {quote.vehicles.model}
+                        {quote.vehicle.year} {quote.vehicle.make} {quote.vehicle.model}
                       </h4>
                       <p className="text-muted-foreground">
-                        License Plate: {quote.vehicles.license_plate}
+                        License Plate: {quote.vehicle.license_plate}
                       </p>
                     </div>
                   ) : (
