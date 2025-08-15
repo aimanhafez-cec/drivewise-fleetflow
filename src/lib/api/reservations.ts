@@ -122,10 +122,29 @@ const contractBillingPlans: DropdownOption[] = [
 ];
 
 const taxLevels: DropdownOption[] = [
-  { id: 'federal', label: 'Federal Only', value: 'federal' },
-  { id: 'state', label: 'State + Federal', value: 'state' },
-  { id: 'local', label: 'Local + State + Federal', value: 'local' },
-  { id: 'exempt', label: 'Tax Exempt', value: 'exempt' },
+  // National
+  { id: 'egypt_vat_standard', label: 'Egypt VAT 14% (Standard)', value: 'egypt_vat_standard' },
+  { id: 'egypt_vat_reduced', label: 'Egypt VAT 10% (Reduced – long term lease)', value: 'egypt_vat_reduced' },
+  { id: 'egypt_vat_exempt', label: 'Egypt VAT Exempt (Govt/Diplomatic)', value: 'egypt_vat_exempt' },
+  
+  // Governorate
+  { id: 'cairo_vat', label: 'Cairo – VAT 14% + City Transport Fee 3%', value: 'cairo_vat' },
+  { id: 'giza_vat', label: 'Giza – VAT 14% + Tourism Levy 2%', value: 'giza_vat' },
+  { id: 'alexandria_vat', label: 'Alexandria – VAT 14%', value: 'alexandria_vat' },
+  { id: 'red_sea_vat', label: 'Red Sea – VAT 14% + Tourism Fee 5%', value: 'red_sea_vat' },
+  { id: 'south_sinai_vat', label: 'South Sinai – VAT 14% + Tourism Fee 5%', value: 'south_sinai_vat' },
+  { id: 'luxor_vat', label: 'Luxor – VAT 14% + Tourism Development Fee 3%', value: 'luxor_vat' },
+  { id: 'aswan_vat', label: 'Aswan – VAT 14% + Tourism Development Fee 3%', value: 'aswan_vat' },
+  
+  // Special Zones
+  { id: 'suez_canal_vat', label: 'Suez Canal Economic Zone – VAT 14%', value: 'suez_canal_vat' },
+  { id: 'free_zone_exempt', label: 'Free Zone – VAT Exempt', value: 'free_zone_exempt' },
+  
+  // Service-Specific
+  { id: 'insurance_only_vat', label: 'Insurance Only – VAT 14%', value: 'insurance_only_vat' },
+  { id: 'addons_vat', label: 'Add-ons – VAT 14%', value: 'addons_vat' },
+  { id: 'fuel_service_vat', label: 'Fuel Service – VAT 14%', value: 'fuel_service_vat' },
+  { id: 'driver_service_vat', label: 'Driver Service – VAT 14%', value: 'driver_service_vat' },
 ];
 
 const taxCodesByLevel: Record<string, DropdownOption[]> = {
