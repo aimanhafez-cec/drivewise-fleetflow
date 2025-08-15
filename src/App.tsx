@@ -25,6 +25,7 @@ import ReservationDetails from "./pages/ReservationDetails";
 import ReservationDetailsPage from "./pages/ReservationDetailsPage";
 import Agreements from "./pages/Agreements";
 import AgreementDetails from "./pages/AgreementDetails";
+import AgreementWizardPage from "./pages/AgreementWizardPage";
 
 const queryClient = new QueryClient();
 
@@ -83,6 +84,7 @@ const App = () => (
               </ProtectedRoute>
             }>
               <Route index element={<Agreements />} />
+              <Route path="new" element={<AgreementWizardPage />} />
               <Route path=":id" element={<AgreementDetails />} />
             </Route>
             <Route path="/payments" element={

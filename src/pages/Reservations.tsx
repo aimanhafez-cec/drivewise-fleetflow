@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,10 +8,14 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
+import { ReservationSearch, SearchFilters } from '@/components/reservations/ReservationSearch';
+import { ConvertToAgreementPreCheck } from '@/components/agreements/ConvertToAgreementPreCheck';
 
 const Reservations = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const [searchFilters, setSearchFilters] = useState<SearchFilters>({});
+  const [convertModal, setConvertModal] = useState<{ open: boolean; reservation?: any }>({ open: false });
 
   // Fetch open reservations (not converted/cancelled)
   const { data: reservations, isLoading, error } = useQuery({
@@ -210,9 +214,12 @@ const Reservations = () => {
               {reservations.map(reservation => (
                 <div 
                   key={reservation.id} 
-                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 cursor-pointer" 
-                  onClick={() => navigate(`/reservations/${reservation.id}`)}
+                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50" 
                 >
+                  <div 
+                    className="flex items-center space-x-4 flex-1 cursor-pointer"
+                    onClick={() => navigate(`/reservations/${reservation.id}`)}
+                  >
                   <div className="flex items-center space-x-4">
                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
                       <User className="h-5 w-5 text-primary" />
@@ -245,9 +252,22 @@ const Reservations = () => {
                     </p>
                   </div>
                   
-                  <Badge className={getStatusColor(reservation.status)}>
-                    {reservation.status}
-                  </Badge>
+                  <div className="flex items-center gap-2">
+                    <Badge className={getStatusColor(reservation.status)}>
+                      {reservation.status}
+                    </Badge>
+                    <Button
+                      id={`btn-convert-agreement-${reservation.id}`}
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setConvertModal({ open: true, reservation });
+                      }}
+                    >
+                      Convert to Agreement
+                    </Button>
+                  </div>
+                  </div>
                 </div>
               ))}
             </div>
