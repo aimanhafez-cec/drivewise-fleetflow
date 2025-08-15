@@ -70,8 +70,8 @@ export const useReservationSummary = (formData: FormData): Summary => {
       .filter(charge => !charge.taxable)
       .reduce((sum, charge) => sum + charge.amount, 0);
     
-    // Calculate tax on misc taxable charges (assuming same tax rate as lines)
-    const avgTaxRate = linesNet > 0 ? taxOnLines / linesNet : 0;
+    // Calculate tax on misc taxable charges (standard 10% tax rate if no line tax rate available)
+    const avgTaxRate = linesNet > 0 ? taxOnLines / linesNet : 0.1; // Default to 10% if no lines
     const taxOnMiscTaxable = miscTaxable * avgTaxRate;
     
     // Get values from form with defaults

@@ -552,17 +552,18 @@ const NewReservation = () => {
     // Clear any previous errors
     setAddLineErrors([]);
 
-    // Calculate pricing using pricing context
+    // Calculate pricing using pricing context - only use fallbacks if no panel rates are set
     const priceResult = calculateLinePrice(
       pricingContext,
       formData.checkOutDate!,
       formData.checkInDate!,
-      {
+      // Only use fallback rates if all panel rates are null/undefined
+      (!pricingContext.hourly && !pricingContext.daily && !pricingContext.weekly && !pricingContext.monthly) ? {
         hourly: 25, // fallback rates from price list
         daily: 50,
         weekly: 300,
         monthly: 1200
-      }
+      } : undefined
     );
     
     let basePrice = priceResult.lineNetPrice;
@@ -646,12 +647,13 @@ const NewReservation = () => {
             pricingContext,
             line.checkOutDate,
             line.checkInDate,
-            {
+            // Only use fallback rates if all panel rates are null/undefined
+            (!pricingContext.hourly && !pricingContext.daily && !pricingContext.weekly && !pricingContext.monthly) ? {
               hourly: 25,
               daily: 50,
               weekly: 300,
               monthly: 1200
-            }
+            } : undefined
           );
           
           const newLineNetPrice = priceResult.lineNetPrice;
@@ -2200,7 +2202,7 @@ const NewReservation = () => {
         <div className="sticky top-6">
           <SummaryCard
             summary={summary}
-            currencyCode={formData.currencyCode}
+            currencyCode="EGP"
           />
         </div>
       </div>
