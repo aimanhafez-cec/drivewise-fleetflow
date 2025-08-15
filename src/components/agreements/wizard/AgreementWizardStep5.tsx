@@ -10,6 +10,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { CreditCard, DollarSign, Shield, User } from 'lucide-react';
+import { formatCurrency } from '@/lib/utils';
 
 interface AgreementWizardStep5Props {
   data: {
@@ -244,15 +245,15 @@ export const AgreementWizardStep5: React.FC<AgreementWizardStep5Props> = ({
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Rental Total:</span>
-                  <span>${reservation.total_amount?.toFixed(2) || '0.00'}</span>
+                  <span>{formatCurrency(reservation.total_amount || 0)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Add-ons:</span>
-                  <span>$0.00</span>
+                  <span>{formatCurrency(0)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Tax:</span>
-                  <span>$24.00</span>
+                  <span>{formatCurrency(24)}</span>
                 </div>
               </div>
 
@@ -260,7 +261,7 @@ export const AgreementWizardStep5: React.FC<AgreementWizardStep5Props> = ({
 
               <div className="flex justify-between font-medium">
                 <span>Grand Total:</span>
-                <span className="text-lg">${(reservation.total_amount + 24).toFixed(2)}</span>
+                <span className="text-lg">{formatCurrency((reservation.total_amount || 0) + 24)}</span>
               </div>
 
               <Separator />
@@ -269,13 +270,13 @@ export const AgreementWizardStep5: React.FC<AgreementWizardStep5Props> = ({
                 {data.advanceAmount > 0 && (
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Advance Payment:</span>
-                    <span>-${data.advanceAmount.toFixed(2)}</span>
+                    <span>-{formatCurrency(data.advanceAmount)}</span>
                   </div>
                 )}
                 {data.securityDeposit > 0 && data.applyDepositAsCredit && (
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Deposit Credit:</span>
-                    <span>-${data.securityDeposit.toFixed(2)}</span>
+                    <span>-{formatCurrency(data.securityDeposit)}</span>
                   </div>
                 )}
               </div>
@@ -286,7 +287,7 @@ export const AgreementWizardStep5: React.FC<AgreementWizardStep5Props> = ({
                   <div className="flex justify-between font-medium text-lg">
                     <span>Amount Due:</span>
                     <span>
-                      ${Math.max(0, (reservation.total_amount + 24) - data.advanceAmount - (data.applyDepositAsCredit ? data.securityDeposit : 0)).toFixed(2)}
+                      {formatCurrency(Math.max(0, ((reservation.total_amount || 0) + 24) - data.advanceAmount - (data.applyDepositAsCredit ? data.securityDeposit : 0)))}
                     </span>
                   </div>
                 </>
@@ -299,7 +300,7 @@ export const AgreementWizardStep5: React.FC<AgreementWizardStep5Props> = ({
                     <span className="font-medium text-blue-800">Security Deposit</span>
                   </div>
                   <p className="text-xs text-blue-700 mt-1">
-                    ${data.securityDeposit.toFixed(2)} will be authorized on your payment method
+                    {formatCurrency(data.securityDeposit)} will be authorized on your payment method
                   </p>
                 </div>
               )}

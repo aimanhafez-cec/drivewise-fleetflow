@@ -4,6 +4,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Shield, Car, UserPlus, MapPin, Clock, Plus } from 'lucide-react';
+import { formatCurrency } from '@/lib/utils';
 
 interface AgreementWizardStep4Props {
   data: {
@@ -200,7 +201,7 @@ export const AgreementWizardStep4: React.FC<AgreementWizardStep4Props> = ({
                         </div>
                         <div className="text-right">
                           <div className="font-medium">
-                            ${addOn.amount.toFixed(2)}
+                            {formatCurrency(addOn.amount)}
                           </div>
                           <div className="text-xs text-muted-foreground">
                             {addOn.taxable ? 'Taxable' : 'Tax Free'}
@@ -230,7 +231,7 @@ export const AgreementWizardStep4: React.FC<AgreementWizardStep4Props> = ({
                         <span className="text-muted-foreground truncate mr-2">
                           {charge.name}
                         </span>
-                        <span>${charge.amount.toFixed(2)}</span>
+                        <span>{formatCurrency(charge.amount)}</span>
                       </div>
                     ))}
                   </div>
@@ -239,7 +240,7 @@ export const AgreementWizardStep4: React.FC<AgreementWizardStep4Props> = ({
 
                   <div className="flex justify-between font-medium">
                     <span>Total Add-ons:</span>
-                    <span>${getTotalAddOnAmount().toFixed(2)}</span>
+                    <span>{formatCurrency(getTotalAddOnAmount())}</span>
                   </div>
 
                   <div className="text-xs text-muted-foreground">

@@ -13,7 +13,7 @@ import { format } from 'date-fns';
 import { CalendarIcon, Trash2, Plus } from 'lucide-react';
 import { ReservationLine } from '@/pages/NewReservation';
 import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
+import { cn, formatCurrency } from '@/lib/utils';
 
 interface LineDetailsModalProps {
   line: ReservationLine | null;
@@ -248,7 +248,7 @@ export const LineDetailsModal: React.FC<LineDetailsModalProps> = ({
                             </Badge>
                             {driver.addlDriverFee && driver.addlDriverFee > 0 && (
                               <span className="text-sm text-muted-foreground">
-                                +${driver.addlDriverFee.toFixed(2)} fee
+                                +{formatCurrency(driver.addlDriverFee)} fee
                               </span>
                             )}
                           </div>
@@ -310,7 +310,7 @@ export const LineDetailsModal: React.FC<LineDetailsModalProps> = ({
               <div className="space-y-2">
                 <Label>Line Total</Label>
                 <Input
-                  value={editedLine.lineTotal.toFixed(2)}
+                  value={formatCurrency(editedLine.lineTotal)}
                   disabled
                   className="bg-muted font-mono"
                 />
@@ -337,7 +337,7 @@ export const LineDetailsModal: React.FC<LineDetailsModalProps> = ({
                           {charge.label}
                         </Label>
                         <p className="text-sm text-muted-foreground">
-                          ${charge.amount.toFixed(2)} {charge.taxable ? '(Taxable)' : '(Non-taxable)'}
+                          {formatCurrency(charge.amount)} {charge.taxable ? '(Taxable)' : '(Non-taxable)'}
                         </p>
                       </div>
                     </div>

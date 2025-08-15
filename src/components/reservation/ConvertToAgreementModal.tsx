@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Loader2 } from 'lucide-react';
+import { formatCurrency } from '@/lib/utils';
 
 interface ConvertToAgreementModalProps {
   open: boolean;
@@ -90,16 +91,16 @@ export const ConvertToAgreementModal: React.FC<ConvertToAgreementModalProps> = (
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
               <span className="font-medium text-muted-foreground">Grand Total:</span>
-              <span className="font-bold">${reservation.grandTotal.toFixed(2)}</span>
+              <span className="font-bold">{formatCurrency(reservation.grandTotal)}</span>
             </div>
             <div className="flex justify-between">
               <span className="font-medium text-muted-foreground">Advance Paid:</span>
-              <span>${reservation.advancePaid.toFixed(2)}</span>
+              <span>{formatCurrency(reservation.advancePaid)}</span>
             </div>
             <div className="flex justify-between">
               <span className="font-medium text-muted-foreground">Balance Due:</span>
               <span className="font-bold text-destructive">
-                ${reservation.balanceDue.toFixed(2)}
+                {formatCurrency(reservation.balanceDue)}
               </span>
             </div>
           </div>

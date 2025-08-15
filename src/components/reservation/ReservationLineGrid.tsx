@@ -11,7 +11,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { ReservationLine } from '@/pages/NewReservation';
 import { LineDetailsModal } from './LineDetailsModal';
 import { format } from 'date-fns';
-import { cn } from '@/lib/utils';
+import { cn, formatCurrency } from '@/lib/utils';
 import { useVehicles, useVehicleCategories, formatVehicleDisplay } from '@/hooks/useVehicles';
 
 interface ReservationLineGridProps {
@@ -233,7 +233,7 @@ export const ReservationLineGrid: React.FC<ReservationLineGridProps> = ({
                       className="min-h-[40px] flex items-center px-2 cursor-pointer hover:bg-muted/50 rounded font-mono"
                       onDoubleClick={() => handleCellDoubleClick(line.id, 'lineNetPrice', line.lineNetPrice)}
                     >
-                      {line.lineNetPrice.toFixed(2)}
+                      {formatCurrency(line.lineNetPrice)}
                     </div>
                   )}
                 </TableCell>
@@ -254,12 +254,12 @@ export const ReservationLineGrid: React.FC<ReservationLineGridProps> = ({
                       className="min-h-[40px] flex items-center px-2 cursor-pointer hover:bg-muted/50 rounded font-mono"
                       onDoubleClick={() => handleCellDoubleClick(line.id, 'taxValue', line.taxValue)}
                     >
-                      {line.taxValue.toFixed(2)}
+                      {formatCurrency(line.taxValue)}
                     </div>
                   )}
                 </TableCell>
                 <TableCell className="font-medium font-mono">
-                  {line.lineTotal.toFixed(2)}
+                  {formatCurrency(line.lineTotal)}
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-1">

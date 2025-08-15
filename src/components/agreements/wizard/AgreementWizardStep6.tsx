@@ -9,6 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { FileText, PenTool, X } from 'lucide-react';
+import { formatCurrency } from '@/lib/utils';
 
 interface AgreementWizardStep6Props {
   data: {
@@ -291,7 +292,7 @@ By signing below, you acknowledge that you have read and agree to be bound by al
 
               <div className="flex justify-between font-medium text-lg">
                 <span>Total Amount:</span>
-                <span>${reservation.total_amount?.toFixed(2) || '0.00'}</span>
+                <span>{formatCurrency(reservation.total_amount || 0)}</span>
               </div>
             </CardContent>
           </Card>
