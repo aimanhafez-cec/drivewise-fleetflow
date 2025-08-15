@@ -1,30 +1,79 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Edit, FileText, DollarSign } from 'lucide-react';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
+import { supabase } from '@/integrations/supabase/client';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useToast } from '@/hooks/use-toast';
+import { format } from 'date-fns';
 
 const ReservationDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(true);
+  const [reservation, setReservation] = useState<any>(null);
 
-  // Mock data - in real app this would come from API
-  const reservation = {
-    id: id,
-    reservationNo: 'RES-123456',
-    customer: 'John Smith',
-    customerEmail: 'john.smith@example.com',
-    entryDate: '2024-01-29',
-    validityDate: '2024-02-29',
-    status: 'ACTIVE',
-    currency: 'USD',
-    businessUnit: 'Downtown Branch',
-    paymentTerms: 'Net 30 Days',
-    totalAmount: 1250.00,
-    leaseToOwn: false,
-  };
+  useEffect(() => {
+    const fetchReservation = async () => {
+      if (!id) return;
+      
+      try {
+        setLoading(true);
+        const { data, error } = await supabase
+          .from('reservations')
+          .select(`
+            *,
+            customers (
+              full_name,
+              email
+            )
+          `)
+          .eq('id', id)
+          .single();
+
+        if (error) {
+          console.error('Error fetching reservation:', error);
+          toast({
+            title: "Error",
+            description: "Failed to load reservation details.",
+            variant: "destructive",
+          });
+          navigate('/reservations');
+          return;
+        }
+
+        setReservation({
+          id: data.id,
+          reservationNo: data.ro_number,
+          customer: data.customers?.full_name || 'Unknown Customer',
+          customerEmail: data.customers?.email || '',
+          entryDate: format(new Date(data.created_at), 'yyyy-MM-dd'),
+          validityDate: format(new Date(data.end_datetime), 'yyyy-MM-dd'),
+          status: data.status.toUpperCase(),
+          currency: 'USD',
+          businessUnit: 'Main Location',
+          paymentTerms: 'Net 30 Days',
+          totalAmount: data.total_amount || 0,
+          leaseToOwn: false,
+        });
+      } catch (error) {
+        console.error('Error:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load reservation details.",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchReservation();
+  }, [id, navigate, toast]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -38,6 +87,24 @@ const ReservationDetails = () => {
         return 'bg-gray-100 text-gray-800';
     }
   };
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-4 w-48" />
+        <Skeleton className="h-32 w-full" />
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <Skeleton className="h-64 w-full" />
+          <Skeleton className="h-64 w-full" />
+          <Skeleton className="h-64 w-full" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!reservation) {
+    return <div>Reservation not found</div>;
+  }
 
   return (
     <div className="space-y-6">

@@ -15,6 +15,7 @@ import { useReservationSummary } from '@/hooks/useReservationSummary';
 import { ConvertToAgreementModal } from '@/components/reservation/ConvertToAgreementModal';
 import { agreementsApi } from '@/lib/api/agreements';
 import { useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ReservationHeader {
   id: string;
@@ -103,24 +104,46 @@ const ReservationDetailsPage = () => {
 
   useEffect(() => {
     const fetchReservationData = async () => {
+      if (!id) return;
+      
       try {
         setLoading(true);
         
-        // Mock API call - replace with actual API
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
+        const { data, error } = await supabase
+          .from('reservations')
+          .select(`
+            *,
+            customers (
+              full_name,
+              email
+            )
+          `)
+          .eq('id', id)
+          .single();
+
+        if (error) {
+          console.error('Error fetching reservation:', error);
+          toast({
+            title: "Error",
+            description: "Reservation not found.",
+            variant: "destructive",
+          });
+          navigate('/reservations');
+          return;
+        }
+
         const mockData = {
           header: {
-            id: id || '',
-            reservationNo: 'RES-123456',
-            customer: 'John Smith',
-            businessUnit: 'Downtown Branch',
-            customerBillTo: 'John Smith - Personal',
+            id: data.id,
+            reservationNo: data.ro_number || 'RES-000000',
+            customer: data.customers?.full_name || 'Unknown Customer',
+            businessUnit: data.pickup_location || 'Main Location',
+            customerBillTo: `${data.customers?.full_name || 'Unknown'} - Personal`,
             paymentTerms: 'Net 30 Days',
-            validityDate: '2024-02-29',
+            validityDate: format(new Date(data.end_datetime), 'yyyy-MM-dd'),
             contractBillingPlan: 'Standard Plan',
-            createdAt: '2024-01-29',
-            status: 'ACTIVE',
+            createdAt: format(new Date(data.created_at), 'yyyy-MM-dd'),
+            status: data.status.toUpperCase(),
           },
           lines: [
             {
