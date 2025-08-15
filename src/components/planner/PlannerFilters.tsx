@@ -90,14 +90,14 @@ export const PlannerFilters: React.FC<PlannerFiltersProps> = ({
           <div className="space-y-2">
             <Label htmlFor="flt-class">Vehicle Class</Label>
             <Select 
-              value={filters.vehicleClass} 
-              onValueChange={(value) => updateFilter("vehicleClass", value)}
+              value={filters.vehicleClass || "all"} 
+              onValueChange={(value) => updateFilter("vehicleClass", value === "all" ? "" : value)}
             >
               <SelectTrigger data-testid="flt-class">
                 <SelectValue placeholder="All Classes" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Classes</SelectItem>
+                <SelectItem value="all">All Classes</SelectItem>
                 {vehicleClasses.map(cls => (
                   <SelectItem key={cls} value={cls}>{cls}</SelectItem>
                 ))}
@@ -109,14 +109,14 @@ export const PlannerFilters: React.FC<PlannerFiltersProps> = ({
           <div className="space-y-2">
             <Label htmlFor="flt-make">Make</Label>
             <Select 
-              value={filters.vehicleMake} 
-              onValueChange={(value) => updateFilter("vehicleMake", value)}
+              value={filters.vehicleMake || "all"} 
+              onValueChange={(value) => updateFilter("vehicleMake", value === "all" ? "" : value)}
             >
               <SelectTrigger data-testid="flt-make">
                 <SelectValue placeholder="All Makes" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Makes</SelectItem>
+                <SelectItem value="all">All Makes</SelectItem>
                 {vehicleMakes.map(make => (
                   <SelectItem key={make} value={make}>{make}</SelectItem>
                 ))}
@@ -128,14 +128,14 @@ export const PlannerFilters: React.FC<PlannerFiltersProps> = ({
           <div className="space-y-2">
             <Label htmlFor="flt-model">Model</Label>
             <Select 
-              value={filters.vehicleModel} 
-              onValueChange={(value) => updateFilter("vehicleModel", value)}
+              value={filters.vehicleModel || "all"} 
+              onValueChange={(value) => updateFilter("vehicleModel", value === "all" ? "" : value)}
             >
               <SelectTrigger data-testid="flt-model">
                 <SelectValue placeholder="All Models" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Models</SelectItem>
+                <SelectItem value="all">All Models</SelectItem>
                 <SelectItem value="Camry">Camry</SelectItem>
                 <SelectItem value="Accord">Accord</SelectItem>
                 <SelectItem value="F-150">F-150</SelectItem>
