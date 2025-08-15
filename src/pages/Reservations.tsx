@@ -10,6 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
 import { ReservationSearch, SearchFilters } from '@/components/reservations/ReservationSearch';
 import { ConvertToAgreementPreCheck } from '@/components/agreements/ConvertToAgreementPreCheck';
+import { formatCurrency } from '@/lib/utils';
 
 const Reservations = () => {
   const navigate = useNavigate();
@@ -224,7 +225,7 @@ const Reservations = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              ${reservations?.reduce((sum, r) => sum + (r.total_amount || 0), 0).toFixed(2) || '0.00'}
+              {formatCurrency(reservations?.reduce((sum, r) => sum + (r.total_amount || 0), 0) || 0)}
             </div>
             <p className="text-xs text-muted-foreground">
               From open reservations
@@ -281,7 +282,7 @@ const Reservations = () => {
                       )}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      ${reservation.total_amount?.toFixed(2) || '0.00'}
+                      {formatCurrency(reservation.total_amount || 0)}
                     </p>
                   </div>
                   
