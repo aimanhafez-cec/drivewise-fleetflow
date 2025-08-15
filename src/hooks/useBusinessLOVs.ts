@@ -11,7 +11,7 @@ export interface Customer {
 }
 
 export const useCustomers = (searchQuery?: string) => {
-  const result = useLOV<Customer>('customers', 'id, full_name, phone, email, status', {
+  const result = useLOV<Customer>('customers', 'id, full_name, phone, email', {
     searchFields: ['full_name', 'phone', 'email']
   });
   
@@ -29,7 +29,7 @@ export const useCustomers = (searchQuery?: string) => {
 };
 
 export const useCustomerById = (id?: string) => {
-  return useLOVById<Customer>('customers', 'id, full_name, phone, email, status', id);
+  return useLOVById<Customer>('customers', 'id, full_name, phone, email', id);
 };
 
 // Vehicle Categories (Classes)
@@ -111,17 +111,23 @@ export interface Location {
 }
 
 export const useLocations = (type?: string) => {
-  const result = useLOV<Location>('locations', 'id, name, code, type', {
-    dependencies: type ? { type } : {},
-    searchFields: ['name', 'code']
-  });
-  
+  // Return static locations since the table doesn't exist in the database
+  const staticLocations: Location[] = [
+    { id: 'main', name: 'Main Location', code: 'MAIN', type: 'branch', label: 'Main Location' },
+    { id: 'airport', name: 'Airport Location', code: 'AIRPORT', type: 'airport', label: 'Airport Location' },
+    { id: 'downtown', name: 'Downtown Branch', code: 'DOWN', type: 'branch', label: 'Downtown Branch' }
+  ];
+
   return {
-    ...result,
-    items: result.items.map(item => ({
-      ...item,
-      label: item.name
-    }))
+    items: staticLocations,
+    isLoading: false,
+    error: null,
+    updateSearch: () => {},
+    searchQuery: '',
+    fetchNextPage: () => Promise.resolve(),
+    hasNextPage: false,
+    isFetchingNextPage: false,
+    refetch: () => Promise.resolve()
   };
 };
 
@@ -179,13 +185,23 @@ export interface BusinessUnit {
 }
 
 export const useBusinessUnits = () => {
-  const result = useLOV<BusinessUnit>('business_units', 'id, name');
+  // Return static business units since the table doesn't exist in the database
+  const staticUnits: BusinessUnit[] = [
+    { id: 'main', name: 'Main Business Unit', label: 'Main Business Unit' },
+    { id: 'branch1', name: 'Branch Office 1', label: 'Branch Office 1' },
+    { id: 'branch2', name: 'Branch Office 2', label: 'Branch Office 2' }
+  ];
+
   return {
-    ...result,
-    items: result.items.map(item => ({
-      ...item,
-      label: item.name
-    }))
+    items: staticUnits,
+    isLoading: false,
+    error: null,
+    updateSearch: () => {},
+    searchQuery: '',
+    fetchNextPage: () => Promise.resolve(),
+    hasNextPage: false,
+    isFetchingNextPage: false,
+    refetch: () => Promise.resolve()
   };
 };
 
@@ -198,13 +214,24 @@ export interface PaymentTerm {
 }
 
 export const usePaymentTerms = () => {
-  const result = useLOV<PaymentTerm>('payment_terms', 'id, name, days');
+  // Return static payment terms since the table doesn't exist in the database
+  const staticTerms: PaymentTerm[] = [
+    { id: 'net30', name: 'Net 30 Days', days: 30, label: 'Net 30 Days' },
+    { id: 'net15', name: 'Net 15 Days', days: 15, label: 'Net 15 Days' },
+    { id: 'cod', name: 'Cash on Delivery', days: 0, label: 'Cash on Delivery' },
+    { id: 'prepaid', name: 'Prepaid', days: -1, label: 'Prepaid' }
+  ];
+
   return {
-    ...result,
-    items: result.items.map(item => ({
-      ...item,
-      label: item.name
-    }))
+    items: staticTerms,
+    isLoading: false,
+    error: null,
+    updateSearch: () => {},
+    searchQuery: '',
+    fetchNextPage: () => Promise.resolve(),
+    hasNextPage: false,
+    isFetchingNextPage: false,
+    refetch: () => Promise.resolve()
   };
 };
 
@@ -216,12 +243,23 @@ export interface ReservationType {
 }
 
 export const useReservationTypes = () => {
-  const result = useLOV<ReservationType>('reservation_types', 'id, name');
+  // Return static reservation types since the table doesn't exist in the database
+  const staticTypes: ReservationType[] = [
+    { id: 'daily', name: 'Daily Rental', label: 'Daily Rental' },
+    { id: 'weekly', name: 'Weekly Rental', label: 'Weekly Rental' },
+    { id: 'monthly', name: 'Monthly Rental', label: 'Monthly Rental' },
+    { id: 'corporate', name: 'Corporate Booking', label: 'Corporate Booking' }
+  ];
+
   return {
-    ...result,
-    items: result.items.map(item => ({
-      ...item,
-      label: item.name
-    }))
+    items: staticTypes,
+    isLoading: false,
+    error: null,
+    updateSearch: () => {},
+    searchQuery: '',
+    fetchNextPage: () => Promise.resolve(),
+    hasNextPage: false,
+    isFetchingNextPage: false,
+    refetch: () => Promise.resolve()
   };
 };
