@@ -18,14 +18,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Calendar } from "@/components/ui/calendar";
@@ -33,6 +25,13 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { 
+  CustomerSelect,
+  VehicleClassSelect,
+  VehicleSelect,
+  LocationSelect,
+  ReservationTypeSelect
+} from "@/components/ui/select-components";
 
 const newReservationSchema = z.object({
   customer: z.string().min(1, "Customer is required"),
@@ -115,7 +114,12 @@ export const NewReservationModal: React.FC<NewReservationModalProps> = ({
                 <FormItem>
                   <FormLabel>Customer *</FormLabel>
                   <FormControl>
-                    <Input placeholder="Customer name" {...field} />
+                    <CustomerSelect
+                      value={field.value}
+                      onChange={(value) => field.onChange(typeof value === 'string' ? value : "")}
+                      placeholder="Select customer"
+                      data-testid="customer-select"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -128,17 +132,13 @@ export const NewReservationModal: React.FC<NewReservationModalProps> = ({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Reservation Type *</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select type" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="Online">Online</SelectItem>
-                      <SelectItem value="Walk-in">Walk-in</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <FormControl>
+                    <ReservationTypeSelect
+                      value={field.value}
+                      onChange={(value) => field.onChange(typeof value === 'string' ? value : "")}
+                      placeholder="Select type"
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
@@ -150,21 +150,38 @@ export const NewReservationModal: React.FC<NewReservationModalProps> = ({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Vehicle Class *</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select class" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="economy">Economy</SelectItem>
-                      <SelectItem value="compact">Compact</SelectItem>
-                      <SelectItem value="midsize">Midsize</SelectItem>
-                      <SelectItem value="fullsize">Full Size</SelectItem>
-                      <SelectItem value="luxury">Luxury</SelectItem>
-                      <SelectItem value="suv">SUV</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <FormControl>
+                    <VehicleClassSelect
+                      value={field.value}
+                      onChange={(value) => {
+                        field.onChange(typeof value === 'string' ? value : "");
+                        // Clear vehicle selection when class changes
+                        if (form.getValues("vehicleId")) {
+                          form.setValue("vehicleId", "");
+                        }
+                      }}
+                      placeholder="Select class"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="vehicleId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Vehicle</FormLabel>
+                  <FormControl>
+                    <VehicleSelect
+                      value={field.value}
+                      onChange={(value) => field.onChange(typeof value === 'string' ? value : "")}
+                      classId={form.watch("vehicleClass") || undefined}
+                      placeholder="Select vehicle"
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
@@ -263,19 +280,13 @@ export const NewReservationModal: React.FC<NewReservationModalProps> = ({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Pickup Location *</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select location" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="airport">Airport</SelectItem>
-                        <SelectItem value="downtown">Downtown</SelectItem>
-                        <SelectItem value="mall">Shopping Mall</SelectItem>
-                        <SelectItem value="hotel">Hotel</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <FormControl>
+                      <LocationSelect
+                        value={field.value}
+                        onChange={(value) => field.onChange(typeof value === 'string' ? value : "")}
+                        placeholder="Select pickup location"
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -287,19 +298,13 @@ export const NewReservationModal: React.FC<NewReservationModalProps> = ({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Return Location *</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select location" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="airport">Airport</SelectItem>
-                        <SelectItem value="downtown">Downtown</SelectItem>
-                        <SelectItem value="mall">Shopping Mall</SelectItem>
-                        <SelectItem value="hotel">Hotel</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <FormControl>
+                      <LocationSelect
+                        value={field.value}
+                        onChange={(value) => field.onChange(typeof value === 'string' ? value : "")}
+                        placeholder="Select return location"
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}

@@ -2,7 +2,6 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -10,6 +9,12 @@ import { Badge } from "@/components/ui/badge";
 import { CalendarIcon, Search, RotateCcw, X } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { 
+  VehicleClassSelect,
+  VehicleMakeSelect,
+  VehicleModelSelect,
+  LocationSelect
+} from "@/components/ui/select-components";
 
 interface PlannerFiltersProps {
   filters: {
@@ -66,18 +71,6 @@ export const PlannerFilters: React.FC<PlannerFiltersProps> = ({
     return value && value !== "";
   });
 
-  const vehicleClasses = [
-    "Economy", "Compact", "Mid-size", "Full-size", "Premium", "Luxury", "SUV", "Van"
-  ];
-
-  const vehicleMakes = [
-    "Toyota", "Honda", "Ford", "Chevrolet", "Nissan", "BMW", "Mercedes", "Audi"
-  ];
-
-  const locations = [
-    "Airport Terminal 1", "Airport Terminal 2", "Downtown", "Mall Branch", "Hotel District"
-  ];
-
   const statusOptions = [
     "Open", "Online", "Walk-in", "Overdue", "Closed", "Pending Payment", "Pending Deposit"
   ];
@@ -89,58 +82,40 @@ export const PlannerFilters: React.FC<PlannerFiltersProps> = ({
           {/* Vehicle Class */}
           <div className="space-y-2">
             <Label htmlFor="flt-class">Vehicle Class</Label>
-            <Select 
-              value={filters.vehicleClass || "all"} 
-              onValueChange={(value) => updateFilter("vehicleClass", value === "all" ? "" : value)}
-            >
-              <SelectTrigger data-testid="flt-class">
-                <SelectValue placeholder="All Classes" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Classes</SelectItem>
-                {vehicleClasses.map(cls => (
-                  <SelectItem key={cls} value={cls}>{cls}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <VehicleClassSelect
+              value={filters.vehicleClass || undefined}
+              onChange={(value) => updateFilter("vehicleClass", typeof value === 'string' ? value : "")}
+              placeholder="All Classes"
+              allowClear={true}
+              data-testid="flt-class"
+            />
           </div>
 
           {/* Vehicle Make */}
           <div className="space-y-2">
             <Label htmlFor="flt-make">Make</Label>
-            <Select 
-              value={filters.vehicleMake || "all"} 
-              onValueChange={(value) => updateFilter("vehicleMake", value === "all" ? "" : value)}
-            >
-              <SelectTrigger data-testid="flt-make">
-                <SelectValue placeholder="All Makes" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Makes</SelectItem>
-                {vehicleMakes.map(make => (
-                  <SelectItem key={make} value={make}>{make}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <VehicleMakeSelect
+              value={filters.vehicleMake || undefined}
+              onChange={(value) => updateFilter("vehicleMake", typeof value === 'string' ? value : "")}
+              classId={filters.vehicleClass || undefined}
+              placeholder="All Makes"
+              allowClear={true}
+              data-testid="flt-make"
+            />
           </div>
 
           {/* Vehicle Model */}
           <div className="space-y-2">
             <Label htmlFor="flt-model">Model</Label>
-            <Select 
-              value={filters.vehicleModel || "all"} 
-              onValueChange={(value) => updateFilter("vehicleModel", value === "all" ? "" : value)}
-            >
-              <SelectTrigger data-testid="flt-model">
-                <SelectValue placeholder="All Models" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Models</SelectItem>
-                <SelectItem value="Camry">Camry</SelectItem>
-                <SelectItem value="Accord">Accord</SelectItem>
-                <SelectItem value="F-150">F-150</SelectItem>
-              </SelectContent>
-            </Select>
+            <VehicleModelSelect
+              value={filters.vehicleModel || undefined}
+              onChange={(value) => updateFilter("vehicleModel", typeof value === 'string' ? value : "")}
+              make={filters.vehicleMake || undefined}
+              classId={filters.vehicleClass || undefined}
+              placeholder="All Models"
+              allowClear={true}
+              data-testid="flt-model"
+            />
           </div>
 
           {/* VIN Search */}
@@ -246,21 +221,14 @@ export const PlannerFilters: React.FC<PlannerFiltersProps> = ({
           {/* Locations */}
           <div className="space-y-2">
             <Label>Locations</Label>
-            <div className="flex flex-wrap gap-2" data-testid="flt-locations">
-              {locations.map(location => (
-                <Badge
-                  key={location}
-                  variant={filters.locations.includes(location) ? "default" : "outline"}
-                  className="cursor-pointer"
-                  onClick={() => toggleLocation(location)}
-                >
-                  {location}
-                  {filters.locations.includes(location) && (
-                    <X className="ml-1 h-3 w-3" />
-                  )}
-                </Badge>
-              ))}
-            </div>
+            <LocationSelect
+              value={filters.locations}
+              onChange={(value) => updateFilter("locations", Array.isArray(value) ? value : value ? [value] : [])}
+              multiple={true}
+              placeholder="Select locations"
+              allowClear={true}
+              data-testid="flt-locations"
+            />
           </div>
         </div>
 
