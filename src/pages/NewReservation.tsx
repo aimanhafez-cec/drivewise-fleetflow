@@ -36,6 +36,7 @@ import { usePricingContext, calculateLinePrice, PricingContext } from '@/hooks/u
 import { RepriceBanner } from '@/components/reservation/RepriceBanner';
 import { useFormValidation, ValidationRules } from '@/hooks/useFormValidation';
 import { useReservationValidation } from '@/hooks/useReservationValidation';
+import { BillToSelector, BillToData, BillToType } from '@/components/ui/bill-to-selector';
 import { useVehicles, useVehicleCategories, formatVehicleDisplay } from '@/hooks/useVehicles';
 
 const STORAGE_KEY = 'new-reservation-draft';
@@ -131,12 +132,13 @@ interface ExtendedFormData extends ReservationFormData {
   // Miscellaneous Charges
   selectedMiscCharges: string[];
   
-  // Billing
-  billingType: 'same' | 'other';
-  billingCustomerName: string;
-  billingMail: string;
-  billingPhone: string;
-  billingAddress: string;
+  // Bill To
+  bill_to_type: BillToType;
+  bill_to_id: string | null;
+  bill_to_display: string;
+  payment_terms_id: string;
+  billing_address_id?: string | null;
+  bill_to_meta?: BillToMeta;
   
   // Notes
   note: string;
@@ -242,11 +244,11 @@ const NewReservation = () => {
     totalDays: 0,
     totalKilometerAllowed: 0,
     selectedMiscCharges: [],
-    billingType: 'same',
-    billingCustomerName: '',
-    billingMail: '',
-    billingPhone: '',
-    billingAddress: '',
+    bill_to_type: 'CUSTOMER',
+    bill_to_id: null,
+    bill_to_display: '',
+    payment_terms_id: '',
+    bill_to_meta: {},
     note: '',
     specialNote: '',
     insuranceLevelId: '',
@@ -1389,65 +1391,35 @@ const NewReservation = () => {
             </AccordionContent>
           </AccordionItem>
 
-          {/* 2) Billing */}
+          {/* 2) Bill To */}
           <AccordionItem value="billing" className="border rounded-lg">
             <AccordionTrigger className="px-6 py-4 hover:no-underline">
               <div className="flex items-center gap-2">
                 <CreditCard className="h-5 w-5" />
-                <span className="font-semibold">Billing</span>
+                <span className="font-semibold">Bill To</span>
               </div>
             </AccordionTrigger>
             <AccordionContent className="px-6 pb-6">
-              <div className="space-y-6">
-                <RadioGroup
-                  value={formData.billingType}
-                  onValueChange={(value: 'same' | 'other') => updateFormData('billingType', value)}
-                  className="flex gap-6"
-                >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="same" id="billing-same" />
-                    <Label htmlFor="billing-same">Same As Customer</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="other" id="billing-other" />
-                    <Label htmlFor="billing-other">Other</Label>
-                  </div>
-                </RadioGroup>
-
-                {formData.billingType === 'other' && (
-                  <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
-                    <div className="space-y-2">
-                      <Label>Customer Name</Label>
-                      <Input 
-                        value={formData.billingCustomerName} 
-                        onChange={(e) => updateFormData('billingCustomerName', e.target.value)}
-                        placeholder="Customer name"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Email</Label>
-                      <Input 
-                        type="email"
-                        value={formData.billingMail} 
-                        onChange={(e) => updateFormData('billingMail', e.target.value)}
-                        placeholder="customer@email.com"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Phone</Label>
-                      <Input 
-                        value={formData.billingPhone} 
-                        onChange={(e) => updateFormData('billingPhone', e.target.value)}
-                        placeholder="+1 (555) 123-4567"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Address</Label>
-                      <Textarea 
-                        value={formData.billingAddress} 
-                        onChange={(e) => updateFormData('billingAddress', e.target.value)}
-                        placeholder="123 Main St, City, State 12345"
-                        rows={2}
+              <BillToSelector
+                value={{
+                  bill_to_type: formData.bill_to_type,
+                  bill_to_id: formData.bill_to_id,
+                  bill_to_display: formData.bill_to_display,
+                  payment_terms_id: formData.payment_terms_id,
+                  billing_address_id: formData.billing_address_id,
+                  bill_to_meta: formData.bill_to_meta
+                }}
+                onChange={(billToData) => {
+                  updateFormData('bill_to_type', billToData.bill_to_type);
+                  updateFormData('bill_to_id', billToData.bill_to_id);
+                  updateFormData('bill_to_display', billToData.bill_to_display);
+                  updateFormData('payment_terms_id', billToData.payment_terms_id);
+                  updateFormData('billing_address_id', billToData.billing_address_id);
+                  updateFormData('bill_to_meta', billToData.bill_to_meta);
+                }}
+                errors={validation.getFieldsWithPrefix('bill_to')}
+                currentCustomerId={formData.customerId}
+                currentCustomerName={selectedCustomer?.fullName}
                       />
                     </div>
                   </div>
