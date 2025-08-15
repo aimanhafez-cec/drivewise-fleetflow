@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -43,6 +44,7 @@ const Customers = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const { data: customers, isLoading } = useQuery({
     queryKey: ['customers'],
@@ -165,7 +167,11 @@ const Customers = () => {
           const creditBadge = getCreditRatingBadge(customer.credit_rating || 0);
           
           return (
-            <Card key={customer.id} className="hover:shadow-lg transition-shadow">
+            <Card 
+              key={customer.id} 
+              className="hover:shadow-lg transition-shadow cursor-pointer"
+              onClick={() => navigate(`/customers/${customer.id}`)}
+            >
               <CardHeader className="pb-2">
                 <div className="flex justify-between items-start">
                   <div className="flex items-center gap-2">
@@ -246,7 +252,10 @@ const Customers = () => {
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    onClick={() => handleEdit(customer)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/customers/${customer.id}`);
+                    }}
                     className="flex-1"
                   >
                     <Edit className="mr-2 h-4 w-4" />
