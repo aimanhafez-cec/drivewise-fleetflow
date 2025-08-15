@@ -76,14 +76,14 @@ export const ReservationSearch: React.FC<ReservationSearchProps> = ({
           {showFilters && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t">
               <Select 
-                value={filters.status || ''} 
-                onValueChange={(value) => updateFilter('status', value || undefined)}
+                value={filters.status || 'all'} 
+                onValueChange={(value) => updateFilter('status', value === 'all' ? undefined : value)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Statuses</SelectItem>
+                  <SelectItem value="all">All Statuses</SelectItem>
                   <SelectItem value="pending">Pending</SelectItem>
                   <SelectItem value="confirmed">Confirmed</SelectItem>
                   <SelectItem value="checked_out">Checked Out</SelectItem>
