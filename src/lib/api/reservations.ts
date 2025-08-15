@@ -355,10 +355,24 @@ export const mockApi = {
     // Convert status to database enum values
     const dbStatus = status === 'DRAFT' ? 'pending' : 'confirmed';
     
-    // Get current date for defaults
+    // Get current date for defaults or use form data dates
     const now = new Date();
-    const startDate = new Date(now.getTime() + 24 * 60 * 60 * 1000); // Tomorrow
-    const endDate = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000); // 3 days from now
+    const startDate = (data as any).checkOutDate || new Date(now.getTime() + 24 * 60 * 60 * 1000); // Tomorrow
+    const endDate = (data as any).checkInDate || new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000); // 3 days from now
+    
+    // Calculate total amount from reservation lines
+    const calculateTotalAmount = () => {
+      const reservationLines = (data as any).reservationLines;
+      if (!reservationLines || reservationLines.length === 0) {
+        return 299.99; // Default fallback
+      }
+      
+      return reservationLines.reduce((total: number, line: any) => {
+        return total + (line.lineTotal || line.lineNetPrice || 0);
+      }, 0);
+    };
+    
+    const totalAmount = calculateTotalAmount();
     
     try {
       // Generate reservation number first
@@ -382,7 +396,7 @@ export const mockApi = {
           pickup_location: 'Main Location', // Default location
           return_location: 'Main Location', // Default location
           status: dbStatus,
-          total_amount: 299.99, // Default amount
+          total_amount: totalAmount,
           ro_number: reservationNo, // Set the reservation number immediately
         })
         .select()
