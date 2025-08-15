@@ -94,7 +94,7 @@ const customers: Customer[] = [
   },
 ];
 
-// Price Lists with rates
+// Price Lists with rates - exported for type checking
 export interface PriceList {
   id: string;
   label: string;

@@ -25,7 +25,7 @@ import { CalendarIcon, ChevronDown, Check, Plus, Trash2, Edit, Copy, Car, User, 
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
-import { mockApi, DropdownOption, Customer, ReservationFormData } from '@/lib/api/reservations';
+import { mockApi, DropdownOption, Customer, ReservationFormData, PriceList } from '@/lib/api/reservations';
 import { useReservationSummary } from '@/hooks/useReservationSummary';
 import { SummaryCard } from '@/components/reservation/SummaryCard';
 import { ReservationLineGrid } from '@/components/reservation/ReservationLineGrid';
