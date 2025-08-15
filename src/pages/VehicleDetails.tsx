@@ -257,35 +257,35 @@ export default function VehicleDetails() {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-10">
-          <TabsTrigger value="summary" className="data-[state=active]:bg-blue-900 data-[state=active]:text-white">
+        <TabsList className="inline-flex w-full overflow-x-auto">
+          <TabsTrigger value="summary" className="data-[state=active]:bg-blue-900 data-[state=active]:text-white whitespace-nowrap">
             Summary
           </TabsTrigger>
-          <TabsTrigger value="reservations" className="data-[state=active]:bg-emerald-500 data-[state=active]:text-white">
+          <TabsTrigger value="reservations" className="data-[state=active]:bg-emerald-500 data-[state=active]:text-white whitespace-nowrap">
             Reservations
           </TabsTrigger>
-          <TabsTrigger value="damages" className="data-[state=active]:bg-emerald-500 data-[state=active]:text-white">
+          <TabsTrigger value="damages" className="data-[state=active]:bg-emerald-500 data-[state=active]:text-white whitespace-nowrap">
             Damages
           </TabsTrigger>
-          <TabsTrigger value="maintenance" className="data-[state=active]:bg-emerald-500 data-[state=active]:text-white">
+          <TabsTrigger value="maintenance" className="data-[state=active]:bg-emerald-500 data-[state=active]:text-white whitespace-nowrap">
             Maintenance
           </TabsTrigger>
-          <TabsTrigger value="expenses" className="data-[state=active]:bg-emerald-500 data-[state=active]:text-white">
+          <TabsTrigger value="expenses" className="data-[state=active]:bg-emerald-500 data-[state=active]:text-white whitespace-nowrap">
             Expenses
           </TabsTrigger>
-          <TabsTrigger value="track" className="data-[state=active]:bg-emerald-500 data-[state=active]:text-white">
+          <TabsTrigger value="track" className="data-[state=active]:bg-emerald-500 data-[state=active]:text-white whitespace-nowrap">
             Track
           </TabsTrigger>
-          <TabsTrigger value="documents" className="data-[state=active]:bg-emerald-500 data-[state=active]:text-white">
+          <TabsTrigger value="documents" className="data-[state=active]:bg-emerald-500 data-[state=active]:text-white whitespace-nowrap">
             Documents
           </TabsTrigger>
-          <TabsTrigger value="agreement-track" className="data-[state=active]:bg-emerald-500 data-[state=active]:text-white">
+          <TabsTrigger value="agreement-track" className="data-[state=active]:bg-emerald-500 data-[state=active]:text-white whitespace-nowrap">
             Agreement Track
           </TabsTrigger>
-          <TabsTrigger value="tasks" className="data-[state=active]:bg-emerald-500 data-[state=active]:text-white">
+          <TabsTrigger value="tasks" className="data-[state=active]:bg-emerald-500 data-[state=active]:text-white whitespace-nowrap">
             Tasks
           </TabsTrigger>
-          <TabsTrigger value="history" className="data-[state=active]:bg-emerald-500 data-[state=active]:text-white">
+          <TabsTrigger value="history" className="data-[state=active]:bg-emerald-500 data-[state=active]:text-white whitespace-nowrap">
             History
           </TabsTrigger>
         </TabsList>
