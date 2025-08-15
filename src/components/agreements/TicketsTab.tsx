@@ -275,7 +275,7 @@ export const TicketsTab: React.FC<TicketsTabProps> = ({ agreementId, customerId,
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="EGP">EGP (ج.م)</SelectItem>
+                      <SelectItem value="EGP">EGP</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

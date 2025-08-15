@@ -112,7 +112,7 @@ export const QuoteWizardStep4: React.FC<QuoteWizardStep4Props> = ({
                     <div className="col-span-2">
                       <Label>Total</Label>
                       <div className="h-10 flex items-center px-3 border rounded-md bg-muted">
-                        {(item.qty * item.rate).toFixed(2)} ج.م
+                        {(item.qty * item.rate).toFixed(2)} EGP
                       </div>
                     </div>
                     <div className="col-span-1">
@@ -158,9 +158,9 @@ export const QuoteWizardStep4: React.FC<QuoteWizardStep4Props> = ({
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="EGP">EGP (ج.م)</SelectItem>
-                </SelectContent>
+                    <SelectContent>
+                      <SelectItem value="EGP">EGP</SelectItem>
+                    </SelectContent>
               </Select>
             </div>
           </div>
@@ -215,16 +215,16 @@ export const QuoteWizardStep4: React.FC<QuoteWizardStep4Props> = ({
           <div className="space-y-3">
             <div className="flex justify-between">
               <span>Subtotal</span>
-              <span>{subtotal.toFixed(2)} ج.م</span>
+              <span>{subtotal.toFixed(2)} EGP</span>
             </div>
             <div className="flex justify-between">
               <span>Tax ({((data.tax_rate || 0) * 100).toFixed(1)}%)</span>
-              <span>{taxAmount.toFixed(2)} ج.م</span>
+              <span>{taxAmount.toFixed(2)} EGP</span>
             </div>
             <Separator />
             <div className="flex justify-between font-semibold text-lg">
               <span>Total</span>
-              <span>{total.toFixed(2)} ج.م</span>
+              <span>{total.toFixed(2)} EGP</span>
             </div>
           </div>
         </CardContent>

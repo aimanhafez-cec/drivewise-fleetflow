@@ -9,7 +9,7 @@ export function cn(...inputs: ClassValue[]) {
 export const formatCurrency = (amount: number, currencyCode: string = 'EGP'): string => {
   // Format for Egyptian Pound
   if (currencyCode === 'EGP') {
-    return `${amount.toFixed(2)} ج.م`;
+    return `${amount.toFixed(2)} EGP`;
   }
   
   // Fallback for other currencies
