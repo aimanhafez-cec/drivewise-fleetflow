@@ -1,72 +1,209 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { useToast } from '@/hooks/use-toast';
 import { 
   ArrowLeft,
   Edit,
+  Save,
   Calendar,
   FileText,
   MoreHorizontal,
   Info,
   Shield,
   CreditCard,
-  DollarSign
+  DollarSign,
+  User,
+  Phone,
+  Mail
 } from 'lucide-react';
+
+interface Customer {
+  id: string;
+  full_name: string;
+  email: string;
+  phone: string;
+  address: any;
+  emergency_contact: any;
+  license_number: string;
+  license_expiry: string;
+  date_of_birth: string;
+  profile_photo_url: string;
+  notes: string;
+  credit_rating: number;
+  total_spent: number;
+  total_rentals: number;
+  created_at: string;
+  updated_at: string;
+}
 
 const CustomerDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState('summary');
+  const [isEditing, setIsEditing] = useState(false);
+  const [editData, setEditData] = useState<Partial<Customer>>({});
 
-  // Mock customer data - in real app this would come from API
-  const customer = {
-    id: id || '1',
-    fullName: 'John Coffman',
-    phone: '',
-    email: '',
-    status: 'Active',
-    licenseNo: '',
-    licenseExpiryDate: '',
-    address: '',
-    avatar: '/lovable-uploads/2b73ff6a-321f-4f42-8e12-e8b171d53e4b.png',
-    companyName: '',
-    companyRegNo: '',
-    licenseCategory: '',
-    licenseIssueDate: '',
-    passportNo: '',
-    passportIssueDate: '',
-    passportExpiryDate: '',
-    accountNo: '',
-    bankName: '',
-    bankSwiftCode: '',
-    emergencyContactNo: '',
-    dateOfBirth: '10/11/1989',
-    drivingExperience: '',
-    insuranceCompany: '',
-    policyNo: '',
-    insuranceExpiryDate: '8/17/2039',
-    creditCardType: '',
-    nameOnCard: '',
-    cardNumber: ''
+  // Fetch customer data
+  const { data: customer, isLoading, error } = useQuery({
+    queryKey: ['customer', id],
+    queryFn: async () => {
+      if (!id) throw new Error('Customer ID is required');
+      
+      const { data, error } = await supabase
+        .from('customers')
+        .select('*')
+        .eq('id', id)
+        .maybeSingle();
+
+      if (error) throw error;
+      if (!data) throw new Error('Customer not found');
+      
+      return data as Customer;
+    },
+    enabled: !!id,
+  });
+
+  // Fetch customer statistics
+  const { data: stats } = useQuery({
+    queryKey: ['customer-stats', id],
+    queryFn: async () => {
+      if (!id) return null;
+
+      const [reservationsResult, agreementsResult, paymentsResult, ticketsResult] = await Promise.all([
+        supabase.from('reservations').select('status, total_amount').eq('customer_id', id),
+        supabase.from('agreements').select('status, total_amount').eq('customer_id', id),
+        supabase.from('payments').select('status, amount').eq('customer_id', id),
+        supabase.from('traffic_tickets').select('status').eq('customer_id', id)
+      ]);
+
+      const reservations = reservationsResult.data || [];
+      const agreements = agreementsResult.data || [];
+      const payments = paymentsResult.data || [];
+      const tickets = ticketsResult.data || [];
+
+      return {
+        totalRevenue: reservations.reduce((sum, r) => sum + (r.total_amount || 0), 0) + 
+                     agreements.reduce((sum, a) => sum + (a.total_amount || 0), 0),
+        openedReservations: reservations.length,
+        confirmedReservations: reservations.filter(r => r.status === 'confirmed').length,
+        noShowReservations: 0, // Note: no_show status not available in current schema
+        cancelledReservations: reservations.filter(r => r.status === 'cancelled').length,
+        openedAgreements: agreements.filter(a => a.status === 'active').length,
+        closedAgreements: agreements.filter(a => a.status === 'completed').length,
+        totalTickets: tickets.length,
+        pendingPayments: payments.filter(p => p.status === 'pending').length,
+      };
+    },
+    enabled: !!id,
+  });
+
+  // Update customer mutation
+  const updateCustomerMutation = useMutation({
+    mutationFn: async (updates: Partial<Customer>) => {
+      if (!id) throw new Error('Customer ID is required');
+      
+      const { error } = await supabase
+        .from('customers')
+        .update(updates)
+        .eq('id', id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['customer', id] });
+      setIsEditing(false);
+      setEditData({});
+      toast({
+        title: "Success",
+        description: "Customer updated successfully",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleSave = () => {
+    updateCustomerMutation.mutate(editData);
   };
 
+  const handleInputChange = (field: keyof Customer, value: any) => {
+    setEditData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const formatDate = (dateString: string) => {
+    if (!dateString) return 'Not provided';
+    return new Date(dateString).toLocaleDateString();
+  };
+
+  const formatAddress = (address: any) => {
+    if (!address) return 'Not provided';
+    if (typeof address === 'string') return address;
+    
+    const parts = [];
+    if (address.street) parts.push(address.street);
+    if (address.city) parts.push(address.city);
+    if (address.state) parts.push(address.state);
+    if (address.zip) parts.push(address.zip);
+    
+    return parts.length > 0 ? parts.join(', ') : 'Not provided';
+  };
+
+  const getCreditRatingBadge = (rating: number) => {
+    if (rating >= 750) return { label: 'Excellent', color: 'bg-green-500' };
+    if (rating >= 700) return { label: 'Good', color: 'bg-blue-500' };
+    if (rating >= 650) return { label: 'Fair', color: 'bg-yellow-500' };
+    if (rating >= 600) return { label: 'Poor', color: 'bg-orange-500' };
+    return { label: 'Very Poor', color: 'bg-red-500' };
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-lg">Loading customer details...</div>
+      </div>
+    );
+  }
+
+  if (error || !customer) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 space-y-4">
+        <div className="text-lg text-destructive">Customer not found</div>
+        <Button onClick={() => navigate('/customers')}>
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to Customers
+        </Button>
+      </div>
+    );
+  }
+
   const summaryStats = [
-    { label: 'Total Revenue', value: '$10,761.00', color: 'text-emerald-500' },
-    { label: 'Opened Reservations', value: '8', color: 'text-blue-500' },
-    { label: 'Confirmed Reservations', value: '4', color: 'text-blue-500' },
-    { label: 'No Show Reservations', value: '0', color: 'text-gray-500' },
-    { label: 'Cancelled Reservations', value: '1', color: 'text-red-500' },
-    { label: 'Opened Agreements', value: '7', color: 'text-purple-500' },
-    { label: 'Closed Agreements', value: '5', color: 'text-green-500' },
-    { label: 'Total Traffic Tickets', value: '0', color: 'text-gray-500' },
-    { label: 'Pending Payments', value: '0', color: 'text-orange-500' },
-    { label: 'Pending Deposits', value: '', color: 'text-gray-500' },
+    { label: 'Total Revenue', value: `$${(stats?.totalRevenue || 0).toLocaleString()}`, color: 'text-emerald-500' },
+    { label: 'Opened Reservations', value: stats?.openedReservations || 0, color: 'text-blue-500' },
+    { label: 'Confirmed Reservations', value: stats?.confirmedReservations || 0, color: 'text-blue-500' },
+    { label: 'No Show Reservations', value: stats?.noShowReservations || 0, color: 'text-gray-500' },
+    { label: 'Cancelled Reservations', value: stats?.cancelledReservations || 0, color: 'text-red-500' },
+    { label: 'Opened Agreements', value: stats?.openedAgreements || 0, color: 'text-purple-500' },
+    { label: 'Closed Agreements', value: stats?.closedAgreements || 0, color: 'text-green-500' },
+    { label: 'Total Traffic Tickets', value: stats?.totalTickets || 0, color: 'text-gray-500' },
+    { label: 'Pending Payments', value: stats?.pendingPayments || 0, color: 'text-orange-500' },
+    { label: 'Total Rentals', value: customer.total_rentals || 0, color: 'text-blue-500' },
   ];
 
   return (
@@ -84,28 +221,63 @@ const CustomerDetails = () => {
           </Button>
           <div className="flex items-center gap-4">
             <Avatar className="h-12 w-12">
-              <AvatarImage src={customer.avatar} alt={customer.fullName} />
-              <AvatarFallback>{customer.fullName.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+              <AvatarImage src={customer.profile_photo_url} alt={customer.full_name} />
+              <AvatarFallback>{customer.full_name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
             </Avatar>
             <div>
-              <h1 className="text-2xl font-semibold">{customer.fullName}</h1>
-              <div className="flex items-center gap-4 text-sm text-gray-600">
-                <span>Phone</span>
+              <h1 className="text-2xl font-semibold">{customer.full_name}</h1>
+              <div className="flex items-center gap-4 text-sm text-muted-foreground">
                 <div className="flex items-center gap-2">
-                  <span>Status</span>
-                  <Badge variant="secondary" className="bg-green-100 text-green-700">
-                    {customer.status}
-                  </Badge>
+                  <Phone className="h-4 w-4" />
+                  <span>{customer.phone || 'No phone'}</span>
                 </div>
+                <div className="flex items-center gap-2">
+                  <Mail className="h-4 w-4" />
+                  <span>{customer.email}</span>
+                </div>
+                {customer.credit_rating && (
+                  <Badge 
+                    variant="secondary" 
+                    className={`${getCreditRatingBadge(customer.credit_rating).color} text-white`}
+                  >
+                    {getCreditRatingBadge(customer.credit_rating).label}
+                  </Badge>
+                )}
               </div>
             </div>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" className="bg-blue-900 text-white hover:bg-blue-800">
-            <Edit className="mr-2 h-4 w-4" />
-            Edit
-          </Button>
+          {isEditing ? (
+            <>
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  setIsEditing(false);
+                  setEditData({});
+                }}
+              >
+                Cancel
+              </Button>
+              <Button 
+                onClick={handleSave}
+                disabled={updateCustomerMutation.isPending}
+                className="bg-emerald-500 hover:bg-emerald-600 text-white"
+              >
+                <Save className="mr-2 h-4 w-4" />
+                {updateCustomerMutation.isPending ? 'Saving...' : 'Save'}
+              </Button>
+            </>
+          ) : (
+            <Button 
+              variant="outline" 
+              onClick={() => setIsEditing(true)}
+              className="bg-blue-900 text-white hover:bg-blue-800"
+            >
+              <Edit className="mr-2 h-4 w-4" />
+              Edit
+            </Button>
+          )}
           <Button className="bg-emerald-500 hover:bg-emerald-600 text-white">
             <Calendar className="mr-2 h-4 w-4" />
             Reservation
@@ -113,9 +285,6 @@ const CustomerDetails = () => {
           <Button className="bg-emerald-500 hover:bg-emerald-600 text-white">
             <FileText className="mr-2 h-4 w-4" />
             Agreement
-          </Button>
-          <Button variant="ghost" size="sm">
-            <MoreHorizontal className="h-4 w-4" />
           </Button>
         </div>
       </div>
@@ -125,29 +294,100 @@ const CustomerDetails = () => {
         <CardContent className="p-6">
           <div className="grid grid-cols-6 gap-4">
             <div>
-              <Label htmlFor="fullName" className="text-sm font-medium text-gray-600">Full Name</Label>
-              <Input id="fullName" value={customer.fullName} readOnly className="mt-1" />
+              <Label htmlFor="fullName" className="text-sm font-medium text-muted-foreground">Full Name</Label>
+              <Input 
+                id="fullName" 
+                value={isEditing ? (editData.full_name ?? customer.full_name) : customer.full_name}
+                onChange={(e) => handleInputChange('full_name', e.target.value)}
+                readOnly={!isEditing}
+                className="mt-1" 
+              />
             </div>
             <div>
-              <Label htmlFor="phoneNo" className="text-sm font-medium text-gray-600">Phone No.</Label>
-              <Input id="phoneNo" value={customer.phone} readOnly className="mt-1" />
+              <Label htmlFor="phoneNo" className="text-sm font-medium text-muted-foreground">Phone No.</Label>
+              <Input 
+                id="phoneNo" 
+                value={isEditing ? (editData.phone ?? customer.phone ?? '') : (customer.phone || '')}
+                onChange={(e) => handleInputChange('phone', e.target.value)}
+                readOnly={!isEditing}
+                className="mt-1" 
+              />
             </div>
             <div>
-              <Label htmlFor="email" className="text-sm font-medium text-gray-600">Email</Label>
-              <Input id="email" value={customer.email} readOnly className="mt-1" />
+              <Label htmlFor="email" className="text-sm font-medium text-muted-foreground">Email</Label>
+              <Input 
+                id="email" 
+                value={isEditing ? (editData.email ?? customer.email) : customer.email}
+                onChange={(e) => handleInputChange('email', e.target.value)}
+                readOnly={!isEditing}
+                className="mt-1" 
+              />
             </div>
             <div>
-              <Label htmlFor="licenseNo" className="text-sm font-medium text-gray-600">License No.</Label>
-              <Input id="licenseNo" value={customer.licenseNo} readOnly className="mt-1" />
+              <Label htmlFor="licenseNo" className="text-sm font-medium text-muted-foreground">License No.</Label>
+              <Input 
+                id="licenseNo" 
+                value={isEditing ? (editData.license_number ?? customer.license_number ?? '') : (customer.license_number || '')}
+                onChange={(e) => handleInputChange('license_number', e.target.value)}
+                readOnly={!isEditing}
+                className="mt-1" 
+              />
             </div>
             <div>
-              <Label htmlFor="licenseExpiry" className="text-sm font-medium text-gray-600">License Expiry Date</Label>
-              <Input id="licenseExpiry" value={customer.licenseExpiryDate} readOnly className="mt-1" />
+              <Label htmlFor="licenseExpiry" className="text-sm font-medium text-muted-foreground">License Expiry Date</Label>
+              <Input 
+                id="licenseExpiry" 
+                type={isEditing ? "date" : "text"}
+                value={isEditing ? (editData.license_expiry ?? customer.license_expiry ?? '') : formatDate(customer.license_expiry)}
+                onChange={(e) => handleInputChange('license_expiry', e.target.value)}
+                readOnly={!isEditing}
+                className="mt-1" 
+              />
             </div>
             <div>
-              <Label htmlFor="address" className="text-sm font-medium text-gray-600">Address</Label>
-              <Input id="address" value={customer.address} readOnly className="mt-1" />
+              <Label htmlFor="dateOfBirth" className="text-sm font-medium text-muted-foreground">Date of Birth</Label>
+              <Input 
+                id="dateOfBirth" 
+                type={isEditing ? "date" : "text"}
+                value={isEditing ? (editData.date_of_birth ?? customer.date_of_birth ?? '') : formatDate(customer.date_of_birth)}
+                onChange={(e) => handleInputChange('date_of_birth', e.target.value)}
+                readOnly={!isEditing}
+                className="mt-1" 
+              />
             </div>
+          </div>
+          
+          {/* Address field */}
+          <div className="mt-4">
+            <Label htmlFor="address" className="text-sm font-medium text-muted-foreground">Address</Label>
+            {isEditing ? (
+              <Textarea 
+                id="address" 
+                value={editData.address ? JSON.stringify(editData.address) : formatAddress(customer.address)}
+                onChange={(e) => handleInputChange('address', e.target.value)}
+                className="mt-1" 
+              />
+            ) : (
+              <Input 
+                id="address" 
+                value={formatAddress(customer.address)}
+                readOnly
+                className="mt-1" 
+              />
+            )}
+          </div>
+
+          {/* Notes field */}
+          <div className="mt-4">
+            <Label htmlFor="notes" className="text-sm font-medium text-muted-foreground">Notes</Label>
+            <Textarea 
+              id="notes" 
+              value={isEditing ? (editData.notes ?? customer.notes ?? '') : (customer.notes || '')}
+              onChange={(e) => handleInputChange('notes', e.target.value)}
+              readOnly={!isEditing}
+              className="mt-1" 
+              rows={3}
+            />
           </div>
         </CardContent>
       </Card>
@@ -188,124 +428,40 @@ const CustomerDetails = () => {
                   <CardContent className="space-y-4">
                     <div className="grid grid-cols-3 gap-4">
                       <div>
-                        <Label className="text-sm font-medium text-gray-600">Company Name</Label>
-                        <Input value={customer.companyName} readOnly className="mt-1" />
+                        <Label className="text-sm font-medium text-muted-foreground">Full Name</Label>
+                        <Input value={customer.full_name} readOnly className="mt-1" />
                       </div>
                       <div>
-                        <Label className="text-sm font-medium text-gray-600">Company Reg No.</Label>
-                        <Input value={customer.companyRegNo} readOnly className="mt-1" />
+                        <Label className="text-sm font-medium text-muted-foreground">Email</Label>
+                        <Input value={customer.email} readOnly className="mt-1" />
                       </div>
                       <div>
-                        <Label className="text-sm font-medium text-gray-600">License Category</Label>
-                        <Input value={customer.licenseCategory} readOnly className="mt-1" />
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-3 gap-4">
-                      <div>
-                        <Label className="text-sm font-medium text-gray-600">License No.</Label>
-                        <Input value={customer.licenseNo} readOnly className="mt-1" />
-                      </div>
-                      <div>
-                        <Label className="text-sm font-medium text-gray-600">License Issue Date</Label>
-                        <Input value={customer.licenseIssueDate} readOnly className="mt-1" />
-                      </div>
-                      <div>
-                        <Label className="text-sm font-medium text-gray-600">License Expiry Date</Label>
-                        <Input value={customer.licenseExpiryDate} readOnly className="mt-1" />
+                        <Label className="text-sm font-medium text-muted-foreground">Phone</Label>
+                        <Input value={customer.phone || 'Not provided'} readOnly className="mt-1" />
                       </div>
                     </div>
                     <div className="grid grid-cols-3 gap-4">
                       <div>
-                        <Label className="text-sm font-medium text-gray-600">Passport No.</Label>
-                        <Input value={customer.passportNo} readOnly className="mt-1" />
+                        <Label className="text-sm font-medium text-muted-foreground">License Number</Label>
+                        <Input value={customer.license_number || 'Not provided'} readOnly className="mt-1" />
                       </div>
                       <div>
-                        <Label className="text-sm font-medium text-gray-600">Passport Issue Date</Label>
-                        <Input value={customer.passportIssueDate} readOnly className="mt-1" />
+                        <Label className="text-sm font-medium text-muted-foreground">License Expiry</Label>
+                        <Input value={formatDate(customer.license_expiry)} readOnly className="mt-1" />
                       </div>
                       <div>
-                        <Label className="text-sm font-medium text-gray-600">Passport Expiry Date</Label>
-                        <Input value={customer.passportExpiryDate} readOnly className="mt-1" />
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-3 gap-4">
-                      <div>
-                        <Label className="text-sm font-medium text-gray-600">Account No.</Label>
-                        <Input value={customer.accountNo} readOnly className="mt-1" />
-                      </div>
-                      <div>
-                        <Label className="text-sm font-medium text-gray-600">Bank Name</Label>
-                        <Input value={customer.bankName} readOnly className="mt-1" />
-                      </div>
-                      <div>
-                        <Label className="text-sm font-medium text-gray-600">Bank Swift Code</Label>
-                        <Input value={customer.bankSwiftCode} readOnly className="mt-1" />
+                        <Label className="text-sm font-medium text-muted-foreground">Date of Birth</Label>
+                        <Input value={formatDate(customer.date_of_birth)} readOnly className="mt-1" />
                       </div>
                     </div>
-                    <div className="grid grid-cols-3 gap-4">
+                    <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <Label className="text-sm font-medium text-gray-600">Emergency Contact No.</Label>
-                        <Input value={customer.emergencyContactNo} readOnly className="mt-1" />
+                        <Label className="text-sm font-medium text-muted-foreground">Address</Label>
+                        <Textarea value={formatAddress(customer.address)} readOnly className="mt-1" rows={2} />
                       </div>
                       <div>
-                        <Label className="text-sm font-medium text-gray-600">Date Of Birth</Label>
-                        <Input value={customer.dateOfBirth} readOnly className="mt-1" />
-                      </div>
-                      <div>
-                        <Label className="text-sm font-medium text-gray-600">Driving Experience</Label>
-                        <Input value={customer.drivingExperience} readOnly className="mt-1" />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Insurance Information */}
-                <Card>
-                  <CardHeader className="pb-4">
-                    <CardTitle className="flex items-center gap-2 text-lg">
-                      <Shield className="h-5 w-5 text-emerald-500" />
-                      Insurance Information
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-3 gap-4">
-                      <div>
-                        <Label className="text-sm font-medium text-gray-600">Company</Label>
-                        <Input value={customer.insuranceCompany} readOnly className="mt-1" />
-                      </div>
-                      <div>
-                        <Label className="text-sm font-medium text-gray-600">Policy No.</Label>
-                        <Input value={customer.policyNo} readOnly className="mt-1" />
-                      </div>
-                      <div>
-                        <Label className="text-sm font-medium text-gray-600">Insurance Expiry Date</Label>
-                        <Input value={customer.insuranceExpiryDate} readOnly className="mt-1" />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Payment Information */}
-                <Card>
-                  <CardHeader className="pb-4">
-                    <CardTitle className="flex items-center gap-2 text-lg">
-                      <CreditCard className="h-5 w-5 text-emerald-500" />
-                      Payment Information
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-3 gap-4">
-                      <div>
-                        <Label className="text-sm font-medium text-gray-600">Credit Card Type</Label>
-                        <Input value={customer.creditCardType} readOnly className="mt-1" />
-                      </div>
-                      <div>
-                        <Label className="text-sm font-medium text-gray-600">Name On Card</Label>
-                        <Input value={customer.nameOnCard} readOnly className="mt-1" />
-                      </div>
-                      <div>
-                        <Label className="text-sm font-medium text-gray-600">Card Number</Label>
-                        <Input value={customer.cardNumber} readOnly className="mt-1" />
+                        <Label className="text-sm font-medium text-muted-foreground">Credit Rating</Label>
+                        <Input value={customer.credit_rating ? `${customer.credit_rating} (${getCreditRatingBadge(customer.credit_rating).label})` : 'Not rated'} readOnly className="mt-1" />
                       </div>
                     </div>
                   </CardContent>
@@ -324,7 +480,7 @@ const CustomerDetails = () => {
                   <CardContent className="space-y-4">
                     {summaryStats.map((stat, index) => (
                       <div key={index} className="flex items-center justify-between py-2">
-                        <span className="text-sm text-gray-600">{stat.label}</span>
+                        <span className="text-sm text-muted-foreground">{stat.label}</span>
                         <span className={`text-sm font-medium ${stat.color}`}>
                           {stat.value}
                         </span>
@@ -339,7 +495,15 @@ const CustomerDetails = () => {
           <TabsContent value="notes">
             <Card>
               <CardContent className="p-6">
-                <p className="text-gray-500">Notes content will be implemented here.</p>
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">Customer Notes</h3>
+                  <Textarea 
+                    value={customer.notes || 'No notes available'}
+                    readOnly
+                    rows={10}
+                    className="w-full"
+                  />
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
@@ -347,7 +511,7 @@ const CustomerDetails = () => {
           <TabsContent value="documents">
             <Card>
               <CardContent className="p-6">
-                <p className="text-gray-500">Documents content will be implemented here.</p>
+                <p className="text-muted-foreground">Documents functionality will be implemented here.</p>
               </CardContent>
             </Card>
           </TabsContent>
@@ -355,7 +519,7 @@ const CustomerDetails = () => {
           <TabsContent value="deposit">
             <Card>
               <CardContent className="p-6">
-                <p className="text-gray-500">Deposit Summary content will be implemented here.</p>
+                <p className="text-muted-foreground">Deposit Summary functionality will be implemented here.</p>
               </CardContent>
             </Card>
           </TabsContent>
@@ -363,7 +527,7 @@ const CustomerDetails = () => {
           <TabsContent value="claims">
             <Card>
               <CardContent className="p-6">
-                <p className="text-gray-500">Claims content will be implemented here.</p>
+                <p className="text-muted-foreground">Claims functionality will be implemented here.</p>
               </CardContent>
             </Card>
           </TabsContent>
