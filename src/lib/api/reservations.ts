@@ -175,7 +175,7 @@ export const mockApi = {
     
     try {
       let supabaseQuery = supabase
-        .from('profiles')
+        .from('customers')
         .select('id, full_name, email')
         .order('full_name');
       
@@ -184,7 +184,7 @@ export const mockApi = {
         supabaseQuery = supabaseQuery.or(`full_name.ilike.%${query}%,email.ilike.%${query}%`);
       }
       
-      const { data: profiles, error } = await supabaseQuery;
+      const { data: customerRecords, error } = await supabaseQuery;
       
       if (error) {
         console.error('Error fetching customers:', error);
@@ -196,11 +196,11 @@ export const mockApi = {
         );
       }
       
-      // Convert profiles to Customer format
-      return profiles.map(profile => ({
-        id: profile.id,
-        name: profile.full_name || 'Unknown Customer',
-        email: profile.email || '',
+      // Convert customer records to Customer format
+      return customerRecords.map(customer => ({
+        id: customer.id,
+        name: customer.full_name || 'Unknown Customer',
+        email: customer.email || '',
         billToOptions: [
           { id: 'personal', label: 'Personal Account', value: 'personal' },
         ],
