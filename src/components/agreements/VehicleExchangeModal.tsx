@@ -11,8 +11,9 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { CalendarIcon, AlertTriangle } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { exchangeAPI } from '@/lib/api/operations';
 import { toast } from 'sonner';
 
 interface VehicleExchangeModalProps {
@@ -50,17 +51,24 @@ export const VehicleExchangeModal: React.FC<VehicleExchangeModalProps> = ({
 
   const queryClient = useQueryClient();
 
+  const { data: availableVehicles } = useQuery({
+    queryKey: ['available-vehicles', formData.newVehicleClass, formData.exchangeAt],
+    queryFn: async () => {
+      if (!formData.newVehicleClass) return [];
+      
+      // Mock data - in real app would check availability
+      return [
+        { id: 'vehicle-1', make: 'Toyota', model: 'Camry', license_plate: 'ABC123', year: 2024 },
+        { id: 'vehicle-2', make: 'Honda', model: 'Accord', license_plate: 'XYZ789', year: 2024 },
+        { id: 'vehicle-3', make: 'Nissan', model: 'Altima', license_plate: 'DEF456', year: 2024 },
+      ];
+    },
+    enabled: !!formData.newVehicleClass
+  });
+
   const exchangeMutation = useMutation({
     mutationFn: async (exchangeData: any) => {
-      // Mock exchange logic - in real app this would call the exchange API
-      const { data, error } = await supabase
-        .from('vehicle_exchanges')
-        .insert([exchangeData])
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
+      return await exchangeAPI.createVehicleExchange(exchangeData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['agreement', agreementId] });
@@ -284,11 +292,16 @@ export const VehicleExchangeModal: React.FC<VehicleExchangeModalProps> = ({
                   <SelectTrigger>
                     <SelectValue placeholder="Select vehicle" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="vehicle-1">2024 Toyota Camry - ABC123</SelectItem>
-                    <SelectItem value="vehicle-2">2024 Honda Accord - XYZ789</SelectItem>
-                    <SelectItem value="vehicle-3">2024 Nissan Altima - DEF456</SelectItem>
-                  </SelectContent>
+                <SelectContent>
+                  {availableVehicles?.map((vehicle) => (
+                    <SelectItem key={vehicle.id} value={vehicle.id}>
+                      {vehicle.year} {vehicle.make} {vehicle.model} - {vehicle.license_plate}
+                    </SelectItem>
+                  ))}
+                  {(!availableVehicles || availableVehicles.length === 0) && (
+                    <SelectItem value="" disabled>No vehicles available</SelectItem>
+                  )}
+                </SelectContent>
                 </Select>
               </div>
             </div>

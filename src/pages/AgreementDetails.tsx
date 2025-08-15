@@ -12,6 +12,7 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbS
 import { ArrowLeft, FileText, Eye } from 'lucide-react';
 import { format } from 'date-fns';
 import { AgreementActions } from '@/components/agreements/AgreementActions';
+import { AgreementLinesTable } from '@/components/agreements/AgreementLinesTable';
 import { DamageTab } from '@/components/agreements/DamageTab';
 import { TicketsTab } from '@/components/agreements/TicketsTab';
 
@@ -21,7 +22,7 @@ const AgreementDetails = () => {
   const [searchParams] = useSearchParams();
   const fromReservation = searchParams.get('fromReservation');
 
-  const { data: agreement, isLoading } = useQuery({
+  const { data: agreement, isLoading, refetch } = useQuery({
     queryKey: ['agreement', id],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -263,59 +264,16 @@ const AgreementDetails = () => {
         </TabsList>
 
         <TabsContent value="summary" className="space-y-6">
-          {/* Agreement Lines */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Agreement Lines</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {agreement.agreement_lines && agreement.agreement_lines.length > 0 ? (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Vehicle</TableHead>
-                      <TableHead>Check Out</TableHead>
-                      <TableHead>Check In</TableHead>
-                      <TableHead>Net Amount</TableHead>
-                      <TableHead>Total</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {agreement.agreement_lines.map((line: any) => (
-                      <TableRow key={line.id}>
-                        <TableCell>
-                          {agreement.vehicles ? 
-                            `${agreement.vehicles.make} ${agreement.vehicles.model}` : 
-                            'Vehicle TBD'
-                          }
-                        </TableCell>
-                        <TableCell>
-                          {line.check_out_at ? 
-                            format(new Date(line.check_out_at), 'MMM dd, yyyy HH:mm') : 
-                            'TBD'
-                          }
-                        </TableCell>
-                        <TableCell>
-                          {line.check_in_at ? 
-                            format(new Date(line.check_in_at), 'MMM dd, yyyy HH:mm') : 
-                            'TBD'
-                          }
-                        </TableCell>
-                        <TableCell>${line.line_net?.toFixed(2) || '0.00'}</TableCell>
-                        <TableCell className="font-medium">
-                          ${line.line_total?.toFixed(2) || '0.00'}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              ) : (
-                <p className="text-muted-foreground text-center py-8">
-                  No agreement lines found
-                </p>
-              )}
-            </CardContent>
-          </Card>
+          <AgreementLinesTable
+            agreementId={id!}
+            lines={agreement.agreement_lines || []}
+            agreementStartDate={new Date(agreement.agreement_date)}
+            agreementEndDate={new Date(agreement.return_datetime || agreement.agreement_date)}
+            onExchangeComplete={() => {
+              // Refresh agreement data after exchange
+              refetch();
+            }}
+          />
         </TabsContent>
 
         {/* Damage Tab */}

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { damageAPI } from '@/lib/api/operations';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -25,29 +26,11 @@ export const DamageTab: React.FC<DamageTabProps> = ({ agreementId, agreementLine
 
   const { data: damageMarkers, isLoading } = useQuery({
     queryKey: ['damage-markers', agreementId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('damage_markers')
-        .select('*')
-        .eq('agreement_id', agreementId)
-        .order('occurred_at', { ascending: false });
-
-      if (error) throw error;
-      return data || [];
-    }
+    queryFn: () => damageAPI.getDamageMarkers(agreementId)
   });
 
   const createMarkerMutation = useMutation({
-    mutationFn: async (markerData: any) => {
-      const { data, error } = await supabase
-        .from('damage_markers')
-        .insert([markerData])
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
+    mutationFn: (markerData: any) => damageAPI.createDamageMarker(markerData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['damage-markers', agreementId] });
       toast.success('Damage marker added successfully');

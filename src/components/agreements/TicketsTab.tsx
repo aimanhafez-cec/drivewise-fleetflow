@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { ticketsAPI, pricingAPI } from '@/lib/api/operations';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -47,31 +48,18 @@ export const TicketsTab: React.FC<TicketsTabProps> = ({ agreementId, customerId,
 
   const { data: tickets, isLoading } = useQuery({
     queryKey: ['traffic-tickets', agreementId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('traffic_tickets')
-        .select('*')
-        .eq('agreement_id', agreementId)
-        .order('occurred_at', { ascending: false });
-
-      if (error) throw error;
-      return data || [];
-    }
+    queryFn: () => ticketsAPI.getTrafficTickets(agreementId)
   });
 
   const createTicketMutation = useMutation({
-    mutationFn: async (ticketData: any) => {
-      const { data, error } = await supabase
-        .from('traffic_tickets')
-        .insert([ticketData])
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: () => {
+    mutationFn: (ticketData: any) => ticketsAPI.createTrafficTicket(ticketData),
+    onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ['traffic-tickets', agreementId] });
+      // Recalculate agreement totals if ticket was billed to customer
+      if (formData.billToCustomer) {
+        await pricingAPI.recalculateAgreementSummary(agreementId);
+        queryClient.invalidateQueries({ queryKey: ['agreement', agreementId] });
+      }
       toast.success('Traffic ticket added successfully');
       resetForm();
       setTicketModalOpen(false);
@@ -82,21 +70,12 @@ export const TicketsTab: React.FC<TicketsTabProps> = ({ agreementId, customerId,
   });
 
   const updateTicketMutation = useMutation({
-    mutationFn: async ({ id, status, paidDate }: { id: string; status: string; paidDate?: Date }) => {
+    mutationFn: ({ id, status, paidDate }: { id: string; status: string; paidDate?: Date }) => {
       const updateData: any = { status };
       if (paidDate) {
-        updateData.paid_date = paidDate.toISOString().split('T')[0];
+        updateData.court_date = paidDate.toISOString().split('T')[0]; // Using court_date for paid_date
       }
-
-      const { data, error } = await supabase
-        .from('traffic_tickets')
-        .update(updateData)
-        .eq('id', id)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
+      return ticketsAPI.updateTrafficTicket(id, updateData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['traffic-tickets', agreementId] });
