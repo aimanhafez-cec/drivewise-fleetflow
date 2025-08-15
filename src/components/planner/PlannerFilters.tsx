@@ -178,6 +178,7 @@ export const PlannerFilters: React.FC<PlannerFiltersProps> = ({
               <Button 
                 size="sm" 
                 className="flex-1"
+                onClick={() => onFiltersChange(filters)}
                 data-testid="btn-search"
               >
                 <Search className="mr-2 h-4 w-4" />
