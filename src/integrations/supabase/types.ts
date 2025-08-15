@@ -215,6 +215,63 @@ export type Database = {
         }
         Relationships: []
       }
+      customers: {
+        Row: {
+          address: Json | null
+          created_at: string
+          credit_rating: number | null
+          date_of_birth: string | null
+          email: string
+          emergency_contact: Json | null
+          full_name: string
+          id: string
+          license_expiry: string | null
+          license_number: string | null
+          notes: string | null
+          phone: string | null
+          profile_photo_url: string | null
+          total_rentals: number | null
+          total_spent: number | null
+          updated_at: string
+        }
+        Insert: {
+          address?: Json | null
+          created_at?: string
+          credit_rating?: number | null
+          date_of_birth?: string | null
+          email: string
+          emergency_contact?: Json | null
+          full_name: string
+          id?: string
+          license_expiry?: string | null
+          license_number?: string | null
+          notes?: string | null
+          phone?: string | null
+          profile_photo_url?: string | null
+          total_rentals?: number | null
+          total_spent?: number | null
+          updated_at?: string
+        }
+        Update: {
+          address?: Json | null
+          created_at?: string
+          credit_rating?: number | null
+          date_of_birth?: string | null
+          email?: string
+          emergency_contact?: Json | null
+          full_name?: string
+          id?: string
+          license_expiry?: string | null
+          license_number?: string | null
+          notes?: string | null
+          phone?: string | null
+          profile_photo_url?: string | null
+          total_rentals?: number | null
+          total_spent?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       damage_markers: {
         Row: {
           agreement_id: string | null

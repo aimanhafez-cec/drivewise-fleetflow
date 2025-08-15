@@ -30,7 +30,6 @@ interface CustomerFormData {
 
 interface Customer {
   id: string;
-  user_id: string;
   full_name: string;
   email: string;
   phone: string;
@@ -40,7 +39,7 @@ interface Customer {
   license_expiry: string;
   date_of_birth: string;
   profile_photo_url: string;
-  notes: string[];
+  notes: string;
   credit_rating: number;
   total_spent: number;
   total_rentals: number;
@@ -85,7 +84,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onSuccess }) => {
         emergency_phone: emergencyContact.phone || '',
         emergency_relationship: emergencyContact.relationship || '',
         credit_rating: customer.credit_rating || 0,
-        notes: customer.notes?.join('\n') || '',
+        notes: customer.notes || '',
       });
     }
   }, [customer, reset]);
@@ -112,12 +111,12 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onSuccess }) => {
           relationship: data.emergency_relationship || null,
         } : null,
         credit_rating: data.credit_rating || null,
-        notes: data.notes ? data.notes.split('\n').filter(note => note.trim()) : null,
+        notes: data.notes || null,
       };
 
       if (customer) {
         const { error } = await supabase
-          .from('profiles')
+          .from('customers')
           .update(customerData)
           .eq('id', customer.id);
         
@@ -126,11 +125,8 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onSuccess }) => {
         // For new customers, we need to create a user first or handle this differently
         // Since this is a management system, we'll insert directly into profiles
         const { error } = await supabase
-          .from('profiles')
-          .insert([{
-            ...customerData,
-            user_id: crypto.randomUUID(), // Generate a temporary UUID for now
-          }]);
+          .from('customers')
+          .insert([customerData]);
         
         if (error) throw error;
       }

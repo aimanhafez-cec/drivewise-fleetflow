@@ -12,7 +12,6 @@ import CustomerForm from '@/components/customers/CustomerForm';
 
 interface Customer {
   id: string;
-  user_id: string;
   full_name: string;
   email: string;
   phone: string;
@@ -22,7 +21,7 @@ interface Customer {
   license_expiry: string;
   date_of_birth: string;
   profile_photo_url: string;
-  notes: string[];
+  notes: string;
   credit_rating: number;
   total_spent: number;
   total_rentals: number;
@@ -49,7 +48,7 @@ const Customers = () => {
     queryKey: ['customers'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('profiles')
+        .from('customers')
         .select('*')
         .order('full_name', { ascending: true });
 
@@ -61,10 +60,10 @@ const Customers = () => {
   const deleteCustomerMutation = useMutation({
     mutationFn: async (customerId: string) => {
       const { error } = await supabase
-        .from('profiles')
+        .from('customers')
         .delete()
         .eq('id', customerId);
-      
+
       if (error) throw error;
     },
     onSuccess: () => {
