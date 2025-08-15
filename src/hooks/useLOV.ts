@@ -56,11 +56,29 @@ export const useLOV = <T extends LOVItem>(
   } = useInfiniteQuery({
     queryKey: [tableName, debouncedQuery, dependencies],
     queryFn: async ({ pageParam = 0 }: { pageParam: number }) => {
-      const { data, error } = await supabase
+      let query = supabase
         .from(tableName as any)
         .select(selectFields)
-        .range(pageParam * pageSize, (pageParam + 1) * pageSize - 1)
-        .order(orderBy);
+        .range(pageParam * pageSize, (pageParam + 1) * pageSize - 1);
+
+      // Apply dependencies as filters
+      Object.entries(dependencies).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          query = query.eq(key, value);
+        }
+      });
+
+      // Apply search if query exists
+      if (debouncedQuery && searchFields.length > 0) {
+        // Create OR conditions for search across multiple fields
+        const searchConditions = searchFields.map(field => `${field}.ilike.%${debouncedQuery}%`).join(',');
+        query = query.or(searchConditions);
+      }
+
+      // Apply ordering
+      query = query.order(orderBy);
+
+      const { data, error } = await query;
 
       if (error) throw error;
 
@@ -72,7 +90,7 @@ export const useLOV = <T extends LOVItem>(
     initialPageParam: 0,
     getNextPageParam: (lastPage: any) => lastPage.nextPage,
     staleTime,
-    enabled: Object.values(dependencies).every(dep => dep !== undefined)
+    enabled: Object.values(dependencies).every(dep => dep !== undefined) || Object.keys(dependencies).length === 0
   });
 
   const items = useMemo(() => {

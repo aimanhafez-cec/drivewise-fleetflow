@@ -12,7 +12,8 @@ export interface Customer {
 
 export const useCustomers = (searchQuery?: string) => {
   const result = useLOV<Customer>('customers', 'id, full_name, phone, email', {
-    searchFields: ['full_name', 'phone', 'email']
+    searchFields: ['full_name', 'email'],
+    orderBy: 'full_name'
   });
   
   if (searchQuery !== undefined) {
@@ -23,7 +24,7 @@ export const useCustomers = (searchQuery?: string) => {
     ...result,
     items: result.items.map(item => ({
       ...item,
-      label: item.full_name
+      label: `${item.full_name} (${item.email})`
     }))
   };
 };
@@ -157,11 +158,11 @@ export const useVehicleOptions = (filters: {
   if (classId) dependencies.category_id = classId;
   if (make) dependencies.make = make;
   if (model) dependencies.model = model;
-  if (locationId) dependencies.location_id = locationId;
   
   const result = useLOV<VehicleOption>('vehicles', 'id, make, model, year, license_plate, status, category_id', {
     dependencies,
-    searchFields: vinOrPlate ? ['vin', 'license_plate'] : ['make', 'model', 'license_plate']
+    searchFields: vinOrPlate ? ['vin', 'license_plate'] : ['make', 'model', 'license_plate'],
+    orderBy: 'make'
   });
   
   if (vinOrPlate) {
