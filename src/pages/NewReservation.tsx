@@ -1415,7 +1415,7 @@ const NewReservation = () => {
                   updateFormData('billing_address_id', billToData.billing_address_id);
                   updateFormData('bill_to_meta', billToData.bill_to_meta);
                 }}
-                errors={{}}
+                errors={validation.getFieldsWithPrefix('bill_to')}
                 currentCustomerId={formData.customerId}
                 currentCustomerName={selectedCustomer?.name}
               />

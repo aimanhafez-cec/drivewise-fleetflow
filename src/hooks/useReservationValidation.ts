@@ -144,6 +144,17 @@ export const useReservationValidation = () => {
     return validationErrors[path];
   }, [validationErrors]);
 
+  const getFieldsWithPrefix = useCallback((prefix: string): Record<string, string> => {
+    const prefixedErrors: Record<string, string> = {};
+    Object.entries(validationErrors).forEach(([key, value]) => {
+      if (key.startsWith(prefix)) {
+        const shortKey = key.replace(`${prefix}.`, '');
+        prefixedErrors[shortKey] = value;
+      }
+    });
+    return prefixedErrors;
+  }, [validationErrors]);
+
   const hasErrors = Object.keys(validationErrors).length > 0;
 
   return {
@@ -156,6 +167,7 @@ export const useReservationValidation = () => {
     clearFieldError,
     focusField,
     getFieldError,
+    getFieldsWithPrefix,
     hasErrors,
   };
 };
