@@ -447,8 +447,16 @@ const NewReservation = () => {
   }, []);
 
   const loadInitialData = async () => {
+    // Set currencies to only EGP & SAR
+    setOptions(prev => ({ 
+      ...prev, 
+      currencies: [
+        { id: 'EGP', label: 'EGP - Egyptian Pound', value: 'EGP' },
+        { id: 'SAR', label: 'SAR - Saudi Riyal', value: 'SAR' }
+      ]
+    }));
+
     const loadTasks = [
-      { key: 'currencies', fn: mockApi.getCurrencies },
       { key: 'reservationMethods', fn: mockApi.getReservationMethods },
       { key: 'reservationTypes', fn: mockApi.getReservationTypes },
       { key: 'businessUnits', fn: mockApi.getBusinessUnits },
