@@ -223,8 +223,13 @@ const DailyPlanner: React.FC = () => {
   };
 
   const handleSearch = () => {
+    console.log("Search button clicked! Invalidating queries...");
     // Invalidate and refetch the planner events query
     queryClient.invalidateQueries({ queryKey: ["planner-events"] });
+    toast({
+      title: "Search triggered",
+      description: "Refreshing planner data..."
+    });
   };
 
   const formatDateHeader = () => {
