@@ -239,6 +239,23 @@ const ReservationDetailsPage = () => {
     });
   };
 
+  const handleEdit = () => {
+    // Navigate to new reservation page with pre-populated data
+    const editData = {
+      reservationId: id,
+      customerId: reservationData.header?.customerId,
+      reservationNo: reservationData.header?.reservationNo,
+      businessUnit: reservationData.header?.businessUnit,
+      validityDate: reservationData.header?.validityDate,
+      paymentTerms: reservationData.header?.paymentTerms,
+      lines: reservationData.lines,
+    };
+    
+    navigate('/reservations/new', { 
+      state: { editData } 
+    });
+  };
+
   const handleConvertToAgreement = () => {
     if (!reservationData.header || reservationData.lines.length === 0) {
       toast({
@@ -374,9 +391,9 @@ const ReservationDetailsPage = () => {
             </div>
             
             <div className="flex items-center gap-2">
-              <Button id="btn-edit" variant="outline" size="sm" onClick={() => setEditMode(!editMode)}>
+              <Button id="btn-edit" variant="outline" size="sm" onClick={() => handleEdit()}>
                 <Edit className="mr-2 h-4 w-4" />
-                {editMode ? 'Save' : 'Edit'}
+                Edit
               </Button>
               <Button 
                 id="btn-convert" 
@@ -485,7 +502,7 @@ const ReservationDetailsPage = () => {
                             <TableCell>{formatCurrency(line.taxValue)}</TableCell>
                             <TableCell>{formatCurrency(line.lineTotal)}</TableCell>
                             <TableCell>
-                              <Button variant="ghost" size="sm">
+                              <Button variant="ghost" size="sm" onClick={() => handleEdit()}>
                                 <Edit className="h-4 w-4" />
                               </Button>
                             </TableCell>

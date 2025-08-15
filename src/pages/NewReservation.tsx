@@ -22,7 +22,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Separator } from '@/components/ui/separator';
 import { format } from 'date-fns';
 import { CalendarIcon, ChevronDown, Check, Plus, Trash2, Edit, Copy, Car, User, Plane, DollarSign, FileText, Shield, CreditCard, Users, Calculator } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { mockApi, DropdownOption, Customer, ReservationFormData, PriceList } from '@/lib/api/reservations';
@@ -183,6 +183,7 @@ interface ExtendedFormData extends ReservationFormData {
 
 const NewReservation = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
   
   const [formData, setFormData] = useState<ExtendedFormData>({
@@ -370,6 +371,90 @@ const NewReservation = () => {
     'vehicles-drivers',
     'reservation-lines'
   ]);
+
+  // Check if we're editing an existing reservation
+  const editData = location.state?.editData;
+
+  // Auto-populate form with existing reservation data
+  useEffect(() => {
+    if (editData) {
+      setFormData(prev => ({
+        ...prev,
+        customerId: editData.customerId || '',
+        businessUnitId: editData.businessUnit || '',
+        paymentTermsId: editData.paymentTerms || '',
+        validityDateTo: editData.validityDate || '',
+      }));
+
+      // Convert and set reservation lines if they exist
+      if (editData.lines && editData.lines.length > 0) {
+        const convertedLines: ReservationLine[] = editData.lines.map((line: any, index: number) => ({
+          id: line.id || (index + 1).toString(),
+          lineNo: index + 1,
+          reservationTypeId: line.reservationType || '',
+          vehicleClassId: line.vehicleClass || '',
+          vehicleId: line.vehicle || '',
+          driverName: line.driverName || '',
+          checkOutLocationId: '',
+          checkInLocationId: '',
+          checkOutDate: line.checkOutDate || '',
+          checkInDate: line.checkInDate || '',
+          lineNetPrice: line.lineNetPrice || 0,
+          taxValue: line.taxValue || 0,
+          lineTotal: line.lineTotal || 0,
+          licenseNumber: '',
+          checkOutTime: '09:00',
+          checkInTime: '17:00',
+          vehicleTypeId: '',
+          vehicleLocationId: '',
+          ratePlanId: '',
+          currencyCode: 'EGP',
+          discountTypeId: '',
+          discountValue: line.discountValue || 0,
+          taxLevelId: '',
+          taxCodeId: '',
+          taxLevel: line.tax || '',
+          taxCode: '',
+          priceListId: '',
+          reservationMethod: '',
+          vehicleMake: '',
+          vehicleModel: '',
+          vehicleType: '',
+          vehicleLocation: '',
+          rateType: '',
+          selectedDriverId: '',
+          hourlyRate: 0,
+          hourlyQty: 0,
+          weeklyRate: 0,
+          weeklyQty: 0,
+          dailyRate: 0,
+          dailyQty: 0,
+          monthlyRate: 0,
+          monthlyQty: 0,
+          kilometerCharge: 0,
+          totalVehiclePrice: 0,
+          dailyKilometerAllowed: 0,
+          totalDays: 0,
+          totalKilometerAllowed: 0,
+          promotionCode: '',
+          miscCharges: [],
+          netPrice: line.lineNetPrice || 0,
+          discount: '',
+          tax: line.tax || '',
+          total: line.lineTotal || 0,
+        }));
+        setFormData(prev => ({
+          ...prev,
+          reservationLines: convertedLines
+        }));
+      }
+
+      toast({
+        title: "Editing Reservation",
+        description: `Loaded data from reservation ${editData.reservationNo || 'Unknown'}`,
+      });
+    }
+  }, [editData, toast]);
 
   // Auto-open reservation lines section when prefill is complete
   useEffect(() => {
