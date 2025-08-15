@@ -145,7 +145,7 @@ const ReservationDetailsPage = () => {
       const data = reservationResponse.data;
       const paymentsData = paymentsResponse.data || [];
 
-      const mockData = {
+      const actualData = {
         header: {
           id: data.id,
           customerId: data.customer_id,
@@ -161,21 +161,21 @@ const ReservationDetailsPage = () => {
         },
         lines: [
           {
-            id: '1',
+            id: data.id,
             lineNo: 1,
-            reservationType: 'Standard',
-            vehicleClass: 'Economy',
-            vehicle: '2023 Toyota Corolla',
-            driverName: 'John Smith',
-            checkOutDate: '2024-01-30',
-            checkInDate: '2024-02-02',
-            lineNetPrice: 300.00,
-            additionAmount: 50.00,
-            discount: 'Weekend Special',
-            discountValue: 30.00,
-            tax: 'Sales Tax',
-            taxValue: 32.00,
-            lineTotal: 352.00,
+            reservationType: String(data.rate_plan || 'Standard'),
+            vehicleClass: 'Vehicle Class',
+            vehicle: data.vehicle_id || 'Vehicle to be assigned',
+            driverName: 'Driver TBD',
+            checkOutDate: format(new Date(data.start_datetime), 'yyyy-MM-dd'),
+            checkInDate: format(new Date(data.end_datetime), 'yyyy-MM-dd'),
+            lineNetPrice: data.total_amount || 0,
+            additionAmount: 0,
+            discount: '',
+            discountValue: 0,
+            tax: 'Tax',
+            taxValue: 0,
+            lineTotal: data.total_amount || 0,
           },
         ],
         payments: paymentsData.map(payment => ({
@@ -192,13 +192,13 @@ const ReservationDetailsPage = () => {
         },
       };
 
-      setReservationData(mockData);
+      setReservationData(actualData);
 
       // Show creation toast if redirected from new reservation
       if (searchParams.get('created') === '1') {
         toast({
           title: "Reservation Created",
-          description: `Reservation ${mockData.header.reservationNo} has been created successfully.`,
+          description: `Reservation ${actualData.header.reservationNo} has been created successfully.`,
         });
       }
 
