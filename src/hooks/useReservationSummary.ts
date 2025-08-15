@@ -17,6 +17,14 @@ export type Summary = {
   balanceDue: number;
   cancellationFee: number;
   securityDepositPaid: number;
+  // Payment terms integration
+  paymentDueDate?: Date;
+  minimumPaymentDue?: number;
+  paymentSchedule?: Array<{
+    dueDate: Date;
+    amount: number;
+    description: string;
+  }>;
 };
 
 interface ReservationLine {
@@ -40,6 +48,7 @@ interface FormData {
   advancePayment: number;
   securityDepositPaid: number;
   cancellationCharges: number;
+  paymentTermsId?: string; // Added payment terms integration
 }
 
 // Mock misc charges data - in real app this would come from API
@@ -96,6 +105,36 @@ export const useReservationSummary = (formData: FormData): Summary => {
     const grandTotal = estimatedTotal + cancelFee;
     const balanceDue = Math.max(grandTotal - advPaid - secDepPaid, 0);
     
+    // Calculate payment terms integration AFTER grandTotal is calculated
+    const paymentTermsId = formData.paymentTermsId;
+    let paymentDueDate: Date | undefined;
+    let minimumPaymentDue = 0;
+    
+    if (paymentTermsId) {
+      const today = new Date();
+      switch (paymentTermsId) {
+        case 'prepaid':
+          paymentDueDate = today;
+          minimumPaymentDue = grandTotal; // Full payment required upfront
+          break;
+        case 'cod':
+          paymentDueDate = today;
+          minimumPaymentDue = grandTotal; // Full payment on delivery
+          break;
+        case 'net15':
+          paymentDueDate = new Date(today.getTime() + 15 * 24 * 60 * 60 * 1000);
+          minimumPaymentDue = Math.max(grandTotal * 0.2, 0); // 20% minimum advance
+          break;
+        case 'net30':
+          paymentDueDate = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
+          minimumPaymentDue = Math.max(grandTotal * 0.2, 0); // 20% minimum advance
+          break;
+        default:
+          paymentDueDate = today;
+          minimumPaymentDue = grandTotal;
+      }
+    }
+    
     return {
       baseRate: Number(baseRate.toFixed(4)),
       promotion: Number(promotion.toFixed(4)),
@@ -113,6 +152,9 @@ export const useReservationSummary = (formData: FormData): Summary => {
       balanceDue: Number(balanceDue.toFixed(4)),
       cancellationFee: Number(cancelFee.toFixed(4)),
       securityDepositPaid: Number(secDepPaid.toFixed(4)),
+      // Payment terms data
+      paymentDueDate,
+      minimumPaymentDue: minimumPaymentDue ? Number(minimumPaymentDue.toFixed(4)) : undefined,
     };
   }, [
     formData.reservationLines,
@@ -123,5 +165,6 @@ export const useReservationSummary = (formData: FormData): Summary => {
     formData.advancePayment,
     formData.securityDepositPaid,
     formData.cancellationCharges,
+    formData.paymentTermsId, // Added payment terms dependency
   ]);
 };
