@@ -22,6 +22,8 @@ import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const [customerSearchTerm, setCustomerSearchTerm] = React.useState('');
+  const [searchResults, setSearchResults] = React.useState<any[]>([]);
 
   // Fetch current reservations count
   const { data: reservationsCount = 0 } = useQuery({
@@ -36,6 +38,40 @@ const Dashboard = () => {
       return count || 0;
     },
   });
+
+  // Search agreements by customer name
+  const searchCustomerAgreements = async () => {
+    if (!customerSearchTerm.trim()) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('agreements')
+        .select(`
+          *,
+          customers!inner(
+            id,
+            full_name,
+            email,
+            phone
+          ),
+          vehicles(
+            make,
+            model,
+            year,
+            license_plate
+          )
+        `)
+        .ilike('customers.full_name', `%${customerSearchTerm}%`)
+        .order('created_at', { ascending: false })
+        .limit(5);
+
+      if (error) throw error;
+      setSearchResults(data || []);
+    } catch (error) {
+      console.error('Error searching agreements:', error);
+      setSearchResults([]);
+    }
+  };
 
   const kpiStats = [
     {
@@ -175,17 +211,67 @@ const Dashboard = () => {
           </div>
         </Card>
 
-        {/* Quick Check-In Agreement */}
+        {/* Customer Agreement Search */}
         <Card className="p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-medium">Quick Check-In Agreement</h3>
+            <h3 className="text-lg font-medium">Search Customer Agreements</h3>
           </div>
-          <div className="flex gap-2">
-            <Input placeholder="Vehicle No." className="flex-1" />
-            <Input placeholder="Agreement No." className="flex-1" />
-            <Button className="bg-emerald-500 hover:bg-emerald-600 text-white px-6">
-              Search
-            </Button>
+          <div className="space-y-4">
+            <div className="flex gap-2">
+              <Input 
+                placeholder="Enter customer name..." 
+                className="flex-1"
+                value={customerSearchTerm}
+                onChange={(e) => setCustomerSearchTerm(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && searchCustomerAgreements()}
+              />
+              <Button 
+                className="bg-emerald-500 hover:bg-emerald-600 text-white px-6"
+                onClick={searchCustomerAgreements}
+              >
+                Search
+              </Button>
+            </div>
+            
+            {/* Search Results */}
+            {searchResults.length > 0 && (
+              <div className="mt-4 space-y-2 max-h-48 overflow-y-auto">
+                {searchResults.map((agreement) => (
+                  <div 
+                    key={agreement.id} 
+                    className="p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
+                    onClick={() => navigate(`/agreements/${agreement.id}`)}
+                  >
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <p className="font-medium">{agreement.customers?.full_name}</p>
+                        <p className="text-sm text-gray-600">
+                          Agreement #{agreement.agreement_no || 'N/A'}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          {agreement.vehicles ? 
+                            `${agreement.vehicles.year} ${agreement.vehicles.make} ${agreement.vehicles.model} (${agreement.vehicles.license_plate})` 
+                            : 'No vehicle assigned'
+                          }
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-medium">
+                          ${agreement.total_amount || '0.00'}
+                        </p>
+                        <p className="text-xs text-gray-500 capitalize">
+                          {agreement.status}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            
+            {customerSearchTerm && searchResults.length === 0 && (
+              <p className="text-gray-500 text-sm mt-2">No agreements found for this customer.</p>
+            )}
           </div>
         </Card>
       </div>
