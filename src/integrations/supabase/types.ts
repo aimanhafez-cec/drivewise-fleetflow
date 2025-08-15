@@ -166,7 +166,7 @@ export type Database = {
             foreignKeyName: "agreements_customer_id_fkey"
             columns: ["customer_id"]
             isOneToOne: false
-            referencedRelation: "profiles"
+            referencedRelation: "customers"
             referencedColumns: ["id"]
           },
           {
