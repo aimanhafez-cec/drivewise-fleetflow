@@ -313,9 +313,9 @@ export const VehicleExchangeModal: React.FC<VehicleExchangeModalProps> = ({
                       {vehicle.year} {vehicle.make} {vehicle.model} - {vehicle.license_plate}
                     </SelectItem>
                   ))}
-                  {(!availableVehicles || availableVehicles.length === 0) && (
-                    <SelectItem value="" disabled>No vehicles available</SelectItem>
-                  )}
+                   {(!availableVehicles || availableVehicles.length === 0) && (
+                     <SelectItem value="__no_vehicles__" disabled>No vehicles available</SelectItem>
+                   )}
                 </SelectContent>
                 </Select>
               </div>

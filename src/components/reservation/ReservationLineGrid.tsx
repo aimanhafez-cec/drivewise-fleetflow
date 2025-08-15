@@ -174,21 +174,21 @@ export const ReservationLineGrid: React.FC<ReservationLineGridProps> = ({
                     value={line.vehicleId} 
                     onValueChange={(value) => onLineUpdate(line.id, { vehicleId: value })}
                   >
-                    <SelectTrigger className="w-40">
-                      <SelectValue placeholder="Vehicle" />
-                    </SelectTrigger>
-                        <SelectContent>
-                          {vehiclesLoading ? (
-                            <SelectItem value="__loading__" disabled>Loading vehicles...</SelectItem>
-                          ) : vehicles?.length === 0 ? (
-                            <SelectItem value="__no_vehicles__" disabled>No vehicles available</SelectItem>
-                      ) : (
-                        vehicles?.map((vehicle) => (
-                          <SelectItem key={vehicle.id} value={vehicle.id}>
-                            {formatVehicleDisplay(vehicle)}
-                          </SelectItem>
-                        ))
-                      )}
+                     <SelectTrigger className="w-40">
+                       <SelectValue placeholder="Vehicle" />
+                     </SelectTrigger>
+                     <SelectContent>
+                       {vehiclesLoading ? (
+                         <SelectItem value="__loading__" disabled>Loading vehicles...</SelectItem>
+                       ) : vehicles?.length === 0 ? (
+                         <SelectItem value="__no_vehicles__" disabled>No vehicles available</SelectItem>
+                       ) : (
+                         vehicles?.map((vehicle) => (
+                           <SelectItem key={vehicle.id} value={vehicle.id}>
+                             {formatVehicleDisplay(vehicle)}
+                           </SelectItem>
+                         ))
+                       )}
                     </SelectContent>
                   </Select>
                 </TableCell>
