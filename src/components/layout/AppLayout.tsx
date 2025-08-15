@@ -92,6 +92,30 @@ const navigation = [
   },
 ];
 
+const AppLayout = () => {
+  return (
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full">
+        <AppSidebar />
+        <main className="flex-1 flex flex-col">
+          <header className="h-12 flex items-center justify-between border-b px-4">
+            <SidebarTrigger />
+            <div className="flex items-center gap-2">
+              <QuickSearch />
+              <Button variant="ghost" size="icon" aria-label="Notifications">
+                <Bell className="h-4 w-4" />
+              </Button>
+            </div>
+          </header>
+          <div className="flex-1 p-6">
+            <Outlet />
+          </div>
+        </main>
+      </div>
+    </SidebarProvider>
+  );
+};
+
 function AppSidebar() {
   const { signOut } = useAuth();
   const { toast } = useToast();
@@ -165,29 +189,5 @@ function AppSidebar() {
     </Sidebar>
   );
 }
-
-const AppLayout = () => {
-  return (
-    <SidebarProvider>
-      <div className="min-h-screen flex w-full">
-        <AppSidebar />
-        <main className="flex-1 flex flex-col">
-          <header className="h-12 flex items-center justify-between border-b px-4">
-            <SidebarTrigger />
-            <div className="flex items-center gap-2">
-              <QuickSearch />
-              <Button variant="ghost" size="icon" aria-label="Notifications">
-                <Bell className="h-4 w-4" />
-              </Button>
-            </div>
-          </header>
-          <div className="flex-1 p-6">
-            <Outlet />
-          </div>
-        </main>
-      </div>
-    </SidebarProvider>
-  );
-};
 
 export default AppLayout;
