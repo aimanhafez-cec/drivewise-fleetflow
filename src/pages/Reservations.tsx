@@ -10,23 +10,27 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
 import { ReservationSearch, SearchFilters } from '@/components/reservations/ReservationSearch';
 import { ConvertToAgreementPreCheck } from '@/components/agreements/ConvertToAgreementPreCheck';
-import { formatCurrency } from '@/lib/utils';
-
 const Reservations = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [searchFilters, setSearchFilters] = useState<SearchFilters>({});
-  const [convertModal, setConvertModal] = useState<{ open: boolean; reservation?: any }>({ open: false });
+  const [convertModal, setConvertModal] = useState<{
+    open: boolean;
+    reservation?: any;
+  }>({
+    open: false
+  });
 
   // Fetch open reservations (not converted/cancelled) with search filters
-  const { data: reservations, isLoading, error } = useQuery({
+  const {
+    data: reservations,
+    isLoading,
+    error
+  } = useQuery({
     queryKey: ['reservations:open', searchFilters],
     queryFn: async () => {
       console.log('Fetching reservations with filters:', searchFilters);
-      
-      let query = supabase
-        .from('reservations')
-        .select(`
+      let query = supabase.from('reservations').select(`
           *,
           profiles:customer_id (
             full_name,
@@ -37,9 +41,7 @@ const Reservations = () => {
             model,
             license_plate
           )
-        `)
-        .in('status', searchFilters.status ? [searchFilters.status as any] : ['pending', 'confirmed', 'checked_out'])
-        .is('converted_agreement_id', null);
+        `).in('status', searchFilters.status ? [searchFilters.status as any] : ['pending', 'confirmed', 'checked_out']).is('converted_agreement_id', null);
 
       // Apply search filter
       if (searchFilters.query) {
@@ -53,46 +55,43 @@ const Reservations = () => {
       if (searchFilters.dateTo) {
         query = query.lte('end_datetime', searchFilters.dateTo);
       }
-
-      const { data, error } = await query.order('created_at', { ascending: false });
-
-      console.log('Reservations query result:', { data, error });
+      const {
+        data,
+        error
+      } = await query.order('created_at', {
+        ascending: false
+      });
+      console.log('Reservations query result:', {
+        data,
+        error
+      });
       if (error) {
         console.error('Reservations query error:', error);
         throw error;
       }
       return data;
-    },
+    }
   });
 
   // Get counts for summary cards
-  const { data: counts } = useQuery({
+  const {
+    data: counts
+  } = useQuery({
     queryKey: ['reservations:counts'],
     queryFn: async () => {
-      const [totalQuery, checkedOutQuery, pendingQuery] = await Promise.all([
-        supabase
-          .from('reservations')
-          .select('id', { count: 'exact' })
-          .in('status', ['pending', 'confirmed', 'checked_out'])
-          .is('converted_agreement_id', null),
-        supabase
-          .from('reservations')
-          .select('id', { count: 'exact' })
-          .eq('status', 'checked_out')
-          .is('converted_agreement_id', null),
-        supabase
-          .from('reservations')
-          .select('id', { count: 'exact' })
-          .eq('status', 'pending')
-          .is('converted_agreement_id', null),
-      ]);
-
+      const [totalQuery, checkedOutQuery, pendingQuery] = await Promise.all([supabase.from('reservations').select('id', {
+        count: 'exact'
+      }).in('status', ['pending', 'confirmed', 'checked_out']).is('converted_agreement_id', null), supabase.from('reservations').select('id', {
+        count: 'exact'
+      }).eq('status', 'checked_out').is('converted_agreement_id', null), supabase.from('reservations').select('id', {
+        count: 'exact'
+      }).eq('status', 'pending').is('converted_agreement_id', null)]);
       return {
         total: totalQuery.count || 0,
         active: checkedOutQuery.count || 0,
-        pending: pendingQuery.count || 0,
+        pending: pendingQuery.count || 0
       };
-    },
+    }
   });
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
@@ -110,22 +109,23 @@ const Reservations = () => {
         return 'bg-gray-100 text-gray-800';
     }
   };
-
   const handleConvertToAgreement = (reservation: any) => {
-    setConvertModal({ open: true, reservation });
+    setConvertModal({
+      open: true,
+      reservation
+    });
   };
-
   const handleConfirmConvert = () => {
     if (convertModal.reservation) {
-      setConvertModal({ open: false });
+      setConvertModal({
+        open: false
+      });
       // Navigate to agreement wizard
       navigate(`/agreements/new?fromReservation=${convertModal.reservation.id}`);
     }
   };
-
   if (isLoading) {
-    return (
-      <div className="space-y-6">
+    return <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div>
             <Skeleton className="h-8 w-48" />
@@ -137,13 +137,10 @@ const Reservations = () => {
           </div>
         </div>
         <div className="grid gap-4 md:grid-cols-4">
-          {[...Array(4)].map((_, i) => (
-            <Skeleton key={i} className="h-24 w-full" />
-          ))}
+          {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-24 w-full" />)}
         </div>
         <Skeleton className="h-96 w-full" />
-      </div>
-    );
+      </div>;
   }
   return <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -160,7 +157,7 @@ const Reservations = () => {
             </Button>
             
             <Button variant="outline" onClick={() => navigate('/planner')}>
-              <Calendar className="mr-2 h-4 w-4" />
+              
               Planner
             </Button>
             
@@ -172,10 +169,7 @@ const Reservations = () => {
       </div>
 
       {/* Search & Filters */}
-      <ReservationSearch 
-        onSearch={setSearchFilters}
-        isLoading={isLoading}
-      />
+      <ReservationSearch onSearch={setSearchFilters} isLoading={isLoading} />
 
       {/* Summary Cards */}
       <div className="grid gap-4 md:grid-cols-4">
@@ -225,7 +219,7 @@ const Reservations = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {formatCurrency(reservations?.reduce((sum, r) => sum + (r.total_amount || 0), 0) || 0)}
+              ${reservations?.reduce((sum, r) => sum + (r.total_amount || 0), 0).toFixed(2) || '0.00'}
             </div>
             <p className="text-xs text-muted-foreground">
               From open reservations
@@ -243,17 +237,9 @@ const Reservations = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {reservations && reservations.length > 0 ? (
-            <div id="reservations-table" className="space-y-4">
-              {reservations.map(reservation => (
-                <div 
-                  key={reservation.id} 
-                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50" 
-                >
-                  <div 
-                    className="flex items-center space-x-4 flex-1 cursor-pointer"
-                    onClick={() => navigate(`/reservations/${reservation.id}`)}
-                  >
+          {reservations && reservations.length > 0 ? <div id="reservations-table" className="space-y-4">
+              {reservations.map(reservation => <div key={reservation.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50">
+                  <div className="flex items-center space-x-4 flex-1 cursor-pointer" onClick={() => navigate(`/reservations/${reservation.id}`)}>
                   <div className="flex items-center space-x-4">
                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
                       <User className="h-5 w-5 text-primary" />
@@ -263,26 +249,19 @@ const Reservations = () => {
                         {reservation.profiles?.full_name || 'Unknown Customer'}
                       </p>
                       <p className="text-sm text-muted-foreground">
-                        {reservation.vehicles ? 
-                          `${reservation.vehicles.make} ${reservation.vehicles.model}` : 
-                          'No vehicle assigned'
-                        }
+                        {reservation.vehicles ? `${reservation.vehicles.make} ${reservation.vehicles.model}` : 'No vehicle assigned'}
                       </p>
                     </div>
                   </div>
                   
                   <div className="text-center">
                     <p className="text-sm font-medium">
-                      {reservation.start_datetime && reservation.end_datetime ? (
-                        <>
+                      {reservation.start_datetime && reservation.end_datetime ? <>
                           {format(new Date(reservation.start_datetime), 'MMM dd')} - {format(new Date(reservation.end_datetime), 'MMM dd, yyyy')}
-                        </>
-                      ) : (
-                        'Dates TBD'
-                      )}
+                        </> : 'Dates TBD'}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      {formatCurrency(reservation.total_amount || 0)}
+                      ${reservation.total_amount?.toFixed(2) || '0.00'}
                     </p>
                   </div>
                   
@@ -290,49 +269,34 @@ const Reservations = () => {
                     <Badge className={getStatusColor(reservation.status)}>
                       {reservation.status}
                     </Badge>
-                    <Button
-                      id={`btn-convert-agreement-${reservation.id}`}
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleConvertToAgreement(reservation);
-                      }}
-                    >
+                    <Button id={`btn-convert-agreement-${reservation.id}`} size="sm" onClick={e => {
+                  e.stopPropagation();
+                  handleConvertToAgreement(reservation);
+                }}>
                       Convert to Agreement
                     </Button>
                   </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-8">
+                </div>)}
+            </div> : <div className="text-center py-8">
               <Calendar className="mx-auto h-12 w-12 text-muted-foreground" />
               <h3 className="mt-4 text-lg font-semibold">No open reservations</h3>
               <p className="text-muted-foreground">
                 Create your first reservation to get started.
               </p>
-              <Button 
-                className="mt-4"
-                onClick={() => navigate('/reservations/new')}
-              >
+              <Button className="mt-4" onClick={() => navigate('/reservations/new')}>
                 <Plus className="mr-2 h-4 w-4" />
                 New Reservation
               </Button>
-            </div>
-          )}
+            </div>}
         </CardContent>
       </Card>
 
       {/* Convert to Agreement Modal */}
-      {convertModal.reservation && (
-        <ConvertToAgreementPreCheck
-          open={convertModal.open}
-          onOpenChange={(open) => setConvertModal({ open, reservation: open ? convertModal.reservation : undefined })}
-          onConfirm={handleConfirmConvert}
-          reservation={convertModal.reservation}
-        />
-      )}
+      {convertModal.reservation && <ConvertToAgreementPreCheck open={convertModal.open} onOpenChange={open => setConvertModal({
+      open,
+      reservation: open ? convertModal.reservation : undefined
+    })} onConfirm={handleConfirmConvert} reservation={convertModal.reservation} />}
     </div>;
 };
 export default Reservations;
