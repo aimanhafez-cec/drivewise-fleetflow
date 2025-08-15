@@ -156,7 +156,9 @@ export const ReservationLineGrid: React.FC<ReservationLineGridProps> = ({
                     </SelectTrigger>
                     <SelectContent>
                       {categoriesLoading ? (
-                        <SelectItem value="" disabled>Loading...</SelectItem>
+                        <SelectItem value="__loading__" disabled>Loading categories...</SelectItem>
+                      ) : categories?.length === 0 ? (
+                        <SelectItem value="__no_categories__" disabled>No categories available</SelectItem>
                       ) : (
                         categories?.map((category) => (
                           <SelectItem key={category.id} value={category.id}>
@@ -175,11 +177,11 @@ export const ReservationLineGrid: React.FC<ReservationLineGridProps> = ({
                     <SelectTrigger className="w-40">
                       <SelectValue placeholder="Vehicle" />
                     </SelectTrigger>
-                    <SelectContent>
-                      {vehiclesLoading ? (
-                        <SelectItem value="" disabled>Loading vehicles...</SelectItem>
-                      ) : vehicles?.length === 0 ? (
-                        <SelectItem value="" disabled>No vehicles available</SelectItem>
+                        <SelectContent>
+                          {vehiclesLoading ? (
+                            <SelectItem value="__loading__" disabled>Loading vehicles...</SelectItem>
+                          ) : vehicles?.length === 0 ? (
+                            <SelectItem value="__no_vehicles__" disabled>No vehicles available</SelectItem>
                       ) : (
                         vehicles?.map((vehicle) => (
                           <SelectItem key={vehicle.id} value={vehicle.id}>

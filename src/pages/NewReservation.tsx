@@ -2034,9 +2034,9 @@ const NewReservation = () => {
                         </SelectTrigger>
                         <SelectContent>
                           {categoriesLoading ? (
-                            <SelectItem value="" disabled>Loading categories...</SelectItem>
+                            <SelectItem value="__loading__" disabled>Loading categories...</SelectItem>
                           ) : categories?.length === 0 ? (
-                            <SelectItem value="" disabled>No categories available</SelectItem>
+                            <SelectItem value="__no_categories__" disabled>No categories available</SelectItem>
                           ) : (
                             categories?.map((category) => (
                               <SelectItem key={category.id} value={category.id}>
@@ -2055,9 +2055,9 @@ const NewReservation = () => {
                         </SelectTrigger>
                         <SelectContent>
                           {vehiclesLoading ? (
-                            <SelectItem value="" disabled>Loading vehicles...</SelectItem>
+                            <SelectItem value="__loading__" disabled>Loading vehicles...</SelectItem>
                           ) : vehicles?.length === 0 ? (
-                            <SelectItem value="" disabled>No vehicles available</SelectItem>
+                            <SelectItem value="__no_vehicles__" disabled>No vehicles available</SelectItem>
                           ) : (
                             vehicles?.map((vehicle) => (
                               <SelectItem key={vehicle.id} value={vehicle.id}>
