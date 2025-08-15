@@ -215,6 +215,63 @@ export type Database = {
         }
         Relationships: []
       }
+      damage_markers: {
+        Row: {
+          agreement_id: string | null
+          created_at: string
+          created_by: string | null
+          damage_type: string
+          event: string
+          id: string
+          line_id: string
+          notes: string | null
+          occurred_at: string
+          photos: Json | null
+          reservation_id: string | null
+          severity: string
+          side: string
+          updated_at: string
+          x: number
+          y: number
+        }
+        Insert: {
+          agreement_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          damage_type: string
+          event: string
+          id?: string
+          line_id: string
+          notes?: string | null
+          occurred_at?: string
+          photos?: Json | null
+          reservation_id?: string | null
+          severity: string
+          side: string
+          updated_at?: string
+          x: number
+          y: number
+        }
+        Update: {
+          agreement_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          damage_type?: string
+          event?: string
+          id?: string
+          line_id?: string
+          notes?: string | null
+          occurred_at?: string
+          photos?: Json | null
+          reservation_id?: string | null
+          severity?: string
+          side?: string
+          updated_at?: string
+          x?: number
+          y?: number
+        }
+        Relationships: []
+      }
       damage_records: {
         Row: {
           agreement_id: string | null
@@ -848,6 +905,75 @@ export type Database = {
           permissions?: Json | null
           role?: Database["public"]["Enums"]["user_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      vehicle_exchanges: {
+        Row: {
+          agreement_id: string
+          created_at: string
+          created_by: string | null
+          exchange_at: string
+          fees_added: Json | null
+          fuel_in_old: number
+          fuel_out_new: number
+          id: string
+          line_id: string
+          new_out_location_id: string | null
+          new_vehicle_id: string
+          notes: string | null
+          odometer_in_old: number
+          odometer_out_new: number
+          old_vehicle_id: string
+          photos: Json | null
+          return_to_location_id: string | null
+          segment_a: Json
+          segment_b: Json
+          updated_at: string
+        }
+        Insert: {
+          agreement_id: string
+          created_at?: string
+          created_by?: string | null
+          exchange_at: string
+          fees_added?: Json | null
+          fuel_in_old: number
+          fuel_out_new: number
+          id?: string
+          line_id: string
+          new_out_location_id?: string | null
+          new_vehicle_id: string
+          notes?: string | null
+          odometer_in_old: number
+          odometer_out_new: number
+          old_vehicle_id: string
+          photos?: Json | null
+          return_to_location_id?: string | null
+          segment_a: Json
+          segment_b: Json
+          updated_at?: string
+        }
+        Update: {
+          agreement_id?: string
+          created_at?: string
+          created_by?: string | null
+          exchange_at?: string
+          fees_added?: Json | null
+          fuel_in_old?: number
+          fuel_out_new?: number
+          id?: string
+          line_id?: string
+          new_out_location_id?: string | null
+          new_vehicle_id?: string
+          notes?: string | null
+          odometer_in_old?: number
+          odometer_out_new?: number
+          old_vehicle_id?: string
+          photos?: Json | null
+          return_to_location_id?: string | null
+          segment_a?: Json
+          segment_b?: Json
+          updated_at?: string
         }
         Relationships: []
       }

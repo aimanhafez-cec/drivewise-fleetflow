@@ -12,6 +12,8 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbS
 import { ArrowLeft, FileText, Eye } from 'lucide-react';
 import { format } from 'date-fns';
 import { AgreementActions } from '@/components/agreements/AgreementActions';
+import { DamageTab } from '@/components/agreements/DamageTab';
+import { TicketsTab } from '@/components/agreements/TicketsTab';
 
 const AgreementDetails = () => {
   const { id } = useParams();
@@ -254,6 +256,8 @@ const AgreementDetails = () => {
       <Tabs defaultValue="summary" className="space-y-6">
         <TabsList>
           <TabsTrigger value="summary">Summary</TabsTrigger>
+          <TabsTrigger id="tab-damage" value="damage">Damage</TabsTrigger>
+          <TabsTrigger id="tab-tickets" value="tickets">Tickets</TabsTrigger>
           <TabsTrigger value="payments">Payments</TabsTrigger>
           <TabsTrigger value="notes">Notes</TabsTrigger>
         </TabsList>
@@ -312,6 +316,23 @@ const AgreementDetails = () => {
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* Damage Tab */}
+        <TabsContent value="damage">
+          <DamageTab 
+            agreementId={id!} 
+            agreementLines={agreement.agreement_lines || []} 
+          />
+        </TabsContent>
+
+        {/* Tickets Tab */}
+        <TabsContent value="tickets">
+          <TicketsTab 
+            agreementId={id!} 
+            customerId={agreement.customer_id}
+            agreementLines={agreement.agreement_lines || []} 
+          />
         </TabsContent>
 
         <TabsContent value="payments">
