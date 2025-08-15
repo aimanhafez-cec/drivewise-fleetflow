@@ -31,6 +31,7 @@ import AgreementWizardPage from "./pages/AgreementWizardPage";
 import RFQs from "./pages/RFQs";
 import NewRFQ from "./pages/NewRFQ";
 import RFQDetails from "./pages/RFQDetails";
+import CustomerDetails from "./pages/CustomerDetails";
 
 const queryClient = new QueryClient();
 
@@ -75,6 +76,7 @@ const App = () => (
               </ProtectedRoute>
             }>
               <Route index element={<Customers />} />
+              <Route path=":id" element={<CustomerDetails />} />
             </Route>
             <Route path="/planner" element={
               <ProtectedRoute>
