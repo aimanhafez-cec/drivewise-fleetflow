@@ -112,7 +112,7 @@ export const QuoteWizardStep4: React.FC<QuoteWizardStep4Props> = ({
                     <div className="col-span-2">
                       <Label>Total</Label>
                       <div className="h-10 flex items-center px-3 border rounded-md bg-muted">
-                        ${(item.qty * item.rate).toFixed(2)}
+                        {(item.qty * item.rate).toFixed(2)} ج.م
                       </div>
                     </div>
                     <div className="col-span-1">
@@ -154,15 +154,12 @@ export const QuoteWizardStep4: React.FC<QuoteWizardStep4Props> = ({
             </div>
             <div className="space-y-2">
               <Label htmlFor="currency">Currency</Label>
-              <Select value={data.currency || "USD"} onValueChange={(value) => onChange({ currency: value })}>
+              <Select value={data.currency || "EGP"} onValueChange={(value) => onChange({ currency: value })}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="USD">USD ($)</SelectItem>
-                  <SelectItem value="EUR">EUR (€)</SelectItem>
-                  <SelectItem value="GBP">GBP (£)</SelectItem>
-                  <SelectItem value="CAD">CAD ($)</SelectItem>
+                  <SelectItem value="EGP">EGP (ج.م)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -218,16 +215,16 @@ export const QuoteWizardStep4: React.FC<QuoteWizardStep4Props> = ({
           <div className="space-y-3">
             <div className="flex justify-between">
               <span>Subtotal</span>
-              <span>${subtotal.toFixed(2)}</span>
+              <span>{subtotal.toFixed(2)} ج.م</span>
             </div>
             <div className="flex justify-between">
               <span>Tax ({((data.tax_rate || 0) * 100).toFixed(1)}%)</span>
-              <span>${taxAmount.toFixed(2)}</span>
+              <span>{taxAmount.toFixed(2)} ج.م</span>
             </div>
             <Separator />
             <div className="flex justify-between font-semibold text-lg">
               <span>Total</span>
-              <span>${total.toFixed(2)}</span>
+              <span>{total.toFixed(2)} ج.م</span>
             </div>
           </div>
         </CardContent>

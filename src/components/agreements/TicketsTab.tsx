@@ -34,7 +34,7 @@ export const TicketsTab: React.FC<TicketsTabProps> = ({ agreementId, customerId,
     authority: '',
     typeCode: '',
     amount: '',
-    currency: 'USD',
+    currency: 'EGP',
     points: '',
     dueDate: null as Date | null,
     status: 'PENDING',
@@ -93,7 +93,7 @@ export const TicketsTab: React.FC<TicketsTabProps> = ({ agreementId, customerId,
       authority: '',
       typeCode: '',
       amount: '',
-      currency: 'USD',
+      currency: 'EGP',
       points: '',
       dueDate: null,
       status: 'PENDING',
@@ -275,10 +275,7 @@ export const TicketsTab: React.FC<TicketsTabProps> = ({ agreementId, customerId,
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="USD">USD</SelectItem>
-                      <SelectItem value="EUR">EUR</SelectItem>
-                      <SelectItem value="GBP">GBP</SelectItem>
-                      <SelectItem value="CAD">CAD</SelectItem>
+                      <SelectItem value="EGP">EGP (ج.م)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

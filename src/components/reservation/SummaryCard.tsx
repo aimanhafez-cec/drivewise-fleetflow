@@ -20,19 +20,19 @@ interface SummaryRowProps {
 }
 
 const formatCurrency = (amount: number, currencyCode: string): string => {
-  // Simple currency formatting - in real app would use Intl.NumberFormat
+  // Simple currency formatting for EGP
   const symbols: Record<string, string> = {
+    'EGP': 'ج.م ',
     'USD': '$',
     'EUR': '€',
-    'GBP': '£',
-    'SAR': 'SAR ',
   };
   
   const symbol = symbols[currencyCode] || currencyCode + ' ';
   const formatted = Math.abs(amount).toFixed(2);
   
-  if (currencyCode === 'SAR') {
-    return `${symbol}${formatted}`;
+  // Format for Egyptian Pound
+  if (currencyCode === 'EGP') {
+    return `${formatted} ج.م`;
   }
   
   return amount < 0 ? `-${symbol}${formatted}` : `${symbol}${formatted}`;

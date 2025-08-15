@@ -493,7 +493,7 @@ const ReservationDetailsPage = () => {
               <div id="summary-card" className="sticky top-6">
                 <SummaryCard
                   summary={summary}
-                  currencyCode="USD"
+                  currencyCode="EGP"
                 />
               </div>
             </div>

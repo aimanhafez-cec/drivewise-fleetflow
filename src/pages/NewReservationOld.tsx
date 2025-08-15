@@ -167,7 +167,7 @@ const NewReservation = () => {
     reservationNo: null,
     entryDate: new Date(),
     reservationMethodId: '',
-    currencyCode: '',
+    currencyCode: 'EGP',
     reservationTypeId: '',
     businessUnitId: '',
     customerId: '',
@@ -2279,7 +2279,7 @@ const NewReservation = () => {
       <div className="lg:w-80 lg:sticky lg:top-6 lg:h-fit order-first lg:order-last">
         <SummaryCard 
           summary={summary} 
-          currencyCode={formData.currencyCode || 'USD'}
+          currencyCode={formData.currencyCode || 'EGP'}
           className="lg:sticky lg:top-6"
         />
       </div>
