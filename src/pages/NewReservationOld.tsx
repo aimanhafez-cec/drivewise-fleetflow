@@ -178,7 +178,6 @@ const NewReservation = () => {
     discountValue: null,
     contractBillingPlanId: null,
     taxLevelId: null,
-    taxCodeId: null,
     leaseToOwn: false,
     
     // Extended fields

@@ -11,7 +11,6 @@ export const headerValidationSchema = z.object({
   priceListId: z.string().min(1, 'Price List is required'),
   validityDateTo: z.date().nullable().optional(),
   taxLevelId: z.string().optional(),
-  taxCodeId: z.string().optional(),
   
   // Billing section
   billingType: z.enum(['SAME_AS_CUSTOMER', 'OTHER']).default('SAME_AS_CUSTOMER'),
@@ -52,14 +51,7 @@ export const headerValidationSchema = z.object({
     });
   }
   
-  // Tax Code required when Tax Level is selected
-  if (data.taxLevelId && !data.taxCodeId) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path: ['taxCodeId'],
-      message: 'Tax Code is required when Tax Level is selected'
-    });
-  }
+  
   
   // Billing validation when "Other" is selected
   if (data.billingType === 'OTHER') {

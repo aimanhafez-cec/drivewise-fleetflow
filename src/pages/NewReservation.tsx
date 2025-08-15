@@ -177,7 +177,6 @@ interface ExtendedFormData extends ReservationFormData {
   discountValue: number;
   contractBillingPlanId: string;
   taxLevelId: string;
-  taxCodeId: string;
   leaseToOwn: boolean;
 }
 
@@ -202,7 +201,6 @@ const NewReservation = () => {
     discountValue: 0,
     contractBillingPlanId: '',
     taxLevelId: '',
-    taxCodeId: '',
     leaseToOwn: false,
     
     // Extended fields
@@ -408,7 +406,6 @@ const NewReservation = () => {
     'header.priceListId': 'Price List',
     'header.validityDateTo': 'Validity Date To',
     'header.taxLevelId': 'Tax Level',
-    'header.taxCodeId': 'Tax Code',
     'header.billingCustomerName': 'Billing Customer Name',
     'header.billingMail': 'Billing Email',
     'header.billingPhone': 'Billing Phone',
@@ -514,8 +511,6 @@ const NewReservation = () => {
       } else {
         // Clear tax codes when no tax level is selected
         setOptions(prev => ({ ...prev, taxCodes: [] }));
-        // Clear selected tax code
-        updateFormData('taxCodeId', '');
       }
     };
 
@@ -747,7 +742,6 @@ const NewReservation = () => {
         priceListId: formData.priceListId,
         validityDateTo: formData.validityDateTo,
         taxLevelId: formData.taxLevelId,
-        taxCodeId: formData.taxCodeId,
         bill_to_type: formData.bill_to_type,
         bill_to_id: formData.bill_to_id,
         bill_to_display: formData.bill_to_display,
@@ -876,7 +870,6 @@ const NewReservation = () => {
         priceListId: formData.priceListId,
         validityDateTo: formData.validityDateTo,
         taxLevelId: formData.taxLevelId,
-        taxCodeId: formData.taxCodeId,
         bill_to_type: formData.bill_to_type,
         bill_to_id: formData.bill_to_id,
         bill_to_display: formData.bill_to_display,
@@ -1346,34 +1339,6 @@ const NewReservation = () => {
                 </div>
 
                 {/* Tax Code */}
-                <div className="space-y-2">
-                  <Label className={formData.taxLevelId ? "flex items-center gap-1" : ""}>
-                    Tax Code
-                    {formData.taxLevelId && <span className="text-destructive">*</span>}
-                  </Label>
-                  {loading.taxCodes ? (
-                    <Skeleton className="h-10 w-full" />
-                  ) : (
-                    <Select 
-                      value={formData.taxCodeId} 
-                      onValueChange={(value) => updateFormData('taxCodeId', value)}
-                      disabled={!formData.taxLevelId}
-                    >
-                      <SelectTrigger className={validation.getFieldError('header.taxCodeId') ? "border-destructive" : ""}>
-                        <SelectValue placeholder={formData.taxLevelId ? "Select tax code" : "Select tax level first"} />
-                      </SelectTrigger>
-                      <SelectContent className="bg-background border z-50 max-h-60 overflow-auto">
-                        {options.taxCodes.map((option) => (
-                          <SelectItem key={option.id} value={option.id}>
-                            {option.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-                  <FormError message={validation.getFieldError('header.taxCodeId')} />
-                </div>
-
                 {/* Lease to Own */}
                 <div className="space-y-2">
                   <div className="flex items-center space-x-2">

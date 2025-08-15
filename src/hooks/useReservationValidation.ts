@@ -21,7 +21,6 @@ export const useReservationValidation = () => {
     'header.priceListId': 'rate-taxes',
     'header.validityDateTo': 'rental-information',
     'header.taxLevelId': 'rental-information',
-    'header.taxCodeId': 'rental-information',
     
     // Billing fields
     'header.billingCustomerName': 'billing',

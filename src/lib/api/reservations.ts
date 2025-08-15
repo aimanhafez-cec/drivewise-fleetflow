@@ -27,7 +27,6 @@ export interface ReservationFormData {
   discountValue: number | string | null;
   contractBillingPlanId: string | null;
   taxLevelId: string | null;
-  taxCodeId: string | null;
   leaseToOwn: boolean;
 }
 
