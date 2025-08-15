@@ -12,7 +12,8 @@ import {
   Settings,
   LogOut,
   Menu,
-  Bell
+  Bell,
+  MessageCircleQuestion
 } from 'lucide-react';
 import {
   Sidebar,
@@ -58,6 +59,11 @@ const navigation = [
     title: 'Customers',
     url: '/customers',
     icon: Users,
+  },
+  {
+    title: 'RFQs',
+    url: '/rfqs',
+    icon: MessageCircleQuestion,
   },
   {
     title: 'Quotes',
