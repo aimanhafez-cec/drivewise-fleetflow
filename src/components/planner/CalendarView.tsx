@@ -2,7 +2,9 @@ import React from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { format, isSameDay, eachDayOfInterval, startOfWeek, endOfWeek } from "date-fns";
-import { Clock, User, MapPin } from "lucide-react";
+import { Clock, User, MapPin, Plus } from "lucide-react";
+import { EventContextMenu } from "./EventContextMenu";
+import { useDragAndDrop } from "@/hooks/useDragAndDrop";
 
 interface PlannerEvent {
   id: string;
@@ -25,6 +27,10 @@ interface CalendarViewProps {
   view: "month" | "week" | "day";
   currentDate: Date;
   isLoading: boolean;
+  onEventAction: (action: string, eventId: string) => void;
+  onCreateEvent: (date: Date) => void;
+  onEventMove: (eventId: string, newStart: Date, newEnd: Date) => Promise<void>;
+  onConflictDetected: (conflicts: any) => void;
 }
 
 export const CalendarView: React.FC<CalendarViewProps> = ({
@@ -32,8 +38,16 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
   dateRange,
   view,
   currentDate,
-  isLoading
+  isLoading,
+  onEventAction,
+  onCreateEvent,
+  onEventMove,
+  onConflictDetected
 }) => {
+  const { handleDragStart, handleDragOver, handleDrop, handleDragEnd, isDragging } = useDragAndDrop({
+    onEventMove,
+    onConflictDetected
+  });
   const getEventColor = (event: PlannerEvent) => {
     if (event.kind === "RESERVATION") {
       switch (event.status.toLowerCase()) {
@@ -61,30 +75,43 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
   };
 
   const renderEventPill = (event: PlannerEvent) => (
-    <div
+    <EventContextMenu 
       key={event.id}
-      className={`p-2 mb-1 rounded border text-xs cursor-pointer transition-all hover:shadow-sm ${getEventColor(event)}`}
-      data-testid={`evt-${event.kind.toLowerCase()}-${event.id}`}
+      event={event} 
+      onAction={onEventAction}
     >
-      <div className="font-medium">
-        #{event.shortNo} • {event.customer}
-      </div>
-      <div className="flex items-center gap-1 mt-1 text-xs opacity-75">
-        <Clock className="h-3 w-3" />
-        {formatEventTime(event.start, event.end)}
-      </div>
-      {event.origin && event.destination && (
-        <div className="flex items-center gap-1 mt-1 text-xs opacity-75">
-          <MapPin className="h-3 w-3" />
-          {event.origin} → {event.destination}
+      <div
+        draggable
+        onDragStart={(e) => handleDragStart(e, {
+          eventId: event.id,
+          originalStart: event.start,
+          originalEnd: event.end,
+          originalVehicleId: event.vehicleId
+        })}
+        onDragEnd={handleDragEnd}
+        className={`p-2 mb-1 rounded border text-xs cursor-move transition-all hover:shadow-sm ${getEventColor(event)} ${isDragging ? 'opacity-50' : ''}`}
+        data-testid={`evt-${event.kind.toLowerCase()}-${event.id}`}
+      >
+        <div className="font-medium">
+          #{event.shortNo} • {event.customer}
         </div>
-      )}
-      <div className="mt-1">
-        <Badge variant="outline" className="text-xs">
-          {event.kind}
-        </Badge>
+        <div className="flex items-center gap-1 mt-1 text-xs opacity-75">
+          <Clock className="h-3 w-3" />
+          {formatEventTime(event.start, event.end)}
+        </div>
+        {event.origin && event.destination && (
+          <div className="flex items-center gap-1 mt-1 text-xs opacity-75">
+            <MapPin className="h-3 w-3" />
+            {event.origin} → {event.destination}
+          </div>
+        )}
+        <div className="mt-1">
+          <Badge variant="outline" className="text-xs">
+            {event.kind}
+          </Badge>
+        </div>
       </div>
-    </div>
+    </EventContextMenu>
   );
 
   if (isLoading) {
@@ -108,14 +135,35 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
         <div className="text-lg font-semibold">
           {format(currentDate, "EEEE, MMMM d, yyyy")}
         </div>
-        <div className="min-h-[400px] bg-muted/20 rounded-lg p-4">
+        <div 
+          className="min-h-[400px] bg-muted/20 rounded-lg p-4 relative"
+          onDragOver={handleDragOver}
+          onDrop={(e) => handleDrop(e, {
+            newStart: currentDate,
+            newEnd: new Date(currentDate.getTime() + 24 * 60 * 60 * 1000)
+          })}
+        >
           {dayEvents.length === 0 ? (
-            <div className="flex items-center justify-center h-full text-muted-foreground">
-              No events scheduled for this day
+            <div 
+              className="flex items-center justify-center h-full text-muted-foreground cursor-pointer hover:bg-muted/30 rounded"
+              onClick={() => onCreateEvent(currentDate)}
+            >
+              <div className="text-center">
+                <Plus className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                <div>No events scheduled</div>
+                <div className="text-sm">Click to create reservation</div>
+              </div>
             </div>
           ) : (
             <div className="space-y-2">
               {dayEvents.map(renderEventPill)}
+              <div 
+                className="p-2 border-2 border-dashed border-muted-foreground/30 rounded cursor-pointer hover:border-muted-foreground/50 text-center text-muted-foreground text-sm"
+                onClick={() => onCreateEvent(currentDate)}
+              >
+                <Plus className="h-4 w-4 mx-auto mb-1" />
+                Add Event
+              </div>
             </div>
           )}
         </div>
@@ -144,8 +192,32 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                   {format(day, "d")}
                 </div>
               </div>
-              <div className="min-h-[200px] bg-muted/20 rounded-lg p-2">
-                {dayEvents.map(renderEventPill)}
+              <div 
+                className="min-h-[200px] bg-muted/20 rounded-lg p-2"
+                onDragOver={handleDragOver}
+                onDrop={(e) => handleDrop(e, {
+                  newStart: day,
+                  newEnd: new Date(day.getTime() + 24 * 60 * 60 * 1000)
+                })}
+              >
+                {dayEvents.length === 0 ? (
+                  <div 
+                    className="h-full flex items-center justify-center cursor-pointer hover:bg-muted/30 rounded text-muted-foreground"
+                    onClick={() => onCreateEvent(day)}
+                  >
+                    <Plus className="h-5 w-5" />
+                  </div>
+                ) : (
+                  <>
+                    {dayEvents.map(renderEventPill)}
+                    <div 
+                      className="mt-2 p-1 border border-dashed border-muted-foreground/30 rounded cursor-pointer hover:border-muted-foreground/50 text-center text-muted-foreground text-xs"
+                      onClick={() => onCreateEvent(day)}
+                    >
+                      <Plus className="h-3 w-3 mx-auto" />
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           );
@@ -168,22 +240,46 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
         const dayEvents = events.filter(e => isSameDay(new Date(e.start), date));
         
         return (
-          <div key={i} className="min-h-[100px] p-1 border rounded bg-background">
+          <div 
+            key={i} 
+            className="min-h-[100px] p-1 border rounded bg-background cursor-pointer hover:bg-muted/50"
+            onDragOver={handleDragOver}
+            onDrop={(e) => handleDrop(e, {
+              newStart: date,
+              newEnd: new Date(date.getTime() + 24 * 60 * 60 * 1000)
+            })}
+            onClick={() => onCreateEvent(date)}
+          >
             <div className="text-sm font-medium mb-1">
               {format(date, "d")}
             </div>
             <div className="space-y-1">
               {dayEvents.slice(0, 3).map(event => (
-                <div
-                  key={event.id}
-                  className={`text-xs p-1 rounded truncate ${getEventColor(event)}`}
-                >
-                  {event.shortNo}
-                </div>
+                <EventContextMenu key={event.id} event={event} onAction={onEventAction}>
+                  <div
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, {
+                      eventId: event.id,
+                      originalStart: event.start,
+                      originalEnd: event.end,
+                      originalVehicleId: event.vehicleId
+                    })}
+                    onDragEnd={handleDragEnd}
+                    className={`text-xs p-1 rounded truncate cursor-move ${getEventColor(event)}`}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {event.shortNo}
+                  </div>
+                </EventContextMenu>
               ))}
               {dayEvents.length > 3 && (
                 <div className="text-xs text-muted-foreground">
                   +{dayEvents.length - 3} more
+                </div>
+              )}
+              {dayEvents.length === 0 && (
+                <div className="flex items-center justify-center h-16 text-muted-foreground">
+                  <Plus className="h-4 w-4" />
                 </div>
               )}
             </div>

@@ -2,7 +2,9 @@ import React from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { format, eachHourOfInterval, startOfDay, endOfDay } from "date-fns";
-import { Car } from "lucide-react";
+import { Car, Plus } from "lucide-react";
+import { EventContextMenu } from "./EventContextMenu";
+import { useDragAndDrop } from "@/hooks/useDragAndDrop";
 
 interface PlannerEvent {
   id: string;
@@ -14,6 +16,7 @@ interface PlannerEvent {
   end: string;
   customer?: string;
   shortNo?: string;
+  actions: string[];
 }
 
 interface ResourceViewProps {
@@ -21,14 +24,26 @@ interface ResourceViewProps {
   dateRange: { start: Date; end: Date };
   view: "week" | "day";
   isLoading: boolean;
+  onEventAction: (action: string, eventId: string) => void;
+  onCreateEvent: (date: Date, vehicleId?: string) => void;
+  onEventMove: (eventId: string, newStart: Date, newEnd: Date, newVehicleId?: string) => Promise<void>;
+  onConflictDetected: (conflicts: any) => void;
 }
 
 export const ResourceView: React.FC<ResourceViewProps> = ({
   events,
   dateRange,
   view,
-  isLoading
+  isLoading,
+  onEventAction,
+  onCreateEvent,
+  onEventMove,
+  onConflictDetected
 }) => {
+  const { handleDragStart, handleDragOver, handleDrop, handleDragEnd, isDragging } = useDragAndDrop({
+    onEventMove,
+    onConflictDetected
+  });
   // Mock vehicles for demo - in real app, this would come from API
   const vehicles = [
     { id: "veh_1", label: "Toyota Camry • ABC123", status: "available" },
@@ -142,29 +157,52 @@ export const ResourceView: React.FC<ResourceViewProps> = ({
                   const position = getEventPosition(event.start, event.end);
                   
                   return (
-                    <div
-                      key={event.id}
-                      className={`absolute top-1 bottom-1 rounded px-2 py-1 text-white text-xs font-medium cursor-pointer transition-all hover:shadow-lg ${getEventColor(event)}`}
-                      style={position}
-                      data-testid={`evt-${event.kind.toLowerCase()}-${event.id}`}
-                      title={`${event.shortNo} • ${event.customer} • ${format(new Date(event.start), "HH:mm")} - ${format(new Date(event.end), "HH:mm")}`}
-                    >
-                      <div className="truncate">
-                        #{event.shortNo} • {event.customer}
+                    <EventContextMenu key={event.id} event={event} onAction={onEventAction}>
+                      <div
+                        draggable
+                        onDragStart={(e) => handleDragStart(e, {
+                          eventId: event.id,
+                          originalStart: event.start,
+                          originalEnd: event.end,
+                          originalVehicleId: event.vehicleId
+                        })}
+                        onDragEnd={handleDragEnd}
+                        className={`absolute top-1 bottom-1 rounded px-2 py-1 text-white text-xs font-medium cursor-move transition-all hover:shadow-lg ${getEventColor(event)} ${isDragging ? 'opacity-50' : ''}`}
+                        style={position}
+                        data-testid={`evt-${event.kind.toLowerCase()}-${event.id}`}
+                        title={`${event.shortNo} • ${event.customer} • ${format(new Date(event.start), "HH:mm")} - ${format(new Date(event.end), "HH:mm")}`}
+                      >
+                        <div className="truncate">
+                          #{event.shortNo} • {event.customer}
+                        </div>
+                        <div className="text-xs opacity-75">
+                          {format(new Date(event.start), "HH:mm")} - {format(new Date(event.end), "HH:mm")}
+                        </div>
                       </div>
-                      <div className="text-xs opacity-75">
-                        {format(new Date(event.start), "HH:mm")} - {format(new Date(event.end), "HH:mm")}
-                      </div>
-                    </div>
+                    </EventContextMenu>
                   );
                 })}
 
-                {/* Empty state click area */}
-                {vehicleEvents.length === 0 && (
-                  <div className="absolute inset-0 flex items-center justify-center text-muted-foreground text-sm">
-                    Click to assign
-                  </div>
-                )}
+                {/* Drop zone for vehicle assignment */}
+                <div
+                  className="absolute inset-0"
+                  onDragOver={handleDragOver}
+                  onDrop={(e) => handleDrop(e, {
+                    newStart: dateRange.start,
+                    newEnd: dateRange.end,
+                    vehicleId: vehicle.id
+                  })}
+                  onClick={() => onCreateEvent(dateRange.start, vehicle.id)}
+                >
+                  {vehicleEvents.length === 0 && (
+                    <div className="absolute inset-0 flex items-center justify-center text-muted-foreground text-sm cursor-pointer hover:bg-muted/20 rounded">
+                      <div className="text-center">
+                        <Plus className="h-4 w-4 mx-auto mb-1" />
+                        <div>Click to assign</div>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           );

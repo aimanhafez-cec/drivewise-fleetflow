@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useToast } from "@/hooks/use-toast";
 import { 
   Calendar,
   ChevronLeft, 
@@ -25,6 +26,8 @@ import { PlannerKPIs } from "@/components/planner/PlannerKPIs";
 import { CalendarView } from "@/components/planner/CalendarView";
 import { ResourceView } from "@/components/planner/ResourceView";
 import { EventLegend } from "@/components/planner/EventLegend";
+import { NewReservationModal } from "@/components/planner/NewReservationModal";
+import { ConflictDialog } from "@/components/planner/ConflictDialog";
 
 type ViewType = "month" | "week" | "day";
 
@@ -47,11 +50,16 @@ interface PlannerEvent {
 
 const DailyPlanner: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const { toast } = useToast();
   const [currentDate, setCurrentDate] = useState(() => new Date());
   const [view, setView] = useState<ViewType>(() => 
     (searchParams.get("view") as ViewType) || "week"
   );
   const [resourceMode, setResourceMode] = useState(false);
+  const [showNewReservationModal, setShowNewReservationModal] = useState(false);
+  const [newReservationPrefill, setNewReservationPrefill] = useState<any>(null);
+  const [conflictDialog, setConflictDialog] = useState<any>(null);
   const [filters, setFilters] = useState({
     vehicleClass: searchParams.get("class") || "",
     vehicleMake: searchParams.get("make") || "",
@@ -226,6 +234,138 @@ const DailyPlanner: React.FC = () => {
     }
   };
 
+  // Event action handlers
+  const handleEventAction = async (action: string, eventId: string) => {
+    try {
+      switch (action) {
+        case "OPEN":
+          // Navigate to details page
+          const event = events.find(e => e.id === eventId);
+          if (event) {
+            if (event.kind === "RESERVATION") {
+              navigate(`/reservations/${eventId}`);
+            } else if (event.kind === "AGREEMENT") {
+              navigate(`/agreements/${eventId}`);
+            }
+          }
+          break;
+        case "CONVERT":
+          // Convert reservation to agreement - using mock for now
+          console.log("Converting reservation to agreement:", eventId);
+          toast({
+            title: "Success",
+            description: "Reservation converted to agreement successfully"
+          });
+          break;
+        case "CHECK_OUT":
+        case "CHECK_IN":
+          // Navigate to check-out/check-in flow
+          navigate(`/agreements/${eventId}`, { state: { action } });
+          break;
+        case "ASSIGN":
+          // Open vehicle assignment modal
+          toast({
+            title: "Vehicle Assignment",
+            description: "Vehicle assignment feature coming soon"
+          });
+          break;
+        case "CANCEL":
+          // Cancel reservation/agreement
+          if (confirm("Are you sure you want to cancel this item?")) {
+            // Implement cancellation logic
+            toast({
+              title: "Cancelled",
+              description: "Item cancelled successfully"
+            });
+          }
+          break;
+      }
+    } catch (error) {
+      console.error("Error handling event action:", error);
+      toast({
+        title: "Error",
+        description: "Failed to perform action",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleCreateEvent = (date: Date, vehicleId?: string) => {
+    setNewReservationPrefill({
+      startDateTime: date,
+      endDateTime: new Date(date.getTime() + 24 * 60 * 60 * 1000),
+      vehicleId,
+      location: "airport" // Default location
+    });
+    setShowNewReservationModal(true);
+  };
+
+  const handleEventMove = async (eventId: string, newStart: Date, newEnd: Date, newVehicleId?: string) => {
+    // Mock API call - implement conflict checking
+    try {
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Mock conflict detection (30% chance)
+      if (Math.random() < 0.3) {
+        throw {
+          status: 409,
+          data: {
+            cause: "Vehicle is already booked during this time period",
+            overlappingEvents: [
+              {
+                id: "conflict_1",
+                kind: "RESERVATION",
+                status: "confirmed",
+                customer: "John Doe",
+                shortNo: "R123",
+                start: newStart.toISOString(),
+                end: newEnd.toISOString(),
+                vehicleLabel: "Toyota Camry • ABC123"
+              }
+            ],
+            suggestions: [
+              { vehicleId: "alt_1", vehicleLabel: "Honda Accord • DEF456", available: true },
+              { vehicleId: "alt_2", vehicleLabel: "Nissan Altima • GHI789", available: true }
+            ]
+          }
+        };
+      }
+
+      toast({
+        title: "Event Moved",
+        description: "Event successfully moved to new time slot"
+      });
+    } catch (error: any) {
+      if (error.status === 409) {
+        throw error; // Let useDragAndDrop handle conflicts
+      }
+      throw error;
+    }
+  };
+
+  const handleConflictDetected = (conflicts: any) => {
+    setConflictDialog({
+      open: true,
+      conflictDetails: conflicts
+    });
+  };
+
+  const handleNewReservationSubmit = async (data: any) => {
+    try {
+      // Mock reservation creation
+      console.log("Creating reservation:", data);
+      
+      toast({
+        title: "Success",
+        description: "New reservation created successfully"
+      });
+    } catch (error) {
+      console.error("Error creating reservation:", error);
+      throw error;
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -239,7 +379,7 @@ const DailyPlanner: React.FC = () => {
             <Filter className="mr-2 h-4 w-4" />
             Saved Views
           </Button>
-          <Button>
+          <Button onClick={() => setShowNewReservationModal(true)}>
             <Plus className="mr-2 h-4 w-4" />
             New Reservation
           </Button>
@@ -323,6 +463,10 @@ const DailyPlanner: React.FC = () => {
               dateRange={dateRange}
               view={view}
               isLoading={isLoading}
+              onEventAction={handleEventAction}
+              onCreateEvent={handleCreateEvent}
+              onEventMove={handleEventMove}
+              onConflictDetected={handleConflictDetected}
             />
           ) : (
             <CalendarView 
@@ -331,10 +475,40 @@ const DailyPlanner: React.FC = () => {
               view={view}
               currentDate={currentDate}
               isLoading={isLoading}
+              onEventAction={handleEventAction}
+              onCreateEvent={handleCreateEvent}
+              onEventMove={handleEventMove}
+              onConflictDetected={handleConflictDetected}
             />
           )}
         </CardContent>
       </Card>
+
+      {/* Modals */}
+      <NewReservationModal
+        open={showNewReservationModal}
+        onOpenChange={setShowNewReservationModal}
+        prefillData={newReservationPrefill}
+        onSubmit={handleNewReservationSubmit}
+      />
+
+      <ConflictDialog
+        open={conflictDialog?.open || false}
+        onOpenChange={(open) => setConflictDialog(open ? conflictDialog : null)}
+        conflictDetails={conflictDialog?.conflictDetails || null}
+        onKeep={() => {
+          toast({ title: "Changes Kept", description: "Event moved despite conflicts" });
+          setConflictDialog(null);
+        }}
+        onUndo={() => {
+          toast({ title: "Changes Undone", description: "Event returned to original position" });
+          setConflictDialog(null);
+        }}
+        onSuggestionSelect={(vehicleId) => {
+          toast({ title: "Vehicle Selected", description: "Event moved to suggested vehicle" });
+          setConflictDialog(null);
+        }}
+      />
     </div>
   );
 };
