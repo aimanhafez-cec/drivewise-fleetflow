@@ -97,6 +97,7 @@ interface ExtendedFormData extends ReservationFormData {
   drivers: Driver[];
   
   // Airport Information
+  enableAirportInfo: boolean;
   arrivalFlightNo: string;
   arrivalAirport: string;
   arrivalCity: string;
@@ -203,16 +204,17 @@ const NewReservation = () => {
     taxLevelId: '',
     leaseToOwn: false,
     
-    // Extended fields
-    reservationLines: [],
-    vehicleClassId: '',
-    vehicleId: '',
-    checkOutDate: null,
-    checkOutLocationId: '',
-    checkInDate: null,
-    checkInLocationId: '',
-    drivers: [],
-    arrivalFlightNo: '',
+  // Extended fields
+  reservationLines: [],
+  vehicleClassId: '',
+  vehicleId: '',
+  checkOutDate: null,
+  checkOutLocationId: '',
+  checkInDate: null,
+  checkInLocationId: '',
+  drivers: [],
+  enableAirportInfo: false,
+  arrivalFlightNo: '',
     arrivalAirport: '',
     arrivalCity: '',
     arrivalZipCode: '',
@@ -1397,40 +1399,40 @@ const NewReservation = () => {
             </AccordionTrigger>
             <AccordionContent className="px-6 pb-6">
               <div className="space-y-6">
-                {/* Show conditional message based on reservation method */}
-                {!['AIRPORT_PICKUP', 'AIRPORT_DROP', 'AIRPORT_PICKUP_DROP'].includes(formData.reservationMethodId) && (
-                  <div className="text-sm text-muted-foreground bg-muted/50 p-4 rounded-lg">
-                    Select a reservation method with airport service to configure flight information.
-                  </div>
-                )}
+                {/* Enable Airport Information Checkbox */}
+                <div className="flex items-center space-x-2">
+                  <Checkbox 
+                    id="enable-airport-info"
+                    checked={formData.enableAirportInfo}
+                    onCheckedChange={(checked) => updateFormData('enableAirportInfo', checked)}
+                  />
+                  <Label htmlFor="enable-airport-info">Enable Airport Information</Label>
+                </div>
 
-                {/* Arrival Information - Show when method includes pickup */}
-                {(formData.reservationMethodId === 'AIRPORT_PICKUP' || formData.reservationMethodId === 'AIRPORT_PICKUP_DROP') && (
+                {formData.enableAirportInfo && (
                   <>
+                    {/* Arrival Information */}
                     <div>
                       <h4 className="font-medium mb-4">Arrival Information</h4>
                       <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                         <div className="space-y-2">
-                          <RequiredLabel>Flight No.</RequiredLabel>
+                          <Label>Flight No.</Label>
                           <Input 
                             value={formData.arrivalFlightNo} 
                             onChange={(e) => updateFormData('arrivalFlightNo', e.target.value)}
                             placeholder="e.g., AA1234"
-                            className={validation.getFieldError('header.arrivalFlightNo') ? "border-destructive" : ""}
                           />
-                          <FormError message={validation.getFieldError('header.arrivalFlightNo')} />
                         </div>
                         
                         <div className="space-y-2">
-                          <RequiredLabel>Date & Time</RequiredLabel>
+                          <Label>Date & Time</Label>
                           <Popover>
                             <PopoverTrigger asChild>
                               <Button
                                 variant="outline"
                                 className={cn(
                                   "w-full justify-start text-left font-normal",
-                                  !formData.arrivalDateTime && "text-muted-foreground",
-                                  validation.getFieldError('header.arrivalDateTime') && "border-destructive"
+                                  !formData.arrivalDateTime && "text-muted-foreground"
                                 )}
                               >
                                 <CalendarIcon className="mr-2 h-4 w-4" />
@@ -1447,18 +1449,15 @@ const NewReservation = () => {
                               />
                             </PopoverContent>
                           </Popover>
-                          <FormError message={validation.getFieldError('header.arrivalDateTime')} />
                         </div>
                         
                         <div className="space-y-2">
-                          <RequiredLabel>Airline</RequiredLabel>
+                          <Label>Airline</Label>
                           <Input 
                             value={formData.arrivalAirline} 
                             onChange={(e) => updateFormData('arrivalAirline', e.target.value)}
                             placeholder="e.g., American Airlines"
-                            className={validation.getFieldError('header.arrivalAirline') ? "border-destructive" : ""}
                           />
-                          <FormError message={validation.getFieldError('header.arrivalAirline')} />
                         </div>
                         
                         <div className="space-y-2">
@@ -1500,36 +1499,29 @@ const NewReservation = () => {
                         </div>
                       </div>
                     </div>
-                  </>
-                )}
 
-                {/* Departure Information - Show when method includes drop */}
-                {(formData.reservationMethodId === 'AIRPORT_DROP' || formData.reservationMethodId === 'AIRPORT_PICKUP_DROP') && (
-                  <>
+                    {/* Departure Information */}
                     <div>
                       <h4 className="font-medium mb-4">Departure Information</h4>
                       <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                         <div className="space-y-2">
-                          <RequiredLabel>Flight No.</RequiredLabel>
+                          <Label>Flight No.</Label>
                           <Input 
                             value={formData.departureFlightNo} 
                             onChange={(e) => updateFormData('departureFlightNo', e.target.value)}
                             placeholder="e.g., AA5678"
-                            className={validation.getFieldError('header.departureFlightNo') ? "border-destructive" : ""}
                           />
-                          <FormError message={validation.getFieldError('header.departureFlightNo')} />
                         </div>
                         
                         <div className="space-y-2">
-                          <RequiredLabel>Date & Time</RequiredLabel>
+                          <Label>Date & Time</Label>
                           <Popover>
                             <PopoverTrigger asChild>
                               <Button
                                 variant="outline"
                                 className={cn(
                                   "w-full justify-start text-left font-normal",
-                                  !formData.departureDateTime && "text-muted-foreground",
-                                  validation.getFieldError('header.departureDateTime') && "border-destructive"
+                                  !formData.departureDateTime && "text-muted-foreground"
                                 )}
                               >
                                 <CalendarIcon className="mr-2 h-4 w-4" />
@@ -1546,18 +1538,15 @@ const NewReservation = () => {
                               />
                             </PopoverContent>
                           </Popover>
-                          <FormError message={validation.getFieldError('header.departureDateTime')} />
                         </div>
                         
                         <div className="space-y-2">
-                          <RequiredLabel>Airline</RequiredLabel>
+                          <Label>Airline</Label>
                           <Input 
                             value={formData.departureAirline} 
                             onChange={(e) => updateFormData('departureAirline', e.target.value)}
                             placeholder="e.g., American Airlines"
-                            className={validation.getFieldError('header.departureAirline') ? "border-destructive" : ""}
                           />
-                          <FormError message={validation.getFieldError('header.departureAirline')} />
                         </div>
                         
                         <div className="space-y-2">
@@ -1600,6 +1589,12 @@ const NewReservation = () => {
                       </div>
                     </div>
                   </>
+                )}
+
+                {!formData.enableAirportInfo && (
+                  <div className="text-sm text-muted-foreground bg-muted/50 p-4 rounded-lg">
+                    Check the box above to enable airport information fields.
+                  </div>
                 )}
               </div>
             </AccordionContent>
