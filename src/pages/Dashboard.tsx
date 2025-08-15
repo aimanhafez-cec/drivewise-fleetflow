@@ -105,7 +105,10 @@ const Dashboard = () => {
               <SelectItem value="middletown">Locations</SelectItem>
             </SelectContent>
           </Select>
-          <Button className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2">
+          <Button 
+            className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2"
+            onClick={() => navigate('/reservations/new')}
+          >
             Reservations
           </Button>
           <Button className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2">
