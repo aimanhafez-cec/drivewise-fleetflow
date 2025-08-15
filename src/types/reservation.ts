@@ -1,8 +1,9 @@
 
 export interface ReservationDriver {
-  id: string;
+  id?: string;
   driverId: string;
   role: 'PRIMARY' | 'ADDITIONAL';
+  addlDriverFee?: number;
 }
 
 export interface ReservationLine {
