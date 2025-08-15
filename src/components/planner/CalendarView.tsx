@@ -51,22 +51,24 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
   const getEventColor = (event: PlannerEvent) => {
     if (event.kind === "RESERVATION") {
       switch (event.status.toLowerCase()) {
-        case "open": return "bg-green-100 border-green-300 text-green-800";
-        case "online": return "bg-yellow-100 border-yellow-300 text-yellow-800";
-        case "walk-in": return "bg-gray-100 border-gray-300 text-gray-800";
-        default: return "bg-blue-100 border-blue-300 text-blue-800";
+        case "open": return "bg-green-500 text-white border-transparent";
+        case "online": return "bg-yellow-500 text-white border-transparent";
+        case "walk-in": return "bg-gray-500 text-white border-transparent";
+        default: return "bg-green-500 text-white border-transparent";
       }
     } else if (event.kind === "AGREEMENT") {
       switch (event.status.toLowerCase()) {
-        case "open": return "bg-blue-100 border-blue-300 text-blue-800";
-        case "overdue": return "bg-red-100 border-red-300 text-red-800";
-        case "closed": return "bg-gray-100 border-gray-300 text-gray-800";
-        case "pending_payment": return "bg-purple-100 border-purple-300 text-purple-800";
-        case "pending_deposit": return "bg-orange-100 border-orange-300 text-orange-800";
-        default: return "bg-blue-100 border-blue-300 text-blue-800";
+        case "open": return "bg-blue-500 text-white border-transparent";
+        case "overdue": return "bg-red-500 text-white border-transparent";
+        case "closed": return "bg-gray-600 text-white border-transparent";
+        case "pending_payment": case "pending payment": return "bg-purple-500 text-white border-transparent";
+        case "pending_deposit": case "pending deposit": return "bg-orange-500 text-white border-transparent";
+        default: return "bg-blue-500 text-white border-transparent";
       }
+    } else if (event.kind === "MAINTENANCE" || event.kind === "HOLD") {
+      return "bg-yellow-600 text-white border-transparent";
     } else {
-      return "bg-yellow-100 border-yellow-300 text-yellow-800";
+      return "bg-gray-500 text-white border-transparent";
     }
   };
 
