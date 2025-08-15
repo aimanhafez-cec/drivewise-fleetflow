@@ -48,7 +48,11 @@ export const EventLegend: React.FC = () => {
             </span>
             <div className="flex gap-2">
               {category.items.map((item) => (
-                <Badge key={item.label} variant={item.variant} className="text-xs">
+                <Badge 
+                  key={item.label} 
+                  variant="outline" 
+                  className={`text-xs ${item.color} text-white border-transparent`}
+                >
                   <item.icon className="mr-1 h-3 w-3" />
                   {item.label}
                 </Badge>
