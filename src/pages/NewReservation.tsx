@@ -36,7 +36,7 @@ import { usePricingContext, calculateLinePrice, PricingContext } from '@/hooks/u
 import { RepriceBanner } from '@/components/reservation/RepriceBanner';
 import { useFormValidation, ValidationRules } from '@/hooks/useFormValidation';
 import { useReservationValidation } from '@/hooks/useReservationValidation';
-import { BillToSelector, BillToData, BillToType } from '@/components/ui/bill-to-selector';
+import { BillToSelector, BillToData, BillToType, BillToMeta } from '@/components/ui/bill-to-selector';
 import { useVehicles, useVehicleCategories, formatVehicleDisplay } from '@/hooks/useVehicles';
 
 const STORAGE_KEY = 'new-reservation-draft';
@@ -748,11 +748,10 @@ const NewReservation = () => {
         validityDateTo: formData.validityDateTo,
         taxLevelId: formData.taxLevelId,
         taxCodeId: formData.taxCodeId,
-        billingType: formData.billingType === 'other' ? 'OTHER' : 'SAME_AS_CUSTOMER',
-        billingCustomerName: formData.billingCustomerName,
-        billingMail: formData.billingMail,
-        billingPhone: formData.billingPhone,
-        billingAddress: formData.billingAddress,
+        bill_to_type: formData.bill_to_type,
+        bill_to_id: formData.bill_to_id,
+        bill_to_display: formData.bill_to_display,
+        bill_to_meta: formData.bill_to_meta,
         arrivalFlightNo: formData.arrivalFlightNo,
         arrivalDateTime: formData.arrivalDateTime,
         arrivalAirline: formData.arrivalAirline,
@@ -878,11 +877,10 @@ const NewReservation = () => {
         validityDateTo: formData.validityDateTo,
         taxLevelId: formData.taxLevelId,
         taxCodeId: formData.taxCodeId,
-        billingType: formData.billingType === 'other' ? 'OTHER' : 'SAME_AS_CUSTOMER',
-        billingCustomerName: formData.billingCustomerName,
-        billingMail: formData.billingMail,
-        billingPhone: formData.billingPhone,
-        billingAddress: formData.billingAddress,
+        bill_to_type: formData.bill_to_type,
+        bill_to_id: formData.bill_to_id,
+        bill_to_display: formData.bill_to_display,
+        bill_to_meta: formData.bill_to_meta,
         arrivalFlightNo: formData.arrivalFlightNo,
         arrivalDateTime: formData.arrivalDateTime,
         arrivalAirline: formData.arrivalAirline,
@@ -1417,14 +1415,10 @@ const NewReservation = () => {
                   updateFormData('billing_address_id', billToData.billing_address_id);
                   updateFormData('bill_to_meta', billToData.bill_to_meta);
                 }}
-                errors={validation.getFieldsWithPrefix('bill_to')}
+                errors={{}}
                 currentCustomerId={formData.customerId}
-                currentCustomerName={selectedCustomer?.fullName}
-                      />
-                    </div>
-                  </div>
-                )}
-              </div>
+                currentCustomerName={selectedCustomer?.name}
+              />
             </AccordionContent>
           </AccordionItem>
 
