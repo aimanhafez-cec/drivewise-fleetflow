@@ -94,6 +94,63 @@ const customers: Customer[] = [
   },
 ];
 
+// Price Lists with rates
+export interface PriceList {
+  id: string;
+  label: string;
+  value: string;
+  rates: {
+    hourly: number;
+    daily: number;
+    weekly: number;
+    monthly: number;
+    kilometerCharge: number;
+    dailyKilometerAllowed: number;
+  };
+}
+
+const priceLists: PriceList[] = [
+  {
+    id: 'standard',
+    label: 'Standard Rates',
+    value: 'standard',
+    rates: {
+      hourly: 150,
+      daily: 2500,
+      weekly: 15000,
+      monthly: 55000,
+      kilometerCharge: 5,
+      dailyKilometerAllowed: 200
+    }
+  },
+  {
+    id: 'premium',
+    label: 'Premium Rates',
+    value: 'premium',
+    rates: {
+      hourly: 250,
+      daily: 3500,
+      weekly: 22000,
+      monthly: 80000,
+      kilometerCharge: 7,
+      dailyKilometerAllowed: 300
+    }
+  },
+  {
+    id: 'corporate',
+    label: 'Corporate Rates',
+    value: 'corporate',
+    rates: {
+      hourly: 120,
+      daily: 2000,
+      weekly: 12000,
+      monthly: 45000,
+      kilometerCharge: 4,
+      dailyKilometerAllowed: 250
+    }
+  }
+];
+
 const paymentTerms: DropdownOption[] = [
   { id: 'immediate', label: 'Payment Due Immediately', value: 'immediate' },
   { id: 'net15', label: 'Net 15 Days', value: 'net15' },
@@ -274,6 +331,17 @@ export const mockApi = {
   getTaxCodes: async (levelId: string): Promise<DropdownOption[]> => {
     await new Promise(resolve => setTimeout(resolve, 180));
     return taxCodesByLevel[levelId] || [];
+  },
+
+  getPriceLists: async (): Promise<DropdownOption[]> => {
+    await new Promise(resolve => setTimeout(resolve, 120));
+    return priceLists.map(pl => ({ id: pl.id, label: pl.label, value: pl.value }));
+  },
+
+  getPriceListRates: async (priceListId: string): Promise<PriceList['rates'] | null> => {
+    await new Promise(resolve => setTimeout(resolve, 80));
+    const priceList = priceLists.find(pl => pl.id === priceListId);
+    return priceList?.rates || null;
   },
 
   createReservation: async (data: Partial<ReservationFormData>, status: 'DRAFT' | 'ACTIVE'): Promise<CreateReservationResponse> => {

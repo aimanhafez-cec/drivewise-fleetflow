@@ -282,6 +282,8 @@ const NewReservation = () => {
     contractBillingPlans: false,
     taxLevels: false,
     taxCodes: false,
+    priceLists: false,
+    initialData: false,
     saving: false,
   });
 
@@ -298,6 +300,7 @@ const NewReservation = () => {
     contractBillingPlans: DropdownOption[];
     taxLevels: DropdownOption[];
     taxCodes: DropdownOption[];
+    priceLists: DropdownOption[];
   }>({
     currencies: [],
     reservationMethods: [],
@@ -311,6 +314,7 @@ const NewReservation = () => {
     contractBillingPlans: [],
     taxLevels: [],
     taxCodes: [],
+    priceLists: [],
   });
 
   const [errors, setErrors] = useState<Partial<Record<keyof ReservationFormData, string>>>({});
@@ -467,6 +471,7 @@ const NewReservation = () => {
       { key: 'discountTypes', fn: mockApi.getDiscountTypes },
       { key: 'contractBillingPlans', fn: mockApi.getContractBillingPlans },
       { key: 'taxLevels', fn: mockApi.getTaxLevels },
+      { key: 'priceLists', fn: mockApi.getPriceLists }, // Added price lists
     ];
 
     await Promise.all(
@@ -525,6 +530,43 @@ const NewReservation = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (errors[field as keyof ReservationFormData]) {
       setErrors(prev => ({ ...prev, [field as keyof ReservationFormData]: undefined }));
+    }
+  };
+
+  // Handle price list selection and auto-fill rates
+  const handlePriceListChange = async (priceListId: string) => {
+    updateFormData('priceListId', priceListId);
+    
+    if (priceListId) {
+      try {
+        const rates = await mockApi.getPriceListRates(priceListId);
+        if (rates) {
+          // Auto-fill the rate fields with price list data
+          updateFormData('hourlyRate', rates.hourly);
+          updateFormData('dailyRate', rates.daily);
+          updateFormData('weeklyRate', rates.weekly);
+          updateFormData('monthlyRate', rates.monthly);
+          updateFormData('kilometerCharge', rates.kilometerCharge);
+          updateFormData('dailyKilometerAllowed', rates.dailyKilometerAllowed);
+          
+          console.log('✅ Auto-filled rates from price list:', {
+            priceListId,
+            rates
+          });
+          
+          toast({
+            title: "Rates Auto-filled",
+            description: `Rates have been loaded from ${options.priceLists.find(p => p.id === priceListId)?.label || 'price list'} and can be edited.`,
+          });
+        }
+      } catch (error) {
+        console.error('Failed to load price list rates:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load price list rates.",
+          variant: "destructive"
+        });
+      }
     }
   };
 
@@ -1715,16 +1757,22 @@ const NewReservation = () => {
                 <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label>Price List</Label>
-                    <Select value={formData.priceListId} onValueChange={(value) => updateFormData('priceListId', value)}>
-                      <SelectTrigger id="select-price-list">
-                        <SelectValue placeholder="Select price list" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="standard">Standard Rates</SelectItem>
-                        <SelectItem value="premium">Premium Rates</SelectItem>
-                        <SelectItem value="corporate">Corporate Rates</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    {loading.priceLists ? (
+                      <Skeleton className="h-10 w-full" />
+                    ) : (
+                      <Select value={formData.priceListId} onValueChange={handlePriceListChange}>
+                        <SelectTrigger id="select-price-list">
+                          <SelectValue placeholder="Select price list" />
+                        </SelectTrigger>
+                        <SelectContent className="z-50 bg-background">
+                          {options.priceLists.map((option) => (
+                            <SelectItem key={option.id} value={option.id}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
                   </div>
                   <div className="space-y-2">
                     <Label>Promotion Code</Label>
