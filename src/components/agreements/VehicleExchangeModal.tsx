@@ -54,16 +54,31 @@ export const VehicleExchangeModal: React.FC<VehicleExchangeModalProps> = ({
   const { data: availableVehicles } = useQuery({
     queryKey: ['available-vehicles', formData.newVehicleClass, formData.exchangeAt],
     queryFn: async () => {
-      if (!formData.newVehicleClass) return [];
+      if (!formData.newVehicleClass || !formData.exchangeAt) return [];
       
-      // Mock data - in real app would check availability
-      return [
-        { id: 'vehicle-1', make: 'Toyota', model: 'Camry', license_plate: 'ABC123', year: 2024 },
-        { id: 'vehicle-2', make: 'Honda', model: 'Accord', license_plate: 'XYZ789', year: 2024 },
-        { id: 'vehicle-3', make: 'Nissan', model: 'Altima', license_plate: 'DEF456', year: 2024 },
-      ];
+      const { data, error } = await supabase
+        .from('vehicles')
+        .select(`
+          *,
+          categories (
+            name,
+            icon
+          )
+        `)
+        .eq('status', 'available')
+        .order('make', { ascending: true });
+
+      if (error) throw error;
+      
+      // Filter by category if needed
+      let filteredVehicles = data || [];
+      
+      // TODO: Add proper availability checking for the exchange date
+      // For now, just return available vehicles
+      
+      return filteredVehicles;
     },
-    enabled: !!formData.newVehicleClass
+    enabled: !!formData.newVehicleClass && !!formData.exchangeAt
   });
 
   const exchangeMutation = useMutation({

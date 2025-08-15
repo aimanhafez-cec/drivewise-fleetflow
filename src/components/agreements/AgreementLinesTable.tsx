@@ -4,8 +4,9 @@ import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { VehicleExchangeModal } from './VehicleExchangeModal';
+import { VehicleAssignmentModal } from './VehicleAssignmentModal';
 import { format } from 'date-fns';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, Plus } from 'lucide-react';
 
 interface AgreementLinesTableProps {
   agreementId: string;
@@ -23,6 +24,7 @@ export const AgreementLinesTable: React.FC<AgreementLinesTableProps> = ({
   onExchangeComplete
 }) => {
   const [exchangeModalOpen, setExchangeModalOpen] = useState(false);
+  const [assignmentModalOpen, setAssignmentModalOpen] = useState(false);
   const [selectedLine, setSelectedLine] = useState<any>(null);
 
   const handleExchangeClick = (line: any) => {
@@ -30,8 +32,21 @@ export const AgreementLinesTable: React.FC<AgreementLinesTableProps> = ({
     setExchangeModalOpen(true);
   };
 
+  const handleAssignClick = (line: any) => {
+    setSelectedLine(line);
+    setAssignmentModalOpen(true);
+  };
+
   const handleExchangeComplete = () => {
     setExchangeModalOpen(false);
+    setSelectedLine(null);
+    if (onExchangeComplete) {
+      onExchangeComplete();
+    }
+  };
+
+  const handleAssignmentComplete = () => {
+    setAssignmentModalOpen(false);
     setSelectedLine(null);
     if (onExchangeComplete) {
       onExchangeComplete();
@@ -84,12 +99,19 @@ export const AgreementLinesTable: React.FC<AgreementLinesTableProps> = ({
                   <TableCell>
                     <div>
                       <div className="font-medium">
-                        {line.vehicle ? `${line.vehicle.make} ${line.vehicle.model}` : 'No Vehicle'}
+                        {line.vehicle ? `${line.vehicle.make} ${line.vehicle.model}` : 
+                          <span className="text-muted-foreground">No Vehicle Assigned</span>
+                        }
                       </div>
                       {line.vehicle?.license_plate && (
                         <div className="text-sm text-muted-foreground">
                           {line.vehicle.license_plate}
                         </div>
+                      )}
+                      {!line.vehicle_id && (
+                        <Badge variant="outline" className="text-xs mt-1">
+                          Needs Assignment
+                        </Badge>
                       )}
                     </div>
                   </TableCell>
@@ -108,16 +130,29 @@ export const AgreementLinesTable: React.FC<AgreementLinesTableProps> = ({
                     ${line.line_total?.toFixed(2) || '0.00'}
                   </TableCell>
                   <TableCell>
-                    <Button 
-                      id={`btn-exchange-${line.id}`}
-                      size="sm" 
-                      variant="outline"
-                      onClick={() => handleExchangeClick(line)}
-                      disabled={!line.vehicle_id} // Can't exchange if no vehicle assigned
-                    >
-                      <RefreshCw className="h-3 w-3 mr-1" />
-                      Exchange Vehicle
-                    </Button>
+                    <div className="flex gap-2">
+                      {!line.vehicle_id ? (
+                        <Button 
+                          id={`btn-assign-${line.id}`}
+                          size="sm" 
+                          variant="default"
+                          onClick={() => handleAssignClick(line)}
+                        >
+                          <Plus className="h-3 w-3 mr-1" />
+                          Assign Vehicle
+                        </Button>
+                      ) : (
+                        <Button 
+                          id={`btn-exchange-${line.id}`}
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => handleExchangeClick(line)}
+                        >
+                          <RefreshCw className="h-3 w-3 mr-1" />
+                          Exchange Vehicle
+                        </Button>
+                      )}
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
@@ -133,10 +168,22 @@ export const AgreementLinesTable: React.FC<AgreementLinesTableProps> = ({
       </Card>
 
       {/* Vehicle Exchange Modal */}
-      {selectedLine && (
+      {selectedLine && exchangeModalOpen && (
         <VehicleExchangeModal
           open={exchangeModalOpen}
           onOpenChange={setExchangeModalOpen}
+          agreementId={agreementId}
+          line={selectedLine}
+          agreementStartDate={agreementStartDate}
+          agreementEndDate={agreementEndDate}
+        />
+      )}
+
+      {/* Vehicle Assignment Modal */}
+      {selectedLine && assignmentModalOpen && (
+        <VehicleAssignmentModal
+          open={assignmentModalOpen}
+          onOpenChange={setAssignmentModalOpen}
           agreementId={agreementId}
           line={selectedLine}
           agreementStartDate={agreementStartDate}
