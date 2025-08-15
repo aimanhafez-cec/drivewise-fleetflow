@@ -39,6 +39,33 @@ const Dashboard = () => {
     },
   });
 
+  // Fetch vehicle status data
+  const { data: vehicleStatusData = [] } = useQuery({
+    queryKey: ['dashboard-vehicle-status'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('vehicles')
+        .select('status');
+      
+      if (error) throw error;
+      
+      // Count vehicles by status
+      const statusCounts = data.reduce((acc, vehicle) => {
+        const status = vehicle.status;
+        acc[status] = (acc[status] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
+
+      // Transform to chart format
+      return [
+        { name: 'Available', value: statusCounts.available || 0, color: '#10B981' },
+        { name: 'Rented', value: statusCounts.rented || 0, color: '#06B6D4' },
+        { name: 'Maintenance', value: statusCounts.maintenance || 0, color: '#F59E0B' },
+        { name: 'Out of Service', value: statusCounts.out_of_service || 0, color: '#EF4444' },
+      ].filter(item => item.value > 0); // Only show statuses with vehicles
+    },
+  });
+
   // Search agreements by customer name
   const searchCustomerAgreements = async () => {
     if (!customerSearchTerm.trim()) return;
@@ -118,11 +145,6 @@ const Dashboard = () => {
     },
   ];
 
-  const vehicleStatusData = [
-    { name: 'Available', value: 1, color: '#10B981' },
-    { name: 'In Service', value: 1, color: '#3B82F6' },
-    { name: 'On Rent', value: 1, color: '#06B6D4' },
-  ];
 
   const rateData = [
     { vehicleType: 'Full Size', mileage: 100, rate: 80 },
@@ -308,10 +330,12 @@ const Dashboard = () => {
                   </Pie>
                 </PieChart>
               </ResponsiveContainer>
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-xl font-bold">1</span>
-                <span className="text-xs text-gray-500">OnRent</span>
-              </div>
+               <div className="absolute inset-0 flex flex-col items-center justify-center">
+                 <span className="text-xl font-bold">
+                   {vehicleStatusData.reduce((sum, item) => sum + item.value, 0)}
+                 </span>
+                 <span className="text-xs text-gray-500">Total</span>
+               </div>
             </div>
             <div className="flex-1">
               {vehicleStatusData.map((item, index) => (
