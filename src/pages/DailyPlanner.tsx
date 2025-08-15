@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -52,6 +52,7 @@ const DailyPlanner: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [currentDate, setCurrentDate] = useState(() => new Date());
   const [view, setView] = useState<ViewType>(() => 
     (searchParams.get("view") as ViewType) || "week"
@@ -219,6 +220,11 @@ const DailyPlanner: React.FC = () => {
       dateRange: { from: undefined, to: undefined }
     };
     updateFilters(emptyFilters);
+  };
+
+  const handleSearch = () => {
+    // Invalidate and refetch the planner events query
+    queryClient.invalidateQueries({ queryKey: ["planner-events"] });
   };
 
   const formatDateHeader = () => {
@@ -394,6 +400,7 @@ const DailyPlanner: React.FC = () => {
         filters={filters}
         onFiltersChange={updateFilters}
         onReset={resetFilters}
+        onSearch={handleSearch}
       />
 
       {/* KPIs */}

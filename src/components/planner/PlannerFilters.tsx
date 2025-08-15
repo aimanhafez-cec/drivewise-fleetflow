@@ -32,12 +32,14 @@ interface PlannerFiltersProps {
   };
   onFiltersChange: (filters: PlannerFiltersProps["filters"]) => void;
   onReset: () => void;
+  onSearch?: () => void;
 }
 
 export const PlannerFilters: React.FC<PlannerFiltersProps> = ({
   filters,
   onFiltersChange,
-  onReset
+  onReset,
+  onSearch
 }) => {
   const updateFilter = (key: string, value: any) => {
     onFiltersChange({
@@ -178,7 +180,7 @@ export const PlannerFilters: React.FC<PlannerFiltersProps> = ({
               <Button 
                 size="sm" 
                 className="flex-1"
-                onClick={() => onFiltersChange(filters)}
+                onClick={onSearch}
                 data-testid="btn-search"
               >
                 <Search className="mr-2 h-4 w-4" />
