@@ -46,8 +46,8 @@ const navigation = [
     icon: Calendar,
   },
   {
-    title: 'Planner',
-    url: '/planner',
+    title: 'Daily Planner',
+    url: '/daily-planner',
     icon: CalendarRange,
   },
   {

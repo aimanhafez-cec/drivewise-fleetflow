@@ -13,6 +13,7 @@ import Reservations from "./pages/Reservations";
 import NewReservation from "./pages/NewReservation";
 import ReservationsMulti from "./pages/ReservationsMulti";
 import Planner from "./pages/Planner";
+import DailyPlanner from "./pages/DailyPlanner";
 import Vehicles from "./pages/Vehicles";
 import VehicleDetails from "./pages/VehicleDetails";
 import Customers from "./pages/Customers";
@@ -81,6 +82,13 @@ const App = () => (
               </ProtectedRoute>
             }>
               <Route index element={<Planner />} />
+            </Route>
+            <Route path="/daily-planner" element={
+              <ProtectedRoute>
+                <AppLayout />
+              </ProtectedRoute>
+            }>
+              <Route index element={<DailyPlanner />} />
             </Route>
             <Route path="/agreements" element={
               <ProtectedRoute>

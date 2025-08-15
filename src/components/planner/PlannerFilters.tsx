@@ -1,0 +1,307 @@
+import React from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, CardContent } from "@/components/ui/card";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Badge } from "@/components/ui/badge";
+import { CalendarIcon, Search, RotateCcw, X } from "lucide-react";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
+
+interface PlannerFiltersProps {
+  filters: {
+    vehicleClass: string;
+    vehicleMake: string;
+    vehicleModel: string;
+    vehicleVin: string;
+    locations: string[];
+    status: string[];
+    salesperson: string;
+    dateRange: {
+      from?: Date;
+      to?: Date;
+    };
+  };
+  onFiltersChange: (filters: PlannerFiltersProps["filters"]) => void;
+  onReset: () => void;
+}
+
+export const PlannerFilters: React.FC<PlannerFiltersProps> = ({
+  filters,
+  onFiltersChange,
+  onReset
+}) => {
+  const updateFilter = (key: string, value: any) => {
+    onFiltersChange({
+      ...filters,
+      [key]: value
+    });
+  };
+
+  const toggleStatus = (status: string) => {
+    const newStatus = filters.status.includes(status)
+      ? filters.status.filter(s => s !== status)
+      : [...filters.status, status];
+    updateFilter("status", newStatus);
+  };
+
+  const toggleLocation = (location: string) => {
+    const newLocations = filters.locations.includes(location)
+      ? filters.locations.filter(l => l !== location)
+      : [...filters.locations, location];
+    updateFilter("locations", newLocations);
+  };
+
+  const hasActiveFilters = Object.entries(filters).some(([key, value]) => {
+    if (key === "dateRange") {
+      const dateRange = value as { from?: Date; to?: Date };
+      return dateRange.from || dateRange.to;
+    }
+    if (Array.isArray(value)) {
+      return value.length > 0;
+    }
+    return value && value !== "";
+  });
+
+  const vehicleClasses = [
+    "Economy", "Compact", "Mid-size", "Full-size", "Premium", "Luxury", "SUV", "Van"
+  ];
+
+  const vehicleMakes = [
+    "Toyota", "Honda", "Ford", "Chevrolet", "Nissan", "BMW", "Mercedes", "Audi"
+  ];
+
+  const locations = [
+    "Airport Terminal 1", "Airport Terminal 2", "Downtown", "Mall Branch", "Hotel District"
+  ];
+
+  const statusOptions = [
+    "Open", "Online", "Walk-in", "Overdue", "Closed", "Pending Payment", "Pending Deposit"
+  ];
+
+  return (
+    <Card className="sticky top-4 z-10 shadow-sm">
+      <CardContent className="p-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+          {/* Vehicle Class */}
+          <div className="space-y-2">
+            <Label htmlFor="flt-class">Vehicle Class</Label>
+            <Select 
+              value={filters.vehicleClass} 
+              onValueChange={(value) => updateFilter("vehicleClass", value)}
+            >
+              <SelectTrigger data-testid="flt-class">
+                <SelectValue placeholder="All Classes" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">All Classes</SelectItem>
+                {vehicleClasses.map(cls => (
+                  <SelectItem key={cls} value={cls}>{cls}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Vehicle Make */}
+          <div className="space-y-2">
+            <Label htmlFor="flt-make">Make</Label>
+            <Select 
+              value={filters.vehicleMake} 
+              onValueChange={(value) => updateFilter("vehicleMake", value)}
+            >
+              <SelectTrigger data-testid="flt-make">
+                <SelectValue placeholder="All Makes" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">All Makes</SelectItem>
+                {vehicleMakes.map(make => (
+                  <SelectItem key={make} value={make}>{make}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Vehicle Model */}
+          <div className="space-y-2">
+            <Label htmlFor="flt-model">Model</Label>
+            <Select 
+              value={filters.vehicleModel} 
+              onValueChange={(value) => updateFilter("vehicleModel", value)}
+            >
+              <SelectTrigger data-testid="flt-model">
+                <SelectValue placeholder="All Models" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">All Models</SelectItem>
+                <SelectItem value="Camry">Camry</SelectItem>
+                <SelectItem value="Accord">Accord</SelectItem>
+                <SelectItem value="F-150">F-150</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* VIN Search */}
+          <div className="space-y-2">
+            <Label htmlFor="flt-vin">VIN/License</Label>
+            <Input
+              id="flt-vin"
+              data-testid="flt-vin"
+              placeholder="Search VIN or License"
+              value={filters.vehicleVin}
+              onChange={(e) => updateFilter("vehicleVin", e.target.value)}
+            />
+          </div>
+
+          {/* Date Range */}
+          <div className="space-y-2">
+            <Label>Date Range</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal",
+                    !filters.dateRange.from && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {filters.dateRange.from ? (
+                    filters.dateRange.to ? (
+                      <>
+                        {format(filters.dateRange.from, "LLL dd")} -{" "}
+                        {format(filters.dateRange.to, "LLL dd")}
+                      </>
+                    ) : (
+                      format(filters.dateRange.from, "LLL dd, y")
+                    )
+                  ) : (
+                    "Pick dates"
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="range"
+                  selected={{
+                    from: filters.dateRange.from,
+                    to: filters.dateRange.to
+                  }}
+                  onSelect={(range) => updateFilter("dateRange", range || { from: undefined, to: undefined })}
+                  numberOfMonths={2}
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="space-y-2">
+            <Label>&nbsp;</Label>
+            <div className="flex gap-2">
+              <Button 
+                size="sm" 
+                className="flex-1"
+                data-testid="btn-search"
+              >
+                <Search className="mr-2 h-4 w-4" />
+                Search
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={onReset}
+                disabled={!hasActiveFilters}
+                data-testid="btn-reset"
+              >
+                <RotateCcw className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Status and Location Filters */}
+        <div className="mt-4 space-y-3">
+          {/* Status */}
+          <div className="space-y-2">
+            <Label>Status</Label>
+            <div className="flex flex-wrap gap-2" data-testid="flt-status">
+              {statusOptions.map(status => (
+                <Badge
+                  key={status}
+                  variant={filters.status.includes(status) ? "default" : "outline"}
+                  className="cursor-pointer"
+                  onClick={() => toggleStatus(status)}
+                >
+                  {status}
+                  {filters.status.includes(status) && (
+                    <X className="ml-1 h-3 w-3" />
+                  )}
+                </Badge>
+              ))}
+            </div>
+          </div>
+
+          {/* Locations */}
+          <div className="space-y-2">
+            <Label>Locations</Label>
+            <div className="flex flex-wrap gap-2" data-testid="flt-locations">
+              {locations.map(location => (
+                <Badge
+                  key={location}
+                  variant={filters.locations.includes(location) ? "default" : "outline"}
+                  className="cursor-pointer"
+                  onClick={() => toggleLocation(location)}
+                >
+                  {location}
+                  {filters.locations.includes(location) && (
+                    <X className="ml-1 h-3 w-3" />
+                  )}
+                </Badge>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Active Filters Summary */}
+        {hasActiveFilters && (
+          <div className="mt-4 p-3 bg-muted/50 rounded-lg">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium">Active Filters:</span>
+              <Button variant="ghost" size="sm" onClick={onReset}>
+                Clear All
+              </Button>
+            </div>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {filters.vehicleClass && (
+                <Badge variant="secondary">Class: {filters.vehicleClass}</Badge>
+              )}
+              {filters.vehicleMake && (
+                <Badge variant="secondary">Make: {filters.vehicleMake}</Badge>
+              )}
+              {filters.vehicleModel && (
+                <Badge variant="secondary">Model: {filters.vehicleModel}</Badge>
+              )}
+              {filters.vehicleVin && (
+                <Badge variant="secondary">VIN: {filters.vehicleVin}</Badge>
+              )}
+              {filters.status.length > 0 && (
+                <Badge variant="secondary">Status: {filters.status.length} selected</Badge>
+              )}
+              {filters.locations.length > 0 && (
+                <Badge variant="secondary">Locations: {filters.locations.length} selected</Badge>
+              )}
+              {filters.dateRange.from && (
+                <Badge variant="secondary">
+                  Date: {format(filters.dateRange.from, "MMM dd")}
+                  {filters.dateRange.to && ` - ${format(filters.dateRange.to, "MMM dd")}`}
+                </Badge>
+              )}
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
