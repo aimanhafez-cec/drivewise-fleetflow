@@ -773,44 +773,106 @@ const NewReservation = () => {
     }
   };
 
+  // Auto-populate header fields from reservation lines
+  const populateHeaderFromLines = () => {
+    if (!formData.reservationLines || formData.reservationLines.length === 0) {
+      return;
+    }
+
+    const firstLine = formData.reservationLines[0];
+    const updatedFormData: Partial<ExtendedFormData> = {};
+
+    // Auto-populate from first line if not already set
+    if (!formData.reservationTypeId && firstLine.reservationTypeId) {
+      updatedFormData.reservationTypeId = firstLine.reservationTypeId;
+    }
+
+    // Set smart defaults for required fields if not already set
+    if (!formData.reservationMethodId && options.reservationMethods.length > 0) {
+      // Default to first available method (e.g., "walk-in")
+      updatedFormData.reservationMethodId = options.reservationMethods[0].id;
+    }
+
+    if (!formData.businessUnitId && options.businessUnits.length > 0) {
+      // Default to first business unit
+      updatedFormData.businessUnitId = options.businessUnits[0].id;
+    }
+
+    if (!formData.paymentTermsId && options.paymentTerms.length > 0) {
+      // Default to first payment terms (e.g., "prepaid")
+      updatedFormData.paymentTermsId = options.paymentTerms[0].id;
+    }
+
+    if (!formData.priceListId && options.priceLists.length > 0) {
+      // Default to first price list
+      updatedFormData.priceListId = options.priceLists[0].id;
+    }
+
+    if (!formData.taxLevelId && options.taxLevels.length > 0) {
+      // Default to first tax level
+      updatedFormData.taxLevelId = options.taxLevels[0].id;
+    }
+
+    // Set validity date from first line's check-in date if not set
+    if (!formData.validityDateTo && firstLine.checkInDate) {
+      updatedFormData.validityDateTo = firstLine.checkInDate;
+    }
+
+    // Update form data if we have changes
+    if (Object.keys(updatedFormData).length > 0) {
+      setFormData(prev => ({ ...prev, ...updatedFormData }));
+      return updatedFormData;
+    }
+
+    return null;
+  };
+
   // Validate form data before saving
   const validateBeforeSave = (status: 'DRAFT' | 'ACTIVE') => {
     if (status === 'DRAFT') return { success: true, errors: [] };
 
+    // Auto-populate header fields from reservation lines before validation
+    const autoPopulatedData = populateHeaderFromLines();
+    
+    // Use current form data plus any auto-populated data for validation
+    const currentFormData = autoPopulatedData 
+      ? { ...formData, ...autoPopulatedData }
+      : formData;
+
     // Prepare data for validation
     const validationData = {
       header: {
-        entryDate: formData.entryDate,
-        reservationMethodId: formData.reservationMethodId,
-        currencyCode: formData.currencyCode,
-        reservationTypeId: formData.reservationTypeId,
-        businessUnitId: formData.businessUnitId,
-        customerId: formData.customerId,
-        paymentTermsId: formData.paymentTermsId,
-        priceListId: formData.priceListId,
-        validityDateTo: formData.validityDateTo,
-        taxLevelId: formData.taxLevelId,
-        bill_to_type: formData.bill_to_type,
-        bill_to_id: formData.bill_to_id,
-        bill_to_display: formData.bill_to_display,
-        bill_to_meta: formData.bill_to_meta,
-        arrivalFlightNo: formData.arrivalFlightNo,
-        arrivalDateTime: formData.arrivalDateTime,
-        arrivalAirline: formData.arrivalAirline,
-        departureFlightNo: formData.departureFlightNo,
-        departureDateTime: formData.departureDateTime,
-        departureAirline: formData.departureAirline,
-        insuranceLevel: formData.insuranceLevelId,
-        insuranceProvider: formData.insuranceProviderId,
-        advancePayment: formData.advancePayment,
-        paymentMethod: formData.paymentMethodId,
-        securityDepositPaid: formData.securityDepositPaid,
-        depositMethod: formData.depositMethodId,
-        depositPaymentMethod: formData.depositPaymentMethodId,
-        benefitType: formData.referralBenefitTypeId,
-        benefitValue: formData.referralValue,
+        entryDate: currentFormData.entryDate,
+        reservationMethodId: currentFormData.reservationMethodId,
+        currencyCode: currentFormData.currencyCode,
+        reservationTypeId: currentFormData.reservationTypeId,
+        businessUnitId: currentFormData.businessUnitId,
+        customerId: currentFormData.customerId,
+        paymentTermsId: currentFormData.paymentTermsId,
+        priceListId: currentFormData.priceListId,
+        validityDateTo: currentFormData.validityDateTo,
+        taxLevelId: currentFormData.taxLevelId,
+        bill_to_type: currentFormData.bill_to_type,
+        bill_to_id: currentFormData.bill_to_id,
+        bill_to_display: currentFormData.bill_to_display,
+        bill_to_meta: currentFormData.bill_to_meta,
+        arrivalFlightNo: currentFormData.arrivalFlightNo,
+        arrivalDateTime: currentFormData.arrivalDateTime,
+        arrivalAirline: currentFormData.arrivalAirline,
+        departureFlightNo: currentFormData.departureFlightNo,
+        departureDateTime: currentFormData.departureDateTime,
+        departureAirline: currentFormData.departureAirline,
+        insuranceLevel: currentFormData.insuranceLevelId,
+        insuranceProvider: currentFormData.insuranceProviderId,
+        advancePayment: currentFormData.advancePayment,
+        paymentMethod: currentFormData.paymentMethodId,
+        securityDepositPaid: currentFormData.securityDepositPaid,
+        depositMethod: currentFormData.depositMethodId,
+        depositPaymentMethod: currentFormData.depositPaymentMethodId,
+        benefitType: currentFormData.referralBenefitTypeId,
+        benefitValue: currentFormData.referralValue,
       },
-      lines: formData.reservationLines?.map(line => ({
+      lines: currentFormData.reservationLines?.map(line => ({
         vehicleClassId: line.vehicleClassId,
         vehicleId: line.vehicleId,
         checkOutDate: line.checkOutDate,
@@ -827,7 +889,29 @@ const NewReservation = () => {
     setLoading(prev => ({ ...prev, saving: true }));
     
     try {
-      // Validate form before saving
+      // Check if we have reservation lines for active reservations
+      if (status === 'ACTIVE' && (!formData.reservationLines || formData.reservationLines.length === 0)) {
+        toast({
+          title: "No Reservation Lines",
+          description: "Please add at least one reservation line before saving",
+          variant: "destructive",
+        });
+        setLoading(prev => ({ ...prev, saving: false }));
+        return;
+      }
+
+      // Auto-populate header fields from reservation lines for active status
+      if (status === 'ACTIVE') {
+        const autoPopulatedData = populateHeaderFromLines();
+        if (autoPopulatedData && Object.keys(autoPopulatedData).length > 0) {
+          toast({
+            title: "Auto-populated Fields",
+            description: "Some header fields were automatically filled from your reservation lines",
+          });
+        }
+      }
+
+      // Validate form after auto-population
       const validationResult = validateBeforeSave(status);
       
       if (!validationResult.success) {
