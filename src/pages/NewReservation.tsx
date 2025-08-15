@@ -36,6 +36,7 @@ import { usePricingContext, calculateLinePrice, PricingContext } from '@/hooks/u
 import { RepriceBanner } from '@/components/reservation/RepriceBanner';
 import { useFormValidation, ValidationRules } from '@/hooks/useFormValidation';
 import { useReservationValidation } from '@/hooks/useReservationValidation';
+import { useVehicles, useVehicleCategories, formatVehicleDisplay } from '@/hooks/useVehicles';
 
 const STORAGE_KEY = 'new-reservation-draft';
 
@@ -318,6 +319,10 @@ const NewReservation = () => {
   const [selectedDrivers, setSelectedDrivers] = useState<Driver[]>([]);
   const [showRepriceBanner, setShowRepriceBanner] = useState(false);
   const [lastPricingHash, setLastPricingHash] = useState('');
+
+  // Fetch real vehicle and category data
+  const { data: vehicles, isLoading: vehiclesLoading } = useVehicles();
+  const { data: categories, isLoading: categoriesLoading } = useVehicleCategories();
 
   // Prefill data for Add Line functionality
   const getPrefillData = () => ({
@@ -2028,11 +2033,17 @@ const NewReservation = () => {
                           <SelectValue placeholder="Select class" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="economy">Economy</SelectItem>
-                          <SelectItem value="compact">Compact</SelectItem>
-                          <SelectItem value="midsize">Midsize</SelectItem>
-                          <SelectItem value="fullsize">Full Size</SelectItem>
-                          <SelectItem value="luxury">Luxury</SelectItem>
+                          {categoriesLoading ? (
+                            <SelectItem value="" disabled>Loading categories...</SelectItem>
+                          ) : categories?.length === 0 ? (
+                            <SelectItem value="" disabled>No categories available</SelectItem>
+                          ) : (
+                            categories?.map((category) => (
+                              <SelectItem key={category.id} value={category.id}>
+                                {category.name}
+                              </SelectItem>
+                            ))
+                          )}
                         </SelectContent>
                       </Select>
                     </div>
@@ -2043,10 +2054,17 @@ const NewReservation = () => {
                           <SelectValue placeholder="Select vehicle" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="car1">Toyota Camry - ABC123</SelectItem>
-                          <SelectItem value="car2">Honda Accord - DEF456</SelectItem>
-                          <SelectItem value="car3">Nissan Altima - GHI789</SelectItem>
-                          <SelectItem value="car4">BMW 3 Series - JKL012</SelectItem>
+                          {vehiclesLoading ? (
+                            <SelectItem value="" disabled>Loading vehicles...</SelectItem>
+                          ) : vehicles?.length === 0 ? (
+                            <SelectItem value="" disabled>No vehicles available</SelectItem>
+                          ) : (
+                            vehicles?.map((vehicle) => (
+                              <SelectItem key={vehicle.id} value={vehicle.id}>
+                                {formatVehicleDisplay(vehicle)}
+                              </SelectItem>
+                            ))
+                          )}
                         </SelectContent>
                       </Select>
                     </div>

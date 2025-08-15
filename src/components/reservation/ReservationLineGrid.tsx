@@ -5,12 +5,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Trash2, Edit, Copy, Eye, MoreVertical } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { ReservationLine } from '@/pages/NewReservation';
 import { LineDetailsModal } from './LineDetailsModal';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { useVehicles, useVehicleCategories, formatVehicleDisplay } from '@/hooks/useVehicles';
 
 interface ReservationLineGridProps {
   lines: ReservationLine[];
@@ -32,6 +34,10 @@ export const ReservationLineGrid: React.FC<ReservationLineGridProps> = ({
   const [editingCell, setEditingCell] = useState<{ lineId: string; field: string } | null>(null);
   const [editValue, setEditValue] = useState('');
   const [showMoreModal, setShowMoreModal] = useState<ReservationLine | null>(null);
+  
+  // Fetch real vehicle and category data
+  const { data: vehicles, isLoading: vehiclesLoading } = useVehicles();
+  const { data: categories, isLoading: categoriesLoading } = useVehicleCategories();
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
@@ -149,11 +155,15 @@ export const ReservationLineGrid: React.FC<ReservationLineGridProps> = ({
                       <SelectValue placeholder="Class" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="economy">Economy</SelectItem>
-                      <SelectItem value="compact">Compact</SelectItem>
-                      <SelectItem value="midsize">Midsize</SelectItem>
-                      <SelectItem value="fullsize">Full Size</SelectItem>
-                      <SelectItem value="luxury">Luxury</SelectItem>
+                      {categoriesLoading ? (
+                        <SelectItem value="" disabled>Loading...</SelectItem>
+                      ) : (
+                        categories?.map((category) => (
+                          <SelectItem key={category.id} value={category.id}>
+                            {category.name}
+                          </SelectItem>
+                        ))
+                      )}
                     </SelectContent>
                   </Select>
                 </TableCell>
@@ -162,14 +172,21 @@ export const ReservationLineGrid: React.FC<ReservationLineGridProps> = ({
                     value={line.vehicleId} 
                     onValueChange={(value) => onLineUpdate(line.id, { vehicleId: value })}
                   >
-                    <SelectTrigger className="w-32">
+                    <SelectTrigger className="w-40">
                       <SelectValue placeholder="Vehicle" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="car1">Toyota Camry</SelectItem>
-                      <SelectItem value="car2">Honda Accord</SelectItem>
-                      <SelectItem value="car3">Nissan Altima</SelectItem>
-                      <SelectItem value="car4">BMW 3 Series</SelectItem>
+                      {vehiclesLoading ? (
+                        <SelectItem value="" disabled>Loading vehicles...</SelectItem>
+                      ) : vehicles?.length === 0 ? (
+                        <SelectItem value="" disabled>No vehicles available</SelectItem>
+                      ) : (
+                        vehicles?.map((vehicle) => (
+                          <SelectItem key={vehicle.id} value={vehicle.id}>
+                            {formatVehicleDisplay(vehicle)}
+                          </SelectItem>
+                        ))
+                      )}
                     </SelectContent>
                   </Select>
                 </TableCell>
