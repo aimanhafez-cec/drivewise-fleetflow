@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { 
   Car, 
   Calendar, 
@@ -21,10 +23,24 @@ import { useNavigate } from 'react-router-dom';
 const Dashboard = () => {
   const navigate = useNavigate();
 
+  // Fetch current reservations count
+  const { data: reservationsCount = 0 } = useQuery({
+    queryKey: ['dashboard-reservations-count'],
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from('reservations')
+        .select('*', { count: 'exact', head: true })
+        .in('status', ['confirmed', 'pending']);
+      
+      if (error) throw error;
+      return count || 0;
+    },
+  });
+
   const kpiStats = [
     {
       title: 'Reservations',
-      value: '0',
+      value: reservationsCount.toString(),
       icon: Calendar,
       color: 'bg-blue-100 text-blue-600',
       iconBg: 'bg-blue-50'
