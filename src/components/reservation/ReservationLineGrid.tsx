@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Trash2, Edit, Copy, Eye, MoreVertical } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { ReservationLine } from '@/pages/NewReservation';
+import { ReservationLine } from '@/types/reservation';
 import { LineDetailsModal } from './LineDetailsModal';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';

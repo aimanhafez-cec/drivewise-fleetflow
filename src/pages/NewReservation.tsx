@@ -24,7 +24,7 @@ import { mockApi, type ReservationFormData, type DropdownOption, type Customer }
 
 // Validation schema for the reservation form
 const phoneRegex = new RegExp(
-  /^([+]?[\s0-9]+)?(\d{3}|[\s(-]?[0-9]{3}))?([-]?[\s]?[0-9]{3})?([-]?[\s]?[0-9]{4})?$/
+  /^([+]?[\s0-9]+)?(\d{3}|[\s\(-]?[0-9]{3})?([-]?[\s]?[0-9]{3})?([-]?[\s]?[0-9]{4})?$/
 );
 
 const contactSchema = z.object({
@@ -71,10 +71,10 @@ const locationSchema = z.object({
     message: "Return Location is required",
   }),
   pickupDate: z.date({
-    required_error: "Pickup Date is required.",
+    message: "Pickup Date is required.",
   }),
   returnDate: z.date({
-    required_error: "Return Date is required.",
+    message: "Return Date is required.",
   }),
 });
 
