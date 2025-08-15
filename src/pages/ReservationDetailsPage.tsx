@@ -13,6 +13,7 @@ import { format } from 'date-fns';
 import { SummaryCard } from '@/components/reservation/SummaryCard';
 import { useReservationSummary } from '@/hooks/useReservationSummary';
 import { ConvertToAgreementModal } from '@/components/reservation/ConvertToAgreementModal';
+import { AddDepositModal } from '@/components/reservation/AddDepositModal';
 import { agreementsApi } from '@/lib/api/agreements';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -20,6 +21,7 @@ import { formatCurrency } from '@/lib/utils';
 
 interface ReservationHeader {
   id: string;
+  customerId: string;
   reservationNo: string;
   customer: string;
   businessUnit: string;
@@ -73,6 +75,7 @@ const ReservationDetailsPage = () => {
   const [editMode, setEditMode] = useState(false);
   const [activeTab, setActiveTab] = useState('summary');
   const [convertModalOpen, setConvertModalOpen] = useState(false);
+  const [addDepositModalOpen, setAddDepositModalOpen] = useState(false);
   const [converting, setConverting] = useState(false);
   
   const queryClient = useQueryClient();
@@ -103,14 +106,14 @@ const ReservationDetailsPage = () => {
 
   const summary = useReservationSummary(mockFormData);
 
-  useEffect(() => {
-    const fetchReservationData = async () => {
-      if (!id) return;
+  const fetchReservationData = async () => {
+    if (!id) return;
+    
+    try {
+      setLoading(true);
       
-      try {
-        setLoading(true);
-        
-        const { data, error } = await supabase
+      const [reservationResponse, paymentsResponse] = await Promise.all([
+        supabase
           .from('reservations')
           .select(`
             *,
@@ -120,90 +123,103 @@ const ReservationDetailsPage = () => {
             )
           `)
           .eq('id', id)
-          .single();
+          .single(),
+        supabase
+          .from('payments')
+          .select('*')
+          .eq('reservation_id', id)
+          .order('processed_at', { ascending: false })
+      ]);
 
-        if (error) {
-          console.error('Error fetching reservation:', error);
-          toast({
-            title: "Error",
-            description: "Reservation not found.",
-            variant: "destructive",
-          });
-          navigate('/reservations');
-          return;
-        }
-
-        const mockData = {
-          header: {
-            id: data.id,
-            reservationNo: data.ro_number || 'RES-000000',
-            customer: data.customers?.full_name || 'Unknown Customer',
-            businessUnit: data.pickup_location || 'Main Location',
-            customerBillTo: `${data.customers?.full_name || 'Unknown'} - Personal`,
-            paymentTerms: 'Net 30 Days',
-            validityDate: format(new Date(data.end_datetime), 'yyyy-MM-dd'),
-            contractBillingPlan: 'Standard Plan',
-            createdAt: format(new Date(data.created_at), 'yyyy-MM-dd'),
-            status: data.status.toUpperCase(),
-          },
-          lines: [
-            {
-              id: '1',
-              lineNo: 1,
-              reservationType: 'Standard',
-              vehicleClass: 'Economy',
-              vehicle: '2023 Toyota Corolla',
-              driverName: 'John Smith',
-              checkOutDate: '2024-01-30',
-              checkInDate: '2024-02-02',
-              lineNetPrice: 300.00,
-              additionAmount: 50.00,
-              discount: 'Weekend Special',
-              discountValue: 30.00,
-              tax: 'Sales Tax',
-              taxValue: 32.00,
-              lineTotal: 352.00,
-            },
-          ],
-          payments: [
-            {
-              id: '1',
-              paymentDate: '2024-01-29',
-              method: 'Credit Card',
-              amount: 100.00,
-              reference: 'CC-123456',
-              status: 'Completed',
-            },
-          ],
-          notes: {
-            note: 'Customer requested early pickup.',
-            specialNote: 'VIP customer - provide excellent service.',
-          },
-        };
-
-        setReservationData(mockData);
-
-        // Show creation toast if redirected from new reservation
-        if (searchParams.get('created') === '1') {
-          toast({
-            title: "Reservation Created",
-            description: `Reservation ${mockData.header.reservationNo} has been created successfully.`,
-          });
-        }
-
-      } catch (error) {
-        console.error('Failed to fetch reservation data:', error);
+      if (reservationResponse.error) {
+        console.error('Error fetching reservation:', reservationResponse.error);
         toast({
           title: "Error",
           description: "Reservation not found.",
           variant: "destructive",
         });
         navigate('/reservations');
-      } finally {
-        setLoading(false);
+        return;
       }
-    };
 
+      const data = reservationResponse.data;
+      const paymentsData = paymentsResponse.data || [];
+
+      const mockData = {
+        header: {
+          id: data.id,
+          customerId: data.customer_id,
+          reservationNo: data.ro_number || 'RES-000000',
+          customer: data.customers?.full_name || 'Unknown Customer',
+          businessUnit: data.pickup_location || 'Main Location',
+          customerBillTo: `${data.customers?.full_name || 'Unknown'} - Personal`,
+          paymentTerms: 'Net 30 Days',
+          validityDate: format(new Date(data.end_datetime), 'yyyy-MM-dd'),
+          contractBillingPlan: 'Standard Plan',
+          createdAt: format(new Date(data.created_at), 'yyyy-MM-dd'),
+          status: data.status.toUpperCase(),
+        },
+        lines: [
+          {
+            id: '1',
+            lineNo: 1,
+            reservationType: 'Standard',
+            vehicleClass: 'Economy',
+            vehicle: '2023 Toyota Corolla',
+            driverName: 'John Smith',
+            checkOutDate: '2024-01-30',
+            checkInDate: '2024-02-02',
+            lineNetPrice: 300.00,
+            additionAmount: 50.00,
+            discount: 'Weekend Special',
+            discountValue: 30.00,
+            tax: 'Sales Tax',
+            taxValue: 32.00,
+            lineTotal: 352.00,
+          },
+        ],
+        payments: paymentsData.map(payment => ({
+          id: payment.id,
+          paymentDate: payment.processed_at || payment.created_at,
+          method: payment.payment_method.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+          amount: payment.amount,
+          reference: payment.transaction_id || '-',
+          status: payment.status.charAt(0).toUpperCase() + payment.status.slice(1),
+        })),
+        notes: {
+          note: 'Customer requested early pickup.',
+          specialNote: 'VIP customer - provide excellent service.',
+        },
+      };
+
+      setReservationData(mockData);
+
+      // Show creation toast if redirected from new reservation
+      if (searchParams.get('created') === '1') {
+        toast({
+          title: "Reservation Created",
+          description: `Reservation ${mockData.header.reservationNo} has been created successfully.`,
+        });
+      }
+
+    } catch (error) {
+      console.error('Failed to fetch reservation data:', error);
+      toast({
+        title: "Error",
+        description: "Reservation not found.",
+        variant: "destructive",
+      });
+      navigate('/reservations');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const refreshDeposits = () => {
+    fetchReservationData();
+  };
+
+  useEffect(() => {
     if (id) {
       fetchReservationData();
     }
@@ -416,7 +432,7 @@ const ReservationDetailsPage = () => {
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger id="tab-summary" value="summary">Summary</TabsTrigger>
-          <TabsTrigger id="tab-payments" value="payments">Payments</TabsTrigger>
+          <TabsTrigger id="tab-deposits" value="deposits">Deposits</TabsTrigger>
           <TabsTrigger id="tab-notes" value="notes">Notes</TabsTrigger>
         </TabsList>
 
@@ -501,15 +517,19 @@ const ReservationDetailsPage = () => {
           </div>
         </TabsContent>
 
-        {/* Payments Tab */}
-        <TabsContent value="payments" className="space-y-6">
+        {/* Deposits Tab */}
+        <TabsContent value="deposits" className="space-y-6">
           <Card>
             <CardHeader>
               <div className="flex justify-between items-center">
-                <CardTitle>Payments & Deposits</CardTitle>
-                <Button variant="outline" size="sm">
+                <CardTitle>Customer Deposits</CardTitle>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => setAddDepositModalOpen(true)}
+                >
                   <DollarSign className="mr-2 h-4 w-4" />
-                  Add Payment
+                  Add Deposit
                 </Button>
               </div>
             </CardHeader>
@@ -547,7 +567,7 @@ const ReservationDetailsPage = () => {
                   {reservationData.payments.length === 0 && (
                     <TableRow>
                       <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                        No payments recorded yet.
+                        No deposits recorded yet.
                       </TableCell>
                     </TableRow>
                   )}
@@ -603,6 +623,17 @@ const ReservationDetailsPage = () => {
           balanceDue: summary.balanceDue,
         }}
       />
+
+      {/* Add Deposit Modal */}
+      {reservationData.header && (
+        <AddDepositModal
+          open={addDepositModalOpen}
+          onOpenChange={setAddDepositModalOpen}
+          reservationId={reservationData.header.id}
+          customerId={reservationData.header.customerId}
+          onDepositAdded={refreshDeposits}
+        />
+      )}
     </div>
   );
 };
