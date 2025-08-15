@@ -9,8 +9,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
-import { ArrowLeft, FileText, Mail, Printer, Eye } from 'lucide-react';
+import { ArrowLeft, FileText, Eye } from 'lucide-react';
 import { format } from 'date-fns';
+import { AgreementActions } from '@/components/agreements/AgreementActions';
 
 const AgreementDetails = () => {
   const { id } = useParams();
@@ -67,15 +68,6 @@ const AgreementDetails = () => {
       default:
         return 'bg-gray-100 text-gray-800';
     }
-  };
-
-  const handlePrint = () => {
-    window.print();
-  };
-
-  const handleEmail = () => {
-    // Implementation for email functionality
-    console.log('Email agreement');
   };
 
   if (isLoading) {
@@ -173,14 +165,10 @@ const AgreementDetails = () => {
               View Reservation
             </Button>
           )}
-          <Button variant="outline" size="sm" onClick={handleEmail}>
-            <Mail className="mr-2 h-4 w-4" />
-            Email
-          </Button>
-          <Button variant="outline" size="sm" onClick={handlePrint}>
-            <Printer className="mr-2 h-4 w-4" />
-            Print
-          </Button>
+          <AgreementActions 
+            agreementId={agreement.id}
+            agreementNo={agreement.agreement_no || `AGR-${agreement.id.slice(0, 8)}`}
+          />
         </div>
       </div>
 

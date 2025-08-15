@@ -17,12 +17,13 @@ const Reservations = () => {
   const [searchFilters, setSearchFilters] = useState<SearchFilters>({});
   const [convertModal, setConvertModal] = useState<{ open: boolean; reservation?: any }>({ open: false });
 
-  // Fetch open reservations (not converted/cancelled)
+  // Fetch open reservations (not converted/cancelled) with search filters
   const { data: reservations, isLoading, error } = useQuery({
-    queryKey: ['reservations:open'],
+    queryKey: ['reservations:open', searchFilters],
     queryFn: async () => {
-      console.log('Fetching reservations...');
-      const { data, error } = await supabase
+      console.log('Fetching reservations with filters:', searchFilters);
+      
+      let query = supabase
         .from('reservations')
         .select(`
           *,
@@ -36,9 +37,23 @@ const Reservations = () => {
             license_plate
           )
         `)
-        .in('status', ['pending', 'confirmed', 'checked_out'])
-        .is('converted_agreement_id', null)
-        .order('created_at', { ascending: false });
+        .in('status', searchFilters.status ? [searchFilters.status as any] : ['pending', 'confirmed', 'checked_out'])
+        .is('converted_agreement_id', null);
+
+      // Apply search filter
+      if (searchFilters.query) {
+        query = query.or(`profiles.full_name.ilike.%${searchFilters.query}%,id.ilike.%${searchFilters.query}%`);
+      }
+
+      // Apply date filters
+      if (searchFilters.dateFrom) {
+        query = query.gte('start_datetime', searchFilters.dateFrom);
+      }
+      if (searchFilters.dateTo) {
+        query = query.lte('end_datetime', searchFilters.dateTo);
+      }
+
+      const { data, error } = await query.order('created_at', { ascending: false });
 
       console.log('Reservations query result:', { data, error });
       if (error) {
@@ -95,6 +110,18 @@ const Reservations = () => {
     }
   };
 
+  const handleConvertToAgreement = (reservation: any) => {
+    setConvertModal({ open: true, reservation });
+  };
+
+  const handleConfirmConvert = () => {
+    if (convertModal.reservation) {
+      setConvertModal({ open: false });
+      // Navigate to agreement wizard
+      navigate(`/agreements/new?fromReservation=${convertModal.reservation.id}`);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="space-y-6">
@@ -142,6 +169,12 @@ const Reservations = () => {
             </Button>
           </div>
       </div>
+
+      {/* Search & Filters */}
+      <ReservationSearch 
+        onSearch={setSearchFilters}
+        isLoading={isLoading}
+      />
 
       {/* Summary Cards */}
       <div className="grid gap-4 md:grid-cols-4">
@@ -261,7 +294,7 @@ const Reservations = () => {
                       size="sm"
                       onClick={(e) => {
                         e.stopPropagation();
-                        setConvertModal({ open: true, reservation });
+                        handleConvertToAgreement(reservation);
                       }}
                     >
                       Convert to Agreement
@@ -289,6 +322,16 @@ const Reservations = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* Convert to Agreement Modal */}
+      {convertModal.reservation && (
+        <ConvertToAgreementPreCheck
+          open={convertModal.open}
+          onOpenChange={(open) => setConvertModal({ open, reservation: open ? convertModal.reservation : undefined })}
+          onConfirm={handleConfirmConvert}
+          reservation={convertModal.reservation}
+        />
+      )}
     </div>;
 };
 export default Reservations;

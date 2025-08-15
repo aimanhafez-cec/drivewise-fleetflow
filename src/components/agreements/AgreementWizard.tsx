@@ -5,6 +5,7 @@ import { Progress } from '@/components/ui/progress';
 import { ArrowLeft, ArrowRight, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
+import { ValidationErrorBanner } from '@/components/ui/validation-error-banner';
 import { agreementsApi } from '@/lib/api/agreements';
 import { AgreementWizardStep1 } from './wizard/AgreementWizardStep1';
 import { AgreementWizardStep2 } from './wizard/AgreementWizardStep2';
@@ -391,6 +392,22 @@ export const AgreementWizard: React.FC<AgreementWizardProps> = ({
           </div>
         </CardContent>
       </Card>
+
+      {/* Validation Error Banner */}
+      {Object.keys(validationErrors).length > 0 && (
+        <ValidationErrorBanner
+          errors={validationErrors}
+          onDismiss={() => setValidationErrors({})}
+          onFieldFocus={(field) => {
+            // Focus on the field - scroll to step if needed
+            const element = document.getElementById(field);
+            if (element) {
+              element.focus();
+              element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+          }}
+        />
+      )}
 
       {/* Current Step Content */}
       <div id={`wiz-step-${steps[currentStep - 1]?.title.toLowerCase()}`}>
