@@ -19,6 +19,7 @@ import Customers from "./pages/Customers";
 import NotFound from "./pages/NotFound";
 import Quotes from "./pages/Quotes";
 import NewQuote from "./pages/NewQuote";
+import QuoteDetails from "./pages/QuoteDetails";
 import Inspections from "./pages/Inspections";
 import NewInspection from "./pages/NewInspection";
 import ReservationDetails from "./pages/ReservationDetails";
@@ -108,6 +109,7 @@ const App = () => (
             }>
               <Route index element={<Quotes />} />
               <Route path="new" element={<NewQuote />} />
+              <Route path=":id" element={<QuoteDetails />} />
             </Route>
             <Route path="/inspections" element={
               <ProtectedRoute>
