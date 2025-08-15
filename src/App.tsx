@@ -27,6 +27,9 @@ import ReservationDetailsPage from "./pages/ReservationDetailsPage";
 import Agreements from "./pages/Agreements";
 import AgreementDetails from "./pages/AgreementDetails";
 import AgreementWizardPage from "./pages/AgreementWizardPage";
+import RFQs from "./pages/RFQs";
+import NewRFQ from "./pages/NewRFQ";
+import RFQDetails from "./pages/RFQDetails";
 
 const queryClient = new QueryClient();
 
@@ -110,6 +113,15 @@ const App = () => (
               <Route index element={<Quotes />} />
               <Route path="new" element={<NewQuote />} />
               <Route path=":id" element={<QuoteDetails />} />
+            </Route>
+            <Route path="/rfqs" element={
+              <ProtectedRoute>
+                <AppLayout />
+              </ProtectedRoute>
+            }>
+              <Route index element={<RFQs />} />
+              <Route path="new" element={<NewRFQ />} />
+              <Route path=":id" element={<RFQDetails />} />
             </Route>
             <Route path="/inspections" element={
               <ProtectedRoute>

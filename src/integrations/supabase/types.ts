@@ -673,6 +673,7 @@ export type Database = {
           items: Json
           notes: string | null
           quote_number: string
+          rfq_id: string | null
           status: string
           subtotal: number
           tax_amount: number
@@ -689,6 +690,7 @@ export type Database = {
           items?: Json
           notes?: string | null
           quote_number: string
+          rfq_id?: string | null
           status?: string
           subtotal?: number
           tax_amount?: number
@@ -705,6 +707,7 @@ export type Database = {
           items?: Json
           notes?: string | null
           quote_number?: string
+          rfq_id?: string | null
           status?: string
           subtotal?: number
           tax_amount?: number
@@ -714,6 +717,13 @@ export type Database = {
           vehicle_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "quotes_rfq_id_fkey"
+            columns: ["rfq_id"]
+            isOneToOne: false
+            referencedRelation: "rfqs"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "quotes_vehicle_id_fkey"
             columns: ["vehicle_id"]
@@ -870,6 +880,60 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      rfqs: {
+        Row: {
+          attachments: Json | null
+          created_at: string
+          created_by: string | null
+          customer_id: string
+          id: string
+          notes: string | null
+          pickup_at: string
+          pickup_loc_id: string
+          return_at: string
+          return_loc_id: string
+          rfq_no: string
+          salesperson_id: string | null
+          status: Database["public"]["Enums"]["rfq_status"]
+          updated_at: string
+          vehicle_type_id: string | null
+        }
+        Insert: {
+          attachments?: Json | null
+          created_at?: string
+          created_by?: string | null
+          customer_id: string
+          id?: string
+          notes?: string | null
+          pickup_at: string
+          pickup_loc_id: string
+          return_at: string
+          return_loc_id: string
+          rfq_no: string
+          salesperson_id?: string | null
+          status?: Database["public"]["Enums"]["rfq_status"]
+          updated_at?: string
+          vehicle_type_id?: string | null
+        }
+        Update: {
+          attachments?: Json | null
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string
+          id?: string
+          notes?: string | null
+          pickup_at?: string
+          pickup_loc_id?: string
+          return_at?: string
+          return_loc_id?: string
+          rfq_no?: string
+          salesperson_id?: string | null
+          status?: Database["public"]["Enums"]["rfq_status"]
+          updated_at?: string
+          vehicle_type_id?: string | null
+        }
+        Relationships: []
       }
       traffic_tickets: {
         Row: {
@@ -1136,6 +1200,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      generate_rfq_no: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
     }
     Enums: {
       agreement_status: "active" | "completed" | "terminated" | "pending_return"
@@ -1158,6 +1226,7 @@ export type Database = {
         | "checked_out"
         | "completed"
         | "cancelled"
+      rfq_status: "new" | "under_review" | "quoted" | "cancelled"
       user_role:
         | "admin"
         | "fleet_manager"
@@ -1321,6 +1390,7 @@ export const Constants = {
         "completed",
         "cancelled",
       ],
+      rfq_status: ["new", "under_review", "quoted", "cancelled"],
       user_role: [
         "admin",
         "fleet_manager",

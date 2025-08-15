@@ -53,9 +53,10 @@ export const QuoteWizard: React.FC = () => {
   const queryClient = useQueryClient();
   const [searchParams] = useSearchParams();
 
-  // Check if we're duplicating or revising a quote
+  // Check if we're duplicating, revising a quote, or creating from RFQ
   const duplicateId = searchParams.get("duplicate");
   const reviseId = searchParams.get("revise");
+  const fromRfqId = searchParams.get("fromRfq");
 
   const { data: existingQuote } = useQuery({
     queryKey: ["quote", duplicateId || reviseId],
@@ -71,6 +72,20 @@ export const QuoteWizard: React.FC = () => {
     enabled: !!(duplicateId || reviseId),
   });
 
+  const { data: sourceRfq } = useQuery({
+    queryKey: ["rfq", fromRfqId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("rfqs")
+        .select("*")
+        .eq("id", fromRfqId)
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!fromRfqId,
+  });
+
   useEffect(() => {
     if (existingQuote) {
       setQuoteData({
@@ -80,8 +95,20 @@ export const QuoteWizard: React.FC = () => {
         tax_rate: 0.08,
         notes: existingQuote.notes || "",
       });
+    } else if (sourceRfq) {
+      setQuoteData({
+        customer_id: sourceRfq.customer_id,
+        pickup_at: sourceRfq.pickup_at,
+        pickup_location: sourceRfq.pickup_loc_id,
+        return_at: sourceRfq.return_at,
+        return_location: sourceRfq.return_loc_id,
+        vehicle_type_id: sourceRfq.vehicle_type_id,
+        items: [],
+        tax_rate: 0.08,
+        notes: sourceRfq.notes || "",
+      });
     }
-  }, [existingQuote]);
+  }, [existingQuote, sourceRfq]);
 
   const createQuoteMutation = useMutation({
     mutationFn: async (data: QuoteData) => {
@@ -102,6 +129,7 @@ export const QuoteWizard: React.FC = () => {
           notes: data.notes,
           quote_number: `Q-${new Date().getFullYear()}-${String(Date.now()).slice(-4)}`,
           status: "draft",
+          rfq_id: fromRfqId || null,
         })
         .select()
         .single();
@@ -109,8 +137,19 @@ export const QuoteWizard: React.FC = () => {
       if (error) throw error;
       return quote;
     },
-    onSuccess: (quote) => {
+    onSuccess: async (quote) => {
       queryClient.invalidateQueries({ queryKey: ["quotes"] });
+      
+      // Update RFQ status to 'quoted' if this quote was created from an RFQ
+      if (fromRfqId) {
+        await supabase
+          .from("rfqs")
+          .update({ status: "quoted" })
+          .eq("id", fromRfqId);
+        queryClient.invalidateQueries({ queryKey: ["rfq", fromRfqId] });
+        queryClient.invalidateQueries({ queryKey: ["rfqs"] });
+      }
+      
       toast({ title: "Success", description: "Quote created successfully" });
       navigate(`/quotes/${quote.id}`);
     },
@@ -226,7 +265,7 @@ export const QuoteWizard: React.FC = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">
-            {reviseId ? "Revise Quote" : duplicateId ? "Duplicate Quote" : "New Quote"}
+            {reviseId ? "Revise Quote" : duplicateId ? "Duplicate Quote" : fromRfqId ? "Prepare Quote from RFQ" : "New Quote"}
           </h1>
           <p className="text-muted-foreground">
             Step {currentStep} of {steps.length}: {steps[currentStep - 1].description}
