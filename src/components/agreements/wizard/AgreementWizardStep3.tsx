@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertTriangle, DollarSign, Receipt } from 'lucide-react';
+import { formatCurrency } from '@/lib/utils/currency';
 
 interface AgreementWizardStep3Props {
   data: {
@@ -117,9 +118,9 @@ export const AgreementWizardStep3: React.FC<AgreementWizardStep3Props> = ({
                     <TableRow key={rate.id}>
                       <TableCell className="font-medium">{rate.description}</TableCell>
                       <TableCell className="text-right">{rate.quantity}</TableCell>
-                      <TableCell className="text-right">${rate.unitPrice.toFixed(2)}</TableCell>
+                      <TableCell className="text-right">{formatCurrency(rate.unitPrice)}</TableCell>
                       <TableCell className="text-right font-medium">
-                        ${rate.total.toFixed(2)}
+                        {formatCurrency(rate.total)}
                       </TableCell>
                     </TableRow>
                   ))}
@@ -147,7 +148,7 @@ export const AgreementWizardStep3: React.FC<AgreementWizardStep3Props> = ({
                       <TableRow key={addition.id}>
                         <TableCell className="font-medium">{addition.description}</TableCell>
                         <TableCell className="text-right font-medium">
-                          ${addition.amount.toFixed(2)}
+                          {formatCurrency(addition.amount)}
                         </TableCell>
                       </TableRow>
                     ))}
@@ -183,10 +184,10 @@ export const AgreementWizardStep3: React.FC<AgreementWizardStep3Props> = ({
                   {taxes.map((tax) => (
                     <TableRow key={tax.id}>
                       <TableCell className="font-medium">{tax.description}</TableCell>
-                      <TableCell className="text-right">${tax.taxableAmount.toFixed(2)}</TableCell>
+                      <TableCell className="text-right">{formatCurrency(tax.taxableAmount)}</TableCell>
                       <TableCell className="text-right">{(tax.rate * 100).toFixed(1)}%</TableCell>
                       <TableCell className="text-right font-medium">
-                        ${tax.amount.toFixed(2)}
+                        {formatCurrency(tax.amount)}
                       </TableCell>
                     </TableRow>
                   ))}
@@ -206,37 +207,37 @@ export const AgreementWizardStep3: React.FC<AgreementWizardStep3Props> = ({
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Base Rate:</span>
-                  <span>${baseRates.reduce((sum, rate) => sum + rate.total, 0).toFixed(2)}</span>
+                  <span>{formatCurrency(baseRates.reduce((sum, rate) => sum + rate.total, 0))}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Additions:</span>
-                  <span>${additions.reduce((sum, add) => sum + add.amount, 0).toFixed(2)}</span>
+                  <span>{formatCurrency(additions.reduce((sum, add) => sum + add.amount, 0))}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Subtotal:</span>
-                  <span>${subtotal.toFixed(2)}</span>
+                  <span>{formatCurrency(subtotal)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Tax:</span>
-                  <span>${taxTotal.toFixed(2)}</span>
+                  <span>{formatCurrency(taxTotal)}</span>
                 </div>
               </div>
 
               <div className="border-t pt-2">
                 <div className="flex justify-between">
                   <span className="font-medium">Grand Total:</span>
-                  <span className="font-bold text-lg">${grandTotal.toFixed(2)}</span>
+                  <span className="font-bold text-lg">{formatCurrency(grandTotal)}</span>
                 </div>
               </div>
 
               <div className="space-y-2 text-sm text-muted-foreground">
                 <div className="flex justify-between">
                   <span>Advance Paid:</span>
-                  <span>$0.00</span>
+                  <span>{formatCurrency(0)}</span>
                 </div>
                 <div className="flex justify-between font-medium text-foreground">
                   <span>Balance Due:</span>
-                  <span>${grandTotal.toFixed(2)}</span>
+                  <span>{formatCurrency(grandTotal)}</span>
                 </div>
               </div>
             </CardContent>

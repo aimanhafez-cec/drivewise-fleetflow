@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Summary } from '@/hooks/useReservationSummary';
-import { cn } from '@/lib/utils';
+import { cn, formatCurrency as formatCurrencyUtil } from '@/lib/utils';
 
 interface SummaryCardProps {
   summary: Summary;
@@ -20,22 +20,8 @@ interface SummaryRowProps {
 }
 
 const formatCurrency = (amount: number, currencyCode: string): string => {
-  // Simple currency formatting for EGP
-  const symbols: Record<string, string> = {
-    'EGP': 'ج.م ',
-    'USD': '$',
-    'EUR': '€',
-  };
-  
-  const symbol = symbols[currencyCode] || currencyCode + ' ';
-  const formatted = Math.abs(amount).toFixed(2);
-  
-  // Format for Egyptian Pound
-  if (currencyCode === 'EGP') {
-    return `${formatted} ج.م`;
-  }
-  
-  return amount < 0 ? `-${symbol}${formatted}` : `${symbol}${formatted}`;
+  // Use the centralized currency formatting utility
+  return formatCurrencyUtil(amount, currencyCode);
 };
 
 const SummaryRow: React.FC<SummaryRowProps> = ({ 

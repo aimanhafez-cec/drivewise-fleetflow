@@ -1,11 +1,3 @@
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
-
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
-}
-
-// Currency formatting utility
 export const formatCurrency = (amount: number, currencyCode: string = 'EGP'): string => {
   // Format for Egyptian Pound
   if (currencyCode === 'EGP') {
