@@ -24,7 +24,7 @@ export function VehicleReservations({ vehicleId }: VehicleReservationsProps) {
         .from('reservations')
         .select(`
           *,
-          profiles (
+          customers (
             full_name,
             email
           )
@@ -44,7 +44,7 @@ export function VehicleReservations({ vehicleId }: VehicleReservationsProps) {
         .from('agreements')
         .select(`
           *,
-          profiles (
+          customers (
             full_name,
             email
           )
@@ -79,7 +79,7 @@ export function VehicleReservations({ vehicleId }: VehicleReservationsProps) {
               {reservations.slice(0, 5).map((reservation) => (
                 <div key={reservation.id} className="border rounded-lg p-4">
                   <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-medium">{reservation.profiles?.full_name}</h4>
+                    <h4 className="font-medium">{(reservation.customers as any)?.full_name}</h4>
                     <Badge variant={statusColors[reservation.status as keyof typeof statusColors]}>
                       {reservation.status}
                     </Badge>
@@ -126,7 +126,7 @@ export function VehicleReservations({ vehicleId }: VehicleReservationsProps) {
               {agreements.slice(0, 5).map((agreement) => (
                 <div key={agreement.id} className="border rounded-lg p-4">
                   <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-medium">{agreement.profiles?.full_name}</h4>
+                    <h4 className="font-medium">{(agreement.customers as any)?.full_name}</h4>
                     <Badge variant={statusColors[agreement.status as keyof typeof statusColors] || "default"}>
                       {agreement.status}
                     </Badge>

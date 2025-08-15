@@ -275,6 +275,17 @@ export const mockApi = {
     const endDate = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000); // 3 days from now
     
     try {
+      // Generate reservation number first
+      const { data: reservationNoData, error: reservationNoError } = await supabase
+        .rpc('generate_reservation_no');
+      
+      if (reservationNoError) {
+        console.error('Error generating reservation number:', reservationNoError);
+        throw reservationNoError;
+      }
+      
+      const reservationNo = reservationNoData;
+      
       // Create the reservation
       const { data: reservation, error } = await supabase
         .from('reservations')
@@ -286,6 +297,7 @@ export const mockApi = {
           return_location: 'Main Location', // Default location
           status: dbStatus,
           total_amount: 299.99, // Default amount
+          ro_number: reservationNo, // Set the reservation number immediately
         })
         .select()
         .single();
@@ -294,15 +306,6 @@ export const mockApi = {
         console.error('Supabase error:', error);
         throw error;
       }
-      
-      // Generate reservation number based on ID
-      const reservationNo = `RES-${reservation.id.slice(0, 8).toUpperCase()}`;
-      
-      // Update with reservation number
-      await supabase
-        .from('reservations')
-        .update({ ro_number: reservationNo })
-        .eq('id', reservation.id);
       
       return {
         id: reservation.id,

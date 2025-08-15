@@ -1132,6 +1132,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      generate_reservation_no: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
     }
     Enums: {
       agreement_status: "active" | "completed" | "terminated" | "pending_return"
