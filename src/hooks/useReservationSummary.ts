@@ -53,11 +53,11 @@ interface FormData {
 
 // Mock misc charges data - in real app this would come from API
 const MISC_CHARGES: MiscCharge[] = [
-  { id: 'insurance', amount: 25.00, taxable: true },
-  { id: 'gps', amount: 15.00, taxable: true },
-  { id: 'cleaning', amount: 30.00, taxable: false },
-  { id: 'fuel', amount: 50.00, taxable: true },
-  { id: 'delivery', amount: 20.00, taxable: false },
+  { id: 'insurance', amount: 750.00, taxable: true },    // ~25 USD -> 750 EGP
+  { id: 'gps', amount: 450.00, taxable: true },          // ~15 USD -> 450 EGP
+  { id: 'cleaning', amount: 900.00, taxable: false },    // ~30 USD -> 900 EGP
+  { id: 'fuel', amount: 1500.00, taxable: true },        // ~50 USD -> 1500 EGP
+  { id: 'delivery', amount: 600.00, taxable: false },    // ~20 USD -> 600 EGP
 ];
 
 export const useReservationSummary = (formData: FormData): Summary => {

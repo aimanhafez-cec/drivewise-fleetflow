@@ -1715,11 +1715,11 @@ const NewReservation = () => {
             <AccordionContent className="px-6 pb-6">
               <div className="space-y-4">
                 {[
-                  { id: 'ldw', name: 'LDW (Per Day - No Tax)', amount: '25.00' },
-                  { id: 'drop-fee', name: 'Drop Fee (Fixed)', amount: '50.00' },
-                  { id: 'under-age', name: 'Under Age Fee (No Tax)', amount: '15.00' },
-                  { id: 'valet', name: 'Valet (Per Day)', amount: '10.00' },
-                  { id: 'sli', name: 'SLI (Fixed)', amount: '75.00' }
+                  { id: 'ldw', name: 'LDW (Per Day - No Tax)', amount: '750.00' },      // ~25 USD -> 750 EGP
+                  { id: 'drop-fee', name: 'Drop Fee (Fixed)', amount: '1500.00' },      // ~50 USD -> 1500 EGP
+                  { id: 'under-age', name: 'Under Age Fee (No Tax)', amount: '450.00' }, // ~15 USD -> 450 EGP
+                  { id: 'valet', name: 'Valet (Per Day)', amount: '300.00' },           // ~10 USD -> 300 EGP
+                  { id: 'sli', name: 'SLI (Fixed)', amount: '2250.00' }                 // ~75 USD -> 2250 EGP
                 ].map((charge) => (
                   <div key={charge.id} className="flex items-center justify-between p-3 border rounded-lg">
                     <div className="flex items-center gap-3">
@@ -1737,7 +1737,7 @@ const NewReservation = () => {
                         <p className="font-medium">{charge.name}</p>
                       </div>
                     </div>
-                    <span className="font-medium">${charge.amount}</span>
+                    <span className="font-medium">EGP {charge.amount}</span>
                   </div>
                 ))}
               </div>
