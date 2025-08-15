@@ -118,7 +118,7 @@ const DailyPlanner: React.FC = () => {
             customers!inner(full_name)
           `)
           .gte("start_datetime", dateRange.start.toISOString())
-          .lte("end_datetime", dateRange.end.toISOString()),
+          .lte("start_datetime", dateRange.end.toISOString()),
         supabase
           .from("agreements")
           .select(`
@@ -126,7 +126,7 @@ const DailyPlanner: React.FC = () => {
             customers!inner(full_name)
           `)
           .gte("checkout_datetime", dateRange.start.toISOString())
-          .lte("return_datetime", dateRange.end.toISOString())
+          .lte("checkout_datetime", dateRange.end.toISOString())
       ]);
 
       const plannerEvents: PlannerEvent[] = [];
