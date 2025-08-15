@@ -9,6 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
+import { formatCurrency } from '@/lib/utils';
 
 const ReservationDetails = () => {
   const { id } = useParams();
@@ -205,7 +206,7 @@ const ReservationDetails = () => {
             </div>
             <div>
               <p className="text-sm font-medium text-muted-foreground">Total Amount</p>
-              <p className="text-xl font-bold">${reservation.totalAmount.toFixed(2)}</p>
+              <p className="text-xl font-bold">{formatCurrency(reservation.totalAmount)}</p>
             </div>
           </CardContent>
         </Card>

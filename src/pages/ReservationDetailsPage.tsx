@@ -16,6 +16,7 @@ import { ConvertToAgreementModal } from '@/components/reservation/ConvertToAgree
 import { agreementsApi } from '@/lib/api/agreements';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { formatCurrency } from '@/lib/utils';
 
 interface ReservationHeader {
   id: string;
@@ -460,13 +461,13 @@ const ReservationDetailsPage = () => {
                             <TableCell>{line.driverName}</TableCell>
                             <TableCell>{format(new Date(line.checkOutDate), 'PP')}</TableCell>
                             <TableCell>{format(new Date(line.checkInDate), 'PP')}</TableCell>
-                            <TableCell>${line.lineNetPrice.toFixed(2)}</TableCell>
-                            <TableCell>${line.additionAmount.toFixed(2)}</TableCell>
+                            <TableCell>{formatCurrency(line.lineNetPrice)}</TableCell>
+                            <TableCell>{formatCurrency(line.additionAmount)}</TableCell>
                             <TableCell>{line.discount}</TableCell>
-                            <TableCell>${line.discountValue.toFixed(2)}</TableCell>
+                            <TableCell>{formatCurrency(line.discountValue)}</TableCell>
                             <TableCell>{line.tax}</TableCell>
-                            <TableCell>${line.taxValue.toFixed(2)}</TableCell>
-                            <TableCell>${line.lineTotal.toFixed(2)}</TableCell>
+                            <TableCell>{formatCurrency(line.taxValue)}</TableCell>
+                            <TableCell>{formatCurrency(line.lineTotal)}</TableCell>
                             <TableCell>
                               <Button variant="ghost" size="sm">
                                 <Edit className="h-4 w-4" />
@@ -529,7 +530,7 @@ const ReservationDetailsPage = () => {
                     <TableRow key={payment.id}>
                       <TableCell>{format(new Date(payment.paymentDate), 'PP')}</TableCell>
                       <TableCell>{payment.method}</TableCell>
-                      <TableCell>${payment.amount.toFixed(2)}</TableCell>
+                      <TableCell>{formatCurrency(payment.amount)}</TableCell>
                       <TableCell>{payment.reference}</TableCell>
                       <TableCell>
                         <Badge variant={payment.status === 'Completed' ? 'default' : 'secondary'}>
