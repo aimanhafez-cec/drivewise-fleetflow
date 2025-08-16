@@ -9,6 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Skeleton } from '@/components/ui/skeleton';
 import { Plus, FileText } from 'lucide-react';
 import { format } from 'date-fns';
+import { formatCurrency } from "@/lib/utils/currency";
 
 const Agreements = () => {
   const navigate = useNavigate();
@@ -183,10 +184,10 @@ const Agreements = () => {
                       </div>
                     </TableCell>
                     <TableCell className="font-medium">
-                      ${agreement.total_amount?.toFixed(2) || '0.00'}
+                      {formatCurrency(agreement.total_amount || 0)}
                     </TableCell>
                     <TableCell className="font-medium text-destructive">
-                      ${(agreement.total_amount || 0).toFixed(2)}
+                      {formatCurrency(agreement.total_amount || 0)}
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
                       {format(new Date(agreement.created_at), 'MMM dd, yyyy')}

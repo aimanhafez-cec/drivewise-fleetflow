@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Calendar, User, Car, DollarSign } from 'lucide-react';
 import { format } from 'date-fns';
+import { formatCurrency } from "@/lib/utils/currency";
 
 interface ConvertToAgreementPreCheckProps {
   open: boolean;
@@ -143,7 +144,7 @@ export const ConvertToAgreementPreCheck: React.FC<ConvertToAgreementPreCheckProp
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Grand Total:</span>
                 <span className="font-bold text-lg">
-                  ${reservation.total_amount?.toFixed(2) || '0.00'}
+                  {formatCurrency(reservation.total_amount || 0)}
                 </span>
               </div>
               <div className="flex justify-between text-sm">

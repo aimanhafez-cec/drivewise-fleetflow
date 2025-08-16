@@ -7,6 +7,7 @@ import { VehicleExchangeModal } from './VehicleExchangeModal';
 import { VehicleAssignmentModal } from './VehicleAssignmentModal';
 import { format } from 'date-fns';
 import { RefreshCw, Plus } from 'lucide-react';
+import { formatCurrency } from "@/lib/utils/currency";
 
 interface AgreementLinesTableProps {
   agreementId: string;
@@ -124,10 +125,10 @@ export const AgreementLinesTable: React.FC<AgreementLinesTableProps> = ({
                   <TableCell>
                     {getSegmentBadges(line)}
                   </TableCell>
-                  <TableCell>${line.line_net?.toFixed(2) || '0.00'}</TableCell>
-                  <TableCell>${line.tax_value?.toFixed(2) || '0.00'}</TableCell>
+                  <TableCell>{formatCurrency(line.line_net || 0)}</TableCell>
+                  <TableCell>{formatCurrency(line.tax_value || 0)}</TableCell>
                   <TableCell className="font-medium">
-                    ${line.line_total?.toFixed(2) || '0.00'}
+                    {formatCurrency(line.line_total || 0)}
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-2">

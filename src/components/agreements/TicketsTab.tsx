@@ -18,6 +18,7 @@ import { CalendarIcon, Plus, Edit, DollarSign, AlertTriangle } from 'lucide-reac
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { formatCurrency } from "@/lib/utils/currency";
 
 interface TicketsTabProps {
   agreementId: string;
@@ -405,7 +406,7 @@ export const TicketsTab: React.FC<TicketsTabProps> = ({ agreementId, customerId,
                     <TableCell>{ticket.violation_type}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1">
-                        ${ticket.fine_amount}
+                        {formatCurrency(Number(ticket.fine_amount) || 0)}
                       </div>
                     </TableCell>
                     <TableCell>
@@ -485,7 +486,7 @@ export const TicketsTab: React.FC<TicketsTabProps> = ({ agreementId, customerId,
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold">
-                  ${tickets.reduce((sum, t) => sum + Number(t.fine_amount), 0).toFixed(2)}
+                  {formatCurrency(tickets.reduce((sum, t) => sum + Number(t.fine_amount), 0))}
                 </div>
                 <div className="text-sm text-muted-foreground">Total Amount</div>
               </div>

@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search, Car, MapPin, Fuel, Gauge } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { formatCurrency } from "@/lib/utils/currency";
 
 interface Vehicle {
   id: string;
@@ -228,7 +229,7 @@ export const VehicleSelector: React.FC<VehicleSelectorProps> = ({
                 {/* Daily Rate */}
                 <div className="text-center pt-2 border-t">
                   <div className="text-lg font-bold text-primary">
-                    ${vehicle.daily_rate || 0}/day
+                    {formatCurrency(vehicle.daily_rate || 0)}/day
                   </div>
                 </div>
               </div>

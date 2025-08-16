@@ -15,6 +15,7 @@ import { AgreementActions } from '@/components/agreements/AgreementActions';
 import { AgreementLinesTable } from '@/components/agreements/AgreementLinesTable';
 import { DamageTab } from '@/components/agreements/DamageTab';
 import { TicketsTab } from '@/components/agreements/TicketsTab';
+import { formatCurrency } from "@/lib/utils/currency";
 
 const AgreementDetails = () => {
   const { id } = useParams();
@@ -242,7 +243,7 @@ const AgreementDetails = () => {
             <div>
               <p className="text-sm font-medium text-muted-foreground">Total Amount</p>
               <p className="text-xl font-bold">
-                ${agreement.total_amount?.toFixed(2) || '0.00'}
+                {formatCurrency(agreement.total_amount || 0)}
               </p>
             </div>
             <div>
