@@ -171,6 +171,8 @@ const AgreementDetails = () => {
           <AgreementActions 
             agreementId={agreement.id}
             agreementNo={agreement.agreement_no || `AGR-${agreement.id.slice(0, 8)}`}
+            agreementStatus={agreement.status}
+            agreementLines={agreement.agreement_lines || []}
           />
         </div>
       </div>
