@@ -18,7 +18,7 @@ import { CalendarIcon, Plus, Edit, DollarSign, AlertTriangle } from 'lucide-reac
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-import { formatCurrency } from "@/lib/utils/currency";
+import { formatCurrency } from "@/lib/utils";
 
 interface TicketsTabProps {
   agreementId: string;

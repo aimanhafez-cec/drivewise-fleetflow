@@ -15,7 +15,7 @@ import { AgreementActions } from '@/components/agreements/AgreementActions';
 import { AgreementLinesTable } from '@/components/agreements/AgreementLinesTable';
 import { DamageTab } from '@/components/agreements/DamageTab';
 import { TicketsTab } from '@/components/agreements/TicketsTab';
-import { formatCurrency } from "@/lib/utils/currency";
+import { formatCurrency } from "@/lib/utils";
 
 const AgreementDetails = () => {
   const { id } = useParams();

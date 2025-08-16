@@ -7,7 +7,7 @@ import { VehicleExchangeModal } from './VehicleExchangeModal';
 import { VehicleAssignmentModal } from './VehicleAssignmentModal';
 import { format } from 'date-fns';
 import { RefreshCw, Plus } from 'lucide-react';
-import { formatCurrency } from "@/lib/utils/currency";
+import { formatCurrency } from "@/lib/utils";
 
 interface AgreementLinesTableProps {
   agreementId: string;

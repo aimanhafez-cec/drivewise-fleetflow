@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Skeleton } from '@/components/ui/skeleton';
 import { Plus, FileText } from 'lucide-react';
 import { format } from 'date-fns';
-import { formatCurrency } from "@/lib/utils/currency";
+import { formatCurrency } from "@/lib/utils";
 
 const Agreements = () => {
   const navigate = useNavigate();

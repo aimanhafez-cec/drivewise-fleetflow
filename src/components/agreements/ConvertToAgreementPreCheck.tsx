@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Calendar, User, Car, DollarSign } from 'lucide-react';
 import { format } from 'date-fns';
-import { formatCurrency } from "@/lib/utils/currency";
+import { formatCurrency } from "@/lib/utils";
 
 interface ConvertToAgreementPreCheckProps {
   open: boolean;

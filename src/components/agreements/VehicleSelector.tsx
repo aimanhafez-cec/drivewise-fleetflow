@@ -7,7 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search, Car, MapPin, Fuel, Gauge } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { formatCurrency } from "@/lib/utils/currency";
+import { formatCurrency } from "@/lib/utils";
 
 interface Vehicle {
   id: string;
