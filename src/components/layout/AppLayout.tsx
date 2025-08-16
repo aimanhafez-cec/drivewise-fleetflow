@@ -94,7 +94,7 @@ const navigation = [
 
 const AppLayout = () => {
   return (
-    <SidebarProvider>
+    <SidebarProvider defaultOpen={false}>
       <div className="min-h-screen flex w-full">
         <AppSidebar />
         <main className="flex-1 flex flex-col">
@@ -121,7 +121,7 @@ function AppSidebar() {
   const { toast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
-  const { state } = useSidebar();
+  const { state, setOpen } = useSidebar();
 
   const handleSignOut = async () => {
     const { error } = await signOut();
@@ -140,10 +140,23 @@ function AppSidebar() {
     }
   };
 
+  const handleMouseEnter = () => {
+    setOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    setOpen(false);
+  };
+
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <Sidebar className={state === "collapsed" ? "w-14" : "w-60"} collapsible="icon">
+    <Sidebar 
+      className={state === "collapsed" ? "w-14" : "w-60"} 
+      collapsible="icon"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>CarRental Pro</SidebarGroupLabel>
