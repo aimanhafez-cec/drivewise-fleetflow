@@ -2045,37 +2045,115 @@ const NewReservation = () => {
               </div>
             </AccordionTrigger>
             <AccordionContent className="px-6 pb-6">
-              <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-                <div className="space-y-2">
-                  <Label>Pre-adjustment</Label>
-                  <Input 
-                    type="number"
-                    step="0.01"
-                    value={formData.preAdjustment} 
-                    onChange={(e) => updateFormData('preAdjustment', parseFloat(e.target.value) || 0)}
-                    placeholder="0.00"
-                  />
+              <div className="space-y-6">
+                <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                  <div className="space-y-2">
+                    <Label>Pre-adjustment</Label>
+                    <Input 
+                      type="number"
+                      step="0.01"
+                      value={formData.preAdjustment} 
+                      onChange={(e) => updateFormData('preAdjustment', parseFloat(e.target.value) || 0)}
+                      placeholder="0.00"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Advance Payment</Label>
+                    <Input 
+                      type="number"
+                      step="0.01"
+                      value={formData.advancePayment} 
+                      onChange={(e) => updateFormData('advancePayment', parseFloat(e.target.value) || 0)}
+                      placeholder="0.00"
+                    />
+                    {validation.getFieldError('header.advancePayment') && (
+                      <FormError message={validation.getFieldError('header.advancePayment')} />
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Security Deposit Paid</Label>
+                    <Input 
+                      type="number"
+                      step="0.01"
+                      value={formData.securityDepositPaid} 
+                      onChange={(e) => updateFormData('securityDepositPaid', parseFloat(e.target.value) || 0)}
+                      placeholder="0.00"
+                    />
+                    {validation.getFieldError('header.securityDepositPaid') && (
+                      <FormError message={validation.getFieldError('header.securityDepositPaid')} />
+                    )}
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label>Advance Payment</Label>
-                  <Input 
-                    type="number"
-                    step="0.01"
-                    value={formData.advancePayment} 
-                    onChange={(e) => updateFormData('advancePayment', parseFloat(e.target.value) || 0)}
-                    placeholder="0.00"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Security Deposit Paid</Label>
-                  <Input 
-                    type="number"
-                    step="0.01"
-                    value={formData.securityDepositPaid} 
-                    onChange={(e) => updateFormData('securityDepositPaid', parseFloat(e.target.value) || 0)}
-                    placeholder="0.00"
-                  />
-                </div>
+
+                {/* Payment Method Section - Shows when advance payment > 0 */}
+                {formData.advancePayment > 0 && (
+                  <div className="space-y-4 p-4 border rounded-lg bg-muted/50">
+                    <h4 className="font-medium">Payment Method (Required for Advance Payment)</h4>
+                    <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
+                      <div className="space-y-2">
+                        <RequiredLabel>Payment Method</RequiredLabel>
+                        <Select value={formData.paymentMethodId} onValueChange={(value) => updateFormData('paymentMethodId', value)}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select payment method" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="cash">Cash</SelectItem>
+                            <SelectItem value="credit-card">Credit Card</SelectItem>
+                            <SelectItem value="debit-card">Debit Card</SelectItem>
+                            <SelectItem value="bank-transfer">Bank Transfer</SelectItem>
+                            <SelectItem value="check">Check</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        {validation.getFieldError('header.paymentMethod') && (
+                          <FormError message={validation.getFieldError('header.paymentMethod')} />
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Deposit Method Section - Shows when security deposit > 0 */}
+                {formData.securityDepositPaid > 0 && (
+                  <div className="space-y-4 p-4 border rounded-lg bg-muted/50">
+                    <h4 className="font-medium">Deposit Payment Details (Required for Security Deposit)</h4>
+                    <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
+                      <div className="space-y-2">
+                        <RequiredLabel>Deposit Method</RequiredLabel>
+                        <Select value={formData.depositMethodId} onValueChange={(value) => updateFormData('depositMethodId', value)}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select deposit method" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="hold">Credit Card Hold</SelectItem>
+                            <SelectItem value="cash-deposit">Cash Deposit</SelectItem>
+                            <SelectItem value="bank-guarantee">Bank Guarantee</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        {validation.getFieldError('header.depositMethod') && (
+                          <FormError message={validation.getFieldError('header.depositMethod')} />
+                        )}
+                      </div>
+                      <div className="space-y-2">
+                        <RequiredLabel>Deposit Payment Method</RequiredLabel>
+                        <Select value={formData.depositPaymentMethodId} onValueChange={(value) => updateFormData('depositPaymentMethodId', value)}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select payment method" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="cash">Cash</SelectItem>
+                            <SelectItem value="credit-card">Credit Card</SelectItem>
+                            <SelectItem value="debit-card">Debit Card</SelectItem>
+                            <SelectItem value="bank-transfer">Bank Transfer</SelectItem>
+                            <SelectItem value="check">Check</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        {validation.getFieldError('header.depositPaymentMethod') && (
+                          <FormError message={validation.getFieldError('header.depositPaymentMethod')} />
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </AccordionContent>
           </AccordionItem>
