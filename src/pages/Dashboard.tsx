@@ -259,7 +259,7 @@ const Dashboard = () => {
           </div>
           <div className="space-y-4">
             <div className="flex gap-2">
-              <Input placeholder="Enter customer name..." className="flex-1" value={customerSearchTerm} onChange={e => setCustomerSearchTerm(e.target.value)} onKeyPress={e => e.key === 'Enter' && searchCustomerAgreements()} />
+              <Input placeholder="Enter customer name..." className="flex-1" value={customerSearchTerm} onChange={(e) => {setCustomerSearchTerm(e.target.value); searchCustomerAgreements()}} />
               <Button className="bg-emerald-500 hover:bg-emerald-600 text-white px-6" onClick={searchCustomerAgreements}>
                 Search
               </Button>
