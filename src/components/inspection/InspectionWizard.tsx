@@ -170,9 +170,33 @@ export const InspectionWizard: React.FC<InspectionWizardProps> = ({
   };
 
   const handleNext = () => {
+    console.log('handleNext called - currentStep:', currentStep);
+    console.log('inspectionData:', inspectionData);
+    
+    // Check if current step has required data
+    if (currentStep === 'checklist') {
+      const REQUIRED_CHECKLIST_ITEMS = 5; // exterior, glass, tires, interior, accessories
+      const checklistComplete = inspectionData.checklist && 
+        Object.keys(inspectionData.checklist).length >= REQUIRED_CHECKLIST_ITEMS;
+      console.log('Checklist complete:', checklistComplete, 'Items completed:', Object.keys(inspectionData.checklist || {}).length, 'Required:', REQUIRED_CHECKLIST_ITEMS);
+      
+      if (!checklistComplete) {
+        toast({
+          title: 'Incomplete Checklist',
+          description: 'Please complete all checklist items before proceeding.',
+          variant: 'destructive'
+        });
+        return;
+      }
+    }
+    
     const currentIndex = getCurrentStepIndex();
+    console.log('Current index:', currentIndex, 'Total steps:', STEPS.length);
+    
     if (currentIndex < STEPS.length - 1) {
-      setCurrentStep(STEPS[currentIndex + 1].key);
+      const nextStep = STEPS[currentIndex + 1].key;
+      console.log('Moving to next step:', nextStep);
+      setCurrentStep(nextStep);
     }
   };
 
