@@ -63,7 +63,11 @@ const Index = () => {
         <div className="container mx-auto px-4 py-16">
           <div className="text-center max-w-4xl mx-auto">
             <div className="flex justify-center mb-6">
-              <Car className="h-16 w-16 text-primary" />
+              <img 
+                src="/lovable-uploads/0fe8cfa9-3548-415c-bc9c-114a2b91ae82.png" 
+                alt="CEC Car Rental Logo" 
+                className="h-20 w-20"
+              />
             </div>
             <h1 className="text-5xl font-bold tracking-tight mb-6">
               CEC Car Rental

@@ -121,7 +121,11 @@ const Auth = () => {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <Car className="h-8 w-8 text-primary" />
+            <img 
+              src="/lovable-uploads/0fe8cfa9-3548-415c-bc9c-114a2b91ae82.png" 
+              alt="CEC Car Rental Logo" 
+              className="h-12 w-12"
+            />
           </div>
           <CardTitle className="text-2xl">CEC Car Rental</CardTitle>
           <CardDescription>
