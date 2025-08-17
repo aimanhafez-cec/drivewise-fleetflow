@@ -129,8 +129,18 @@ const NewInspection: React.FC = () => {
                 <Input type="number" value={odometer} onChange={(e) => setOdometer(e.target.value)} placeholder="e.g., 45231" />
               </div>
               <div className="space-y-2">
-                <Label>Fuel Level (%)</Label>
-                <Input type="number" min={0} max={100} value={fuel} onChange={(e) => setFuel(e.target.value)} placeholder="0-100" />
+                <Label>Fuel Level</Label>
+                <Select value={fuel} onValueChange={setFuel}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="25">1/4</SelectItem>
+                    <SelectItem value="50">2/4</SelectItem>
+                    <SelectItem value="75">3/4</SelectItem>
+                    <SelectItem value="100">Full</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
                 <Label>Status</Label>

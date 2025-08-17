@@ -99,6 +99,21 @@ export default function VehicleDetails() {
     }
   };
 
+  const getFuelLevelInfo = (fuel_level: number) => {
+    switch (fuel_level) {
+      case 100:
+        return { label: 'Full', color: 'bg-green-500 text-white' };
+      case 75:
+        return { label: '3/4', color: 'bg-blue-500 text-white' };
+      case 50:
+        return { label: '2/4', color: 'bg-orange-500 text-white' };
+      case 25:
+        return { label: '1/4', color: 'bg-red-500 text-white' };
+      default:
+        return { label: fuel_level, color: 'bg-gray-500 text-white' };
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="space-y-6 p-6">
@@ -245,7 +260,7 @@ export default function VehicleDetails() {
             </div>
             <div>
               <Label className="text-sm font-medium text-muted-foreground">Fuel Level</Label>
-              <Input value={`${vehicle.fuel_level || 100}%`} readOnly className="mt-1" />
+              <Input value={getFuelLevelInfo(vehicle.fuel_level).label} readOnly className="mt-1" />
             </div>
             <div>
               <Label className="text-sm font-medium text-muted-foreground">Location</Label>
@@ -354,8 +369,10 @@ export default function VehicleDetails() {
                         </div>
                       </div>
                       <div>
-                        <Label className="text-sm font-medium text-muted-foreground">Fuel Level</Label>
-                        <Input value={`${vehicle.fuel_level || 100}%`} readOnly className="mt-1" />
+                        <Label className="text-sm font-medium text-muted-foreground">Fuel Level </Label>
+                        <Badge className={getFuelLevelInfo(vehicle.fuel_level).color}>
+                          {getFuelLevelInfo(vehicle.fuel_level).label}
+                        </Badge>
                       </div>
                       <div>
                         <Label className="text-sm font-medium text-muted-foreground">Odometer</Label>
@@ -429,7 +446,7 @@ export default function VehicleDetails() {
                       <TableCell>-</TableCell>
                       <TableCell>-</TableCell>
                       <TableCell>{vehicle.odometer || 0}</TableCell>
-                      <TableCell>{vehicle.fuel_level || 100}%</TableCell>
+                      <TableCell>{getFuelLevelInfo(vehicle.fuel_level).label}</TableCell>
                       <TableCell>-</TableCell>
                       <TableCell>-</TableCell>
                       <TableCell>{getStatusInfo(vehicle.status).label}</TableCell>

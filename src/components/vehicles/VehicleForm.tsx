@@ -320,15 +320,19 @@ const VehicleForm: React.FC<VehicleFormProps> = ({ vehicle, onSuccess }) => {
         </div>
 
         <div>
-          <Label htmlFor="fuel_level">Fuel Level (%)</Label>
-          <Input
-            id="fuel_level"
-            type="number"
-            min="0"
-            max="100"
-            {...register('fuel_level')}
-            placeholder="100"
-          />
+          <Label htmlFor="fuel_level">Fuel Level</Label>
+          <Select value={watch('fuel_level')} onValueChange={(value) => setValue('fuel_level', value as any)}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="25">1/4</SelectItem>
+              <SelectItem value="50">2/4</SelectItem>
+              <SelectItem value="75">3/4</SelectItem>
+              <SelectItem value="100">Full</SelectItem>
+            </SelectContent>
+          </Select>
+          
         </div>
 
         <div>
