@@ -32,7 +32,30 @@ export const InspectionSummary: React.FC<InspectionSummaryProps> = ({
   const [signature, setSignature] = useState<string | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const getEventPos = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return { x: 0, y: 0 };
+
+    const rect = canvas.getBoundingClientRect();
+    
+    if ('clientX' in e) {
+      // Mouse event
+      return {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+      };
+    } else {
+      // Touch event
+      const touch = e.touches[0] || e.changedTouches[0];
+      return {
+        x: touch.clientX - rect.left,
+        y: touch.clientY - rect.top
+      };
+    }
+  };
+
+  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+    e.preventDefault();
     setIsDrawing(true);
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -40,15 +63,14 @@ export const InspectionSummary: React.FC<InspectionSummaryProps> = ({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const { x, y } = getEventPos(e);
 
     ctx.beginPath();
     ctx.moveTo(x, y);
   };
 
-  const draw = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const draw = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+    e.preventDefault();
     if (!isDrawing) return;
 
     const canvas = canvasRef.current;
@@ -57,9 +79,7 @@ export const InspectionSummary: React.FC<InspectionSummaryProps> = ({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const { x, y } = getEventPos(e);
 
     ctx.lineWidth = 2;
     ctx.lineCap = 'round';
@@ -268,15 +288,18 @@ export const InspectionSummary: React.FC<InspectionSummaryProps> = ({
                     ref={canvasRef}
                     width={400}
                     height={150}
-                    className="w-full border border-gray-200 rounded cursor-crosshair bg-white"
+                    className="w-full border border-gray-200 rounded cursor-crosshair bg-white touch-none"
                     onMouseDown={startDrawing}
                     onMouseMove={draw}
                     onMouseUp={stopDrawing}
                     onMouseLeave={stopDrawing}
+                    onTouchStart={startDrawing}
+                    onTouchMove={draw}
+                    onTouchEnd={stopDrawing}
                   />
                   <div className="flex justify-between items-center mt-2">
                     <p className="text-sm text-muted-foreground">
-                      Sign above using your mouse or touch screen
+                      Sign above using your mouse, finger, or Apple Pencil
                     </p>
                     <Button
                       type="button"
