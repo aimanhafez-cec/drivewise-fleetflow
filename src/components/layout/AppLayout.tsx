@@ -97,7 +97,7 @@ const AppLayout = () => {
     <SidebarProvider defaultOpen={false}>
       <div className="min-h-screen flex w-full">
         <AppSidebar />
-        <main className="flex-1 flex flex-col">
+        <main className="flex-1 flex flex-col min-w-0">
           <header className="h-12 flex items-center justify-between border-b px-4">
             <SidebarTrigger />
             <div className="flex items-center gap-2">
@@ -107,7 +107,7 @@ const AppLayout = () => {
               </Button>
             </div>
           </header>
-          <div className="flex-1 p-6">
+          <div className="flex-1 p-4 md:p-6 min-w-0 overflow-x-auto">
             <Outlet />
           </div>
         </main>

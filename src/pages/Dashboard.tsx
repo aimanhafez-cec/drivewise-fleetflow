@@ -194,7 +194,7 @@ const Dashboard = () => {
     previousTotal: 3800,
     total: 4800
   }];
-  return <div className="space-y-6 p-6">
+  return <div className="space-y-6 w-full min-w-0">
       {/* Header with Action Buttons */}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold text-gray-900">Dashboard</h1>
@@ -370,9 +370,10 @@ const Dashboard = () => {
               </SelectContent>
             </Select>
           </div>
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-slate-800 hover:bg-slate-800">
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-slate-800 hover:bg-slate-800">
                 <TableHead className="text-white font-medium">Vehicle Type</TableHead>
                 <TableHead className="text-white font-medium">Mileage</TableHead>
                 <TableHead className="text-white font-medium">Rate</TableHead>
@@ -383,9 +384,10 @@ const Dashboard = () => {
                   <TableCell className="font-medium">{row.vehicleType}</TableCell>
                   <TableCell>{row.mileage}</TableCell>
                   <TableCell>{row.rate}</TableCell>
-                </TableRow>)}
+                 </TableRow>)}
             </TableBody>
           </Table>
+          </div>
         </Card>
       </div>
 
