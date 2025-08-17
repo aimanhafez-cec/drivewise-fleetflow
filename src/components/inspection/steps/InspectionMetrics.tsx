@@ -287,6 +287,19 @@ export const InspectionMetrics: React.FC<InspectionMetricsProps> = ({
           </div>
         </CardContent>
       </Card>
+
+      {/* Next Button */}
+      <div className="flex justify-end pt-4">
+        <Button 
+          onClick={() => {
+            const nextStepEvent = new CustomEvent('proceedToNextStep');
+            window.dispatchEvent(nextStepEvent);
+          }}
+          className="min-w-[100px]"
+        >
+          Next
+        </Button>
+      </div>
     </div>
   );
 };

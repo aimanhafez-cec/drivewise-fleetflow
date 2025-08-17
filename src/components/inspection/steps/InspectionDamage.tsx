@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { DamageTab } from '@/components/agreements/DamageTab';
 import { AlertTriangle, CheckCircle } from 'lucide-react';
 
@@ -94,6 +95,19 @@ export const InspectionDamage: React.FC<InspectionDamageProps> = ({
           <li>All markers will be recorded as "OUT" inspection damage</li>
           <li>High severity damage requires photo documentation</li>
         </ul>
+      </div>
+
+      {/* Next Button */}
+      <div className="flex justify-end pt-4">
+        <Button 
+          onClick={() => {
+            const nextStepEvent = new CustomEvent('proceedToNextStep');
+            window.dispatchEvent(nextStepEvent);
+          }}
+          className="min-w-[100px]"
+        >
+          Next
+        </Button>
       </div>
     </div>
   );

@@ -201,25 +201,6 @@ export const InspectionWizard: React.FC<InspectionWizardProps> = ({
   };
 
   const handleLockAndAttach = () => {
-    // Validate required fields
-    if (!inspectionData.metrics?.odometerOut || !inspectionData.metrics?.fuelLevelOut) {
-      toast({
-        title: 'Missing Required Information',
-        description: 'Please complete odometer and fuel level readings.',
-        variant: 'destructive'
-      });
-      return;
-    }
-
-    if (!inspectionData.signature) {
-      toast({
-        title: 'Missing Signature',
-        description: 'Customer signature is required to complete the inspection.',
-        variant: 'destructive'
-      });
-      return;
-    }
-
     lockInspectionMutation.mutate();
   };
 
