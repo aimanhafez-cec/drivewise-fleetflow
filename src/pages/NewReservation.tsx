@@ -75,9 +75,6 @@ export interface ReservationLine {
   priceSource?: 'panel' | 'pricelist';
 }
 
-// Use Driver interface from useDrivers hook
-import { Driver } from '@/hooks/useDrivers';
-
 interface ExtendedFormData extends ReservationFormData {
   // Reservation Lines
   reservationLines: ReservationLine[];
@@ -703,8 +700,8 @@ const NewReservation = () => {
     
     // Add underage driver fees if applicable
     const underageFees = selectedDrivers.reduce((sum, driver) => {
-      if (driver.dob) {
-        const age = new Date().getFullYear() - driver.dob.getFullYear();
+      if (driver.date_of_birth) {
+        const age = new Date().getFullYear() - new Date(driver.date_of_birth).getFullYear();
         return sum + (age < 25 ? 20.00 : 0); // $20 underage fee
       }
       return sum;
@@ -1058,11 +1055,15 @@ const NewReservation = () => {
   const addDriver = () => {
     const newDriver: Driver = {
       id: Date.now().toString(),
-      fullName: '',
-      licenseNo: '',
+      label: '',
+      full_name: '',
+      license_no: '',
       phone: '',
       email: '',
-      dob: null,
+      date_of_birth: '',
+      license_expiry: '',
+      status: 'active',
+      additional_driver_fee: 25.00,
     };
     
     setSelectedDrivers(prev => [...prev, newDriver]);
