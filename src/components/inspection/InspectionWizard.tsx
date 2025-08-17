@@ -377,7 +377,7 @@ export const InspectionWizard: React.FC<InspectionWizardProps> = ({
             ) : (
               <Button
                 onClick={handleNext}
-                disabled={getCurrentStepIndex() === STEPS.length - 1}
+                disabled={false}
               >
                 Next
               </Button>
