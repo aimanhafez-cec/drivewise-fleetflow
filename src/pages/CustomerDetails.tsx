@@ -194,7 +194,7 @@ const CustomerDetails = () => {
   }
 
   const summaryStats = [
-    { label: 'Total Revenue', value: `$${(stats?.totalRevenue || 0).toLocaleString()}`, color: 'text-emerald-500' },
+    { label: 'Total Revenue', value: `AED ${(stats?.totalRevenue || 0).toLocaleString()}`, color: 'text-emerald-500' },
     { label: 'Opened Reservations', value: stats?.openedReservations || 0, color: 'text-blue-500' },
     { label: 'Confirmed Reservations', value: stats?.confirmedReservations || 0, color: 'text-blue-500' },
     { label: 'No Show Reservations', value: stats?.noShowReservations || 0, color: 'text-gray-500' },

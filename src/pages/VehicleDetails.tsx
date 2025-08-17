@@ -135,14 +135,14 @@ export default function VehicleDetails() {
   }
 
   const summaryStats = [
-    { label: 'Total Revenue', value: `$${(stats?.totalRevenue || 0).toLocaleString()}`, color: 'text-emerald-500' },
+    { label: 'Total Revenue', value: `AED ${(stats?.totalRevenue || 0).toLocaleString()}`, color: 'text-emerald-500' },
     { label: 'Total Reservations', value: stats?.totalReservations || 0, color: 'text-blue-500' },
     { label: 'Active Reservations', value: stats?.activeReservations || 0, color: 'text-blue-500' },
     { label: 'Total Agreements', value: stats?.totalAgreements || 0, color: 'text-purple-500' },
     { label: 'Active Agreements', value: stats?.activeAgreements || 0, color: 'text-purple-500' },
     { label: 'Completed Agreements', value: stats?.completedAgreements || 0, color: 'text-green-500' },
     { label: 'Damage Records', value: stats?.damageCount || 0, color: 'text-red-500' },
-    { label: 'Repair Costs', value: `$${(stats?.repairCosts || 0).toLocaleString()}`, color: 'text-red-500' },
+    { label: 'Repair Costs', value: `AED ${(stats?.repairCosts || 0).toLocaleString()}`, color: 'text-red-500' },
     { label: 'Pending Repairs', value: stats?.pendingRepairs || 0, color: 'text-orange-500' },
     { label: 'Odometer Reading', value: `${(vehicle.odometer || 0).toLocaleString()} km`, color: 'text-gray-500' },
   ];
