@@ -123,7 +123,7 @@ const Auth = () => {
           <div className="flex justify-center mb-4">
             <Car className="h-8 w-8 text-primary" />
           </div>
-          <CardTitle className="text-2xl">CarRental Pro</CardTitle>
+          <CardTitle className="text-2xl">CEC Car Rental</CardTitle>
           <CardDescription>
             Sign in to your account to access the rental management system
           </CardDescription>

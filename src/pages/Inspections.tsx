@@ -31,7 +31,7 @@ const statusColor = (s?: string | null) => {
 const Inspections: React.FC = () => {
   const navigate = useNavigate();
 
-  useEffect(() => { document.title = "Inspections | CarRental Pro"; }, []);
+  useEffect(() => { document.title = "Inspections | CEC Car Rental"; }, []);
 
   const { data: inspections = [] } = useQuery({
     queryKey: ["inspections"],

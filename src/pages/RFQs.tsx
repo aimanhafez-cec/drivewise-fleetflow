@@ -17,7 +17,7 @@ const RFQs: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<string>("all");
 
   useEffect(() => {
-    document.title = "RFQs | CarRental Pro";
+    document.title = "RFQs | CEC Car Rental";
   }, []);
 
   const { data: rfqs, isLoading } = useQuery({

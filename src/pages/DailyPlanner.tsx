@@ -76,7 +76,7 @@ const DailyPlanner: React.FC = () => {
   });
 
   useEffect(() => {
-    document.title = "Daily Planner | CarRental Pro";
+    document.title = "Daily Planner | CEC Car Rental";
   }, []);
 
   // Calculate date range based on current view

@@ -66,7 +66,7 @@ const Index = () => {
               <Car className="h-16 w-16 text-primary" />
             </div>
             <h1 className="text-5xl font-bold tracking-tight mb-6">
-              CarRental Pro
+              CEC Car Rental
             </h1>
             <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
               Complete car rental management system with fleet tracking, 
@@ -133,7 +133,7 @@ const Index = () => {
             Ready to streamline your rental business?
           </h2>
           <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Join hundreds of rental companies already using CarRental Pro 
+            Join hundreds of rental companies already using CEC Car Rental 
             to manage their operations more efficiently.
           </p>
           <Button 

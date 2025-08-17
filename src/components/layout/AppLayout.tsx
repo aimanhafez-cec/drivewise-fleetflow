@@ -159,7 +159,7 @@ function AppSidebar() {
     >
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>CarRental Pro</SidebarGroupLabel>
+          <SidebarGroupLabel>CEC Car Rental</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {navigation.map((item) => (

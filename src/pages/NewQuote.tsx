@@ -3,7 +3,7 @@ import { QuoteWizard } from "@/components/quotes/QuoteWizard";
 
 const NewQuote: React.FC = () => {
   useEffect(() => {
-    document.title = "New Quote | CarRental Pro";
+    document.title = "New Quote | CEC Car Rental";
   }, []);
 
   return <QuoteWizard />;

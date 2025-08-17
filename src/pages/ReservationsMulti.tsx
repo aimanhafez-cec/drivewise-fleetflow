@@ -42,7 +42,7 @@ const ReservationsMulti: React.FC = () => {
 
   // SEO minimal
   useEffect(() => {
-    document.title = "Multi-Line Reservation | CarRental Pro";
+    document.title = "Multi-Line Reservation | CEC Car Rental";
   }, []);
 
   const [customerId, setCustomerId] = useState<string>("");

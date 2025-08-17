@@ -18,7 +18,7 @@ const NewInspection: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  useEffect(() => { document.title = "New Inspection | CarRental Pro"; }, []);
+  useEffect(() => { document.title = "New Inspection | CEC Car Rental"; }, []);
 
   const { data: vehicles = [] } = useQuery({
     queryKey: ["vehicles-basic"],
