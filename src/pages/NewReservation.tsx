@@ -31,13 +31,16 @@ import { SummaryCard } from '@/components/reservation/SummaryCard';
 import { ReservationLineGrid } from '@/components/reservation/ReservationLineGrid';
 import { AddLineValidation, validateAddLine, ValidationError } from '@/components/reservation/AddLineValidation';
 import { PrefillChips } from '@/components/reservation/PrefillChips';
-import { DriverPicker } from '@/components/reservation/DriverPicker';
+import { EnhancedDriverPicker } from '@/components/reservation/EnhancedDriverPicker';
+import { ConditionalVehicleSelector } from '@/components/reservation/ConditionalVehicleSelector';
+import { VehicleClassSelect, LocationSelect } from '@/components/ui/select-components';
 import { usePricingContext, calculateLinePrice, PricingContext } from '@/hooks/usePricingContext';
 import { RepriceBanner } from '@/components/reservation/RepriceBanner';
 import { useFormValidation, ValidationRules } from '@/hooks/useFormValidation';
 import { useReservationValidation } from '@/hooks/useReservationValidation';
 import { BillToSelector, BillToData, BillToType, BillToMeta } from '@/components/ui/bill-to-selector';
 import { useVehicles, useVehicleCategories, formatVehicleDisplay } from '@/hooks/useVehicles';
+import { Driver } from '@/hooks/useDrivers';
 
 const STORAGE_KEY = 'new-reservation-draft';
 
@@ -72,16 +75,8 @@ export interface ReservationLine {
   priceSource?: 'panel' | 'pricelist';
 }
 
-export interface Driver {
-  id: string;
-  fullName: string;
-  licenseNo: string;
-  phone: string;
-  email: string;
-  dob: Date | null;
-  role?: 'PRIMARY' | 'ADDITIONAL';
-  addlDriverFee?: number;
-}
+// Use Driver interface from useDrivers hook
+import { Driver } from '@/hooks/useDrivers';
 
 interface ExtendedFormData extends ReservationFormData {
   // Reservation Lines
@@ -2258,51 +2253,10 @@ const NewReservation = () => {
                 </TabsList>
                 
                 <TabsContent value="vehicles" className="space-y-6">
-                  <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                  <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
+                    {/* Dates */}
                     <div className="space-y-2">
-                      <Label>Vehicle Class</Label>
-                      <Select value={formData.vehicleClassId} onValueChange={(value) => updateFormData('vehicleClassId', value)}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select class" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {categoriesLoading ? (
-                            <SelectItem value="__loading__" disabled>Loading categories...</SelectItem>
-                          ) : categories?.length === 0 ? (
-                            <SelectItem value="__no_categories__" disabled>No categories available</SelectItem>
-                          ) : (
-                            categories?.map((category) => (
-                              <SelectItem key={category.id} value={category.id}>
-                                {category.name}
-                              </SelectItem>
-                            ))
-                          )}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Vehicle</Label>
-                      <Select value={formData.vehicleId} onValueChange={(value) => updateFormData('vehicleId', value)}>
-                        <SelectTrigger data-id="vehicle-select">
-                          <SelectValue placeholder="Select vehicle" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {vehiclesLoading ? (
-                            <SelectItem value="__loading__" disabled>Loading vehicles...</SelectItem>
-                          ) : vehicles?.length === 0 ? (
-                            <SelectItem value="__no_vehicles__" disabled>No vehicles available</SelectItem>
-                          ) : (
-                            vehicles?.map((vehicle) => (
-                              <SelectItem key={vehicle.id} value={vehicle.id}>
-                                {formatVehicleDisplay(vehicle)}
-                              </SelectItem>
-                            ))
-                          )}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Check Out Date</Label>
+                      <Label>Check Out Date <span className="text-destructive">*</span></Label>
                       <Popover>
                         <PopoverTrigger asChild>
                           <Button
@@ -2313,21 +2267,28 @@ const NewReservation = () => {
                             )}
                           >
                             <CalendarIcon className="mr-2 h-4 w-4" />
-                            {formData.checkOutDate ? format(formData.checkOutDate, "PPP") : <span>Pick date</span>}
+                            {formData.checkOutDate ? format(formData.checkOutDate, "PPP") : <span>Pick check out date</span>}
                           </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0" align="start">
                           <Calendar
                             mode="single"
                             selected={formData.checkOutDate}
-                            onSelect={(date) => updateFormData('checkOutDate', date)}
+                            onSelect={(date) => {
+                              updateFormData('checkOutDate', date);
+                              // Clear vehicle selection when dates change
+                              if (formData.vehicleId) {
+                                updateFormData('vehicleId', '');
+                              }
+                            }}
                             initialFocus
                           />
                         </PopoverContent>
                       </Popover>
                     </div>
+                    
                     <div className="space-y-2">
-                      <Label>Check In Date</Label>
+                      <Label>Check In Date <span className="text-destructive">*</span></Label>
                       <Popover>
                         <PopoverTrigger asChild>
                           <Button
@@ -2338,44 +2299,79 @@ const NewReservation = () => {
                             )}
                           >
                             <CalendarIcon className="mr-2 h-4 w-4" />
-                            {formData.checkInDate ? format(formData.checkInDate, "PPP") : <span>Pick date</span>}
+                            {formData.checkInDate ? format(formData.checkInDate, "PPP") : <span>Pick check in date</span>}
                           </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0" align="start">
                           <Calendar
                             mode="single"
                             selected={formData.checkInDate}
-                            onSelect={(date) => updateFormData('checkInDate', date)}
+                            onSelect={(date) => {
+                              updateFormData('checkInDate', date);
+                              // Clear vehicle selection when dates change
+                              if (formData.vehicleId) {
+                                updateFormData('vehicleId', '');
+                              }
+                            }}
                             initialFocus
                           />
                         </PopoverContent>
                       </Popover>
                     </div>
-                    <div className="space-y-2">
-                      <Label>Check Out Location</Label>
-                      <Select value={formData.checkOutLocationId} onValueChange={(value) => updateFormData('checkOutLocationId', value)}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select location" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="loc1">Main Office - Downtown</SelectItem>
-                          <SelectItem value="loc2">Airport Branch - LAX</SelectItem>
-                          <SelectItem value="loc3">Hotel Pickup - Beverly Hills</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Check In Location</Label>
-                      <Select value={formData.checkInLocationId} onValueChange={(value) => updateFormData('checkInLocationId', value)}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select location" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="loc1">Main Office - Downtown</SelectItem>
-                          <SelectItem value="loc2">Airport Branch - LAX</SelectItem>
-                          <SelectItem value="loc3">Hotel Pickup - Beverly Hills</SelectItem>
-                        </SelectContent>
-                      </Select>
+
+                    {/* Locations */}
+                    <LocationSelect
+                      value={formData.checkOutLocationId}
+                      onChange={(locationId) => {
+                        updateFormData('checkOutLocationId', locationId);
+                        // Clear vehicle selection when location changes
+                        if (formData.vehicleId) {
+                          updateFormData('vehicleId', '');
+                        }
+                      }}
+                      placeholder="Select check out location"
+                      className="w-full"
+                    />
+                    
+                    <LocationSelect
+                      value={formData.checkInLocationId}
+                      onChange={(locationId) => {
+                        updateFormData('checkInLocationId', locationId);
+                        // Clear vehicle selection when location changes
+                        if (formData.vehicleId) {
+                          updateFormData('vehicleId', '');
+                        }
+                      }}
+                      placeholder="Select check in location"
+                      className="w-full"
+                    />
+
+                    {/* Vehicle Class */}
+                    <VehicleClassSelect
+                      value={formData.vehicleClassId}
+                      onChange={(classId) => {
+                        updateFormData('vehicleClassId', classId);
+                        // Clear vehicle selection when class changes
+                        if (formData.vehicleId) {
+                          updateFormData('vehicleId', '');
+                        }
+                      }}
+                      placeholder="Select vehicle class"
+                      className="w-full"
+                    />
+                    
+                    {/* Enhanced Vehicle Selector with Dependencies */}
+                    <div className="md:col-span-2">
+                      <ConditionalVehicleSelector
+                        value={formData.vehicleId}
+                        onChange={(vehicleId) => updateFormData('vehicleId', vehicleId)}
+                        checkOutDate={formData.checkOutDate}
+                        checkInDate={formData.checkInDate}
+                        checkOutLocationId={formData.checkOutLocationId}
+                        checkInLocationId={formData.checkInLocationId}
+                        vehicleClassId={formData.vehicleClassId}
+                        className="w-full"
+                      />
                     </div>
                   </div>
                   
@@ -2393,40 +2389,11 @@ const NewReservation = () => {
                 </TabsContent>
                 
                 <TabsContent value="drivers" className="space-y-6">
-                  <div className="flex justify-between items-center">
-                    <h4 className="font-medium">Driver Information</h4>
-                    <Button variant="outline" onClick={addDriver} className="flex items-center gap-2">
-                      <Plus className="h-4 w-4" />
-                      Add Driver
-                    </Button>
-                  </div>
-                  
-                  {selectedDrivers.length > 0 ? (
-                    <div className="space-y-4">
-                      {selectedDrivers.map((driver, index) => (
-                        <div key={driver.id} className="p-4 border rounded-lg space-y-4">
-                          <div className="flex justify-between items-center">
-                            <h5 className="font-medium">Driver {index + 1}</h5>
-                            <Button variant="ghost" size="sm" onClick={() => setSelectedDrivers(prev => prev.filter(d => d.id !== driver.id))}>
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                          <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
-                            <Input placeholder="Full Name" value={driver.fullName} onChange={(e) => 
-                              setSelectedDrivers(prev => prev.map(d => d.id === driver.id ? {...d, fullName: e.target.value} : d))
-                            } />
-                            <Input placeholder="License No." value={driver.licenseNo} onChange={(e) => 
-                              setSelectedDrivers(prev => prev.map(d => d.id === driver.id ? {...d, licenseNo: e.target.value} : d))
-                            } />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-8 text-muted-foreground">
-                      No drivers added yet. Click "Add Driver" to get started.
-                    </div>
-                  )}
+                  <EnhancedDriverPicker
+                    selectedDrivers={formData.drivers}
+                    onDriversChange={(drivers) => updateFormData('drivers', drivers)}
+                    className="w-full"
+                  />
                 </TabsContent>
               </Tabs>
             </AccordionContent>

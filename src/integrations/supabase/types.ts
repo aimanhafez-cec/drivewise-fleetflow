@@ -395,6 +395,48 @@ export type Database = {
           },
         ]
       }
+      drivers: {
+        Row: {
+          additional_driver_fee: number | null
+          created_at: string
+          date_of_birth: string | null
+          email: string | null
+          full_name: string
+          id: string
+          license_expiry: string | null
+          license_no: string
+          phone: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          additional_driver_fee?: number | null
+          created_at?: string
+          date_of_birth?: string | null
+          email?: string | null
+          full_name: string
+          id?: string
+          license_expiry?: string | null
+          license_no: string
+          phone?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          additional_driver_fee?: number | null
+          created_at?: string
+          date_of_birth?: string | null
+          email?: string | null
+          full_name?: string
+          id?: string
+          license_expiry?: string | null
+          license_no?: string
+          phone?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       inspection_out: {
         Row: {
           agreement_id: string
