@@ -378,21 +378,23 @@ const DailyPlanner: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full min-w-0">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Daily Planner</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Daily Planner</h1>
           <p className="text-muted-foreground">Schedule and manage vehicle reservations and agreements</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <Button variant="outline" size="sm">
             <Filter className="mr-2 h-4 w-4" />
-            Saved Views
+            <span className="hidden sm:inline">Saved Views</span>
+            <span className="sm:hidden">Views</span>
           </Button>
-          <Button onClick={() => setShowNewReservationModal(true)}>
+          <Button onClick={() => setShowNewReservationModal(true)} size="sm">
             <Plus className="mr-2 h-4 w-4" />
-            New Reservation
+            <span className="hidden sm:inline">New Reservation</span>
+            <span className="sm:hidden">New</span>
           </Button>
         </div>
       </div>

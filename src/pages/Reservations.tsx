@@ -145,28 +145,29 @@ const Reservations = () => {
       </div>
     );
   }
-  return <div className="space-y-6">
-      <div className="flex items-center justify-between">
+  return <div className="space-y-6 w-full min-w-0">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Open Reservations</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Open Reservations</h1>
             <p className="text-muted-foreground">
               Manage active customer reservations and bookings
             </p>
           </div>
-          <div className="flex gap-2">
-            <Button id="btn-new-reservation" onClick={() => navigate('/reservations/new')}>
+          <div className="flex flex-wrap gap-2">
+            <Button id="btn-new-reservation" onClick={() => navigate('/reservations/new')} size="sm">
               <Plus className="mr-2 h-4 w-4" />
-              New Reservation
+              <span className="hidden sm:inline">New Reservation</span>
+              <span className="sm:hidden">New</span>
             </Button>
             
-            <Button variant="outline" onClick={() => navigate('/planner')}>
+            <Button variant="outline" onClick={() => navigate('/planner')} size="sm">
               <Calendar className="mr-2 h-4 w-4" />
-              Planner
+              <span className="hidden sm:inline">Planner</span>
             </Button>
             
-            <Button variant="outline" onClick={() => navigate('/agreements')}>
+            <Button variant="outline" onClick={() => navigate('/agreements')} size="sm">
               <FileText className="mr-2 h-4 w-4" />
-              Agreements
+              <span className="hidden sm:inline">Agreements</span>
             </Button>
           </div>
       </div>
@@ -248,21 +249,20 @@ const Reservations = () => {
               {reservations.map(reservation => (
                 <div 
                   key={reservation.id} 
-                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50" 
+                  className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 border rounded-lg hover:bg-muted/50" 
                 >
                   <div 
-                    className="flex items-center space-x-4 flex-1 cursor-pointer"
+                    className="flex items-center space-x-4 flex-1 cursor-pointer min-w-0"
                     onClick={() => navigate(`/reservations/${reservation.id}`)}
                   >
-                  <div className="flex items-center space-x-4">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 flex-shrink-0">
                       <User className="h-5 w-5 text-primary" />
                     </div>
-                    <div>
-                      <p className="text-sm font-medium leading-none">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium leading-none truncate">
                         {reservation.profiles?.full_name || 'Unknown Customer'}
                       </p>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-muted-foreground truncate">
                         {reservation.vehicles ? 
                           `${reservation.vehicles.make} ${reservation.vehicles.model}` : 
                           'No vehicle assigned'
@@ -271,36 +271,39 @@ const Reservations = () => {
                     </div>
                   </div>
                   
-                  <div className="text-center">
-                    <p className="text-sm font-medium">
-                      {reservation.start_datetime && reservation.end_datetime ? (
-                        <>
-                          {format(new Date(reservation.start_datetime), 'MMM dd')} - {format(new Date(reservation.end_datetime), 'MMM dd, yyyy')}
-                        </>
-                      ) : (
-                        'Dates TBD'
-                      )}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {formatCurrency(reservation.total_amount || 0)}
-                    </p>
-                  </div>
-                  
-                  <div className="flex items-center gap-2">
-                    <Badge className={getStatusColor(reservation.status)}>
-                      {reservation.status}
-                    </Badge>
-                    <Button
-                      id={`btn-convert-agreement-${reservation.id}`}
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleConvertToAgreement(reservation);
-                      }}
-                    >
-                      Convert to Agreement
-                    </Button>
-                  </div>
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full sm:w-auto">
+                    <div className="text-left sm:text-center">
+                      <p className="text-sm font-medium">
+                        {reservation.start_datetime && reservation.end_datetime ? (
+                          <>
+                            {format(new Date(reservation.start_datetime), 'MMM dd')} - {format(new Date(reservation.end_datetime), 'MMM dd, yyyy')}
+                          </>
+                        ) : (
+                          'Dates TBD'
+                        )}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {formatCurrency(reservation.total_amount || 0)}
+                      </p>
+                    </div>
+                    
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full sm:w-auto">
+                      <Badge className={getStatusColor(reservation.status)}>
+                        {reservation.status}
+                      </Badge>
+                      <Button
+                        id={`btn-convert-agreement-${reservation.id}`}
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleConvertToAgreement(reservation);
+                        }}
+                        className="w-full sm:w-auto"
+                      >
+                        <span className="hidden sm:inline">Convert to Agreement</span>
+                        <span className="sm:hidden">Convert</span>
+                      </Button>
+                    </div>
                   </div>
                 </div>
               ))}
