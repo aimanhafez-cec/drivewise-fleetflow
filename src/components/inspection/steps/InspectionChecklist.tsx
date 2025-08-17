@@ -188,6 +188,20 @@ export const InspectionChecklist: React.FC<InspectionChecklistProps> = ({
           Changes are automatically saved
         </div>
       )}
+
+      {/* Next Button */}
+      <div className="flex justify-end pt-4">
+        <Button 
+          onClick={() => {
+            // Force proceed to next step regardless of completion
+            const nextStepEvent = new CustomEvent('proceedToNextStep');
+            window.dispatchEvent(nextStepEvent);
+          }}
+          className="min-w-[100px]"
+        >
+          Next
+        </Button>
+      </div>
     </div>
   );
 };

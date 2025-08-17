@@ -134,6 +134,16 @@ export const InspectionWizard: React.FC<InspectionWizardProps> = ({
     }
   }, [isOpen, existingInspection, inspectionData.id]);
 
+  // Listen for proceed to next step event
+  useEffect(() => {
+    const handleProceedNext = () => {
+      handleNext();
+    };
+    
+    window.addEventListener('proceedToNextStep', handleProceedNext);
+    return () => window.removeEventListener('proceedToNextStep', handleProceedNext);
+  }, [currentStep, inspectionData]);
+
   const getCurrentStepIndex = () => STEPS.findIndex(step => step.key === currentStep);
   const getProgressPercentage = () => ((getCurrentStepIndex() + 1) / STEPS.length) * 100;
 
@@ -172,25 +182,6 @@ export const InspectionWizard: React.FC<InspectionWizardProps> = ({
   const handleNext = () => {
     console.log('handleNext called - currentStep:', currentStep);
     console.log('inspectionData:', inspectionData);
-    
-    // Check if current step has required data
-    if (currentStep === 'checklist') {
-      const REQUIRED_CHECKLIST_SECTIONS = ['exterior', 'glass', 'tires', 'interior', 'accessories'];
-      const checklistComplete = inspectionData.checklist && 
-        REQUIRED_CHECKLIST_SECTIONS.every(section => 
-          inspectionData.checklist && inspectionData.checklist[section]
-        );
-      console.log('Checklist complete:', checklistComplete, 'Sections completed:', Object.keys(inspectionData.checklist || {}), 'Required sections:', REQUIRED_CHECKLIST_SECTIONS);
-      
-      if (!checklistComplete) {
-        toast({
-          title: 'Incomplete Checklist',
-          description: 'Please complete all checklist sections before proceeding.',
-          variant: 'destructive'
-        });
-        return;
-      }
-    }
     
     const currentIndex = getCurrentStepIndex();
     console.log('Current index:', currentIndex, 'Total steps:', STEPS.length);
