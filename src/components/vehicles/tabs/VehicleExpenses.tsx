@@ -64,7 +64,7 @@ export function VehicleExpenses({ vehicleId }: VehicleExpensesProps) {
             <div className="flex items-center space-x-2">
               <DollarSign className="h-5 w-5 text-green-600" />
               <div>
-                <p className="text-2xl font-bold">${totalRevenue.toFixed(2)}</p>
+                <p className="text-2xl font-bold">AED {totalRevenue.toFixed(2)}</p>
                 <p className="text-sm text-muted-foreground">Total Revenue</p>
               </div>
             </div>
@@ -76,7 +76,7 @@ export function VehicleExpenses({ vehicleId }: VehicleExpensesProps) {
             <div className="flex items-center space-x-2">
               <TrendingDown className="h-5 w-5 text-red-600" />
               <div>
-                <p className="text-2xl font-bold">${totalExpenses.toFixed(2)}</p>
+                <p className="text-2xl font-bold">AED {totalExpenses.toFixed(2)}</p>
                 <p className="text-sm text-muted-foreground">Total Expenses</p>
               </div>
             </div>
@@ -88,7 +88,7 @@ export function VehicleExpenses({ vehicleId }: VehicleExpensesProps) {
             <div className="flex items-center space-x-2">
               <TrendingUp className={`h-5 w-5 ${netProfit >= 0 ? 'text-green-600' : 'text-red-600'}`} />
               <div>
-                <p className="text-2xl font-bold">${netProfit.toFixed(2)}</p>
+                <p className="text-2xl font-bold">AED {netProfit.toFixed(2)}</p>
                 <p className="text-sm text-muted-foreground">Net Profit</p>
               </div>
             </div>
@@ -117,11 +117,11 @@ export function VehicleExpenses({ vehicleId }: VehicleExpensesProps) {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
               <p className="text-sm text-muted-foreground">Revenue This Year</p>
-              <p className="text-2xl font-bold text-green-600">${currentYearRevenue.toFixed(2)}</p>
+              <p className="text-2xl font-bold text-green-600">AED {currentYearRevenue.toFixed(2)}</p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Expenses This Year</p>
-              <p className="text-2xl font-bold text-red-600">${currentYearExpenses.toFixed(2)}</p>
+              <p className="text-2xl font-bold text-red-600">AED {currentYearExpenses.toFixed(2)}</p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Profit This Year</p>

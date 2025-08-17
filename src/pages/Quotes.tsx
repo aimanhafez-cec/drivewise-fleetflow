@@ -83,7 +83,7 @@ const Quotes: React.FC = () => {
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-medium">${Number(q.total_amount || 0).toFixed(2)}</p>
+                  <p className="text-sm font-medium">AED {Number(q.total_amount || 0).toFixed(2)}</p>
                 </div>
                 <Badge className={statusColor(q.status)}>{q.status}</Badge>
               </div>

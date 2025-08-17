@@ -281,10 +281,10 @@ const QuoteDetails: React.FC = () => {
                         <div>
                           <p className="font-medium">{item.description}</p>
                           <p className="text-sm text-muted-foreground">
-                            Qty: {item.qty} × ${Number(item.rate).toFixed(2)}
+                            Qty: {item.qty} × AED {Number(item.rate).toFixed(2)}
                           </p>
                         </div>
-                        <p className="font-semibold">${Number(item.qty * item.rate).toFixed(2)}</p>
+                        <p className="font-semibold">AED {Number(item.qty * item.rate).toFixed(2)}</p>
                       </div>
                     ))}
                   </div>
@@ -295,16 +295,16 @@ const QuoteDetails: React.FC = () => {
                   <div className="space-y-2">
                     <div className="flex justify-between">
                       <span>Subtotal</span>
-                      <span>${Number(quote.subtotal).toFixed(2)}</span>
+                      <span>AED {Number(quote.subtotal).toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Tax</span>
-                      <span>${Number(quote.tax_amount).toFixed(2)}</span>
+                      <span>AED {Number(quote.tax_amount).toFixed(2)}</span>
                     </div>
                     <Separator />
                     <div className="flex justify-between font-semibold text-lg">
                       <span>Total</span>
-                      <span>${Number(quote.total_amount).toFixed(2)}</span>
+                      <span>AED {Number(quote.total_amount).toFixed(2)}</span>
                     </div>
                   </div>
                 </CardContent>
@@ -409,16 +409,16 @@ const QuoteDetails: React.FC = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="text-center p-4 bg-muted rounded-lg">
-                <p className="text-2xl font-bold">${Number(quote.total_amount).toFixed(2)}</p>
+                <p className="text-2xl font-bold">AED {Number(quote.total_amount).toFixed(2)}</p>
                 <p className="text-sm text-muted-foreground">Total Amount</p>
               </div>
               <div className="grid grid-cols-2 gap-2 text-sm">
                 <div className="text-center p-2 bg-muted rounded">
-                  <p className="font-semibold">${Number(quote.subtotal).toFixed(2)}</p>
+                  <p className="font-semibold">AED {Number(quote.subtotal).toFixed(2)}</p>
                   <p className="text-muted-foreground">Subtotal</p>
                 </div>
                 <div className="text-center p-2 bg-muted rounded">
-                  <p className="font-semibold">${Number(quote.tax_amount).toFixed(2)}</p>
+                  <p className="font-semibold">AED {Number(quote.tax_amount).toFixed(2)}</p>
                   <p className="text-muted-foreground">Tax</p>
                 </div>
               </div>

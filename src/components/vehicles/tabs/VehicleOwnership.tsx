@@ -97,15 +97,15 @@ export function VehicleOwnership({ vehicle }: VehicleOwnershipProps) {
           <div className="grid grid-cols-1 gap-4">
             <div>
               <p className="text-sm text-muted-foreground">Daily Rate</p>
-              <p className="font-medium">${vehicle.daily_rate || 'Not set'}</p>
+              <p className="font-medium">AED {vehicle.daily_rate || 'Not set'}</p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Weekly Rate</p>
-              <p className="font-medium">${vehicle.weekly_rate || 'Not set'}</p>
+              <p className="font-medium">AED {vehicle.weekly_rate || 'Not set'}</p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Monthly Rate</p>
-              <p className="font-medium">${vehicle.monthly_rate || 'Not set'}</p>
+              <p className="font-medium">AED {vehicle.monthly_rate || 'Not set'}</p>
             </div>
           </div>
         </CardContent>

@@ -99,7 +99,7 @@ export const QuoteWizardStep5: React.FC<QuoteWizardStep5Props> = ({
                 {(data.items || []).map((item: any, index: number) => (
                   <div key={index} className="flex justify-between">
                     <span>{item.description}</span>
-                    <span>${(item.qty * item.rate).toFixed(2)}</span>
+                    <span>AED {(item.qty * item.rate).toFixed(2)}</span>
                   </div>
                 ))}
               </div>
@@ -109,11 +109,11 @@ export const QuoteWizardStep5: React.FC<QuoteWizardStep5Props> = ({
               <div className="space-y-1 text-sm">
                 <div className="flex justify-between">
                   <span>Subtotal</span>
-                  <span>${subtotal.toFixed(2)}</span>
+                  <span>AED {subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Tax ({((data.tax_rate || 0) * 100).toFixed(1)}%)</span>
-                  <span>${taxAmount.toFixed(2)}</span>
+                  <span>AED {taxAmount.toFixed(2)}</span>
                 </div>
               </div>
 
@@ -121,7 +121,7 @@ export const QuoteWizardStep5: React.FC<QuoteWizardStep5Props> = ({
               
               <div className="flex justify-between font-semibold">
                 <span>Total</span>
-                <span>${total.toFixed(2)}</span>
+                <span>AED {total.toFixed(2)}</span>
               </div>
             </div>
           </div>

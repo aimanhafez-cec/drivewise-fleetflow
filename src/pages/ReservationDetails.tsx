@@ -55,7 +55,7 @@ const ReservationDetails = () => {
           entryDate: format(new Date(data.created_at), 'yyyy-MM-dd'),
           validityDate: format(new Date(data.end_datetime), 'yyyy-MM-dd'),
           status: data.status.toUpperCase(),
-          currency: 'EGP',
+          currency: 'AED',
           businessUnit: 'Main Location',
           paymentTerms: 'Net 30 Days',
           totalAmount: data.total_amount || 0,

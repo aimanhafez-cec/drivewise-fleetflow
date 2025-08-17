@@ -112,7 +112,7 @@ export const QuoteWizardStep4: React.FC<QuoteWizardStep4Props> = ({
                     <div className="col-span-2">
                       <Label>Total</Label>
                       <div className="h-10 flex items-center px-3 border rounded-md bg-muted">
-                        {(item.qty * item.rate).toFixed(2)} EGP
+                        {(item.qty * item.rate).toFixed(2)} AED
                       </div>
                     </div>
                     <div className="col-span-1">
@@ -154,12 +154,12 @@ export const QuoteWizardStep4: React.FC<QuoteWizardStep4Props> = ({
             </div>
             <div className="space-y-2">
               <Label htmlFor="currency">Currency</Label>
-              <Select value={data.currency || "EGP"} onValueChange={(value) => onChange({ currency: value })}>
+              <Select value={data.currency || "AED"} onValueChange={(value) => onChange({ currency: value })}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="EGP">EGP</SelectItem>
+                      <SelectItem value="AED">AED</SelectItem>
                     </SelectContent>
               </Select>
             </div>
@@ -215,16 +215,16 @@ export const QuoteWizardStep4: React.FC<QuoteWizardStep4Props> = ({
           <div className="space-y-3">
             <div className="flex justify-between">
               <span>Subtotal</span>
-              <span>{subtotal.toFixed(2)} EGP</span>
+              <span>{subtotal.toFixed(2)} AED</span>
             </div>
             <div className="flex justify-between">
               <span>Tax ({((data.tax_rate || 0) * 100).toFixed(1)}%)</span>
-              <span>{taxAmount.toFixed(2)} EGP</span>
+              <span>{taxAmount.toFixed(2)} AED</span>
             </div>
             <Separator />
             <div className="flex justify-between font-semibold text-lg">
               <span>Total</span>
-              <span>{total.toFixed(2)} EGP</span>
+              <span>{total.toFixed(2)} AED</span>
             </div>
           </div>
         </CardContent>

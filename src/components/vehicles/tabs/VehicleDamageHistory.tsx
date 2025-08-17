@@ -127,7 +127,7 @@ export function VehicleDamageHistory({ vehicleId }: VehicleDamageHistoryProps) {
                     <div>
                       <p className="text-muted-foreground">Repair Cost</p>
                       <p className="font-medium">
-                        {record.repair_cost ? `$${Number(record.repair_cost).toFixed(2)}` : 'TBD'}
+                        {record.repair_cost ? `AED ${Number(record.repair_cost).toFixed(2)}` : 'TBD'}
                       </p>
                     </div>
                     <div>

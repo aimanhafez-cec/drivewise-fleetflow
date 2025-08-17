@@ -58,7 +58,7 @@ export const AgreementWizardStep1: React.FC<AgreementWizardStep1Props> = ({
             </div>
             <div>
               <Label className="text-sm font-medium text-muted-foreground">Currency *</Label>
-              <p className="font-medium">EGP</p>
+              <p className="font-medium">AED</p>
             </div>
             <div>
               <Label className="text-sm font-medium text-muted-foreground">Status</Label>

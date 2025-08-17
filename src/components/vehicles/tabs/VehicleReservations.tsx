@@ -103,7 +103,7 @@ export function VehicleReservations({ vehicleId }: VehicleReservationsProps) {
                     </div>
                     <div>
                       <p>Total</p>
-                      <p className="font-medium">${reservation.total_amount || 'TBD'}</p>
+                      <p className="font-medium">AED {reservation.total_amount || 'TBD'}</p>
                     </div>
                   </div>
                 </div>
@@ -158,7 +158,7 @@ export function VehicleReservations({ vehicleId }: VehicleReservationsProps) {
                     </div>
                     <div>
                       <p>Total</p>
-                      <p className="font-medium">${agreement.total_amount || 'TBD'}</p>
+                      <p className="font-medium">AED {agreement.total_amount || 'TBD'}</p>
                     </div>
                   </div>
                 </div>

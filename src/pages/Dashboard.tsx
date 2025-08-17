@@ -280,7 +280,7 @@ const Dashboard = () => {
                       </div>
                       <div className="text-right">
                         <p className="text-sm font-medium">
-                          ${agreement.total_amount || '0.00'}
+                          AED {agreement.total_amount || '0.00'}
                         </p>
                         <p className="text-xs text-gray-500 capitalize">
                           {agreement.status}

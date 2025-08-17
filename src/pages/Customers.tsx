@@ -224,7 +224,7 @@ const Customers = () => {
                   </div>
                   <div>
                     <div className="text-muted-foreground">Total Spent</div>
-                    <div className="font-semibold">${(customer.total_spent || 0).toLocaleString()}</div>
+                    <div className="font-semibold">AED {(customer.total_spent || 0).toLocaleString()}</div>
                   </div>
                 </div>
 

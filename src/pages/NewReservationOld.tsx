@@ -167,7 +167,7 @@ const NewReservation = () => {
     reservationNo: null,
     entryDate: new Date(),
     reservationMethodId: '',
-    currencyCode: 'EGP',
+    currencyCode: 'AED',
     reservationTypeId: '',
     businessUnitId: '',
     customerId: '',
@@ -1871,7 +1871,7 @@ const NewReservation = () => {
                         <p className="font-medium">{charge.name}</p>
                       </div>
                     </div>
-                    <span className="font-medium">${charge.amount}</span>
+                    <span className="font-medium">AED {charge.amount}</span>
                   </div>
                 ))}
               </div>
@@ -2279,7 +2279,7 @@ const NewReservation = () => {
       <div className="lg:w-80 lg:sticky lg:top-6 lg:h-fit order-first lg:order-last">
         <SummaryCard 
           summary={summary} 
-          currencyCode={formData.currencyCode || 'EGP'}
+          currencyCode={formData.currencyCode || 'AED'}
           className="lg:sticky lg:top-6"
         />
       </div>

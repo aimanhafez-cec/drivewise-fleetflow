@@ -323,7 +323,7 @@ export const QuoteWizard: React.FC = () => {
                       <div key={index} className="text-sm">
                         <div className="flex justify-between">
                           <span>{item.description}</span>
-                          <span>${(item.qty * item.rate).toFixed(2)}</span>
+                          <span>AED {(item.qty * item.rate).toFixed(2)}</span>
                         </div>
                       </div>
                     ))}

@@ -170,7 +170,7 @@ export const ConditionalVehicleSelector: React.FC<ConditionalVehicleSelectorProp
                 {selectedVehicle.daily_rate && (
                   <>
                     <span>•</span>
-                    <span>${selectedVehicle.daily_rate}/day</span>
+                    <span>AED {selectedVehicle.daily_rate}/day</span>
                   </>
                 )}
               </div>

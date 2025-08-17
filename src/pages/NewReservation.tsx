@@ -183,7 +183,7 @@ const NewReservation = () => {
     reservationNo: null,
     entryDate: new Date(),
     reservationMethodId: '',
-    currencyCode: 'EGP',
+    currencyCode: 'AED',
     reservationTypeId: '',
     businessUnitId: '',
     customerId: '',
@@ -400,7 +400,7 @@ const NewReservation = () => {
           vehicleTypeId: '',
           vehicleLocationId: '',
           ratePlanId: '',
-          currencyCode: 'EGP',
+          currencyCode: 'AED',
           discountTypeId: '',
           discountValue: line.discountValue || 0,
           taxLevelId: '',
@@ -529,16 +529,16 @@ const NewReservation = () => {
   }, []);
 
   const loadInitialData = async () => {
-    // Set currency to only EGP
+    // Set currency to only AED
     setOptions(prev => ({ 
       ...prev, 
       currencies: [
-        { id: 'EGP', label: 'EGP - Egyptian Pound', value: 'EGP' }
+        { id: 'AED', label: 'AED - Egyptian Pound', value: 'AED' }
       ]
     }));
 
-    // Set EGP as default currency
-    setFormData(prev => ({ ...prev, currencyCode: 'EGP' }));
+    // Set AED as default currency
+    setFormData(prev => ({ ...prev, currencyCode: 'AED' }));
 
     const loadTasks = [
       { key: 'reservationMethods', fn: mockApi.getReservationMethods },
@@ -1880,11 +1880,11 @@ const NewReservation = () => {
             <AccordionContent className="px-6 pb-6">
               <div className="space-y-4">
                 {[
-                  { id: 'ldw', name: 'LDW (Per Day - No Tax)', amount: '750.00' },      // ~25 USD -> 750 EGP
-                  { id: 'drop-fee', name: 'Drop Fee (Fixed)', amount: '1500.00' },      // ~50 USD -> 1500 EGP
-                  { id: 'under-age', name: 'Under Age Fee (No Tax)', amount: '450.00' }, // ~15 USD -> 450 EGP
-                  { id: 'valet', name: 'Valet (Per Day)', amount: '300.00' },           // ~10 USD -> 300 EGP
-                  { id: 'sli', name: 'SLI (Fixed)', amount: '2250.00' }                 // ~75 USD -> 2250 EGP
+                  { id: 'ldw', name: 'LDW (Per Day - No Tax)', amount: '750.00' },      // ~25 USD -> 750 AED
+                  { id: 'drop-fee', name: 'Drop Fee (Fixed)', amount: '1500.00' },      // ~50 USD -> 1500 AED
+                  { id: 'under-age', name: 'Under Age Fee (No Tax)', amount: '450.00' }, // ~15 USD -> 450 AED
+                  { id: 'valet', name: 'Valet (Per Day)', amount: '300.00' },           // ~10 USD -> 300 AED
+                  { id: 'sli', name: 'SLI (Fixed)', amount: '2250.00' }                 // ~75 USD -> 2250 AED
                 ].map((charge) => (
                   <div key={charge.id} className="flex items-center justify-between p-3 border rounded-lg">
                     <div className="flex items-center gap-3">
@@ -1902,7 +1902,7 @@ const NewReservation = () => {
                         <p className="font-medium">{charge.name}</p>
                       </div>
                     </div>
-                    <span className="font-medium">EGP {charge.amount}</span>
+                    <span className="font-medium">AED {charge.amount}</span>
                   </div>
                 ))}
               </div>
@@ -2465,7 +2465,7 @@ const NewReservation = () => {
         <div className="sticky top-6">
           <SummaryCard
             summary={summary}
-            currencyCode="EGP"
+            currencyCode="AED"
           />
         </div>
       </div>

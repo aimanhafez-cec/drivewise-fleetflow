@@ -1,7 +1,7 @@
-export const formatCurrency = (amount: number, currencyCode: string = 'EGP'): string => {
+export const formatCurrency = (amount: number, currencyCode: string = 'AED'): string => {
   // Format for Egyptian Pound
-  if (currencyCode === 'EGP') {
-    return `${amount.toFixed(2)} EGP`;
+  if (currencyCode === 'AED') {
+    return `${amount.toFixed(2)} AED`;
   }
   
   // Fallback for other currencies
@@ -15,4 +15,4 @@ export const formatCurrency = (amount: number, currencyCode: string = 'EGP'): st
   return amount < 0 ? `-${symbol}${Math.abs(amount).toFixed(2)}` : `${symbol}${amount.toFixed(2)}`;
 };
 
-export const DEFAULT_CURRENCY = 'EGP';
+export const DEFAULT_CURRENCY = 'AED';
