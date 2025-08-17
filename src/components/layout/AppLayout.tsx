@@ -172,7 +172,8 @@ function AppSidebar() {
                       }
                     >
                       <item.icon className="mr-2 h-4 w-4" />
-                      {state !== "collapsed" && <span>{item.title}</span>}
+                      <span className="md:hidden">{item.title}</span>
+                      {state !== "collapsed" && <span className="hidden md:inline">{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -191,7 +192,8 @@ function AppSidebar() {
                     className="w-full text-left hover:bg-muted/50"
                   >
                     <LogOut className="mr-2 h-4 w-4" />
-                    {state !== "collapsed" && <span>Sign Out</span>}
+                    <span className="md:hidden">Sign Out</span>
+                    {state !== "collapsed" && <span className="hidden md:inline">Sign Out</span>}
                   </button>
                 </SidebarMenuButton>
               </SidebarMenuItem>
