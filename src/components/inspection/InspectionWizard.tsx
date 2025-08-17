@@ -175,15 +175,17 @@ export const InspectionWizard: React.FC<InspectionWizardProps> = ({
     
     // Check if current step has required data
     if (currentStep === 'checklist') {
-      const REQUIRED_CHECKLIST_ITEMS = 5; // exterior, glass, tires, interior, accessories
+      const REQUIRED_CHECKLIST_SECTIONS = ['exterior', 'glass', 'tires', 'interior', 'accessories'];
       const checklistComplete = inspectionData.checklist && 
-        Object.keys(inspectionData.checklist).length >= REQUIRED_CHECKLIST_ITEMS;
-      console.log('Checklist complete:', checklistComplete, 'Items completed:', Object.keys(inspectionData.checklist || {}).length, 'Required:', REQUIRED_CHECKLIST_ITEMS);
+        REQUIRED_CHECKLIST_SECTIONS.every(section => 
+          inspectionData.checklist && inspectionData.checklist[section]
+        );
+      console.log('Checklist complete:', checklistComplete, 'Sections completed:', Object.keys(inspectionData.checklist || {}), 'Required sections:', REQUIRED_CHECKLIST_SECTIONS);
       
       if (!checklistComplete) {
         toast({
           title: 'Incomplete Checklist',
-          description: 'Please complete all checklist items before proceeding.',
+          description: 'Please complete all checklist sections before proceeding.',
           variant: 'destructive'
         });
         return;
