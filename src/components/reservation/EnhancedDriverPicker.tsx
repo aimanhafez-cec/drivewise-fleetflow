@@ -197,7 +197,7 @@ export const EnhancedDriverPicker: React.FC<EnhancedDriverPickerProps> = ({
                       )}
                       {driver.role === 'ADDITIONAL' && driver.additional_driver_fee > 0 && (
                         <Badge variant="secondary" className="text-xs px-2 py-0">
-                          +${driver.additional_driver_fee}
+                          +AED{driver.additional_driver_fee}
                         </Badge>
                       )}
                     </div>
