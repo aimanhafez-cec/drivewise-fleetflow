@@ -340,8 +340,8 @@ const NewReservation = () => {
     return !!(prefill.vehicleClassId && prefill.vehicleId && prefill.checkOutDate && prefill.checkOutLocationId && prefill.checkInDate && prefill.checkInLocationId && prefill.checkOutDate < prefill.checkInDate);
   };
 
-  // State for accordion sections - REORDERED per requirements
-  const [accordionValues, setAccordionValues] = useState(['rental-info', 'billing', 'airport-info', 'insurance', 'misc-charges', 'rate-taxes', 'adjustments-deposits', 'referral-info', 'notes', 'vehicles-drivers', 'reservation-lines']);
+  // State for accordion sections - REORDERED: Vehicle selection comes BEFORE rate & taxes
+  const [accordionValues, setAccordionValues] = useState(['rental-info', 'billing', 'vehicles-drivers', 'airport-info', 'insurance', 'misc-charges', 'rate-taxes', 'adjustments-deposits', 'referral-info', 'notes', 'reservation-lines']);
 
   // Check if we're editing an existing reservation
   const editData = location.state?.editData;
