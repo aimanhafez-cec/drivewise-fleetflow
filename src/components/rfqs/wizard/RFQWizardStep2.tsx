@@ -2,6 +2,7 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { FormError } from "@/components/ui/form-error";
+import { LocationSelect } from "@/components/ui/select-components";
 
 interface RFQWizardStep2Props {
   data: any;
@@ -40,11 +41,10 @@ export const RFQWizardStep2: React.FC<RFQWizardStep2Props> = ({
               <label htmlFor="pickup-location" className="text-sm font-medium">
                 Pickup Location *
               </label>
-              <Input
-                id="pickup-location"
-                placeholder="Enter pickup location"
+              <LocationSelect
                 value={data.pickup_loc_id || ""}
-                onChange={(e) => onChange({ pickup_loc_id: e.target.value })}
+                onChange={(locationId) => onChange({ pickup_loc_id: locationId })}
+                placeholder="Select pickup location"
                 className="mt-1"
               />
               {errors.pickup_loc_id && <FormError message={errors.pickup_loc_id} />}
@@ -70,11 +70,10 @@ export const RFQWizardStep2: React.FC<RFQWizardStep2Props> = ({
               <label htmlFor="return-location" className="text-sm font-medium">
                 Return Location *
               </label>
-              <Input
-                id="return-location"
-                placeholder="Enter return location"
+              <LocationSelect
                 value={data.return_loc_id || ""}
-                onChange={(e) => onChange({ return_loc_id: e.target.value })}
+                onChange={(locationId) => onChange({ return_loc_id: locationId })}
+                placeholder="Select return location"
                 className="mt-1"
               />
               {errors.return_loc_id && <FormError message={errors.return_loc_id} />}

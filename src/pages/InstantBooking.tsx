@@ -11,6 +11,7 @@ import QuickVehicleSelector from '@/components/instant-booking/QuickVehicleSelec
 import CustomerDetector from '@/components/instant-booking/CustomerDetector';
 import PricingCalculatorInstant from '@/components/instant-booking/PricingCalculatorInstant';
 import { useInstantBooking } from '@/hooks/useInstantBooking';
+import { LocationSelect } from '@/components/ui/select-components';
 const InstantBooking = () => {
   const navigate = useNavigate();
   const {
@@ -154,11 +155,11 @@ const InstantBooking = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="pickup-location">Pickup Location</Label>
-                      <Input id="pickup-location" placeholder="Select pickup location..." value={bookingData.pickupLocation} onChange={e => handleDataChange('pickupLocation', e.target.value)} className="mt-1" />
+                      <LocationSelect value={bookingData.pickupLocation} onChange={locationId => handleDataChange('pickupLocation', locationId)} placeholder="Select pickup location..." className="mt-1" />
                     </div>
                     <div>
                       <Label htmlFor="return-location">Return Location</Label>
-                      <Input id="return-location" placeholder="Select return location..." value={bookingData.returnLocation} onChange={e => handleDataChange('returnLocation', e.target.value)} className="mt-1" />
+                      <LocationSelect value={bookingData.returnLocation} onChange={locationId => handleDataChange('returnLocation', locationId)} placeholder="Select return location..." className="mt-1" />
                     </div>
                   </div>
                 </CardContent>
