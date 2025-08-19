@@ -32,6 +32,13 @@ interface ReservationResult {
   end_datetime: string;
 }
 
+interface CustomerResult {
+  id: string;
+  full_name: string | null;
+  email: string | null;
+  phone: string | null;
+}
+
 const useDebounced = (value: string, delay = 300) => {
   const [debounced, setDebounced] = useState(value);
   useEffect(() => {
@@ -87,16 +94,34 @@ const QuickSearch: React.FC = () => {
         .from("reservations")
         .select("id, ro_number, po_number, start_datetime, end_datetime")
         .or(
-          `ro_number.ilike.%${q}%,po_number.ilike.%${q}%,id.eq.${q}`
+          `ro_number.ilike.%${q}%,po_number.ilike.%${q}%`
         )
         .limit(8);
       if (error) throw error;
       return (data || []) as ReservationResult[];
     },
   });
+  
+  const customersQuery = useQuery({
+    queryKey: ["quick-search-customers", debounced],
+    enabled,
+    queryFn: async () => {
+      const q = debounced.trim();
+      const { data, error } = await supabase
+        .from("customers")
+        .select("id, full_name, email, phone")
+        .or(
+          `full_name.ilike.%${q}%,email.ilike.%${q}%,phone.ilike.%${q}%`
+        )
+        .limit(8);
+      if (error) throw error;
+      return (data || []) as CustomerResult[];
+    },
+  });
 
   const vehicles = vehiclesQuery.data || [];
   const reservations = reservationsQuery.data || [];
+  const customers = customersQuery.data || [];
 
   const placeholder = useMemo(
     () => "Search vehicles (VIN/plate/make) or reservations (RO/PO/ID)...",
@@ -114,6 +139,11 @@ const QuickSearch: React.FC = () => {
 
   const openVehicle = (id: string) => {
     navigate(`/vehicles/${id}`);
+    setOpen(false);
+  };
+
+  const openCustomer = (id: string) => {
+    navigate(`/customers/${id}`);
     setOpen(false);
   };
 
@@ -170,6 +200,25 @@ const QuickSearch: React.FC = () => {
                   )}
                   {r.po_number && (
                     <span className="text-muted-foreground">PO {r.po_number}</span>
+                  )}
+                </div>
+              </CommandItem>
+            ))}
+          </CommandGroup>
+          <CommandSeparator />
+          <CommandGroup heading="Customers">
+            {customers.map((r) => (
+              <CommandItem key={r.id} onSelect={() => openCustomer(r.id)}>
+                <div className="flex items-center gap-2">
+                  <span className="font-medium">ID: {r.id}</span>
+                  {r.full_name && (
+                    <span className="text-muted-foreground">Name: {r.full_name}</span>
+                  )}
+                  {r.email && (
+                    <span className="text-muted-foreground">Email: {r.email}</span>
+                  )}
+                  {r.phone && (
+                    <span className="text-muted-foreground">Phone: {r.phone}</span>
                   )}
                 </div>
               </CommandItem>

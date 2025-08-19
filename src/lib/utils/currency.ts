@@ -9,6 +9,7 @@ export const formatCurrency = (amount: number, currencyCode: string = 'AED'): st
     'USD': '$',
     'EUR': '€',
     'GBP': '£',
+    'AED': 'AED',
   };
   
   const symbol = symbols[currencyCode] || currencyCode + ' ';
