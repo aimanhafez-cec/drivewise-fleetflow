@@ -449,6 +449,60 @@ export type Database = {
         }
         Relationships: []
       }
+      inspection_in: {
+        Row: {
+          agreement_id: string
+          checklist: Json
+          created_at: string
+          damage_marker_ids: string[] | null
+          device_info: string | null
+          id: string
+          line_id: string
+          location_id: string | null
+          media: Json | null
+          metrics: Json
+          performed_at: string
+          performed_by_user_id: string | null
+          signature: Json | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          agreement_id: string
+          checklist?: Json
+          created_at?: string
+          damage_marker_ids?: string[] | null
+          device_info?: string | null
+          id?: string
+          line_id: string
+          location_id?: string | null
+          media?: Json | null
+          metrics?: Json
+          performed_at?: string
+          performed_by_user_id?: string | null
+          signature?: Json | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          agreement_id?: string
+          checklist?: Json
+          created_at?: string
+          damage_marker_ids?: string[] | null
+          device_info?: string | null
+          id?: string
+          line_id?: string
+          location_id?: string | null
+          media?: Json | null
+          metrics?: Json
+          performed_at?: string
+          performed_by_user_id?: string | null
+          signature?: Json | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       inspection_out: {
         Row: {
           agreement_id: string
@@ -1401,6 +1455,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      agreement_has_locked_in_inspection: {
+        Args: { agreement_id_param: string }
+        Returns: boolean
+      }
       agreement_has_locked_out_inspection: {
         Args: { agreement_id_param: string }
         Returns: boolean

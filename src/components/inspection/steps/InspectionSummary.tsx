@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { RequiredLabel } from '@/components/ui/required-label';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { InspectionOutData } from '@/lib/api/inspection';
+import { InspectionData } from '@/lib/api/inspection';
 import { 
   FileText, 
   CheckCircle, 
@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 
 interface InspectionSummaryProps {
-  inspectionData: Partial<InspectionOutData>;
+  inspectionData: Partial<InspectionData>;
   onSignature: (signature: { imageUrl: string; name: string; signedAt: string }) => void;
 }
 
@@ -193,7 +193,7 @@ export const InspectionSummary: React.FC<InspectionSummaryProps> = ({
                 Odometer (Out):
               </span>
               <Badge variant="outline">
-                {inspectionData.metrics?.odometerOut?.toLocaleString() || 'Not set'}
+                {inspectionData.metrics?.odometer?.toLocaleString() || 'Not set'}
               </Badge>
             </div>
             <div className="flex items-center justify-between">
@@ -202,7 +202,7 @@ export const InspectionSummary: React.FC<InspectionSummaryProps> = ({
                 Fuel Level (Out):
               </span>
               <Badge variant="outline">
-                {inspectionData.metrics?.fuelLevelOut || 'Not set'}
+                {inspectionData.metrics?.fuelLevel || 'Not set'}
               </Badge>
             </div>
             <div className="flex items-center justify-between">
@@ -211,7 +211,7 @@ export const InspectionSummary: React.FC<InspectionSummaryProps> = ({
                 Extras Issued:
               </span>
               <Badge variant="outline">
-                {inspectionData.metrics?.extrasIssued?.length || 0}
+                {inspectionData.metrics?.extras?.length || 0}
               </Badge>
             </div>
           </CardContent>

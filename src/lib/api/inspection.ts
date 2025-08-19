@@ -1,6 +1,8 @@
 import { supabase } from '@/integrations/supabase/client';
 
-export interface InspectionOutData {
+export type InspectionType = 'OUT' | 'IN';
+
+export interface InspectionData {
   id: string;
   agreementId: string;
   lineId: string;
@@ -13,9 +15,9 @@ export interface InspectionOutData {
     accessories: 'OK' | 'DAMAGE';
   };
   metrics: {
-    odometerOut: number;
-    fuelLevelOut: 'E' | 'Q1' | 'H' | 'Q3' | 'F';
-    extrasIssued?: Array<{code: string; qty: number}>;
+    odometer: number;
+    fuelLevel: 'E' | 'Q1' | 'H' | 'Q3' | 'F';
+    extras?: Array<{code: string; qty: number}>;
   };
   damageMarkerIds: string[];
   media: Array<{id: string; url: string; kind: 'PHOTO' | 'VIDEO'; label?: string}>;
@@ -26,29 +28,35 @@ export interface InspectionOutData {
   locationId?: string;
 }
 
+// Legacy type alias for backward compatibility
+export type InspectionOutData = InspectionData;
+
 export interface CreateInspectionRequest {
   agreementId: string;
   lineId: string;
-  checklist?: Partial<InspectionOutData['checklist']>;
-  metrics?: Partial<InspectionOutData['metrics']>;
+  type: InspectionType;
+  checklist?: Partial<InspectionData['checklist']>;
+  metrics?: Partial<InspectionData['metrics']>;
 }
 
 export interface UpdateInspectionRequest {
-  checklist?: Partial<InspectionOutData['checklist']>;
-  metrics?: Partial<InspectionOutData['metrics']>;
+  checklist?: Partial<InspectionData['checklist']>;
+  metrics?: Partial<InspectionData['metrics']>;
   damageMarkerIds?: string[];
-  media?: InspectionOutData['media'];
-  signature?: InspectionOutData['signature'];
+  media?: InspectionData['media'];
+  signature?: InspectionData['signature'];
 }
 
 export const inspectionApi = {
   async startInspection(
     data: CreateInspectionRequest,
     idempotencyKey: string
-  ): Promise<InspectionOutData> {
+  ): Promise<InspectionData> {
+    const tableName = data.type === 'OUT' ? 'inspection_out' : 'inspection_in';
+    
     // Check if inspection already exists for this agreement and line
     const { data: existing } = await supabase
-      .from('inspection_out')
+      .from(tableName)
       .select('*')
       .eq('agreement_id', data.agreementId)
       .eq('line_id', data.lineId)
@@ -60,7 +68,7 @@ export const inspectionApi = {
 
     // Create new inspection
     const { data: newInspection, error } = await supabase
-      .from('inspection_out')
+      .from(tableName)
       .insert({
         agreement_id: data.agreementId,
         line_id: data.lineId,
@@ -77,8 +85,10 @@ export const inspectionApi = {
 
   async updateInspection(
     inspectionId: string,
-    data: UpdateInspectionRequest
-  ): Promise<InspectionOutData> {
+    data: UpdateInspectionRequest,
+    type: InspectionType = 'OUT'
+  ): Promise<InspectionData> {
+    const tableName = type === 'OUT' ? 'inspection_out' : 'inspection_in';
     const updateData: any = {};
     
     if (data.checklist) updateData.checklist = data.checklist;
@@ -88,7 +98,7 @@ export const inspectionApi = {
     if (data.signature) updateData.signature = data.signature;
 
     const { data: updated, error } = await supabase
-      .from('inspection_out')
+      .from(tableName)
       .update(updateData)
       .eq('id', inspectionId)
       .select()
@@ -99,11 +109,14 @@ export const inspectionApi = {
   },
 
   async lockAndAttach(
-    inspectionId: string
+    inspectionId: string,
+    type: InspectionType = 'OUT'
   ): Promise<{ status: 'LOCKED'; pdfUrl?: string }> {
+    const tableName = type === 'OUT' ? 'inspection_out' : 'inspection_in';
+    
     // Update status to LOCKED
     const { error } = await supabase
-      .from('inspection_out')
+      .from(tableName)
       .update({ 
         status: 'LOCKED',
         performed_at: new Date().toISOString() 
@@ -116,9 +129,11 @@ export const inspectionApi = {
     return { status: 'LOCKED' };
   },
 
-  async getInspection(inspectionId: string): Promise<InspectionOutData | null> {
+  async getInspection(inspectionId: string, type: InspectionType = 'OUT'): Promise<InspectionData | null> {
+    const tableName = type === 'OUT' ? 'inspection_out' : 'inspection_in';
+    
     const { data, error } = await supabase
-      .from('inspection_out')
+      .from(tableName)
       .select('*')
       .eq('id', inspectionId)
       .maybeSingle();
@@ -127,9 +142,11 @@ export const inspectionApi = {
     return data ? this.mapDbToInterface(data) : null;
   },
 
-  async getInspectionByAgreement(agreementId: string): Promise<InspectionOutData | null> {
+  async getInspectionByAgreement(agreementId: string, type: InspectionType = 'OUT'): Promise<InspectionData | null> {
+    const tableName = type === 'OUT' ? 'inspection_out' : 'inspection_in';
+    
     const { data, error } = await supabase
-      .from('inspection_out')
+      .from(tableName)
       .select('*')
       .eq('agreement_id', agreementId)
       .maybeSingle();
@@ -138,22 +155,30 @@ export const inspectionApi = {
     return data ? this.mapDbToInterface(data) : null;
   },
 
-  async hasLockedInspection(agreementId: string): Promise<boolean> {
+  async hasLockedInspection(agreementId: string, type: InspectionType = 'OUT'): Promise<boolean> {
+    const functionName = type === 'OUT' 
+      ? 'agreement_has_locked_out_inspection'
+      : 'agreement_has_locked_in_inspection';
+      
     const { data, error } = await supabase
-      .rpc('agreement_has_locked_out_inspection', { agreement_id_param: agreementId });
+      .rpc(functionName, { agreement_id_param: agreementId });
 
     if (error) throw error;
     return data || false;
   },
 
-  mapDbToInterface(dbData: any): InspectionOutData {
+  mapDbToInterface(dbData: any): InspectionData {
     return {
       id: dbData.id,
       agreementId: dbData.agreement_id,
       lineId: dbData.line_id,
       status: dbData.status,
       checklist: dbData.checklist || {},
-      metrics: dbData.metrics || {},
+      metrics: {
+        odometer: dbData.metrics?.odometerOut || dbData.metrics?.odometerIn || dbData.metrics?.odometer || 0,
+        fuelLevel: dbData.metrics?.fuelLevelOut || dbData.metrics?.fuelLevelIn || dbData.metrics?.fuelLevel || 'F',
+        extras: dbData.metrics?.extrasIssued || dbData.metrics?.extrasReturned || dbData.metrics?.extras || []
+      },
       damageMarkerIds: dbData.damage_marker_ids || [],
       media: dbData.media || [],
       signature: dbData.signature,

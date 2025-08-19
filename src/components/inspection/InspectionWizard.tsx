@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { inspectionApi, InspectionOutData, CreateInspectionRequest } from '@/lib/api/inspection';
+import { inspectionApi, InspectionData, CreateInspectionRequest, InspectionType } from '@/lib/api/inspection';
 import { InspectionVehicleAssignment } from './steps/InspectionVehicleAssignment';
 import { InspectionChecklist } from './steps/InspectionChecklist';
 import { InspectionDamage } from './steps/InspectionDamage';
@@ -19,6 +19,7 @@ interface InspectionWizardProps {
   lineId: string;
   onClose: () => void;
   isOpen: boolean;
+  inspectionType?: InspectionType;
 }
 
 type WizardStep = 'assign' | 'checklist' | 'damage' | 'metrics' | 'summary';
@@ -35,10 +36,11 @@ export const InspectionWizard: React.FC<InspectionWizardProps> = ({
   agreementId,
   lineId,
   onClose,
-  isOpen
+  isOpen,
+  inspectionType = 'OUT'
 }) => {
   const [currentStep, setCurrentStep] = useState<WizardStep>('assign');
-  const [inspectionData, setInspectionData] = useState<Partial<InspectionOutData>>({});
+  const [inspectionData, setInspectionData] = useState<Partial<InspectionData>>({});
   const [isDraft, setIsDraft] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -46,9 +48,9 @@ export const InspectionWizard: React.FC<InspectionWizardProps> = ({
 
   // Fetch existing inspection if any
   const { data: existingInspection } = useQuery({
-    queryKey: ['inspection', agreementId, lineId],
+    queryKey: ['inspection', agreementId, lineId, inspectionType],
     queryFn: async () => {
-      return await inspectionApi.getInspectionByAgreement(agreementId);
+      return await inspectionApi.getInspectionByAgreement(agreementId, inspectionType);
     },
     enabled: isOpen,
   });
@@ -87,7 +89,7 @@ export const InspectionWizard: React.FC<InspectionWizardProps> = ({
   const updateInspectionMutation = useMutation({
     mutationFn: async (updateData: any) => {
       if (!inspectionData.id) return;
-      return await inspectionApi.updateInspection(inspectionData.id, updateData);
+      return await inspectionApi.updateInspection(inspectionData.id, updateData, inspectionType);
     },
     onSuccess: (data) => {
       if (data) {
@@ -104,12 +106,12 @@ export const InspectionWizard: React.FC<InspectionWizardProps> = ({
   const lockInspectionMutation = useMutation({
     mutationFn: async () => {
       if (!inspectionData.id) throw new Error('No inspection ID');
-      return await inspectionApi.lockAndAttach(inspectionData.id);
+      return await inspectionApi.lockAndAttach(inspectionData.id, inspectionType);
     },
     onSuccess: () => {
       toast({
         title: 'Inspection Locked',
-        description: 'Pre-rental inspection has been completed and locked to the agreement.'
+        description: `${inspectionType === 'OUT' ? 'Pre-rental' : 'Return'} inspection has been completed and locked to the agreement.`
       });
       queryClient.invalidateQueries({ queryKey: ['inspection'] });
       queryClient.invalidateQueries({ queryKey: ['agreement'] });
@@ -129,7 +131,8 @@ export const InspectionWizard: React.FC<InspectionWizardProps> = ({
     if (isOpen && !existingInspection && !inspectionData.id) {
       startInspectionMutation.mutate({
         agreementId,
-        lineId
+        lineId,
+        type: inspectionType
       });
     }
   }, [isOpen, existingInspection, inspectionData.id]);
@@ -262,8 +265,8 @@ export const InspectionWizard: React.FC<InspectionWizardProps> = ({
         <div className="border-b p-6">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h2 className="text-2xl font-bold">Pre-Rental Inspection</h2>
-              <p className="text-muted-foreground">Complete the vehicle inspection before check-out</p>
+              <h2 className="text-2xl font-bold">{inspectionType === 'OUT' ? 'Pre-Rental' : 'Return'} Inspection</h2>
+              <p className="text-muted-foreground">Complete the vehicle inspection {inspectionType === 'OUT' ? 'before check-out' : 'after return'}</p>
             </div>
             <div className="flex items-center gap-2">
               {isDraft && (
