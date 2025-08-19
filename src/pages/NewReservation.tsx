@@ -510,7 +510,7 @@ const NewReservation = () => {
       ...prev,
       currencies: [{
         id: 'AED',
-        label: 'AED - Egyptian Pound',
+        label: 'AED - Arab Emirates Dirahm',
         value: 'AED'
       }]
     }));

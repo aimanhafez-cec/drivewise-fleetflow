@@ -7,7 +7,7 @@ export function cn(...inputs: ClassValue[]) {
 
 // Currency formatting utility
 export const formatCurrency = (amount: number, currencyCode: string = 'AED'): string => {
-  // Format for Egyptian Pound
+  // Format for Arab Emirates Dirahm
   if (currencyCode === 'AED') {
     return `${amount.toFixed(2)} AED`;
   }
