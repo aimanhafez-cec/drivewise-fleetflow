@@ -321,7 +321,7 @@ const VehicleForm: React.FC<VehicleFormProps> = ({ vehicle, onSuccess }) => {
 
         <div>
           <Label htmlFor="fuel_level">Fuel Level</Label>
-          <Select value={watch('fuel_level')} onValueChange={(value) => setValue('fuel_level', value as any)}>
+          <Select value={watch('fuel_level')?.toString()} onValueChange={(value) => setValue('fuel_level', Number(value))}>
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
