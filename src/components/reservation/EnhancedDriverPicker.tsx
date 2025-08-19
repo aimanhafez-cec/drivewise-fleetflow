@@ -35,7 +35,7 @@ export const EnhancedDriverPicker: React.FC<EnhancedDriverPickerProps> = ({
     email: '',
     date_of_birth: '',
     license_expiry: '',
-    additional_driver_fee: 300.00
+    additional_driver_fee: 25.00
   });
 
   const { items: drivers, isLoading, updateSearch } = useDrivers();
@@ -104,7 +104,7 @@ export const EnhancedDriverPicker: React.FC<EnhancedDriverPickerProps> = ({
         date_of_birth: newDriver.date_of_birth,
         license_expiry: newDriver.license_expiry,
         status: 'active',
-        additional_driver_fee: newDriver.additional_driver_fee || 300.00
+        additional_driver_fee: newDriver.additional_driver_fee || 25.00
       });
 
       const driverWithRole: Driver = {
@@ -121,7 +121,7 @@ export const EnhancedDriverPicker: React.FC<EnhancedDriverPickerProps> = ({
         email: '', 
         date_of_birth: '',
         license_expiry: '',
-        additional_driver_fee: 300.00 
+        additional_driver_fee: 25.00 
       });
       setShowNewDriverModal(false);
       
@@ -298,7 +298,7 @@ export const EnhancedDriverPicker: React.FC<EnhancedDriverPickerProps> = ({
                 type="number"
                 min="0"
                 step="0.01"
-                value={newDriver.additional_driver_fee || 300.00}
+                value={newDriver.additional_driver_fee || 25.00}
                 onChange={(e) => setNewDriver(prev => ({ ...prev, additional_driver_fee: parseFloat(e.target.value) || 0 }))}
               />
             </div>

@@ -54,7 +54,7 @@ export const useCreateDriver = () => {
           date_of_birth: driver.date_of_birth,
           license_expiry: driver.license_expiry,
           status: driver.status || 'active',
-          additional_driver_fee: driver.additional_driver_fee || 300.00
+          additional_driver_fee: driver.additional_driver_fee || 25.00
         })
         .select()
         .single();
