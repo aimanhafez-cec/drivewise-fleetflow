@@ -49,8 +49,9 @@ export const EnhancedDriverPicker: React.FC<EnhancedDriverPickerProps> = ({
     !selectedDrivers.find(selected => selected.id === driver.id)
   );
 
-  const handleDriverSelect = (driverIds: string[]) => {
-    const newDriverId = driverIds[driverIds.length - 1]; // Get the last selected ID
+  const handleDriverSelect = (driverId: string | string[] | undefined) => {
+    // Handle single string (when multiple=false) or array
+    const newDriverId = Array.isArray(driverId) ? driverId[driverId.length - 1] : driverId;
     if (!newDriverId) return;
 
     const driver = drivers.find(d => d.id === newDriverId);
@@ -196,7 +197,7 @@ export const EnhancedDriverPicker: React.FC<EnhancedDriverPickerProps> = ({
                       )}
                       {driver.role === 'ADDITIONAL' && driver.additional_driver_fee > 0 && (
                         <Badge variant="secondary" className="text-xs px-2 py-0">
-                          +${driver.additional_driver_fee}
+                          +AED{driver.additional_driver_fee}
                         </Badge>
                       )}
                     </div>

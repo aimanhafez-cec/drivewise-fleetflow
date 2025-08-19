@@ -143,7 +143,17 @@ export const agreementsApi = {
           year
         ),
         agreement_lines (
-          *
+          *,
+          vehicles (
+            id,
+            make,
+            model,
+            license_plate,
+            year,
+            color,
+            vin,
+            status
+          )
         )
       `)
       .eq('id', id)

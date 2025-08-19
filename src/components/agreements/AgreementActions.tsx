@@ -1,9 +1,16 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { toast } from '@/hooks/use-toast';
-import { Printer, Mail, Download, Clipboard } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { useQuery } from '@tanstack/react-query';
 import { InspectionWizard } from '@/components/inspection/InspectionWizard';
+import { inspectionApi, InspectionType } from '@/lib/api/inspection';
+import { 
+  Printer, 
+  Mail, 
+  Download, 
+  ClipboardCheck, 
+  ClipboardX 
+} from 'lucide-react';
 
 interface AgreementActionsProps {
   agreementId: string;
@@ -19,8 +26,35 @@ export const AgreementActions: React.FC<AgreementActionsProps> = ({
   agreementLines = []
 }) => {
   const [showInspectionWizard, setShowInspectionWizard] = useState(false);
+  const [currentInspectionType, setCurrentInspectionType] = useState<InspectionType>('OUT');
+  const { toast } = useToast();
 
-  const canStartInspection = agreementStatus === 'active' && agreementLines.length > 0;
+  // Check if inspections are locked
+  const { data: hasLockedOutInspection } = useQuery({
+    queryKey: ['inspection-out-locked', agreementId],
+    queryFn: () => inspectionApi.hasLockedInspection(agreementId, 'OUT'),
+    enabled: !!agreementId,
+  });
+
+  const { data: hasLockedInInspection } = useQuery({
+    queryKey: ['inspection-in-locked', agreementId],
+    queryFn: () => inspectionApi.hasLockedInspection(agreementId, 'IN'),
+    enabled: !!agreementId,
+  });
+
+  const canStartOutInspection = agreementStatus === 'active' && 
+    agreementLines.length > 0 && 
+    agreementLines.some(line => line.vehicle_id) &&
+    !hasLockedOutInspection;
+
+  const canStartInInspection = agreementStatus === 'pending_return' && 
+    hasLockedOutInspection && 
+    !hasLockedInInspection;
+
+  const handleStartInspection = (type: InspectionType) => {
+    setCurrentInspectionType(type);
+    setShowInspectionWizard(true);
+  };
 
   const handlePrint = async () => {
     try {
@@ -82,14 +116,29 @@ export const AgreementActions: React.FC<AgreementActionsProps> = ({
   return (
     <>
       <div className="flex items-center space-x-2">
-        {canStartInspection && (
+        {canStartOutInspection && (
           <Button
             id="btn-start-inspection-out"
-            onClick={() => setShowInspectionWizard(true)}
-            className="mr-2"
+            variant="default"
+            size="sm"
+            onClick={() => handleStartInspection('OUT')}
+            className="bg-blue-600 hover:bg-blue-700"
           >
-            <Clipboard className="mr-2 h-4 w-4" />
+            <ClipboardCheck className="mr-2 h-4 w-4" />
             Start Inspection (OUT)
+          </Button>
+        )}
+        
+        {canStartInInspection && (
+          <Button
+            id="btn-start-inspection-in"
+            variant="default"
+            size="sm"
+            onClick={() => handleStartInspection('IN')}
+            className="bg-orange-600 hover:bg-orange-700"
+          >
+            <ClipboardX className="mr-2 h-4 w-4" />
+            Start Inspection (IN)
           </Button>
         )}
         
@@ -125,6 +174,7 @@ export const AgreementActions: React.FC<AgreementActionsProps> = ({
         <InspectionWizard
           agreementId={agreementId}
           lineId={agreementLines[0].id}
+          inspectionType={currentInspectionType}
           isOpen={showInspectionWizard}
           onClose={() => setShowInspectionWizard(false)}
         />

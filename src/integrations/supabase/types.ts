@@ -218,8 +218,12 @@ export type Database = {
       customers: {
         Row: {
           address: Json | null
+          approval_required: boolean | null
+          corporate_account_id: string | null
           created_at: string
+          credit_limit: number | null
           credit_rating: number | null
+          customer_type: Database["public"]["Enums"]["customer_type"] | null
           date_of_birth: string | null
           email: string
           emergency_contact: Json | null
@@ -236,8 +240,12 @@ export type Database = {
         }
         Insert: {
           address?: Json | null
+          approval_required?: boolean | null
+          corporate_account_id?: string | null
           created_at?: string
+          credit_limit?: number | null
           credit_rating?: number | null
+          customer_type?: Database["public"]["Enums"]["customer_type"] | null
           date_of_birth?: string | null
           email: string
           emergency_contact?: Json | null
@@ -254,8 +262,12 @@ export type Database = {
         }
         Update: {
           address?: Json | null
+          approval_required?: boolean | null
+          corporate_account_id?: string | null
           created_at?: string
+          credit_limit?: number | null
           credit_rating?: number | null
+          customer_type?: Database["public"]["Enums"]["customer_type"] | null
           date_of_birth?: string | null
           email?: string
           emergency_contact?: Json | null
@@ -437,6 +449,60 @@ export type Database = {
         }
         Relationships: []
       }
+      inspection_in: {
+        Row: {
+          agreement_id: string
+          checklist: Json
+          created_at: string
+          damage_marker_ids: string[] | null
+          device_info: string | null
+          id: string
+          line_id: string
+          location_id: string | null
+          media: Json | null
+          metrics: Json
+          performed_at: string
+          performed_by_user_id: string | null
+          signature: Json | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          agreement_id: string
+          checklist?: Json
+          created_at?: string
+          damage_marker_ids?: string[] | null
+          device_info?: string | null
+          id?: string
+          line_id: string
+          location_id?: string | null
+          media?: Json | null
+          metrics?: Json
+          performed_at?: string
+          performed_by_user_id?: string | null
+          signature?: Json | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          agreement_id?: string
+          checklist?: Json
+          created_at?: string
+          damage_marker_ids?: string[] | null
+          device_info?: string | null
+          id?: string
+          line_id?: string
+          location_id?: string | null
+          media?: Json | null
+          metrics?: Json
+          performed_at?: string
+          performed_by_user_id?: string | null
+          signature?: Json | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       inspection_out: {
         Row: {
           agreement_id: string
@@ -553,6 +619,98 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      instant_booking_profiles: {
+        Row: {
+          auto_approve_limit: number | null
+          created_at: string
+          customer_id: string
+          default_rental_duration: unknown | null
+          id: string
+          notification_preferences: Json | null
+          preferred_locations: string[] | null
+          preferred_vehicle_categories: string[] | null
+          saved_payment_methods: Json | null
+          updated_at: string
+        }
+        Insert: {
+          auto_approve_limit?: number | null
+          created_at?: string
+          customer_id: string
+          default_rental_duration?: unknown | null
+          id?: string
+          notification_preferences?: Json | null
+          preferred_locations?: string[] | null
+          preferred_vehicle_categories?: string[] | null
+          saved_payment_methods?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          auto_approve_limit?: number | null
+          created_at?: string
+          customer_id?: string
+          default_rental_duration?: unknown | null
+          id?: string
+          notification_preferences?: Json | null
+          preferred_locations?: string[] | null
+          preferred_vehicle_categories?: string[] | null
+          saved_payment_methods?: Json | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "instant_booking_profiles_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: true
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      instant_booking_rules: {
+        Row: {
+          advance_booking_hours: number | null
+          blackout_dates: Json | null
+          business_rules: Json | null
+          created_at: string
+          customer_type: Database["public"]["Enums"]["customer_type"]
+          id: string
+          is_active: boolean | null
+          location_id: string | null
+          max_auto_approve_amount: number
+          requires_approval: boolean | null
+          updated_at: string
+          vehicle_category_id: string | null
+        }
+        Insert: {
+          advance_booking_hours?: number | null
+          blackout_dates?: Json | null
+          business_rules?: Json | null
+          created_at?: string
+          customer_type: Database["public"]["Enums"]["customer_type"]
+          id?: string
+          is_active?: boolean | null
+          location_id?: string | null
+          max_auto_approve_amount?: number
+          requires_approval?: boolean | null
+          updated_at?: string
+          vehicle_category_id?: string | null
+        }
+        Update: {
+          advance_booking_hours?: number | null
+          blackout_dates?: Json | null
+          business_rules?: Json | null
+          created_at?: string
+          customer_type?: Database["public"]["Enums"]["customer_type"]
+          id?: string
+          is_active?: boolean | null
+          location_id?: string | null
+          max_auto_approve_amount?: number
+          requires_approval?: boolean | null
+          updated_at?: string
+          vehicle_category_id?: string | null
+        }
+        Relationships: []
       }
       invoices: {
         Row: {
@@ -884,13 +1042,16 @@ export type Database = {
         Row: {
           add_ons: Json | null
           airport_info: Json | null
+          auto_approved: boolean | null
           billing_address: Json | null
+          booking_type: Database["public"]["Enums"]["booking_type"] | null
           converted_agreement_id: string | null
           created_at: string
           created_by: string | null
           customer_id: string
           end_datetime: string
           id: string
+          instant_booking_score: number | null
           pickup_location: string
           po_number: string | null
           rate_plan: Json | null
@@ -908,13 +1069,16 @@ export type Database = {
         Insert: {
           add_ons?: Json | null
           airport_info?: Json | null
+          auto_approved?: boolean | null
           billing_address?: Json | null
+          booking_type?: Database["public"]["Enums"]["booking_type"] | null
           converted_agreement_id?: string | null
           created_at?: string
           created_by?: string | null
           customer_id: string
           end_datetime: string
           id?: string
+          instant_booking_score?: number | null
           pickup_location: string
           po_number?: string | null
           rate_plan?: Json | null
@@ -932,13 +1096,16 @@ export type Database = {
         Update: {
           add_ons?: Json | null
           airport_info?: Json | null
+          auto_approved?: boolean | null
           billing_address?: Json | null
+          booking_type?: Database["public"]["Enums"]["booking_type"] | null
           converted_agreement_id?: string | null
           created_at?: string
           created_by?: string | null
           customer_id?: string
           end_datetime?: string
           id?: string
+          instant_booking_score?: number | null
           pickup_location?: string
           po_number?: string | null
           rate_plan?: Json | null
@@ -1288,6 +1455,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      agreement_has_locked_in_inspection: {
+        Args: { agreement_id_param: string }
+        Returns: boolean
+      }
       agreement_has_locked_out_inspection: {
         Args: { agreement_id_param: string }
         Returns: boolean
@@ -1307,6 +1478,8 @@ export type Database = {
     }
     Enums: {
       agreement_status: "active" | "completed" | "terminated" | "pending_return"
+      booking_type: "INSTANT" | "STANDARD"
+      customer_type: "B2B" | "B2C" | "CORPORATE"
       damage_type:
         | "scratch"
         | "dent"
@@ -1468,6 +1641,8 @@ export const Constants = {
   public: {
     Enums: {
       agreement_status: ["active", "completed", "terminated", "pending_return"],
+      booking_type: ["INSTANT", "STANDARD"],
+      customer_type: ["B2B", "B2C", "CORPORATE"],
       damage_type: [
         "scratch",
         "dent",

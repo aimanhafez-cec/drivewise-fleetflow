@@ -23,6 +23,7 @@ import NewQuote from "./pages/NewQuote";
 import QuoteDetails from "./pages/QuoteDetails";
 import Inspections from "./pages/Inspections";
 import NewInspection from "./pages/NewInspection";
+import InspectionDetails from "./pages/InspectionDetails";
 import ReservationDetails from "./pages/ReservationDetails";
 import ReservationDetailsPage from "./pages/ReservationDetailsPage";
 import Agreements from "./pages/Agreements";
@@ -32,6 +33,7 @@ import RFQs from "./pages/RFQs";
 import NewRFQ from "./pages/NewRFQ";
 import RFQDetails from "./pages/RFQDetails";
 import CustomerDetails from "./pages/CustomerDetails";
+import InstantBooking from "./pages/InstantBooking";
 
 const queryClient = new QueryClient();
 
@@ -51,6 +53,13 @@ const App = () => (
               </ProtectedRoute>
             }>
               <Route index element={<Dashboard />} />
+            </Route>
+            <Route path="/instant-booking" element={
+              <ProtectedRoute>
+                <AppLayout />
+              </ProtectedRoute>
+            }>
+              <Route index element={<InstantBooking />} />
             </Route>
               <Route path="/reservations" element={
                 <ProtectedRoute>
@@ -140,6 +149,7 @@ const App = () => (
             }>
               <Route index element={<Inspections />} />
               <Route path="new" element={<NewInspection />} />
+              <Route path=":id" element={<InspectionDetails />} />
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

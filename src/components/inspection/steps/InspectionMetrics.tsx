@@ -26,9 +26,9 @@ const EXTRA_ITEMS = [
 ];
 
 interface MetricsData {
-  odometerOut?: number;
-  fuelLevelOut?: 'E' | 'Q1' | 'H' | 'Q3' | 'F';
-  extrasIssued?: Array<{code: string; qty: number}>;
+  odometer?: number;
+  fuelLevel?: 'E' | 'Q1' | 'H' | 'Q3' | 'F';
+  extras?: Array<{code: string; qty: number}>;
 }
 
 interface InspectionMetricsProps {
@@ -51,12 +51,12 @@ export const InspectionMetrics: React.FC<InspectionMetricsProps> = ({
   const handleOdometerChange = (value: string) => {
     const numValue = parseInt(value);
     if (!isNaN(numValue) && numValue >= 0) {
-      const newMetrics = { ...metrics, odometerOut: numValue };
+      const newMetrics = { ...metrics, odometer: numValue };
       setMetrics(newMetrics);
       onUpdate(newMetrics);
       setErrors(prev => ({ ...prev, odometer: '' }));
     } else if (value === '') {
-      const newMetrics = { ...metrics, odometerOut: undefined };
+      const newMetrics = { ...metrics, odometer: undefined };
       setMetrics(newMetrics);
       onUpdate(newMetrics);
     } else {
@@ -65,14 +65,14 @@ export const InspectionMetrics: React.FC<InspectionMetricsProps> = ({
   };
 
   const handleFuelLevelChange = (value: 'E' | 'Q1' | 'H' | 'Q3' | 'F') => {
-    const newMetrics = { ...metrics, fuelLevelOut: value };
+    const newMetrics = { ...metrics, fuelLevel: value };
     setMetrics(newMetrics);
     onUpdate(newMetrics);
     setErrors(prev => ({ ...prev, fuel: '' }));
   };
 
   const handleExtraChange = (code: string, checked: boolean, qty: number = 1) => {
-    const currentExtras = metrics.extrasIssued || [];
+    const currentExtras = metrics.extras || [];
     let newExtras;
     
     if (checked) {
@@ -87,17 +87,17 @@ export const InspectionMetrics: React.FC<InspectionMetricsProps> = ({
       newExtras = currentExtras.filter(e => e.code !== code);
     }
     
-    const newMetrics = { ...metrics, extrasIssued: newExtras };
+    const newMetrics = { ...metrics, extras: newExtras };
     setMetrics(newMetrics);
     onUpdate(newMetrics);
   };
 
   const getExtraQty = (code: string) => {
-    return metrics.extrasIssued?.find(e => e.code === code)?.qty || 1;
+    return metrics.extras?.find(e => e.code === code)?.qty || 1;
   };
 
   const isExtraSelected = (code: string) => {
-    return metrics.extrasIssued?.some(e => e.code === code) || false;
+    return metrics.extras?.some(e => e.code === code) || false;
   };
 
   const takeFuelPhoto = () => {
@@ -108,11 +108,11 @@ export const InspectionMetrics: React.FC<InspectionMetricsProps> = ({
   const validateRequiredFields = () => {
     const newErrors: Record<string, string> = {};
     
-    if (!metrics.odometerOut) {
+    if (!metrics.odometer) {
       newErrors.odometer = 'Odometer reading is required';
     }
     
-    if (!metrics.fuelLevelOut) {
+    if (!metrics.fuelLevel) {
       newErrors.fuel = 'Fuel level is required';
     }
     
@@ -120,7 +120,7 @@ export const InspectionMetrics: React.FC<InspectionMetricsProps> = ({
     return Object.keys(newErrors).length === 0;
   };
 
-  const isComplete = metrics.odometerOut && metrics.fuelLevelOut;
+  const isComplete = metrics.odometer && metrics.fuelLevel;
 
   return (
     <div id="step-metrics" className="space-y-6">
@@ -166,7 +166,7 @@ export const InspectionMetrics: React.FC<InspectionMetricsProps> = ({
               type="number"
               min="0"
               placeholder="Enter current odometer reading"
-              value={metrics.odometerOut || ''}
+              value={metrics.odometer || ''}
               onChange={(e) => handleOdometerChange(e.target.value)}
               className={errors.odometer ? 'border-red-500' : ''}
               aria-required="true"
@@ -190,7 +190,7 @@ export const InspectionMetrics: React.FC<InspectionMetricsProps> = ({
           <div>
             <RequiredLabel htmlFor="fuel-out">Fuel Level (Out) *</RequiredLabel>
             <Select
-              value={metrics.fuelLevelOut || ''}
+              value={metrics.fuelLevel || ''}
               onValueChange={handleFuelLevelChange}
             >
               <SelectTrigger id="fuel-out" className={errors.fuel ? 'border-red-500' : ''}>

@@ -13,7 +13,8 @@ import {
   LogOut,
   Menu,
   Bell,
-  MessageCircleQuestion
+  MessageCircleQuestion,
+  Zap
 } from 'lucide-react';
 import {
   Sidebar,
@@ -39,6 +40,11 @@ const navigation = [
     title: 'Dashboard',
     url: '/dashboard',
     icon: LayoutDashboard,
+  },
+  {
+    title: 'Instant Booking',
+    url: '/instant-booking',
+    icon: Zap,
   },
   {
     title: 'Reservations',

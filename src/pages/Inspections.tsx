@@ -1,92 +1,273 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Plus, ClipboardCheck } from "lucide-react";
+import { Plus, BarChart3, ClipboardCheck, FileText, AlertTriangle } from "lucide-react";
+import { InspectionFilters } from "@/components/inspections/InspectionFilters";
+import { InspectionsList } from "@/components/inspections/InspectionsList";
 
-interface Inspection {
+interface UnifiedInspection {
   id: string;
-  inspection_date: string;
-  status: string | null;
-  odometer: number | null;
-  fuel_level: number | null;
+  type: 'OUT' | 'IN' | 'LEGACY';
+  status: string;
+  performed_at: string;
+  inspection_date?: string;
+  agreement_id?: string;
+  vehicle_id?: string;
+  location_id?: string;
+  agreements?: {
+    agreement_no: string;
+    vehicle_id: string;
+  };
+  vehicles?: {
+    make: string;
+    model: string;
+    year: number;
+    license_plate: string;
+  };
+  reservations?: {
+    ro_number: string;
+  };
+  checklist?: any;
+  metrics?: any;
+  damage_marker_ids?: string[];
 }
-
-const statusColor = (s?: string | null) => {
-  switch (s) {
-    case "passed":
-      return "bg-green-100 text-green-800";
-    case "failed":
-      return "bg-red-100 text-red-800";
-    case "needs_attention":
-      return "bg-yellow-100 text-yellow-800";
-    default:
-      return "bg-gray-100 text-gray-800";
-  }
-};
 
 const Inspections: React.FC = () => {
   const navigate = useNavigate();
+  
+  // Filter states
+  const [searchQuery, setSearchQuery] = useState("");
+  const [typeFilter, setTypeFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [dateFilter, setDateFilter] = useState("all");
 
-  useEffect(() => { document.title = "Inspections | CEC Car Rental"; }, []);
+  useEffect(() => { 
+    document.title = "Inspections | CEC Car Rental"; 
+  }, []);
 
-  const { data: inspections = [] } = useQuery({
-    queryKey: ["inspections"],
+  // Fetch unified inspections from all tables
+  const { data: allInspections = [], isLoading } = useQuery({
+    queryKey: ["inspections-unified"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const inspections: UnifiedInspection[] = [];
+
+      // Fetch inspection_out
+      const { data: outData } = await supabase
+        .from("inspection_out")
+        .select(`
+          id, status, performed_at, agreement_id, line_id, location_id, 
+          checklist, metrics, damage_marker_ids, created_at, updated_at
+        `)
+        .order("performed_at", { ascending: false });
+
+      if (outData) {
+        inspections.push(...outData.map(item => ({ ...item, type: 'OUT' as const })));
+      }
+
+      // Fetch inspection_in
+      const { data: inData } = await supabase
+        .from("inspection_in")
+        .select(`
+          id, status, performed_at, agreement_id, line_id, location_id, 
+          checklist, metrics, damage_marker_ids, created_at, updated_at
+        `)
+        .order("performed_at", { ascending: false });
+
+      if (inData) {
+        inspections.push(...inData.map(item => ({ ...item, type: 'IN' as const })));
+      }
+
+      // Fetch legacy inspections
+      const { data: legacyData } = await supabase
         .from("inspections")
-        .select("id, inspection_date, status, odometer, fuel_level")
+        .select(`
+          *,
+          vehicles(make, model, year, license_plate),
+          reservations(ro_number)
+        `)
         .order("inspection_date", { ascending: false });
-      if (error) throw error;
-      return (data || []) as Inspection[];
+
+      if (legacyData) {
+        inspections.push(...legacyData.map(item => ({ 
+          ...item, 
+          type: 'LEGACY' as const,
+          performed_at: item.inspection_date 
+        })));
+      }
+
+      // Sort all inspections by date
+      return inspections.sort((a, b) => 
+        new Date(b.performed_at || b.inspection_date || 0).getTime() - 
+        new Date(a.performed_at || a.inspection_date || 0).getTime()
+      );
     },
   });
 
+  // Apply filters
+  const filteredInspections = useMemo(() => {
+    return allInspections.filter(inspection => {
+      // Search filter
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        const searchString = `
+          ${inspection.id} 
+          ${inspection.agreements?.agreement_no || ''} 
+          ${inspection.vehicles?.make || ''} 
+          ${inspection.vehicles?.model || ''} 
+          ${inspection.vehicles?.license_plate || ''}
+          ${inspection.reservations?.ro_number || ''}
+        `.toLowerCase();
+        
+        if (!searchString.includes(query)) return false;
+      }
+
+      // Type filter
+      if (typeFilter !== "all" && inspection.type !== typeFilter) return false;
+
+      // Status filter  
+      if (statusFilter !== "all" && inspection.status !== statusFilter) return false;
+
+      // Date filter
+      if (dateFilter !== "all") {
+        const inspectionDate = new Date(inspection.performed_at || inspection.inspection_date || '');
+        const now = new Date();
+        
+        switch (dateFilter) {
+          case "today":
+            if (inspectionDate.toDateString() !== now.toDateString()) return false;
+            break;
+          case "week":
+            const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+            if (inspectionDate < weekAgo) return false;
+            break;
+          case "month":
+            const monthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+            if (inspectionDate < monthAgo) return false;
+            break;
+          case "quarter":
+            const quarterAgo = new Date(now.getFullYear(), now.getMonth() - 3, now.getDate());
+            if (inspectionDate < quarterAgo) return false;
+            break;
+        }
+      }
+
+      return true;
+    });
+  }, [allInspections, searchQuery, typeFilter, statusFilter, dateFilter]);
+
+  // Calculate stats
+  const stats = useMemo(() => {
+    const total = allInspections.length;
+    const locked = allInspections.filter(i => i.status === 'LOCKED').length;
+    const drafts = allInspections.filter(i => i.status === 'DRAFT').length;
+    const failed = allInspections.filter(i => i.status === 'failed').length;
+
+    return { total, locked, drafts, failed };
+  }, [allInspections]);
+
+  const hasActiveFilters = Boolean(searchQuery || typeFilter !== "all" || statusFilter !== "all" || dateFilter !== "all");
+
+  const clearFilters = () => {
+    setSearchQuery("");
+    setTypeFilter("all");
+    setStatusFilter("all");
+    setDateFilter("all");
+  };
+
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Inspections</h1>
-          <p className="text-muted-foreground">Record pre/post-rental vehicle inspections</p>
+          <p className="text-muted-foreground">Manage vehicle inspections and quality checks</p>
         </div>
         <Button onClick={() => navigate("/inspections/new")}>
           <Plus className="mr-2 h-4 w-4" /> New Inspection
         </Button>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Recent Inspections</CardTitle>
-          <CardDescription>Most recent vehicle inspections</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {inspections.length === 0 && (
-              <p className="text-sm text-muted-foreground">No inspections yet.</p>
-            )}
-            {inspections.map((insp) => (
-              <div key={insp.id} className="flex items-center justify-between p-4 border rounded-lg">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                    <ClipboardCheck className="h-5 w-5 text-primary" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">#{insp.id.slice(0,8)}</p>
-                    <p className="text-xs text-muted-foreground">{new Date(insp.inspection_date).toLocaleString()}</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="text-sm">Odo: {insp.odometer ?? '-'} • Fuel: {insp.fuel_level ?? '-'}</p>
-                </div>
-                <Badge className={statusColor(insp.status || undefined)}>{insp.status || 'n/a'}</Badge>
+      {/* Stats Cards */}
+      <div className="grid gap-4 md:grid-cols-4">
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                <FileText className="h-5 w-5 text-primary" />
               </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-muted-foreground">Total</p>
+                <p className="text-2xl font-bold">{stats.total}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-100 dark:bg-green-900">
+                <ClipboardCheck className="h-5 w-5 text-green-600 dark:text-green-400" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-muted-foreground">Completed</p>
+                <p className="text-2xl font-bold">{stats.locked}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-yellow-100 dark:bg-yellow-900">
+                <BarChart3 className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-muted-foreground">Drafts</p>
+                <p className="text-2xl font-bold">{stats.drafts}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-100 dark:bg-red-900">
+                <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-muted-foreground">Issues</p>
+                <p className="text-2xl font-bold">{stats.failed}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Filters */}
+      <InspectionFilters
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        typeFilter={typeFilter}
+        onTypeFilterChange={setTypeFilter}
+        statusFilter={statusFilter}
+        onStatusFilterChange={setStatusFilter}
+        dateFilter={dateFilter}
+        onDateFilterChange={setDateFilter}
+        onClearFilters={clearFilters}
+        hasActiveFilters={hasActiveFilters}
+      />
+
+      {/* Inspections List */}
+      <InspectionsList
+        inspections={filteredInspections}
+        isLoading={isLoading}
+      />
     </div>
   );
 };

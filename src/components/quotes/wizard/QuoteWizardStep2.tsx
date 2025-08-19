@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { MapPin, Calendar } from "lucide-react";
+import { LocationSelect } from "@/components/ui/select-components";
 
 interface QuoteWizardStep2Props {
   data: any;
@@ -47,11 +48,10 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
 
             <div className="space-y-2">
               <Label htmlFor="pickup_location">Pickup Location *</Label>
-              <Input
-                id="pickup_location"
+              <LocationSelect
                 value={data.pickup_location || ""}
-                onChange={(e) => onChange({ pickup_location: e.target.value })}
-                placeholder="Enter pickup location"
+                onChange={(locationId) => onChange({ pickup_location: locationId })}
+                placeholder="Select pickup location"
               />
               {errors.pickup_location && (
                 <p className="text-sm text-destructive">{errors.pickup_location}</p>
@@ -81,11 +81,10 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
 
             <div className="space-y-2">
               <Label htmlFor="return_location">Return Location *</Label>
-              <Input
-                id="return_location"
+              <LocationSelect
                 value={data.return_location || ""}
-                onChange={(e) => onChange({ return_location: e.target.value })}
-                placeholder="Enter return location"
+                onChange={(locationId) => onChange({ return_location: locationId })}
+                placeholder="Select return location"
               />
               {errors.return_location && (
                 <p className="text-sm text-destructive">{errors.return_location}</p>

@@ -26,7 +26,10 @@ const AgreementDetails = () => {
   const { data: agreement, isLoading, refetch } = useQuery({
     queryKey: ['agreement', id],
     queryFn: async () => {
-      const { data, error } = await supabase
+      if (!id) return null;
+      
+      // Get agreement with lines
+      const { data: agreementData, error: agreementError } = await supabase
         .from('agreements')
         .select(`
           *,
@@ -35,15 +38,7 @@ const AgreementDetails = () => {
             email,
             phone
           ),
-          vehicles (
-            make,
-            model,
-            license_plate,
-            year
-          ),
-          agreement_lines (
-            *
-          ),
+          agreement_lines (*),
           reservations:reservation_id (
             id,
             start_datetime,
@@ -53,8 +48,35 @@ const AgreementDetails = () => {
         .eq('id', id)
         .maybeSingle();
 
-      if (error) throw error;
-      return data;
+      if (agreementError) throw agreementError;
+      if (!agreementData) return null;
+
+      // Get vehicles for the agreement lines
+      const vehicleIds = agreementData.agreement_lines
+        ?.map(line => line.vehicle_id)
+        .filter(Boolean) || [];
+
+      let vehiclesData: any[] = [];
+      if (vehicleIds.length > 0) {
+        const { data: vehicles, error: vehiclesError } = await supabase
+          .from('vehicles')
+          .select('id, make, model, license_plate, year, color, vin, status')
+          .in('id', vehicleIds);
+        
+        if (vehiclesError) throw vehiclesError;
+        vehiclesData = vehicles || [];
+      }
+
+      // Merge vehicle data with agreement lines
+      const enrichedLines = agreementData.agreement_lines?.map(line => ({
+        ...line,
+        vehicle: vehiclesData.find(v => v.id === line.vehicle_id) || null
+      })) || [];
+
+      return {
+        ...agreementData,
+        agreement_lines: enrichedLines
+      };
     },
     enabled: !!id,
   });
@@ -211,22 +233,41 @@ const AgreementDetails = () => {
             <CardTitle className="text-lg">Vehicle Information</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {agreement.vehicles ? (
-              <>
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Vehicle</p>
-                  <p className="font-medium">
-                    {agreement.vehicles.year} {agreement.vehicles.make} {agreement.vehicles.model}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">License Plate</p>
-                  <p>{agreement.vehicles.license_plate}</p>
-                </div>
-              </>
-            ) : (
-              <p className="text-muted-foreground">No vehicle assigned</p>
-            )}
+            {(() => {
+              const vehicleFromLine = agreement.agreement_lines?.find(line => line.vehicle_id)?.vehicle;
+              return vehicleFromLine ? (
+                <>
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Vehicle</p>
+                    <p className="font-medium">
+                      {vehicleFromLine.year} {vehicleFromLine.make} {vehicleFromLine.model}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">License Plate</p>
+                    <p>{vehicleFromLine.license_plate}</p>
+                  </div>
+                  {vehicleFromLine.color && (
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">Color</p>
+                      <p>{vehicleFromLine.color}</p>
+                    </div>
+                  )}
+                  {vehicleFromLine.vin && (
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">VIN</p>
+                      <p className="font-mono text-sm">{vehicleFromLine.vin}</p>
+                    </div>
+                  )}
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Status</p>
+                    <p className="capitalize">{vehicleFromLine.status}</p>
+                  </div>
+                </>
+              ) : (
+                <p className="text-muted-foreground">No vehicle assigned</p>
+              );
+            })()}
           </CardContent>
         </Card>
 
