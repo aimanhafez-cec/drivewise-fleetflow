@@ -32,6 +32,7 @@ import RFQs from "./pages/RFQs";
 import NewRFQ from "./pages/NewRFQ";
 import RFQDetails from "./pages/RFQDetails";
 import CustomerDetails from "./pages/CustomerDetails";
+import InstantBooking from "./pages/InstantBooking";
 
 const queryClient = new QueryClient();
 
@@ -51,6 +52,13 @@ const App = () => (
               </ProtectedRoute>
             }>
               <Route index element={<Dashboard />} />
+            </Route>
+            <Route path="/instant-booking" element={
+              <ProtectedRoute>
+                <AppLayout />
+              </ProtectedRoute>
+            }>
+              <Route index element={<InstantBooking />} />
             </Route>
               <Route path="/reservations" element={
                 <ProtectedRoute>

@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Car, Calendar, Users, DollarSign, AlertTriangle, Search, MapPin, Clock, CreditCard } from 'lucide-react';
+import { Car, Calendar, Users, DollarSign, AlertTriangle, Search, MapPin, Clock, CreditCard, Zap } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Area, AreaChart } from 'recharts';
 import { useNavigate } from 'react-router-dom';
 const Dashboard = () => {
@@ -207,6 +207,13 @@ const Dashboard = () => {
               <SelectItem value="middletown">Locations</SelectItem>
             </SelectContent>
           </Select>
+          <Button 
+            className="bg-gradient-primary hover:opacity-90 text-white px-6 py-2 font-medium shadow-elegant" 
+            onClick={() => navigate('/instant-booking')}
+          >
+            <Zap className="h-4 w-4 mr-2" />
+            Instant Book
+          </Button>
           <Button className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2" onClick={() => navigate('/reservations/new')}>
             Reservations
           </Button>
