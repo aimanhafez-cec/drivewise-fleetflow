@@ -41,7 +41,6 @@ import { useReservationValidation } from '@/hooks/useReservationValidation';
 import { BillToSelector, BillToData, BillToType, BillToMeta } from '@/components/ui/bill-to-selector';
 import { useVehicles, useVehicleCategories, formatVehicleDisplay } from '@/hooks/useVehicles';
 import { Driver } from '@/hooks/useDrivers';
-
 const STORAGE_KEY = 'new-reservation-draft';
 
 // Extended interfaces for new sections
@@ -74,11 +73,10 @@ export interface ReservationLine {
   discounts: any[];
   priceSource?: 'panel' | 'pricelist';
 }
-
 interface ExtendedFormData extends ReservationFormData {
   // Reservation Lines
   reservationLines: ReservationLine[];
-  
+
   // Vehicle & Driver
   vehicleClassId: string;
   vehicleId: string;
@@ -87,7 +85,7 @@ interface ExtendedFormData extends ReservationFormData {
   checkInDate: Date | null;
   checkInLocationId: string;
   drivers: Driver[];
-  
+
   // Airport Information
   enableAirportInfo: boolean;
   arrivalFlightNo: string;
@@ -104,7 +102,7 @@ interface ExtendedFormData extends ReservationFormData {
   departureDateTime: Date | null;
   departureAirline: string;
   departurePassengers: number;
-  
+
   // Rate & Taxes
   priceListId: string;
   promotionCode: string;
@@ -121,10 +119,10 @@ interface ExtendedFormData extends ReservationFormData {
   dailyKilometerAllowed: number;
   totalDays: number;
   totalKilometerAllowed: number;
-  
+
   // Miscellaneous Charges
   selectedMiscCharges: string[];
-  
+
   // Bill To
   bill_to_type: BillToType;
   bill_to_id: string | null;
@@ -132,16 +130,16 @@ interface ExtendedFormData extends ReservationFormData {
   payment_terms_id: string;
   billing_address_id?: string | null;
   bill_to_meta?: BillToMeta;
-  
+
   // Notes
   note: string;
   specialNote: string;
-  
+
   // Insurance
   insuranceLevelId: string;
   insuranceGroupId: string;
   insuranceProviderId: string;
-  
+
   // Adjustments & Deposits
   preAdjustment: number;
   advancePayment: number;
@@ -150,7 +148,7 @@ interface ExtendedFormData extends ReservationFormData {
   depositMethodId: string;
   depositPaymentMethodId: string;
   cancellationCharges: number;
-  
+
   // Referral Information
   referralNameId: string;
   referralContactNameId: string;
@@ -158,7 +156,7 @@ interface ExtendedFormData extends ReservationFormData {
   referralPhone: string;
   referralBenefitTypeId: string;
   referralValue: number;
-  
+
   // Additional rental information fields
   reservationMethodId: string;
   reservationTypeId: string;
@@ -172,12 +170,12 @@ interface ExtendedFormData extends ReservationFormData {
   taxLevelId: string;
   leaseToOwn: boolean;
 }
-
 const NewReservation = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { toast } = useToast();
-  
+  const {
+    toast
+  } = useToast();
   const [formData, setFormData] = useState<ExtendedFormData>({
     // Original fields
     reservationNo: null,
@@ -196,18 +194,17 @@ const NewReservation = () => {
     contractBillingPlanId: '',
     taxLevelId: '',
     leaseToOwn: false,
-    
-  // Extended fields
-  reservationLines: [],
-  vehicleClassId: '',
-  vehicleId: '',
-  checkOutDate: null,
-  checkOutLocationId: '',
-  checkInDate: null,
-  checkInLocationId: '',
-  drivers: [],
-  enableAirportInfo: false,
-  arrivalFlightNo: '',
+    // Extended fields
+    reservationLines: [],
+    vehicleClassId: '',
+    vehicleId: '',
+    checkOutDate: null,
+    checkOutLocationId: '',
+    checkInDate: null,
+    checkInLocationId: '',
+    drivers: [],
+    enableAirportInfo: false,
+    arrivalFlightNo: '',
     arrivalAirport: '',
     arrivalCity: '',
     arrivalZipCode: '',
@@ -259,9 +256,8 @@ const NewReservation = () => {
     referralAddress: '',
     referralPhone: '',
     referralBenefitTypeId: '',
-    referralValue: 0,
+    referralValue: 0
   });
-
   const [loading, setLoading] = useState({
     currencies: false,
     reservationMethods: false,
@@ -277,9 +273,8 @@ const NewReservation = () => {
     taxCodes: false,
     priceLists: false,
     initialData: false,
-    saving: false,
+    saving: false
   });
-
   const [options, setOptions] = useState<{
     currencies: DropdownOption[];
     reservationMethods: DropdownOption[];
@@ -307,9 +302,8 @@ const NewReservation = () => {
     contractBillingPlans: [],
     taxLevels: [],
     taxCodes: [],
-    priceLists: [],
+    priceLists: []
   });
-
   const [errors, setErrors] = useState<Partial<Record<keyof ReservationFormData, string>>>({});
   const [customerSearchOpen, setCustomerSearchOpen] = useState(false);
   const [customerSearchQuery, setCustomerSearchQuery] = useState('');
@@ -320,8 +314,14 @@ const NewReservation = () => {
   const [lastPricingHash, setLastPricingHash] = useState('');
 
   // Fetch real vehicle and category data
-  const { data: vehicles, isLoading: vehiclesLoading } = useVehicles();
-  const { data: categories, isLoading: categoriesLoading } = useVehicleCategories();
+  const {
+    data: vehicles,
+    isLoading: vehiclesLoading
+  } = useVehicles();
+  const {
+    data: categories,
+    isLoading: categoriesLoading
+  } = useVehicleCategories();
 
   // Prefill data for Add Line functionality
   const getPrefillData = () => ({
@@ -335,34 +335,13 @@ const NewReservation = () => {
     priceListId: formData.priceListId,
     promotionCode: formData.promotionCode
   });
-
   const isPrefillComplete = () => {
     const prefill = getPrefillData();
-    return !!(
-      prefill.vehicleClassId &&
-      prefill.vehicleId &&
-      prefill.checkOutDate &&
-      prefill.checkOutLocationId &&
-      prefill.checkInDate &&
-      prefill.checkInLocationId &&
-      prefill.checkOutDate < prefill.checkInDate
-    );
+    return !!(prefill.vehicleClassId && prefill.vehicleId && prefill.checkOutDate && prefill.checkOutLocationId && prefill.checkInDate && prefill.checkInLocationId && prefill.checkOutDate < prefill.checkInDate);
   };
 
   // State for accordion sections - REORDERED per requirements
-  const [accordionValues, setAccordionValues] = useState([
-    'rental-info',
-    'billing',
-    'airport-info',
-    'insurance',
-    'misc-charges',
-    'rate-taxes',
-    'adjustments-deposits',
-    'referral-info',
-    'notes',
-    'vehicles-drivers',
-    'reservation-lines'
-  ]);
+  const [accordionValues, setAccordionValues] = useState(['rental-info', 'billing', 'airport-info', 'insurance', 'misc-charges', 'rate-taxes', 'adjustments-deposits', 'referral-info', 'notes', 'vehicles-drivers', 'reservation-lines']);
 
   // Check if we're editing an existing reservation
   const editData = location.state?.editData;
@@ -375,7 +354,7 @@ const NewReservation = () => {
         customerId: editData.customerId || '',
         businessUnitId: editData.businessUnit || '',
         paymentTermsId: editData.paymentTerms || '',
-        validityDateTo: editData.validityDate || '',
+        validityDateTo: editData.validityDate || ''
       }));
 
       // Convert and set reservation lines if they exist
@@ -433,17 +412,16 @@ const NewReservation = () => {
           netPrice: line.lineNetPrice || 0,
           discount: '',
           tax: line.tax || '',
-          total: line.lineTotal || 0,
+          total: line.lineTotal || 0
         }));
         setFormData(prev => ({
           ...prev,
           reservationLines: convertedLines
         }));
       }
-
       toast({
         title: "Editing Reservation",
-        description: `Loaded data from reservation ${editData.reservationNo || 'Unknown'}`,
+        description: `Loaded data from reservation ${editData.reservationNo || 'Unknown'}`
       });
     }
   }, [editData, toast]);
@@ -465,9 +443,8 @@ const NewReservation = () => {
       weeklyRate: formData.weeklyRate,
       monthlyRate: formData.monthlyRate,
       kilometerCharge: formData.kilometerCharge,
-      dailyKilometerAllowed: formData.dailyKilometerAllowed,
+      dailyKilometerAllowed: formData.dailyKilometerAllowed
     });
-    
     if (lastPricingHash && lastPricingHash !== pricingHash && formData.reservationLines.length > 0) {
       setShowRepriceBanner(true);
     }
@@ -520,64 +497,100 @@ const NewReservation = () => {
     weeklyRate: formData.weeklyRate,
     monthlyRate: formData.monthlyRate,
     kilometerCharge: formData.kilometerCharge,
-    dailyKilometerAllowed: formData.dailyKilometerAllowed,
+    dailyKilometerAllowed: formData.dailyKilometerAllowed
   });
 
   // Load initial data
   useEffect(() => {
     loadInitialData();
   }, []);
-
   const loadInitialData = async () => {
     // Set currency to only AED
-    setOptions(prev => ({ 
-      ...prev, 
-      currencies: [
-        { id: 'AED', label: 'AED - Egyptian Pound', value: 'AED' }
-      ]
+    setOptions(prev => ({
+      ...prev,
+      currencies: [{
+        id: 'AED',
+        label: 'AED - Egyptian Pound',
+        value: 'AED'
+      }]
     }));
 
     // Set AED as default currency
-    setFormData(prev => ({ ...prev, currencyCode: 'AED' }));
-
-    const loadTasks = [
-      { key: 'reservationMethods', fn: mockApi.getReservationMethods },
-      { key: 'reservationTypes', fn: mockApi.getReservationTypes },
-      { key: 'businessUnits', fn: mockApi.getBusinessUnits },
-      { key: 'paymentTerms', fn: mockApi.getPaymentTerms },
-      { key: 'discountTypes', fn: mockApi.getDiscountTypes },
-      { key: 'contractBillingPlans', fn: mockApi.getContractBillingPlans },
-      { key: 'taxLevels', fn: mockApi.getTaxLevels },
-      { key: 'priceLists', fn: mockApi.getPriceLists }, // Added price lists
+    setFormData(prev => ({
+      ...prev,
+      currencyCode: 'AED'
+    }));
+    const loadTasks = [{
+      key: 'reservationMethods',
+      fn: mockApi.getReservationMethods
+    }, {
+      key: 'reservationTypes',
+      fn: mockApi.getReservationTypes
+    }, {
+      key: 'businessUnits',
+      fn: mockApi.getBusinessUnits
+    }, {
+      key: 'paymentTerms',
+      fn: mockApi.getPaymentTerms
+    }, {
+      key: 'discountTypes',
+      fn: mockApi.getDiscountTypes
+    }, {
+      key: 'contractBillingPlans',
+      fn: mockApi.getContractBillingPlans
+    }, {
+      key: 'taxLevels',
+      fn: mockApi.getTaxLevels
+    }, {
+      key: 'priceLists',
+      fn: mockApi.getPriceLists
+    } // Added price lists
     ];
-
-    await Promise.all(
-      loadTasks.map(async ({ key, fn }) => {
-        setLoading(prev => ({ ...prev, [key]: true }));
-        try {
-          const data = await fn();
-          setOptions(prev => ({ ...prev, [key]: data }));
-        } catch (error) {
-          console.error(`Failed to load ${key}:`, error);
-        } finally {
-          setLoading(prev => ({ ...prev, [key]: false }));
-        }
-      })
-    );
+    await Promise.all(loadTasks.map(async ({
+      key,
+      fn
+    }) => {
+      setLoading(prev => ({
+        ...prev,
+        [key]: true
+      }));
+      try {
+        const data = await fn();
+        setOptions(prev => ({
+          ...prev,
+          [key]: data
+        }));
+      } catch (error) {
+        console.error(`Failed to load ${key}:`, error);
+      } finally {
+        setLoading(prev => ({
+          ...prev,
+          [key]: false
+        }));
+      }
+    }));
 
     // Load customers separately
     searchCustomers('');
   };
-
   const searchCustomers = async (query: string) => {
-    setLoading(prev => ({ ...prev, customers: true }));
+    setLoading(prev => ({
+      ...prev,
+      customers: true
+    }));
     try {
       const customers = await mockApi.searchCustomers(query);
-      setOptions(prev => ({ ...prev, customers }));
+      setOptions(prev => ({
+        ...prev,
+        customers
+      }));
     } catch (error) {
       console.error('Failed to search customers:', error);
     } finally {
-      setLoading(prev => ({ ...prev, customers: false }));
+      setLoading(prev => ({
+        ...prev,
+        customers: false
+      }));
     }
   };
 
@@ -585,35 +598,50 @@ const NewReservation = () => {
   useEffect(() => {
     const loadTaxCodes = async () => {
       if (formData.taxLevelId) {
-        setLoading(prev => ({ ...prev, taxCodes: true }));
+        setLoading(prev => ({
+          ...prev,
+          taxCodes: true
+        }));
         try {
           const taxCodes = await mockApi.getTaxCodes(formData.taxLevelId);
-          setOptions(prev => ({ ...prev, taxCodes }));
+          setOptions(prev => ({
+            ...prev,
+            taxCodes
+          }));
         } catch (error) {
           console.error('Failed to load tax codes:', error);
         } finally {
-          setLoading(prev => ({ ...prev, taxCodes: false }));
+          setLoading(prev => ({
+            ...prev,
+            taxCodes: false
+          }));
         }
       } else {
         // Clear tax codes when no tax level is selected
-        setOptions(prev => ({ ...prev, taxCodes: [] }));
+        setOptions(prev => ({
+          ...prev,
+          taxCodes: []
+        }));
       }
     };
-
     loadTaxCodes();
   }, [formData.taxLevelId]);
-
   const updateFormData = (field: keyof ExtendedFormData, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
     if (errors[field as keyof ReservationFormData]) {
-      setErrors(prev => ({ ...prev, [field as keyof ReservationFormData]: undefined }));
+      setErrors(prev => ({
+        ...prev,
+        [field as keyof ReservationFormData]: undefined
+      }));
     }
   };
 
   // Handle price list selection and auto-fill rates
   const handlePriceListChange = async (priceListId: string) => {
     updateFormData('priceListId', priceListId);
-    
     if (priceListId) {
       try {
         const rates = await mockApi.getPriceListRates(priceListId);
@@ -625,15 +653,13 @@ const NewReservation = () => {
           updateFormData('monthlyRate', rates.monthly);
           updateFormData('kilometerCharge', rates.kilometerCharge);
           updateFormData('dailyKilometerAllowed', rates.dailyKilometerAllowed);
-          
           console.log('✅ Auto-filled rates from price list:', {
             priceListId,
             rates
           });
-          
           toast({
             title: "Rates Auto-filled",
-            description: `Rates have been loaded from ${options.priceLists.find(p => p.id === priceListId)?.label || 'price list'} and can be edited.`,
+            description: `Rates have been loaded from ${options.priceLists.find(p => p.id === priceListId)?.label || 'price list'} and can be edited.`
           });
         }
       } catch (error) {
@@ -651,7 +677,6 @@ const NewReservation = () => {
   const addReservationLine = () => {
     console.log('addReservationLine called');
     console.log('isPrefillComplete():', isPrefillComplete());
-    
     if (!isPrefillComplete()) {
       toast({
         title: "Incomplete Information",
@@ -672,32 +697,28 @@ const NewReservation = () => {
     setAddLineErrors([]);
 
     // Calculate pricing using pricing context - only use fallbacks if no panel rates are set
-    const priceResult = calculateLinePrice(
-      pricingContext,
-      formData.checkOutDate!,
-      formData.checkInDate!,
-      // Only use fallback rates if all panel rates are null/undefined
-      (!pricingContext.hourly && !pricingContext.daily && !pricingContext.weekly && !pricingContext.monthly) ? {
-        hourly: 25, // fallback rates from price list
-        daily: 50,
-        weekly: 300,
-        monthly: 1200
-      } : undefined
-    );
-    
+    const priceResult = calculateLinePrice(pricingContext, formData.checkOutDate!, formData.checkInDate!,
+    // Only use fallback rates if all panel rates are null/undefined
+    !pricingContext.hourly && !pricingContext.daily && !pricingContext.weekly && !pricingContext.monthly ? {
+      hourly: 25,
+      // fallback rates from price list
+      daily: 50,
+      weekly: 300,
+      monthly: 1200
+    } : undefined);
     let basePrice = priceResult.lineNetPrice;
-    
+
     // Apply driver-related charges
     const driverLineData = selectedDrivers.map(driver => ({
       driverId: driver.id,
       role: driver.role || 'ADDITIONAL',
       addlDriverFee: driver.role === 'ADDITIONAL' ? 15.00 : 0 // $15 per additional driver
     }));
-    
+
     // Add additional driver fees to base price
     const additionalDriverFees = driverLineData.reduce((sum, driver) => sum + (driver.addlDriverFee || 0), 0);
     basePrice += additionalDriverFees;
-    
+
     // Add underage driver fees if applicable
     const underageFees = selectedDrivers.reduce((sum, driver) => {
       if (driver.date_of_birth) {
@@ -707,10 +728,8 @@ const NewReservation = () => {
       return sum;
     }, 0);
     basePrice += underageFees;
-
     const taxValue = basePrice * 0.1; // 10% tax
     const lineTotal = basePrice + taxValue;
-
     const newLine: ReservationLine = {
       id: Date.now().toString(),
       lineNo: (formData.reservationLines || []).length + 1,
@@ -736,7 +755,6 @@ const NewReservation = () => {
       discounts: [],
       priceSource: priceResult.source
     };
-    
     setFormData(prev => ({
       ...prev,
       reservationLines: [...(prev.reservationLines || []), newLine]
@@ -753,32 +771,25 @@ const NewReservation = () => {
     const driverCount = selectedDrivers.length;
     toast({
       title: "Line added",
-      description: `Line #${newLine.lineNo} added with ${driverCount} driver(s). ${priceResult.source === 'panel' ? '(from Rate & Taxes)' : '(from Price List)'}`,
+      description: `Line #${newLine.lineNo} added with ${driverCount} driver(s). ${priceResult.source === 'panel' ? '(from Rate & Taxes)' : '(from Price List)'}`
     });
   };
-
   const handleRepriceLines = () => {
     setFormData(prev => ({
       ...prev,
       reservationLines: prev.reservationLines.map(line => {
         if (line.checkOutDate && line.checkInDate) {
-          const priceResult = calculateLinePrice(
-            pricingContext,
-            line.checkOutDate,
-            line.checkInDate,
-            // Only use fallback rates if all panel rates are null/undefined
-            (!pricingContext.hourly && !pricingContext.daily && !pricingContext.weekly && !pricingContext.monthly) ? {
-              hourly: 25,
-              daily: 50,
-              weekly: 300,
-              monthly: 1200
-            } : undefined
-          );
-          
+          const priceResult = calculateLinePrice(pricingContext, line.checkOutDate, line.checkInDate,
+          // Only use fallback rates if all panel rates are null/undefined
+          !pricingContext.hourly && !pricingContext.daily && !pricingContext.weekly && !pricingContext.monthly ? {
+            hourly: 25,
+            daily: 50,
+            weekly: 300,
+            monthly: 1200
+          } : undefined);
           const newLineNetPrice = priceResult.lineNetPrice;
           const newTaxValue = newLineNetPrice * 0.1;
           const newLineTotal = newLineNetPrice + newTaxValue;
-          
           return {
             ...line,
             lineNetPrice: newLineNetPrice,
@@ -790,42 +801,33 @@ const NewReservation = () => {
         return line;
       })
     }));
-    
     setShowRepriceBanner(false);
-    
     toast({
       title: "Lines repriced",
-      description: "All reservation lines have been updated with new rates.",
+      description: "All reservation lines have been updated with new rates."
     });
   };
-
   const handleLineUpdate = (lineId: string, updates: Partial<ReservationLine>) => {
     setFormData(prev => ({
       ...prev,
-      reservationLines: prev.reservationLines.map(line => 
-        line.id === lineId 
-          ? { 
-              ...line, 
-              ...updates,
-              // Recalculate totals if price changed
-              lineTotal: updates.lineNetPrice !== undefined 
-                ? (updates.lineNetPrice || 0) + (updates.taxValue || line.taxValue || 0)
-                : line.lineTotal
-            }
-          : line
-      )
+      reservationLines: prev.reservationLines.map(line => line.id === lineId ? {
+        ...line,
+        ...updates,
+        // Recalculate totals if price changed
+        lineTotal: updates.lineNetPrice !== undefined ? (updates.lineNetPrice || 0) + (updates.taxValue || line.taxValue || 0) : line.lineTotal
+      } : line)
     }));
   };
-
   const handleLineRemove = (lineId: string) => {
     setFormData(prev => ({
       ...prev,
-      reservationLines: prev.reservationLines.filter(line => line.id !== lineId)
-        .map((line, index) => ({ ...line, lineNo: index + 1 })) // Renumber lines
+      reservationLines: prev.reservationLines.filter(line => line.id !== lineId).map((line, index) => ({
+        ...line,
+        lineNo: index + 1
+      })) // Renumber lines
     }));
     setSelectedLines(prev => prev.filter(id => id !== lineId));
   };
-
   const handleLineDuplicate = (lineId: string) => {
     const lineToDuplicate = formData.reservationLines.find(line => line.id === lineId);
     if (lineToDuplicate) {
@@ -833,19 +835,19 @@ const NewReservation = () => {
         ...lineToDuplicate,
         id: Date.now().toString(),
         lineNo: formData.reservationLines.length + 1,
-        vehicleId: '', // Clear vehicle for new selection
-        drivers: [], // Clear drivers
+        vehicleId: '',
+        // Clear vehicle for new selection
+        drivers: [],
+        // Clear drivers
         selected: false
       };
-      
       setFormData(prev => ({
         ...prev,
         reservationLines: [...prev.reservationLines, newLine]
       }));
-
       toast({
         title: "Line duplicated",
-        description: `Line #${newLine.lineNo} has been created as a copy.`,
+        description: `Line #${newLine.lineNo} has been created as a copy.`
       });
     }
   };
@@ -855,7 +857,6 @@ const NewReservation = () => {
     if (!formData.reservationLines || formData.reservationLines.length === 0) {
       return;
     }
-
     const firstLine = formData.reservationLines[0];
     const updatedFormData: Partial<ExtendedFormData> = {};
 
@@ -869,22 +870,18 @@ const NewReservation = () => {
       // Default to first available method (e.g., "walk-in")
       updatedFormData.reservationMethodId = options.reservationMethods[0].id;
     }
-
     if (!formData.businessUnitId && options.businessUnits.length > 0) {
       // Default to first business unit
       updatedFormData.businessUnitId = options.businessUnits[0].id;
     }
-
     if (!formData.paymentTermsId && options.paymentTerms.length > 0) {
       // Default to first payment terms (e.g., "prepaid")
       updatedFormData.paymentTermsId = options.paymentTerms[0].id;
     }
-
     if (!formData.priceListId && options.priceLists.length > 0) {
       // Default to first price list
       updatedFormData.priceListId = options.priceLists[0].id;
     }
-
     if (!formData.taxLevelId && options.taxLevels.length > 0) {
       // Default to first tax level
       updatedFormData.taxLevelId = options.taxLevels[0].id;
@@ -897,24 +894,30 @@ const NewReservation = () => {
 
     // Update form data if we have changes
     if (Object.keys(updatedFormData).length > 0) {
-      setFormData(prev => ({ ...prev, ...updatedFormData }));
+      setFormData(prev => ({
+        ...prev,
+        ...updatedFormData
+      }));
       return updatedFormData;
     }
-
     return null;
   };
 
   // Validate form data before saving
   const validateBeforeSave = (status: 'DRAFT' | 'ACTIVE') => {
-    if (status === 'DRAFT') return { success: true, errors: [] };
+    if (status === 'DRAFT') return {
+      success: true,
+      errors: []
+    };
 
     // Auto-populate header fields from reservation lines before validation
     const autoPopulatedData = populateHeaderFromLines();
-    
+
     // Use current form data plus any auto-populated data for validation
-    const currentFormData = autoPopulatedData 
-      ? { ...formData, ...autoPopulatedData }
-      : formData;
+    const currentFormData = autoPopulatedData ? {
+      ...formData,
+      ...autoPopulatedData
+    } : formData;
 
     // Prepare data for validation
     const validationData = {
@@ -947,7 +950,7 @@ const NewReservation = () => {
         depositMethod: currentFormData.depositMethodId,
         depositPaymentMethod: currentFormData.depositPaymentMethodId,
         benefitType: currentFormData.referralBenefitTypeId,
-        benefitValue: currentFormData.referralValue,
+        benefitValue: currentFormData.referralValue
       },
       lines: currentFormData.reservationLines?.map(line => ({
         vehicleClassId: line.vehicleClassId,
@@ -955,25 +958,28 @@ const NewReservation = () => {
         checkOutDate: line.checkOutDate,
         checkOutLocationId: line.outLocationId,
         checkInDate: line.checkInDate,
-        checkInLocationId: line.inLocationId,
+        checkInLocationId: line.inLocationId
       })) || []
     };
-
     return validation.validateForm(validationData);
   };
-
   const handleSave = async (status: 'DRAFT' | 'ACTIVE') => {
-    setLoading(prev => ({ ...prev, saving: true }));
-    
+    setLoading(prev => ({
+      ...prev,
+      saving: true
+    }));
     try {
       // Check if we have reservation lines for active reservations
       if (status === 'ACTIVE' && (!formData.reservationLines || formData.reservationLines.length === 0)) {
         toast({
           title: "No Reservation Lines",
           description: "Please add at least one reservation line before saving",
-          variant: "destructive",
+          variant: "destructive"
         });
-        setLoading(prev => ({ ...prev, saving: false }));
+        setLoading(prev => ({
+          ...prev,
+          saving: false
+        }));
         return;
       }
 
@@ -983,35 +989,31 @@ const NewReservation = () => {
         if (autoPopulatedData && Object.keys(autoPopulatedData).length > 0) {
           toast({
             title: "Auto-populated Fields",
-            description: "Some header fields were automatically filled from your reservation lines",
+            description: "Some header fields were automatically filled from your reservation lines"
           });
         }
       }
 
       // Validate form after auto-population
       const validationResult = validateBeforeSave(status);
-      
       if (!validationResult.success) {
         toast({
           title: "Validation Error",
           description: "Please correct the errors before continuing",
-          variant: "destructive",
+          variant: "destructive"
         });
         return;
       }
 
       // Create idempotency key
       const idempotencyKey = `reservation-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-      
+
       // Mock API call to create reservation
       const response = await mockApi.createReservation(formData, status);
-
       if (response.id) {
         toast({
           title: status === 'DRAFT' ? "Draft Saved" : "Reservation Created",
-          description: status === 'DRAFT' 
-            ? "Your reservation draft has been saved." 
-            : `Reservation ${response.reservationNo} has been created successfully.`,
+          description: status === 'DRAFT' ? "Your reservation draft has been saved." : `Reservation ${response.reservationNo} has been created successfully.`
         });
 
         // Clear draft from localStorage if successfully created as ACTIVE
@@ -1025,33 +1027,35 @@ const NewReservation = () => {
       }
     } catch (error: any) {
       console.error('Save error:', error);
-      
+
       // Handle structured validation errors from server
       if (error.status === 422 && error.errors) {
         validation.applyServerErrors(error.errors);
         toast({
           title: "Validation Error",
           description: "Please correct the errors highlighted below",
-          variant: "destructive",
+          variant: "destructive"
         });
       } else if (error.status === 409) {
         toast({
           title: "Conflict Error",
           description: "Vehicle not available for selected dates",
-          variant: "destructive",
+          variant: "destructive"
         });
       } else {
         toast({
           title: "Error",
           description: "Failed to save reservation. Please try again.",
-          variant: "destructive",
+          variant: "destructive"
         });
       }
     } finally {
-      setLoading(prev => ({ ...prev, saving: false }));
+      setLoading(prev => ({
+        ...prev,
+        saving: false
+      }));
     }
   };
-
   const addDriver = () => {
     const newDriver: Driver = {
       id: Date.now().toString(),
@@ -1063,9 +1067,8 @@ const NewReservation = () => {
       date_of_birth: '',
       license_expiry: '',
       status: 'active',
-      additional_driver_fee: 25.00,
+      additional_driver_fee: 25.00
     };
-    
     setSelectedDrivers(prev => [...prev, newDriver]);
   };
 
@@ -1101,7 +1104,7 @@ const NewReservation = () => {
         depositMethod: formData.depositMethodId,
         depositPaymentMethod: formData.depositPaymentMethodId,
         benefitType: formData.referralBenefitTypeId,
-        benefitValue: formData.referralValue,
+        benefitValue: formData.referralValue
       },
       lines: formData.reservationLines?.map(line => ({
         vehicleClassId: line.vehicleClassId,
@@ -1109,15 +1112,12 @@ const NewReservation = () => {
         checkOutDate: line.checkOutDate,
         checkOutLocationId: line.outLocationId,
         checkInDate: line.checkInDate,
-        checkInLocationId: line.inLocationId,
+        checkInLocationId: line.inLocationId
       })) || []
     };
-    
     validation.validateForm(validationData);
   };
-
-  return (
-    <div className="flex flex-col lg:flex-row gap-6">
+  return <div className="flex flex-col lg:flex-row gap-6">
       {/* Main Content */}
       <div className="flex-1 space-y-6 min-w-0">
         {/* Breadcrumbs */}
@@ -1140,36 +1140,20 @@ const NewReservation = () => {
         </div>
 
         {/* Error Summary */}
-        {validation.hasErrors && (
-          <div id="error-summary">
-            <ErrorSummary
-              errors={validation.validationErrors}
-              fieldLabels={fieldLabels}
-              onFieldFocus={validation.focusField}
-            />
-          </div>
-        )}
+        {validation.hasErrors && <div id="error-summary">
+            <ErrorSummary errors={validation.validationErrors} fieldLabels={fieldLabels} onFieldFocus={validation.focusField} />
+          </div>}
 
         {/* Validation Actions */}
         <div className="flex justify-between items-center">
-          <Button
-            id="btn-validate"
-            variant="outline"
-            onClick={handleValidateNow}
-            className="flex items-center gap-2"
-          >
+          <Button id="btn-validate" variant="outline" onClick={handleValidateNow} className="flex items-center gap-2">
             <Check className="h-4 w-4" />
             Validate Now
           </Button>
         </div>
 
         {/* Accordion Sections - REORDERED */}
-        <Accordion 
-          type="multiple" 
-          value={[...accordionValues, ...validation.expandedAccordions]} 
-          onValueChange={setAccordionValues} 
-          className="space-y-4"
-        >
+        <Accordion type="multiple" value={[...accordionValues, ...validation.expandedAccordions]} onValueChange={setAccordionValues} className="space-y-4">
           
           {/* 1) Rental Information */}
           <AccordionItem value="rental-info" className="border rounded-lg">
@@ -1184,13 +1168,7 @@ const NewReservation = () => {
                 {/* Reservation No. */}
                 <div className="space-y-2">
                   <Label htmlFor="reservationNo">Reservation no.</Label>
-                  <Input
-                    id="reservationNo"
-                    value={formData.reservationNo || ''}
-                    disabled
-                    placeholder="Auto-generated on save"
-                    className="bg-muted"
-                  />
+                  <Input id="reservationNo" value={formData.reservationNo || ''} disabled placeholder="Auto-generated on save" className="bg-muted" />
                 </div>
 
                 {/* Entry Date */}
@@ -1198,25 +1176,13 @@ const NewReservation = () => {
                   <Label>Reservation Entry Date <span className="text-destructive">*</span></Label>
                   <Popover>
                     <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className={cn(
-                          "w-full justify-start text-left font-normal",
-                          !formData.entryDate && "text-muted-foreground",
-                          errors.entryDate && "border-destructive"
-                        )}
-                      >
+                      <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !formData.entryDate && "text-muted-foreground", errors.entryDate && "border-destructive")}>
                         <CalendarIcon className="mr-2 h-4 w-4" />
                         {formData.entryDate ? format(formData.entryDate, "PPP") : <span>Pick entry date</span>}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={formData.entryDate}
-                        onSelect={(date) => updateFormData('entryDate', date || new Date())}
-                        initialFocus
-                      />
+                      <Calendar mode="single" selected={formData.entryDate} onSelect={date => updateFormData('entryDate', date || new Date())} initialFocus />
                     </PopoverContent>
                   </Popover>
                   {errors.entryDate && <p className="text-sm text-destructive">{errors.entryDate}</p>}
@@ -1225,25 +1191,16 @@ const NewReservation = () => {
                 {/* Currency */}
                 <div className="space-y-2">
                   <Label>Currency <span className="text-destructive">*</span></Label>
-                  {loading.currencies ? (
-                    <Skeleton className="h-10 w-full" />
-                  ) : (
-                    <Select 
-                      value={formData.currencyCode} 
-                      onValueChange={(value) => updateFormData('currencyCode', value)}
-                    >
+                  {loading.currencies ? <Skeleton className="h-10 w-full" /> : <Select value={formData.currencyCode} onValueChange={value => updateFormData('currencyCode', value)}>
                       <SelectTrigger className={errors.currencyCode ? "border-destructive" : ""}>
                         <SelectValue placeholder="Select currency" />
                       </SelectTrigger>
                       <SelectContent>
-                        {options.currencies.map((option) => (
-                          <SelectItem key={option.id} value={option.id}>
+                        {options.currencies.map(option => <SelectItem key={option.id} value={option.id}>
                             {option.label}
-                          </SelectItem>
-                        ))}
+                          </SelectItem>)}
                       </SelectContent>
-                    </Select>
-                  )}
+                    </Select>}
                   {errors.currencyCode && <p className="text-sm text-destructive">{errors.currencyCode}</p>}
                 </div>
 
@@ -1252,60 +1209,33 @@ const NewReservation = () => {
                   <Label>Customer <span className="text-destructive">*</span></Label>
                   <Popover open={customerSearchOpen} onOpenChange={setCustomerSearchOpen}>
                     <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        role="combobox"
-                        aria-expanded={customerSearchOpen}
-                        className={cn(
-                          "w-full justify-between",
-                          !formData.customerId && "text-muted-foreground",
-                          errors.customerId && "border-destructive"
-                        )}
-                      >
-                        {formData.customerId
-                          ? options.customers.find(customer => customer.id === formData.customerId)?.name
-                          : "Select customer..."
-                        }
+                      <Button variant="outline" role="combobox" aria-expanded={customerSearchOpen} className={cn("w-full justify-between", !formData.customerId && "text-muted-foreground", errors.customerId && "border-destructive")}>
+                        {formData.customerId ? options.customers.find(customer => customer.id === formData.customerId)?.name : "Select customer..."}
                         <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-full p-0">
                       <Command>
-                        <CommandInput
-                          placeholder="Search customers..."
-                          value={customerSearchQuery}
-                          onValueChange={(value) => {
-                            setCustomerSearchQuery(value);
-                            searchCustomers(value);
-                          }}
-                        />
+                        <CommandInput placeholder="Search customers..." value={customerSearchQuery} onValueChange={value => {
+                        setCustomerSearchQuery(value);
+                        searchCustomers(value);
+                      }} />
                         <CommandList>
                           <CommandEmpty>
                             {loading.customers ? "Loading..." : "No customers found."}
                           </CommandEmpty>
                           <CommandGroup>
-                            {options.customers.map((customer) => (
-                              <CommandItem
-                                key={customer.id}
-                                value={customer.id}
-                                onSelect={() => {
-                                  updateFormData('customerId', customer.id);
-                                  setCustomerSearchOpen(false);
-                                  setCustomerSearchQuery('');
-                                }}
-                              >
-                                <Check
-                                  className={cn(
-                                    "mr-2 h-4 w-4",
-                                    formData.customerId === customer.id ? "opacity-100" : "opacity-0"
-                                  )}
-                                />
+                            {options.customers.map(customer => <CommandItem key={customer.id} value={customer.id} onSelect={() => {
+                            updateFormData('customerId', customer.id);
+                            setCustomerSearchOpen(false);
+                            setCustomerSearchQuery('');
+                          }}>
+                                <Check className={cn("mr-2 h-4 w-4", formData.customerId === customer.id ? "opacity-100" : "opacity-0")} />
                                 <div className="flex flex-col">
                                   <span className="font-medium">{customer.name}</span>
                                   <span className="text-sm text-muted-foreground">{customer.email}</span>
                                 </div>
-                              </CommandItem>
-                            ))}
+                              </CommandItem>)}
                           </CommandGroup>
                         </CommandList>
                       </Command>
@@ -1317,100 +1247,64 @@ const NewReservation = () => {
                 {/* Reservation Method */}
                 <div className="space-y-2">
                   <RequiredLabel>Reservation Method</RequiredLabel>
-                  {loading.reservationMethods ? (
-                    <Skeleton className="h-10 w-full" />
-                  ) : (
-                    <Select 
-                      value={formData.reservationMethodId} 
-                      onValueChange={(value) => updateFormData('reservationMethodId', value)}
-                    >
+                  {loading.reservationMethods ? <Skeleton className="h-10 w-full" /> : <Select value={formData.reservationMethodId} onValueChange={value => updateFormData('reservationMethodId', value)}>
                       <SelectTrigger className={validation.getFieldError('header.reservationMethodId') ? "border-destructive" : ""}>
                         <SelectValue placeholder="Select method" />
                       </SelectTrigger>
                       <SelectContent>
-                        {options.reservationMethods.map((option) => (
-                          <SelectItem key={option.id} value={option.id}>
+                        {options.reservationMethods.map(option => <SelectItem key={option.id} value={option.id}>
                             {option.label}
-                          </SelectItem>
-                        ))}
+                          </SelectItem>)}
                       </SelectContent>
-                    </Select>
-                  )}
+                    </Select>}
                   <FormError message={validation.getFieldError('header.reservationMethodId')} />
                 </div>
 
                 {/* Reservation Type */}
                 <div className="space-y-2">
                   <RequiredLabel>Reservation Type</RequiredLabel>
-                  {loading.reservationTypes ? (
-                    <Skeleton className="h-10 w-full" />
-                  ) : (
-                    <Select 
-                      value={formData.reservationTypeId} 
-                      onValueChange={(value) => updateFormData('reservationTypeId', value)}
-                    >
+                  {loading.reservationTypes ? <Skeleton className="h-10 w-full" /> : <Select value={formData.reservationTypeId} onValueChange={value => updateFormData('reservationTypeId', value)}>
                       <SelectTrigger className={validation.getFieldError('header.reservationTypeId') ? "border-destructive" : ""}>
                         <SelectValue placeholder="Select type" />
                       </SelectTrigger>
                       <SelectContent>
-                        {options.reservationTypes.map((option) => (
-                          <SelectItem key={option.id} value={option.id}>
+                        {options.reservationTypes.map(option => <SelectItem key={option.id} value={option.id}>
                             {option.label}
-                          </SelectItem>
-                        ))}
+                          </SelectItem>)}
                       </SelectContent>
-                    </Select>
-                  )}
+                    </Select>}
                   <FormError message={validation.getFieldError('header.reservationTypeId')} />
                 </div>
 
                 {/* Business Unit */}
                 <div className="space-y-2">
                   <RequiredLabel>Business Unit</RequiredLabel>
-                  {loading.businessUnits ? (
-                    <Skeleton className="h-10 w-full" />
-                  ) : (
-                    <Select 
-                      value={formData.businessUnitId} 
-                      onValueChange={(value) => updateFormData('businessUnitId', value)}
-                    >
+                  {loading.businessUnits ? <Skeleton className="h-10 w-full" /> : <Select value={formData.businessUnitId} onValueChange={value => updateFormData('businessUnitId', value)}>
                       <SelectTrigger className={validation.getFieldError('header.businessUnitId') ? "border-destructive" : ""}>
                         <SelectValue placeholder="Select business unit" />
                       </SelectTrigger>
                       <SelectContent>
-                        {options.businessUnits.map((option) => (
-                          <SelectItem key={option.id} value={option.id}>
+                        {options.businessUnits.map(option => <SelectItem key={option.id} value={option.id}>
                             {option.label}
-                          </SelectItem>
-                        ))}
+                          </SelectItem>)}
                       </SelectContent>
-                    </Select>
-                  )}
+                    </Select>}
                   <FormError message={validation.getFieldError('header.businessUnitId')} />
                 </div>
 
                 {/* Payment Terms */}
                 <div className="space-y-2">
                   <RequiredLabel>Payment Terms</RequiredLabel>
-                  {loading.paymentTerms ? (
-                    <Skeleton className="h-10 w-full" />
-                  ) : (
-                    <Select 
-                      value={formData.paymentTermsId} 
-                      onValueChange={(value) => updateFormData('paymentTermsId', value)}
-                    >
+                  {loading.paymentTerms ? <Skeleton className="h-10 w-full" /> : <Select value={formData.paymentTermsId} onValueChange={value => updateFormData('paymentTermsId', value)}>
                       <SelectTrigger className={validation.getFieldError('header.paymentTermsId') ? "border-destructive" : ""}>
                         <SelectValue placeholder="Select payment terms" />
                       </SelectTrigger>
                       <SelectContent>
-                        {options.paymentTerms.map((option) => (
-                          <SelectItem key={option.id} value={option.id}>
+                        {options.paymentTerms.map(option => <SelectItem key={option.id} value={option.id}>
                             {option.label}
-                          </SelectItem>
-                        ))}
+                          </SelectItem>)}
                       </SelectContent>
-                    </Select>
-                  )}
+                    </Select>}
                   <FormError message={validation.getFieldError('header.paymentTermsId')} />
                 </div>
 
@@ -1419,135 +1313,70 @@ const NewReservation = () => {
                   <Label>Validity Date To</Label>
                   <Popover>
                     <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className={cn(
-                          "w-full justify-start text-left font-normal",
-                          !formData.validityDateTo && "text-muted-foreground",
-                          validation.getFieldError('header.validityDateTo') && "border-destructive"
-                        )}
-                      >
+                      <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !formData.validityDateTo && "text-muted-foreground", validation.getFieldError('header.validityDateTo') && "border-destructive")}>
                         <CalendarIcon className="mr-2 h-4 w-4" />
                         {formData.validityDateTo ? format(formData.validityDateTo, "PPP") : <span>Select validity date</span>}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={formData.validityDateTo}
-                        onSelect={(date) => updateFormData('validityDateTo', date)}
-                        initialFocus
-                      />
+                      <Calendar mode="single" selected={formData.validityDateTo} onSelect={date => updateFormData('validityDateTo', date)} initialFocus />
                     </PopoverContent>
                   </Popover>
                   <FormError message={validation.getFieldError('header.validityDateTo')} />
                 </div>
 
                 {/* Customer Bill To */}
-                <div className="space-y-2">
-                  <Label>Customer Bill To</Label>
-                  {loading.billTo ? (
-                    <Skeleton className="h-10 w-full" />
-                  ) : (
-                    <Select 
-                      value={formData.customerBillToId} 
-                      onValueChange={(value) => updateFormData('customerBillToId', value)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select bill to" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {options.billTo.map((option) => (
-                          <SelectItem key={option.id} value={option.id}>
-                            {option.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-                </div>
+                
 
                 {/* Discount Type */}
                 <div className="space-y-2">
                   <Label>Discount Type</Label>
-                  {loading.discountTypes ? (
-                    <Skeleton className="h-10 w-full" />
-                  ) : (
-                    <Select 
-                      value={formData.discountTypeId} 
-                      onValueChange={(value) => updateFormData('discountTypeId', value)}
-                    >
+                  {loading.discountTypes ? <Skeleton className="h-10 w-full" /> : <Select value={formData.discountTypeId} onValueChange={value => updateFormData('discountTypeId', value)}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select discount type" />
                       </SelectTrigger>
                       <SelectContent>
-                        {options.discountTypes.map((option) => (
-                          <SelectItem key={option.id} value={option.id}>
+                        {options.discountTypes.map(option => <SelectItem key={option.id} value={option.id}>
                             {option.label}
-                          </SelectItem>
-                        ))}
+                          </SelectItem>)}
                       </SelectContent>
-                    </Select>
-                  )}
+                    </Select>}
                 </div>
 
                 {/* Discount Value */}
                 <div className="space-y-2">
                   <Label>Discount Value</Label>
-                  <Input 
-                    type="number"
-                    value={formData.discountValue || ''} 
-                    onChange={(e) => updateFormData('discountValue', parseFloat(e.target.value) || 0)}
-                    placeholder="0.00"
-                  />
+                  <Input type="number" value={formData.discountValue || ''} onChange={e => updateFormData('discountValue', parseFloat(e.target.value) || 0)} placeholder="0.00" />
                 </div>
 
                 {/* Contract Billing Plan */}
                 <div className="space-y-2">
                   <Label>Contract Billing Plan</Label>
-                  {loading.contractBillingPlans ? (
-                    <Skeleton className="h-10 w-full" />
-                  ) : (
-                    <Select 
-                      value={formData.contractBillingPlanId} 
-                      onValueChange={(value) => updateFormData('contractBillingPlanId', value)}
-                    >
+                  {loading.contractBillingPlans ? <Skeleton className="h-10 w-full" /> : <Select value={formData.contractBillingPlanId} onValueChange={value => updateFormData('contractBillingPlanId', value)}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select billing plan" />
                       </SelectTrigger>
                       <SelectContent>
-                        {options.contractBillingPlans.map((option) => (
-                          <SelectItem key={option.id} value={option.id}>
+                        {options.contractBillingPlans.map(option => <SelectItem key={option.id} value={option.id}>
                             {option.label}
-                          </SelectItem>
-                        ))}
+                          </SelectItem>)}
                       </SelectContent>
-                    </Select>
-                  )}
+                    </Select>}
                 </div>
 
                 {/* Tax Level */}
                 <div className="space-y-2">
                   <Label>Tax Level</Label>
-                  {loading.taxLevels ? (
-                    <Skeleton className="h-10 w-full" />
-                  ) : (
-                    <Select 
-                      value={formData.taxLevelId} 
-                      onValueChange={(value) => updateFormData('taxLevelId', value)}
-                    >
+                  {loading.taxLevels ? <Skeleton className="h-10 w-full" /> : <Select value={formData.taxLevelId} onValueChange={value => updateFormData('taxLevelId', value)}>
                       <SelectTrigger className={validation.getFieldError('header.taxLevelId') ? "border-destructive" : ""}>
                         <SelectValue placeholder="Select tax level" />
                       </SelectTrigger>
                       <SelectContent>
-                        {options.taxLevels.map((option) => (
-                          <SelectItem key={option.id} value={option.id}>
+                        {options.taxLevels.map(option => <SelectItem key={option.id} value={option.id}>
                             {option.label}
-                          </SelectItem>
-                        ))}
+                          </SelectItem>)}
                       </SelectContent>
-                    </Select>
-                  )}
+                    </Select>}
                   <FormError message={validation.getFieldError('header.taxLevelId')} />
                 </div>
 
@@ -1555,11 +1384,7 @@ const NewReservation = () => {
                 {/* Lease to Own */}
                 <div className="space-y-2">
                   <div className="flex items-center space-x-2">
-                    <Checkbox 
-                      id="lease-to-own"
-                      checked={formData.leaseToOwn || false}
-                      onCheckedChange={(checked) => updateFormData('leaseToOwn', checked)}
-                    />
+                    <Checkbox id="lease-to-own" checked={formData.leaseToOwn || false} onCheckedChange={checked => updateFormData('leaseToOwn', checked)} />
                     <Label htmlFor="lease-to-own">Lease to Own</Label>
                   </div>
                 </div>
@@ -1576,27 +1401,21 @@ const NewReservation = () => {
               </div>
             </AccordionTrigger>
             <AccordionContent className="px-6 pb-6">
-              <BillToSelector
-                value={{
-                  bill_to_type: formData.bill_to_type,
-                  bill_to_id: formData.bill_to_id,
-                  bill_to_display: formData.bill_to_display,
-                  payment_terms_id: formData.payment_terms_id,
-                  billing_address_id: formData.billing_address_id,
-                  bill_to_meta: formData.bill_to_meta
-                }}
-                onChange={(billToData) => {
-                  updateFormData('bill_to_type', billToData.bill_to_type);
-                  updateFormData('bill_to_id', billToData.bill_to_id);
-                  updateFormData('bill_to_display', billToData.bill_to_display);
-                  updateFormData('payment_terms_id', billToData.payment_terms_id);
-                  updateFormData('billing_address_id', billToData.billing_address_id);
-                  updateFormData('bill_to_meta', billToData.bill_to_meta);
-                }}
-                errors={validation.getFieldsWithPrefix('bill_to')}
-                currentCustomerId={formData.customerId}
-                currentCustomerName={selectedCustomer?.name}
-              />
+              <BillToSelector value={{
+              bill_to_type: formData.bill_to_type,
+              bill_to_id: formData.bill_to_id,
+              bill_to_display: formData.bill_to_display,
+              payment_terms_id: formData.payment_terms_id,
+              billing_address_id: formData.billing_address_id,
+              bill_to_meta: formData.bill_to_meta
+            }} onChange={billToData => {
+              updateFormData('bill_to_type', billToData.bill_to_type);
+              updateFormData('bill_to_id', billToData.bill_to_id);
+              updateFormData('bill_to_display', billToData.bill_to_display);
+              updateFormData('payment_terms_id', billToData.payment_terms_id);
+              updateFormData('billing_address_id', billToData.billing_address_id);
+              updateFormData('bill_to_meta', billToData.bill_to_meta);
+            }} errors={validation.getFieldsWithPrefix('bill_to')} currentCustomerId={formData.customerId} currentCustomerName={selectedCustomer?.name} />
             </AccordionContent>
           </AccordionItem>
 
@@ -1612,101 +1431,58 @@ const NewReservation = () => {
               <div className="space-y-6">
                 {/* Enable Airport Information Checkbox */}
                 <div className="flex items-center space-x-2">
-                  <Checkbox 
-                    id="enable-airport-info"
-                    checked={formData.enableAirportInfo}
-                    onCheckedChange={(checked) => updateFormData('enableAirportInfo', checked)}
-                  />
+                  <Checkbox id="enable-airport-info" checked={formData.enableAirportInfo} onCheckedChange={checked => updateFormData('enableAirportInfo', checked)} />
                   <Label htmlFor="enable-airport-info">Enable Airport Information</Label>
                 </div>
 
-                {formData.enableAirportInfo && (
-                  <>
+                {formData.enableAirportInfo && <>
                     {/* Arrival Information */}
                     <div>
                       <h4 className="font-medium mb-4">Arrival Information</h4>
                       <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                         <div className="space-y-2">
                           <Label>Flight No.</Label>
-                          <Input 
-                            value={formData.arrivalFlightNo} 
-                            onChange={(e) => updateFormData('arrivalFlightNo', e.target.value)}
-                            placeholder="e.g., AA1234"
-                          />
+                          <Input value={formData.arrivalFlightNo} onChange={e => updateFormData('arrivalFlightNo', e.target.value)} placeholder="e.g., AA1234" />
                         </div>
                         
                         <div className="space-y-2">
                           <Label>Date & Time</Label>
                           <Popover>
                             <PopoverTrigger asChild>
-                              <Button
-                                variant="outline"
-                                className={cn(
-                                  "w-full justify-start text-left font-normal",
-                                  !formData.arrivalDateTime && "text-muted-foreground"
-                                )}
-                              >
+                              <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !formData.arrivalDateTime && "text-muted-foreground")}>
                                 <CalendarIcon className="mr-2 h-4 w-4" />
                                 {formData.arrivalDateTime ? format(formData.arrivalDateTime, "PPP p") : <span>Select arrival date & time</span>}
                               </Button>
                             </PopoverTrigger>
                             <PopoverContent className="w-auto p-0" align="start">
-                              <Calendar
-                                mode="single"
-                                selected={formData.arrivalDateTime}
-                                onSelect={(date) => updateFormData('arrivalDateTime', date)}
-                                initialFocus
-                                className="p-3 pointer-events-auto"
-                              />
+                              <Calendar mode="single" selected={formData.arrivalDateTime} onSelect={date => updateFormData('arrivalDateTime', date)} initialFocus className="p-3 pointer-events-auto" />
                             </PopoverContent>
                           </Popover>
                         </div>
                         
                         <div className="space-y-2">
                           <Label>Airline</Label>
-                          <Input 
-                            value={formData.arrivalAirline} 
-                            onChange={(e) => updateFormData('arrivalAirline', e.target.value)}
-                            placeholder="e.g., American Airlines"
-                          />
+                          <Input value={formData.arrivalAirline} onChange={e => updateFormData('arrivalAirline', e.target.value)} placeholder="e.g., American Airlines" />
                         </div>
                         
                         <div className="space-y-2">
                           <Label>Airport</Label>
-                          <Input 
-                            value={formData.arrivalAirport} 
-                            onChange={(e) => updateFormData('arrivalAirport', e.target.value)}
-                            placeholder="e.g., LAX International"
-                          />
+                          <Input value={formData.arrivalAirport} onChange={e => updateFormData('arrivalAirport', e.target.value)} placeholder="e.g., LAX International" />
                         </div>
                         
                         <div className="space-y-2">
                           <Label>City</Label>
-                          <Input 
-                            value={formData.arrivalCity} 
-                            onChange={(e) => updateFormData('arrivalCity', e.target.value)}
-                            placeholder="e.g., Los Angeles"
-                          />
+                          <Input value={formData.arrivalCity} onChange={e => updateFormData('arrivalCity', e.target.value)} placeholder="e.g., Los Angeles" />
                         </div>
                         
                         <div className="space-y-2">
                           <Label>Zip Code</Label>
-                          <Input 
-                            value={formData.arrivalZipCode} 
-                            onChange={(e) => updateFormData('arrivalZipCode', e.target.value)}
-                            placeholder="e.g., 90045"
-                          />
+                          <Input value={formData.arrivalZipCode} onChange={e => updateFormData('arrivalZipCode', e.target.value)} placeholder="e.g., 90045" />
                         </div>
                         
                         <div className="space-y-2">
                           <Label>Passengers</Label>
-                          <Input 
-                            type="number"
-                            value={formData.arrivalPassengers || ''} 
-                            onChange={(e) => updateFormData('arrivalPassengers', parseInt(e.target.value) || 0)}
-                            placeholder="Number of passengers"
-                            min="0"
-                          />
+                          <Input type="number" value={formData.arrivalPassengers || ''} onChange={e => updateFormData('arrivalPassengers', parseInt(e.target.value) || 0)} placeholder="Number of passengers" min="0" />
                         </div>
                       </div>
                     </div>
@@ -1717,96 +1493,55 @@ const NewReservation = () => {
                       <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                         <div className="space-y-2">
                           <Label>Flight No.</Label>
-                          <Input 
-                            value={formData.departureFlightNo} 
-                            onChange={(e) => updateFormData('departureFlightNo', e.target.value)}
-                            placeholder="e.g., AA5678"
-                          />
+                          <Input value={formData.departureFlightNo} onChange={e => updateFormData('departureFlightNo', e.target.value)} placeholder="e.g., AA5678" />
                         </div>
                         
                         <div className="space-y-2">
                           <Label>Date & Time</Label>
                           <Popover>
                             <PopoverTrigger asChild>
-                              <Button
-                                variant="outline"
-                                className={cn(
-                                  "w-full justify-start text-left font-normal",
-                                  !formData.departureDateTime && "text-muted-foreground"
-                                )}
-                              >
+                              <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !formData.departureDateTime && "text-muted-foreground")}>
                                 <CalendarIcon className="mr-2 h-4 w-4" />
                                 {formData.departureDateTime ? format(formData.departureDateTime, "PPP p") : <span>Select departure date & time</span>}
                               </Button>
                             </PopoverTrigger>
                             <PopoverContent className="w-auto p-0" align="start">
-                              <Calendar
-                                mode="single"
-                                selected={formData.departureDateTime}
-                                onSelect={(date) => updateFormData('departureDateTime', date)}
-                                initialFocus
-                                className="p-3 pointer-events-auto"
-                              />
+                              <Calendar mode="single" selected={formData.departureDateTime} onSelect={date => updateFormData('departureDateTime', date)} initialFocus className="p-3 pointer-events-auto" />
                             </PopoverContent>
                           </Popover>
                         </div>
                         
                         <div className="space-y-2">
                           <Label>Airline</Label>
-                          <Input 
-                            value={formData.departureAirline} 
-                            onChange={(e) => updateFormData('departureAirline', e.target.value)}
-                            placeholder="e.g., American Airlines"
-                          />
+                          <Input value={formData.departureAirline} onChange={e => updateFormData('departureAirline', e.target.value)} placeholder="e.g., American Airlines" />
                         </div>
                         
                         <div className="space-y-2">
                           <Label>Airport</Label>
-                          <Input 
-                            value={formData.departureAirport} 
-                            onChange={(e) => updateFormData('departureAirport', e.target.value)}
-                            placeholder="e.g., LAX International"
-                          />
+                          <Input value={formData.departureAirport} onChange={e => updateFormData('departureAirport', e.target.value)} placeholder="e.g., LAX International" />
                         </div>
                         
                         <div className="space-y-2">
                           <Label>City</Label>
-                          <Input 
-                            value={formData.departureCity} 
-                            onChange={(e) => updateFormData('departureCity', e.target.value)}
-                            placeholder="e.g., Los Angeles"
-                          />
+                          <Input value={formData.departureCity} onChange={e => updateFormData('departureCity', e.target.value)} placeholder="e.g., Los Angeles" />
                         </div>
                         
                         <div className="space-y-2">
                           <Label>Zip Code</Label>
-                          <Input 
-                            value={formData.departureZipCode} 
-                            onChange={(e) => updateFormData('departureZipCode', e.target.value)}
-                            placeholder="e.g., 90045"
-                          />
+                          <Input value={formData.departureZipCode} onChange={e => updateFormData('departureZipCode', e.target.value)} placeholder="e.g., 90045" />
                         </div>
                         
                         <div className="space-y-2">
                           <Label>Passengers</Label>
-                          <Input 
-                            type="number"
-                            value={formData.departurePassengers || ''} 
-                            onChange={(e) => updateFormData('departurePassengers', parseInt(e.target.value) || 0)}
-                            placeholder="Number of passengers"
-                            min="0"
-                          />
+                          <Input type="number" value={formData.departurePassengers || ''} onChange={e => updateFormData('departurePassengers', parseInt(e.target.value) || 0)} placeholder="Number of passengers" min="0" />
                         </div>
                       </div>
                     </div>
-                  </>
-                )}
+                  </>}
 
-                {!formData.enableAirportInfo && (
-                  <div className="text-sm text-muted-foreground bg-muted/50 p-4 rounded-lg">
+                {!formData.enableAirportInfo && <div className="text-sm text-muted-foreground bg-muted/50 p-4 rounded-lg">
                     Check the box above to enable airport information fields.
-                  </div>
-                )}
+                  </div>}
               </div>
             </AccordionContent>
           </AccordionItem>
@@ -1823,7 +1558,7 @@ const NewReservation = () => {
               <div className="grid gap-4 grid-cols-1 md:grid-cols-3">
                 <div className="space-y-2">
                   <Label>Insurance Level</Label>
-                  <Select value={formData.insuranceLevelId} onValueChange={(value) => updateFormData('insuranceLevelId', value)}>
+                  <Select value={formData.insuranceLevelId} onValueChange={value => updateFormData('insuranceLevelId', value)}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select level" />
                     </SelectTrigger>
@@ -1836,7 +1571,7 @@ const NewReservation = () => {
                 </div>
                 <div className="space-y-2">
                   <Label>Insurance Group</Label>
-                  <Select value={formData.insuranceGroupId} onValueChange={(value) => updateFormData('insuranceGroupId', value)}>
+                  <Select value={formData.insuranceGroupId} onValueChange={value => updateFormData('insuranceGroupId', value)}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select group" />
                     </SelectTrigger>
@@ -1849,7 +1584,7 @@ const NewReservation = () => {
                 </div>
                 <div className="space-y-2">
                   <Label>Insurance Provider</Label>
-                  <Select value={formData.insuranceProviderId} onValueChange={(value) => updateFormData('insuranceProviderId', value)}>
+                  <Select value={formData.insuranceProviderId} onValueChange={value => updateFormData('insuranceProviderId', value)}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select provider" />
                     </SelectTrigger>
@@ -1870,41 +1605,57 @@ const NewReservation = () => {
               <div className="flex items-center gap-2">
                 <Plus className="h-5 w-5" />
                 <span className="font-semibold">Miscellaneous Charges</span>
-                {(formData.selectedMiscCharges || []).length > 0 && (
-                  <Badge variant="secondary" className="ml-2">
+                {(formData.selectedMiscCharges || []).length > 0 && <Badge variant="secondary" className="ml-2">
                     {(formData.selectedMiscCharges || []).length} selected
-                  </Badge>
-                )}
+                  </Badge>}
               </div>
             </AccordionTrigger>
             <AccordionContent className="px-6 pb-6">
               <div className="space-y-4">
-                {[
-                  { id: 'ldw', name: 'LDW (Per Day - No Tax)', amount: '750.00' },      // ~25 USD -> 750 AED
-                  { id: 'drop-fee', name: 'Drop Fee (Fixed)', amount: '1500.00' },      // ~50 USD -> 1500 AED
-                  { id: 'under-age', name: 'Under Age Fee (No Tax)', amount: '450.00' }, // ~15 USD -> 450 AED
-                  { id: 'valet', name: 'Valet (Per Day)', amount: '300.00' },           // ~10 USD -> 300 AED
-                  { id: 'sli', name: 'SLI (Fixed)', amount: '2250.00' }                 // ~75 USD -> 2250 AED
-                ].map((charge) => (
-                  <div key={charge.id} className="flex items-center justify-between p-3 border rounded-lg">
+                {[{
+                id: 'ldw',
+                name: 'LDW (Per Day - No Tax)',
+                amount: '750.00'
+              },
+              // ~25 USD -> 750 AED
+              {
+                id: 'drop-fee',
+                name: 'Drop Fee (Fixed)',
+                amount: '1500.00'
+              },
+              // ~50 USD -> 1500 AED
+              {
+                id: 'under-age',
+                name: 'Under Age Fee (No Tax)',
+                amount: '450.00'
+              },
+              // ~15 USD -> 450 AED
+              {
+                id: 'valet',
+                name: 'Valet (Per Day)',
+                amount: '300.00'
+              },
+              // ~10 USD -> 300 AED
+              {
+                id: 'sli',
+                name: 'SLI (Fixed)',
+                amount: '2250.00'
+              } // ~75 USD -> 2250 AED
+              ].map(charge => <div key={charge.id} className="flex items-center justify-between p-3 border rounded-lg">
                     <div className="flex items-center gap-3">
-                      <Checkbox 
-                        checked={(formData.selectedMiscCharges || []).includes(charge.id)}
-                        onCheckedChange={(checked) => {
-                          if (checked) {
-                            updateFormData('selectedMiscCharges', [...(formData.selectedMiscCharges || []), charge.id]);
-                          } else {
-                            updateFormData('selectedMiscCharges', (formData.selectedMiscCharges || []).filter(id => id !== charge.id));
-                          }
-                        }}
-                      />
+                      <Checkbox checked={(formData.selectedMiscCharges || []).includes(charge.id)} onCheckedChange={checked => {
+                    if (checked) {
+                      updateFormData('selectedMiscCharges', [...(formData.selectedMiscCharges || []), charge.id]);
+                    } else {
+                      updateFormData('selectedMiscCharges', (formData.selectedMiscCharges || []).filter(id => id !== charge.id));
+                    }
+                  }} />
                       <div>
                         <p className="font-medium">{charge.name}</p>
                       </div>
                     </div>
                     <span className="font-medium">AED {charge.amount}</span>
-                  </div>
-                ))}
+                  </div>)}
               </div>
             </AccordionContent>
           </AccordionItem>
@@ -1922,32 +1673,21 @@ const NewReservation = () => {
                 <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label>Price List</Label>
-                    {loading.priceLists ? (
-                      <Skeleton className="h-10 w-full" />
-                    ) : (
-                      <Select value={formData.priceListId} onValueChange={handlePriceListChange}>
+                    {loading.priceLists ? <Skeleton className="h-10 w-full" /> : <Select value={formData.priceListId} onValueChange={handlePriceListChange}>
                         <SelectTrigger id="select-price-list">
                           <SelectValue placeholder="Select price list" />
                         </SelectTrigger>
                         <SelectContent className="z-50 bg-background">
-                          {options.priceLists.map((option) => (
-                            <SelectItem key={option.id} value={option.id}>
+                          {options.priceLists.map(option => <SelectItem key={option.id} value={option.id}>
                               {option.label}
-                            </SelectItem>
-                          ))}
+                            </SelectItem>)}
                         </SelectContent>
-                      </Select>
-                    )}
+                      </Select>}
                   </div>
                   <div className="space-y-2">
                     <Label>Promotion Code</Label>
                     <div className="flex gap-2">
-                      <Input 
-                        id="input-promo"
-                        value={formData.promotionCode} 
-                        onChange={(e) => updateFormData('promotionCode', e.target.value)}
-                        placeholder="Enter promo code"
-                      />
+                      <Input id="input-promo" value={formData.promotionCode} onChange={e => updateFormData('promotionCode', e.target.value)} placeholder="Enter promo code" />
                       <Button variant="outline" size="icon">
                         <Check className="h-4 w-4" />
                       </Button>
@@ -1960,47 +1700,19 @@ const NewReservation = () => {
                   <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
                     <div className="space-y-2">
                       <Label>Hourly Rate</Label>
-                      <Input 
-                        id="rate-hourly"
-                        type="number"
-                        step="0.01"
-                        value={formData.hourlyRate}
-                        onChange={(e) => updateFormData('hourlyRate', parseFloat(e.target.value) || 0)}
-                        placeholder="0.00"
-                      />
+                      <Input id="rate-hourly" type="number" step="0.01" value={formData.hourlyRate} onChange={e => updateFormData('hourlyRate', parseFloat(e.target.value) || 0)} placeholder="0.00" />
                     </div>
                     <div className="space-y-2">
                       <Label>Daily Rate</Label>
-                      <Input 
-                        id="rate-daily"
-                        type="number"
-                        step="0.01"
-                        value={formData.dailyRate}
-                        onChange={(e) => updateFormData('dailyRate', parseFloat(e.target.value) || 0)}
-                        placeholder="0.00"
-                      />
+                      <Input id="rate-daily" type="number" step="0.01" value={formData.dailyRate} onChange={e => updateFormData('dailyRate', parseFloat(e.target.value) || 0)} placeholder="0.00" />
                     </div>
                     <div className="space-y-2">
                       <Label>Weekly Rate</Label>
-                      <Input 
-                        id="rate-weekly"
-                        type="number"
-                        step="0.01"
-                        value={formData.weeklyRate}
-                        onChange={(e) => updateFormData('weeklyRate', parseFloat(e.target.value) || 0)}
-                        placeholder="0.00"
-                      />
+                      <Input id="rate-weekly" type="number" step="0.01" value={formData.weeklyRate} onChange={e => updateFormData('weeklyRate', parseFloat(e.target.value) || 0)} placeholder="0.00" />
                     </div>
                     <div className="space-y-2">
                       <Label>Monthly Rate</Label>
-                      <Input 
-                        id="rate-monthly"
-                        type="number"
-                        step="0.01"
-                        value={formData.monthlyRate}
-                        onChange={(e) => updateFormData('monthlyRate', parseFloat(e.target.value) || 0)}
-                        placeholder="0.00"
-                      />
+                      <Input id="rate-monthly" type="number" step="0.01" value={formData.monthlyRate} onChange={e => updateFormData('monthlyRate', parseFloat(e.target.value) || 0)} placeholder="0.00" />
                     </div>
                   </div>
                 </div>
@@ -2008,24 +1720,11 @@ const NewReservation = () => {
                 <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label>Kilometer Charge</Label>
-                    <Input 
-                      id="rate-km-charge"
-                      type="number"
-                      step="0.01"
-                      value={formData.kilometerCharge}
-                      onChange={(e) => updateFormData('kilometerCharge', parseFloat(e.target.value) || 0)}
-                      placeholder="0.00"
-                    />
+                    <Input id="rate-km-charge" type="number" step="0.01" value={formData.kilometerCharge} onChange={e => updateFormData('kilometerCharge', parseFloat(e.target.value) || 0)} placeholder="0.00" />
                   </div>
                   <div className="space-y-2">
                     <Label>Daily Kilometer Allowed</Label>
-                    <Input 
-                      id="rate-daily-km-allowed"
-                      type="number"
-                      value={formData.dailyKilometerAllowed}
-                      onChange={(e) => updateFormData('dailyKilometerAllowed', parseInt(e.target.value) || 0)}
-                      placeholder="0"
-                    />
+                    <Input id="rate-daily-km-allowed" type="number" value={formData.dailyKilometerAllowed} onChange={e => updateFormData('dailyKilometerAllowed', parseInt(e.target.value) || 0)} placeholder="0" />
                   </div>
                 </div>
               </div>
@@ -2045,50 +1744,27 @@ const NewReservation = () => {
                 <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                   <div className="space-y-2">
                     <Label>Pre-adjustment</Label>
-                    <Input 
-                      type="number"
-                      step="0.01"
-                      value={formData.preAdjustment} 
-                      onChange={(e) => updateFormData('preAdjustment', parseFloat(e.target.value) || 0)}
-                      placeholder="0.00"
-                    />
+                    <Input type="number" step="0.01" value={formData.preAdjustment} onChange={e => updateFormData('preAdjustment', parseFloat(e.target.value) || 0)} placeholder="0.00" />
                   </div>
                   <div className="space-y-2">
                     <Label>Advance Payment</Label>
-                    <Input 
-                      type="number"
-                      step="0.01"
-                      value={formData.advancePayment} 
-                      onChange={(e) => updateFormData('advancePayment', parseFloat(e.target.value) || 0)}
-                      placeholder="0.00"
-                    />
-                    {validation.getFieldError('header.advancePayment') && (
-                      <FormError message={validation.getFieldError('header.advancePayment')} />
-                    )}
+                    <Input type="number" step="0.01" value={formData.advancePayment} onChange={e => updateFormData('advancePayment', parseFloat(e.target.value) || 0)} placeholder="0.00" />
+                    {validation.getFieldError('header.advancePayment') && <FormError message={validation.getFieldError('header.advancePayment')} />}
                   </div>
                   <div className="space-y-2">
                     <Label>Security Deposit Paid</Label>
-                    <Input 
-                      type="number"
-                      step="0.01"
-                      value={formData.securityDepositPaid} 
-                      onChange={(e) => updateFormData('securityDepositPaid', parseFloat(e.target.value) || 0)}
-                      placeholder="0.00"
-                    />
-                    {validation.getFieldError('header.securityDepositPaid') && (
-                      <FormError message={validation.getFieldError('header.securityDepositPaid')} />
-                    )}
+                    <Input type="number" step="0.01" value={formData.securityDepositPaid} onChange={e => updateFormData('securityDepositPaid', parseFloat(e.target.value) || 0)} placeholder="0.00" />
+                    {validation.getFieldError('header.securityDepositPaid') && <FormError message={validation.getFieldError('header.securityDepositPaid')} />}
                   </div>
                 </div>
 
                 {/* Payment Method Section - Shows when advance payment > 0 */}
-                {formData.advancePayment > 0 && (
-                  <div className="space-y-4 p-4 border rounded-lg bg-muted/50">
+                {formData.advancePayment > 0 && <div className="space-y-4 p-4 border rounded-lg bg-muted/50">
                     <h4 className="font-medium">Payment Method (Required for Advance Payment)</h4>
                     <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
                       <div className="space-y-2">
                         <RequiredLabel>Payment Method</RequiredLabel>
-                        <Select value={formData.paymentMethodId} onValueChange={(value) => updateFormData('paymentMethodId', value)}>
+                        <Select value={formData.paymentMethodId} onValueChange={value => updateFormData('paymentMethodId', value)}>
                           <SelectTrigger>
                             <SelectValue placeholder="Select payment method" />
                           </SelectTrigger>
@@ -2100,22 +1776,18 @@ const NewReservation = () => {
                             <SelectItem value="check">Check</SelectItem>
                           </SelectContent>
                         </Select>
-                        {validation.getFieldError('header.paymentMethod') && (
-                          <FormError message={validation.getFieldError('header.paymentMethod')} />
-                        )}
+                        {validation.getFieldError('header.paymentMethod') && <FormError message={validation.getFieldError('header.paymentMethod')} />}
                       </div>
                     </div>
-                  </div>
-                )}
+                  </div>}
 
                 {/* Deposit Method Section - Shows when security deposit > 0 */}
-                {formData.securityDepositPaid > 0 && (
-                  <div className="space-y-4 p-4 border rounded-lg bg-muted/50">
+                {formData.securityDepositPaid > 0 && <div className="space-y-4 p-4 border rounded-lg bg-muted/50">
                     <h4 className="font-medium">Deposit Payment Details (Required for Security Deposit)</h4>
                     <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
                       <div className="space-y-2">
                         <RequiredLabel>Deposit Method</RequiredLabel>
-                        <Select value={formData.depositMethodId} onValueChange={(value) => updateFormData('depositMethodId', value)}>
+                        <Select value={formData.depositMethodId} onValueChange={value => updateFormData('depositMethodId', value)}>
                           <SelectTrigger>
                             <SelectValue placeholder="Select deposit method" />
                           </SelectTrigger>
@@ -2125,13 +1797,11 @@ const NewReservation = () => {
                             <SelectItem value="bank-guarantee">Bank Guarantee</SelectItem>
                           </SelectContent>
                         </Select>
-                        {validation.getFieldError('header.depositMethod') && (
-                          <FormError message={validation.getFieldError('header.depositMethod')} />
-                        )}
+                        {validation.getFieldError('header.depositMethod') && <FormError message={validation.getFieldError('header.depositMethod')} />}
                       </div>
                       <div className="space-y-2">
                         <RequiredLabel>Deposit Payment Method</RequiredLabel>
-                        <Select value={formData.depositPaymentMethodId} onValueChange={(value) => updateFormData('depositPaymentMethodId', value)}>
+                        <Select value={formData.depositPaymentMethodId} onValueChange={value => updateFormData('depositPaymentMethodId', value)}>
                           <SelectTrigger>
                             <SelectValue placeholder="Select payment method" />
                           </SelectTrigger>
@@ -2143,13 +1813,10 @@ const NewReservation = () => {
                             <SelectItem value="check">Check</SelectItem>
                           </SelectContent>
                         </Select>
-                        {validation.getFieldError('header.depositPaymentMethod') && (
-                          <FormError message={validation.getFieldError('header.depositPaymentMethod')} />
-                        )}
+                        {validation.getFieldError('header.depositPaymentMethod') && <FormError message={validation.getFieldError('header.depositPaymentMethod')} />}
                       </div>
                     </div>
-                  </div>
-                )}
+                  </div>}
               </div>
             </AccordionContent>
           </AccordionItem>
@@ -2166,7 +1833,7 @@ const NewReservation = () => {
               <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                 <div className="space-y-2">
                   <Label>Referral Name</Label>
-                  <Select value={formData.referralNameId} onValueChange={(value) => updateFormData('referralNameId', value)}>
+                  <Select value={formData.referralNameId} onValueChange={value => updateFormData('referralNameId', value)}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select referral" />
                     </SelectTrigger>
@@ -2179,7 +1846,7 @@ const NewReservation = () => {
                 </div>
                 <div className="space-y-2">
                   <Label>Contact Name</Label>
-                  <Select value={formData.referralContactNameId} onValueChange={(value) => updateFormData('referralContactNameId', value)}>
+                  <Select value={formData.referralContactNameId} onValueChange={value => updateFormData('referralContactNameId', value)}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select contact" />
                     </SelectTrigger>
@@ -2192,11 +1859,7 @@ const NewReservation = () => {
                 </div>
                 <div className="space-y-2">
                   <Label>Phone No.</Label>
-                  <Input 
-                    value={formData.referralPhone} 
-                    onChange={(e) => updateFormData('referralPhone', e.target.value)}
-                    placeholder="+97150345234"
-                  />
+                  <Input value={formData.referralPhone} onChange={e => updateFormData('referralPhone', e.target.value)} placeholder="+97150345234" />
                 </div>
               </div>
             </AccordionContent>
@@ -2214,24 +1877,12 @@ const NewReservation = () => {
               <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label>Note</Label>
-                  <Textarea 
-                    value={formData.note} 
-                    onChange={(e) => updateFormData('note', e.target.value)}
-                    placeholder="General notes about the reservation..."
-                    rows={4}
-                    maxLength={500}
-                  />
+                  <Textarea value={formData.note} onChange={e => updateFormData('note', e.target.value)} placeholder="General notes about the reservation..." rows={4} maxLength={500} />
                   <p className="text-xs text-muted-foreground">{(formData.note || '').length}/500 characters</p>
                 </div>
                 <div className="space-y-2">
                   <Label>Special Note</Label>
-                  <Textarea 
-                    value={formData.specialNote} 
-                    onChange={(e) => updateFormData('specialNote', e.target.value)}
-                    placeholder="Special instructions or requirements..."
-                    rows={4}
-                    maxLength={500}
-                  />
+                  <Textarea value={formData.specialNote} onChange={e => updateFormData('specialNote', e.target.value)} placeholder="Special instructions or requirements..." rows={4} maxLength={500} />
                   <p className="text-xs text-muted-foreground">{(formData.specialNote || '').length}/500 characters</p>
                 </div>
               </div>
@@ -2260,30 +1911,19 @@ const NewReservation = () => {
                       <Label>Check Out Date <span className="text-destructive">*</span></Label>
                       <Popover>
                         <PopoverTrigger asChild>
-                          <Button
-                            variant="outline"
-                            className={cn(
-                              "w-full justify-start text-left font-normal",
-                              !formData.checkOutDate && "text-muted-foreground"
-                            )}
-                          >
+                          <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !formData.checkOutDate && "text-muted-foreground")}>
                             <CalendarIcon className="mr-2 h-4 w-4" />
                             {formData.checkOutDate ? format(formData.checkOutDate, "PPP") : <span>Pick check out date</span>}
                           </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={formData.checkOutDate}
-                            onSelect={(date) => {
-                              updateFormData('checkOutDate', date);
-                              // Clear vehicle selection when dates change
-                              if (formData.vehicleId) {
-                                updateFormData('vehicleId', '');
-                              }
-                            }}
-                            initialFocus
-                          />
+                          <Calendar mode="single" selected={formData.checkOutDate} onSelect={date => {
+                          updateFormData('checkOutDate', date);
+                          // Clear vehicle selection when dates change
+                          if (formData.vehicleId) {
+                            updateFormData('vehicleId', '');
+                          }
+                        }} initialFocus />
                         </PopoverContent>
                       </Popover>
                     </div>
@@ -2292,97 +1932,57 @@ const NewReservation = () => {
                       <Label>Check In Date <span className="text-destructive">*</span></Label>
                       <Popover>
                         <PopoverTrigger asChild>
-                          <Button
-                            variant="outline"
-                            className={cn(
-                              "w-full justify-start text-left font-normal",
-                              !formData.checkInDate && "text-muted-foreground"
-                            )}
-                          >
+                          <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !formData.checkInDate && "text-muted-foreground")}>
                             <CalendarIcon className="mr-2 h-4 w-4" />
                             {formData.checkInDate ? format(formData.checkInDate, "PPP") : <span>Pick check in date</span>}
                           </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={formData.checkInDate}
-                            onSelect={(date) => {
-                              updateFormData('checkInDate', date);
-                              // Clear vehicle selection when dates change
-                              if (formData.vehicleId) {
-                                updateFormData('vehicleId', '');
-                              }
-                            }}
-                            initialFocus
-                          />
+                          <Calendar mode="single" selected={formData.checkInDate} onSelect={date => {
+                          updateFormData('checkInDate', date);
+                          // Clear vehicle selection when dates change
+                          if (formData.vehicleId) {
+                            updateFormData('vehicleId', '');
+                          }
+                        }} initialFocus />
                         </PopoverContent>
                       </Popover>
                     </div>
 
                     {/* Locations */}
-                    <LocationSelect
-                      value={formData.checkOutLocationId}
-                      onChange={(locationId) => {
-                        updateFormData('checkOutLocationId', locationId);
-                        // Clear vehicle selection when location changes
-                        if (formData.vehicleId) {
-                          updateFormData('vehicleId', '');
-                        }
-                      }}
-                      placeholder="Select check out location"
-                      className="w-full"
-                    />
+                    <LocationSelect value={formData.checkOutLocationId} onChange={locationId => {
+                    updateFormData('checkOutLocationId', locationId);
+                    // Clear vehicle selection when location changes
+                    if (formData.vehicleId) {
+                      updateFormData('vehicleId', '');
+                    }
+                  }} placeholder="Select check out location" className="w-full" />
                     
-                    <LocationSelect
-                      value={formData.checkInLocationId}
-                      onChange={(locationId) => {
-                        updateFormData('checkInLocationId', locationId);
-                        // Clear vehicle selection when location changes
-                        if (formData.vehicleId) {
-                          updateFormData('vehicleId', '');
-                        }
-                      }}
-                      placeholder="Select check in location"
-                      className="w-full"
-                    />
+                    <LocationSelect value={formData.checkInLocationId} onChange={locationId => {
+                    updateFormData('checkInLocationId', locationId);
+                    // Clear vehicle selection when location changes
+                    if (formData.vehicleId) {
+                      updateFormData('vehicleId', '');
+                    }
+                  }} placeholder="Select check in location" className="w-full" />
 
                     {/* Vehicle Class */}
-                    <VehicleClassSelect
-                      value={formData.vehicleClassId}
-                      onChange={(classId) => {
-                        updateFormData('vehicleClassId', classId);
-                        // Clear vehicle selection when class changes
-                        if (formData.vehicleId) {
-                          updateFormData('vehicleId', '');
-                        }
-                      }}
-                      placeholder="Select vehicle class"
-                      className="w-full"
-                    />
+                    <VehicleClassSelect value={formData.vehicleClassId} onChange={classId => {
+                    updateFormData('vehicleClassId', classId);
+                    // Clear vehicle selection when class changes
+                    if (formData.vehicleId) {
+                      updateFormData('vehicleId', '');
+                    }
+                  }} placeholder="Select vehicle class" className="w-full" />
                     
                     {/* Enhanced Vehicle Selector with Dependencies */}
                     <div className="md:col-span-2">
-                      <ConditionalVehicleSelector
-                        value={formData.vehicleId}
-                        onChange={(vehicleId) => updateFormData('vehicleId', vehicleId)}
-                        checkOutDate={formData.checkOutDate}
-                        checkInDate={formData.checkInDate}
-                        checkOutLocationId={formData.checkOutLocationId}
-                        checkInLocationId={formData.checkInLocationId}
-                        vehicleClassId={formData.vehicleClassId}
-                        className="w-full"
-                      />
+                      <ConditionalVehicleSelector value={formData.vehicleId} onChange={vehicleId => updateFormData('vehicleId', vehicleId)} checkOutDate={formData.checkOutDate} checkInDate={formData.checkInDate} checkOutLocationId={formData.checkOutLocationId} checkInLocationId={formData.checkInLocationId} vehicleClassId={formData.vehicleClassId} className="w-full" />
                     </div>
                   </div>
                   
                   <div className="flex justify-end">
-                    <Button
-                      id="btn-add-line-vehicle"
-                      onClick={addReservationLine}
-                      disabled={!isPrefillComplete()}
-                      className="flex items-center gap-2"
-                    >
+                    <Button id="btn-add-line-vehicle" onClick={addReservationLine} disabled={!isPrefillComplete()} className="flex items-center gap-2">
                       <Plus className="h-4 w-4" />
                       Add Line
                     </Button>
@@ -2390,11 +1990,7 @@ const NewReservation = () => {
                 </TabsContent>
                 
                 <TabsContent value="drivers" className="space-y-6">
-                  <EnhancedDriverPicker
-                    selectedDrivers={formData.drivers}
-                    onDriversChange={(drivers) => updateFormData('drivers', drivers)}
-                    className="w-full"
-                  />
+                  <EnhancedDriverPicker selectedDrivers={formData.drivers} onDriversChange={drivers => updateFormData('drivers', drivers)} className="w-full" />
                 </TabsContent>
               </Tabs>
             </AccordionContent>
@@ -2406,30 +2002,17 @@ const NewReservation = () => {
               <div className="flex items-center gap-2">
                 <Car className="h-5 w-5" />
                 <span className="font-semibold">Reservation Lines</span>
-                {(formData.reservationLines || []).length > 0 && (
-                  <Badge variant="secondary" className="ml-2">
+                {(formData.reservationLines || []).length > 0 && <Badge variant="secondary" className="ml-2">
                     {(formData.reservationLines || []).length} lines
-                  </Badge>
-                )}
+                  </Badge>}
               </div>
             </AccordionTrigger>
             <AccordionContent className="px-6 pb-6">
               <div className="space-y-4">
-                <RepriceBanner
-                  show={showRepriceBanner}
-                  onReprice={handleRepriceLines}
-                  onDismiss={() => setShowRepriceBanner(false)}
-                />
+                <RepriceBanner show={showRepriceBanner} onReprice={handleRepriceLines} onDismiss={() => setShowRepriceBanner(false)} />
                 
                 <div id="grid-reservation-lines">
-                  <ReservationLineGrid
-                    lines={formData.reservationLines || []}
-                    onLineUpdate={handleLineUpdate}
-                    onLineRemove={handleLineRemove}
-                    onLineDuplicate={handleLineDuplicate}
-                    selectedLines={selectedLines}
-                    onSelectionChange={setSelectedLines}
-                  />
+                  <ReservationLineGrid lines={formData.reservationLines || []} onLineUpdate={handleLineUpdate} onLineRemove={handleLineRemove} onLineDuplicate={handleLineDuplicate} selectedLines={selectedLines} onSelectionChange={setSelectedLines} />
                 </div>
               </div>
             </AccordionContent>
@@ -2440,20 +2023,10 @@ const NewReservation = () => {
         {/* Action Buttons - Fixed Bottom */}
         <div className="sticky bottom-0 bg-background border-t px-6 py-4 mt-8">
           <div className="flex justify-end gap-4 max-w-7xl mx-auto">
-            <Button 
-              variant="outline" 
-              onClick={() => handleSave('DRAFT')}
-              disabled={loading.saving}
-            >
+            <Button variant="outline" onClick={() => handleSave('DRAFT')} disabled={loading.saving}>
               {loading.saving ? 'Saving...' : 'Save Draft'}
             </Button>
-            <Button 
-              id="btn-save-continue"
-              onClick={() => handleSave('ACTIVE')}
-              disabled={loading.saving}
-              className="min-w-32"
-              title={validation.hasErrors || (formData.reservationLines || []).length === 0 ? "Complete required fields first" : undefined}
-            >
+            <Button id="btn-save-continue" onClick={() => handleSave('ACTIVE')} disabled={loading.saving} className="min-w-32" title={validation.hasErrors || (formData.reservationLines || []).length === 0 ? "Complete required fields first" : undefined}>
               {loading.saving ? 'Saving...' : 'Save & Continue'}
             </Button>
           </div>
@@ -2463,14 +2036,9 @@ const NewReservation = () => {
       {/* Right Sidebar - Summary */}
       <div className="lg:w-96 space-y-6">
         <div className="sticky top-6">
-          <SummaryCard
-            summary={summary}
-            currencyCode="AED"
-          />
+          <SummaryCard summary={summary} currencyCode="AED" />
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default NewReservation;
