@@ -4,12 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, MapPin, Clock, Zap, CheckCircle } from 'lucide-react';
+import { Calendar, MapPin, Clock, Zap, CheckCircle, Car, Users, DollarSign } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import QuickVehicleSelector from '@/components/instant-booking/QuickVehicleSelector';
 import CustomerDetector from '@/components/instant-booking/CustomerDetector';
-import InstantBookingForm from '@/components/instant-booking/InstantBookingForm';
 import PricingCalculatorInstant from '@/components/instant-booking/PricingCalculatorInstant';
 import { useInstantBooking } from '@/hooks/useInstantBooking';
 
@@ -283,7 +282,7 @@ const InstantBooking = () => {
                   <Calendar className="h-4 w-4 text-muted-foreground" />
                   <span className="text-sm">
                     {bookingData.pickupDate && bookingData.returnDate
-                      ? `${Math.ceil((new Date(bookingData.returnDate) - new Date(bookingData.pickupDate)) / (1000 * 60 * 60 * 24))} days`
+                      ? `${Math.ceil((new Date(bookingData.returnDate).getTime() - new Date(bookingData.pickupDate).getTime()) / (1000 * 60 * 60 * 24))} days`
                       : 'Select dates'
                     }
                   </span>

@@ -29,7 +29,12 @@ const CustomerDetector: React.FC<CustomerDetectorProps> = ({
   selectedCustomerId
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [newCustomer, setNewCustomer] = useState({
+  const [newCustomer, setNewCustomer] = useState<{
+    full_name: string;
+    email: string;
+    phone: string;
+    customer_type: 'B2B' | 'B2C' | 'CORPORATE';
+  }>({
     full_name: '',
     email: '',
     phone: '',
