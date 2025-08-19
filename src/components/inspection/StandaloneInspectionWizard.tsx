@@ -172,7 +172,10 @@ export const StandaloneInspectionWizard: React.FC<StandaloneInspectionWizardProp
           <InspectionChecklist
             data={inspectionData.checklist || {}}
             onUpdate={(data) => handleStepData('checklist', data)}
-            onDamageDetected={() => setCurrentStep('damage')}
+            onDamageDetected={() => {
+              // Navigate to damage step when user explicitly clicks the button
+              setCurrentStep('damage');
+            }}
           />
         );
       case 'damage':

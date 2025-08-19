@@ -69,15 +69,6 @@ export const InspectionChecklist: React.FC<InspectionChecklistProps> = ({
     setChecklistData(newData);
     setHasUnsavedChanges(true);
     onUpdate(newData);
-
-    // If damage is detected, prompt to add marker
-    if (value === 'DAMAGE') {
-      setTimeout(() => {
-        if (confirm(`Damage detected in ${CHECKLIST_SECTIONS.flatMap(s => s.items).find(i => i.id === itemId)?.name}. Would you like to add a damage marker to the vehicle diagram?`)) {
-          onDamageDetected();
-        }
-      }, 500);
-    }
   };
 
   const getCompletionStats = () => {
@@ -189,19 +180,6 @@ export const InspectionChecklist: React.FC<InspectionChecklistProps> = ({
         </div>
       )}
 
-      {/* Next Button */}
-      <div className="flex justify-end pt-4">
-        <Button 
-          onClick={() => {
-            // Force proceed to next step regardless of completion
-            const nextStepEvent = new CustomEvent('proceedToNextStep');
-            window.dispatchEvent(nextStepEvent);
-          }}
-          className="min-w-[100px]"
-        >
-          Next
-        </Button>
-      </div>
     </div>
   );
 };
