@@ -1,5 +1,5 @@
 export const formatCurrency = (amount: number, currencyCode: string = 'AED'): string => {
-  // Format for Arab Emirates Dirham
+  // Format for Egyptian Pound
   if (currencyCode === 'AED') {
     return `${amount.toFixed(2)} AED`;
   }

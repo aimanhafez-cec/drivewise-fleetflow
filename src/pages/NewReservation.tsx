@@ -506,11 +506,13 @@ const NewReservation = () => {
   }, []);
   const loadInitialData = async () => {
     // Set currency to only AED
-    setOptions(prev => ({ 
-      ...prev, 
-      currencies: [
-        { id: 'AED', label: 'AED - Arab Emirates Dirham', value: 'AED' }
-      ]
+    setOptions(prev => ({
+      ...prev,
+      currencies: [{
+        id: 'AED',
+        label: 'AED - Egyptian Pound',
+        value: 'AED'
+      }]
     }));
 
     // Set AED as default currency
