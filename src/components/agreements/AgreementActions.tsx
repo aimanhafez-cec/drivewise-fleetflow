@@ -20,7 +20,9 @@ export const AgreementActions: React.FC<AgreementActionsProps> = ({
 }) => {
   const [showInspectionWizard, setShowInspectionWizard] = useState(false);
 
-  const canStartInspection = agreementStatus === 'active' && agreementLines.length > 0;
+  const canStartInspection = agreementStatus === 'active' && 
+    agreementLines.length > 0 && 
+    agreementLines.some(line => line.vehicle_id);
 
   const handlePrint = async () => {
     try {
