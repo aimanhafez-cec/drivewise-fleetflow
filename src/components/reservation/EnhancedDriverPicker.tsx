@@ -49,8 +49,9 @@ export const EnhancedDriverPicker: React.FC<EnhancedDriverPickerProps> = ({
     !selectedDrivers.find(selected => selected.id === driver.id)
   );
 
-  const handleDriverSelect = (driverIds: string[]) => {
-    const newDriverId = driverIds[driverIds.length - 1]; // Get the last selected ID
+  const handleDriverSelect = (driverId: string | string[] | undefined) => {
+    // Handle single string (when multiple=false) or array
+    const newDriverId = Array.isArray(driverId) ? driverId[driverId.length - 1] : driverId;
     if (!newDriverId) return;
 
     const driver = drivers.find(d => d.id === newDriverId);
