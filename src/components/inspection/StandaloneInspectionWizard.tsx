@@ -9,10 +9,42 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { StandaloneVehicleAssignment } from './steps/StandaloneVehicleAssignment';
 import { InspectionChecklist } from './steps/InspectionChecklist';
-import { CompareOutVsInStep } from './steps/CompareOutVsInStep';
 import { InspectionMetrics } from './steps/InspectionMetrics';
 import { StandaloneInspectionSummary } from './steps/StandaloneInspectionSummary';
 import { X, Save, CheckCircle } from 'lucide-react';
+
+const CHECKLIST_SECTIONS = [
+  {
+    name: 'Exterior',
+    items: [
+      { id: 'exterior', name: 'Exterior Panels', description: 'Check for dents, scratches, paint damage', testId: 'chk-exterior' }
+    ]
+  },
+  {
+    name: 'Glass',
+    items: [
+      { id: 'glass', name: 'Windshield & Windows', description: 'Check for cracks, chips, or damage', testId: 'chk-glass' }
+    ]
+  },
+  {
+    name: 'Tires & Rims',
+    items: [
+      { id: 'tires', name: 'Tires & Rims', description: 'Check tread, sidewalls, rim condition', testId: 'chk-tires' }
+    ]
+  },
+  {
+    name: 'Interior',
+    items: [
+      { id: 'interior', name: 'Dashboard & Seats', description: 'Check seats, dashboard, controls', testId: 'chk-interior' }
+    ]
+  },
+  {
+    name: 'Accessories',
+    items: [
+      { id: 'accessories', name: 'Spare Tire & Equipment', description: 'Check spare tire, jack, GPS, child seats', testId: 'chk-accessories' }
+    ]
+  }
+];
 
 interface ChecklistData {
   status: Record<string, 'OK' | 'DAMAGE'>;
@@ -28,22 +60,15 @@ interface StandaloneInspectionData {
     fuelLevel?: 'E' | 'Q1' | 'H' | 'Q3' | 'F';
     extras?: Array<{code: string; qty: number}>;
   };
-  comparePhotos: Array<{
-    id: string;
-    type: 'out' | 'in';
-    imageUrl: string;
-    timestamp: string;
-  }>;
   signature?: { imageUrl: string; name: string; signedAt: string };
   notes?: string;
 }
 
-type WizardStep = 'vehicle' | 'checklist' | 'compare' | 'metrics' | 'summary';
+type WizardStep = 'vehicle' | 'checklist' | 'metrics' | 'summary';
 
 const STEPS: { key: WizardStep; title: string; id: string }[] = [
   { key: 'vehicle', title: 'Select Vehicle', id: 'step-vehicle' },
   { key: 'checklist', title: 'Walk-Around Checklist', id: 'step-checklist' },
-  { key: 'compare', title: 'Compare Out vs In', id: 'step-compare' },
   { key: 'metrics', title: 'Vehicle Metrics', id: 'step-metrics' },
   { key: 'summary', title: 'Summary & Signature', id: 'step-summary' },
 ];
@@ -59,7 +84,6 @@ export const StandaloneInspectionWizard: React.FC<StandaloneInspectionWizardProp
   const [inspectionData, setInspectionData] = useState<StandaloneInspectionData>({
     checklist: { status: {}, photos: {}, extraDamages: {} },
     metrics: {},
-    comparePhotos: [],
   });
   const [isDraft, setIsDraft] = useState(false);
   const { toast } = useToast();
@@ -124,9 +148,6 @@ export const StandaloneInspectionWizard: React.FC<StandaloneInspectionWizardProp
       case 'checklist':
         updatedData.checklist = { ...updatedData.checklist, ...data };
         break;
-      case 'compare':
-        updatedData.comparePhotos = data.comparePhotos || [];
-        break;
       case 'metrics':
         updatedData.metrics = { ...updatedData.metrics, ...data };
         break;
@@ -163,7 +184,10 @@ export const StandaloneInspectionWizard: React.FC<StandaloneInspectionWizardProp
       case 'vehicle':
         return !!inspectionData.vehicleId;
       case 'checklist':
-        return Object.keys(inspectionData.checklist.status).length > 0;
+        // Check if all checklist items are completed
+        const totalItems = CHECKLIST_SECTIONS.flatMap(s => s.items).length;
+        const completedItems = Object.keys(inspectionData.checklist.status).length;
+        return completedItems === totalItems;
       default:
         return true;
     }
@@ -183,14 +207,6 @@ export const StandaloneInspectionWizard: React.FC<StandaloneInspectionWizardProp
           <InspectionChecklist
             data={inspectionData.checklist}
             onUpdate={(data) => handleStepData('checklist', data)}
-          />
-        );
-      case 'compare':
-        return (
-          <CompareOutVsInStep
-            vehicleId={inspectionData.vehicleId!}
-            existingPhotos={inspectionData.comparePhotos || []}
-            onUpdate={(data) => handleStepData('compare', data)}
           />
         );
       case 'metrics':
