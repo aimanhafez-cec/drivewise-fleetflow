@@ -154,7 +154,7 @@ export const InspectionChecklist: React.FC<InspectionChecklistProps> = ({
                   {checklistData[item.id] === 'DAMAGE' && (
                     <div className="mt-2 p-3 bg-red-50 border border-red-200 rounded-lg">
                       <p className="text-sm text-red-800 mb-2">
-                        Damage detected. Consider adding a damage marker to the vehicle diagram.
+                        Damage detected. Consider adding a damage photo for documentation.
                       </p>
                       <Button
                         size="sm"
@@ -163,7 +163,7 @@ export const InspectionChecklist: React.FC<InspectionChecklistProps> = ({
                         className="border-red-300 text-red-700 hover:bg-red-100"
                       >
                         <Camera className="mr-2 h-3 w-3" />
-                        Add Damage Marker
+                        Add Damage Photo
                       </Button>
                     </div>
                   )}

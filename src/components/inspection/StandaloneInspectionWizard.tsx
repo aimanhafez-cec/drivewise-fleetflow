@@ -9,7 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { StandaloneVehicleAssignment } from './steps/StandaloneVehicleAssignment';
 import { InspectionChecklist } from './steps/InspectionChecklist';
-import { StandaloneDamageMarking } from './steps/StandaloneDamageMarking';
+import { CompareOutVsInStep } from './steps/CompareOutVsInStep';
 import { InspectionMetrics } from './steps/InspectionMetrics';
 import { StandaloneInspectionSummary } from './steps/StandaloneInspectionSummary';
 import { X, Save, CheckCircle } from 'lucide-react';
@@ -22,17 +22,22 @@ interface StandaloneInspectionData {
     fuelLevel?: 'E' | 'Q1' | 'H' | 'Q3' | 'F';
     extras?: Array<{code: string; qty: number}>;
   };
-  damageMarkerIds: string[];
+  comparePhotos: Array<{
+    id: string;
+    type: 'out' | 'in';
+    imageUrl: string;
+    timestamp: string;
+  }>;
   signature?: { imageUrl: string; name: string; signedAt: string };
   notes?: string;
 }
 
-type WizardStep = 'vehicle' | 'checklist' | 'damage' | 'metrics' | 'summary';
+type WizardStep = 'vehicle' | 'checklist' | 'compare' | 'metrics' | 'summary';
 
 const STEPS: { key: WizardStep; title: string; id: string }[] = [
   { key: 'vehicle', title: 'Select Vehicle', id: 'step-vehicle' },
   { key: 'checklist', title: 'Walk-Around Checklist', id: 'step-checklist' },
-  { key: 'damage', title: 'Damage Marking', id: 'step-damage' },
+  { key: 'compare', title: 'Compare Out vs In', id: 'step-compare' },
   { key: 'metrics', title: 'Vehicle Metrics', id: 'step-metrics' },
   { key: 'summary', title: 'Summary & Signature', id: 'step-summary' },
 ];
@@ -48,7 +53,7 @@ export const StandaloneInspectionWizard: React.FC<StandaloneInspectionWizardProp
   const [inspectionData, setInspectionData] = useState<StandaloneInspectionData>({
     checklist: {},
     metrics: {},
-    damageMarkerIds: [],
+    comparePhotos: [],
   });
   const [isDraft, setIsDraft] = useState(false);
   const { toast } = useToast();
@@ -113,8 +118,8 @@ export const StandaloneInspectionWizard: React.FC<StandaloneInspectionWizardProp
       case 'checklist':
         updatedData.checklist = { ...updatedData.checklist, ...data };
         break;
-      case 'damage':
-        updatedData.damageMarkerIds = data.damageMarkerIds || [];
+      case 'compare':
+        updatedData.comparePhotos = data.comparePhotos || [];
         break;
       case 'metrics':
         updatedData.metrics = { ...updatedData.metrics, ...data };
@@ -173,17 +178,17 @@ export const StandaloneInspectionWizard: React.FC<StandaloneInspectionWizardProp
             data={inspectionData.checklist || {}}
             onUpdate={(data) => handleStepData('checklist', data)}
             onDamageDetected={() => {
-              // Navigate to damage step when user explicitly clicks the button
-              setCurrentStep('damage');
+              // Navigate to compare step when user explicitly clicks the button
+              setCurrentStep('compare');
             }}
           />
         );
-      case 'damage':
+      case 'compare':
         return (
-          <StandaloneDamageMarking
+          <CompareOutVsInStep
             vehicleId={inspectionData.vehicleId!}
-            existingMarkerIds={inspectionData.damageMarkerIds || []}
-            onUpdate={(data) => handleStepData('damage', data)}
+            existingPhotos={inspectionData.comparePhotos || []}
+            onUpdate={(data) => handleStepData('compare', data)}
           />
         );
       case 'metrics':
