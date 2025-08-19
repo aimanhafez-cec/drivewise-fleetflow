@@ -14,9 +14,15 @@ import { InspectionMetrics } from './steps/InspectionMetrics';
 import { StandaloneInspectionSummary } from './steps/StandaloneInspectionSummary';
 import { X, Save, CheckCircle } from 'lucide-react';
 
+interface ChecklistData {
+  status: Record<string, 'OK' | 'DAMAGE'>;
+  photos: Record<string, Array<{id: string; file: File; preview: string}>>;
+  extraDamages: Record<string, Array<{id: string; description: string; photos: Array<{id: string; file: File; preview: string}>}>>;
+}
+
 interface StandaloneInspectionData {
   vehicleId?: string;
-  checklist: Record<string, 'OK' | 'DAMAGE'>;
+  checklist: ChecklistData;
   metrics: {
     odometer?: number;
     fuelLevel?: 'E' | 'Q1' | 'H' | 'Q3' | 'F';
@@ -51,7 +57,7 @@ export const StandaloneInspectionWizard: React.FC<StandaloneInspectionWizardProp
 }) => {
   const [currentStep, setCurrentStep] = useState<WizardStep>('vehicle');
   const [inspectionData, setInspectionData] = useState<StandaloneInspectionData>({
-    checklist: {},
+    checklist: { status: {}, photos: {}, extraDamages: {} },
     metrics: {},
     comparePhotos: [],
   });
@@ -77,7 +83,7 @@ export const StandaloneInspectionWizard: React.FC<StandaloneInspectionWizardProp
         notes: finalData.notes || null,
         performed_by,
         status: finalData.status,
-        checklist: finalData.checklist,
+        checklist: finalData.checklist.status,
         photos: []
       };
 
@@ -157,7 +163,7 @@ export const StandaloneInspectionWizard: React.FC<StandaloneInspectionWizardProp
       case 'vehicle':
         return !!inspectionData.vehicleId;
       case 'checklist':
-        return Object.keys(inspectionData.checklist).length > 0;
+        return Object.keys(inspectionData.checklist.status).length > 0;
       default:
         return true;
     }
@@ -175,12 +181,8 @@ export const StandaloneInspectionWizard: React.FC<StandaloneInspectionWizardProp
       case 'checklist':
         return (
           <InspectionChecklist
-            data={inspectionData.checklist || {}}
+            data={inspectionData.checklist}
             onUpdate={(data) => handleStepData('checklist', data)}
-            onDamageDetected={() => {
-              // Navigate to compare step when user explicitly clicks the button
-              setCurrentStep('compare');
-            }}
           />
         );
       case 'compare':

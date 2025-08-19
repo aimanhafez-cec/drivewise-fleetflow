@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { AlertTriangle, CheckCircle, Camera } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { AlertTriangle, CheckCircle, Camera, Plus, Trash2 } from 'lucide-react';
 
 interface ChecklistItem {
   id: string;
@@ -46,26 +47,155 @@ const CHECKLIST_SECTIONS: { name: string; items: ChecklistItem[] }[] = [
   }
 ];
 
+interface DamagePhoto {
+  id: string;
+  file: File;
+  preview: string;
+}
+
+interface DamageEntry {
+  id: string;
+  description: string;
+  photos: DamagePhoto[];
+}
+
+interface ChecklistData {
+  status: Record<string, 'OK' | 'DAMAGE'>;
+  photos: Record<string, DamagePhoto[]>;
+  extraDamages: Record<string, DamageEntry[]>;
+}
+
 interface InspectionChecklistProps {
-  data: Record<string, 'OK' | 'DAMAGE'>;
-  onUpdate: (data: Record<string, 'OK' | 'DAMAGE'>) => void;
-  onDamageDetected: () => void;
+  data: ChecklistData;
+  onUpdate: (data: ChecklistData) => void;
 }
 
 export const InspectionChecklist: React.FC<InspectionChecklistProps> = ({
   data,
-  onUpdate,
-  onDamageDetected
+  onUpdate
 }) => {
-  const [checklistData, setChecklistData] = useState<Record<string, 'OK' | 'DAMAGE'>>(data);
+  const [checklistData, setChecklistData] = useState<ChecklistData>(
+    data || { status: {}, photos: {}, extraDamages: {} }
+  );
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   useEffect(() => {
-    setChecklistData(data);
+    setChecklistData(data || { status: {}, photos: {}, extraDamages: {} });
   }, [data]);
 
   const handleItemChange = (itemId: string, value: 'OK' | 'DAMAGE') => {
-    const newData = { ...checklistData, [itemId]: value };
+    const newData = { 
+      ...checklistData, 
+      status: { ...checklistData.status, [itemId]: value }
+    };
+    setChecklistData(newData);
+    setHasUnsavedChanges(true);
+    onUpdate(newData);
+  };
+
+  const handlePhotoUpload = (itemId: string, files: FileList) => {
+    const newPhotos: DamagePhoto[] = Array.from(files).map(file => ({
+      id: crypto.randomUUID(),
+      file,
+      preview: URL.createObjectURL(file)
+    }));
+
+    const newData = {
+      ...checklistData,
+      photos: {
+        ...checklistData.photos,
+        [itemId]: [...(checklistData.photos[itemId] || []), ...newPhotos]
+      }
+    };
+    
+    setChecklistData(newData);
+    setHasUnsavedChanges(true);
+    onUpdate(newData);
+  };
+
+  const handlePhotoRemove = (itemId: string, photoId: string) => {
+    const newData = {
+      ...checklistData,
+      photos: {
+        ...checklistData.photos,
+        [itemId]: checklistData.photos[itemId]?.filter(photo => photo.id !== photoId) || []
+      }
+    };
+    
+    setChecklistData(newData);
+    setHasUnsavedChanges(true);
+    onUpdate(newData);
+  };
+
+  const handleAddExtraDamage = (sectionName: string) => {
+    const newDamage: DamageEntry = {
+      id: crypto.randomUUID(),
+      description: '',
+      photos: []
+    };
+
+    const newData = {
+      ...checklistData,
+      extraDamages: {
+        ...checklistData.extraDamages,
+        [sectionName]: [...(checklistData.extraDamages[sectionName] || []), newDamage]
+      }
+    };
+    
+    setChecklistData(newData);
+    setHasUnsavedChanges(true);
+    onUpdate(newData);
+  };
+
+  const handleExtraDamageChange = (sectionName: string, damageId: string, description: string) => {
+    const newData = {
+      ...checklistData,
+      extraDamages: {
+        ...checklistData.extraDamages,
+        [sectionName]: checklistData.extraDamages[sectionName]?.map(damage =>
+          damage.id === damageId ? { ...damage, description } : damage
+        ) || []
+      }
+    };
+    
+    setChecklistData(newData);
+    setHasUnsavedChanges(true);
+    onUpdate(newData);
+  };
+
+  const handleExtraDamagePhotoUpload = (sectionName: string, damageId: string, files: FileList) => {
+    const newPhotos: DamagePhoto[] = Array.from(files).map(file => ({
+      id: crypto.randomUUID(),
+      file,
+      preview: URL.createObjectURL(file)
+    }));
+
+    const newData = {
+      ...checklistData,
+      extraDamages: {
+        ...checklistData.extraDamages,
+        [sectionName]: checklistData.extraDamages[sectionName]?.map(damage =>
+          damage.id === damageId 
+            ? { ...damage, photos: [...damage.photos, ...newPhotos] }
+            : damage
+        ) || []
+      }
+    };
+    
+    setChecklistData(newData);
+    setHasUnsavedChanges(true);
+    onUpdate(newData);
+  };
+
+  const handleRemoveExtraDamage = (sectionName: string, damageId: string) => {
+    const newData = {
+      ...checklistData,
+      extraDamages: {
+        ...checklistData.extraDamages,
+        [sectionName]: checklistData.extraDamages[sectionName]?.filter(damage => damage.id !== damageId) || []
+      }
+    };
+    
     setChecklistData(newData);
     setHasUnsavedChanges(true);
     onUpdate(newData);
@@ -73,8 +203,8 @@ export const InspectionChecklist: React.FC<InspectionChecklistProps> = ({
 
   const getCompletionStats = () => {
     const totalItems = CHECKLIST_SECTIONS.flatMap(s => s.items).length;
-    const completedItems = Object.keys(checklistData).length;
-    const damageItems = Object.values(checklistData).filter(v => v === 'DAMAGE').length;
+    const completedItems = Object.keys(checklistData.status).length;
+    const damageItems = Object.values(checklistData.status).filter(v => v === 'DAMAGE').length;
     
     return { totalItems, completedItems, damageItems };
   };
@@ -131,7 +261,7 @@ export const InspectionChecklist: React.FC<InspectionChecklistProps> = ({
                   </div>
                   
                   <RadioGroup
-                    value={checklistData[item.id] || ''}
+                    value={checklistData.status[item.id] || ''}
                     onValueChange={(value: 'OK' | 'DAMAGE') => handleItemChange(item.id, value)}
                     className="flex gap-6"
                   >
@@ -151,24 +281,133 @@ export const InspectionChecklist: React.FC<InspectionChecklistProps> = ({
                     </div>
                   </RadioGroup>
 
-                  {checklistData[item.id] === 'DAMAGE' && (
-                    <div className="mt-2 p-3 bg-red-50 border border-red-200 rounded-lg">
-                      <p className="text-sm text-red-800 mb-2">
-                        Damage detected. Consider adding a damage photo for documentation.
+                  {checklistData.status[item.id] === 'DAMAGE' && (
+                    <div className="mt-2 p-3 bg-red-50 border border-red-200 rounded-lg space-y-3">
+                      <p className="text-sm text-red-800">
+                        Damage detected. Add photos for documentation:
                       </p>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={onDamageDetected}
-                        className="border-red-300 text-red-700 hover:bg-red-100"
-                      >
-                        <Camera className="mr-2 h-3 w-3" />
-                        Add Damage Photo
-                      </Button>
+                      
+                      {/* Photo Upload */}
+                      <div className="space-y-2">
+                        <Input
+                          type="file"
+                          accept="image/*"
+                          multiple
+                          onChange={(e) => e.target.files && handlePhotoUpload(item.id, e.target.files)}
+                          className="text-sm"
+                        />
+                        
+                        {/* Display uploaded photos */}
+                        {checklistData.photos[item.id]?.length > 0 && (
+                          <div className="grid grid-cols-3 gap-2 mt-2">
+                            {checklistData.photos[item.id].map((photo) => (
+                              <div key={photo.id} className="relative">
+                                <img
+                                  src={photo.preview}
+                                  alt="Damage"
+                                  className="w-full h-20 object-cover rounded border"
+                                />
+                                <Button
+                                  size="sm"
+                                  variant="destructive"
+                                  className="absolute -top-2 -right-2 h-6 w-6 p-0"
+                                  onClick={() => handlePhotoRemove(item.id, photo.id)}
+                                >
+                                  ×
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>
               ))}
+
+              {/* Extra Damages Section */}
+              <div className="mt-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <h5 className="font-medium text-sm">Additional Damages</h5>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleAddExtraDamage(section.name)}
+                  >
+                    <Plus className="h-3 w-3 mr-1" />
+                    Add Damage
+                  </Button>
+                </div>
+
+                {checklistData.extraDamages[section.name]?.map((damage) => (
+                  <div key={damage.id} className="p-3 border border-gray-200 rounded-lg space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Input
+                        placeholder="Describe the damage..."
+                        value={damage.description}
+                        onChange={(e) => handleExtraDamageChange(section.name, damage.id, e.target.value)}
+                        className="flex-1"
+                      />
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleRemoveExtraDamage(section.name, damage.id)}
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={(e) => e.target.files && handleExtraDamagePhotoUpload(section.name, damage.id, e.target.files)}
+                        className="text-sm"
+                      />
+                      
+                      {damage.photos.length > 0 && (
+                        <div className="grid grid-cols-3 gap-2">
+                          {damage.photos.map((photo) => (
+                            <div key={photo.id} className="relative">
+                              <img
+                                src={photo.preview}
+                                alt="Damage"
+                                className="w-full h-20 object-cover rounded border"
+                              />
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                className="absolute -top-2 -right-2 h-6 w-6 p-0"
+                                onClick={() => {
+                                  const updatedDamages = checklistData.extraDamages[section.name]?.map(d =>
+                                    d.id === damage.id
+                                      ? { ...d, photos: d.photos.filter(p => p.id !== photo.id) }
+                                      : d
+                                  ) || [];
+                                  
+                                  const newData = {
+                                    ...checklistData,
+                                    extraDamages: {
+                                      ...checklistData.extraDamages,
+                                      [section.name]: updatedDamages
+                                    }
+                                  };
+                                  
+                                  setChecklistData(newData);
+                                  onUpdate(newData);
+                                }}
+                              >
+                                ×
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </CardContent>
           </Card>
         ))}

@@ -221,11 +221,24 @@ export const InspectionWizard: React.FC<InspectionWizardProps> = ({
           />
         );
       case 'checklist':
+        // Convert old format to new format if needed
+        let checklistData;
+        if (inspectionData.checklist && typeof inspectionData.checklist === 'object' && !('status' in inspectionData.checklist)) {
+          // Old format: Record<string, 'OK' | 'DAMAGE'>
+          checklistData = {
+            status: inspectionData.checklist as Record<string, 'OK' | 'DAMAGE'>,
+            photos: {},
+            extraDamages: {}
+          };
+        } else {
+          // New format or empty
+          checklistData = inspectionData.checklist || { status: {}, photos: {}, extraDamages: {} };
+        }
+        
         return (
           <InspectionChecklist
-            data={inspectionData.checklist || {}}
+            data={checklistData}
             onUpdate={(data) => handleStepData('checklist', data)}
-            onDamageDetected={() => setCurrentStep('damage')}
           />
         );
       case 'damage':
