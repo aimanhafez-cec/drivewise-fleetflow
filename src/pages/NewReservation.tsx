@@ -2195,7 +2195,7 @@ const NewReservation = () => {
                   <Input 
                     value={formData.referralPhone} 
                     onChange={(e) => updateFormData('referralPhone', e.target.value)}
-                    placeholder="+1 (555) 123-4567"
+                    placeholder="+97150345234"
                   />
                 </div>
               </div>
