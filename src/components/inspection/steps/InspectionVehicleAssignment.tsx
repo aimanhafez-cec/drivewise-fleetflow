@@ -6,8 +6,9 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useVehicles } from '@/hooks/useVehicles';
 import { formatVehicleDisplay } from '@/hooks/useVehicles';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Car, CheckCircle } from 'lucide-react';
+import Select from "react-select";
 
 interface InspectionVehicleAssignmentProps {
   agreementId: string;
@@ -107,25 +108,24 @@ export const InspectionVehicleAssignment: React.FC<InspectionVehicleAssignmentPr
       )}
 
       <Card>
-        <CardHeader>
-          <CardTitle>Select Vehicle</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <Select
-            value={selectedVehicleId}
-            onValueChange={handleVehicleSelect}
-          >
-            <SelectTrigger id="select-vehicle">
-              <SelectValue placeholder="Choose a vehicle..." />
-            </SelectTrigger>
-            <SelectContent>
-              {vehicles?.map((vehicle) => (
-                <SelectItem key={vehicle.id} value={vehicle.id}>
-                  {formatVehicleDisplay(vehicle)} - {vehicle.status}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <CardHeader>
+            <CardTitle>Select Vehicle</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Select
+              inputId="select-vehicle"
+              options={vehicles?.map(vehicle => ({
+                value: vehicle.id,
+                label: `${formatVehicleDisplay(vehicle)} - ${vehicle.status}`,
+              }))}
+              value={vehicles?.find(v => v.id === selectedVehicleId) ? {
+                value: selectedVehicleId,
+                label: `${formatVehicleDisplay(selectedVehicle)} - ${selectedVehicle?.status}`,
+              } : null}
+              onChange={option => handleVehicleSelect(option?.value || "")}
+              placeholder="Choose a vehicle..."
+              isClearable
+            />
 
           {selectedVehicle && (
             <div className="p-4 bg-muted rounded-lg">
