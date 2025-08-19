@@ -1419,7 +1419,114 @@ const NewReservation = () => {
             </AccordionContent>
           </AccordionItem>
 
-          {/* 3) Airport Information */}
+          {/* 3) Vehicle & Driver */}
+          <AccordionItem value="vehicles-drivers" className="border rounded-lg">
+            <AccordionTrigger className="px-6 py-4 hover:no-underline">
+              <div className="flex items-center gap-2">
+                <Car className="h-5 w-5" />
+                <span className="font-semibold">Vehicle & Driver</span>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="px-6 pb-6">
+              <Tabs defaultValue="vehicles" className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="vehicles">Vehicle Information</TabsTrigger>
+                  <TabsTrigger value="drivers">Driver Information</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="vehicles" className="space-y-6">
+                  <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
+                    {/* Dates */}
+                    <div className="space-y-2">
+                      <Label>Check Out Date <span className="text-destructive">*</span></Label>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !formData.checkOutDate && "text-muted-foreground")}>
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {formData.checkOutDate ? format(formData.checkOutDate, "PPP") : <span>Pick check out date</span>}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar mode="single" selected={formData.checkOutDate} onSelect={date => {
+                          updateFormData('checkOutDate', date);
+                          // Clear vehicle selection when dates change
+                          if (formData.vehicleId) {
+                            updateFormData('vehicleId', '');
+                          }
+                        }} initialFocus />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label>Check In Date <span className="text-destructive">*</span></Label>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !formData.checkInDate && "text-muted-foreground")}>
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {formData.checkInDate ? format(formData.checkInDate, "PPP") : <span>Pick check in date</span>}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar mode="single" selected={formData.checkInDate} onSelect={date => {
+                          updateFormData('checkInDate', date);
+                          // Clear vehicle selection when dates change
+                          if (formData.vehicleId) {
+                            updateFormData('vehicleId', '');
+                          }
+                        }} initialFocus />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+
+                    {/* Locations */}
+                    <LocationSelect value={formData.checkOutLocationId} onChange={locationId => {
+                    updateFormData('checkOutLocationId', locationId);
+                    // Clear vehicle selection when location changes
+                    if (formData.vehicleId) {
+                      updateFormData('vehicleId', '');
+                    }
+                  }} placeholder="Select check out location" className="w-full" />
+                    
+                    <LocationSelect value={formData.checkInLocationId} onChange={locationId => {
+                    updateFormData('checkInLocationId', locationId);
+                    // Clear vehicle selection when location changes
+                    if (formData.vehicleId) {
+                      updateFormData('vehicleId', '');
+                    }
+                  }} placeholder="Select check in location" className="w-full" />
+
+                    {/* Vehicle Class */}
+                    <VehicleClassSelect value={formData.vehicleClassId} onChange={classId => {
+                    updateFormData('vehicleClassId', classId);
+                    // Clear vehicle selection when class changes
+                    if (formData.vehicleId) {
+                      updateFormData('vehicleId', '');
+                    }
+                  }} placeholder="Select vehicle class" className="w-full" />
+                    
+                    {/* Enhanced Vehicle Selector with Dependencies */}
+                    <div className="md:col-span-2">
+                      <ConditionalVehicleSelector value={formData.vehicleId} onChange={vehicleId => updateFormData('vehicleId', vehicleId)} checkOutDate={formData.checkOutDate} checkInDate={formData.checkInDate} checkOutLocationId={formData.checkOutLocationId} checkInLocationId={formData.checkInLocationId} vehicleClassId={formData.vehicleClassId} className="w-full" />
+                    </div>
+                  </div>
+                  
+                  <div className="flex justify-end">
+                    <Button id="btn-add-line-vehicle" onClick={addReservationLine} disabled={!isPrefillComplete()} className="flex items-center gap-2">
+                      <Plus className="h-4 w-4" />
+                      Add Line
+                    </Button>
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="drivers" className="space-y-6">
+                  <EnhancedDriverPicker selectedDrivers={formData.drivers} onDriversChange={drivers => updateFormData('drivers', drivers)} className="w-full" />
+                </TabsContent>
+              </Tabs>
+            </AccordionContent>
+          </AccordionItem>
+
+          {/* 4) Airport Information */}
           <AccordionItem value="airport-info" className="border rounded-lg">
             <AccordionTrigger className="px-6 py-4 hover:no-underline">
               <div className="flex items-center gap-2">
@@ -1886,113 +1993,6 @@ const NewReservation = () => {
                   <p className="text-xs text-muted-foreground">{(formData.specialNote || '').length}/500 characters</p>
                 </div>
               </div>
-            </AccordionContent>
-          </AccordionItem>
-
-          {/* 10) Vehicle & Driver */}
-          <AccordionItem value="vehicles-drivers" className="border rounded-lg">
-            <AccordionTrigger className="px-6 py-4 hover:no-underline">
-              <div className="flex items-center gap-2">
-                <Car className="h-5 w-5" />
-                <span className="font-semibold">Vehicle & Driver</span>
-              </div>
-            </AccordionTrigger>
-            <AccordionContent className="px-6 pb-6">
-              <Tabs defaultValue="vehicles" className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="vehicles">Vehicle Information</TabsTrigger>
-                  <TabsTrigger value="drivers">Driver Information</TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="vehicles" className="space-y-6">
-                  <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
-                    {/* Dates */}
-                    <div className="space-y-2">
-                      <Label>Check Out Date <span className="text-destructive">*</span></Label>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !formData.checkOutDate && "text-muted-foreground")}>
-                            <CalendarIcon className="mr-2 h-4 w-4" />
-                            {formData.checkOutDate ? format(formData.checkOutDate, "PPP") : <span>Pick check out date</span>}
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar mode="single" selected={formData.checkOutDate} onSelect={date => {
-                          updateFormData('checkOutDate', date);
-                          // Clear vehicle selection when dates change
-                          if (formData.vehicleId) {
-                            updateFormData('vehicleId', '');
-                          }
-                        }} initialFocus />
-                        </PopoverContent>
-                      </Popover>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label>Check In Date <span className="text-destructive">*</span></Label>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !formData.checkInDate && "text-muted-foreground")}>
-                            <CalendarIcon className="mr-2 h-4 w-4" />
-                            {formData.checkInDate ? format(formData.checkInDate, "PPP") : <span>Pick check in date</span>}
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar mode="single" selected={formData.checkInDate} onSelect={date => {
-                          updateFormData('checkInDate', date);
-                          // Clear vehicle selection when dates change
-                          if (formData.vehicleId) {
-                            updateFormData('vehicleId', '');
-                          }
-                        }} initialFocus />
-                        </PopoverContent>
-                      </Popover>
-                    </div>
-
-                    {/* Locations */}
-                    <LocationSelect value={formData.checkOutLocationId} onChange={locationId => {
-                    updateFormData('checkOutLocationId', locationId);
-                    // Clear vehicle selection when location changes
-                    if (formData.vehicleId) {
-                      updateFormData('vehicleId', '');
-                    }
-                  }} placeholder="Select check out location" className="w-full" />
-                    
-                    <LocationSelect value={formData.checkInLocationId} onChange={locationId => {
-                    updateFormData('checkInLocationId', locationId);
-                    // Clear vehicle selection when location changes
-                    if (formData.vehicleId) {
-                      updateFormData('vehicleId', '');
-                    }
-                  }} placeholder="Select check in location" className="w-full" />
-
-                    {/* Vehicle Class */}
-                    <VehicleClassSelect value={formData.vehicleClassId} onChange={classId => {
-                    updateFormData('vehicleClassId', classId);
-                    // Clear vehicle selection when class changes
-                    if (formData.vehicleId) {
-                      updateFormData('vehicleId', '');
-                    }
-                  }} placeholder="Select vehicle class" className="w-full" />
-                    
-                    {/* Enhanced Vehicle Selector with Dependencies */}
-                    <div className="md:col-span-2">
-                      <ConditionalVehicleSelector value={formData.vehicleId} onChange={vehicleId => updateFormData('vehicleId', vehicleId)} checkOutDate={formData.checkOutDate} checkInDate={formData.checkInDate} checkOutLocationId={formData.checkOutLocationId} checkInLocationId={formData.checkInLocationId} vehicleClassId={formData.vehicleClassId} className="w-full" />
-                    </div>
-                  </div>
-                  
-                  <div className="flex justify-end">
-                    <Button id="btn-add-line-vehicle" onClick={addReservationLine} disabled={!isPrefillComplete()} className="flex items-center gap-2">
-                      <Plus className="h-4 w-4" />
-                      Add Line
-                    </Button>
-                  </div>
-                </TabsContent>
-                
-                <TabsContent value="drivers" className="space-y-6">
-                  <EnhancedDriverPicker selectedDrivers={formData.drivers} onDriversChange={drivers => updateFormData('drivers', drivers)} className="w-full" />
-                </TabsContent>
-              </Tabs>
             </AccordionContent>
           </AccordionItem>
 
