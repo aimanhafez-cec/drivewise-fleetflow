@@ -88,7 +88,7 @@ const VehicleForm: React.FC<VehicleFormProps> = ({ vehicle, onSuccess }) => {
         .select('*')
         .order('name');
       
-      if (error) throw error;
+        if (error) throw error;
       return data;
     },
   });

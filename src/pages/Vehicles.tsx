@@ -152,11 +152,6 @@ const Vehicles = () => {
     }
   };
 
-  const handleEdit = (vehicle: Vehicle) => {
-    setSelectedVehicle(vehicle);
-    setIsFormOpen(true);
-  };
-
   const handleAdd = () => {
     setSelectedVehicle(null);
     setIsFormOpen(true);

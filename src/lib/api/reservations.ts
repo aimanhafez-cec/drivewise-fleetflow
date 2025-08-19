@@ -42,6 +42,7 @@ const currencies: DropdownOption[] = [
   { id: 'EUR', label: 'Euro', value: 'EUR' },
   { id: 'GBP', label: 'British Pound', value: 'GBP' },
   { id: 'CAD', label: 'Canadian Dollar', value: 'CAD' },
+  { id: 'AED', label: 'Canadian Dollar', value: 'AED' },
 ];
 
 const reservationMethods: DropdownOption[] = [

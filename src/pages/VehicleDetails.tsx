@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useState } from "react";
+import { MouseEvent, useState } from "react";
 import { 
   ArrowLeft, 
   Edit, 
@@ -25,11 +25,42 @@ import {
   Shield
 } from "lucide-react";
 import { format } from "date-fns";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import VehicleForm from '@/components/vehicles/VehicleForm';
+
+interface Vehicle {
+  id: string;
+  make: string;
+  model: string;
+  year: number;
+  license_plate: string;
+  vin: string;
+  color: string;
+  status: 'available' | 'rented' | 'maintenance' | 'out_of_service';
+  daily_rate: number;
+  weekly_rate: number;
+  monthly_rate: number;
+  odometer: number;
+  fuel_level: number;
+  location: string;
+  transmission: string;
+  engine_size: string;
+  features: string[];
+  category_id: string;
+  subtype: string;
+  ownership_type: string;
+  categories?: {
+    name: string;
+    icon: string;
+  };
+}
 
 export default function VehicleDetails() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('summary');
+  const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
+  const [isFormOpen, setIsFormOpen] = useState(false);
 
   const { data: vehicle, isLoading, error } = useQuery({
     queryKey: ['vehicle', id],
@@ -112,6 +143,16 @@ export default function VehicleDetails() {
       default:
         return { label: fuel_level, color: 'bg-gray-500 text-white' };
     }
+  };
+  
+  const handleEdit = (vehicle) => {
+    setSelectedVehicle(vehicle);
+    setIsFormOpen(true);
+  };
+
+  const handleFormClose = () => {
+    setIsFormOpen(false);
+    setSelectedVehicle(null);
   };
 
   if (isLoading) {
@@ -200,10 +241,28 @@ export default function VehicleDetails() {
             </div>
           </div>
         </div>
+
+        <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+          <DialogTrigger asChild>
+          </DialogTrigger>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>
+                {selectedVehicle ? 'Edit Vehicle' : 'Add New Vehicle'}
+              </DialogTitle>
+            </DialogHeader>
+            <VehicleForm
+              vehicle={selectedVehicle}
+              onSuccess={handleFormClose}
+            />
+          </DialogContent>
+        </Dialog>
+
         <div className="flex items-center gap-2">
           <Button 
             variant="outline" 
             className="bg-blue-900 text-white hover:bg-blue-800"
+            onClick={() => handleEdit(vehicle)}
           >
             <Edit className="mr-2 h-4 w-4" />
             Edit
