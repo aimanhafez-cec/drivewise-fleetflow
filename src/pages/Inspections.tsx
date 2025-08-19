@@ -54,7 +54,7 @@ const Inspections: React.FC = () => {
     queryFn: async () => {
       const inspections: UnifiedInspection[] = [];
 
-      // Fetch inspection_out
+      // Fetch inspection_out 
       const { data: outData } = await supabase
         .from("inspection_out")
         .select(`
@@ -62,10 +62,6 @@ const Inspections: React.FC = () => {
           checklist, metrics, damage_marker_ids, created_at, updated_at
         `)
         .order("performed_at", { ascending: false });
-
-      if (outData) {
-        inspections.push(...outData.map(item => ({ ...item, type: 'OUT' as const })));
-      }
 
       // Fetch inspection_in
       const { data: inData } = await supabase
@@ -76,8 +72,45 @@ const Inspections: React.FC = () => {
         `)
         .order("performed_at", { ascending: false });
 
-      if (inData) {
-        inspections.push(...inData.map(item => ({ ...item, type: 'IN' as const })));
+      // Combine modern inspections and add type
+      const modernInspections = [
+        ...(outData?.map(item => ({ ...item, type: 'OUT' as const })) || []),
+        ...(inData?.map(item => ({ ...item, type: 'IN' as const })) || [])
+      ];
+
+      // Get unique agreement IDs to fetch related data
+      const agreementIds = [...new Set(modernInspections.map(i => i.agreement_id).filter(Boolean))];
+      
+      // Fetch agreement and vehicle data for modern inspections
+      let agreementData: any[] = [];
+      if (agreementIds.length > 0) {
+        const { data } = await supabase
+          .from("agreements")
+          .select(`
+            id, agreement_no,
+            agreement_lines(
+              id, vehicle_id,
+              vehicles(make, model, year, license_plate)
+            )
+          `)
+          .in('id', agreementIds);
+        agreementData = data || [];
+      }
+
+      // Map modern inspections with agreement and vehicle data
+      for (const inspection of modernInspections) {
+        const agreement = agreementData.find(a => a.id === inspection.agreement_id);
+        const agreementLine = agreement?.agreement_lines?.find((l: any) => l.id === inspection.line_id);
+        
+        inspections.push({
+          ...inspection,
+          agreements: agreement ? {
+            agreement_no: agreement.agreement_no,
+            vehicle_id: agreementLine?.vehicle_id || ''
+          } : undefined,
+          vehicles: agreementLine?.vehicles || undefined,
+          vehicle_id: agreementLine?.vehicle_id
+        });
       }
 
       // Fetch legacy inspections
