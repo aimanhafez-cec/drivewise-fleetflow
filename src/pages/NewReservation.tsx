@@ -1067,7 +1067,7 @@ const NewReservation = () => {
       date_of_birth: '',
       license_expiry: '',
       status: 'active',
-      additional_driver_fee: 25.00
+      additional_driver_fee: 300.00
     };
     setSelectedDrivers(prev => [...prev, newDriver]);
   };
