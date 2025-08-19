@@ -1514,7 +1514,7 @@ const NewReservation = () => {
                   <div className="flex justify-end">
                     <Button id="btn-add-line-vehicle" onClick={addReservationLine} disabled={!isPrefillComplete()} className="flex items-center gap-2">
                       <Plus className="h-4 w-4" />
-                      Add Line
+                      Add Vehicle
                     </Button>
                   </div>
                 </TabsContent>
