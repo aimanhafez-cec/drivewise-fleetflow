@@ -87,20 +87,31 @@ const Inspections: React.FC = () => {
         const { data } = await supabase
           .from("agreements")
           .select(`
-            id, agreement_no,
-            agreement_lines(
-              id, vehicle_id,
-              vehicles(make, model, year, license_plate)
-            )
+            id, agreement_no
           `)
           .in('id', agreementIds);
         agreementData = data || [];
       }
 
+      // Get unique line IDs to fetch vehicle data
+      const lineIds = [...new Set(modernInspections.map(i => i.line_id).filter(Boolean))];
+      
+      let lineData: any[] = [];
+      if (lineIds.length > 0) {
+        const { data } = await supabase
+          .from("agreement_lines")
+          .select(`
+            id, agreement_id, vehicle_id,
+            vehicles(make, model, year, license_plate)
+          `)
+          .in('id', lineIds);
+        lineData = data || [];
+      }
+
       // Map modern inspections with agreement and vehicle data
       for (const inspection of modernInspections) {
         const agreement = agreementData.find(a => a.id === inspection.agreement_id);
-        const agreementLine = agreement?.agreement_lines?.find((l: any) => l.id === inspection.line_id);
+        const agreementLine = lineData.find((l: any) => l.id === inspection.line_id);
         
         inspections.push({
           ...inspection,
