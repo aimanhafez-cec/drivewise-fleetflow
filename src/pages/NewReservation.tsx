@@ -370,8 +370,6 @@ const NewReservation = () => {
   // Auto-populate form with existing reservation data
   useEffect(() => {
     if (editData) {
-      console.log('Prefilling form with edit data:', editData);
-      
       setFormData(prev => ({
         ...prev,
         customerId: editData.customerId || '',
@@ -1004,8 +1002,6 @@ const NewReservation = () => {
 
       // Create idempotency key
       const idempotencyKey = `reservation-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-      
-      // console.log(formData, 'Form data before API call:');
       
       // Mock API call to create reservation
       const response = await mockApi.createReservation(formData, status);
