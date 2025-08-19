@@ -23,6 +23,7 @@ import NewQuote from "./pages/NewQuote";
 import QuoteDetails from "./pages/QuoteDetails";
 import Inspections from "./pages/Inspections";
 import NewInspection from "./pages/NewInspection";
+import InspectionDetails from "./pages/InspectionDetails";
 import ReservationDetails from "./pages/ReservationDetails";
 import ReservationDetailsPage from "./pages/ReservationDetailsPage";
 import Agreements from "./pages/Agreements";
@@ -148,6 +149,7 @@ const App = () => (
             }>
               <Route index element={<Inspections />} />
               <Route path="new" element={<NewInspection />} />
+              <Route path=":id" element={<InspectionDetails />} />
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
