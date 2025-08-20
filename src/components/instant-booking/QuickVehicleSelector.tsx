@@ -87,8 +87,8 @@ const QuickVehicleSelector: React.FC<QuickVehicleSelectorProps> = ({
         </CardTitle>
         
         {/* Filters */}
-        <div className="flex gap-4 mt-4">
-          <div className="flex-1">
+        <div className="items-center">
+          <div className="mt-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
@@ -103,12 +103,12 @@ const QuickVehicleSelector: React.FC<QuickVehicleSelectorProps> = ({
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="px-3 py-2 border rounded-md bg-background"
+            className="mt-4 px-3 py-2 border rounded-md bg-background w-full"
           >
-            <option value="">All Categories</option>
+            <option value="">Select Category</option>
             {categories.map(category => (
               <option key={category.id} value={category.id}>
-                {category.name}
+                {category.name} {category.description ? `(${category.description})` : ''} 
               </option>
             ))}
           </select>
