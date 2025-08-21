@@ -11,6 +11,8 @@ export interface InstantBookingData {
   vehicleId: string;
   customerId: string;
   customerType: 'B2B' | 'B2C' | 'CORPORATE';
+  selectedAddOns?: string[];
+  addOnCharges?: Record<string, number>;
   pricing?: any;
 }
 
@@ -35,6 +37,7 @@ export const useInstantBooking = () => {
         pickup_location: bookingData.pickupLocation,
         return_location: bookingData.returnLocation,
         total_amount: bookingData.pricing?.totalAmount || 0,
+        add_ons: bookingData.selectedAddOns || [],
         booking_type: 'INSTANT' as const,
         auto_approved: bookingData.pricing?.autoApproved || false,
         instant_booking_score: 100, // High score for instant bookings

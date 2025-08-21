@@ -12,6 +12,8 @@ interface PricingCalculatorInstantProps {
     vehicleId: string;
     customerId: string;
     customerType: 'B2B' | 'B2C' | 'CORPORATE';
+    selectedAddOns?: string[];
+    addOnCharges?: Record<string, number>;
   };
   onPricingUpdate: (pricing: any) => void;
 }
@@ -113,29 +115,37 @@ const PricingCalculatorInstant: React.FC<PricingCalculatorInstantProps> = ({
       rateType = 'daily';
     }
 
-    // Apply customer type discounts
+    // Add-ons total
+    const addOnTotal = Object.values(bookingData.addOnCharges || {}).reduce((sum: number, amount: number) => sum + amount, 0);
+
+    // Apply customer type discounts (only on base amount, not add-ons)
     let customerDiscount = 0;
     if (bookingData.customerType === 'B2B') {
       customerDiscount = baseAmount * 0.1; // 10% B2B discount
     } else if (bookingData.customerType === 'CORPORATE') {
       customerDiscount = baseAmount * 0.15; // 15% corporate discount
     }
+    
     const discountedAmount = baseAmount - customerDiscount;
+    const subtotalWithAddOns = discountedAmount + addOnTotal;
 
-    // Calculate tax (5% VAT)
-    const taxAmount = discountedAmount * 0.05;
-    const totalAmount = discountedAmount + taxAmount;
+    // Calculate tax (5% VAT) on subtotal including add-ons
+    const taxAmount = subtotalWithAddOns * 0.05;
+    const totalAmount = subtotalWithAddOns + taxAmount;
+    
     return {
       days,
       baseAmount,
+      addOnTotal,
       customerDiscount,
       discountedAmount,
+      subtotalWithAddOns,
       taxAmount,
       totalAmount,
       rateType,
       dailyRate
     };
-  }, [vehicle, bookingData]);
+  }, [vehicle, bookingData.pickupDate, bookingData.returnDate, bookingData.customerType, bookingData.addOnCharges]);
 
   // Check auto-approval status
   useEffect(() => {
@@ -211,7 +221,7 @@ const PricingCalculatorInstant: React.FC<PricingCalculatorInstantProps> = ({
         <div className="space-y-3">
           <div className="flex justify-between items-center">
             <span className="text-muted-foreground">
-              Base Rate ({pricingCalculation.rateType})
+              Base Rate ({pricingCalculation.rateType}) - {pricingCalculation.days} days
             </span>
             <span>AED {pricingCalculation.baseAmount.toFixed(2)}</span>
           </div>
@@ -226,11 +236,16 @@ const PricingCalculatorInstant: React.FC<PricingCalculatorInstantProps> = ({
               <span>-AED {pricingCalculation.customerDiscount.toFixed(2)}</span>
             </div>}
 
+          {pricingCalculation.addOnTotal > 0 && <div className="flex justify-between items-center">
+              <span className="text-muted-foreground">Add-ons Total</span>
+              <span>AED {pricingCalculation.addOnTotal.toFixed(2)}</span>
+            </div>}
+
           <Separator />
 
           <div className="flex justify-between items-center">
             <span className="text-muted-foreground">Subtotal</span>
-            <span>AED {pricingCalculation.discountedAmount.toFixed(2)}</span>
+            <span>AED {pricingCalculation.subtotalWithAddOns.toFixed(2)}</span>
           </div>
 
           <div className="flex justify-between items-center">

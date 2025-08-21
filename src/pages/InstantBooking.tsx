@@ -4,12 +4,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, MapPin, Clock, Zap, CheckCircle, Car, Users, DollarSign } from 'lucide-react';
+import { Calendar, MapPin, Clock, Zap, CheckCircle, Car, Users, DollarSign, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import QuickVehicleSelector from '@/components/instant-booking/QuickVehicleSelector';
 import CustomerDetector from '@/components/instant-booking/CustomerDetector';
 import PricingCalculatorInstant from '@/components/instant-booking/PricingCalculatorInstant';
+import AddOnsSelector from '@/components/instant-booking/AddOnsSelector';
 import { useInstantBooking } from '@/hooks/useInstantBooking';
 import { LocationSelect } from '@/components/ui/select-components';
 const InstantBooking = () => {
@@ -25,7 +26,9 @@ const InstantBooking = () => {
     returnLocation: '',
     vehicleId: null,
     customerId: null,
-    customerType: 'B2C'
+    customerType: 'B2C',
+    selectedAddOns: [],
+    addOnCharges: {}
   });
   const {
     createInstantBooking,
@@ -40,10 +43,54 @@ const InstantBooking = () => {
     }));
   };
   const handleNextStep = () => {
-    if (step < 5) setStep(step + 1);
+    if (step < 6) setStep(step + 1);
   };
   const handlePreviousStep = () => {
     if (step > 1) setStep(step - 1);
+  };
+
+  const handleAddOnToggle = (addOnId: string) => {
+    const availableAddOns = [
+      { id: 'additional_driver', amount: 25, isFlat: false },
+      { id: 'child_seat', amount: 20, isFlat: false },
+      { id: 'gps_navigation', amount: 15, isFlat: false },
+      { id: 'wifi_hotspot', amount: 50, isFlat: false },
+      { id: 'cdw_scdw', amount: 45, isFlat: false },
+      { id: 'roadside_assistance', amount: 10, isFlat: false },
+      { id: 'off_road_insurance', amount: 50, isFlat: false },
+      { id: 'delivery_collection', amount: 100, isFlat: true },
+      { id: 'young_driver', amount: 50, isFlat: false }
+    ];
+
+    const addOn = availableAddOns.find(a => a.id === addOnId);
+    if (!addOn) return;
+
+    const isSelected = bookingData.selectedAddOns.includes(addOnId);
+    const rentalDays = bookingData.pickupDate && bookingData.returnDate 
+      ? Math.ceil((new Date(bookingData.returnDate).getTime() - new Date(bookingData.pickupDate).getTime()) / (1000 * 60 * 60 * 24))
+      : 1;
+
+    if (isSelected) {
+      // Remove add-on
+      setBookingData(prev => ({
+        ...prev,
+        selectedAddOns: prev.selectedAddOns.filter((id: string) => id !== addOnId),
+        addOnCharges: Object.fromEntries(
+          Object.entries(prev.addOnCharges).filter(([key]) => key !== addOnId)
+        )
+      }));
+    } else {
+      // Add add-on
+      const cost = addOn.isFlat ? addOn.amount : addOn.amount * rentalDays;
+      setBookingData(prev => ({
+        ...prev,
+        selectedAddOns: [...prev.selectedAddOns, addOnId],
+        addOnCharges: {
+          ...prev.addOnCharges,
+          [addOnId]: cost
+        }
+      }));
+    }
   };
   const handleInstantBook = async () => {
     try {
@@ -70,8 +117,9 @@ const InstantBooking = () => {
       case 3:
         return bookingData.customerId;
       case 4:
-        return true;
-      // Pricing step is always complete when reached
+        return true; // Add-ons are optional
+      case 5:
+        return true; // Pricing step is always complete when reached
       default:
         return false;
     }
@@ -91,7 +139,7 @@ const InstantBooking = () => {
         <Card className="shadow-card">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-6">
-              {[{
+            {[{
               num: 1,
               title: 'Location & Date',
               icon: MapPin
@@ -105,10 +153,14 @@ const InstantBooking = () => {
               icon: Users
             }, {
               num: 4,
+              title: 'Add-ons',
+              icon: Plus
+            }, {
+              num: 5,
               title: 'Pricing',
               icon: DollarSign
             }, {
-              num: 5,
+              num: 6,
               title: 'Confirm',
               icon: CheckCircle
             }].map((stepInfo, index) => <div key={stepInfo.num} className="flex flex-col items-center flex-1">
@@ -121,7 +173,7 @@ const InstantBooking = () => {
                   <p className={`text-sm font-medium ${step >= stepInfo.num ? 'text-foreground' : 'text-muted-foreground'}`}>
                     {stepInfo.title}
                   </p>
-                  {index < 4 && <div className={`h-0.5 w-full mt-3 ${step > stepInfo.num ? 'bg-primary' : 'bg-muted'}`} />}
+                  {index < 5 && <div className={`h-0.5 w-full mt-3 ${step > stepInfo.num ? 'bg-primary' : 'bg-muted'}`} />}
                 </div>)}
             </div>
           </CardContent>
@@ -172,9 +224,19 @@ const InstantBooking = () => {
             handleDataChange('customerType', customer.customer_type);
           }} selectedCustomerId={bookingData.customerId} />}
 
-            {step === 4 && <PricingCalculatorInstant bookingData={bookingData} onPricingUpdate={pricing => handleDataChange('pricing', pricing)} />}
+            {step === 4 && <AddOnsSelector 
+              selectedAddOns={bookingData.selectedAddOns}
+              addOnCharges={bookingData.addOnCharges}
+              onAddOnToggle={handleAddOnToggle}
+              rentalDays={bookingData.pickupDate && bookingData.returnDate 
+                ? Math.ceil((new Date(bookingData.returnDate).getTime() - new Date(bookingData.pickupDate).getTime()) / (1000 * 60 * 60 * 24))
+                : 1
+              }
+            />}
 
-            {step === 5 && <Card className="shadow-card">
+            {step === 5 && <PricingCalculatorInstant bookingData={bookingData} onPricingUpdate={pricing => handleDataChange('pricing', pricing)} />}
+
+            {step === 6 && <Card className="shadow-card">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-green-600">
                     <CheckCircle className="h-5 w-5" />
@@ -244,7 +306,7 @@ const InstantBooking = () => {
               {step > 1 && <Button variant="outline" onClick={handlePreviousStep} className="w-full">
                   Previous Step
                 </Button>}
-              {step < 5 && isStepComplete(step) && <Button onClick={handleNextStep} className="w-full bg-primary hover:bg-primary/90">
+              {step < 6 && isStepComplete(step) && <Button onClick={handleNextStep} className="w-full bg-primary hover:bg-primary/90">
                   Continue
                 </Button>}
             </div>
