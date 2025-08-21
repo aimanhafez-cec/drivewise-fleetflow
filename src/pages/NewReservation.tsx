@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -1711,65 +1711,101 @@ const NewReservation = () => {
           </AccordionItem>
 
           {/* 5) Miscellaneous Charges */}
-          <AccordionItem value="misc-charges" className="border rounded-lg">
-            <AccordionTrigger className="px-6 py-4 hover:no-underline">
-              <div className="flex items-center gap-2">
-                <Plus className="h-5 w-5" />
-                <span className="font-semibold text-foreground">Miscellaneous Charges</span>
-                {(formData.selectedMiscCharges || []).length > 0 && <Badge variant="secondary" className="ml-2">
+          <Card className="shadow-card">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-card-foreground">
+                <Plus className="h-5 w-5 text-card-foreground" />
+                Miscellaneous Charges
+                {(formData.selectedMiscCharges || []).length > 0 && (
+                  <Badge variant="secondary" className="ml-2">
                     {(formData.selectedMiscCharges || []).length} selected
-                  </Badge>}
-              </div>
-            </AccordionTrigger>
-            <AccordionContent className="px-6 pb-6">
-              <div className="space-y-4">
+                  </Badge>
+                )}
+              </CardTitle>
+              <CardDescription className="text-card-foreground/70">
+                Optional additional charges and services
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid gap-4">
                 {[{
-                id: 'ldw',
-                name: 'LDW (Per Day - No Tax)',
-                amount: '750.00'
-              },
-              // ~25 USD -> 750 AED
-              {
-                id: 'drop-fee',
-                name: 'Drop Fee (Fixed)',
-                amount: '1500.00'
-              },
-              // ~50 USD -> 1500 AED
-              {
-                id: 'under-age',
-                name: 'Under Age Fee (No Tax)',
-                amount: '450.00'
-              },
-              // ~15 USD -> 450 AED
-              {
-                id: 'valet',
-                name: 'Valet (Per Day)',
-                amount: '300.00'
-              },
-              // ~10 USD -> 300 AED
-              {
-                id: 'sli',
-                name: 'SLI (Fixed)',
-                amount: '2250.00'
-              } // ~75 USD -> 2250 AED
-              ].map(charge => <div key={charge.id} className="flex items-center justify-between p-3 border rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <Checkbox checked={(formData.selectedMiscCharges || []).includes(charge.id)} onCheckedChange={checked => {
-                    if (checked) {
-                      updateFormData('selectedMiscCharges', [...(formData.selectedMiscCharges || []), charge.id]);
-                    } else {
-                      updateFormData('selectedMiscCharges', (formData.selectedMiscCharges || []).filter(id => id !== charge.id));
-                    }
-                  }} />
-                      <div>
-                        <p className="font-medium">{charge.name}</p>
+                  id: 'ldw',
+                  name: 'LDW (Loss Damage Waiver)',
+                  description: 'Protection against damage or theft - per day, no tax',
+                  amount: '750.00'
+                },
+                {
+                  id: 'drop-fee',
+                  name: 'Drop Fee',
+                  description: 'One-time fee for vehicle drop-off service',
+                  amount: '1500.00'
+                },
+                {
+                  id: 'under-age',
+                  name: 'Young Driver Surcharge',
+                  description: 'Additional fee for drivers under 25 years - no tax',
+                  amount: '450.00'
+                },
+                {
+                  id: 'valet',
+                  name: 'Valet Service',
+                  description: 'Professional valet parking service - per day',
+                  amount: '300.00'
+                },
+                {
+                  id: 'sli',
+                  name: 'Supplemental Liability Insurance',
+                  description: 'Additional liability coverage - fixed rate',
+                  amount: '2250.00'
+                }].map(charge => {
+                  const isSelected = (formData.selectedMiscCharges || []).includes(charge.id);
+                  
+                  return (
+                    <div
+                      key={charge.id}
+                      className={`
+                        relative p-4 border rounded-lg cursor-pointer transition-all hover:shadow-md
+                        ${isSelected 
+                          ? 'border-primary bg-primary/5 shadow-sm' 
+                          : 'border-card-foreground/20 bg-card hover:border-primary/50'
+                        }
+                      `}
+                      onClick={() => {
+                        if (isSelected) {
+                          updateFormData('selectedMiscCharges', (formData.selectedMiscCharges || []).filter(id => id !== charge.id));
+                        } else {
+                          updateFormData('selectedMiscCharges', [...(formData.selectedMiscCharges || []), charge.id]);
+                        }
+                      }}
+                    >
+                      <div className="flex items-start gap-4">
+                        <Checkbox 
+                          checked={isSelected}
+                          onChange={() => {}} // Controlled by parent click
+                          className="mt-1"
+                        />
+                        
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <h4 className="font-medium text-card-foreground">{charge.name}</h4>
+                          </div>
+                          <p className="text-sm text-card-foreground/70 mb-3">
+                            {charge.description}
+                          </p>
+                          
+                          <div className="flex items-center justify-between">
+                            <div className="text-lg font-bold text-red-600">
+                              AED {charge.amount}
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                    <span className="font-medium">AED {charge.amount}</span>
-                  </div>)}
+                  );
+                })}
               </div>
-            </AccordionContent>
-          </AccordionItem>
+            </CardContent>
+          </Card>
 
           {/* 6) Rate & Taxes */}
           <AccordionItem value="rate-taxes" className="border rounded-lg">
