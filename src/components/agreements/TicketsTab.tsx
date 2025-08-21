@@ -195,8 +195,8 @@ export const TicketsTab: React.FC<TicketsTabProps> = ({ agreementId, customerId,
                       <Button
                         variant="outline"
                         className={cn(
-                          "w-full justify-start text-left font-normal",
-                          !formData.occurredAt && "text-muted-foreground"
+                          "w-full justify-start text-left font-normal text-white",
+                          !formData.occurredAt && "text-white"
                         )}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
@@ -320,12 +320,12 @@ export const TicketsTab: React.FC<TicketsTabProps> = ({ agreementId, customerId,
                     <Button
                       variant="outline"
                       className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !formData.dueDate && "text-muted-foreground"
+                        "w-full justify-start text-left font-normal text-white",
+                        !formData.dueDate && "text-white"
                       )}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      {formData.dueDate ? format(formData.dueDate, "PPP") : <span>Pick a due date (optional)</span>}
+                      {formData.dueDate ? format(formData.dueDate, "PPP") : <span className="text-white">Pick a due date (optional)</span>}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
@@ -473,13 +473,13 @@ export const TicketsTab: React.FC<TicketsTabProps> = ({ agreementId, customerId,
                 <div className="text-sm text-white">Total Tickets</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-red-600">
+                <div className="text-2xl font-bold text-white">
                   {tickets.filter(t => t.status === 'PENDING').length}
                 </div>
                 <div className="text-sm text-white">Pending</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-green-600">
+                <div className="text-2xl font-bold text-white">
                   {tickets.filter(t => t.status === 'PAID').length}
                 </div>
                 <div className="text-sm text-white">Paid</div>
