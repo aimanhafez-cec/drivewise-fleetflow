@@ -1509,7 +1509,7 @@ const NewReservation = () => {
                     {/* Enhanced Vehicle Selector with Dependencies - Optional */}
                     <div className="md:col-span-2">
                       <div className="space-y-2">
-                        <Label className="text-foreground">Specific Vehicle <span className="text-foreground">(Optional - leave empty to assign later in agreement)</span></Label>
+                        <Label className="text-foreground">Specific Vehicle <span className="text-white">(Optional - leave empty to assign later in agreement)</span></Label>
                         <ConditionalVehicleSelector value={formData.vehicleId} onChange={vehicleId => updateFormData('vehicleId', vehicleId)} checkOutDate={formData.checkOutDate} checkInDate={formData.checkInDate} checkOutLocationId={formData.checkOutLocationId} checkInLocationId={formData.checkInLocationId} vehicleClassId={formData.vehicleClassId} className="w-full" placeholder="Select specific vehicle (optional)" />
                       </div>
                     </div>
