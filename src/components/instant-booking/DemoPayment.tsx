@@ -42,16 +42,16 @@ const DemoPayment: React.FC<DemoPaymentProps> = ({
               <CheckCircle className="h-8 w-8 text-green-600" />
             </div>
           </div>
-          <h3 className="text-xl font-semibold text-card-foreground mb-2">
+          <h3 className="text-xl font-semibold text-black mb-2">
             Payment Successful!
           </h3>
-          <p className="text-card-foreground/70 mb-4">
+          <p className="text-black mb-4">
             Agreement {agreementNo} has been created and payment processed.
           </p>
           <Badge variant="default" className="bg-green-100 text-green-800">
             AED {amount.toFixed(2)} Paid
           </Badge>
-          <p className="text-sm text-card-foreground/60 mt-4">
+          <p className="text-sm text-black mt-4">
             Redirecting to agreement details...
           </p>
         </CardContent>
@@ -72,12 +72,12 @@ const DemoPayment: React.FC<DemoPaymentProps> = ({
         {/* Agreement Summary */}
         <div className="bg-muted/30 p-4 rounded-lg">
           <div className="flex justify-between items-center mb-2">
-            <span className="font-medium text-card-foreground">Agreement Number:</span>
+            <span className="font-medium text-black">Agreement Number:</span>
             <Badge variant="outline">{agreementNo}</Badge>
           </div>
           <div className="flex justify-between items-center">
-            <span className="font-medium text-card-foreground">Total Amount:</span>
-            <span className="text-xl font-bold text-primary">AED {amount.toFixed(2)}</span>
+            <span className="font-medium text-black">Total Amount:</span>
+            <span className="text-xl font-bold text-black">AED {amount.toFixed(2)}</span>
           </div>
         </div>
 
@@ -88,25 +88,25 @@ const DemoPayment: React.FC<DemoPaymentProps> = ({
               <CreditCard className="h-5 w-5 text-blue-600" />
             </div>
             <div>
-              <h4 className="font-semibold text-card-foreground">Demo Credit Card</h4>
-              <p className="text-sm text-card-foreground/70">**** **** **** 1234</p>
+              <h4 className="font-semibold text-black">Demo Credit Card</h4>
+              <p className="text-sm text-black">**** **** **** 1234</p>
             </div>
           </div>
           
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
-              <p className="text-card-foreground/70">Cardholder</p>
-              <p className="font-medium text-card-foreground">Demo User</p>
+              <p className="text-black">Cardholder</p>
+              <p className="font-medium text-black">Demo User</p>
             </div>
             <div>
-              <p className="text-card-foreground/70">Expiry</p>
-              <p className="font-medium text-card-foreground">12/25</p>
+              <p className="text-black">Expiry</p>
+              <p className="font-medium text-black">12/25</p>
             </div>
           </div>
         </div>
 
         {/* Security Features */}
-        <div className="flex items-center gap-4 text-sm text-card-foreground/70">
+        <div className="flex items-center gap-4 text-sm text-black">
           <div className="flex items-center gap-2">
             <Shield className="h-4 w-4 text-green-600" />
             <span>Secure Demo Payment</span>
@@ -133,7 +133,7 @@ const DemoPayment: React.FC<DemoPaymentProps> = ({
           )}
         </Button>
 
-        <p className="text-center text-xs text-card-foreground/60">
+        <p className="text-center text-xs text-black">
           This is a demo payment. No real transaction will be processed.
         </p>
       </CardContent>
