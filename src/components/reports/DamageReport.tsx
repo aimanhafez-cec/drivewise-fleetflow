@@ -10,8 +10,45 @@ import { supabase } from '@/integrations/supabase/client';
 import { AlertTriangle, DollarSign, FileImage, Wrench } from 'lucide-react';
 import { format } from 'date-fns';
 import { formatCurrency } from '@/lib/utils/currency';
-import { DAMAGE_SEVERITY_CONFIG, VEHICLE_CATEGORY_COLORS } from '@/lib/chartConfig';
-import { formatNumber } from '@/lib/utils/chartUtils';
+
+// Fallback color arrays to ensure charts work
+const VEHICLE_CATEGORY_COLORS = [
+  "hsl(220, 91%, 60%)", // Bright blue
+  "hsl(142, 76%, 36%)", // Green
+  "hsl(346, 87%, 54%)", // Pink/Red
+  "hsl(38, 92%, 50%)", // Orange
+  "hsl(271, 76%, 53%)", // Purple
+  "hsl(185, 76%, 46%)", // Cyan
+  "hsl(54, 91%, 51%)", // Yellow
+  "hsl(239, 84%, 67%)", // Indigo
+  "hsl(330, 81%, 60%)", // Rose
+  "hsl(142, 71%, 45%)", // Emerald
+  "hsl(43, 96%, 56%)", // Amber
+  "hsl(258, 90%, 66%)", // Violet
+];
+
+const DAMAGE_SEVERITY_CONFIG = {
+  low: {
+    label: "Low Severity",
+    color: "hsl(142, 76%, 36%)", // Green
+  },
+  medium: {
+    label: "Medium Severity", 
+    color: "hsl(38, 92%, 50%)", // Orange
+  },
+  high: {
+    label: "High Severity",
+    color: "hsl(346, 87%, 54%)", // Red
+  },
+  critical: {
+    label: "Critical",
+    color: "hsl(330, 81%, 60%)", // Dark Red
+  },
+};
+
+const formatNumber = (value: number): string => {
+  return new Intl.NumberFormat('en-US').format(value);
+};
 
 interface DamageReportProps {
   dateRange?: DateRange;
