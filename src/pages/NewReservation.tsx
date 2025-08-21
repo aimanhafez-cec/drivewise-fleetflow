@@ -337,7 +337,8 @@ const NewReservation = () => {
   });
   const isPrefillComplete = () => {
     const prefill = getPrefillData();
-    return !!(prefill.vehicleClassId && prefill.vehicleId && prefill.checkOutDate && prefill.checkOutLocationId && prefill.checkInDate && prefill.checkInLocationId && prefill.checkOutDate < prefill.checkInDate);
+    // Allow adding vehicles with just vehicle class (no specific vehicle required)
+    return !!(prefill.vehicleClassId && prefill.checkOutDate && prefill.checkOutLocationId && prefill.checkInDate && prefill.checkInLocationId && prefill.checkOutDate < prefill.checkInDate);
   };
 
   // State for accordion sections - REORDERED: Vehicle selection comes BEFORE rate & taxes
@@ -1505,9 +1506,12 @@ const NewReservation = () => {
                     }
                   }} placeholder="Select vehicle class" className="w-full" />
                     
-                    {/* Enhanced Vehicle Selector with Dependencies */}
+                    {/* Enhanced Vehicle Selector with Dependencies - Optional */}
                     <div className="md:col-span-2">
-                      <ConditionalVehicleSelector value={formData.vehicleId} onChange={vehicleId => updateFormData('vehicleId', vehicleId)} checkOutDate={formData.checkOutDate} checkInDate={formData.checkInDate} checkOutLocationId={formData.checkOutLocationId} checkInLocationId={formData.checkInLocationId} vehicleClassId={formData.vehicleClassId} className="w-full" />
+                      <div className="space-y-2">
+                        <Label className="text-foreground">Specific Vehicle <span className="text-muted-foreground">(Optional - leave empty to assign later in agreement)</span></Label>
+                        <ConditionalVehicleSelector value={formData.vehicleId} onChange={vehicleId => updateFormData('vehicleId', vehicleId)} checkOutDate={formData.checkOutDate} checkInDate={formData.checkInDate} checkOutLocationId={formData.checkOutLocationId} checkInLocationId={formData.checkInLocationId} vehicleClassId={formData.vehicleClassId} className="w-full" placeholder="Select specific vehicle (optional)" />
+                      </div>
                     </div>
                   </div>
                   
