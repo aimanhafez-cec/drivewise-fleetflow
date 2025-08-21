@@ -155,12 +155,13 @@ const FleetStatusReport = ({ dateRange }: FleetStatusReportProps) => {
           </CardHeader>
           <CardContent>
             <ChartContainer
-              config={{
-                available: { label: "Available", color: "hsl(var(--success))" },
-                rented: { label: "Rented", color: "hsl(var(--primary))" },
-                maintenance: { label: "Maintenance", color: "hsl(var(--warning))" },
-                out_of_service: { label: "Out of Service", color: "hsl(var(--destructive))" },
-              }}
+              config={pieData.reduce((acc, item) => ({
+                ...acc,
+                [item.name.toLowerCase().replace(' ', '_')]: { 
+                  label: item.name, 
+                  color: item.color 
+                }
+              }), {})}
               className="h-[300px]"
             >
               <ResponsiveContainer width="100%" height="100%">
@@ -173,12 +174,16 @@ const FleetStatusReport = ({ dateRange }: FleetStatusReportProps) => {
                     outerRadius={100}
                     paddingAngle={5}
                     dataKey="value"
+                    label={({ name, value, percent }) => `${name}: ${value} (${(percent * 100).toFixed(0)}%)`}
+                    labelLine={false}
                   >
                     {pieData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
+                      <Cell key={`cell-${index}`} fill={entry.color} stroke="hsl(var(--background))" strokeWidth={2} />
                     ))}
                   </Pie>
-                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <ChartTooltip 
+                    content={<ChartTooltipContent formatter={(value, name) => [value, name]} />} 
+                  />
                 </PieChart>
               </ResponsiveContainer>
             </ChartContainer>
@@ -193,17 +198,19 @@ const FleetStatusReport = ({ dateRange }: FleetStatusReportProps) => {
           <CardContent>
             <ChartContainer
               config={{
-                utilization: { label: "Utilization %", color: "hsl(var(--primary))" },
+                utilization: { label: "Utilization %", color: "hsl(var(--chart-1))" },
               }}
               className="h-[300px]"
             >
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={utilizationData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="location" />
-                  <YAxis />
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Bar dataKey="utilization" fill="hsl(var(--primary))" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+                  <XAxis dataKey="location" stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                  <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                  <ChartTooltip 
+                    content={<ChartTooltipContent formatter={(value) => [`${value}%`, 'Utilization']} />} 
+                  />
+                  <Bar dataKey="utilization" fill="hsl(var(--chart-1))" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </ChartContainer>

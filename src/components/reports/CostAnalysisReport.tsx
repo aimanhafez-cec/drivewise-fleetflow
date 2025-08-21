@@ -163,14 +163,16 @@ const CostAnalysisReport = ({ dateRange }: CostAnalysisReportProps) => {
           >
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={monthlyCosts}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="maintenance" stackId="a" fill="hsl(var(--chart-1))" />
-                <Bar dataKey="fuel" stackId="a" fill="hsl(var(--chart-2))" />
-                <Bar dataKey="insurance" stackId="a" fill="hsl(var(--chart-3))" />
-                <Bar dataKey="overhead" stackId="a" fill="hsl(var(--chart-4))" />
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+                <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                <ChartTooltip 
+                  content={<ChartTooltipContent formatter={(value) => [formatCurrency(Number(value)), 'Cost']} />} 
+                />
+                <Bar dataKey="maintenance" stackId="a" fill="hsl(var(--chart-1))" radius={[0, 0, 0, 0]} />
+                <Bar dataKey="fuel" stackId="a" fill="hsl(var(--chart-2))" radius={[0, 0, 0, 0]} />
+                <Bar dataKey="insurance" stackId="a" fill="hsl(var(--chart-3))" radius={[0, 0, 0, 0]} />
+                <Bar dataKey="overhead" stackId="a" fill="hsl(var(--chart-4))" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </ChartContainer>
@@ -186,9 +188,13 @@ const CostAnalysisReport = ({ dateRange }: CostAnalysisReportProps) => {
           </CardHeader>
           <CardContent>
             <ChartContainer
-              config={{
-                amount: { label: 'Amount', color: 'hsl(var(--chart-1))' }
-              }}
+              config={costBreakdown.reduce((acc, item, index) => ({
+                ...acc,
+                [item.category.toLowerCase()]: { 
+                  label: item.category, 
+                  color: `hsl(var(--chart-${(index % 8) + 1}))` 
+                }
+              }), {})}
               className="h-[300px]"
             >
               <ResponsiveContainer width="100%" height="100%">
@@ -197,15 +203,21 @@ const CostAnalysisReport = ({ dateRange }: CostAnalysisReportProps) => {
                     data={costBreakdown}
                     cx="50%"
                     cy="50%"
+                    innerRadius={40}
                     outerRadius={80}
+                    paddingAngle={5}
                     dataKey="amount"
                     nameKey="category"
+                    label={({ category, percent }) => `${category}: ${(percent * 100).toFixed(0)}%`}
+                    labelLine={false}
                   >
                     {costBreakdown.map((_, index) => (
-                      <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
+                      <Cell key={`cell-${index}`} fill={`hsl(var(--chart-${(index % 8) + 1}))`} stroke="hsl(var(--background))" strokeWidth={2} />
                     ))}
                   </Pie>
-                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <ChartTooltip 
+                    content={<ChartTooltipContent formatter={(value) => [formatCurrency(Number(value)), 'Amount']} />} 
+                  />
                 </PieChart>
               </ResponsiveContainer>
             </ChartContainer>
@@ -215,7 +227,7 @@ const CostAnalysisReport = ({ dateRange }: CostAnalysisReportProps) => {
                   <div className="flex items-center gap-2">
                     <div 
                       className="w-3 h-3 rounded-sm" 
-                      style={{ backgroundColor: colors[index % colors.length] }}
+                      style={{ backgroundColor: `hsl(var(--chart-${(index % 8) + 1}))` }}
                     />
                     <span>{item.category}</span>
                   </div>
@@ -241,11 +253,13 @@ const CostAnalysisReport = ({ dateRange }: CostAnalysisReportProps) => {
             >
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={costsByVehicleClass}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="category" />
-                  <YAxis />
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Bar dataKey="cost" fill="hsl(var(--chart-1))" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+                  <XAxis dataKey="category" stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                  <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                  <ChartTooltip 
+                    content={<ChartTooltipContent formatter={(value) => [formatCurrency(Number(value)), 'Cost']} />} 
+                  />
+                  <Bar dataKey="cost" fill="hsl(var(--chart-1))" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </ChartContainer>
