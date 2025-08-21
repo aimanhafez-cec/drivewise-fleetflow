@@ -160,7 +160,7 @@ const Reservations = () => {
               <span className="sm:hidden">New</span>
             </Button>
             
-            <Button variant="outline" onClick={() => navigate('/planner')} size="sm" className="text-white">
+            <Button variant="outline" onClick={() => navigate('/daily-planner')} size="sm" className="text-white">
               <Calendar className="mr-2 h-4 w-4" />
               <span className="hidden sm:inline">Planner</span>
             </Button>
