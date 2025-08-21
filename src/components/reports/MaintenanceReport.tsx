@@ -9,6 +9,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { AlertTriangle, Calendar, Clock, Wrench, CheckCircle } from 'lucide-react';
 import { formatDistanceToNow, isBefore, addDays } from 'date-fns';
+import { formatCurrency } from '@/lib/utils/currency';
 
 interface MaintenanceReportProps {
   dateRange?: DateRange;
@@ -240,7 +241,7 @@ const MaintenanceReport = ({ dateRange }: MaintenanceReportProps) => {
                        vehicle.isDueSoon ? 'Due Soon' : 'Scheduled'}
                     </Badge>
                   </TableCell>
-                  <TableCell>${vehicle.estimatedCost}</TableCell>
+                  <TableCell>{formatCurrency(vehicle.estimatedCost)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

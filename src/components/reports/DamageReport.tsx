@@ -9,6 +9,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { AlertTriangle, DollarSign, FileImage, Wrench } from 'lucide-react';
 import { format } from 'date-fns';
+import { formatCurrency } from '@/lib/utils/currency';
 
 interface DamageReportProps {
   dateRange?: DateRange;
@@ -187,7 +188,7 @@ const DamageReport = ({ dateRange }: DamageReportProps) => {
             <DollarSign className="h-4 w-4 text-success" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${totalRepairCost.toLocaleString()}</div>
+            <div className="text-2xl font-bold">{formatCurrency(totalRepairCost)}</div>
             <p className="text-xs text-muted-foreground">From {damageRecords.length} repair records</p>
           </CardContent>
         </Card>
@@ -210,7 +211,7 @@ const DamageReport = ({ dateRange }: DamageReportProps) => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              ${damageRecords.length > 0 ? Math.round(totalRepairCost / damageRecords.length) : 0}
+              {formatCurrency(damageRecords.length > 0 ? Math.round(totalRepairCost / damageRecords.length) : 0)}
             </div>
             <p className="text-xs text-muted-foreground">Per incident</p>
           </CardContent>
@@ -328,7 +329,7 @@ const DamageReport = ({ dateRange }: DamageReportProps) => {
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      {record.repair_cost ? `$${record.repair_cost}` : 'TBD'}
+                      {record.repair_cost ? formatCurrency(record.repair_cost) : 'TBD'}
                     </TableCell>
                     <TableCell>
                       {record.photos && record.photos.length > 0 ? (
@@ -370,9 +371,9 @@ const DamageReport = ({ dateRange }: DamageReportProps) => {
                   <TableRow key={vehicle.vehicleId}>
                     <TableCell>{vehicle.vehicle}</TableCell>
                     <TableCell className="font-semibold">{vehicle.incidents}</TableCell>
-                    <TableCell>${vehicle.totalCost.toLocaleString()}</TableCell>
+                    <TableCell>{formatCurrency(vehicle.totalCost)}</TableCell>
                     <TableCell>
-                      ${Math.round(vehicle.totalCost / vehicle.incidents).toLocaleString()}
+                      {formatCurrency(Math.round(vehicle.totalCost / vehicle.incidents))}
                     </TableCell>
                   </TableRow>
                 ))}

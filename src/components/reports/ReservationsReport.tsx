@@ -9,6 +9,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { AlertTriangle, Calendar, TrendingUp, Users } from 'lucide-react';
 import { format, startOfWeek, endOfWeek, eachDayOfInterval, isSameDay } from 'date-fns';
+import { formatCurrency } from '@/lib/utils/currency';
 
 interface ReservationsReportProps {
   dateRange?: DateRange;
@@ -305,7 +306,7 @@ const ReservationsReport = ({ dateRange }: ReservationsReportProps) => {
                       {reservation.status}
                     </Badge>
                   </TableCell>
-                  <TableCell>${reservation.total_amount || 0}</TableCell>
+                  <TableCell>{formatCurrency(reservation.total_amount || 0)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

@@ -8,6 +8,7 @@ import { DateRange } from 'react-day-picker';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { AlertTriangle, Car, CheckCircle, Wrench } from 'lucide-react';
+import { formatCurrency } from '@/lib/utils/currency';
 
 interface FleetStatusReportProps {
   dateRange?: DateRange;
@@ -240,7 +241,7 @@ const FleetStatusReport = ({ dateRange }: FleetStatusReportProps) => {
                     </Badge>
                   </TableCell>
                   <TableCell>{vehicle.location || 'Not Set'}</TableCell>
-                  <TableCell>${vehicle.daily_rate || 0}/day</TableCell>
+                  <TableCell>{formatCurrency(vehicle.daily_rate || 0)}/day</TableCell>
                 </TableRow>
               ))}
             </TableBody>
