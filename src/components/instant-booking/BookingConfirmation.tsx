@@ -225,7 +225,7 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
           <div className="border-t border-primary/20 pt-4">
             <div className="flex justify-between items-center">
               <span className="text-xl font-bold text-card-foreground">Total:</span>
-              <span className="text-2xl font-bold text-primary">
+              <span className="text-2xl font-bold text-red-600">
                 AED {totalAmount.toFixed(2)}
               </span>
             </div>
