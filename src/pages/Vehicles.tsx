@@ -12,7 +12,6 @@ import { Pagination, PaginationContent, PaginationItem, PaginationLink, Paginati
 import { useToast } from '@/hooks/use-toast';
 import { Plus, Search, Filter, ChevronUp, ChevronDown } from 'lucide-react';
 import VehicleForm from '@/components/vehicles/VehicleForm';
-
 interface Vehicle {
   id: string;
   make: string;
@@ -39,14 +38,24 @@ interface Vehicle {
     icon: string;
   };
 }
-
 const statusConfig = {
-  available: { label: 'Available', className: 'bg-green-500 text-white' },
-  rented: { label: 'On Rent', className: 'bg-orange-500 text-white' },
-  maintenance: { label: 'In Service', className: 'bg-blue-500 text-white' },
-  out_of_service: { label: 'Out of Service', className: 'bg-red-500 text-white' },
+  available: {
+    label: 'Available',
+    className: 'bg-green-500 text-white'
+  },
+  rented: {
+    label: 'On Rent',
+    className: 'bg-orange-500 text-white'
+  },
+  maintenance: {
+    label: 'In Service',
+    className: 'bg-blue-500 text-white'
+  },
+  out_of_service: {
+    label: 'Out of Service',
+    className: 'bg-red-500 text-white'
+  }
 };
-
 const Vehicles = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -56,93 +65,87 @@ const Vehicles = () => {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [sortField, setSortField] = useState<keyof Vehicle>('make');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
-  const { toast } = useToast();
+  const {
+    toast
+  } = useToast();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-
-  const { data: vehicles, isLoading } = useQuery({
+  const {
+    data: vehicles,
+    isLoading
+  } = useQuery({
     queryKey: ['vehicles'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('vehicles')
-        .select(`
+      const {
+        data,
+        error
+      } = await supabase.from('vehicles').select(`
           *,
           categories (
             name,
             icon
           )
-        `)
-        .order('make', { ascending: true });
-
+        `).order('make', {
+        ascending: true
+      });
       if (error) throw error;
       return data as Vehicle[];
-    },
+    }
   });
-
-  const { data: categories } = useQuery({
+  const {
+    data: categories
+  } = useQuery({
     queryKey: ['categories'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('categories')
-        .select('*')
-        .order('name', { ascending: true });
-
+      const {
+        data,
+        error
+      } = await supabase.from('categories').select('*').order('name', {
+        ascending: true
+      });
       if (error) throw error;
       return data;
-    },
+    }
   });
-
   const deleteVehicleMutation = useMutation({
     mutationFn: async (vehicleId: string) => {
-      const { error } = await supabase
-        .from('vehicles')
-        .delete()
-        .eq('id', vehicleId);
-      
+      const {
+        error
+      } = await supabase.from('vehicles').delete().eq('id', vehicleId);
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['vehicles'] });
+      queryClient.invalidateQueries({
+        queryKey: ['vehicles']
+      });
       toast({
         title: "Success",
-        description: "Vehicle deleted successfully",
+        description: "Vehicle deleted successfully"
       });
     },
-    onError: (error) => {
+    onError: error => {
       toast({
         title: "Error",
         description: error.message,
-        variant: "destructive",
+        variant: "destructive"
       });
-    },
+    }
   });
-
   const filteredVehicles = vehicles?.filter(vehicle => {
-    const matchesSearch = vehicle.make.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      vehicle.model.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      vehicle.license_plate.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      vehicle.vin.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesCategory = selectedCategory === 'all' || 
-      vehicle.category_id === selectedCategory ||
-      (!vehicle.category_id && selectedCategory === 'uncategorized');
-    
+    const matchesSearch = vehicle.make.toLowerCase().includes(searchTerm.toLowerCase()) || vehicle.model.toLowerCase().includes(searchTerm.toLowerCase()) || vehicle.license_plate.toLowerCase().includes(searchTerm.toLowerCase()) || vehicle.vin.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory === 'all' || vehicle.category_id === selectedCategory || !vehicle.category_id && selectedCategory === 'uncategorized';
     return matchesSearch && matchesCategory;
   }) || [];
-
   const sortedVehicles = [...filteredVehicles].sort((a, b) => {
     const aValue = a[sortField];
     const bValue = b[sortField];
-    
     if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
     if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
     return 0;
   });
-
   const totalPages = Math.ceil(sortedVehicles.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedVehicles = sortedVehicles.slice(startIndex, startIndex + itemsPerPage);
-
   const handleSort = (field: keyof Vehicle) => {
     if (sortField === field) {
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
@@ -151,33 +154,26 @@ const Vehicles = () => {
       setSortDirection('asc');
     }
   };
-
   const handleAdd = () => {
     setSelectedVehicle(null);
     setIsFormOpen(true);
   };
-
   const handleFormClose = () => {
     setIsFormOpen(false);
     setSelectedVehicle(null);
   };
-
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-64">
+    return <div className="flex items-center justify-center h-64">
         <div className="text-lg">Loading vehicles...</div>
-      </div>
-    );
+      </div>;
   }
-
-  return (
-    <div className="space-y-6">
+  return <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">Vehicles</h1>
         </div>
         <div className="flex items-center space-x-4">
-          <Select value={`${itemsPerPage}`} onValueChange={(value) => setItemsPerPage(parseInt(value))}>
+          <Select value={`${itemsPerPage}`} onValueChange={value => setItemsPerPage(parseInt(value))}>
             <SelectTrigger className="w-20">
               <SelectValue />
             </SelectTrigger>
@@ -205,10 +201,7 @@ const Vehicles = () => {
                   {selectedVehicle ? 'Edit Vehicle' : 'Add New Vehicle'}
                 </DialogTitle>
               </DialogHeader>
-              <VehicleForm
-                vehicle={selectedVehicle}
-                onSuccess={handleFormClose}
-              />
+              <VehicleForm vehicle={selectedVehicle} onSuccess={handleFormClose} />
             </DialogContent>
           </Dialog>
         </div>
@@ -222,25 +215,18 @@ const Vehicles = () => {
           <SelectContent>
             <SelectItem value="all">All Categories</SelectItem>
             <SelectItem value="uncategorized">Uncategorized</SelectItem>
-            {categories?.map((category) => (
-              <SelectItem key={category.id} value={category.id}>
+            {categories?.map(category => <SelectItem key={category.id} value={category.id}>
                 {category.name}
-              </SelectItem>
-            ))}
+              </SelectItem>)}
           </SelectContent>
         </Select>
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-          <Input
-            placeholder="Vehicle No."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
-          />
+          <Input placeholder="Vehicle No." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-10" />
         </div>
       </div>
 
-      <div className="border rounded-lg overflow-x-auto">
+      <div className="border rounded-lg overflow-x-auto bg-slate-800/[0.47]">
         <Table>
           <TableHeader className="bg-slate-800 text-white">
             <TableRow>
@@ -298,12 +284,7 @@ const Vehicles = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paginatedVehicles.map((vehicle, index) => (
-              <TableRow 
-                key={vehicle.id} 
-                className="hover:bg-muted/50 cursor-pointer"
-                onClick={() => navigate(`/vehicles/${vehicle.id}`)}
-              >
+            {paginatedVehicles.map((vehicle, index) => <TableRow key={vehicle.id} className="hover:bg-muted/50 cursor-pointer" onClick={() => navigate(`/vehicles/${vehicle.id}`)}>
                 <TableCell className="font-medium">{startIndex + index + 1}</TableCell>
                 <TableCell>{vehicle.license_plate}</TableCell>
                 <TableCell>{vehicle.color || '-'}</TableCell>
@@ -324,8 +305,7 @@ const Vehicles = () => {
                 <TableCell>{vehicle.transmission || 'Automatic'}</TableCell>
                 <TableCell>-</TableCell>
                 <TableCell>{vehicle.odometer?.toLocaleString() || 0}</TableCell>
-              </TableRow>
-            ))}
+              </TableRow>)}
           </TableBody>
         </Table>
       </div>
@@ -337,51 +317,33 @@ const Vehicles = () => {
         <Pagination>
           <PaginationContent>
             <PaginationItem>
-              <PaginationPrevious 
-                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-              />
+              <PaginationPrevious onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))} className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'} />
             </PaginationItem>
             {[...Array(Math.min(5, totalPages))].map((_, i) => {
-              const pageNumber = i + 1;
-              return (
-                <PaginationItem key={pageNumber}>
-                  <PaginationLink
-                    onClick={() => setCurrentPage(pageNumber)}
-                    isActive={currentPage === pageNumber}
-                    className="cursor-pointer"
-                  >
+            const pageNumber = i + 1;
+            return <PaginationItem key={pageNumber}>
+                  <PaginationLink onClick={() => setCurrentPage(pageNumber)} isActive={currentPage === pageNumber} className="cursor-pointer">
                     {pageNumber}
                   </PaginationLink>
-                </PaginationItem>
-              );
-            })}
+                </PaginationItem>;
+          })}
             <PaginationItem>
-              <PaginationNext 
-                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-              />
+              <PaginationNext onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))} className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'} />
             </PaginationItem>
           </PaginationContent>
         </Pagination>
       </div>
 
-      {filteredVehicles.length === 0 && !isLoading && (
-        <div className="text-center py-12">
+      {filteredVehicles.length === 0 && !isLoading && <div className="text-center py-12">
           <h3 className="text-lg font-semibold mb-2">No vehicles found</h3>
           <p className="text-muted-foreground mb-4">
             {searchTerm ? 'Try adjusting your search terms.' : 'Get started by adding your first vehicle.'}
           </p>
-          {!searchTerm && (
-            <Button onClick={handleAdd}>
+          {!searchTerm && <Button onClick={handleAdd}>
               <Plus className="mr-2 h-4 w-4" />
               Add Vehicle
-            </Button>
-          )}
-        </div>
-      )}
-    </div>
-  );
+            </Button>}
+        </div>}
+    </div>;
 };
-
 export default Vehicles;
