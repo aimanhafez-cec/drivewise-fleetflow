@@ -2,13 +2,15 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
+import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from '@/components/ui/chart';
 import { DateRange } from 'react-day-picker';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Users, TrendingUp, DollarSign, Repeat } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils/currency';
+import { MONTHLY_TRENDS_CONFIG, VEHICLE_CATEGORY_COLORS } from '@/lib/chartConfig';
+import { currencyTooltipFormatter, formatMonth } from '@/lib/utils/chartUtils';
 
 interface RentalHistoryReportProps {
   dateRange?: DateRange;
@@ -180,25 +182,37 @@ const RentalHistoryReport: React.FC<RentalHistoryReportProps> = ({ dateRange }) 
           </CardHeader>
           <CardContent>
             <ChartContainer 
-              config={{
-                revenue: { label: 'Revenue', color: chartColors.revenue }
-              }} 
+              config={MONTHLY_TRENDS_CONFIG}
               className="h-[300px]"
             >
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={revenueByMonth}>
+                <LineChart data={revenueByMonth} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
-                  <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                  <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                  <ChartTooltip 
-                    content={<ChartTooltipContent formatter={(value: number) => [formatCurrency(value), 'Revenue']} />}
+                  <XAxis 
+                    dataKey="month" 
+                    stroke="hsl(var(--muted-foreground))" 
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                    tickFormatter={formatMonth}
                   />
+                  <YAxis 
+                    stroke="hsl(var(--muted-foreground))" 
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                    tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
+                  />
+                  <ChartTooltip 
+                    content={<ChartTooltipContent formatter={currencyTooltipFormatter} />}
+                  />
+                  <ChartLegend content={<ChartLegendContent />} />
                   <Line 
                     type="monotone" 
                     dataKey="revenue" 
-                    stroke={chartColors.revenue} 
+                    stroke={MONTHLY_TRENDS_CONFIG.revenue.color}
                     strokeWidth={3}
-                    dot={{ fill: chartColors.revenue, strokeWidth: 2, r: 6 }}
+                    dot={{ fill: MONTHLY_TRENDS_CONFIG.revenue.color, strokeWidth: 2, r: 6 }}
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -218,7 +232,7 @@ const RentalHistoryReport: React.FC<RentalHistoryReportProps> = ({ dateRange }) 
                 ...acc,
                 [item.type.toLowerCase()]: { 
                   label: item.type, 
-                  color: pieColors[index % pieColors.length] 
+                  color: VEHICLE_CATEGORY_COLORS[index % VEHICLE_CATEGORY_COLORS.length] 
                 }
               }), {}) || {}}
               className="h-[300px]"
@@ -234,16 +248,20 @@ const RentalHistoryReport: React.FC<RentalHistoryReportProps> = ({ dateRange }) 
                     paddingAngle={5}
                     dataKey="revenue"
                     nameKey="type"
-                    label={({ type, percent }) => `${type}: ${(percent * 100).toFixed(0)}%`}
-                    labelLine={false}
                   >
                     {customerSegmentation?.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={pieColors[index % pieColors.length]} stroke="hsl(var(--background))" strokeWidth={2} />
+                      <Cell 
+                        key={`cell-${index}`} 
+                        fill={VEHICLE_CATEGORY_COLORS[index % VEHICLE_CATEGORY_COLORS.length]} 
+                        stroke="hsl(var(--background))" 
+                        strokeWidth={2} 
+                      />
                     ))}
                   </Pie>
                   <ChartTooltip 
-                    content={<ChartTooltipContent formatter={(value: number) => [formatCurrency(value), 'Revenue']} />}
+                    content={<ChartTooltipContent formatter={currencyTooltipFormatter} />}
                   />
+                  <ChartLegend content={<ChartLegendContent />} />
                 </PieChart>
               </ResponsiveContainer>
             </ChartContainer>

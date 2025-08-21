@@ -9,7 +9,7 @@ export const CHART_COLORS = {
   purple: "hsl(271, 76%, 53%)", // Purple
   cyan: "hsl(185, 76%, 46%)", // Cyan
   yellow: "hsl(54, 91%, 51%)", // Yellow
-  indigo: "hsl(239, 84%, 67%indigo)", // Indigo
+  indigo: "hsl(239, 84%, 67%)", // Indigo
   rose: "hsl(330, 81%, 60%)", // Rose
   emerald: "hsl(142, 71%, 45%)", // Emerald
   amber: "hsl(43, 96%, 56%)", // Amber
