@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Car, MapPin, Fuel, Users, CheckCircle, Search, Filter, Calendar, Shield, Settings } from 'lucide-react';
 import { useAvailableVehicles } from '@/hooks/useAvailableVehicles';
 import { useVehicleCategories } from '@/hooks/useVehicles';
+import nissanVersaImage from '@/assets/nissan-versa.jpg';
 
 interface QuickVehicleSelectorProps {
   pickupDate: string;
@@ -278,10 +279,20 @@ const QuickVehicleSelector: React.FC<QuickVehicleSelectorProps> = ({
           
           {selectedVehicle && (
             <div className="space-y-6">
-              {/* Vehicle Image Placeholder */}
-              <div className="w-full h-48 bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg flex items-center justify-center">
-                <Car className="h-16 w-16 text-muted-foreground" />
-              </div>
+              {/* Vehicle Image */}
+              {selectedVehicle.make?.toLowerCase() === 'nissan' && selectedVehicle.model?.toLowerCase().includes('versa') ? (
+                <div className="w-full h-48 rounded-lg overflow-hidden">
+                  <img 
+                    src={nissanVersaImage} 
+                    alt={`${selectedVehicle.make} ${selectedVehicle.model}`}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              ) : (
+                <div className="w-full h-48 bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg flex items-center justify-center">
+                  <Car className="h-16 w-16 text-muted-foreground" />
+                </div>
+              )}
 
               {/* Basic Info */}
               <div className="grid grid-cols-2 gap-4">
