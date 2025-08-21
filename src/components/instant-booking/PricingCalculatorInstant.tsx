@@ -274,7 +274,7 @@ const PricingCalculatorInstant: React.FC<PricingCalculatorInstantProps> = ({
             <p className="text-2xl font-bold text-primary">
               AED {(pricingCalculation.totalAmount / pricingCalculation.days).toFixed(0)}
             </p>
-            <p className="text-sm text-muted-foreground">Effective Daily</p>
+            <p className="text-sm text-foreground">Effective Daily</p>
           </div>
         </div>
       </CardContent>
