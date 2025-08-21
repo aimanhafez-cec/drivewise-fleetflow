@@ -283,7 +283,7 @@ const PricingCalculatorInstant: React.FC<PricingCalculatorInstantProps> = ({
             <p className="text-2xl font-bold text-primary">
               AED {pricingCalculation.dailyRate}
             </p>
-            <p className="text-sm text-muted-foreground">Daily Rate</p>
+            <p className="text-sm text-card-foreground">Daily Rate</p>
           </div>
           <div className="text-center">
             <p className="text-2xl font-bold text-primary">
