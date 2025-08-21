@@ -1795,7 +1795,7 @@ const NewReservation = () => {
                                   
                                   <div className="flex-1">
                                     <div className="flex items-center gap-2 mb-2">
-                                      <IconComponent className="h-5 w-5 text-primary" />
+                                      <IconComponent className="h-5 w-5 text-white" />
                                       <h4 className="font-medium text-card-foreground">{addOn.name}</h4>
                                       {addOn.popular && (
                                         <Badge variant="secondary" className="text-xs">
@@ -1849,7 +1849,7 @@ const NewReservation = () => {
                           return (
                             <div key={addOnId} className="flex items-center justify-between p-3 bg-card-foreground/5 rounded-lg border border-card-foreground/10">
                               <div className="flex items-center gap-2 flex-1">
-                                <IconComponent className="h-4 w-4 text-primary" />
+                                <IconComponent className="h-4 w-4 text-white" />
                                 <div className="flex-1 min-w-0">
                                   <p className="font-medium text-sm truncate text-card-foreground">{addOn.name}</p>
                                   <p className="text-xs text-card-foreground/70">
