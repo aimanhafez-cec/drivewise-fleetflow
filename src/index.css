@@ -235,4 +235,26 @@
     transform: scaleX(1);
     transform-origin: left;
   }
+
+  /* Abstract wave background for cards */
+  .card-with-background {
+    position: relative;
+    overflow: visible;
+  }
+
+  .card-with-background::before {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: -20px;
+    right: -20px;
+    height: 200px;
+    background-image: url('/lovable-uploads/b96ecccc-1eb0-48af-837e-a82f81df2afb.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: -1;
+    border-radius: 0 0 var(--radius) var(--radius);
+    opacity: 0.8;
+  }
 }
