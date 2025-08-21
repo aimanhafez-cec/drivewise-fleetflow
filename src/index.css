@@ -136,9 +136,7 @@
   }
 
   body {
-    @apply text-foreground;
-    background: hsl(var(--background)) url('/lovable-uploads/8cb181cb-582c-47bb-b3df-2473b9a87228.png') no-repeat center center fixed;
-    background-size: cover;
+    @apply bg-background text-foreground;
   }
 
   /* Corporate Teal Dashboard Enhancements */
