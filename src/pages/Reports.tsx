@@ -16,6 +16,10 @@ import RentalHistoryReport from '@/components/reports/RentalHistoryReport';
 import PreferencesTrendsReport from '@/components/reports/PreferencesTrendsReport';
 import SatisfactionFeedbackReport from '@/components/reports/SatisfactionFeedbackReport';
 import LateReturnAnalysisReport from '@/components/reports/LateReturnAnalysisReport';
+import RevenueBreakdownReport from '@/components/reports/RevenueBreakdownReport';
+import CostAnalysisReport from '@/components/reports/CostAnalysisReport';
+import ProfitabilityReport from '@/components/reports/ProfitabilityReport';
+import OutstandingPaymentsReport from '@/components/reports/OutstandingPaymentsReport';
 
 const Reports = () => {
   const [date, setDate] = useState<DateRange | undefined>({
@@ -86,9 +90,10 @@ const Reports = () => {
 
       {/* Main Report Tabs */}
       <Tabs defaultValue="operations" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="operations">Internal Operations Reports</TabsTrigger>
           <TabsTrigger value="customer-insights">Customer Insight Reports</TabsTrigger>
+          <TabsTrigger value="financial">Financial Reports</TabsTrigger>
         </TabsList>
 
         {/* Internal Operations Reports */}
@@ -196,6 +201,35 @@ const Reports = () => {
 
             <TabsContent value="late-returns" className="space-y-4">
               <LateReturnAnalysisReport dateRange={date} />
+            </TabsContent>
+          </Tabs>
+        </TabsContent>
+
+        {/* Financial Reports */}
+        <TabsContent value="financial" className="space-y-6">
+          {/* Financial Reports Sub-tabs */}
+          <Tabs defaultValue="revenue-breakdown" className="space-y-4">
+            <TabsList>
+              <TabsTrigger value="revenue-breakdown">Revenue Breakdown & Trends</TabsTrigger>
+              <TabsTrigger value="cost-analysis">Cost Analysis & Expenses</TabsTrigger>
+              <TabsTrigger value="profitability">Profitability Analysis</TabsTrigger>
+              <TabsTrigger value="outstanding-payments">Outstanding Payments</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="revenue-breakdown" className="space-y-4">
+              <RevenueBreakdownReport dateRange={date} />
+            </TabsContent>
+
+            <TabsContent value="cost-analysis" className="space-y-4">
+              <CostAnalysisReport dateRange={date} />
+            </TabsContent>
+
+            <TabsContent value="profitability" className="space-y-4">
+              <ProfitabilityReport dateRange={date} />
+            </TabsContent>
+
+            <TabsContent value="outstanding-payments" className="space-y-4">
+              <OutstandingPaymentsReport dateRange={date} />
             </TabsContent>
           </Tabs>
         </TabsContent>
