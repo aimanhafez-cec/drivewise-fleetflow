@@ -1118,9 +1118,9 @@ const NewReservation = () => {
     };
     validation.validateForm(validationData);
   };
-  return <div className="flex flex-col lg:flex-row gap-6 min-h-screen">
+  return <div className="flex flex-col lg:flex-row gap-6 h-full">
       {/* Main Content */}
-      <div className="flex-1 space-y-6 min-w-0 max-w-none overflow-x-auto">
+      <div className="flex-1 space-y-6 min-w-0 overflow-y-auto">
         {/* Breadcrumbs */}
         <Breadcrumb>
           <BreadcrumbList>

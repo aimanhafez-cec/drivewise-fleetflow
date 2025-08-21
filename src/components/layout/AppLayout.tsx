@@ -119,7 +119,7 @@ const AppLayout = () => {
               </Button>
             </div>
           </header>
-          <div className="flex-1 p-4 md:p-6 min-w-0 overflow-x-auto">
+          <div className="flex-1 p-4 md:p-6 min-w-0">
             <Outlet />
           </div>
         </main>
