@@ -40,9 +40,10 @@ export const validateAddLine = (formData: any): ValidationError[] => {
     errors.push({ field: 'vehicleClassId', message: 'Vehicle Class is required' });
   }
   
-  if (!formData.vehicleId) {
-    errors.push({ field: 'vehicleId', message: 'Vehicle is required' });
-  }
+  // Vehicle ID is optional - can be assigned later in agreement
+  // if (!formData.vehicleId) {
+  //   errors.push({ field: 'vehicleId', message: 'Vehicle is required' });
+  // }
   
   if (!formData.checkOutDate) {
     errors.push({ field: 'checkOutDate', message: 'Check-out Date is required' });
