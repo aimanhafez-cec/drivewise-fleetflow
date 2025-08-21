@@ -83,13 +83,13 @@ export const DamageTab: React.FC<DamageTabProps> = ({ agreementId, agreementLine
   };
 
   if (isLoading) {
-    return <div>Loading damage information...</div>;
+    return <div className="text-white">Loading damage information...</div>;
   }
 
   return (
     <div id="tab-damage" className="space-y-6">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">Vehicle Damage Assessment</h3>
+        <h3 className="text-lg font-semibold text-white">Vehicle Damage Assessment</h3>
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
@@ -106,18 +106,18 @@ export const DamageTab: React.FC<DamageTabProps> = ({ agreementId, agreementLine
       <Card>
         <CardContent className="pt-6">
           <div className="flex items-center gap-4">
-            <span className="text-sm font-medium">Severity Legend:</span>
+            <span className="text-sm font-medium text-white">Severity Legend:</span>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-              <span className="text-sm">Low</span>
+              <span className="text-sm text-white">Low</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-              <span className="text-sm">Medium</span>
+              <span className="text-sm text-white">Medium</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-              <span className="text-sm">High</span>
+              <span className="text-sm text-white">High</span>
             </div>
           </div>
         </CardContent>
@@ -127,7 +127,7 @@ export const DamageTab: React.FC<DamageTabProps> = ({ agreementId, agreementLine
       {agreementLines.map((line, index) => (
         <Card key={line.id} id={`damage-card-line-${index + 1}`}>
           <CardHeader>
-            <CardTitle className="flex items-center justify-between">
+            <CardTitle className="flex items-center justify-between text-white">
               <span>Line {index + 1} - Vehicle Damage</span>
               <Badge variant="outline">{line.vehicle?.make} {line.vehicle?.model}</Badge>
             </CardTitle>
@@ -150,7 +150,7 @@ export const DamageTab: React.FC<DamageTabProps> = ({ agreementId, agreementLine
       {damageMarkers && damageMarkers.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>Damage Summary</CardTitle>
+            <CardTitle className="text-white">Damage Summary</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
@@ -159,8 +159,8 @@ export const DamageTab: React.FC<DamageTabProps> = ({ agreementId, agreementLine
                   <div className="flex items-center gap-3">
                     <div className={`w-3 h-3 rounded-full ${getSeverityColor(marker.severity)}`}></div>
                     <div>
-                      <div className="font-medium">{marker.damage_type} - {marker.side}</div>
-                      <div className="text-sm text-muted-foreground">
+                      <div className="font-medium text-white">{marker.damage_type} - {marker.side}</div>
+                      <div className="text-sm text-white">
                         {marker.event} | {new Date(marker.occurred_at).toLocaleDateString()}
                       </div>
                     </div>

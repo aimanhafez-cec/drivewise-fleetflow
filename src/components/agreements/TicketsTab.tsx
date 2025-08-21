@@ -164,13 +164,13 @@ export const TicketsTab: React.FC<TicketsTabProps> = ({ agreementId, customerId,
   };
 
   if (isLoading) {
-    return <div>Loading traffic tickets...</div>;
+    return <div className="text-white">Loading traffic tickets...</div>;
   }
 
   return (
     <div id="tab-tickets" className="space-y-6">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">Traffic Tickets</h3>
+        <h3 className="text-lg font-semibold text-white">Traffic Tickets</h3>
         <Dialog open={ticketModalOpen} onOpenChange={setTicketModalOpen}>
           <DialogTrigger asChild>
             <Button id="btn-ticket-add" onClick={resetForm}>
@@ -180,16 +180,16 @@ export const TicketsTab: React.FC<TicketsTabProps> = ({ agreementId, customerId,
           </DialogTrigger>
           <DialogContent id="modal-ticket" className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Add Traffic Ticket</DialogTitle>
+              <DialogTitle className="text-white">Add Traffic Ticket</DialogTitle>
             </DialogHeader>
 
             <div className="space-y-4">
-              <p className="text-sm text-muted-foreground">Fields marked * are required.</p>
+              <p className="text-sm text-white">Fields marked * are required.</p>
 
               {/* Date & Time */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Violation Date *</Label>
+                  <Label className="text-white">Violation Date *</Label>
                   <Popover open={showOccurredCalendar} onOpenChange={setShowOccurredCalendar}>
                     <PopoverTrigger asChild>
                       <Button
@@ -221,7 +221,7 @@ export const TicketsTab: React.FC<TicketsTabProps> = ({ agreementId, customerId,
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="city">City/Location *</Label>
+                  <Label htmlFor="city" className="text-white">City/Location *</Label>
                   <Input
                     id="city"
                     value={formData.city}
@@ -386,35 +386,35 @@ export const TicketsTab: React.FC<TicketsTabProps> = ({ agreementId, customerId,
           <Table id="tickets-table">
             <TableHeader>
               <TableRow>
-                <TableHead>Date</TableHead>
-                <TableHead>Location</TableHead>
-                <TableHead>Authority</TableHead>
-                <TableHead>Type/Code</TableHead>
-                <TableHead>Amount</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Due Date</TableHead>
-                <TableHead>Actions</TableHead>
+                <TableHead className="text-white">Date</TableHead>
+                <TableHead className="text-white">Location</TableHead>
+                <TableHead className="text-white">Authority</TableHead>
+                <TableHead className="text-white">Type/Code</TableHead>
+                <TableHead className="text-white">Amount</TableHead>
+                <TableHead className="text-white">Status</TableHead>
+                <TableHead className="text-white">Due Date</TableHead>
+                <TableHead className="text-white">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {tickets && tickets.length > 0 ? (
                 tickets.map((ticket) => (
                   <TableRow key={ticket.id}>
-                    <TableCell>{format(new Date(ticket.ticket_date), 'MMM dd, yyyy')}</TableCell>
-                    <TableCell>-</TableCell>
-                    <TableCell>-</TableCell>
-                    <TableCell>{ticket.violation_type}</TableCell>
-                    <TableCell>
+                    <TableCell className="text-white">{format(new Date(ticket.ticket_date), 'MMM dd, yyyy')}</TableCell>
+                    <TableCell className="text-white">-</TableCell>
+                    <TableCell className="text-white">-</TableCell>
+                    <TableCell className="text-white">{ticket.violation_type}</TableCell>
+                    <TableCell className="text-white">
                       <div className="flex items-center gap-1">
                         {formatCurrency(Number(ticket.fine_amount) || 0)}
                       </div>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="text-white">
                       <Badge variant={getStatusColor(ticket.status)}>
                         {ticket.status}
                       </Badge>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="text-white">
                       {ticket.court_date ? format(new Date(ticket.court_date), 'MMM dd, yyyy') : '-'}
                     </TableCell>
                     <TableCell>
@@ -450,7 +450,7 @@ export const TicketsTab: React.FC<TicketsTabProps> = ({ agreementId, customerId,
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={8} className="text-center py-8 text-white">
                     No traffic tickets found
                   </TableCell>
                 </TableRow>
@@ -464,31 +464,31 @@ export const TicketsTab: React.FC<TicketsTabProps> = ({ agreementId, customerId,
       {tickets && tickets.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>Tickets Summary</CardTitle>
+            <CardTitle className="text-white">Tickets Summary</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="text-center">
-                <div className="text-2xl font-bold">{tickets.length}</div>
-                <div className="text-sm text-muted-foreground">Total Tickets</div>
+                <div className="text-2xl font-bold text-white">{tickets.length}</div>
+                <div className="text-sm text-white">Total Tickets</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-red-600">
                   {tickets.filter(t => t.status === 'PENDING').length}
                 </div>
-                <div className="text-sm text-muted-foreground">Pending</div>
+                <div className="text-sm text-white">Pending</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-green-600">
                   {tickets.filter(t => t.status === 'PAID').length}
                 </div>
-                <div className="text-sm text-muted-foreground">Paid</div>
+                <div className="text-sm text-white">Paid</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold">
+                <div className="text-2xl font-bold text-white">
                   {formatCurrency(tickets.reduce((sum, t) => sum + Number(t.fine_amount), 0))}
                 </div>
-                <div className="text-sm text-muted-foreground">Total Amount</div>
+                <div className="text-sm text-white">Total Amount</div>
               </div>
             </div>
           </CardContent>

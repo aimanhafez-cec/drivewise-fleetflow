@@ -128,9 +128,9 @@ const AgreementDetails = () => {
   if (!agreement) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px]">
-        <FileText className="h-12 w-12 text-muted-foreground" />
-        <h3 className="mt-4 text-lg font-semibold">Agreement not found</h3>
-        <p className="text-muted-foreground">
+        <FileText className="h-12 w-12 text-white" />
+        <h3 className="mt-4 text-lg font-semibold text-white">Agreement not found</h3>
+        <p className="text-white">
           The agreement you're looking for doesn't exist.
         </p>
         <Button 
@@ -169,10 +169,10 @@ const AgreementDetails = () => {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">
+            <h1 className="text-3xl font-bold tracking-tight text-white">
               Agreement {agreement.agreement_no || `#${agreement.id.slice(0, 8)}`}
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-white">
               Created on {format(new Date(agreement.created_at), 'MMMM dd, yyyy')}
             </p>
           </div>
@@ -205,23 +205,23 @@ const AgreementDetails = () => {
         {/* Customer Information */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Customer Information</CardTitle>
+            <CardTitle className="text-lg text-white">Customer Information</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <p className="text-sm font-medium text-muted-foreground">Customer Name</p>
-              <p className="font-medium">
+              <p className="text-sm font-medium text-white">Customer Name</p>
+              <p className="font-medium text-white">
                 {agreement.profiles?.full_name || 'Unknown Customer'}
               </p>
             </div>
             <div>
-              <p className="text-sm font-medium text-muted-foreground">Email</p>
-              <p>{agreement.profiles?.email || 'N/A'}</p>
+              <p className="text-sm font-medium text-white">Email</p>
+              <p className="text-white">{agreement.profiles?.email || 'N/A'}</p>
             </div>
             {agreement.profiles?.phone && (
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Phone</p>
-                <p>{agreement.profiles.phone}</p>
+                <p className="text-sm font-medium text-white">Phone</p>
+                <p className="text-white">{agreement.profiles.phone}</p>
               </div>
             )}
           </CardContent>
@@ -230,7 +230,7 @@ const AgreementDetails = () => {
         {/* Vehicle Information */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Vehicle Information</CardTitle>
+            <CardTitle className="text-lg text-white">Vehicle Information</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {(() => {
@@ -238,34 +238,34 @@ const AgreementDetails = () => {
               return vehicleFromLine ? (
                 <>
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Vehicle</p>
-                    <p className="font-medium">
+                    <p className="text-sm font-medium text-white">Vehicle</p>
+                    <p className="font-medium text-white">
                       {vehicleFromLine.year} {vehicleFromLine.make} {vehicleFromLine.model}
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">License Plate</p>
-                    <p>{vehicleFromLine.license_plate}</p>
+                    <p className="text-sm font-medium text-white">License Plate</p>
+                    <p className="text-white">{vehicleFromLine.license_plate}</p>
                   </div>
                   {vehicleFromLine.color && (
                     <div>
-                      <p className="text-sm font-medium text-muted-foreground">Color</p>
-                      <p>{vehicleFromLine.color}</p>
+                      <p className="text-sm font-medium text-white">Color</p>
+                      <p className="text-white">{vehicleFromLine.color}</p>
                     </div>
                   )}
                   {vehicleFromLine.vin && (
                     <div>
-                      <p className="text-sm font-medium text-muted-foreground">VIN</p>
-                      <p className="font-mono text-sm">{vehicleFromLine.vin}</p>
+                      <p className="text-sm font-medium text-white">VIN</p>
+                      <p className="font-mono text-sm text-white">{vehicleFromLine.vin}</p>
                     </div>
                   )}
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Status</p>
-                    <p className="capitalize">{vehicleFromLine.status}</p>
+                    <p className="text-sm font-medium text-white">Status</p>
+                    <p className="capitalize text-white">{vehicleFromLine.status}</p>
                   </div>
                 </>
               ) : (
-                <p className="text-muted-foreground">No vehicle assigned</p>
+                <p className="text-white">No vehicle assigned</p>
               );
             })()}
           </CardContent>
@@ -274,21 +274,21 @@ const AgreementDetails = () => {
         {/* Financial Information */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Financial Details</CardTitle>
+            <CardTitle className="text-lg text-white">Financial Details</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <p className="text-sm font-medium text-muted-foreground">Agreement Date</p>
-              <p>{format(new Date(agreement.agreement_date), 'MMM dd, yyyy')}</p>
+              <p className="text-sm font-medium text-white">Agreement Date</p>
+              <p className="text-white">{format(new Date(agreement.agreement_date), 'MMM dd, yyyy')}</p>
             </div>
             <div>
-              <p className="text-sm font-medium text-muted-foreground">Total Amount</p>
-              <p className="text-xl font-bold">
+              <p className="text-sm font-medium text-white">Total Amount</p>
+              <p className="text-xl font-bold text-white">
                 {formatCurrency(agreement.total_amount || 0)}
               </p>
             </div>
             <div>
-              <p className="text-sm font-medium text-muted-foreground">Status</p>
+              <p className="text-sm font-medium text-white">Status</p>
               <Badge className={getStatusColor(agreement.status)}>
                 {agreement.status.replace('_', ' ').toUpperCase()}
               </Badge>
@@ -340,10 +340,10 @@ const AgreementDetails = () => {
         <TabsContent value="payments">
           <Card>
             <CardHeader>
-              <CardTitle>Payment Records</CardTitle>
+              <CardTitle className="text-white">Payment Records</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground text-center py-8">
+              <p className="text-white text-center py-8">
                 No payment records found
               </p>
             </CardContent>
@@ -353,13 +353,13 @@ const AgreementDetails = () => {
         <TabsContent value="notes">
           <Card>
             <CardHeader>
-              <CardTitle>Notes</CardTitle>
+              <CardTitle className="text-white">Notes</CardTitle>
             </CardHeader>
             <CardContent>
               {agreement.notes ? (
-                <p className="whitespace-pre-wrap">{agreement.notes}</p>
+                <p className="whitespace-pre-wrap text-white">{agreement.notes}</p>
               ) : (
-                <p className="text-muted-foreground">No notes available</p>
+                <p className="text-white">No notes available</p>
               )}
             </CardContent>
           </Card>

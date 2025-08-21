@@ -78,34 +78,34 @@ export const AgreementLinesTable: React.FC<AgreementLinesTableProps> = ({
     <>
       <Card>
         <CardHeader>
-          <CardTitle>Agreement Lines</CardTitle>
+          <CardTitle className="text-white">Agreement Lines</CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Vehicle</TableHead>
-                <TableHead>Check Out</TableHead>
-                <TableHead>Check In</TableHead>
-                <TableHead>Segments</TableHead>
-                <TableHead>Line Net</TableHead>
-                <TableHead>Tax</TableHead>
-                <TableHead>Line Total</TableHead>
-                <TableHead>Actions</TableHead>
+                <TableHead className="text-white">Vehicle</TableHead>
+                <TableHead className="text-white">Check Out</TableHead>
+                <TableHead className="text-white">Check In</TableHead>
+                <TableHead className="text-white">Segments</TableHead>
+                <TableHead className="text-white">Line Net</TableHead>
+                <TableHead className="text-white">Tax</TableHead>
+                <TableHead className="text-white">Line Total</TableHead>
+                <TableHead className="text-white">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {lines.map((line) => (
                 <TableRow key={line.id}>
-                  <TableCell>
+                  <TableCell className="text-white">
                     <div>
-                      <div className="font-medium">
+                      <div className="font-medium text-white">
                         {line.vehicle ? `${line.vehicle.make} ${line.vehicle.model}` : 
-                          <span className="text-muted-foreground">No Vehicle Assigned</span>
+                          <span className="text-white">No Vehicle Assigned</span>
                         }
                       </div>
                       {line.vehicle?.license_plate && (
-                        <div className="text-sm text-muted-foreground">
+                        <div className="text-sm text-white">
                           {line.vehicle.license_plate}
                         </div>
                       )}
@@ -116,18 +116,18 @@ export const AgreementLinesTable: React.FC<AgreementLinesTableProps> = ({
                       )}
                     </div>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="text-white">
                     {line.check_out_at ? format(new Date(line.check_out_at), 'MMM dd, yyyy\nHH:mm') : '-'}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="text-white">
                     {line.check_in_at ? format(new Date(line.check_in_at), 'MMM dd, yyyy\nHH:mm') : '-'}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="text-white">
                     {getSegmentBadges(line)}
                   </TableCell>
-                  <TableCell>{formatCurrency(line.line_net || 0)}</TableCell>
-                  <TableCell>{formatCurrency(line.tax_value || 0)}</TableCell>
-                  <TableCell className="font-medium">
+                  <TableCell className="text-white">{formatCurrency(line.line_net || 0)}</TableCell>
+                  <TableCell className="text-white">{formatCurrency(line.tax_value || 0)}</TableCell>
+                  <TableCell className="font-medium text-white">
                     {formatCurrency(line.line_total || 0)}
                   </TableCell>
                   <TableCell>
@@ -161,7 +161,7 @@ export const AgreementLinesTable: React.FC<AgreementLinesTableProps> = ({
           </Table>
 
           {lines.length === 0 && (
-            <div className="text-center py-8 text-muted-foreground">
+            <div className="text-center py-8 text-white">
               No agreement lines found
             </div>
           )}
