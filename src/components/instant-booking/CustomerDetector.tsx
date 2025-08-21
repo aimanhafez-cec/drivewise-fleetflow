@@ -31,11 +31,27 @@ const CustomerDetector: React.FC<CustomerDetectorProps> = ({
     email: string;
     phone: string;
     customer_type: 'B2B' | 'B2C' | 'CORPORATE';
+    national_id?: string;
+    license_number?: string;
+    license_expiry?: string;
+    passport_number?: string;
+    date_of_birth?: string;
+    address?: string;
+    emergency_contact_name?: string;
+    emergency_contact_phone?: string;
   }>({
     full_name: '',
     email: '',
     phone: '',
-    customer_type: 'B2C' as const
+    customer_type: 'B2C' as const,
+    national_id: '',
+    license_number: '',
+    license_expiry: '',
+    passport_number: '',
+    date_of_birth: '',
+    address: '',
+    emergency_contact_name: '',
+    emergency_contact_phone: ''
   });
 
   // Search existing customers
@@ -194,39 +210,115 @@ const CustomerDetector: React.FC<CustomerDetectorProps> = ({
                 </div>}
             </TabsContent>
 
-            <TabsContent value="new" className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="new-name">Full Name *</Label>
-                  <Input id="new-name" value={newCustomer.full_name} onChange={e => setNewCustomer(prev => ({
-                ...prev,
-                full_name: e.target.value
-              }))} className="mt-1" />
+            <TabsContent value="new" className="space-y-6">
+              {/* Basic Information */}
+              <div>
+                <h4 className="text-sm font-medium text-muted-foreground mb-3">Basic Information</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="new-name">Full Name *</Label>
+                    <Input id="new-name" value={newCustomer.full_name} onChange={e => setNewCustomer(prev => ({
+                      ...prev,
+                      full_name: e.target.value
+                    }))} className="mt-1" />
+                  </div>
+                  <div>
+                    <Label htmlFor="new-email">Email *</Label>
+                    <Input id="new-email" type="email" value={newCustomer.email} onChange={e => setNewCustomer(prev => ({
+                      ...prev,
+                      email: e.target.value
+                    }))} className="mt-1" />
+                  </div>
+                  <div>
+                    <Label htmlFor="new-phone">Phone</Label>
+                    <Input id="new-phone" value={newCustomer.phone} onChange={e => setNewCustomer(prev => ({
+                      ...prev,
+                      phone: e.target.value
+                    }))} className="mt-1" />
+                  </div>
+                  <div>
+                    <Label htmlFor="customer-type">Customer Type</Label>
+                    <select id="customer-type" value={newCustomer.customer_type} onChange={e => setNewCustomer(prev => ({
+                      ...prev,
+                      customer_type: e.target.value as 'B2B' | 'B2C' | 'CORPORATE'
+                    }))} className="mt-1 w-full px-3 py-2 border rounded-md bg-background">
+                      <option value="B2C">Individual</option>
+                      <option value="B2B">B2B - Business</option>
+                      <option value="CORPORATE">Corporate Account</option>
+                    </select>
+                  </div>
+                  <div>
+                    <Label htmlFor="date-of-birth">Date of Birth</Label>
+                    <Input id="date-of-birth" type="date" value={newCustomer.date_of_birth} onChange={e => setNewCustomer(prev => ({
+                      ...prev,
+                      date_of_birth: e.target.value
+                    }))} className="mt-1" />
+                  </div>
                 </div>
-                <div>
-                  <Label htmlFor="new-email">Email *</Label>
-                  <Input id="new-email" type="email" value={newCustomer.email} onChange={e => setNewCustomer(prev => ({
-                ...prev,
-                email: e.target.value
-              }))} className="mt-1" />
+              </div>
+
+              {/* Identification Documents */}
+              <div>
+                <h4 className="text-sm font-medium text-muted-foreground mb-3">Identification Documents</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="national-id">National ID / Social Security</Label>
+                    <Input id="national-id" value={newCustomer.national_id} onChange={e => setNewCustomer(prev => ({
+                      ...prev,
+                      national_id: e.target.value
+                    }))} className="mt-1" placeholder="For local customers" />
+                  </div>
+                  <div>
+                    <Label htmlFor="passport-number">Passport Number</Label>
+                    <Input id="passport-number" value={newCustomer.passport_number} onChange={e => setNewCustomer(prev => ({
+                      ...prev,
+                      passport_number: e.target.value
+                    }))} className="mt-1" placeholder="For tourists/international customers" />
+                  </div>
+                  <div>
+                    <Label htmlFor="license-number">Driver's License Number</Label>
+                    <Input id="license-number" value={newCustomer.license_number} onChange={e => setNewCustomer(prev => ({
+                      ...prev,
+                      license_number: e.target.value
+                    }))} className="mt-1" />
+                  </div>
+                  <div>
+                    <Label htmlFor="license-expiry">License Expiry Date</Label>
+                    <Input id="license-expiry" type="date" value={newCustomer.license_expiry} onChange={e => setNewCustomer(prev => ({
+                      ...prev,
+                      license_expiry: e.target.value
+                    }))} className="mt-1" />
+                  </div>
                 </div>
-                <div>
-                  <Label htmlFor="new-phone">Phone</Label>
-                  <Input id="new-phone" value={newCustomer.phone} onChange={e => setNewCustomer(prev => ({
-                ...prev,
-                phone: e.target.value
-              }))} className="mt-1" />
-                </div>
-                <div>
-                  <Label htmlFor="customer-type">Customer Type</Label>
-                  <select id="customer-type" value={newCustomer.customer_type} onChange={e => setNewCustomer(prev => ({
-                ...prev,
-                customer_type: e.target.value as 'B2B' | 'B2C' | 'CORPORATE'
-              }))} className="mt-1 w-full px-3 py-2 border rounded-md bg-background">
-                    <option value="B2C">Individual</option>
-                    <option value="B2B">B2B - Business</option>
-                    <option value="CORPORATE">Corporate Account</option>
-                  </select>
+              </div>
+
+              {/* Additional Details */}
+              <div>
+                <h4 className="text-sm font-medium text-muted-foreground mb-3">Additional Details</h4>
+                <div className="grid grid-cols-1 gap-4">
+                  <div>
+                    <Label htmlFor="address">Address</Label>
+                    <Input id="address" value={newCustomer.address} onChange={e => setNewCustomer(prev => ({
+                      ...prev,
+                      address: e.target.value
+                    }))} className="mt-1" placeholder="Full address including city and postal code" />
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="emergency-contact-name">Emergency Contact Name</Label>
+                      <Input id="emergency-contact-name" value={newCustomer.emergency_contact_name} onChange={e => setNewCustomer(prev => ({
+                        ...prev,
+                        emergency_contact_name: e.target.value
+                      }))} className="mt-1" />
+                    </div>
+                    <div>
+                      <Label htmlFor="emergency-contact-phone">Emergency Contact Phone</Label>
+                      <Input id="emergency-contact-phone" value={newCustomer.emergency_contact_phone} onChange={e => setNewCustomer(prev => ({
+                        ...prev,
+                        emergency_contact_phone: e.target.value
+                      }))} className="mt-1" />
+                    </div>
+                  </div>
                 </div>
               </div>
 
