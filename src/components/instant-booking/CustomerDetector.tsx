@@ -90,12 +90,51 @@ const CustomerDetector: React.FC<CustomerDetectorProps> = ({
   });
   const handleCreateCustomer = async () => {
     try {
+      // Prepare the customer data with proper formatting for jsonb fields
+      const customerData = {
+        full_name: newCustomer.full_name,
+        email: newCustomer.email,
+        phone: newCustomer.phone || null,
+        customer_type: newCustomer.customer_type,
+        national_id: newCustomer.national_id || null,
+        passport_number: newCustomer.passport_number || null,
+        license_number: newCustomer.license_number || null,
+        license_expiry: newCustomer.license_expiry || null,
+        date_of_birth: newCustomer.date_of_birth || null,
+        // Format address as jsonb if provided
+        address: newCustomer.address ? {
+          full_address: newCustomer.address
+        } : null,
+        // Format emergency contact as jsonb if provided
+        emergency_contact: (newCustomer.emergency_contact_name || newCustomer.emergency_contact_phone) ? {
+          name: newCustomer.emergency_contact_name || null,
+          phone: newCustomer.emergency_contact_phone || null
+        } : null
+      };
+
       const {
         data,
         error
-      } = await supabase.from('customers').insert([newCustomer]).select().single();
+      } = await supabase.from('customers').insert([customerData]).select().single();
+      
       if (error) throw error;
       onCustomerSelect(data as Customer);
+      
+      // Reset form after successful creation
+      setNewCustomer({
+        full_name: '',
+        email: '',
+        phone: '',
+        customer_type: 'B2C' as const,
+        national_id: '',
+        license_number: '',
+        license_expiry: '',
+        passport_number: '',
+        date_of_birth: '',
+        address: '',
+        emergency_contact_name: '',
+        emergency_contact_phone: ''
+      });
     } catch (error) {
       console.error('Error creating customer:', error);
     }

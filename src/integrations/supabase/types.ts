@@ -231,7 +231,9 @@ export type Database = {
           id: string
           license_expiry: string | null
           license_number: string | null
+          national_id: string | null
           notes: string | null
+          passport_number: string | null
           phone: string | null
           profile_photo_url: string | null
           total_rentals: number | null
@@ -253,7 +255,9 @@ export type Database = {
           id?: string
           license_expiry?: string | null
           license_number?: string | null
+          national_id?: string | null
           notes?: string | null
+          passport_number?: string | null
           phone?: string | null
           profile_photo_url?: string | null
           total_rentals?: number | null
@@ -275,7 +279,9 @@ export type Database = {
           id?: string
           license_expiry?: string | null
           license_number?: string | null
+          national_id?: string | null
           notes?: string | null
+          passport_number?: string | null
           phone?: string | null
           profile_photo_url?: string | null
           total_rentals?: number | null
