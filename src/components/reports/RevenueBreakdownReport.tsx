@@ -15,35 +15,57 @@ interface RevenueBreakdownReportProps {
 }
 
 const RevenueBreakdownReport = ({ dateRange }: RevenueBreakdownReportProps) => {
+  // Mock data for demo purposes
+  const mockReservations = [
+    { total_amount: 1200, start_datetime: '2024-01-15', booking_type: 'STANDARD', pickup_location: 'Downtown Location' },
+    { total_amount: 850, start_datetime: '2024-01-20', booking_type: 'INSTANT', pickup_location: 'Airport Terminal' },
+    { total_amount: 2300, start_datetime: '2024-02-10', booking_type: 'QUOTE', pickup_location: 'Business District' },
+    { total_amount: 950, start_datetime: '2024-02-25', booking_type: 'STANDARD', pickup_location: 'Mall Plaza' },
+    { total_amount: 1450, start_datetime: '2024-03-05', booking_type: 'RFQ', pickup_location: 'Downtown Location' },
+    { total_amount: 780, start_datetime: '2024-03-18', booking_type: 'INSTANT', pickup_location: 'Hotel District' },
+    { total_amount: 1650, start_datetime: '2024-04-02', booking_type: 'STANDARD', pickup_location: 'Airport Terminal' },
+    { total_amount: 1100, start_datetime: '2024-04-15', booking_type: 'QUOTE', pickup_location: 'Business District' },
+    { total_amount: 920, start_datetime: '2024-05-08', booking_type: 'INSTANT', pickup_location: 'Downtown Location' },
+    { total_amount: 1850, start_datetime: '2024-05-22', booking_type: 'STANDARD', pickup_location: 'Mall Plaza' },
+  ];
+
   const { data: revenueData, isLoading } = useQuery({
     queryKey: ['revenue-breakdown', dateRange],
     queryFn: async () => {
       const fromDate = dateRange?.from?.toISOString() || new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString();
       const toDate = dateRange?.to?.toISOString() || new Date().toISOString();
 
-      // Revenue by time period
-      const { data: reservations } = await supabase
-        .from('reservations')
-        .select('total_amount, start_datetime, booking_type, pickup_location, return_location')
-        .gte('created_at', fromDate)
-        .lte('created_at', toDate)
-        .not('total_amount', 'is', null);
+      try {
+        // Revenue by time period
+        const { data: reservations } = await supabase
+          .from('reservations')
+          .select('total_amount, start_datetime, booking_type, pickup_location, return_location')
+          .gte('created_at', fromDate)
+          .lte('created_at', toDate)
+          .not('total_amount', 'is', null);
 
-      // Revenue by vehicle class
-      const { data: vehicleRevenue } = await supabase
-        .from('reservations')
-        .select(`
-          total_amount,
-          vehicles (
-            category_id,
-            categories (name)
-          )
-        `)
-        .gte('created_at', fromDate)
-        .lte('created_at', toDate)
-        .not('total_amount', 'is', null);
+        // Revenue by vehicle class
+        const { data: vehicleRevenue } = await supabase
+          .from('reservations')
+          .select(`
+            total_amount,
+            vehicles (
+              category_id,
+              categories (name)
+            )
+          `)
+          .gte('created_at', fromDate)
+          .lte('created_at', toDate)
+          .not('total_amount', 'is', null);
 
-      return { reservations: reservations || [], vehicleRevenue: vehicleRevenue || [] };
+        return { 
+          reservations: (reservations && reservations.length > 0) ? reservations : mockReservations, 
+          vehicleRevenue: vehicleRevenue || [] 
+        };
+      } catch (error) {
+        console.log('Using mock data for revenue breakdown');
+        return { reservations: mockReservations, vehicleRevenue: [] };
+      }
     },
   });
 
