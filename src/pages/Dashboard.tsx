@@ -327,11 +327,11 @@ const Dashboard = () => {
               {appCards.map((app) => (
                 <Card 
                   key={app.name}
-                  className="hover:bg-slate-800/60 transition-all duration-300 cursor-pointer group"
+                  className="cursor-pointer"
                   onClick={() => navigate(app.path)}
                 >
                   <CardContent className="p-6 flex items-center gap-4">
-                    <div className={`p-3 rounded-lg ${app.color} group-hover:shadow-lg transition-shadow`}>
+                    <div className={`p-3 rounded-lg ${app.color}`}>
                       <app.icon className="h-6 w-6 text-white" />
                     </div>
                     <div>
@@ -342,7 +342,7 @@ const Dashboard = () => {
               ))}
               
               {/* Add New Card */}
-              <Card className="border-2 border-dashed border-primary/60 hover:bg-slate-800/60 transition-colors cursor-pointer group">
+              <Card className="cursor-pointer">
                 <CardContent className="p-6 flex items-center justify-center gap-4">
                   <Plus className="h-6 w-6 text-teal-accent" />
                   <span className="text-teal-accent font-medium">Add New</span>
