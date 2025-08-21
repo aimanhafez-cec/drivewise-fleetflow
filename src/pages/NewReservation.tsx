@@ -1168,7 +1168,7 @@ const NewReservation = () => {
                 {/* Reservation No. */}
                 <div className="space-y-2">
                   <Label htmlFor="reservationNo" className="text-foreground">Reservation no.</Label>
-                  <Input id="reservationNo" value={formData.reservationNo || ''} disabled placeholder="Auto-generated on save" className="bg-muted" />
+                  <Input id="reservationNo" value={formData.reservationNo || ''} disabled placeholder="Auto-generated on save" className="bg-muted text-white placeholder:text-white/70" />
                 </div>
 
                 {/* Entry Date */}
@@ -1346,7 +1346,7 @@ const NewReservation = () => {
                 {/* Discount Value */}
                 <div className="space-y-2">
                   <Label className="text-foreground">Discount Value</Label>
-                  <Input type="number" value={formData.discountValue || ''} onChange={e => updateFormData('discountValue', parseFloat(e.target.value) || 0)} placeholder="0.00" />
+                  <Input type="number" value={formData.discountValue || ''} onChange={e => updateFormData('discountValue', parseFloat(e.target.value) || 0)} placeholder="0.00" className="text-white placeholder:text-white/70" />
                 </div>
 
                 {/* Contract Billing Plan */}
@@ -1549,7 +1549,7 @@ const NewReservation = () => {
                       <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                         <div className="space-y-2">
                           <Label className="text-foreground">Flight No.</Label>
-                          <Input value={formData.arrivalFlightNo} onChange={e => updateFormData('arrivalFlightNo', e.target.value)} placeholder="e.g., AA1234" />
+                          <Input value={formData.arrivalFlightNo} onChange={e => updateFormData('arrivalFlightNo', e.target.value)} placeholder="e.g., AA1234" className="text-white placeholder:text-white/70" />
                         </div>
                         
                         <div className="space-y-2">
@@ -1569,27 +1569,27 @@ const NewReservation = () => {
                         
                         <div className="space-y-2">
                           <Label className="text-foreground">Airline</Label>
-                          <Input value={formData.arrivalAirline} onChange={e => updateFormData('arrivalAirline', e.target.value)} placeholder="e.g., American Airlines" />
+                          <Input value={formData.arrivalAirline} onChange={e => updateFormData('arrivalAirline', e.target.value)} placeholder="e.g., American Airlines" className="text-white placeholder:text-white/70" />
                         </div>
                         
                         <div className="space-y-2">
                           <Label className="text-foreground">Airport</Label>
-                          <Input value={formData.arrivalAirport} onChange={e => updateFormData('arrivalAirport', e.target.value)} placeholder="e.g., LAX International" />
+                          <Input value={formData.arrivalAirport} onChange={e => updateFormData('arrivalAirport', e.target.value)} placeholder="e.g., LAX International" className="text-white placeholder:text-white/70" />
                         </div>
                         
                         <div className="space-y-2">
                           <Label className="text-foreground">City</Label>
-                          <Input value={formData.arrivalCity} onChange={e => updateFormData('arrivalCity', e.target.value)} placeholder="e.g., Los Angeles" />
+                          <Input value={formData.arrivalCity} onChange={e => updateFormData('arrivalCity', e.target.value)} placeholder="e.g., Los Angeles" className="text-white placeholder:text-white/70" />
                         </div>
                         
                         <div className="space-y-2">
                           <Label className="text-foreground">Zip Code</Label>
-                          <Input value={formData.arrivalZipCode} onChange={e => updateFormData('arrivalZipCode', e.target.value)} placeholder="e.g., 90045" />
+                          <Input value={formData.arrivalZipCode} onChange={e => updateFormData('arrivalZipCode', e.target.value)} placeholder="e.g., 90045" className="text-white placeholder:text-white/70" />
                         </div>
                         
                         <div className="space-y-2">
                           <Label className="text-foreground">Passengers</Label>
-                          <Input type="number" value={formData.arrivalPassengers || ''} onChange={e => updateFormData('arrivalPassengers', parseInt(e.target.value) || 0)} placeholder="Number of passengers" min="0" />
+                          <Input type="number" value={formData.arrivalPassengers || ''} onChange={e => updateFormData('arrivalPassengers', parseInt(e.target.value) || 0)} placeholder="Number of passengers" min="0" className="text-white placeholder:text-white/70" />
                         </div>
                       </div>
                     </div>
@@ -1600,7 +1600,7 @@ const NewReservation = () => {
                       <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                         <div className="space-y-2">
                           <Label className="text-foreground">Flight No.</Label>
-                          <Input value={formData.departureFlightNo} onChange={e => updateFormData('departureFlightNo', e.target.value)} placeholder="e.g., AA5678" />
+                          <Input value={formData.departureFlightNo} onChange={e => updateFormData('departureFlightNo', e.target.value)} placeholder="e.g., AA5678" className="text-white placeholder:text-white/70" />
                         </div>
                         
                         <div className="space-y-2">
@@ -1620,27 +1620,27 @@ const NewReservation = () => {
                         
                         <div className="space-y-2">
                           <Label className="text-foreground">Airline</Label>
-                          <Input value={formData.departureAirline} onChange={e => updateFormData('departureAirline', e.target.value)} placeholder="e.g., American Airlines" />
+                          <Input value={formData.departureAirline} onChange={e => updateFormData('departureAirline', e.target.value)} placeholder="e.g., American Airlines" className="text-white placeholder:text-white/70" />
                         </div>
                         
                         <div className="space-y-2">
                           <Label className="text-foreground">Airport</Label>
-                          <Input value={formData.departureAirport} onChange={e => updateFormData('departureAirport', e.target.value)} placeholder="e.g., LAX International" />
+                          <Input value={formData.departureAirport} onChange={e => updateFormData('departureAirport', e.target.value)} placeholder="e.g., LAX International" className="text-white placeholder:text-white/70" />
                         </div>
                         
                         <div className="space-y-2">
                           <Label className="text-foreground">City</Label>
-                          <Input value={formData.departureCity} onChange={e => updateFormData('departureCity', e.target.value)} placeholder="e.g., Los Angeles" />
+                          <Input value={formData.departureCity} onChange={e => updateFormData('departureCity', e.target.value)} placeholder="e.g., Los Angeles" className="text-white placeholder:text-white/70" />
                         </div>
                         
                         <div className="space-y-2">
                           <Label className="text-foreground">Zip Code</Label>
-                          <Input value={formData.departureZipCode} onChange={e => updateFormData('departureZipCode', e.target.value)} placeholder="e.g., 90045" />
+                          <Input value={formData.departureZipCode} onChange={e => updateFormData('departureZipCode', e.target.value)} placeholder="e.g., 90045" className="text-white placeholder:text-white/70" />
                         </div>
                         
                         <div className="space-y-2">
                           <Label className="text-foreground">Passengers</Label>
-                          <Input type="number" value={formData.departurePassengers || ''} onChange={e => updateFormData('departurePassengers', parseInt(e.target.value) || 0)} placeholder="Number of passengers" min="0" />
+                          <Input type="number" value={formData.departurePassengers || ''} onChange={e => updateFormData('departurePassengers', parseInt(e.target.value) || 0)} placeholder="Number of passengers" min="0" className="text-white placeholder:text-white/70" />
                         </div>
                       </div>
                     </div>
@@ -1794,7 +1794,7 @@ const NewReservation = () => {
                   <div className="space-y-2">
                     <Label className="text-foreground">Promotion Code</Label>
                     <div className="flex gap-2">
-                      <Input id="input-promo" value={formData.promotionCode} onChange={e => updateFormData('promotionCode', e.target.value)} placeholder="Enter promo code" />
+                      <Input id="input-promo" value={formData.promotionCode} onChange={e => updateFormData('promotionCode', e.target.value)} placeholder="Enter promo code" className="text-white placeholder:text-white/70" />
                       <Button variant="outline" size="icon">
                         <Check className="h-4 w-4" />
                       </Button>
@@ -1807,19 +1807,19 @@ const NewReservation = () => {
                   <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
                     <div className="space-y-2">
                       <Label className="text-foreground">Hourly Rate</Label>
-                      <Input id="rate-hourly" type="number" step="0.01" value={formData.hourlyRate} onChange={e => updateFormData('hourlyRate', parseFloat(e.target.value) || 0)} placeholder="0.00" />
+                      <Input id="rate-hourly" type="number" step="0.01" value={formData.hourlyRate} onChange={e => updateFormData('hourlyRate', parseFloat(e.target.value) || 0)} placeholder="0.00" className="text-white placeholder:text-white/70" />
                     </div>
                     <div className="space-y-2">
                       <Label className="text-foreground">Daily Rate</Label>
-                      <Input id="rate-daily" type="number" step="0.01" value={formData.dailyRate} onChange={e => updateFormData('dailyRate', parseFloat(e.target.value) || 0)} placeholder="0.00" />
+                      <Input id="rate-daily" type="number" step="0.01" value={formData.dailyRate} onChange={e => updateFormData('dailyRate', parseFloat(e.target.value) || 0)} placeholder="0.00" className="text-white placeholder:text-white/70" />
                     </div>
                     <div className="space-y-2">
                       <Label className="text-foreground">Weekly Rate</Label>
-                      <Input id="rate-weekly" type="number" step="0.01" value={formData.weeklyRate} onChange={e => updateFormData('weeklyRate', parseFloat(e.target.value) || 0)} placeholder="0.00" />
+                      <Input id="rate-weekly" type="number" step="0.01" value={formData.weeklyRate} onChange={e => updateFormData('weeklyRate', parseFloat(e.target.value) || 0)} placeholder="0.00" className="text-white placeholder:text-white/70" />
                     </div>
                     <div className="space-y-2">
                       <Label className="text-foreground">Monthly Rate</Label>
-                      <Input id="rate-monthly" type="number" step="0.01" value={formData.monthlyRate} onChange={e => updateFormData('monthlyRate', parseFloat(e.target.value) || 0)} placeholder="0.00" />
+                      <Input id="rate-monthly" type="number" step="0.01" value={formData.monthlyRate} onChange={e => updateFormData('monthlyRate', parseFloat(e.target.value) || 0)} placeholder="0.00" className="text-white placeholder:text-white/70" />
                     </div>
                   </div>
                 </div>
@@ -1827,11 +1827,11 @@ const NewReservation = () => {
                 <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label className="text-foreground">Kilometer Charge</Label>
-                    <Input id="rate-km-charge" type="number" step="0.01" value={formData.kilometerCharge} onChange={e => updateFormData('kilometerCharge', parseFloat(e.target.value) || 0)} placeholder="0.00" />
+                    <Input id="rate-km-charge" type="number" step="0.01" value={formData.kilometerCharge} onChange={e => updateFormData('kilometerCharge', parseFloat(e.target.value) || 0)} placeholder="0.00" className="text-white placeholder:text-white/70" />
                   </div>
                   <div className="space-y-2">
                     <Label className="text-foreground">Daily Kilometer Allowed</Label>
-                    <Input id="rate-daily-km-allowed" type="number" value={formData.dailyKilometerAllowed} onChange={e => updateFormData('dailyKilometerAllowed', parseInt(e.target.value) || 0)} placeholder="0" />
+                    <Input id="rate-daily-km-allowed" type="number" value={formData.dailyKilometerAllowed} onChange={e => updateFormData('dailyKilometerAllowed', parseInt(e.target.value) || 0)} placeholder="0" className="text-white placeholder:text-white/70" />
                   </div>
                 </div>
               </div>
@@ -1851,16 +1851,16 @@ const NewReservation = () => {
                 <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                   <div className="space-y-2">
                     <Label className="text-foreground">Pre-adjustment</Label>
-                    <Input type="number" step="0.01" value={formData.preAdjustment} onChange={e => updateFormData('preAdjustment', parseFloat(e.target.value) || 0)} placeholder="0.00" />
+                    <Input type="number" step="0.01" value={formData.preAdjustment} onChange={e => updateFormData('preAdjustment', parseFloat(e.target.value) || 0)} placeholder="0.00" className="text-white placeholder:text-white/70" />
                   </div>
                   <div className="space-y-2">
                     <Label className="text-foreground">Advance Payment</Label>
-                    <Input type="number" step="0.01" value={formData.advancePayment} onChange={e => updateFormData('advancePayment', parseFloat(e.target.value) || 0)} placeholder="0.00" />
+                    <Input type="number" step="0.01" value={formData.advancePayment} onChange={e => updateFormData('advancePayment', parseFloat(e.target.value) || 0)} placeholder="0.00" className="text-white placeholder:text-white/70" />
                     {validation.getFieldError('header.advancePayment') && <FormError message={validation.getFieldError('header.advancePayment')} />}
                   </div>
                   <div className="space-y-2">
                     <Label className="text-foreground">Security Deposit Paid</Label>
-                    <Input type="number" step="0.01" value={formData.securityDepositPaid} onChange={e => updateFormData('securityDepositPaid', parseFloat(e.target.value) || 0)} placeholder="0.00" />
+                    <Input type="number" step="0.01" value={formData.securityDepositPaid} onChange={e => updateFormData('securityDepositPaid', parseFloat(e.target.value) || 0)} placeholder="0.00" className="text-white placeholder:text-white/70" />
                     {validation.getFieldError('header.securityDepositPaid') && <FormError message={validation.getFieldError('header.securityDepositPaid')} />}
                   </div>
                 </div>
@@ -1966,7 +1966,7 @@ const NewReservation = () => {
                 </div>
                 <div className="space-y-2">
                   <Label className="text-foreground">Phone No.</Label>
-                  <Input value={formData.referralPhone} onChange={e => updateFormData('referralPhone', e.target.value)} placeholder="+97150345234" />
+                  <Input value={formData.referralPhone} onChange={e => updateFormData('referralPhone', e.target.value)} placeholder="+97150345234" className="text-white placeholder:text-white/70" />
                 </div>
               </div>
             </AccordionContent>
@@ -1984,12 +1984,12 @@ const NewReservation = () => {
               <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label className="text-foreground">Note</Label>
-                  <Textarea value={formData.note} onChange={e => updateFormData('note', e.target.value)} placeholder="General notes about the reservation..." rows={4} maxLength={500} />
+                  <Textarea value={formData.note} onChange={e => updateFormData('note', e.target.value)} placeholder="General notes about the reservation..." rows={4} maxLength={500} className="text-white placeholder:text-white/70" />
                   <p className="text-xs text-foreground">{(formData.note || '').length}/500 characters</p>
                 </div>
                 <div className="space-y-2">
                   <Label className="text-foreground">Special Note</Label>
-                  <Textarea value={formData.specialNote} onChange={e => updateFormData('specialNote', e.target.value)} placeholder="Special instructions or requirements..." rows={4} maxLength={500} />
+                  <Textarea value={formData.specialNote} onChange={e => updateFormData('specialNote', e.target.value)} placeholder="Special instructions or requirements..." rows={4} maxLength={500} className="text-white placeholder:text-white/70" />
                   <p className="text-xs text-foreground">{(formData.specialNote || '').length}/500 characters</p>
                 </div>
               </div>
