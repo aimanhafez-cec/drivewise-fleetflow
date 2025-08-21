@@ -91,7 +91,16 @@ const RevenueBreakdownReport = ({ dateRange }: RevenueBreakdownReportProps) => {
   const totalBookings = revenueData?.reservations.length || 0;
   const avgRevenuePerBooking = totalBookings > 0 ? totalRevenue / totalBookings : 0;
 
-  const colors = ['hsl(var(--chart-1))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))', 'hsl(var(--chart-5))'];
+  const chartColors = {
+    revenue: 'hsl(var(--chart-1))',
+    bookings: 'hsl(var(--chart-2))', 
+    standard: 'hsl(var(--chart-1))',
+    instant: 'hsl(var(--chart-3))',
+    quote: 'hsl(var(--chart-4))',
+    rfq: 'hsl(var(--chart-5))'
+  };
+
+  const pieColors = ['hsl(var(--chart-1))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))', 'hsl(var(--chart-5))'];
 
   return (
     <div className="space-y-6">
@@ -158,20 +167,25 @@ const RevenueBreakdownReport = ({ dateRange }: RevenueBreakdownReportProps) => {
         <CardContent>
           <ChartContainer
             config={{
-              revenue: { label: 'Revenue', color: 'hsl(var(--chart-1))' },
-              bookings: { label: 'Bookings', color: 'hsl(var(--chart-2))' }
+              revenue: { label: 'Revenue', color: chartColors.revenue },
+              bookings: { label: 'Bookings', color: chartColors.bookings }
             }}
             className="h-[400px]"
           >
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={monthlyRevenue}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis yAxisId="left" />
-                <YAxis yAxisId="right" orientation="right" />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar yAxisId="right" dataKey="bookings" fill="hsl(var(--chart-2))" opacity={0.6} />
-                <Line yAxisId="left" type="monotone" dataKey="revenue" stroke="hsl(var(--chart-1))" strokeWidth={3} />
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+                <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                <YAxis yAxisId="left" stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                <YAxis yAxisId="right" orientation="right" stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                <ChartTooltip 
+                  content={<ChartTooltipContent formatter={(value, name) => [
+                    name === 'revenue' ? formatCurrency(Number(value)) : value, 
+                    name === 'revenue' ? 'Revenue' : 'Bookings'
+                  ]} />} 
+                />
+                <Bar yAxisId="right" dataKey="bookings" fill={chartColors.bookings} opacity={0.7} radius={[4, 4, 0, 0]} />
+                <Line yAxisId="left" type="monotone" dataKey="revenue" stroke={chartColors.revenue} strokeWidth={3} dot={{ fill: chartColors.revenue, strokeWidth: 2, r: 6 }} />
               </LineChart>
             </ResponsiveContainer>
           </ChartContainer>
@@ -187,9 +201,13 @@ const RevenueBreakdownReport = ({ dateRange }: RevenueBreakdownReportProps) => {
           </CardHeader>
           <CardContent>
             <ChartContainer
-              config={{
-                revenue: { label: 'Revenue', color: 'hsl(var(--chart-1))' }
-              }}
+              config={bookingTypeRevenue.reduce((acc, item, index) => ({
+                ...acc,
+                [item.type]: { 
+                  label: item.type.replace('_', ' ').toUpperCase(), 
+                  color: pieColors[index % pieColors.length] 
+                }
+              }), {})}
               className="h-[300px]"
             >
               <ResponsiveContainer width="100%" height="100%">
@@ -198,15 +216,21 @@ const RevenueBreakdownReport = ({ dateRange }: RevenueBreakdownReportProps) => {
                     data={bookingTypeRevenue}
                     cx="50%"
                     cy="50%"
+                    innerRadius={40}
                     outerRadius={80}
+                    paddingAngle={5}
                     dataKey="revenue"
                     nameKey="type"
+                    label={({ type, value, percent }) => `${type}: ${(percent * 100).toFixed(0)}%`}
+                    labelLine={false}
                   >
                     {bookingTypeRevenue.map((_, index) => (
-                      <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
+                      <Cell key={`cell-${index}`} fill={pieColors[index % pieColors.length]} stroke="hsl(var(--background))" strokeWidth={2} />
                     ))}
                   </Pie>
-                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <ChartTooltip 
+                    content={<ChartTooltipContent formatter={(value) => [formatCurrency(Number(value)), 'Revenue']} />} 
+                  />
                 </PieChart>
               </ResponsiveContainer>
             </ChartContainer>
@@ -222,17 +246,19 @@ const RevenueBreakdownReport = ({ dateRange }: RevenueBreakdownReportProps) => {
           <CardContent>
             <ChartContainer
               config={{
-                revenue: { label: 'Revenue', color: 'hsl(var(--chart-1))' }
+                revenue: { label: 'Revenue', color: chartColors.revenue }
               }}
               className="h-[300px]"
             >
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={locationRevenue} layout="horizontal">
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis type="number" />
-                  <YAxis dataKey="location" type="category" width={80} />
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Bar dataKey="revenue" fill="hsl(var(--chart-1))" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+                  <XAxis type="number" stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                  <YAxis dataKey="location" type="category" width={100} stroke="hsl(var(--muted-foreground))" fontSize={11} />
+                  <ChartTooltip 
+                    content={<ChartTooltipContent formatter={(value) => [formatCurrency(Number(value)), 'Revenue']} />} 
+                  />
+                  <Bar dataKey="revenue" fill={chartColors.revenue} radius={[0, 4, 4, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </ChartContainer>

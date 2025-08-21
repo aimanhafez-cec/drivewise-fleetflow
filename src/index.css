@@ -127,6 +127,16 @@
     --sidebar-accent-foreground: 0 0% 100%;
     --sidebar-border: 181 99% 31%;
     --sidebar-ring: 180 61% 51%;
+
+    /* Chart Colors for Beautiful Data Visualization */
+    --chart-1: 180 61% 51%; /* Teal accent */
+    --chart-2: 142 69% 38%; /* Success green */
+    --chart-3: 48 96% 53%; /* Warning yellow */
+    --chart-4: 0 84% 60%; /* Destructive red */
+    --chart-5: 268 85% 66%; /* Purple */
+    --chart-6: 31 81% 56%; /* Orange */
+    --chart-7: 215 100% 61%; /* Blue */
+    --chart-8: 340 75% 55%; /* Pink */
   }
 }
 

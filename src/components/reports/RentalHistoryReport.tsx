@@ -104,7 +104,14 @@ const RentalHistoryReport: React.FC<RentalHistoryReportProps> = ({ dateRange }) 
   const retainedCustomers = customersData?.filter(c => (c.total_rentals || 0) > 1).length || 0;
   const retentionRate = totalCustomers > 0 ? (retainedCustomers / totalCustomers) * 100 : 0;
 
-  const chartColors = ['hsl(var(--primary))', 'hsl(var(--secondary))', 'hsl(var(--accent))'];
+  const chartColors = {
+    revenue: 'hsl(var(--chart-1))',
+    b2c: 'hsl(var(--chart-2))',
+    b2b: 'hsl(var(--chart-3))',
+    corporate: 'hsl(var(--chart-4))'
+  };
+  
+  const pieColors = ['hsl(var(--chart-2))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))', 'hsl(var(--chart-5))'];
 
   return (
     <div className="space-y-6">
@@ -172,20 +179,26 @@ const RentalHistoryReport: React.FC<RentalHistoryReportProps> = ({ dateRange }) 
             <CardDescription>Monthly revenue over time</CardDescription>
           </CardHeader>
           <CardContent>
-            <ChartContainer config={{}} className="h-[300px]">
+            <ChartContainer 
+              config={{
+                revenue: { label: 'Revenue', color: chartColors.revenue }
+              }} 
+              className="h-[300px]"
+            >
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={revenueByMonth}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip 
-                    formatter={(value: number) => [formatCurrency(value), 'Revenue']}
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+                  <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                  <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                  <ChartTooltip 
+                    content={<ChartTooltipContent formatter={(value: number) => [formatCurrency(value), 'Revenue']} />}
                   />
                   <Line 
                     type="monotone" 
                     dataKey="revenue" 
-                    stroke="hsl(var(--primary))" 
-                    strokeWidth={2}
+                    stroke={chartColors.revenue} 
+                    strokeWidth={3}
+                    dot={{ fill: chartColors.revenue, strokeWidth: 2, r: 6 }}
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -200,24 +213,36 @@ const RentalHistoryReport: React.FC<RentalHistoryReportProps> = ({ dateRange }) 
             <CardDescription>Revenue by customer type</CardDescription>
           </CardHeader>
           <CardContent>
-            <ChartContainer config={{}} className="h-[300px]">
+            <ChartContainer 
+              config={customerSegmentation?.reduce((acc, item, index) => ({
+                ...acc,
+                [item.type.toLowerCase()]: { 
+                  label: item.type, 
+                  color: pieColors[index % pieColors.length] 
+                }
+              }), {}) || {}}
+              className="h-[300px]"
+            >
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
                     data={customerSegmentation}
                     cx="50%"
                     cy="50%"
+                    innerRadius={40}
                     outerRadius={80}
-                    fill="hsl(var(--primary))"
+                    paddingAngle={5}
                     dataKey="revenue"
-                    label={({ type, value }) => `${type}: ${formatCurrency(value)}`}
+                    nameKey="type"
+                    label={({ type, percent }) => `${type}: ${(percent * 100).toFixed(0)}%`}
+                    labelLine={false}
                   >
                     {customerSegmentation?.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={chartColors[index % chartColors.length]} />
+                      <Cell key={`cell-${index}`} fill={pieColors[index % pieColors.length]} stroke="hsl(var(--background))" strokeWidth={2} />
                     ))}
                   </Pie>
-                  <Tooltip 
-                    formatter={(value: number) => [formatCurrency(value), 'Revenue']}
+                  <ChartTooltip 
+                    content={<ChartTooltipContent formatter={(value: number) => [formatCurrency(value), 'Revenue']} />}
                   />
                 </PieChart>
               </ResponsiveContainer>
