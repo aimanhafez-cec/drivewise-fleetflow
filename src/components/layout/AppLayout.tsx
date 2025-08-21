@@ -14,7 +14,8 @@ import {
   Menu,
   Bell,
   MessageCircleQuestion,
-  Zap
+  Zap,
+  BarChart3
 } from 'lucide-react';
 import {
   Sidebar,
@@ -85,6 +86,11 @@ const navigation = [
     title: 'Agreements',
     url: '/agreements',
     icon: FileText,
+  },
+  {
+    title: 'Reports',
+    url: '/reports',
+    icon: BarChart3,
   },
   {
     title: 'Payments',

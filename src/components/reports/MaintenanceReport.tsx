@@ -1,0 +1,292 @@
+import React from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, LineChart, Line } from 'recharts';
+import { DateRange } from 'react-day-picker';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { AlertTriangle, Calendar, Clock, Wrench, CheckCircle } from 'lucide-react';
+import { formatDistanceToNow, isBefore, addDays } from 'date-fns';
+
+interface MaintenanceReportProps {
+  dateRange?: DateRange;
+}
+
+const MaintenanceReport = ({ dateRange }: MaintenanceReportProps) => {
+  // Fetch vehicles with maintenance-related data
+  const { data: vehicles = [], isLoading } = useQuery({
+    queryKey: ['vehicles-maintenance'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('vehicles')
+        .select('id, make, model, year, license_plate, status, odometer, created_at, location')
+        .order('make, model');
+      
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
+  // Mock maintenance data (in a real app, this would come from a maintenance table)
+  const generateMaintenanceData = (vehicles: any[]) => {
+    return vehicles.map((vehicle) => {
+      // Simulate maintenance records
+      const lastServiceDays = Math.floor(Math.random() * 180) + 30; // 30-210 days ago
+      const nextServiceDays = Math.floor(Math.random() * 60) + 30; // 30-90 days from now
+      const lastService = new Date();
+      lastService.setDate(lastService.getDate() - lastServiceDays);
+      
+      const nextService = new Date();
+      nextService.setDate(nextService.getDate() + nextServiceDays);
+      
+      const serviceInterval = 5000 + Math.floor(Math.random() * 5000); // 5k-10k miles
+      const milesSinceService = Math.floor(Math.random() * serviceInterval);
+      
+      return {
+        ...vehicle,
+        lastService,
+        nextService,
+        milesSinceService,
+        serviceInterval,
+        isOverdue: isBefore(nextService, new Date()),
+        isDueSoon: !isBefore(nextService, new Date()) && isBefore(nextService, addDays(new Date(), 30)),
+        estimatedCost: 150 + Math.floor(Math.random() * 300),
+        serviceType: ['Oil Change', 'Tire Rotation', 'Brake Inspection', 'General Service'][Math.floor(Math.random() * 4)],
+        downtime: Math.floor(Math.random() * 3) + 1, // 1-3 days
+      };
+    });
+  };
+
+  const maintenanceData = generateMaintenanceData(vehicles);
+
+  // Calculate statistics
+  const overdueServices = maintenanceData.filter(v => v.isOverdue);
+  const dueSoonServices = maintenanceData.filter(v => v.isDueSoon);
+  const inMaintenance = vehicles.filter(v => v.status === 'maintenance');
+
+  // Monthly maintenance trend (mock data)
+  const monthlyTrend = [
+    { month: 'Jan', services: 12, cost: 1800 },
+    { month: 'Feb', services: 8, cost: 1200 },
+    { month: 'Mar', services: 15, cost: 2250 },
+    { month: 'Apr', services: 11, cost: 1650 },
+    { month: 'May', services: 9, cost: 1350 },
+    { month: 'Jun', services: 13, cost: 1950 },
+  ];
+
+  // Service type breakdown
+  const serviceTypes = [
+    { type: 'Oil Change', count: 28, avgCost: 75 },
+    { type: 'Tire Rotation', count: 15, avgCost: 50 },
+    { type: 'Brake Inspection', count: 12, avgCost: 200 },
+    { type: 'General Service', count: 22, avgCost: 300 },
+    { type: 'Emergency Repair', count: 8, avgCost: 450 },
+  ];
+
+  if (isLoading) {
+    return <div>Loading maintenance report...</div>;
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Maintenance Overview */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Overdue Services</CardTitle>
+            <AlertTriangle className="h-4 w-4 text-destructive" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-destructive">{overdueServices.length}</div>
+            <p className="text-xs text-muted-foreground">Require immediate attention</p>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Due Soon</CardTitle>
+            <Calendar className="h-4 w-4 text-warning" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-warning">{dueSoonServices.length}</div>
+            <p className="text-xs text-muted-foreground">Due within 30 days</p>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">In Maintenance</CardTitle>
+            <Wrench className="h-4 w-4 text-primary" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{inMaintenance.length}</div>
+            <p className="text-xs text-muted-foreground">Currently being serviced</p>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Avg. Downtime</CardTitle>
+            <Clock className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">2.1 days</div>
+            <p className="text-xs text-muted-foreground">Per service event</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Charts */}
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Monthly Service Trend</CardTitle>
+            <CardDescription>Number of services completed per month</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer
+              config={{
+                services: { label: "Services", color: "hsl(var(--primary))" },
+              }}
+              className="h-[300px]"
+            >
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={monthlyTrend}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="month" />
+                  <YAxis />
+                  <Line 
+                    type="monotone" 
+                    dataKey="services" 
+                    stroke="hsl(var(--primary))" 
+                    strokeWidth={2}
+                    dot={{ fill: "hsl(var(--primary))", strokeWidth: 2 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </ChartContainer>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Service Type Breakdown</CardTitle>
+            <CardDescription>Most common maintenance services</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer
+              config={{
+                count: { label: "Count", color: "hsl(var(--primary))" },
+              }}
+              className="h-[300px]"
+            >
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={serviceTypes}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="type" angle={-45} textAnchor="end" height={80} />
+                  <YAxis />
+                  <Bar dataKey="count" fill="hsl(var(--primary))" />
+                </BarChart>
+              </ResponsiveContainer>
+            </ChartContainer>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Service Schedule Table */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Service Schedule</CardTitle>
+          <CardDescription>Upcoming maintenance for all vehicles</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Vehicle</TableHead>
+                <TableHead>License Plate</TableHead>
+                <TableHead>Last Service</TableHead>
+                <TableHead>Next Service</TableHead>
+                <TableHead>Service Type</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Est. Cost</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {maintenanceData
+                .sort((a, b) => a.nextService.getTime() - b.nextService.getTime())
+                .slice(0, 20)
+                .map((vehicle) => (
+                <TableRow key={vehicle.id}>
+                  <TableCell>
+                    {vehicle.make} {vehicle.model} ({vehicle.year})
+                  </TableCell>
+                  <TableCell className="font-mono">{vehicle.license_plate}</TableCell>
+                  <TableCell>
+                    {formatDistanceToNow(vehicle.lastService, { addSuffix: true })}
+                  </TableCell>
+                  <TableCell>
+                    {formatDistanceToNow(vehicle.nextService, { addSuffix: true })}
+                  </TableCell>
+                  <TableCell>{vehicle.serviceType}</TableCell>
+                  <TableCell>
+                    <Badge variant={
+                      vehicle.isOverdue ? 'destructive' : 
+                      vehicle.isDueSoon ? 'outline' : 'default'
+                    }>
+                      {vehicle.isOverdue ? 'Overdue' : 
+                       vehicle.isDueSoon ? 'Due Soon' : 'Scheduled'}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>${vehicle.estimatedCost}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      {/* Current Maintenance Jobs */}
+      {inMaintenance.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Current Maintenance Jobs</CardTitle>
+            <CardDescription>Vehicles currently being serviced</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Vehicle</TableHead>
+                  <TableHead>Location</TableHead>
+                  <TableHead>Started</TableHead>
+                  <TableHead>Est. Completion</TableHead>
+                  <TableHead>Status</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {inMaintenance.map((vehicle) => (
+                  <TableRow key={vehicle.id}>
+                    <TableCell>
+                      {vehicle.make} {vehicle.model} ({vehicle.year})
+                    </TableCell>
+                    <TableCell>{vehicle.location || 'Main Garage'}</TableCell>
+                    <TableCell>2 days ago</TableCell>
+                    <TableCell>Tomorrow</TableCell>
+                    <TableCell>
+                      <Badge variant="outline">In Progress</Badge>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+};
+
+export default MaintenanceReport;
