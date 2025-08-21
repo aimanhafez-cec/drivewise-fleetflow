@@ -20,7 +20,6 @@ export const DamageTab: React.FC<DamageTabProps> = ({ agreementId, agreementLine
   const [showComparison, setShowComparison] = useState(false);
   const [damageDrawerOpen, setDamageDrawerOpen] = useState(false);
   const [selectedMarker, setSelectedMarker] = useState<any>(null);
-  const [currentSide, setCurrentSide] = useState<string>('FRONT');
   
   const queryClient = useQueryClient();
 
@@ -63,12 +62,11 @@ export const DamageTab: React.FC<DamageTabProps> = ({ agreementId, agreementLine
     setSelectedMarker(null);
   };
 
-  const getMarkersForLine = (lineId: string, side: string, event?: string) => {
+  const getMarkersForLine = (lineId: string, event?: string) => {
     if (!damageMarkers) return [];
     
     return damageMarkers.filter(marker => 
-      marker.line_id === lineId && 
-      marker.side === side &&
+      marker.line_id === lineId &&
       (!event || marker.event === event)
     );
   };
@@ -136,10 +134,8 @@ export const DamageTab: React.FC<DamageTabProps> = ({ agreementId, agreementLine
             <VehicleDiagram
               lineId={line.id}
               onMarkerClick={handleMarkerClick}
-              markers={getMarkersForLine(line.id, currentSide)}
-              comparisonMarkers={showComparison ? getMarkersForLine(line.id, currentSide, 'IN') : []}
-              currentSide={currentSide}
-              onSideChange={setCurrentSide}
+              markers={getMarkersForLine(line.id)}
+              comparisonMarkers={showComparison ? getMarkersForLine(line.id, 'IN') : []}
               getSeverityColor={getSeverityColor}
             />
           </CardContent>
