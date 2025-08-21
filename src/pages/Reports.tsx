@@ -90,7 +90,7 @@ const Reports = () => {
 
       {/* Main Report Tabs */}
       <Tabs defaultValue="operations" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-3 relative z-10">
           <TabsTrigger value="operations">Internal Operations Reports</TabsTrigger>
           <TabsTrigger value="customer-insights">Customer Insight Reports</TabsTrigger>
           <TabsTrigger value="financial">Financial Reports</TabsTrigger>
@@ -151,7 +151,7 @@ const Reports = () => {
 
           {/* Operations Sub-tabs */}
           <Tabs defaultValue="fleet-status" className="space-y-4">
-            <TabsList>
+            <TabsList className="relative z-10">
               <TabsTrigger value="fleet-status">Fleet Status & Utilization</TabsTrigger>
               <TabsTrigger value="maintenance">Maintenance & Service</TabsTrigger>
               <TabsTrigger value="reservations">Reservations & Availability</TabsTrigger>
@@ -180,7 +180,7 @@ const Reports = () => {
         <TabsContent value="customer-insights" className="space-y-6">
           {/* Customer Insights Sub-tabs */}
           <Tabs defaultValue="rental-history" className="space-y-4">
-            <TabsList>
+            <TabsList className="relative z-10">
               <TabsTrigger value="rental-history">Rental History & Loyalty</TabsTrigger>
               <TabsTrigger value="preferences">Preferences & Trends</TabsTrigger>
               <TabsTrigger value="satisfaction">Satisfaction & Feedback</TabsTrigger>
@@ -209,7 +209,7 @@ const Reports = () => {
         <TabsContent value="financial" className="space-y-6">
           {/* Financial Reports Sub-tabs */}
           <Tabs defaultValue="revenue-breakdown" className="space-y-4">
-            <TabsList>
+            <TabsList className="relative z-10">
               <TabsTrigger value="revenue-breakdown">Revenue Breakdown & Trends</TabsTrigger>
               <TabsTrigger value="cost-analysis">Cost Analysis & Expenses</TabsTrigger>
               <TabsTrigger value="profitability">Profitability Analysis</TabsTrigger>
