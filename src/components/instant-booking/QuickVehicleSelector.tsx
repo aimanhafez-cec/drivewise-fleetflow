@@ -184,6 +184,16 @@ const QuickVehicleSelector: React.FC<QuickVehicleSelectorProps> = ({
                               <span>{vehicle.category?.name || 'Standard'}</span>
                             </div>
                             
+                            {(vehicle as any).color && (
+                              <div className="flex items-center gap-2 text-sm">
+                                <div 
+                                  className="w-4 h-4 rounded-full border border-border" 
+                                  style={{ backgroundColor: (vehicle as any).color.toLowerCase() }}
+                                />
+                                <span className="capitalize">{(vehicle as any).color}</span>
+                              </div>
+                            )}
+                            
                             <div className="flex items-center gap-2 text-sm">
                               <MapPin className="h-4 w-4 text-muted-foreground" />
                               <span>Available at {pickupLocation}</span>
