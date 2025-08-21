@@ -76,7 +76,7 @@ const InstantBooking = () => {
         return false;
     }
   };
-  return <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 p-4">
+  return <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 p-4 border-2 border-dashed border-primary/85">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
         <div className="text-center space-y-4">
