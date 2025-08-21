@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { DateRange } from 'react-day-picker';
 import { useQuery } from '@tanstack/react-query';
@@ -149,21 +149,38 @@ const MaintenanceReport = ({ dateRange }: MaintenanceReportProps) => {
           <CardContent>
             <ChartContainer
               config={{
-                services: { label: "Services", color: "hsl(var(--primary))" },
+                services: { label: "Services", color: "hsl(var(--chart-1))" },
+                cost: { label: "Cost", color: "hsl(var(--chart-2))" }
               }}
               className="h-[300px]"
             >
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={monthlyTrend}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+                  <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                  <YAxis yAxisId="left" stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                  <YAxis yAxisId="right" orientation="right" stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                  <ChartTooltip 
+                    content={<ChartTooltipContent formatter={(value, name) => [
+                      name === 'cost' ? formatCurrency(Number(value)) : value,
+                      name === 'services' ? 'Services' : 'Cost'
+                    ]} />}
+                  />
                   <Line 
+                    yAxisId="left"
                     type="monotone" 
                     dataKey="services" 
-                    stroke="hsl(var(--primary))" 
-                    strokeWidth={2}
-                    dot={{ fill: "hsl(var(--primary))", strokeWidth: 2 }}
+                    stroke="hsl(var(--chart-1))" 
+                    strokeWidth={3}
+                    dot={{ fill: "hsl(var(--chart-1))", strokeWidth: 2, r: 6 }}
+                  />
+                  <Line 
+                    yAxisId="right"
+                    type="monotone" 
+                    dataKey="cost" 
+                    stroke="hsl(var(--chart-2))" 
+                    strokeWidth={3}
+                    dot={{ fill: "hsl(var(--chart-2))", strokeWidth: 2, r: 6 }}
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -178,20 +195,50 @@ const MaintenanceReport = ({ dateRange }: MaintenanceReportProps) => {
           </CardHeader>
           <CardContent>
             <ChartContainer
-              config={{
-                count: { label: "Count", color: "hsl(var(--primary))" },
-              }}
+              config={serviceTypes.reduce((acc, service, index) => ({
+                ...acc,
+                [service.type.toLowerCase().replace(' ', '_')]: { 
+                  label: service.type, 
+                  color: `hsl(var(--chart-${(index % 8) + 1}))` 
+                }
+              }), {})}
               className="h-[300px]"
             >
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={serviceTypes}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="type" angle={-45} textAnchor="end" height={80} />
-                  <YAxis />
-                  <Bar dataKey="count" fill="hsl(var(--primary))" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+                  <XAxis 
+                    dataKey="type" 
+                    angle={-45} 
+                    textAnchor="end" 
+                    height={80} 
+                    stroke="hsl(var(--muted-foreground))" 
+                    fontSize={11}
+                  />
+                  <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                  <ChartTooltip 
+                    content={<ChartTooltipContent formatter={(value, name) => [
+                      value, name === 'count' ? 'Services' : name === 'avgCost' ? 'Avg Cost' : name
+                    ]} />}
+                  />
+                  <Bar dataKey="count" fill="hsl(var(--chart-1))" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </ChartContainer>
+            <div className="grid grid-cols-2 gap-2 mt-4 text-sm">
+              {serviceTypes.map((service, index) => (
+                <div key={service.type} className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div 
+                      className="w-3 h-3 rounded-sm" 
+                      style={{ backgroundColor: `hsl(var(--chart-${(index % 8) + 1}))` }}
+                    />
+                    <span>{service.type}</span>
+                  </div>
+                  <span className="font-medium">{formatCurrency(service.avgCost)}</span>
+                </div>
+              ))}
+            </div>
           </CardContent>
         </Card>
       </div>

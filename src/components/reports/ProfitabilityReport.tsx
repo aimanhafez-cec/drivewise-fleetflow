@@ -226,13 +226,15 @@ const ProfitabilityReport = ({ dateRange }: ProfitabilityReportProps) => {
           >
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={categoryProfitability}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="category" />
-                <YAxis />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="revenue" fill="hsl(var(--chart-1))" />
-                <Bar dataKey="costs" fill="hsl(var(--chart-2))" />
-                <Bar dataKey="profit" fill="hsl(var(--chart-3))" />
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+                <XAxis dataKey="category" stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                <ChartTooltip 
+                  content={<ChartTooltipContent formatter={(value) => [formatCurrency(Number(value)), 'Amount']} />} 
+                />
+                <Bar dataKey="revenue" fill="hsl(var(--chart-1))" radius={[0, 0, 0, 0]} />
+                <Bar dataKey="costs" fill="hsl(var(--chart-2))" radius={[0, 0, 0, 0]} />
+                <Bar dataKey="profit" fill="hsl(var(--chart-3))" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </ChartContainer>
