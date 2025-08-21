@@ -88,7 +88,7 @@ const InstantBooking = () => {
         </div>
 
         {/* Progress Steps */}
-        <Card className="shadow-card">
+        <Card>
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-6">
               {[{
@@ -130,7 +130,7 @@ const InstantBooking = () => {
         {/* Main Content */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
-            {step === 1 && <Card className="shadow-card">
+            {step === 1 && <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <MapPin className="h-5 w-5" />
@@ -174,7 +174,7 @@ const InstantBooking = () => {
 
             {step === 4 && <PricingCalculatorInstant bookingData={bookingData} onPricingUpdate={pricing => handleDataChange('pricing', pricing)} />}
 
-            {step === 5 && <Card className="shadow-card">
+            {step === 5 && <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-green-600">
                     <CheckCircle className="h-5 w-5" />
@@ -213,7 +213,7 @@ const InstantBooking = () => {
 
           {/* Sidebar */}
           <div className="space-y-4">
-            <Card className="shadow-card">
+            <Card>
               <CardHeader>
                 <CardTitle className="text-lg">Booking Summary</CardTitle>
               </CardHeader>

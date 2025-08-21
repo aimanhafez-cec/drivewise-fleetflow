@@ -327,7 +327,7 @@ const Dashboard = () => {
               {appCards.map((app) => (
                 <Card 
                   key={app.name}
-                  className="bg-card hover:bg-teal-light transition-all duration-300 cursor-pointer group border-0 shadow-card rounded-xl"
+                  className="hover:bg-slate-800/60 transition-all duration-300 cursor-pointer group"
                   onClick={() => navigate(app.path)}
                 >
                   <CardContent className="p-6 flex items-center gap-4">
@@ -342,7 +342,7 @@ const Dashboard = () => {
               ))}
               
               {/* Add New Card */}
-              <Card className="bg-transparent border-2 border-dashed border-teal-accent hover:bg-teal-overlay/20 transition-colors cursor-pointer group rounded-xl">
+              <Card className="border-2 border-dashed border-primary/60 hover:bg-slate-800/60 transition-colors cursor-pointer group">
                 <CardContent className="p-6 flex items-center justify-center gap-4">
                   <Plus className="h-6 w-6 text-teal-accent" />
                   <span className="text-teal-accent font-medium">Add New</span>
@@ -354,7 +354,7 @@ const Dashboard = () => {
           {/* KPI Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
             {kpiStats.map((stat) => (
-              <Card key={stat.title} className="bg-card border-0 shadow-card rounded-xl">
+              <Card key={stat.title}>
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div>
@@ -373,7 +373,7 @@ const Dashboard = () => {
           {/* Dashboard Content Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             {/* Quick Lookup */}
-            <Card className="bg-card border-0 shadow-card rounded-xl">
+            <Card>
               <CardHeader>
                 <CardTitle className="text-white">Quick Lookup</CardTitle>
               </CardHeader>
@@ -396,7 +396,7 @@ const Dashboard = () => {
             </Card>
 
             {/* Customer Agreement Search */}
-            <Card className="bg-card border-0 shadow-card rounded-xl">
+            <Card>
               <CardHeader>
                 <CardTitle className="text-white">Search Customer Agreements</CardTitle>
               </CardHeader>
@@ -458,7 +458,7 @@ const Dashboard = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             {/* Vehicle Status */}
-            <Card className="bg-card border-0 shadow-card rounded-xl">
+            <Card>
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="text-white">Vehicle Status</CardTitle>
                 <Select defaultValue="fullsize">
@@ -505,7 +505,7 @@ const Dashboard = () => {
             </Card>
 
             {/* Rate Summary */}
-            <Card className="bg-card border-0 shadow-card rounded-xl">
+            <Card>
               <CardHeader>
                 <CardTitle className="text-white">Rate Summary</CardTitle>
               </CardHeader>
@@ -561,7 +561,7 @@ const Dashboard = () => {
           </div>
 
           {/* Sales Status */}
-          <Card className="bg-card border-0 shadow-card rounded-xl">
+          <Card>
             <CardHeader>
               <CardTitle className="text-white">Sales Status</CardTitle>
             </CardHeader>
