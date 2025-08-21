@@ -78,7 +78,7 @@ const Reservations = () => {
         supabase
           .from('reservations')
           .select('id', { count: 'exact' })
-          .eq('status', 'checked_out')
+          .eq('status', 'confirmed')
           .is('converted_agreement_id', null),
         supabase
           .from('reservations')
@@ -89,7 +89,7 @@ const Reservations = () => {
 
       return {
         total: totalQuery.count || 0,
-        active: checkedOutQuery.count || 0,
+        confirmed: checkedOutQuery.count || 0,
         pending: pendingQuery.count || 0,
       };
     },
@@ -199,9 +199,9 @@ const Reservations = () => {
             <Car className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{counts?.active || 0}</div>
+            <div className="text-2xl font-bold">{counts?.confirmed || 0}</div>
             <p className="text-xs text-muted-foreground">
-              Currently ongoing
+              Ready to proceed
             </p>
           </CardContent>
         </Card>
