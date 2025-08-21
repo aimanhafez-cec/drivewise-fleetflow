@@ -1118,9 +1118,9 @@ const NewReservation = () => {
     };
     validation.validateForm(validationData);
   };
-  return <div className="flex flex-col lg:flex-row gap-6">
+  return <div className="flex flex-col lg:flex-row gap-6 min-h-screen">
       {/* Main Content */}
-      <div className="flex-1 space-y-6 min-w-0">
+      <div className="flex-1 space-y-6 min-w-0 max-w-none overflow-x-auto">
         {/* Breadcrumbs */}
         <Breadcrumb>
           <BreadcrumbList>
@@ -2074,8 +2074,8 @@ const NewReservation = () => {
       </div>
 
       {/* Right Sidebar - Summary */}
-      <div className="lg:w-96 space-y-6">
-        <div className="sticky top-4 z-10">
+      <div className="lg:w-96 lg:flex-shrink-0">
+        <div className="sticky top-4 max-h-[calc(100vh-2rem)] overflow-y-auto">
           <SummaryCard summary={summary} currencyCode="AED" />
         </div>
       </div>
