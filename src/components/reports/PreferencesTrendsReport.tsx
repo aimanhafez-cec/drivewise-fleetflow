@@ -2,13 +2,15 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
+import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from '@/components/ui/chart';
 import { DateRange } from 'react-day-picker';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { TrendingUp, Calendar, MapPin, Zap } from 'lucide-react';
 import { format, getMonth } from 'date-fns';
+import { MONTHLY_TRENDS_CONFIG, VEHICLE_CATEGORY_COLORS } from '@/lib/chartConfig';
+import { formatNumber, currencyTooltipFormatter } from '@/lib/utils/chartUtils';
 
 interface PreferencesTrendsReportProps {
   dateRange?: DateRange;
@@ -274,14 +276,38 @@ const PreferencesTrendsReport: React.FC<PreferencesTrendsReportProps> = ({ dateR
             <CardDescription>Most popular vehicle categories</CardDescription>
           </CardHeader>
           <CardContent>
-            <ChartContainer config={{}} className="h-[300px]">
+            <ChartContainer 
+              config={vehiclePreferences?.categories.slice(0, 6).reduce((acc, item, index) => ({
+                ...acc,
+                [item.name]: { 
+                  label: item.name, 
+                  color: VEHICLE_CATEGORY_COLORS[index % VEHICLE_CATEGORY_COLORS.length] 
+                }
+              }), {}) || {}}
+              className="h-[300px]"
+            >
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={vehiclePreferences?.categories.slice(0, 6)}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="count" fill="hsl(var(--primary))" />
+                <BarChart data={vehiclePreferences?.categories.slice(0, 6)} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+                  <XAxis 
+                    dataKey="name" 
+                    stroke="hsl(var(--muted-foreground))" 
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <YAxis 
+                    stroke="hsl(var(--muted-foreground))" 
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <ChartTooltip content={<ChartTooltipContent formatter={(value, name) => [formatNumber(Number(value)), name]} />} />
+                  <Bar 
+                    dataKey="count" 
+                    fill="hsl(220, 91%, 60%)"
+                    radius={[4, 4, 0, 0]} 
+                  />
                 </BarChart>
               </ResponsiveContainer>
             </ChartContainer>
@@ -295,18 +321,34 @@ const PreferencesTrendsReport: React.FC<PreferencesTrendsReportProps> = ({ dateR
             <CardDescription>Bookings by month</CardDescription>
           </CardHeader>
           <CardContent>
-            <ChartContainer config={{}} className="h-[300px]">
+            <ChartContainer 
+              config={MONTHLY_TRENDS_CONFIG}
+              className="h-[300px]"
+            >
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={seasonalTrends}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip />
+                <LineChart data={seasonalTrends} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+                  <XAxis 
+                    dataKey="month" 
+                    stroke="hsl(var(--muted-foreground))" 
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <YAxis 
+                    stroke="hsl(var(--muted-foreground))" 
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <ChartTooltip content={<ChartTooltipContent formatter={(value, name) => [formatNumber(Number(value)), name]} />} />
+                  <ChartLegend content={<ChartLegendContent />} />
                   <Line 
                     type="monotone" 
                     dataKey="bookings" 
-                    stroke="hsl(var(--primary))" 
-                    strokeWidth={2}
+                    stroke={MONTHLY_TRENDS_CONFIG.bookings.color}
+                    strokeWidth={3}
+                    dot={{ fill: MONTHLY_TRENDS_CONFIG.bookings.color, strokeWidth: 2, r: 6 }}
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -321,7 +363,16 @@ const PreferencesTrendsReport: React.FC<PreferencesTrendsReportProps> = ({ dateR
             <CardDescription>Distribution of booking types</CardDescription>
           </CardHeader>
           <CardContent>
-            <ChartContainer config={{}} className="h-[300px]">
+            <ChartContainer 
+              config={bookingChannels?.reduce((acc, item, index) => ({
+                ...acc,
+                [item.type.toLowerCase().replace(' ', '_')]: { 
+                  label: item.type, 
+                  color: VEHICLE_CATEGORY_COLORS[index % VEHICLE_CATEGORY_COLORS.length] 
+                }
+              }), {}) || {}}
+              className="h-[300px]"
+            >
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
@@ -329,15 +380,20 @@ const PreferencesTrendsReport: React.FC<PreferencesTrendsReportProps> = ({ dateR
                     cx="50%"
                     cy="50%"
                     outerRadius={80}
-                    fill="hsl(var(--primary))"
                     dataKey="count"
-                    label={({ type, percentage }) => `${type}: ${percentage.toFixed(1)}%`}
+                    nameKey="type"
                   >
                     {bookingChannels?.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={chartColors[index % chartColors.length]} />
+                      <Cell 
+                        key={`cell-${index}`} 
+                        fill={VEHICLE_CATEGORY_COLORS[index % VEHICLE_CATEGORY_COLORS.length]}
+                        stroke="hsl(var(--background))" 
+                        strokeWidth={2} 
+                      />
                     ))}
                   </Pie>
-                  <Tooltip />
+                  <ChartTooltip content={<ChartTooltipContent formatter={(value, name) => [formatNumber(Number(value)), name]} />} />
+                  <ChartLegend content={<ChartLegendContent />} />
                 </PieChart>
               </ResponsiveContainer>
             </ChartContainer>
@@ -351,14 +407,37 @@ const PreferencesTrendsReport: React.FC<PreferencesTrendsReportProps> = ({ dateR
             <CardDescription>Most popular pickup/return locations</CardDescription>
           </CardHeader>
           <CardContent>
-            <ChartContainer config={{}} className="h-[300px]">
+            <ChartContainer 
+              config={{
+                count: { label: "Reservations", color: "hsl(142, 76%, 36%)" }
+              }}
+              className="h-[300px]"
+            >
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={locationPreferences} layout="horizontal">
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis type="number" />
-                  <YAxis dataKey="location" type="category" width={100} />
-                  <Tooltip />
-                  <Bar dataKey="count" fill="hsl(var(--secondary))" />
+                <BarChart data={locationPreferences} layout="horizontal" margin={{ top: 20, right: 30, left: 80, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+                  <XAxis 
+                    type="number" 
+                    stroke="hsl(var(--muted-foreground))" 
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <YAxis 
+                    dataKey="location" 
+                    type="category" 
+                    width={100}
+                    stroke="hsl(var(--muted-foreground))" 
+                    fontSize={11}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <ChartTooltip content={<ChartTooltipContent formatter={(value, name) => [formatNumber(Number(value)), name]} />} />
+                  <Bar 
+                    dataKey="count" 
+                    fill="hsl(142, 76%, 36%)"
+                    radius={[0, 4, 4, 0]} 
+                  />
                 </BarChart>
               </ResponsiveContainer>
             </ChartContainer>
