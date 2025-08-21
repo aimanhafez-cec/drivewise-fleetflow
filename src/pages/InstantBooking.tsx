@@ -114,11 +114,11 @@ const InstantBooking = () => {
             }].map((stepInfo, index) => <div key={stepInfo.num} className="flex flex-col items-center flex-1">
                   <div className={`
                     w-10 h-10 rounded-full flex items-center justify-center mb-2 transition-all
-                    ${step >= stepInfo.num ? 'bg-primary text-primary-foreground shadow-elegant' : step === stepInfo.num ? 'bg-primary/20 text-primary border-2 border-primary' : 'bg-muted text-muted-foreground'}
+                    ${step >= stepInfo.num ? 'bg-primary text-primary-foreground shadow-elegant' : step === stepInfo.num ? 'bg-primary/20 text-primary border-2 border-primary' : 'bg-border text-foreground/70'}
                   `}>
                     {isStepComplete(stepInfo.num) ? <CheckCircle className="h-5 w-5" /> : <stepInfo.icon className="h-5 w-5" />}
                   </div>
-                  <p className={`text-sm font-medium ${step >= stepInfo.num ? 'text-foreground' : 'text-muted-foreground'}`}>
+                  <p className={`text-sm font-medium ${step >= stepInfo.num ? 'text-foreground' : 'text-foreground/70'}`}>
                     {stepInfo.title}
                   </p>
                   {index < 4 && <div className={`h-0.5 w-full mt-3 ${step > stepInfo.num ? 'bg-primary' : 'bg-muted'}`} />}
