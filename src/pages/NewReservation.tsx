@@ -33,7 +33,7 @@ import { AddLineValidation, validateAddLine, ValidationError } from '@/component
 import { PrefillChips } from '@/components/reservation/PrefillChips';
 import { EnhancedDriverPicker } from '@/components/reservation/EnhancedDriverPicker';
 import { ConditionalVehicleSelector } from '@/components/reservation/ConditionalVehicleSelector';
-import { VehicleClassSelect, LocationSelect } from '@/components/ui/select-components';
+import { VehicleClassSelect, LocationSelect, CustomerSelect } from '@/components/ui/select-components';
 import { usePricingContext, calculateLinePrice, PricingContext } from '@/hooks/usePricingContext';
 import { RepriceBanner } from '@/components/reservation/RepriceBanner';
 import { useFormValidation, ValidationRules } from '@/hooks/useFormValidation';
@@ -149,13 +149,9 @@ interface ExtendedFormData extends ReservationFormData {
   depositPaymentMethodId: string;
   cancellationCharges: number;
 
-  // Referral Information
-  referralNameId: string;
-  referralContactNameId: string;
-  referralAddress: string;
-  referralPhone: string;
-  referralBenefitTypeId: string;
-  referralValue: number;
+  // Referral Information - Loyalty Program
+  referralCustomerId: string;
+  referralCode: string;
 
   // Additional rental information fields
   reservationMethodId: string;
@@ -251,12 +247,10 @@ const NewReservation = () => {
     depositMethodId: '',
     depositPaymentMethodId: '',
     cancellationCharges: 0,
-    referralNameId: '',
-    referralContactNameId: '',
-    referralAddress: '',
-    referralPhone: '',
-    referralBenefitTypeId: '',
-    referralValue: 0
+    
+    // Referral Information - Loyalty Program
+    referralCustomerId: '',
+    referralCode: ''
   });
   const [loading, setLoading] = useState({
     currencies: false,
@@ -950,8 +944,8 @@ const NewReservation = () => {
         securityDepositPaid: currentFormData.securityDepositPaid,
         depositMethod: currentFormData.depositMethodId,
         depositPaymentMethod: currentFormData.depositPaymentMethodId,
-        benefitType: currentFormData.referralBenefitTypeId,
-        benefitValue: currentFormData.referralValue
+        referralCustomer: currentFormData.referralCustomerId,
+        referralCode: currentFormData.referralCode
       },
       lines: currentFormData.reservationLines?.map(line => ({
         vehicleClassId: line.vehicleClassId,
@@ -1104,8 +1098,8 @@ const NewReservation = () => {
         securityDepositPaid: formData.securityDepositPaid,
         depositMethod: formData.depositMethodId,
         depositPaymentMethod: formData.depositPaymentMethodId,
-        benefitType: formData.referralBenefitTypeId,
-        benefitValue: formData.referralValue
+        referralCustomer: formData.referralCustomerId,
+        referralCode: formData.referralCode
       },
       lines: formData.reservationLines?.map(line => ({
         vehicleClassId: line.vehicleClassId,
@@ -1968,45 +1962,39 @@ const NewReservation = () => {
             </AccordionContent>
           </AccordionItem>
 
-          {/* 8) Referral Information */}
+          {/* 8) Referral Information - Loyalty Program */}
           <AccordionItem value="referral-info" className="border rounded-lg">
             <AccordionTrigger className="px-6 py-4 hover:no-underline">
               <div className="flex items-center gap-2">
                 <Users className="h-5 w-5" />
-                <span className="font-semibold text-foreground">Referral Information</span>
+                <span className="font-semibold text-foreground">Referral Information - Loyalty Program</span>
               </div>
             </AccordionTrigger>
             <AccordionContent className="px-6 pb-6">
-              <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label className="text-foreground">Referral Name</Label>
-                  <Select value={formData.referralNameId} onValueChange={value => updateFormData('referralNameId', value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select referral" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="referral-1">Corporate Partner A</SelectItem>
-                      <SelectItem value="referral-2">Travel Agency B</SelectItem>
-                      <SelectItem value="referral-3">Hotel Chain C</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Label className="text-foreground">Referred by Customer</Label>
+                  <CustomerSelect
+                    value={formData.referralCustomerId}
+                    onChange={value => updateFormData('referralCustomerId', value)}
+                    placeholder="Select referring customer"
+                    className="w-full"
+                  />
+                  <p className="text-sm text-card-foreground/70">
+                    Select the existing customer who referred this reservation
+                  </p>
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-foreground">Contact Name</Label>
-                  <Select value={formData.referralContactNameId} onValueChange={value => updateFormData('referralContactNameId', value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select contact" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="contact-1">John Smith</SelectItem>
-                      <SelectItem value="contact-2">Jane Doe</SelectItem>
-                      <SelectItem value="contact-3">Bob Johnson</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-foreground">Phone No.</Label>
-                  <Input value={formData.referralPhone} onChange={e => updateFormData('referralPhone', e.target.value)} placeholder="+97150345234" className="text-white placeholder:text-white/70" />
+                  <Label className="text-foreground">Referral Code</Label>
+                  <Input 
+                    value={formData.referralCode} 
+                    onChange={e => updateFormData('referralCode', e.target.value)} 
+                    placeholder="Enter referral code (optional)"
+                    className="text-white placeholder:text-white/70" 
+                  />
+                  <p className="text-sm text-card-foreground/70">
+                    Optional code for tracking referral campaigns
+                  </p>
                 </div>
               </div>
             </AccordionContent>
