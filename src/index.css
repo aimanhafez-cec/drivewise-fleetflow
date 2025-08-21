@@ -27,7 +27,7 @@
     --secondary-foreground: 0 0% 100%;
 
     --muted: 183 31% 85%; /* #C7E4E5 - Secondary/muted text */
-    --muted-foreground: 183 31% 85%;
+    --muted-foreground: 183 95% 15%; /* Dark teal for readable text on muted backgrounds */
 
     --accent: 180 61% 51%; /* #33CFCF - Accent color */
     --accent-foreground: 0 0% 100%;
@@ -107,7 +107,7 @@
     --secondary-foreground: 0 0% 100%;
 
     --muted: 183 31% 85%;
-    --muted-foreground: 183 31% 85%;
+    --muted-foreground: 183 95% 15%; /* Dark teal for readable text on muted backgrounds */
 
     --accent: 180 61% 51%;
     --accent-foreground: 0 0% 100%;
