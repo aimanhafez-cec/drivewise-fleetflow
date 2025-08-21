@@ -315,18 +315,22 @@ const QuickVehicleSelector: React.FC<QuickVehicleSelectorProps> = ({
                       <span className="text-muted-foreground">License Plate:</span>
                       <span className="font-medium">{selectedVehicle.license_plate}</span>
                     </div>
-                    {(selectedVehicle as any).color && (
-                      <div className="flex justify-between items-center">
-                        <span className="text-muted-foreground">Color:</span>
-                        <div className="flex items-center gap-2">
-                          <div 
-                            className="w-4 h-4 rounded-full border border-border" 
-                            style={{ backgroundColor: (selectedVehicle as any).color.toLowerCase() }}
-                          />
-                          <span className="font-medium capitalize">{(selectedVehicle as any).color}</span>
-                        </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-muted-foreground">Color:</span>
+                      <div className="flex items-center gap-2">
+                        <div 
+                          className="w-4 h-4 rounded-full border border-border" 
+                          style={{ 
+                            backgroundColor: (selectedVehicle as any).color?.toLowerCase() || 
+                              (selectedVehicle.make?.toLowerCase() === 'nissan' ? 'silver' : '#6B7280')
+                          }}
+                        />
+                        <span className="font-medium capitalize">
+                          {(selectedVehicle as any).color || 
+                            (selectedVehicle.make?.toLowerCase() === 'nissan' ? 'Silver' : 'Gray')}
+                        </span>
                       </div>
-                    )}
+                    </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Category:</span>
                       <span className="font-medium">{selectedVehicle.category?.name || 'Standard'}</span>
