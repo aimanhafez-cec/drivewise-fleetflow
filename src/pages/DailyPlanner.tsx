@@ -7,19 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { 
-  Calendar,
-  ChevronLeft, 
-  ChevronRight,
-  Filter,
-  RotateCcw,
-  Plus,
-  Clock,
-  Users,
-  AlertTriangle,
-  Car,
-  Wrench
-} from "lucide-react";
+import { Calendar, ChevronLeft, ChevronRight, Filter, RotateCcw, Plus, Clock, Users, AlertTriangle, Car, Wrench } from "lucide-react";
 import { format, addDays, startOfToday, startOfWeek, startOfMonth, endOfMonth, endOfWeek } from "date-fns";
 import { PlannerFilters } from "@/components/planner/PlannerFilters";
 import { PlannerKPIs } from "@/components/planner/PlannerKPIs";
@@ -28,9 +16,7 @@ import { ResourceView } from "@/components/planner/ResourceView";
 import { EventLegend } from "@/components/planner/EventLegend";
 import { NewReservationModal } from "@/components/planner/NewReservationModal";
 import { ConflictDialog } from "@/components/planner/ConflictDialog";
-
 type ViewType = "month" | "week" | "day";
-
 interface PlannerEvent {
   id: string;
   kind: "RESERVATION" | "AGREEMENT" | "HOLD" | "MAINTENANCE";
@@ -47,16 +33,15 @@ interface PlannerEvent {
   shortNo?: string;
   actions: string[];
 }
-
 const DailyPlanner: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const {
+    toast
+  } = useToast();
   const queryClient = useQueryClient();
   const [currentDate, setCurrentDate] = useState(() => new Date());
-  const [view, setView] = useState<ViewType>(() => 
-    (searchParams.get("view") as ViewType) || "week"
-  );
+  const [view, setView] = useState<ViewType>(() => searchParams.get("view") as ViewType || "week");
   const [resourceMode, setResourceMode] = useState(false);
   const [showNewReservationModal, setShowNewReservationModal] = useState(false);
   const [newReservationPrefill, setNewReservationPrefill] = useState<any>(null);
@@ -71,10 +56,9 @@ const DailyPlanner: React.FC = () => {
     salesperson: searchParams.get("salesperson") || "",
     dateRange: {
       from: searchParams.get("from") ? new Date(searchParams.get("from")!) : undefined,
-      to: searchParams.get("to") ? new Date(searchParams.get("to")!) : undefined,
+      to: searchParams.get("to") ? new Date(searchParams.get("to")!) : undefined
     }
   });
-
   useEffect(() => {
     document.title = "Daily Planner | CEC Car Rental";
   }, []);
@@ -106,29 +90,20 @@ const DailyPlanner: React.FC = () => {
   }, [currentDate, view]);
 
   // Fetch planner events
-  const { data: events = [], isLoading } = useQuery({
+  const {
+    data: events = [],
+    isLoading
+  } = useQuery({
     queryKey: ["planner-events", dateRange.start.toISOString(), dateRange.end.toISOString(), filters],
     queryFn: async () => {
       // For now, let's fetch from reservations and agreements
-      const [reservationsResult, agreementsResult] = await Promise.all([
-        supabase
-          .from("reservations")
-          .select(`
+      const [reservationsResult, agreementsResult] = await Promise.all([supabase.from("reservations").select(`
             id, status, start_datetime, end_datetime, pickup_location, return_location, ro_number,
             customers!inner(full_name)
-          `)
-          .gte("start_datetime", dateRange.start.toISOString())
-          .lte("start_datetime", dateRange.end.toISOString()),
-        supabase
-          .from("agreements")
-          .select(`
+          `).gte("start_datetime", dateRange.start.toISOString()).lte("start_datetime", dateRange.end.toISOString()), supabase.from("agreements").select(`
             id, status, checkout_datetime, return_datetime, agreement_no,
             customers!inner(full_name)
-          `)
-          .gte("checkout_datetime", dateRange.start.toISOString())
-          .lte("checkout_datetime", dateRange.end.toISOString())
-      ]);
-
+          `).gte("checkout_datetime", dateRange.start.toISOString()).lte("checkout_datetime", dateRange.end.toISOString())]);
       const plannerEvents: PlannerEvent[] = [];
 
       // Convert reservations
@@ -166,11 +141,9 @@ const DailyPlanner: React.FC = () => {
           }
         });
       }
-
       return plannerEvents;
-    },
+    }
   });
-
   const navigateDate = (direction: "prev" | "next" | "today") => {
     if (direction === "today") {
       setCurrentDate(new Date());
@@ -190,7 +163,6 @@ const DailyPlanner: React.FC = () => {
       });
     }
   };
-
   const updateFilters = (newFilters: typeof filters) => {
     setFilters(newFilters);
     // Update URL params
@@ -207,7 +179,6 @@ const DailyPlanner: React.FC = () => {
     params.set("view", view);
     setSearchParams(params);
   };
-
   const resetFilters = () => {
     const emptyFilters = {
       vehicleClass: "",
@@ -217,21 +188,24 @@ const DailyPlanner: React.FC = () => {
       locations: [],
       status: [],
       salesperson: "",
-      dateRange: { from: undefined, to: undefined }
+      dateRange: {
+        from: undefined,
+        to: undefined
+      }
     };
     updateFilters(emptyFilters);
   };
-
   const handleSearch = () => {
     console.log("Search button clicked! Invalidating queries...");
     // Invalidate and refetch the planner events query
-    queryClient.invalidateQueries({ queryKey: ["planner-events"] });
+    queryClient.invalidateQueries({
+      queryKey: ["planner-events"]
+    });
     toast({
       title: "Search triggered",
       description: "Refreshing planner data..."
     });
   };
-
   const formatDateHeader = () => {
     switch (view) {
       case "month":
@@ -271,7 +245,11 @@ const DailyPlanner: React.FC = () => {
         case "CHECK_OUT":
         case "CHECK_IN":
           // Navigate to check-out/check-in flow
-          navigate(`/agreements/${eventId}`, { state: { action } });
+          navigate(`/agreements/${eventId}`, {
+            state: {
+              action
+            }
+          });
           break;
         case "ASSIGN":
           // Open vehicle assignment modal
@@ -300,7 +278,6 @@ const DailyPlanner: React.FC = () => {
       });
     }
   };
-
   const handleCreateEvent = (date: Date, vehicleId?: string) => {
     setNewReservationPrefill({
       startDateTime: date,
@@ -310,39 +287,40 @@ const DailyPlanner: React.FC = () => {
     });
     setShowNewReservationModal(true);
   };
-
   const handleEventMove = async (eventId: string, newStart: Date, newEnd: Date, newVehicleId?: string) => {
     // Mock API call - implement conflict checking
     try {
       // Simulate API delay
       await new Promise(resolve => setTimeout(resolve, 500));
-      
+
       // Mock conflict detection (30% chance)
       if (Math.random() < 0.3) {
         throw {
           status: 409,
           data: {
             cause: "Vehicle is already booked during this time period",
-            overlappingEvents: [
-              {
-                id: "conflict_1",
-                kind: "RESERVATION",
-                status: "confirmed",
-                customer: "John Doe",
-                shortNo: "R123",
-                start: newStart.toISOString(),
-                end: newEnd.toISOString(),
-                vehicleLabel: "Toyota Camry • ABC123"
-              }
-            ],
-            suggestions: [
-              { vehicleId: "alt_1", vehicleLabel: "Honda Accord • DEF456", available: true },
-              { vehicleId: "alt_2", vehicleLabel: "Nissan Altima • GHI789", available: true }
-            ]
+            overlappingEvents: [{
+              id: "conflict_1",
+              kind: "RESERVATION",
+              status: "confirmed",
+              customer: "John Doe",
+              shortNo: "R123",
+              start: newStart.toISOString(),
+              end: newEnd.toISOString(),
+              vehicleLabel: "Toyota Camry • ABC123"
+            }],
+            suggestions: [{
+              vehicleId: "alt_1",
+              vehicleLabel: "Honda Accord • DEF456",
+              available: true
+            }, {
+              vehicleId: "alt_2",
+              vehicleLabel: "Nissan Altima • GHI789",
+              available: true
+            }]
           }
         };
       }
-
       toast({
         title: "Event Moved",
         description: "Event successfully moved to new time slot"
@@ -354,19 +332,16 @@ const DailyPlanner: React.FC = () => {
       throw error;
     }
   };
-
   const handleConflictDetected = (conflicts: any) => {
     setConflictDialog({
       open: true,
       conflictDetails: conflicts
     });
   };
-
   const handleNewReservationSubmit = async (data: any) => {
     try {
       // Mock reservation creation
       console.log("Creating reservation:", data);
-      
       toast({
         title: "Success",
         description: "New reservation created successfully"
@@ -376,9 +351,7 @@ const DailyPlanner: React.FC = () => {
       throw error;
     }
   };
-
-  return (
-    <div className="space-y-6 w-full min-w-0">
+  return <div className="space-y-6 w-full min-w-0">
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
@@ -403,12 +376,7 @@ const DailyPlanner: React.FC = () => {
       <EventLegend />
 
       {/* Filters */}
-      <PlannerFilters 
-        filters={filters}
-        onFiltersChange={updateFilters}
-        onReset={resetFilters}
-        onSearch={handleSearch}
-      />
+      <PlannerFilters filters={filters} onFiltersChange={updateFilters} onReset={resetFilters} onSearch={handleSearch} />
 
       {/* KPIs */}
       <PlannerKPIs events={events} />
@@ -418,50 +386,28 @@ const DailyPlanner: React.FC = () => {
         <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <Tabs value={view} onValueChange={(v) => setView(v as ViewType)}>
-                <TabsList>
+              <Tabs value={view} onValueChange={v => setView(v as ViewType)}>
+                <TabsList className="bg-transparent">
                   <TabsTrigger value="month" data-testid="view-month">Month</TabsTrigger>
                   <TabsTrigger value="week" data-testid="view-week">Week</TabsTrigger>
                   <TabsTrigger value="day" data-testid="view-day">Day</TabsTrigger>
                 </TabsList>
               </Tabs>
 
-              {(view === "week" || view === "day") && (
-                <Button
-                  variant={resourceMode ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setResourceMode(!resourceMode)}
-                  data-testid="toggle-resource"
-                >
+              {(view === "week" || view === "day") && <Button variant={resourceMode ? "default" : "outline"} size="sm" onClick={() => setResourceMode(!resourceMode)} data-testid="toggle-resource">
                   <Car className="mr-2 h-4 w-4" />
                   Resource View
-                </Button>
-              )}
+                </Button>}
             </div>
 
             <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => navigateDate("today")}
-                data-testid="btn-today"
-              >
+              <Button variant="outline" size="sm" onClick={() => navigateDate("today")} data-testid="btn-today">
                 Today
               </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => navigateDate("prev")}
-                data-testid="btn-prev"
-              >
+              <Button variant="outline" size="sm" onClick={() => navigateDate("prev")} data-testid="btn-prev">
                 <ChevronLeft className="h-4 w-4" />
               </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => navigateDate("next")}
-                data-testid="btn-next"
-              >
+              <Button variant="outline" size="sm" onClick={() => navigateDate("next")} data-testid="btn-next">
                 <ChevronRight className="h-4 w-4" />
               </Button>
             </div>
@@ -471,60 +417,32 @@ const DailyPlanner: React.FC = () => {
         </CardHeader>
 
         <CardContent>
-          {resourceMode && (view === "week" || view === "day") ? (
-            <ResourceView 
-              events={events}
-              dateRange={dateRange}
-              view={view}
-              isLoading={isLoading}
-              onEventAction={handleEventAction}
-              onCreateEvent={handleCreateEvent}
-              onEventMove={handleEventMove}
-              onConflictDetected={handleConflictDetected}
-            />
-          ) : (
-            <CalendarView 
-              events={events}
-              dateRange={dateRange}
-              view={view}
-              currentDate={currentDate}
-              isLoading={isLoading}
-              onEventAction={handleEventAction}
-              onCreateEvent={handleCreateEvent}
-              onEventMove={handleEventMove}
-              onConflictDetected={handleConflictDetected}
-            />
-          )}
+          {resourceMode && (view === "week" || view === "day") ? <ResourceView events={events} dateRange={dateRange} view={view} isLoading={isLoading} onEventAction={handleEventAction} onCreateEvent={handleCreateEvent} onEventMove={handleEventMove} onConflictDetected={handleConflictDetected} /> : <CalendarView events={events} dateRange={dateRange} view={view} currentDate={currentDate} isLoading={isLoading} onEventAction={handleEventAction} onCreateEvent={handleCreateEvent} onEventMove={handleEventMove} onConflictDetected={handleConflictDetected} />}
         </CardContent>
       </Card>
 
       {/* Modals */}
-      <NewReservationModal
-        open={showNewReservationModal}
-        onOpenChange={setShowNewReservationModal}
-        prefillData={newReservationPrefill}
-        onSubmit={handleNewReservationSubmit}
-      />
+      <NewReservationModal open={showNewReservationModal} onOpenChange={setShowNewReservationModal} prefillData={newReservationPrefill} onSubmit={handleNewReservationSubmit} />
 
-      <ConflictDialog
-        open={conflictDialog?.open || false}
-        onOpenChange={(open) => setConflictDialog(open ? conflictDialog : null)}
-        conflictDetails={conflictDialog?.conflictDetails || null}
-        onKeep={() => {
-          toast({ title: "Changes Kept", description: "Event moved despite conflicts" });
-          setConflictDialog(null);
-        }}
-        onUndo={() => {
-          toast({ title: "Changes Undone", description: "Event returned to original position" });
-          setConflictDialog(null);
-        }}
-        onSuggestionSelect={(vehicleId) => {
-          toast({ title: "Vehicle Selected", description: "Event moved to suggested vehicle" });
-          setConflictDialog(null);
-        }}
-      />
-    </div>
-  );
+      <ConflictDialog open={conflictDialog?.open || false} onOpenChange={open => setConflictDialog(open ? conflictDialog : null)} conflictDetails={conflictDialog?.conflictDetails || null} onKeep={() => {
+      toast({
+        title: "Changes Kept",
+        description: "Event moved despite conflicts"
+      });
+      setConflictDialog(null);
+    }} onUndo={() => {
+      toast({
+        title: "Changes Undone",
+        description: "Event returned to original position"
+      });
+      setConflictDialog(null);
+    }} onSuggestionSelect={vehicleId => {
+      toast({
+        title: "Vehicle Selected",
+        description: "Event moved to suggested vehicle"
+      });
+      setConflictDialog(null);
+    }} />
+    </div>;
 };
-
 export default DailyPlanner;
