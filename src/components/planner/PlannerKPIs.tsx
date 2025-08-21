@@ -66,23 +66,9 @@ export const PlannerKPIs: React.FC<PlannerKPIsProps> = ({
     variant: "default",
     testId: "kpi-idle"
   }];
-  const getVariantColor = (variant: string) => {
-    switch (variant) {
-      case "success":
-        return "text-green-600 bg-green-50 border-green-200";
-      case "warning":
-        return "text-yellow-600 bg-yellow-50 border-yellow-200";
-      case "info":
-        return "text-blue-600 bg-blue-50 border-blue-200";
-      case "destructive":
-        return "text-red-600 bg-red-50 border-red-200";
-      default:
-        return "text-muted-foreground bg-muted/50 border-border";
-    }
-  };
   return <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-      {kpis.map(kpi => <Card key={kpi.id} className={`cursor-pointer transition-colors hover:bg-muted/50 ${getVariantColor(kpi.variant)}`} data-testid={kpi.testId}>
-          <CardContent className="p-4 bg-transparent">
+      {kpis.map(kpi => <Card key={kpi.id} className="cursor-pointer" data-testid={kpi.testId}>
+          <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-2xl font-bold">
