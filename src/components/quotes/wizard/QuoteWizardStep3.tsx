@@ -49,7 +49,7 @@ export const QuoteWizardStep3: React.FC<QuoteWizardStep3Props> = ({
                 ) : (
                   categories.map((category) => (
                     <SelectItem key={category.id} value={category.id}>
-                      {category.name}
+                      {category.name} - {category.description || ""}
                     </SelectItem>
                   ))
                 )}

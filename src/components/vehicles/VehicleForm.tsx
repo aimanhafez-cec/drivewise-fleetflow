@@ -269,7 +269,7 @@ const VehicleForm: React.FC<VehicleFormProps> = ({ vehicle, onSuccess }) => {
             <SelectContent>
               {categories?.map((category) => (
                 <SelectItem key={category.id} value={category.id}>
-                  {category.name}
+                  {category.name} - {category.description || ""}
                 </SelectItem>
               ))}
             </SelectContent>

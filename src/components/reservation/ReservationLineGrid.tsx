@@ -162,7 +162,7 @@ export const ReservationLineGrid: React.FC<ReservationLineGridProps> = ({
                       ) : (
                         categories?.map((category) => (
                           <SelectItem key={category.id} value={category.id}>
-                            {category.name}
+                            {category.name} - {category.description || ""}
                           </SelectItem>
                         ))
                       )}

@@ -216,7 +216,7 @@ const Vehicles = () => {
             <SelectItem value="all">All Categories</SelectItem>
             <SelectItem value="uncategorized">Uncategorized</SelectItem>
             {categories?.map(category => <SelectItem key={category.id} value={category.id}>
-                {category.name}
+                {category.name} - {category.description || ""}
               </SelectItem>)}
           </SelectContent>
         </Select>

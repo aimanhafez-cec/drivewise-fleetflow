@@ -47,7 +47,7 @@ export const useVehicleClasses = () => {
     ...result,
     items: result.items.map(item => ({
       ...item,
-      label: item.name
+      label: item.name + ' - ' + (item.description || '')
     }))
   };
 };
