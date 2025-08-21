@@ -3,7 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Car, MapPin, Fuel, Users, CheckCircle, Search, Filter } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Car, MapPin, Fuel, Users, CheckCircle, Search, Filter, Calendar, Shield, Settings } from 'lucide-react';
 import { useAvailableVehicles } from '@/hooks/useAvailableVehicles';
 import { useVehicleCategories } from '@/hooks/useVehicles';
 
@@ -24,6 +25,8 @@ const QuickVehicleSelector: React.FC<QuickVehicleSelectorProps> = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
 
   const startDate = pickupDate ? new Date(pickupDate) : undefined;
   const endDate = returnDate ? new Date(returnDate) : undefined;
@@ -152,7 +155,10 @@ const QuickVehicleSelector: React.FC<QuickVehicleSelectorProps> = ({
                           ? 'ring-2 ring-primary shadow-elegant' 
                           : 'hover:shadow-md'
                       }`}
-                      onClick={() => onVehicleSelect(vehicle.id)}
+                      onClick={() => {
+                        setSelectedVehicle(vehicle);
+                        setIsModalOpen(true);
+                      }}
                     >
                       <CardContent className="p-4">
                         <div className="space-y-3">
@@ -249,6 +255,149 @@ const QuickVehicleSelector: React.FC<QuickVehicleSelectorProps> = ({
           </div>
         )}
       </CardContent>
+
+      {/* Vehicle Details Modal */}
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Car className="h-5 w-5" />
+              {selectedVehicle?.make} {selectedVehicle?.model}
+            </DialogTitle>
+          </DialogHeader>
+          
+          {selectedVehicle && (
+            <div className="space-y-6">
+              {/* Vehicle Image Placeholder */}
+              <div className="w-full h-48 bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg flex items-center justify-center">
+                <Car className="h-16 w-16 text-muted-foreground" />
+              </div>
+
+              {/* Basic Info */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <h3 className="font-semibold mb-3">Vehicle Information</h3>
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Make:</span>
+                      <span className="font-medium">{selectedVehicle.make}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Model:</span>
+                      <span className="font-medium">{selectedVehicle.model}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Year:</span>
+                      <span className="font-medium">{selectedVehicle.year}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">License Plate:</span>
+                      <span className="font-medium">{selectedVehicle.license_plate}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Category:</span>
+                      <span className="font-medium">{selectedVehicle.category?.name || 'Standard'}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold mb-3">Rental Details</h3>
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Daily Rate:</span>
+                      <span className="font-bold text-primary">AED {selectedVehicle.daily_rate}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Status:</span>
+                      <Badge variant={selectedVehicle.status === 'available' ? 'default' : 'secondary'}>
+                        {selectedVehicle.status}
+                      </Badge>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Location:</span>
+                      <span className="font-medium">{pickupLocation}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Features */}
+              <div>
+                <h3 className="font-semibold mb-3 flex items-center gap-2">
+                  <Settings className="h-4 w-4" />
+                  Vehicle Features
+                </h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
+                    <Fuel className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm">Fuel Efficient</span>
+                  </div>
+                  <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
+                    <Users className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm">5 Passengers</span>
+                  </div>
+                  <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
+                    <Shield className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm">Full Insurance</span>
+                  </div>
+                  <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
+                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm">Available Now</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Rental Period Summary */}
+              <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
+                <h4 className="font-semibold mb-2">Rental Summary</h4>
+                <div className="space-y-1 text-sm">
+                  <div className="flex justify-between">
+                    <span>Pickup Date:</span>
+                    <span>{new Date(pickupDate).toLocaleDateString()}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Return Date:</span>
+                    <span>{new Date(returnDate).toLocaleDateString()}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Total Days:</span>
+                    <span>
+                      {Math.ceil((new Date(returnDate).getTime() - new Date(pickupDate).getTime()) / (1000 * 60 * 60 * 24))} days
+                    </span>
+                  </div>
+                  <div className="flex justify-between font-semibold text-base border-t pt-2 mt-2">
+                    <span>Estimated Total:</span>
+                    <span className="text-primary">
+                      AED {(selectedVehicle.daily_rate * Math.ceil((new Date(returnDate).getTime() - new Date(pickupDate).getTime()) / (1000 * 60 * 60 * 24))).toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-3 pt-4">
+                <Button 
+                  variant="outline" 
+                  className="flex-1"
+                  onClick={() => setIsModalOpen(false)}
+                >
+                  Close
+                </Button>
+                <Button 
+                  className="flex-1"
+                  onClick={() => {
+                    onVehicleSelect(selectedVehicle.id);
+                    setIsModalOpen(false);
+                  }}
+                >
+                  {selectedVehicleId === selectedVehicle.id ? 'Selected' : 'Select This Vehicle'}
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 };
