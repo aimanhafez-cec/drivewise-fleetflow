@@ -173,7 +173,7 @@ export const TicketsTab: React.FC<TicketsTabProps> = ({ agreementId, customerId,
         <h3 className="text-lg font-semibold text-white">Traffic Tickets</h3>
         <Dialog open={ticketModalOpen} onOpenChange={setTicketModalOpen}>
           <DialogTrigger asChild>
-            <Button id="btn-ticket-add" onClick={resetForm}>
+            <Button id="btn-ticket-add" onClick={resetForm} className="text-white">
               <Plus className="h-4 w-4 mr-2" />
               Add Ticket
             </Button>
@@ -368,10 +368,10 @@ export const TicketsTab: React.FC<TicketsTabProps> = ({ agreementId, customerId,
               </div>
 
               <div className="flex justify-end gap-2 pt-4">
-                <Button variant="outline" onClick={() => setTicketModalOpen(false)}>
+                <Button variant="outline" onClick={() => setTicketModalOpen(false)} className="text-white">
                   Cancel
                 </Button>
-                <Button onClick={handleSubmit} disabled={!isFormValid()}>
+                <Button onClick={handleSubmit} disabled={!isFormValid()} className="text-white">
                   Add Ticket
                 </Button>
               </div>
@@ -425,6 +425,7 @@ export const TicketsTab: React.FC<TicketsTabProps> = ({ agreementId, customerId,
                               size="sm"
                               variant="outline"
                               onClick={() => handleMarkPaid(ticket.id)}
+                              className="text-white"
                             >
                               Mark Paid
                             </Button>
@@ -432,6 +433,7 @@ export const TicketsTab: React.FC<TicketsTabProps> = ({ agreementId, customerId,
                               size="sm"
                               variant="outline"
                               onClick={() => handleDispute(ticket.id)}
+                              className="text-white"
                             >
                               Dispute
                             </Button>
@@ -439,6 +441,7 @@ export const TicketsTab: React.FC<TicketsTabProps> = ({ agreementId, customerId,
                               size="sm"
                               variant="outline"
                               onClick={() => handleTransfer(ticket.id)}
+                              className="text-white"
                             >
                               Transfer
                             </Button>
