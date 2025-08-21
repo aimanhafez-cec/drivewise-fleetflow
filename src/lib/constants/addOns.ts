@@ -37,7 +37,7 @@ export const availableAddOns: AddOn[] = [
   {
     id: 'off_road_insurance',
     name: 'Off-Road Insurance',
-    description: 'Coverage for off-road driving adventures',
+    description: 'Coverage for off-road driving adventures - included with premium price-list',
     amount: 50,
     isFlat: false,
     category: 'Insurance & Protection',
@@ -46,7 +46,7 @@ export const availableAddOns: AddOn[] = [
   {
     id: 'roadside_assistance',
     name: 'Roadside Assistance (Premium)',
-    description: '24/7 premium roadside assistance service',
+    description: '24/7 premium roadside assistance service - included with premium price-list',
     amount: 10,
     isFlat: false,
     category: 'Insurance & Protection',
@@ -67,7 +67,7 @@ export const availableAddOns: AddOn[] = [
   {
     id: 'gps_navigation',
     name: 'GPS Navigation',
-    description: 'Turn-by-turn GPS navigation system',
+    description: 'Turn-by-turn GPS navigation system - included with premium price-list',
     amount: 15,
     isFlat: false,
     category: 'Equipment & Accessories',
@@ -107,7 +107,7 @@ export const availableAddOns: AddOn[] = [
   {
     id: 'delivery_collection',
     name: 'Delivery & Collection Service',
-    description: 'Vehicle delivery and collection service',
+    description: 'Vehicle delivery and collection service - included with premium price-list',
     amount: 100,
     isFlat: true,
     category: 'Delivery Services',

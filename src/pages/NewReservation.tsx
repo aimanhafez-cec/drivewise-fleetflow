@@ -431,6 +431,27 @@ const NewReservation = () => {
     }
   }, [formData.vehicleClassId, formData.vehicleId, formData.checkOutDate, formData.checkInDate]);
 
+  // Calculate total days when check-in/check-out dates change
+  useEffect(() => {
+    if (formData.checkOutDate && formData.checkInDate) {
+      const totalHours = Math.ceil((formData.checkInDate.getTime() - formData.checkOutDate.getTime()) / (1000 * 60 * 60));
+      const totalDays = Math.ceil(totalHours / 24);
+      updateFormData('totalDays', totalDays);
+      
+      // Recalculate add-on charges based on new total days
+      if (formData.selectedMiscCharges && formData.selectedMiscCharges.length > 0) {
+        const newCharges: Record<string, number> = {};
+        formData.selectedMiscCharges.forEach(addOnId => {
+          const addOn = availableAddOns.find(a => a.id === addOnId);
+          if (addOn) {
+            newCharges[addOnId] = calculateAddOnCost(addOn, totalDays);
+          }
+        });
+        updateFormData('addOnCharges', newCharges);
+      }
+    }
+  }, [formData.checkOutDate, formData.checkInDate]);
+
   // Monitor pricing context changes to show reprice banner
   useEffect(() => {
     const pricingHash = JSON.stringify({
