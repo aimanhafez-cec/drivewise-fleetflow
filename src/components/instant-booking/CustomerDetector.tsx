@@ -173,8 +173,8 @@ const CustomerDetector: React.FC<CustomerDetectorProps> = ({
   };
   return <Card className="shadow-card">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Users className="h-5 w-5" />
+        <CardTitle className="flex items-center gap-2 text-card-foreground">
+          <Users className="h-5 w-5 text-card-foreground" />
           Customer Information
         </CardTitle>
       </CardHeader>
@@ -187,9 +187,9 @@ const CustomerDetector: React.FC<CustomerDetectorProps> = ({
               <div className="flex items-center gap-3">
                 <CheckCircle className="h-8 w-8 text-primary" />
                 <div>
-                  <h3 className="font-semibold text-lg">{selectedCustomer.full_name}</h3>
-                  <p className="text-muted-foreground">{selectedCustomer.email}</p>
-                  {selectedCustomer.phone && <p className="text-sm text-muted-foreground">{selectedCustomer.phone}</p>}
+                  <h3 className="font-semibold text-lg text-card-foreground">{selectedCustomer.full_name}</h3>
+                  <p className="text-card-foreground/70">{selectedCustomer.email}</p>
+                  {selectedCustomer.phone && <p className="text-sm text-card-foreground/70">{selectedCustomer.phone}</p>}
                 </div>
               </div>
               <div className="text-right space-y-2">
@@ -197,7 +197,7 @@ const CustomerDetector: React.FC<CustomerDetectorProps> = ({
                   {getCustomerTypeIcon(selectedCustomer.customer_type)}
                   <span className="ml-1">{getCustomerTypeDisplay(selectedCustomer.customer_type)}</span>
                 </Badge>
-                <div className="text-sm text-muted-foreground">
+                <div className="text-sm text-card-foreground/70">
                   {selectedCustomer.total_rentals || 0} previous rentals
                 </div>
               </div>
@@ -210,41 +210,46 @@ const CustomerDetector: React.FC<CustomerDetectorProps> = ({
       // Customer Selection/Creation
       <Tabs defaultValue="existing" className="w-full">
             <TabsList className="grid w-full grid-cols-2 bg-transparent">
-              <TabsTrigger value="existing">Existing Customer</TabsTrigger>
-              <TabsTrigger value="new">New Customer</TabsTrigger>
+              <TabsTrigger value="existing" className="text-card-foreground data-[state=active]:text-card-foreground">Existing Customer</TabsTrigger>
+              <TabsTrigger value="new" className="text-card-foreground data-[state=active]:text-card-foreground">New Customer</TabsTrigger>
             </TabsList>
 
             <TabsContent value="existing" className="space-y-4">
               {/* Search */}
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input placeholder="Search by name, email, or phone..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-10" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-card-foreground/50" />
+                <Input 
+                  placeholder="Search by name, email, or phone..." 
+                  value={searchTerm} 
+                  onChange={e => setSearchTerm(e.target.value)} 
+                  className="pl-10 text-card-foreground placeholder:text-card-foreground/50 bg-card/50 border-card-foreground/20" 
+                />
               </div>
 
               {/* Search Results */}
               {isSearching ? <div className="space-y-2">
                   {[...Array(3)].map((_, i) => <div key={i} className="animate-pulse bg-muted h-16 rounded-lg"></div>)}
                 </div> : searchResults.length > 0 ? <div className="space-y-2 max-h-64 overflow-y-auto">
-                  {searchResults.map(customer => <div key={customer.id} className="p-3 border rounded-lg hover:bg-muted/50 cursor-pointer transition-colors" onClick={() => onCustomerSelect(customer)}>
+                  {searchResults.map(customer => <div key={customer.id} className="p-3 border border-card-foreground/20 rounded-lg hover:bg-card-foreground/10 cursor-pointer transition-colors" onClick={() => onCustomerSelect(customer)}>
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
-                          <h4 className="font-medium">{customer.full_name}</h4>
-                          <p className="text-sm text-muted-foreground">{customer.email}</p>
-                          {customer.phone && <p className="text-xs text-muted-foreground">{customer.phone}</p>}
+                          <h4 className="font-medium text-card-foreground">{customer.full_name}</h4>
+                          <p className="text-sm text-card-foreground/70">{customer.email}</p>
+                          {customer.phone && <p className="text-xs text-card-foreground/70">{customer.phone}</p>}
                         </div>
                         <div className="flex flex-col items-end gap-1">
                           <Badge className={getCustomerTypeColor(customer.customer_type)} variant="outline">
                             {getCustomerTypeDisplay(customer.customer_type)}
                           </Badge>
-                          <span className="text-xs text-muted-foreground">
+                          <span className="text-xs text-card-foreground/70">
                             {customer.total_rentals || 0} rentals
                           </span>
                         </div>
                       </div>
                     </div>)}
-                </div> : searchTerm.length >= 2 ? <div className="text-center py-8 text-muted-foreground">
+                </div> : searchTerm.length >= 2 ? <div className="text-center py-8 text-card-foreground/70">
                   No customers found matching "{searchTerm}"
-                </div> : <div className="text-center py-8 text-muted-foreground">
+                </div> : <div className="text-center py-8 text-card-foreground/70">
                   Start typing to search for customers
                 </div>}
             </TabsContent>
@@ -252,14 +257,19 @@ const CustomerDetector: React.FC<CustomerDetectorProps> = ({
             <TabsContent value="new" className="space-y-6">
               {/* Basic Information */}
               <div>
-                <h4 className="text-sm font-medium text-muted-foreground mb-3">Basic Information</h4>
+                <h4 className="text-sm font-medium text-card-foreground mb-3">Basic Information</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="new-name">Full Name *</Label>
-                    <Input id="new-name" value={newCustomer.full_name} onChange={e => setNewCustomer(prev => ({
-                      ...prev,
-                      full_name: e.target.value
-                    }))} className="mt-1" />
+                    <Label htmlFor="new-name" className="text-card-foreground">Full Name *</Label>
+                    <Input 
+                      id="new-name" 
+                      value={newCustomer.full_name} 
+                      onChange={e => setNewCustomer(prev => ({
+                        ...prev,
+                        full_name: e.target.value
+                      }))} 
+                      className="mt-1 text-card-foreground bg-card/50 border-card-foreground/20" 
+                    />
                   </div>
                   <div>
                     <Label htmlFor="new-email">Email *</Label>
