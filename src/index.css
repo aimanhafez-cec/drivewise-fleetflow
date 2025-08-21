@@ -6,72 +6,71 @@
 
 @layer base {
   :root {
-    /* Fleet Management Color Palette */
-    --background: 0 0% 100%;
-    --foreground: 213 27% 8%;
+    /* Corporate Teal Dashboard Theme */
+    --background: 183 85% 20%; /* #075E61 - Background teal */
+    --foreground: 0 0% 100%; /* #FFFFFF - Primary text */
 
-    --card: 0 0% 100%;
-    --card-foreground: 213 27% 8%;
+    --card: 182 85% 26%; /* #0A7A7D - Card background */
+    --card-foreground: 0 0% 100%; /* #FFFFFF */
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 213 27% 8%;
+    --popover: 182 85% 26%;
+    --popover-foreground: 0 0% 100%;
 
-    /* Automotive Navy Primary */
-    --primary: 213 94% 12%;
-    --primary-foreground: 0 0% 98%;
-    --primary-light: 213 50% 25%;
-    --primary-glow: 213 60% 35%;
+    /* Corporate Teal Primary Colors */
+    --primary: 181 100% 25%; /* #007C7E - Light teal overlay */
+    --primary-foreground: 0 0% 100%;
+    --primary-light: 181 99% 31%; /* #019C9E - Lighter teal overlay */
+    --primary-glow: 180 61% 51%; /* #33CFCF - Accent icons/hover */
 
-    /* Silver/Gray Secondary */
-    --secondary: 220 14% 96%;
-    --secondary-foreground: 213 27% 8%;
+    /* Header and Secondary Elements */
+    --secondary: 0 0% 17%; /* #2B2B2B - Header bar */
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 220 14% 96%;
-    --muted-foreground: 215 16% 47%;
+    --muted: 183 31% 85%; /* #C7E4E5 - Secondary/muted text */
+    --muted-foreground: 183 31% 85%;
 
-    --accent: 220 14% 96%;
-    --accent-foreground: 213 27% 8%;
+    --accent: 180 61% 51%; /* #33CFCF - Accent color */
+    --accent-foreground: 0 0% 100%;
 
-    /* Fleet Status Colors */
+    /* Corporate Teal Status Colors */
     --available: 142 69% 38%;
     --available-foreground: 0 0% 100%;
     --maintenance: 48 96% 53%;
-    --maintenance-foreground: 213 27% 8%;
-    --reserved: 213 94% 12%;
-    --reserved-foreground: 0 0% 98%;
-    --rented: 25 95% 53%;
+    --maintenance-foreground: 0 0% 100%;
+    --reserved: 181 100% 25%;
+    --reserved-foreground: 0 0% 100%;
+    --rented: 180 61% 51%;
     --rented-foreground: 0 0% 100%;
     --out-of-service: 0 84% 60%;
     --out-of-service-foreground: 0 0% 100%;
 
-    /* Automotive Accent Colors */
-    --orange-accent: 25 95% 53%;
-    --orange-accent-foreground: 0 0% 100%;
-    --blue-accent: 213 94% 50%;
-    --blue-accent-foreground: 0 0% 100%;
+    /* Dashboard Accent Colors */
+    --teal-overlay: 181 100% 25%; /* #007C7E */
+    --teal-light: 181 99% 31%; /* #019C9E */
+    --teal-accent: 180 61% 51%; /* #33CFCF */
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 213 94% 12%;
+    --border: 181 99% 31%;
+    --input: 0 0% 100%;
+    --ring: 180 61% 51%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
-    /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
-    --gradient-dashboard: linear-gradient(180deg, hsl(var(--background)), hsl(220 14% 98%));
-    --gradient-fleet: linear-gradient(135deg, hsl(var(--available)), hsl(var(--blue-accent)));
+    /* Corporate Teal Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(181 100% 25%), hsl(180 61% 51%));
+    --gradient-dashboard: linear-gradient(180deg, hsl(183 85% 20%), hsl(181 100% 25%));
+    --gradient-card: linear-gradient(135deg, rgba(10,122,125,0.9), rgba(1,156,158,0.8));
 
-    /* Shadows */
-    --shadow-elegant: 0 10px 30px -10px hsl(var(--primary) / 0.2);
-    --shadow-fleet: 0 8px 25px -8px hsl(var(--blue-accent) / 0.3);
-    --shadow-card: 0 4px 12px -4px hsl(var(--primary) / 0.1);
+    /* Elegant Shadows */
+    --shadow-elegant: 0 10px 30px -10px rgba(0,0,0,0.3);
+    --shadow-card: 0 8px 25px -8px rgba(0,0,0,0.2);
+    --shadow-soft: 0 4px 12px -4px rgba(0,0,0,0.15);
 
-    /* Animations */
+    /* Smooth Animations */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-dashboard: all 0.2s ease-out;
+    --transition-quick: all 0.2s ease-out;
 
     --sidebar-background: 0 0% 98%;
 
@@ -90,42 +89,44 @@
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
+  /* Dark mode maintains the same corporate teal theme */
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    --background: 183 85% 20%; /* Same teal background */
+    --foreground: 0 0% 100%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 182 85% 26%;
+    --card-foreground: 0 0% 100%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 182 85% 26%;
+    --popover-foreground: 0 0% 100%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 181 100% 25%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 0 0% 17%;
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 183 31% 85%;
+    --muted-foreground: 183 31% 85%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 180 61% 51%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
+    --border: 181 99% 31%;
+    --input: 0 0% 100%;
+    --ring: 180 61% 51%;
+    
+    --sidebar-background: 181 100% 25%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 180 61% 51%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-accent: 181 99% 31%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 181 99% 31%;
+    --sidebar-ring: 180 61% 51%;
   }
 }
 
@@ -136,5 +137,102 @@
 
   body {
     @apply bg-background text-foreground;
+  }
+
+  /* Corporate Teal Dashboard Enhancements */
+  .shadow-soft {
+    box-shadow: var(--shadow-soft);
+  }
+
+  .shadow-card {
+    box-shadow: var(--shadow-card);
+  }
+
+  .shadow-elegant {
+    box-shadow: var(--shadow-elegant);
+  }
+
+  /* Smooth transitions for dashboard elements */
+  .transition-dashboard {
+    transition: var(--transition-smooth);
+  }
+
+  /* Custom scrollbar for teal theme */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: rgba(0, 124, 126, 0.1);
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--teal-accent));
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--teal-light));
+  }
+
+  /* Mobile responsive adjustments */
+  @media (max-width: 768px) {
+    .mobile-grid {
+      grid-template-columns: 1fr !important;
+    }
+    
+    .mobile-sidebar {
+      position: fixed;
+      top: 4rem;
+      left: 0;
+      height: calc(100vh - 4rem);
+      z-index: 50;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease-in-out;
+    }
+    
+    .mobile-sidebar.open {
+      transform: translateX(0);
+    }
+  }
+
+  /* Card hover animations */
+  .app-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .app-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px -12px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Icon glow effect */
+  .icon-glow:hover {
+    filter: drop-shadow(0 0 8px hsl(var(--teal-accent)));
+  }
+
+  /* Tab underline animation */
+  .tab-underline {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .tab-underline::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: hsl(var(--teal-accent));
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s ease;
+  }
+
+  .tab-underline.active::after {
+    transform: scaleX(1);
+    transform-origin: left;
   }
 }

@@ -54,7 +54,7 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
-				/* Fleet Status Colors */
+				/* Corporate Teal Theme Colors */
 				available: {
 					DEFAULT: 'hsl(var(--available))',
 					foreground: 'hsl(var(--available-foreground))'
@@ -75,13 +75,17 @@ export default {
 					DEFAULT: 'hsl(var(--out-of-service))',
 					foreground: 'hsl(var(--out-of-service-foreground))'
 				},
-				'orange-accent': {
-					DEFAULT: 'hsl(var(--orange-accent))',
-					foreground: 'hsl(var(--orange-accent-foreground))'
+				'teal-overlay': {
+					DEFAULT: 'hsl(var(--teal-overlay))',
+					foreground: 'hsl(var(--foreground))'
 				},
-				'blue-accent': {
-					DEFAULT: 'hsl(var(--blue-accent))',
-					foreground: 'hsl(var(--blue-accent-foreground))'
+				'teal-light': {
+					DEFAULT: 'hsl(var(--teal-light))',
+					foreground: 'hsl(var(--foreground))'
+				},
+				'teal-accent': {
+					DEFAULT: 'hsl(var(--teal-accent))',
+					foreground: 'hsl(var(--foreground))'
 				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
