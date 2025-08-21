@@ -2075,7 +2075,7 @@ const NewReservation = () => {
 
       {/* Right Sidebar - Summary */}
       <div className="lg:w-96 space-y-6">
-        <div className="sticky top-6">
+        <div className="sticky top-4 z-10">
           <SummaryCard summary={summary} currencyCode="AED" />
         </div>
       </div>
