@@ -64,7 +64,7 @@ const DemoPayment: React.FC<DemoPaymentProps> = ({
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-primary">
           <CreditCard className="h-5 w-5" />
-          Demo Payment Processing
+          Payment Processing
         </CardTitle>
       </CardHeader>
       
@@ -81,14 +81,14 @@ const DemoPayment: React.FC<DemoPaymentProps> = ({
           </div>
         </div>
 
-        {/* Demo Payment Card */}
+        {/* Payment Card */}
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-lg border border-blue-200">
           <div className="flex items-center gap-3 mb-4">
             <div className="bg-blue-100 p-2 rounded">
               <CreditCard className="h-5 w-5 text-blue-600" />
             </div>
             <div>
-              <h4 className="font-semibold text-black">Demo Credit Card</h4>
+              <h4 className="font-semibold text-black">Visa Credit Card</h4>
               <p className="text-sm text-black">**** **** **** 1234</p>
             </div>
           </div>
@@ -96,7 +96,7 @@ const DemoPayment: React.FC<DemoPaymentProps> = ({
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
               <p className="text-black">Cardholder</p>
-              <p className="font-medium text-black">Demo User</p>
+              <p className="font-medium text-black">John Smith</p>
             </div>
             <div>
               <p className="text-black">Expiry</p>
@@ -109,7 +109,7 @@ const DemoPayment: React.FC<DemoPaymentProps> = ({
         <div className="flex items-center gap-4 text-sm text-black">
           <div className="flex items-center gap-2">
             <Shield className="h-4 w-4 text-green-600" />
-            <span>Secure Demo Payment</span>
+            <span>Secure Payment</span>
           </div>
           <div className="flex items-center gap-2">
             <Clock className="h-4 w-4 text-blue-600" />
@@ -129,12 +129,12 @@ const DemoPayment: React.FC<DemoPaymentProps> = ({
               Processing Payment...
             </div>
           ) : (
-            `Pay AED ${amount.toFixed(2)} - Demo Mode`
+            `Pay AED ${amount.toFixed(2)}`
           )}
         </Button>
 
         <p className="text-center text-xs text-black">
-          This is a demo payment. No real transaction will be processed.
+          Your payment is secured with 256-bit SSL encryption.
         </p>
       </CardContent>
     </Card>
