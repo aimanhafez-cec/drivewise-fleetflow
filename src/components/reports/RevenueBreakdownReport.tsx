@@ -2,11 +2,13 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from '@/components/ui/chart';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
 import { DateRange } from 'react-day-picker';
 import { formatCurrency } from '@/lib/utils/currency';
 import { TrendingUp, TrendingDown, DollarSign, MapPin } from 'lucide-react';
+import { MONTHLY_TRENDS_CONFIG, VEHICLE_CATEGORY_COLORS } from '@/lib/chartConfig';
+import { currencyTooltipFormatter, formatMonth } from '@/lib/utils/chartUtils';
 
 interface RevenueBreakdownReportProps {
   dateRange?: DateRange;
@@ -166,26 +168,55 @@ const RevenueBreakdownReport = ({ dateRange }: RevenueBreakdownReportProps) => {
         </CardHeader>
         <CardContent>
           <ChartContainer
-            config={{
-              revenue: { label: 'Revenue', color: chartColors.revenue },
-              bookings: { label: 'Bookings', color: chartColors.bookings }
-            }}
+            config={MONTHLY_TRENDS_CONFIG}
             className="h-[400px]"
           >
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={monthlyRevenue}>
+              <LineChart data={monthlyRevenue} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
-                <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                <YAxis yAxisId="left" stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                <YAxis yAxisId="right" orientation="right" stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                <ChartTooltip 
-                  content={<ChartTooltipContent formatter={(value, name) => [
-                    name === 'revenue' ? formatCurrency(Number(value)) : value, 
-                    name === 'revenue' ? 'Revenue' : 'Bookings'
-                  ]} />} 
+                <XAxis 
+                  dataKey="month" 
+                  stroke="hsl(var(--muted-foreground))" 
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
                 />
-                <Bar yAxisId="right" dataKey="bookings" fill={chartColors.bookings} opacity={0.7} radius={[4, 4, 0, 0]} />
-                <Line yAxisId="left" type="monotone" dataKey="revenue" stroke={chartColors.revenue} strokeWidth={3} dot={{ fill: chartColors.revenue, strokeWidth: 2, r: 6 }} />
+                <YAxis 
+                  yAxisId="left"
+                  stroke="hsl(var(--muted-foreground))" 
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                  tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
+                />
+                <YAxis 
+                  yAxisId="right" 
+                  orientation="right" 
+                  stroke="hsl(var(--muted-foreground))" 
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <ChartTooltip 
+                  content={<ChartTooltipContent formatter={currencyTooltipFormatter} />} 
+                />
+                <ChartLegend content={<ChartLegendContent />} />
+                <Line
+                  yAxisId="left"
+                  type="monotone"
+                  dataKey="revenue"
+                  stroke={MONTHLY_TRENDS_CONFIG.revenue.color}
+                  strokeWidth={3}
+                  dot={{ fill: MONTHLY_TRENDS_CONFIG.revenue.color, strokeWidth: 2, r: 6 }}
+                />
+                <Line
+                  yAxisId="right"
+                  type="monotone"
+                  dataKey="bookings"
+                  stroke={MONTHLY_TRENDS_CONFIG.bookings.color}
+                  strokeWidth={3}
+                  dot={{ fill: MONTHLY_TRENDS_CONFIG.bookings.color, strokeWidth: 2, r: 6 }}
+                />
               </LineChart>
             </ResponsiveContainer>
           </ChartContainer>
@@ -203,9 +234,9 @@ const RevenueBreakdownReport = ({ dateRange }: RevenueBreakdownReportProps) => {
             <ChartContainer
               config={bookingTypeRevenue.reduce((acc, item, index) => ({
                 ...acc,
-                [item.type]: { 
+                [item.type.toLowerCase()]: { 
                   label: item.type.replace('_', ' ').toUpperCase(), 
-                  color: pieColors[index % pieColors.length] 
+                  color: VEHICLE_CATEGORY_COLORS[index % VEHICLE_CATEGORY_COLORS.length] 
                 }
               }), {})}
               className="h-[300px]"
@@ -221,16 +252,20 @@ const RevenueBreakdownReport = ({ dateRange }: RevenueBreakdownReportProps) => {
                     paddingAngle={5}
                     dataKey="revenue"
                     nameKey="type"
-                    label={({ type, value, percent }) => `${type}: ${(percent * 100).toFixed(0)}%`}
-                    labelLine={false}
                   >
                     {bookingTypeRevenue.map((_, index) => (
-                      <Cell key={`cell-${index}`} fill={pieColors[index % pieColors.length]} stroke="hsl(var(--background))" strokeWidth={2} />
+                      <Cell 
+                        key={`cell-${index}`} 
+                        fill={VEHICLE_CATEGORY_COLORS[index % VEHICLE_CATEGORY_COLORS.length]} 
+                        stroke="hsl(var(--background))" 
+                        strokeWidth={2} 
+                      />
                     ))}
                   </Pie>
                   <ChartTooltip 
-                    content={<ChartTooltipContent formatter={(value) => [formatCurrency(Number(value)), 'Revenue']} />} 
+                    content={<ChartTooltipContent formatter={currencyTooltipFormatter} />} 
                   />
+                  <ChartLegend content={<ChartLegendContent />} />
                 </PieChart>
               </ResponsiveContainer>
             </ChartContainer>
@@ -246,19 +281,38 @@ const RevenueBreakdownReport = ({ dateRange }: RevenueBreakdownReportProps) => {
           <CardContent>
             <ChartContainer
               config={{
-                revenue: { label: 'Revenue', color: chartColors.revenue }
+                revenue: { label: 'Revenue', color: "hsl(142, 76%, 36%)" }
               }}
               className="h-[300px]"
             >
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={locationRevenue} layout="horizontal">
+                <BarChart data={locationRevenue} layout="horizontal" margin={{ top: 20, right: 30, left: 80, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
-                  <XAxis type="number" stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                  <YAxis dataKey="location" type="category" width={100} stroke="hsl(var(--muted-foreground))" fontSize={11} />
-                  <ChartTooltip 
-                    content={<ChartTooltipContent formatter={(value) => [formatCurrency(Number(value)), 'Revenue']} />} 
+                  <XAxis 
+                    type="number" 
+                    stroke="hsl(var(--muted-foreground))" 
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                    tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
                   />
-                  <Bar dataKey="revenue" fill={chartColors.revenue} radius={[0, 4, 4, 0]} />
+                  <YAxis 
+                    dataKey="location" 
+                    type="category" 
+                    width={100} 
+                    stroke="hsl(var(--muted-foreground))" 
+                    fontSize={11}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <ChartTooltip 
+                    content={<ChartTooltipContent formatter={currencyTooltipFormatter} />} 
+                  />
+                  <Bar 
+                    dataKey="revenue" 
+                    fill="hsl(142, 76%, 36%)" 
+                    radius={[0, 4, 4, 0]} 
+                  />
                 </BarChart>
               </ResponsiveContainer>
             </ChartContainer>
