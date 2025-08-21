@@ -19,15 +19,15 @@ export interface InstantBookingData {
 export const useInstantBooking = () => {
   const { toast } = useToast();
 
-  const createInstantBooking = useMutation({
-    mutationFn: async (bookingData: InstantBookingData) => {
-      // First generate reservation number
+  // Convert booking to agreement and create demo payment flow
+  const convertToAgreement = async (bookingData: InstantBookingData) => {
+    try {
+      // First create the reservation
       const { data: reservationNumber, error: numberError } = await supabase
         .rpc('generate_reservation_no');
 
       if (numberError) throw numberError;
 
-      // Create the reservation
       const reservationPayload = {
         ro_number: reservationNumber,
         customer_id: bookingData.customerId,
@@ -40,8 +40,8 @@ export const useInstantBooking = () => {
         add_ons: bookingData.selectedAddOns || [],
         booking_type: 'INSTANT' as const,
         auto_approved: bookingData.pricing?.autoApproved || false,
-        instant_booking_score: 100, // High score for instant bookings
-        status: bookingData.pricing?.autoApproved ? 'confirmed' as const : 'pending' as const,
+        instant_booking_score: 100,
+        status: 'confirmed' as const,
       };
 
       const { data: reservation, error: reservationError } = await supabase
@@ -52,7 +52,51 @@ export const useInstantBooking = () => {
 
       if (reservationError) throw reservationError;
 
-      // Create instant booking profile if it doesn't exist
+      // Generate agreement number
+      const { data: agreementNo, error: agreementNoError } = await supabase
+        .rpc('generate_agreement_no');
+
+      if (agreementNoError) throw agreementNoError;
+
+      // Create agreement with auto-filled details
+      const { data: agreement, error: agreementError } = await supabase
+        .from('agreements')
+        .insert({
+          agreement_no: agreementNo,
+          customer_id: bookingData.customerId,
+          vehicle_id: bookingData.vehicleId,
+          reservation_id: reservation.id,
+          agreement_date: new Date().toISOString().split('T')[0],
+          checkout_datetime: bookingData.pickupDate,
+          return_datetime: bookingData.returnDate,
+          total_amount: bookingData.pricing?.totalAmount || 0,
+          status: 'active',
+          add_ons: bookingData.selectedAddOns || [],
+        })
+        .select()
+        .single();
+
+      if (agreementError) throw agreementError;
+
+      // Create agreement line
+      await supabase
+        .from('agreement_lines')
+        .insert({
+          agreement_id: agreement.id,
+          vehicle_id: bookingData.vehicleId,
+          check_out_at: bookingData.pickupDate,
+          check_in_at: bookingData.returnDate,
+          line_net: bookingData.pricing?.baseAmount || 0,
+          line_total: bookingData.pricing?.totalAmount || 0,
+        });
+
+      // Update reservation with agreement reference
+      await supabase
+        .from('reservations')
+        .update({ converted_agreement_id: agreement.id })
+        .eq('id', reservation.id);
+
+      // Create instant booking profile
       await supabase
         .from('instant_booking_profiles')
         .upsert({
@@ -61,19 +105,30 @@ export const useInstantBooking = () => {
           default_rental_duration: `${Math.ceil((new Date(bookingData.returnDate).getTime() - new Date(bookingData.pickupDate).getTime()) / (1000 * 60 * 60 * 24))} days`,
         });
 
-      return reservation;
-    },
+      return {
+        reservation,
+        agreement,
+        agreementNo
+      };
+    } catch (error) {
+      console.error('Agreement creation error:', error);
+      throw error;
+    }
+  };
+
+  const createInstantBooking = useMutation({
+    mutationFn: convertToAgreement,
     onSuccess: (data) => {
       toast({
-        title: "Instant Booking Successful!",
-        description: `Reservation ${data.ro_number} has been created`,
+        title: "Agreement Created!",
+        description: `Agreement ${data.agreementNo} has been created and is ready for payment`,
       });
     },
     onError: (error) => {
-      console.error('Instant booking error:', error);
+      console.error('Agreement creation error:', error);
       toast({
-        title: "Booking Failed",
-        description: "Unable to complete instant booking. Please try again.",
+        title: "Agreement Creation Failed",
+        description: "Unable to create agreement. Please try again.",
         variant: "destructive",
       });
     },
