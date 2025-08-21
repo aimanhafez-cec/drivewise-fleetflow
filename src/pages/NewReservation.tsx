@@ -41,6 +41,7 @@ import { useReservationValidation } from '@/hooks/useReservationValidation';
 import { BillToSelector, BillToData, BillToType, BillToMeta } from '@/components/ui/bill-to-selector';
 import { useVehicles, useVehicleCategories, formatVehicleDisplay } from '@/hooks/useVehicles';
 import { Driver } from '@/hooks/useDrivers';
+import { availableAddOns, categorizeAddOns, calculateAddOnCost, addOnCategories } from '@/lib/constants/addOns';
 const STORAGE_KEY = 'new-reservation-draft';
 
 // Extended interfaces for new sections
@@ -120,8 +121,9 @@ interface ExtendedFormData extends ReservationFormData {
   totalDays: number;
   totalKilometerAllowed: number;
 
-  // Miscellaneous Charges
+  // Miscellaneous Charges (Add-ons)
   selectedMiscCharges: string[];
+  addOnCharges: Record<string, number>;
 
   // Bill To
   bill_to_type: BillToType;
@@ -230,6 +232,7 @@ const NewReservation = () => {
     totalDays: 0,
     totalKilometerAllowed: 0,
     selectedMiscCharges: [],
+    addOnCharges: {},
     bill_to_type: 'CUSTOMER',
     bill_to_id: null,
     bill_to_display: '',
@@ -1705,101 +1708,156 @@ const NewReservation = () => {
           </AccordionItem>
 
           {/* 5) Miscellaneous Charges */}
-          <Card className="shadow-card">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-card-foreground">
-                <Plus className="h-5 w-5 text-card-foreground" />
-                Miscellaneous Charges
+          <AccordionItem value="misc-charges" className="border rounded-lg">
+            <AccordionTrigger className="px-6 py-4 hover:no-underline">
+              <div className="flex items-center gap-2">
+                <Plus className="h-5 w-5" />
+                <span className="font-semibold text-foreground">Miscellaneous Charges</span>
                 {(formData.selectedMiscCharges || []).length > 0 && (
                   <Badge variant="secondary" className="ml-2">
                     {(formData.selectedMiscCharges || []).length} selected
                   </Badge>
                 )}
-              </CardTitle>
-              <CardDescription className="text-card-foreground/70">
-                Optional additional charges and services
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid gap-4">
-                {[{
-                  id: 'ldw',
-                  name: 'LDW (Loss Damage Waiver)',
-                  description: 'Protection against damage or theft - per day, no tax',
-                  amount: '750.00'
-                },
-                {
-                  id: 'drop-fee',
-                  name: 'Drop Fee',
-                  description: 'One-time fee for vehicle drop-off service',
-                  amount: '1500.00'
-                },
-                {
-                  id: 'under-age',
-                  name: 'Young Driver Surcharge',
-                  description: 'Additional fee for drivers under 25 years - no tax',
-                  amount: '450.00'
-                },
-                {
-                  id: 'valet',
-                  name: 'Valet Service',
-                  description: 'Professional valet parking service - per day',
-                  amount: '300.00'
-                },
-                {
-                  id: 'sli',
-                  name: 'Supplemental Liability Insurance',
-                  description: 'Additional liability coverage - fixed rate',
-                  amount: '2250.00'
-                }].map(charge => {
-                  const isSelected = (formData.selectedMiscCharges || []).includes(charge.id);
-                  
-                  return (
-                    <div
-                      key={charge.id}
-                      className={`
-                        relative p-4 border rounded-lg cursor-pointer transition-all hover:shadow-md
-                        ${isSelected 
-                          ? 'border-primary bg-primary/5 shadow-sm' 
-                          : 'border-card-foreground/20 bg-card hover:border-primary/50'
-                        }
-                      `}
-                      onClick={() => {
-                        if (isSelected) {
-                          updateFormData('selectedMiscCharges', (formData.selectedMiscCharges || []).filter(id => id !== charge.id));
-                        } else {
-                          updateFormData('selectedMiscCharges', [...(formData.selectedMiscCharges || []), charge.id]);
-                        }
-                      }}
-                    >
-                      <div className="flex items-start gap-4">
-                        <Checkbox 
-                          checked={isSelected}
-                          onChange={() => {}} // Controlled by parent click
-                          className="mt-1"
-                        />
-                        
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-2">
-                            <h4 className="font-medium text-card-foreground">{charge.name}</h4>
-                          </div>
-                          <p className="text-sm text-card-foreground/70 mb-3">
-                            {charge.description}
-                          </p>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="px-6 pb-6">
+              <div className="space-y-6">
+                {/* Add-ons Selection */}
+                <div className="space-y-8">
+                  {addOnCategories.map((category) => {
+                    const categoryAddOns = categorizeAddOns(category);
+                    if (categoryAddOns.length === 0) return null;
+
+                    return (
+                      <div key={category} className="space-y-4">
+                        <h3 className="font-semibold text-lg text-card-foreground border-b border-card-foreground/20 pb-2">
+                          {category}
+                        </h3>
+                        <div className="grid gap-4">
+                          {categoryAddOns.map((addOn) => {
+                            const isSelected = (formData.selectedMiscCharges || []).includes(addOn.id);
+                            const rentalDays = formData.totalDays || 1;
+                            const cost = calculateAddOnCost(addOn, rentalDays);
+                            const IconComponent = addOn.icon;
+
+                            return (
+                              <div
+                                key={addOn.id}
+                                className={`
+                                  relative p-4 border rounded-lg cursor-pointer transition-all hover:shadow-md
+                                  ${isSelected 
+                                    ? 'border-primary bg-primary/5 shadow-sm' 
+                                    : 'border-card-foreground/20 bg-card hover:border-primary/50'
+                                  }
+                                `}
+                                onClick={() => {
+                                  if (isSelected) {
+                                    const newSelected = (formData.selectedMiscCharges || []).filter(id => id !== addOn.id);
+                                    const newCharges = { ...formData.addOnCharges };
+                                    delete newCharges[addOn.id];
+                                    updateFormData('selectedMiscCharges', newSelected);
+                                    updateFormData('addOnCharges', newCharges);
+                                  } else {
+                                    const newSelected = [...(formData.selectedMiscCharges || []), addOn.id];
+                                    const newCharges = { ...formData.addOnCharges, [addOn.id]: cost };
+                                    updateFormData('selectedMiscCharges', newSelected);
+                                    updateFormData('addOnCharges', newCharges);
+                                  }
+                                }}
+                              >
+                                <div className="flex items-start gap-4">
+                                  <Checkbox 
+                                    checked={isSelected}
+                                    onChange={() => {}} // Controlled by parent click
+                                    className="mt-1"
+                                  />
+                                  
+                                  <div className="flex-1">
+                                    <div className="flex items-center gap-2 mb-2">
+                                      <IconComponent className="h-5 w-5 text-primary" />
+                                      <h4 className="font-medium text-card-foreground">{addOn.name}</h4>
+                                      {addOn.popular && (
+                                        <Badge variant="secondary" className="text-xs">
+                                          Popular
+                                        </Badge>
+                                      )}
+                                    </div>
+                                    <p className="text-sm text-card-foreground/70 mb-3">
+                                      {addOn.description}
+                                    </p>
+                                    
+                                    <div className="flex items-center justify-between">
+                                      <div className="text-lg font-bold text-red-600">
+                                        AED {cost.toFixed(0)}
+                                        {addOn.isFlat ? (
+                                          <span className="text-xs text-card-foreground/70 ml-1">(flat rate)</span>
+                                        ) : (
+                                          <span className="text-xs text-card-foreground/70 ml-1">
+                                            ({rentalDays} day{rentalDays > 1 ? 's' : ''} × AED {addOn.amount})
+                                          </span>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Selected Add-ons Summary */}
+                {(formData.selectedMiscCharges || []).length > 0 && (
+                  <Card className="shadow-card">
+                    <CardHeader>
+                      <CardTitle className="text-lg text-card-foreground">Selected Add-ons Summary</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                        {(formData.selectedMiscCharges || []).map((addOnId) => {
+                          const addOn = availableAddOns.find(a => a.id === addOnId);
+                          if (!addOn) return null;
                           
-                          <div className="flex items-center justify-between">
-                            <div className="text-lg font-bold text-red-600">
-                              AED {charge.amount}
+                          const rentalDays = formData.totalDays || 1;
+                          const cost = calculateAddOnCost(addOn, rentalDays);
+                          const IconComponent = addOn.icon;
+                          
+                          return (
+                            <div key={addOnId} className="flex items-center justify-between p-3 bg-card-foreground/5 rounded-lg border border-card-foreground/10">
+                              <div className="flex items-center gap-2 flex-1">
+                                <IconComponent className="h-4 w-4 text-primary" />
+                                <div className="flex-1 min-w-0">
+                                  <p className="font-medium text-sm truncate text-card-foreground">{addOn.name}</p>
+                                  <p className="text-xs text-card-foreground/70">
+                                    {addOn.isFlat ? 'Flat rate' : `AED ${addOn.amount}/day`}
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <p className="font-bold text-sm text-red-600">AED {cost.toFixed(0)}</p>
+                              </div>
                             </div>
+                          );
+                        })}
+                        
+                        <div className="border-t border-card-foreground/20 pt-3 mt-3">
+                          <div className="flex justify-between items-center">
+                            <span className="font-semibold text-card-foreground">Add-ons Total:</span>
+                            <span className="font-bold text-lg text-red-600">
+                              AED {Object.values(formData.addOnCharges || {}).reduce((sum, amount) => sum + amount, 0).toFixed(0)}
+                            </span>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    </CardContent>
+                  </Card>
+                )}
               </div>
-            </CardContent>
-          </Card>
+            </AccordionContent>
+          </AccordionItem>
 
           {/* 6) Rate & Taxes */}
           <AccordionItem value="rate-taxes" className="border rounded-lg">

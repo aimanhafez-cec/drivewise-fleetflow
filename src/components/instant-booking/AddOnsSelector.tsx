@@ -3,30 +3,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { 
-  Shield, 
-  Baby, 
-  Navigation, 
-  Wifi, 
-  UserPlus, 
-  PhoneCall, 
-  Mountain, 
-  Truck,
-  Clock,
-  Plus,
-  Minus
-} from 'lucide-react';
-
-interface AddOn {
-  id: string;
-  name: string;
-  description: string;
-  amount: number;
-  isFlat: boolean; // true for flat rate, false for daily rate
-  category: string;
-  icon: React.ComponentType<any>;
-  popular?: boolean;
-}
+import { Plus, Minus } from 'lucide-react';
+import { availableAddOns, categorizeAddOns, calculateAddOnCost, addOnCategories, AddOn } from '@/lib/constants/addOns';
 
 interface AddOnsSelectorProps {
   selectedAddOns: string[];
@@ -35,124 +13,15 @@ interface AddOnsSelectorProps {
   rentalDays?: number;
 }
 
-const availableAddOns: AddOn[] = [
-  // Insurance & Protection
-  {
-    id: 'cdw_scdw',
-    name: 'Collision Damage Waiver (CDW/SCDW)',
-    description: 'Protection against collision and comprehensive damage',
-    amount: 45,
-    isFlat: false,
-    category: 'Insurance & Protection',
-    icon: Shield,
-    popular: true
-  },
-  {
-    id: 'off_road_insurance',
-    name: 'Off-Road Insurance',
-    description: 'Coverage for off-road driving adventures',
-    amount: 50,
-    isFlat: false,
-    category: 'Insurance & Protection',
-    icon: Mountain
-  },
-  {
-    id: 'roadside_assistance',
-    name: 'Roadside Assistance (Premium)',
-    description: '24/7 premium roadside assistance service',
-    amount: 10,
-    isFlat: false,
-    category: 'Insurance & Protection',
-    icon: PhoneCall
-  },
-  
-  // Equipment & Accessories
-  {
-    id: 'child_seat',
-    name: 'Child Seat',
-    description: 'Safety-certified child car seat',
-    amount: 20,
-    isFlat: false,
-    category: 'Equipment & Accessories',
-    icon: Baby,
-    popular: true
-  },
-  {
-    id: 'gps_navigation',
-    name: 'GPS Navigation',
-    description: 'Turn-by-turn GPS navigation system',
-    amount: 15,
-    isFlat: false,
-    category: 'Equipment & Accessories',
-    icon: Navigation
-  },
-  {
-    id: 'wifi_hotspot',
-    name: 'Wi-Fi Hotspot',
-    description: 'Mobile internet hotspot device',
-    amount: 50,
-    isFlat: false,
-    category: 'Equipment & Accessories',
-    icon: Wifi
-  },
-  
-  // Driver Services
-  {
-    id: 'additional_driver',
-    name: 'Additional Driver',
-    description: 'Add an extra authorized driver',
-    amount: 25,
-    isFlat: false,
-    category: 'Driver Services',
-    icon: UserPlus
-  },
-  {
-    id: 'young_driver',
-    name: 'Young Driver Surcharge (under 24)',
-    description: 'Required surcharge for drivers under 24 years',
-    amount: 50,
-    isFlat: false,
-    category: 'Driver Services',
-    icon: Clock
-  },
-  
-  // Delivery Services
-  {
-    id: 'delivery_collection',
-    name: 'Delivery & Collection Service',
-    description: 'Vehicle delivery and collection service',
-    amount: 100,
-    isFlat: true,
-    category: 'Delivery Services',
-    icon: Truck,
-    popular: true
-  }
-];
-
 const AddOnsSelector: React.FC<AddOnsSelectorProps> = ({
   selectedAddOns = [],
   addOnCharges = {},
   onAddOnToggle,
   rentalDays = 1
 }) => {
-  const categorizeAddOns = (category: string) => {
-    return availableAddOns.filter(addOn => addOn.category === category);
-  };
-
   const getTotalAddOnAmount = () => {
     return Object.values(addOnCharges).reduce((sum, amount) => sum + amount, 0);
   };
-
-  const calculateAddOnCost = (addOn: AddOn) => {
-    return addOn.isFlat ? addOn.amount : addOn.amount * rentalDays;
-  };
-
-  const categories = [
-    'Insurance & Protection',
-    'Equipment & Accessories', 
-    'Driver Services',
-    'Delivery Services'
-  ];
 
   return (
     <div className="space-y-6">
@@ -168,7 +37,7 @@ const AddOnsSelector: React.FC<AddOnsSelectorProps> = ({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-8">
-          {categories.map((category) => {
+          {addOnCategories.map((category) => {
             const categoryAddOns = categorizeAddOns(category);
             if (categoryAddOns.length === 0) return null;
 
@@ -180,7 +49,7 @@ const AddOnsSelector: React.FC<AddOnsSelectorProps> = ({
                 <div className="grid gap-4">
                   {categoryAddOns.map((addOn) => {
                     const isSelected = selectedAddOns.includes(addOn.id);
-                    const cost = calculateAddOnCost(addOn);
+                    const cost = calculateAddOnCost(addOn, rentalDays);
                     const IconComponent = addOn.icon;
 
                     return (
@@ -252,7 +121,7 @@ const AddOnsSelector: React.FC<AddOnsSelectorProps> = ({
                 const addOn = availableAddOns.find(a => a.id === addOnId);
                 if (!addOn) return null;
                 
-                const cost = calculateAddOnCost(addOn);
+                const cost = calculateAddOnCost(addOn, rentalDays);
                 const IconComponent = addOn.icon;
                 
                 return (
