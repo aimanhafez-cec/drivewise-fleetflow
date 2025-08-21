@@ -234,7 +234,7 @@ export const TicketsTab: React.FC<TicketsTabProps> = ({ agreementId, customerId,
               {/* Authority and Type */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="authority">Issuing Authority *</Label>
+                  <Label htmlFor="authority" className="text-white">Issuing Authority *</Label>
                   <Input
                     id="authority"
                     value={formData.authority}
@@ -244,7 +244,7 @@ export const TicketsTab: React.FC<TicketsTabProps> = ({ agreementId, customerId,
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="typeCode">Type/Code *</Label>
+                  <Label htmlFor="typeCode" className="text-white">Type/Code *</Label>
                   <Input
                     id="typeCode"
                     value={formData.typeCode}
@@ -257,7 +257,7 @@ export const TicketsTab: React.FC<TicketsTabProps> = ({ agreementId, customerId,
               {/* Amount and Currency */}
               <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2 col-span-2">
-                  <Label htmlFor="amount">Amount *</Label>
+                  <Label htmlFor="amount" className="text-white">Amount *</Label>
                   <Input
                     id="amount"
                     type="number"
@@ -270,7 +270,7 @@ export const TicketsTab: React.FC<TicketsTabProps> = ({ agreementId, customerId,
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="currency">Currency *</Label>
+                  <Label htmlFor="currency" className="text-white">Currency *</Label>
                   <Select value={formData.currency} onValueChange={(value) => setFormData(prev => ({ ...prev, currency: value }))}>
                     <SelectTrigger>
                       <SelectValue />
@@ -285,7 +285,7 @@ export const TicketsTab: React.FC<TicketsTabProps> = ({ agreementId, customerId,
               {/* Status and Points */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="status">Status *</Label>
+                  <Label htmlFor="status" className="text-white">Status *</Label>
                   <Select value={formData.status} onValueChange={(value) => setFormData(prev => ({ ...prev, status: value }))}>
                     <SelectTrigger>
                       <SelectValue />
@@ -300,7 +300,7 @@ export const TicketsTab: React.FC<TicketsTabProps> = ({ agreementId, customerId,
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="points">Points</Label>
+                  <Label htmlFor="points" className="text-white">Points</Label>
                   <Input
                     id="points"
                     type="number"
@@ -314,7 +314,7 @@ export const TicketsTab: React.FC<TicketsTabProps> = ({ agreementId, customerId,
 
               {/* Due Date */}
               <div className="space-y-2">
-                <Label>Due Date</Label>
+                <Label className="text-white">Due Date</Label>
                 <Popover open={showDueCalendar} onOpenChange={setShowDueCalendar}>
                   <PopoverTrigger asChild>
                     <Button
@@ -350,14 +350,14 @@ export const TicketsTab: React.FC<TicketsTabProps> = ({ agreementId, customerId,
                   checked={formData.billToCustomer}
                   onCheckedChange={(checked) => setFormData(prev => ({ ...prev, billToCustomer: !!checked }))}
                 />
-                <Label htmlFor="billToCustomer" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                <Label htmlFor="billToCustomer" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-white">
                   Bill to Customer
                 </Label>
               </div>
 
               {/* Notes */}
               <div className="space-y-2">
-                <Label htmlFor="notes">Notes</Label>
+                <Label htmlFor="notes" className="text-white">Notes</Label>
                 <Textarea
                   id="notes"
                   value={formData.notes}
