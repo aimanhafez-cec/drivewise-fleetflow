@@ -1391,9 +1391,12 @@ const NewReservation = () => {
                         <SelectValue placeholder="Select tax level" />
                       </SelectTrigger>
                       <SelectContent>
-                        {options.taxLevels.map(option => <SelectItem key={option.id} value={option.id}>
-                            {option.label}
-                          </SelectItem>)}
+                        <SelectItem value="5-vat-standard">5% VAT – Standard Rental & Add-ons</SelectItem>
+                        <SelectItem value="no-vat-deposit">No VAT – Security Deposit (Refundable)</SelectItem>
+                        <SelectItem value="5-vat-forfeited">5% VAT – Forfeited Deposit / Damage Charges</SelectItem>
+                        <SelectItem value="5-vat-tolls">5% VAT – Tolls, Late Fees, Extra Charges</SelectItem>
+                        <SelectItem value="exempt-transport">Exempt – Domestic Passenger Transport (Taxi, Bus, etc.)</SelectItem>
+                        <SelectItem value="0-vat-exports">0% VAT – International Exports / Cross-border Transport</SelectItem>
                       </SelectContent>
                     </Select>}
                   <FormError message={validation.getFieldError('header.taxLevelId')} />
