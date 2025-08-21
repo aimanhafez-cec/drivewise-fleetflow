@@ -1133,8 +1133,8 @@ const NewReservation = () => {
 
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">New Reservation</h1>
-          <p className="text-sm text-muted-foreground mt-2">
+          <h1 className="text-3xl font-bold tracking-tight text-white">New Reservation</h1>
+          <p className="text-sm text-white mt-2">
             Fields marked with an asterisk (*) are required.
           </p>
         </div>
@@ -1160,20 +1160,20 @@ const NewReservation = () => {
             <AccordionTrigger className="px-6 py-4 hover:no-underline">
               <div className="flex items-center gap-2">
                 <DollarSign className="h-5 w-5" />
-                <span className="font-semibold">Rental Information</span>
+                <span className="font-semibold text-white">Rental Information</span>
               </div>
             </AccordionTrigger>
             <AccordionContent className="px-6 pb-6">
               <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                 {/* Reservation No. */}
                 <div className="space-y-2">
-                  <Label htmlFor="reservationNo">Reservation no.</Label>
+                  <Label htmlFor="reservationNo" className="text-white">Reservation no.</Label>
                   <Input id="reservationNo" value={formData.reservationNo || ''} disabled placeholder="Auto-generated on save" className="bg-muted" />
                 </div>
 
                 {/* Entry Date */}
                 <div className="space-y-2">
-                  <Label>Reservation Entry Date <span className="text-destructive">*</span></Label>
+                  <Label className="text-white">Reservation Entry Date <span className="text-destructive">*</span></Label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !formData.entryDate && "text-muted-foreground", errors.entryDate && "border-destructive")}>
@@ -1190,7 +1190,7 @@ const NewReservation = () => {
 
                 {/* Currency */}
                 <div className="space-y-2">
-                  <Label>Currency <span className="text-destructive">*</span></Label>
+                  <Label className="text-white">Currency <span className="text-destructive">*</span></Label>
                   {loading.currencies ? <Skeleton className="h-10 w-full" /> : <Select value={formData.currencyCode} onValueChange={value => updateFormData('currencyCode', value)}>
                       <SelectTrigger className={errors.currencyCode ? "border-destructive" : ""}>
                         <SelectValue placeholder="Select currency" />
@@ -1206,7 +1206,7 @@ const NewReservation = () => {
 
                 {/* Customer - with search */}
                 <div className="space-y-2">
-                  <Label>Customer <span className="text-destructive">*</span></Label>
+                  <Label className="text-white">Customer <span className="text-destructive">*</span></Label>
                   <Popover open={customerSearchOpen} onOpenChange={setCustomerSearchOpen}>
                     <PopoverTrigger asChild>
                       <Button variant="outline" role="combobox" aria-expanded={customerSearchOpen} className={cn("w-full justify-between", !formData.customerId && "text-muted-foreground", errors.customerId && "border-destructive")}>
@@ -1233,7 +1233,7 @@ const NewReservation = () => {
                                 <Check className={cn("mr-2 h-4 w-4", formData.customerId === customer.id ? "opacity-100" : "opacity-0")} />
                                 <div className="flex flex-col">
                                   <span className="font-medium">{customer.name}</span>
-                                  <span className="text-sm text-muted-foreground">{customer.email}</span>
+                                  <span className="text-sm text-white">{customer.email}</span>
                                 </div>
                               </CommandItem>)}
                           </CommandGroup>
@@ -1310,7 +1310,7 @@ const NewReservation = () => {
 
                 {/* Validity Date To */}
                 <div className="space-y-2">
-                  <Label>Validity Date To</Label>
+                  <Label className="text-white">Validity Date To</Label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !formData.validityDateTo && "text-muted-foreground", validation.getFieldError('header.validityDateTo') && "border-destructive")}>
@@ -1330,7 +1330,7 @@ const NewReservation = () => {
 
                 {/* Discount Type */}
                 <div className="space-y-2">
-                  <Label>Discount Type</Label>
+                  <Label className="text-white">Discount Type</Label>
                   {loading.discountTypes ? <Skeleton className="h-10 w-full" /> : <Select value={formData.discountTypeId} onValueChange={value => updateFormData('discountTypeId', value)}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select discount type" />
@@ -1345,13 +1345,13 @@ const NewReservation = () => {
 
                 {/* Discount Value */}
                 <div className="space-y-2">
-                  <Label>Discount Value</Label>
+                  <Label className="text-white">Discount Value</Label>
                   <Input type="number" value={formData.discountValue || ''} onChange={e => updateFormData('discountValue', parseFloat(e.target.value) || 0)} placeholder="0.00" />
                 </div>
 
                 {/* Contract Billing Plan */}
                 <div className="space-y-2">
-                  <Label>Contract Billing Plan</Label>
+                  <Label className="text-white">Contract Billing Plan</Label>
                   {loading.contractBillingPlans ? <Skeleton className="h-10 w-full" /> : <Select value={formData.contractBillingPlanId} onValueChange={value => updateFormData('contractBillingPlanId', value)}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select billing plan" />
@@ -1366,7 +1366,7 @@ const NewReservation = () => {
 
                 {/* Tax Level */}
                 <div className="space-y-2">
-                  <Label>Tax Level</Label>
+                  <Label className="text-white">Tax Level</Label>
                   {loading.taxLevels ? <Skeleton className="h-10 w-full" /> : <Select value={formData.taxLevelId} onValueChange={value => updateFormData('taxLevelId', value)}>
                       <SelectTrigger className={validation.getFieldError('header.taxLevelId') ? "border-destructive" : ""}>
                         <SelectValue placeholder="Select tax level" />
@@ -1385,7 +1385,7 @@ const NewReservation = () => {
                 <div className="space-y-2">
                   <div className="flex items-center space-x-2">
                     <Checkbox id="lease-to-own" checked={formData.leaseToOwn || false} onCheckedChange={checked => updateFormData('leaseToOwn', checked)} />
-                    <Label htmlFor="lease-to-own">Lease to Own</Label>
+                    <Label htmlFor="lease-to-own" className="text-white">Lease to Own</Label>
                   </div>
                 </div>
               </div>
@@ -1397,7 +1397,7 @@ const NewReservation = () => {
             <AccordionTrigger className="px-6 py-4 hover:no-underline">
               <div className="flex items-center gap-2">
                 <CreditCard className="h-5 w-5" />
-                <span className="font-semibold">Bill To</span>
+                <span className="font-semibold text-white">Bill To</span>
               </div>
             </AccordionTrigger>
             <AccordionContent className="px-6 pb-6">
@@ -1424,7 +1424,7 @@ const NewReservation = () => {
             <AccordionTrigger className="px-6 py-4 hover:no-underline">
               <div className="flex items-center gap-2">
                 <Car className="h-5 w-5" />
-                <span className="font-semibold">Vehicle & Driver</span>
+                <span className="font-semibold text-white">Vehicle & Driver</span>
               </div>
             </AccordionTrigger>
             <AccordionContent className="px-6 pb-6">
@@ -1438,7 +1438,7 @@ const NewReservation = () => {
                   <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
                     {/* Dates */}
                     <div className="space-y-2">
-                      <Label>Check Out Date <span className="text-destructive">*</span></Label>
+                      <Label className="text-white">Check Out Date <span className="text-destructive">*</span></Label>
                       <Popover>
                         <PopoverTrigger asChild>
                           <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !formData.checkOutDate && "text-muted-foreground")}>
@@ -1459,7 +1459,7 @@ const NewReservation = () => {
                     </div>
                     
                     <div className="space-y-2">
-                      <Label>Check In Date <span className="text-destructive">*</span></Label>
+                      <Label className="text-white">Check In Date <span className="text-destructive">*</span></Label>
                       <Popover>
                         <PopoverTrigger asChild>
                           <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !formData.checkInDate && "text-muted-foreground")}>
@@ -1531,7 +1531,7 @@ const NewReservation = () => {
             <AccordionTrigger className="px-6 py-4 hover:no-underline">
               <div className="flex items-center gap-2">
                 <Plane className="h-5 w-5" />
-                <span className="font-semibold">Airport Information</span>
+                <span className="font-semibold text-white">Airport Information</span>
               </div>
             </AccordionTrigger>
             <AccordionContent className="px-6 pb-6">
@@ -1539,21 +1539,21 @@ const NewReservation = () => {
                 {/* Enable Airport Information Checkbox */}
                 <div className="flex items-center space-x-2">
                   <Checkbox id="enable-airport-info" checked={formData.enableAirportInfo} onCheckedChange={checked => updateFormData('enableAirportInfo', checked)} />
-                  <Label htmlFor="enable-airport-info">Enable Airport Information</Label>
+                  <Label htmlFor="enable-airport-info" className="text-white">Enable Airport Information</Label>
                 </div>
 
                 {formData.enableAirportInfo && <>
                     {/* Arrival Information */}
                     <div>
-                      <h4 className="font-medium mb-4">Arrival Information</h4>
+                      <h4 className="font-medium mb-4 text-white">Arrival Information</h4>
                       <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                         <div className="space-y-2">
-                          <Label>Flight No.</Label>
+                          <Label className="text-white">Flight No.</Label>
                           <Input value={formData.arrivalFlightNo} onChange={e => updateFormData('arrivalFlightNo', e.target.value)} placeholder="e.g., AA1234" />
                         </div>
                         
                         <div className="space-y-2">
-                          <Label>Date & Time</Label>
+                          <Label className="text-white">Date & Time</Label>
                           <Popover>
                             <PopoverTrigger asChild>
                               <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !formData.arrivalDateTime && "text-muted-foreground")}>
@@ -1568,27 +1568,27 @@ const NewReservation = () => {
                         </div>
                         
                         <div className="space-y-2">
-                          <Label>Airline</Label>
+                          <Label className="text-white">Airline</Label>
                           <Input value={formData.arrivalAirline} onChange={e => updateFormData('arrivalAirline', e.target.value)} placeholder="e.g., American Airlines" />
                         </div>
                         
                         <div className="space-y-2">
-                          <Label>Airport</Label>
+                          <Label className="text-white">Airport</Label>
                           <Input value={formData.arrivalAirport} onChange={e => updateFormData('arrivalAirport', e.target.value)} placeholder="e.g., LAX International" />
                         </div>
                         
                         <div className="space-y-2">
-                          <Label>City</Label>
+                          <Label className="text-white">City</Label>
                           <Input value={formData.arrivalCity} onChange={e => updateFormData('arrivalCity', e.target.value)} placeholder="e.g., Los Angeles" />
                         </div>
                         
                         <div className="space-y-2">
-                          <Label>Zip Code</Label>
+                          <Label className="text-white">Zip Code</Label>
                           <Input value={formData.arrivalZipCode} onChange={e => updateFormData('arrivalZipCode', e.target.value)} placeholder="e.g., 90045" />
                         </div>
                         
                         <div className="space-y-2">
-                          <Label>Passengers</Label>
+                          <Label className="text-white">Passengers</Label>
                           <Input type="number" value={formData.arrivalPassengers || ''} onChange={e => updateFormData('arrivalPassengers', parseInt(e.target.value) || 0)} placeholder="Number of passengers" min="0" />
                         </div>
                       </div>
@@ -1596,15 +1596,15 @@ const NewReservation = () => {
 
                     {/* Departure Information */}
                     <div>
-                      <h4 className="font-medium mb-4">Departure Information</h4>
+                      <h4 className="font-medium mb-4 text-white">Departure Information</h4>
                       <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                         <div className="space-y-2">
-                          <Label>Flight No.</Label>
+                          <Label className="text-white">Flight No.</Label>
                           <Input value={formData.departureFlightNo} onChange={e => updateFormData('departureFlightNo', e.target.value)} placeholder="e.g., AA5678" />
                         </div>
                         
                         <div className="space-y-2">
-                          <Label>Date & Time</Label>
+                          <Label className="text-white">Date & Time</Label>
                           <Popover>
                             <PopoverTrigger asChild>
                               <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !formData.departureDateTime && "text-muted-foreground")}>
@@ -1619,34 +1619,34 @@ const NewReservation = () => {
                         </div>
                         
                         <div className="space-y-2">
-                          <Label>Airline</Label>
+                          <Label className="text-white">Airline</Label>
                           <Input value={formData.departureAirline} onChange={e => updateFormData('departureAirline', e.target.value)} placeholder="e.g., American Airlines" />
                         </div>
                         
                         <div className="space-y-2">
-                          <Label>Airport</Label>
+                          <Label className="text-white">Airport</Label>
                           <Input value={formData.departureAirport} onChange={e => updateFormData('departureAirport', e.target.value)} placeholder="e.g., LAX International" />
                         </div>
                         
                         <div className="space-y-2">
-                          <Label>City</Label>
+                          <Label className="text-white">City</Label>
                           <Input value={formData.departureCity} onChange={e => updateFormData('departureCity', e.target.value)} placeholder="e.g., Los Angeles" />
                         </div>
                         
                         <div className="space-y-2">
-                          <Label>Zip Code</Label>
+                          <Label className="text-white">Zip Code</Label>
                           <Input value={formData.departureZipCode} onChange={e => updateFormData('departureZipCode', e.target.value)} placeholder="e.g., 90045" />
                         </div>
                         
                         <div className="space-y-2">
-                          <Label>Passengers</Label>
+                          <Label className="text-white">Passengers</Label>
                           <Input type="number" value={formData.departurePassengers || ''} onChange={e => updateFormData('departurePassengers', parseInt(e.target.value) || 0)} placeholder="Number of passengers" min="0" />
                         </div>
                       </div>
                     </div>
                   </>}
 
-                {!formData.enableAirportInfo && <div className="text-sm text-muted-foreground bg-muted/50 p-4 rounded-lg">
+                {!formData.enableAirportInfo && <div className="text-sm text-white bg-muted/50 p-4 rounded-lg">
                     Check the box above to enable airport information fields.
                   </div>}
               </div>
@@ -1658,13 +1658,13 @@ const NewReservation = () => {
             <AccordionTrigger className="px-6 py-4 hover:no-underline">
               <div className="flex items-center gap-2">
                 <Shield className="h-5 w-5" />
-                <span className="font-semibold">Insurance Information</span>
+                <span className="font-semibold text-white">Insurance Information</span>
               </div>
             </AccordionTrigger>
             <AccordionContent className="px-6 pb-6">
               <div className="grid gap-4 grid-cols-1 md:grid-cols-3">
                 <div className="space-y-2">
-                  <Label>Insurance Level</Label>
+                  <Label className="text-white">Insurance Level</Label>
                   <Select value={formData.insuranceLevelId} onValueChange={value => updateFormData('insuranceLevelId', value)}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select level" />
@@ -1677,7 +1677,7 @@ const NewReservation = () => {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>Insurance Group</Label>
+                  <Label className="text-white">Insurance Group</Label>
                   <Select value={formData.insuranceGroupId} onValueChange={value => updateFormData('insuranceGroupId', value)}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select group" />
@@ -1690,7 +1690,7 @@ const NewReservation = () => {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>Insurance Provider</Label>
+                  <Label className="text-white">Insurance Provider</Label>
                   <Select value={formData.insuranceProviderId} onValueChange={value => updateFormData('insuranceProviderId', value)}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select provider" />
@@ -1711,7 +1711,7 @@ const NewReservation = () => {
             <AccordionTrigger className="px-6 py-4 hover:no-underline">
               <div className="flex items-center gap-2">
                 <Plus className="h-5 w-5" />
-                <span className="font-semibold">Miscellaneous Charges</span>
+                <span className="font-semibold text-white">Miscellaneous Charges</span>
                 {(formData.selectedMiscCharges || []).length > 0 && <Badge variant="secondary" className="ml-2">
                     {(formData.selectedMiscCharges || []).length} selected
                   </Badge>}
@@ -1772,14 +1772,14 @@ const NewReservation = () => {
             <AccordionTrigger className="px-6 py-4 hover:no-underline">
               <div className="flex items-center gap-2">
                 <Calculator className="h-5 w-5" />
-                <span className="font-semibold">Rate & Taxes</span>
+                <span className="font-semibold text-white">Rate & Taxes</span>
               </div>
             </AccordionTrigger>
             <AccordionContent className="px-6 pb-6">
               <div className="space-y-6">
                 <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
                   <div className="space-y-2">
-                    <Label>Price List</Label>
+                    <Label className="text-white">Price List</Label>
                     {loading.priceLists ? <Skeleton className="h-10 w-full" /> : <Select value={formData.priceListId} onValueChange={handlePriceListChange}>
                         <SelectTrigger id="select-price-list">
                           <SelectValue placeholder="Select price list" />
@@ -1792,7 +1792,7 @@ const NewReservation = () => {
                       </Select>}
                   </div>
                   <div className="space-y-2">
-                    <Label>Promotion Code</Label>
+                    <Label className="text-white">Promotion Code</Label>
                     <div className="flex gap-2">
                       <Input id="input-promo" value={formData.promotionCode} onChange={e => updateFormData('promotionCode', e.target.value)} placeholder="Enter promo code" />
                       <Button variant="outline" size="icon">
@@ -1803,22 +1803,22 @@ const NewReservation = () => {
                 </div>
                 
                 <div className="space-y-4">
-                  <h4 className="font-medium">Rates</h4>
+                  <h4 className="font-medium text-white">Rates</h4>
                   <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
                     <div className="space-y-2">
-                      <Label>Hourly Rate</Label>
+                      <Label className="text-white">Hourly Rate</Label>
                       <Input id="rate-hourly" type="number" step="0.01" value={formData.hourlyRate} onChange={e => updateFormData('hourlyRate', parseFloat(e.target.value) || 0)} placeholder="0.00" />
                     </div>
                     <div className="space-y-2">
-                      <Label>Daily Rate</Label>
+                      <Label className="text-white">Daily Rate</Label>
                       <Input id="rate-daily" type="number" step="0.01" value={formData.dailyRate} onChange={e => updateFormData('dailyRate', parseFloat(e.target.value) || 0)} placeholder="0.00" />
                     </div>
                     <div className="space-y-2">
-                      <Label>Weekly Rate</Label>
+                      <Label className="text-white">Weekly Rate</Label>
                       <Input id="rate-weekly" type="number" step="0.01" value={formData.weeklyRate} onChange={e => updateFormData('weeklyRate', parseFloat(e.target.value) || 0)} placeholder="0.00" />
                     </div>
                     <div className="space-y-2">
-                      <Label>Monthly Rate</Label>
+                      <Label className="text-white">Monthly Rate</Label>
                       <Input id="rate-monthly" type="number" step="0.01" value={formData.monthlyRate} onChange={e => updateFormData('monthlyRate', parseFloat(e.target.value) || 0)} placeholder="0.00" />
                     </div>
                   </div>
@@ -1826,11 +1826,11 @@ const NewReservation = () => {
 
                 <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
                   <div className="space-y-2">
-                    <Label>Kilometer Charge</Label>
+                    <Label className="text-white">Kilometer Charge</Label>
                     <Input id="rate-km-charge" type="number" step="0.01" value={formData.kilometerCharge} onChange={e => updateFormData('kilometerCharge', parseFloat(e.target.value) || 0)} placeholder="0.00" />
                   </div>
                   <div className="space-y-2">
-                    <Label>Daily Kilometer Allowed</Label>
+                    <Label className="text-white">Daily Kilometer Allowed</Label>
                     <Input id="rate-daily-km-allowed" type="number" value={formData.dailyKilometerAllowed} onChange={e => updateFormData('dailyKilometerAllowed', parseInt(e.target.value) || 0)} placeholder="0" />
                   </div>
                 </div>
@@ -1843,23 +1843,23 @@ const NewReservation = () => {
             <AccordionTrigger className="px-6 py-4 hover:no-underline">
               <div className="flex items-center gap-2">
                 <DollarSign className="h-5 w-5" />
-                <span className="font-semibold">Adjustments & Deposits</span>
+                <span className="font-semibold text-white">Adjustments & Deposits</span>
               </div>
             </AccordionTrigger>
             <AccordionContent className="px-6 pb-6">
               <div className="space-y-6">
                 <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                   <div className="space-y-2">
-                    <Label>Pre-adjustment</Label>
+                    <Label className="text-white">Pre-adjustment</Label>
                     <Input type="number" step="0.01" value={formData.preAdjustment} onChange={e => updateFormData('preAdjustment', parseFloat(e.target.value) || 0)} placeholder="0.00" />
                   </div>
                   <div className="space-y-2">
-                    <Label>Advance Payment</Label>
+                    <Label className="text-white">Advance Payment</Label>
                     <Input type="number" step="0.01" value={formData.advancePayment} onChange={e => updateFormData('advancePayment', parseFloat(e.target.value) || 0)} placeholder="0.00" />
                     {validation.getFieldError('header.advancePayment') && <FormError message={validation.getFieldError('header.advancePayment')} />}
                   </div>
                   <div className="space-y-2">
-                    <Label>Security Deposit Paid</Label>
+                    <Label className="text-white">Security Deposit Paid</Label>
                     <Input type="number" step="0.01" value={formData.securityDepositPaid} onChange={e => updateFormData('securityDepositPaid', parseFloat(e.target.value) || 0)} placeholder="0.00" />
                     {validation.getFieldError('header.securityDepositPaid') && <FormError message={validation.getFieldError('header.securityDepositPaid')} />}
                   </div>
@@ -1867,7 +1867,7 @@ const NewReservation = () => {
 
                 {/* Payment Method Section - Shows when advance payment > 0 */}
                 {formData.advancePayment > 0 && <div className="space-y-4 p-4 border rounded-lg bg-muted/50">
-                    <h4 className="font-medium">Payment Method (Required for Advance Payment)</h4>
+                    <h4 className="font-medium text-white">Payment Method (Required for Advance Payment)</h4>
                     <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
                       <div className="space-y-2">
                         <RequiredLabel>Payment Method</RequiredLabel>
@@ -1890,7 +1890,7 @@ const NewReservation = () => {
 
                 {/* Deposit Method Section - Shows when security deposit > 0 */}
                 {formData.securityDepositPaid > 0 && <div className="space-y-4 p-4 border rounded-lg bg-muted/50">
-                    <h4 className="font-medium">Deposit Payment Details (Required for Security Deposit)</h4>
+                    <h4 className="font-medium text-white">Deposit Payment Details (Required for Security Deposit)</h4>
                     <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
                       <div className="space-y-2">
                         <RequiredLabel>Deposit Method</RequiredLabel>
@@ -1933,13 +1933,13 @@ const NewReservation = () => {
             <AccordionTrigger className="px-6 py-4 hover:no-underline">
               <div className="flex items-center gap-2">
                 <Users className="h-5 w-5" />
-                <span className="font-semibold">Referral Information</span>
+                <span className="font-semibold text-white">Referral Information</span>
               </div>
             </AccordionTrigger>
             <AccordionContent className="px-6 pb-6">
               <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                 <div className="space-y-2">
-                  <Label>Referral Name</Label>
+                  <Label className="text-white">Referral Name</Label>
                   <Select value={formData.referralNameId} onValueChange={value => updateFormData('referralNameId', value)}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select referral" />
@@ -1952,7 +1952,7 @@ const NewReservation = () => {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>Contact Name</Label>
+                  <Label className="text-white">Contact Name</Label>
                   <Select value={formData.referralContactNameId} onValueChange={value => updateFormData('referralContactNameId', value)}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select contact" />
@@ -1965,7 +1965,7 @@ const NewReservation = () => {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>Phone No.</Label>
+                  <Label className="text-white">Phone No.</Label>
                   <Input value={formData.referralPhone} onChange={e => updateFormData('referralPhone', e.target.value)} placeholder="+97150345234" />
                 </div>
               </div>
@@ -1977,20 +1977,20 @@ const NewReservation = () => {
             <AccordionTrigger className="px-6 py-4 hover:no-underline">
               <div className="flex items-center gap-2">
                 <FileText className="h-5 w-5" />
-                <span className="font-semibold">Notes</span>
+                <span className="font-semibold text-white">Notes</span>
               </div>
             </AccordionTrigger>
             <AccordionContent className="px-6 pb-6">
               <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label>Note</Label>
+                  <Label className="text-white">Note</Label>
                   <Textarea value={formData.note} onChange={e => updateFormData('note', e.target.value)} placeholder="General notes about the reservation..." rows={4} maxLength={500} />
-                  <p className="text-xs text-muted-foreground">{(formData.note || '').length}/500 characters</p>
+                  <p className="text-xs text-white">{(formData.note || '').length}/500 characters</p>
                 </div>
                 <div className="space-y-2">
-                  <Label>Special Note</Label>
+                  <Label className="text-white">Special Note</Label>
                   <Textarea value={formData.specialNote} onChange={e => updateFormData('specialNote', e.target.value)} placeholder="Special instructions or requirements..." rows={4} maxLength={500} />
-                  <p className="text-xs text-muted-foreground">{(formData.specialNote || '').length}/500 characters</p>
+                  <p className="text-xs text-white">{(formData.specialNote || '').length}/500 characters</p>
                 </div>
               </div>
             </AccordionContent>
@@ -2001,7 +2001,7 @@ const NewReservation = () => {
             <AccordionTrigger className="px-6 py-4 hover:no-underline">
               <div className="flex items-center gap-2">
                 <Car className="h-5 w-5" />
-                <span className="font-semibold">Reservation Lines</span>
+                <span className="font-semibold text-white">Reservation Lines</span>
                 {(formData.reservationLines || []).length > 0 && <Badge variant="secondary" className="ml-2">
                     {(formData.reservationLines || []).length} lines
                   </Badge>}
