@@ -11,6 +11,7 @@ import QuickVehicleSelector from '@/components/instant-booking/QuickVehicleSelec
 import CustomerDetector from '@/components/instant-booking/CustomerDetector';
 import PricingCalculatorInstant from '@/components/instant-booking/PricingCalculatorInstant';
 import AddOnsSelector from '@/components/instant-booking/AddOnsSelector';
+import BookingConfirmation from '@/components/instant-booking/BookingConfirmation';
 import { useInstantBooking } from '@/hooks/useInstantBooking';
 import { LocationSelect } from '@/components/ui/select-components';
 const InstantBooking = () => {
@@ -236,41 +237,11 @@ const InstantBooking = () => {
 
             {step === 5 && <PricingCalculatorInstant bookingData={bookingData} onPricingUpdate={pricing => handleDataChange('pricing', pricing)} />}
 
-            {step === 6 && <Card className="shadow-card">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-green-600">
-                    <CheckCircle className="h-5 w-5" />
-                    Booking Confirmation
-                  </CardTitle>
-                  <CardDescription>
-                    Review your booking details and confirm
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="bg-muted/50 p-4 rounded-lg space-y-3">
-                    <div className="flex justify-between">
-                      <span className="font-medium">Pickup:</span>
-                      <span>{new Date(bookingData.pickupDate).toLocaleString()} at {bookingData.pickupLocation}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="font-medium">Return:</span>
-                      <span>{new Date(bookingData.returnDate).toLocaleString()} at {bookingData.returnLocation}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="font-medium">Vehicle:</span>
-                      <span>Selected Vehicle</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="font-medium">Total Amount:</span>
-                      <span className="font-bold text-lg">AED {bookingData.pricing?.total || '0.00'}</span>
-                    </div>
-                  </div>
-
-                  <Button onClick={handleInstantBook} className="w-full bg-gradient-primary hover:opacity-90 text-white py-6 text-lg" disabled={isLoading}>
-                    {isLoading ? 'Creating Booking...' : 'Confirm Instant Booking'}
-                  </Button>
-                </CardContent>
-              </Card>}
+            {step === 6 && <BookingConfirmation 
+              bookingData={bookingData}
+              onConfirm={handleInstantBook}
+              isLoading={isLoading}
+            />}
           </div>
 
           {/* Sidebar */}
