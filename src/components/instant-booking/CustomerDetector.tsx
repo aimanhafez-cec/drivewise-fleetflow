@@ -94,6 +94,19 @@ const CustomerDetector: React.FC<CustomerDetectorProps> = ({
         return 'bg-green-100 text-green-800';
     }
   };
+
+  const getCustomerTypeDisplay = (type: string) => {
+    switch (type) {
+      case 'B2C':
+        return 'Individual';
+      case 'B2B':
+        return 'B2B';
+      case 'CORPORATE':
+        return 'Corporate';
+      default:
+        return 'Individual';
+    }
+  };
   const getCustomerTypeIcon = (type: string) => {
     switch (type) {
       case 'B2B':
@@ -127,7 +140,7 @@ const CustomerDetector: React.FC<CustomerDetectorProps> = ({
               <div className="text-right space-y-2">
                 <Badge className={getCustomerTypeColor(selectedCustomer.customer_type)}>
                   {getCustomerTypeIcon(selectedCustomer.customer_type)}
-                  <span className="ml-1">{selectedCustomer.customer_type}</span>
+                  <span className="ml-1">{getCustomerTypeDisplay(selectedCustomer.customer_type)}</span>
                 </Badge>
                 <div className="text-sm text-muted-foreground">
                   {selectedCustomer.total_rentals || 0} previous rentals
@@ -166,7 +179,7 @@ const CustomerDetector: React.FC<CustomerDetectorProps> = ({
                         </div>
                         <div className="flex flex-col items-end gap-1">
                           <Badge className={getCustomerTypeColor(customer.customer_type)} variant="outline">
-                            {customer.customer_type}
+                            {getCustomerTypeDisplay(customer.customer_type)}
                           </Badge>
                           <span className="text-xs text-muted-foreground">
                             {customer.total_rentals || 0} rentals
@@ -210,7 +223,7 @@ const CustomerDetector: React.FC<CustomerDetectorProps> = ({
                 ...prev,
                 customer_type: e.target.value as 'B2B' | 'B2C' | 'CORPORATE'
               }))} className="mt-1 w-full px-3 py-2 border rounded-md bg-background">
-                    <option value="B2C">B2C - Individual</option>
+                    <option value="B2C">Individual</option>
                     <option value="B2B">B2B - Business</option>
                     <option value="CORPORATE">Corporate Account</option>
                   </select>
