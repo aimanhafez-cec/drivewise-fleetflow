@@ -218,7 +218,7 @@ const AddOnsSelector: React.FC<AddOnsSelectorProps> = ({
                               </p>
                               
                               <div className="flex items-center justify-between">
-                                <div className="text-lg font-bold text-primary">
+                                <div className="text-lg font-bold text-red-600">
                                   AED {cost.toFixed(0)}
                                   {addOn.isFlat ? (
                                     <span className="text-xs text-card-foreground/70 ml-1">(flat rate)</span>
@@ -272,7 +272,7 @@ const AddOnsSelector: React.FC<AddOnsSelectorProps> = ({
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="font-bold text-sm text-card-foreground">AED {cost.toFixed(0)}</p>
+                        <p className="font-bold text-sm text-red-600">AED {cost.toFixed(0)}</p>
                         <Button
                           variant="ghost"
                           size="sm"
@@ -292,7 +292,7 @@ const AddOnsSelector: React.FC<AddOnsSelectorProps> = ({
                 <div className="border-t border-card-foreground/20 pt-3 mt-3">
                   <div className="flex justify-between items-center">
                     <span className="font-semibold text-card-foreground">Add-ons Total:</span>
-                    <span className="font-bold text-lg text-primary">
+                    <span className="font-bold text-lg text-red-600">
                       AED {getTotalAddOnAmount().toFixed(0)}
                     </span>
                   </div>
