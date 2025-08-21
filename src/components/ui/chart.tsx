@@ -311,7 +311,7 @@ const ChartLegendContent = React.forwardRef<
                   }}
                 />
               )}
-              {itemConfig?.label}
+              {itemConfig?.label || item.value || item.dataKey || key}
             </div>
           )
         })}
