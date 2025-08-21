@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
+import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from '@/components/ui/chart';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
 import { DateRange } from 'react-day-picker';
 import { useQuery } from '@tanstack/react-query';
@@ -10,6 +10,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { AlertTriangle, DollarSign, FileImage, Wrench } from 'lucide-react';
 import { format } from 'date-fns';
 import { formatCurrency } from '@/lib/utils/currency';
+import { DAMAGE_SEVERITY_CONFIG, VEHICLE_CATEGORY_COLORS } from '@/lib/chartConfig';
+import { formatNumber } from '@/lib/utils/chartUtils';
 
 interface DamageReportProps {
   dateRange?: DateRange;
@@ -266,12 +268,13 @@ const DamageReport = ({ dateRange }: DamageReportProps) => {
           </CardHeader>
           <CardContent>
             <ChartContainer
-              config={{
-                scratch: { label: "Scratch", color: "hsl(var(--warning))" },
-                dent: { label: "Dent", color: "hsl(var(--destructive))" },
-                crack: { label: "Crack", color: "hsl(var(--primary))" },
-                other: { label: "Other", color: "hsl(var(--muted))" },
-              }}
+              config={damageTypeData.reduce((acc, item, index) => ({
+                ...acc,
+                [item.type.toLowerCase().replace(' ', '_')]: { 
+                  label: item.type, 
+                  color: VEHICLE_CATEGORY_COLORS[index % VEHICLE_CATEGORY_COLORS.length] 
+                }
+              }), {})}
               className="h-[300px]"
             >
               <ResponsiveContainer width="100%" height="100%">
@@ -282,12 +285,21 @@ const DamageReport = ({ dateRange }: DamageReportProps) => {
                     cy="50%"
                     outerRadius={100}
                     dataKey="count"
-                    label={({ type, count }) => `${type}: ${count}`}
+                    nameKey="type"
                   >
                     {damageTypeData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
+                      <Cell 
+                        key={`cell-${index}`} 
+                        fill={VEHICLE_CATEGORY_COLORS[index % VEHICLE_CATEGORY_COLORS.length]}
+                        stroke="hsl(var(--background))" 
+                        strokeWidth={2} 
+                      />
                     ))}
                   </Pie>
+                  <ChartTooltip 
+                    content={<ChartTooltipContent formatter={(value, name) => [formatNumber(Number(value)), name]} />} 
+                  />
+                  <ChartLegend content={<ChartLegendContent />} />
                 </PieChart>
               </ResponsiveContainer>
             </ChartContainer>
@@ -301,17 +313,40 @@ const DamageReport = ({ dateRange }: DamageReportProps) => {
           </CardHeader>
           <CardContent>
             <ChartContainer
-              config={{
-                count: { label: "Count", color: "hsl(var(--primary))" },
-              }}
+              config={DAMAGE_SEVERITY_CONFIG}
               className="h-[300px]"
             >
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={severityData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="severity" />
-                  <YAxis />
-                  <Bar dataKey="count" fill="hsl(var(--primary))" />
+                <BarChart data={severityData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+                  <XAxis 
+                    dataKey="severity" 
+                    stroke="hsl(var(--muted-foreground))" 
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <YAxis 
+                    stroke="hsl(var(--muted-foreground))" 
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <ChartTooltip 
+                    content={<ChartTooltipContent formatter={(value, name) => [formatNumber(Number(value)), name]} />} 
+                  />
+                  <ChartLegend content={<ChartLegendContent />} />
+                  <Bar 
+                    dataKey="count" 
+                    radius={[4, 4, 0, 0]}
+                  >
+                    {severityData.map((entry, index) => (
+                      <Cell 
+                        key={`cell-${index}`} 
+                        fill={DAMAGE_SEVERITY_CONFIG[entry.severity.toLowerCase() as keyof typeof DAMAGE_SEVERITY_CONFIG]?.color || VEHICLE_CATEGORY_COLORS[index % VEHICLE_CATEGORY_COLORS.length]} 
+                      />
+                    ))}
+                  </Bar>
                 </BarChart>
               </ResponsiveContainer>
             </ChartContainer>
