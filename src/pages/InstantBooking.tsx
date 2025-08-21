@@ -76,7 +76,7 @@ const InstantBooking = () => {
         return false;
     }
   };
-  return <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 p-4 border-2 border-dashed border-primary/85 rounded-3xl">
+  return <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 p-4">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
         <div className="text-center space-y-4">
@@ -88,7 +88,7 @@ const InstantBooking = () => {
         </div>
 
         {/* Progress Steps */}
-        <Card>
+        <Card className="shadow-card">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-6">
               {[{
@@ -114,11 +114,11 @@ const InstantBooking = () => {
             }].map((stepInfo, index) => <div key={stepInfo.num} className="flex flex-col items-center flex-1">
                   <div className={`
                     w-10 h-10 rounded-full flex items-center justify-center mb-2 transition-all
-                    ${step >= stepInfo.num ? 'bg-primary text-primary-foreground shadow-elegant' : step === stepInfo.num ? 'bg-primary/20 text-primary border-2 border-primary' : 'bg-border text-foreground/70'}
+                    ${step >= stepInfo.num ? 'bg-primary text-primary-foreground shadow-elegant' : step === stepInfo.num ? 'bg-primary/20 text-primary border-2 border-primary' : 'bg-muted text-muted-foreground'}
                   `}>
                     {isStepComplete(stepInfo.num) ? <CheckCircle className="h-5 w-5" /> : <stepInfo.icon className="h-5 w-5" />}
                   </div>
-                  <p className={`text-sm font-medium ${step >= stepInfo.num ? 'text-foreground' : 'text-foreground/70'}`}>
+                  <p className={`text-sm font-medium ${step >= stepInfo.num ? 'text-foreground' : 'text-muted-foreground'}`}>
                     {stepInfo.title}
                   </p>
                   {index < 4 && <div className={`h-0.5 w-full mt-3 ${step > stepInfo.num ? 'bg-primary' : 'bg-muted'}`} />}
@@ -130,7 +130,7 @@ const InstantBooking = () => {
         {/* Main Content */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
-            {step === 1 && <Card>
+            {step === 1 && <Card className="shadow-card">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <MapPin className="h-5 w-5" />
@@ -174,7 +174,7 @@ const InstantBooking = () => {
 
             {step === 4 && <PricingCalculatorInstant bookingData={bookingData} onPricingUpdate={pricing => handleDataChange('pricing', pricing)} />}
 
-            {step === 5 && <Card>
+            {step === 5 && <Card className="shadow-card">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-green-600">
                     <CheckCircle className="h-5 w-5" />
@@ -213,7 +213,7 @@ const InstantBooking = () => {
 
           {/* Sidebar */}
           <div className="space-y-4">
-            <Card>
+            <Card className="shadow-card">
               <CardHeader>
                 <CardTitle className="text-lg">Booking Summary</CardTitle>
               </CardHeader>
