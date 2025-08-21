@@ -5,10 +5,49 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from '@/components/ui/chart';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
 import { DateRange } from 'react-day-picker';
+import { TrendingUp, DollarSign, MapPin } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils/currency';
-import { TrendingUp, TrendingDown, DollarSign, MapPin } from 'lucide-react';
-import { MONTHLY_TRENDS_CONFIG, VEHICLE_CATEGORY_COLORS } from '@/lib/chartConfig';
-import { currencyTooltipFormatter, formatMonth } from '@/lib/utils/chartUtils';
+
+// Fallback color arrays and configuration to ensure charts work
+const VEHICLE_CATEGORY_COLORS = [
+  "hsl(220, 91%, 60%)", // Bright blue
+  "hsl(142, 76%, 36%)", // Green
+  "hsl(346, 87%, 54%)", // Pink/Red
+  "hsl(38, 92%, 50%)", // Orange
+  "hsl(271, 76%, 53%)", // Purple
+  "hsl(185, 76%, 46%)", // Cyan
+  "hsl(54, 91%, 51%)", // Yellow
+  "hsl(239, 84%, 67%)", // Indigo
+  "hsl(330, 81%, 60%)", // Rose
+  "hsl(142, 71%, 45%)", // Emerald
+  "hsl(43, 96%, 56%)", // Amber
+  "hsl(258, 90%, 66%)", // Violet
+];
+
+const MONTHLY_TRENDS_CONFIG = {
+  revenue: {
+    label: "Revenue",
+    color: "hsl(220, 91%, 60%)", // Bright blue
+  },
+  bookings: {
+    label: "Bookings", 
+    color: "hsl(142, 76%, 36%)", // Green
+  },
+};
+
+// Utility functions
+const formatMonth = (value: string | Date): string => {
+  const date = typeof value === 'string' ? new Date(value) : value;
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    year: 'numeric',
+  });
+};
+
+const currencyTooltipFormatter = (value: number, name: string) => [
+  formatCurrency(value),
+  name,
+];
 
 interface RevenueBreakdownReportProps {
   dateRange?: DateRange;
