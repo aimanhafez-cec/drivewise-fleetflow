@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from '@/components/ui/chart';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { DateRange } from 'react-day-picker';
 import { useQuery } from '@tanstack/react-query';
@@ -10,6 +10,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { AlertTriangle, Calendar, Clock, Wrench, CheckCircle } from 'lucide-react';
 import { formatDistanceToNow, isBefore, addDays } from 'date-fns';
 import { formatCurrency } from '@/lib/utils/currency';
+import { MONTHLY_TRENDS_CONFIG, VEHICLE_CATEGORY_COLORS } from '@/lib/chartConfig';
+import { formatNumber, currencyTooltipFormatter } from '@/lib/utils/chartUtils';
 
 interface MaintenanceReportProps {
   dateRange?: DateRange;
@@ -148,39 +150,57 @@ const MaintenanceReport = ({ dateRange }: MaintenanceReportProps) => {
           </CardHeader>
           <CardContent>
             <ChartContainer
-              config={{
-                services: { label: "Services", color: "hsl(var(--chart-1))" },
-                cost: { label: "Cost", color: "hsl(var(--chart-2))" }
-              }}
+              config={MONTHLY_TRENDS_CONFIG}
               className="h-[300px]"
             >
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={monthlyTrend}>
+                <LineChart data={monthlyTrend} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
-                  <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                  <YAxis yAxisId="left" stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                  <YAxis yAxisId="right" orientation="right" stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                  <XAxis 
+                    dataKey="month" 
+                    stroke="hsl(var(--muted-foreground))" 
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <YAxis 
+                    yAxisId="left" 
+                    stroke="hsl(var(--muted-foreground))" 
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <YAxis 
+                    yAxisId="right" 
+                    orientation="right" 
+                    stroke="hsl(var(--muted-foreground))" 
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                    tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
+                  />
                   <ChartTooltip 
                     content={<ChartTooltipContent formatter={(value, name) => [
-                      name === 'cost' ? formatCurrency(Number(value)) : value,
+                      name === 'cost' ? formatCurrency(Number(value)) : formatNumber(Number(value)),
                       name === 'services' ? 'Services' : 'Cost'
                     ]} />}
                   />
+                  <ChartLegend content={<ChartLegendContent />} />
                   <Line 
                     yAxisId="left"
                     type="monotone" 
                     dataKey="services" 
-                    stroke="hsl(var(--chart-1))" 
+                    stroke={MONTHLY_TRENDS_CONFIG.services.color}
                     strokeWidth={3}
-                    dot={{ fill: "hsl(var(--chart-1))", strokeWidth: 2, r: 6 }}
+                    dot={{ fill: MONTHLY_TRENDS_CONFIG.services.color, strokeWidth: 2, r: 6 }}
                   />
                   <Line 
                     yAxisId="right"
                     type="monotone" 
                     dataKey="cost" 
-                    stroke="hsl(var(--chart-2))" 
+                    stroke={MONTHLY_TRENDS_CONFIG.costs.color}
                     strokeWidth={3}
-                    dot={{ fill: "hsl(var(--chart-2))", strokeWidth: 2, r: 6 }}
+                    dot={{ fill: MONTHLY_TRENDS_CONFIG.costs.color, strokeWidth: 2, r: 6 }}
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -199,13 +219,13 @@ const MaintenanceReport = ({ dateRange }: MaintenanceReportProps) => {
                 ...acc,
                 [service.type.toLowerCase().replace(' ', '_')]: { 
                   label: service.type, 
-                  color: `hsl(var(--chart-${(index % 8) + 1}))` 
+                  color: VEHICLE_CATEGORY_COLORS[index % VEHICLE_CATEGORY_COLORS.length] 
                 }
               }), {})}
               className="h-[300px]"
             >
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={serviceTypes}>
+                <BarChart data={serviceTypes} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
                   <XAxis 
                     dataKey="type" 
@@ -214,14 +234,27 @@ const MaintenanceReport = ({ dateRange }: MaintenanceReportProps) => {
                     height={80} 
                     stroke="hsl(var(--muted-foreground))" 
                     fontSize={11}
+                    tickLine={false}
+                    axisLine={false}
                   />
-                  <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                  <YAxis 
+                    stroke="hsl(var(--muted-foreground))" 
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                  />
                   <ChartTooltip 
                     content={<ChartTooltipContent formatter={(value, name) => [
-                      value, name === 'count' ? 'Services' : name === 'avgCost' ? 'Avg Cost' : name
+                      formatNumber(Number(value)), 
+                      name === 'count' ? 'Services' : name === 'avgCost' ? 'Avg Cost' : name
                     ]} />}
                   />
-                  <Bar dataKey="count" fill="hsl(var(--chart-1))" radius={[4, 4, 0, 0]} />
+                  <ChartLegend content={<ChartLegendContent />} />
+                  <Bar 
+                    dataKey="count" 
+                    fill="hsl(220, 91%, 60%)" 
+                    radius={[4, 4, 0, 0]} 
+                  />
                 </BarChart>
               </ResponsiveContainer>
             </ChartContainer>
@@ -231,7 +264,7 @@ const MaintenanceReport = ({ dateRange }: MaintenanceReportProps) => {
                   <div className="flex items-center gap-2">
                     <div 
                       className="w-3 h-3 rounded-sm" 
-                      style={{ backgroundColor: `hsl(var(--chart-${(index % 8) + 1}))` }}
+                      style={{ backgroundColor: VEHICLE_CATEGORY_COLORS[index % VEHICLE_CATEGORY_COLORS.length] }}
                     />
                     <span>{service.type}</span>
                   </div>
