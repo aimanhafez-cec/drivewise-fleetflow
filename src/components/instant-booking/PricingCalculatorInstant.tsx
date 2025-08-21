@@ -250,7 +250,7 @@ const PricingCalculatorInstant: React.FC<PricingCalculatorInstantProps> = ({
         <div className={`p-4 rounded-lg border-2 ${autoApprovalStatus.approved ? 'border-green-200 bg-green-50' : 'border-amber-200 bg-amber-50'}`}>
           <div className="flex items-center gap-3">
             {autoApprovalStatus.approved ? <CheckCircle className="h-6 w-6 text-green-600" /> : <AlertTriangle className="h-6 w-6 text-amber-600" />}
-            <div className="flex-1">
+            <div className="flex-1 text-slate-50">
               <h4 className={`font-semibold ${autoApprovalStatus.approved ? 'text-green-800' : 'text-amber-800'}`}>
                 {autoApprovalStatus.approved ? 'Auto-Approved' : 'Manual Approval Required'}
               </h4>
