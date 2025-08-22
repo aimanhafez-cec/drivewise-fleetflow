@@ -59,7 +59,7 @@ const FleetStatusReport = ({ dateRange }: FleetStatusReportProps) => {
   }, {} as Record<string, number>);
 
   const pieData = Object.entries(statusCounts).map(([status, count]) => ({
-    name: status.replace('_', ' ').toUpperCase(),
+    name: status,
     value: count,
     color: getStatusColor(status),
   }));
@@ -163,10 +163,7 @@ const FleetStatusReport = ({ dateRange }: FleetStatusReportProps) => {
               <ResponsiveContainer>
                 <PieChart>
                   <Pie
-                    data={pieData.map(item => ({
-                      name: item.name.toLowerCase().replace(' ', '_'),
-                      value: item.value,
-                    }))}
+                    data={pieData}
                     cx="50%"
                     cy="50%"
                     innerRadius={60}
@@ -178,7 +175,7 @@ const FleetStatusReport = ({ dateRange }: FleetStatusReportProps) => {
                     {pieData.map((entry, index) => (
                       <Cell 
                         key={`cell-${index}`} 
-                        fill={FLEET_STATUS_CONFIG[entry.name.toLowerCase().replace(' ', '_') as keyof typeof FLEET_STATUS_CONFIG]?.color || VEHICLE_CATEGORY_COLORS[index % VEHICLE_CATEGORY_COLORS.length]} 
+                        fill={FLEET_STATUS_CONFIG[entry.name as keyof typeof FLEET_STATUS_CONFIG]?.color || VEHICLE_CATEGORY_COLORS[index % VEHICLE_CATEGORY_COLORS.length]} 
                         stroke="hsl(var(--background))" 
                         strokeWidth={2} 
                       />
