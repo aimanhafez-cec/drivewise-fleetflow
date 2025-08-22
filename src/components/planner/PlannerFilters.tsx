@@ -78,7 +78,7 @@ export const PlannerFilters: React.FC<PlannerFiltersProps> = ({
   ];
 
   return (
-    <Card className="sticky top-4 z-10 shadow-sm">
+    <Card className="shadow-sm">
       <CardContent className="p-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4">
           {/* Vehicle Class */}
