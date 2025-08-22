@@ -61,12 +61,7 @@ const FleetStatusReport = ({ dateRange }: FleetStatusReportProps) => {
   const pieData = Object.entries(statusCounts).map(([status, count]) => ({
     name: status,
     value: count,
-    color: getStatusColor(status),
   }));
-
-  console.log('Fleet Status - Raw status counts:', statusCounts);
-  console.log('Fleet Status - Pie data:', pieData);
-  console.log('Fleet Status - Chart config keys:', Object.keys(FLEET_STATUS_CONFIG));
 
   // Calculate utilization by location
   const utilizationByLocation = vehicles.reduce((acc, vehicle) => {
@@ -180,8 +175,6 @@ const FleetStatusReport = ({ dateRange }: FleetStatusReportProps) => {
                       <Cell 
                         key={`cell-${index}`} 
                         fill={FLEET_STATUS_CONFIG[entry.name as keyof typeof FLEET_STATUS_CONFIG]?.color || VEHICLE_CATEGORY_COLORS[index % VEHICLE_CATEGORY_COLORS.length]} 
-                        stroke="hsl(var(--background))" 
-                        strokeWidth={2} 
                       />
                     ))}
                   </Pie>
