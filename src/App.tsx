@@ -34,7 +34,7 @@ import NewRFQ from "./pages/NewRFQ";
 import RFQDetails from "./pages/RFQDetails";
 import CustomerDetails from "./pages/CustomerDetails";
 import InstantBooking from "./pages/InstantBooking";
-import Reports from "./pages/Reports";
+import ReportsNew from "./pages/ReportsNew";
 
 const queryClient = new QueryClient();
 
@@ -157,7 +157,7 @@ const App = () => (
                 <AppLayout />
               </ProtectedRoute>
             }>
-              <Route index element={<Reports />} />
+              <Route index element={<ReportsNew />} />
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
