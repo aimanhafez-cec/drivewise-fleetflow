@@ -22,9 +22,22 @@ export function StandardLineChart({
   xAxisKey,
   lines
 }: StandardLineChartProps) {
+  console.log('StandardLineChart rendered with:', { data, config, height, showLegend });
+  
+  if (!data || data.length === 0) {
+    console.log('No data for line chart');
+    return (
+      <div className="h-full w-full flex items-center justify-center text-white">
+        No data available
+      </div>
+    );
+  }
+
   return (
-    <ChartContainer config={config} className="h-full w-full" style={{ height: `${height}px` }}>
+    <ChartContainer config={config} style={{ height: `${height}px` }}>
       <LineChart
+        width={400}
+        height={height}
         data={data}
         margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
       >
@@ -53,6 +66,7 @@ export function StandardLineChart({
           const color = config[line.dataKey]?.color || `hsl(var(--chart-${(index % 8) + 1}))`;
           const name = line.name || config[line.dataKey]?.label;
           const displayName = typeof name === 'string' ? name : line.dataKey;
+          console.log('Line color for', line.dataKey, ':', color);
           
           return (
             <Line
