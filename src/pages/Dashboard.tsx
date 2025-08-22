@@ -13,7 +13,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [customerSearchTerm, setCustomerSearchTerm] = React.useState('');
   const [searchResults, setSearchResults] = React.useState<any[]>([]);
-  const [activeTab, setActiveTab] = React.useState('suggestions');
+  
   const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
 
   // Fetch current reservations count
@@ -229,7 +229,7 @@ const Dashboard = () => {
     color: 'bg-teal-light',
     path: '/inspections'
   }];
-  const tabs = ['Suggestions', 'Me', 'My Team', 'My Client Groups'];
+  
   const rateData = [{
     vehicleType: 'Full Size',
     mileage: 100,
@@ -334,20 +334,9 @@ const Dashboard = () => {
 
         {/* Main Content */}
         <main className="flex-1 p-6">
-          {/* Greeting & Tabs */}
+          {/* Greeting */}
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-white mb-6">Good morning, Fleet Manager</h1>
-            
-            <div className="flex gap-8 border-b border-teal-light">
-              {tabs.map(tab => (
-                <button
-                  key={tab}
-                  className="py-2 text-sm font-medium text-white hover:text-teal-accent transition-colors"
-                >
-                  {tab}
-                </button>
-              ))}
-            </div>
           </div>
 
           {/* Apps Grid */}
