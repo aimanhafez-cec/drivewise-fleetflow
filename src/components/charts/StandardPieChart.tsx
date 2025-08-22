@@ -18,40 +18,53 @@ export function StandardPieChart({
   dataKey = "value",
   nameKey = "name"
 }: StandardPieChartProps) {
+  console.log('StandardPieChart rendered with:', { data, config, height, showLegend });
+  
+  if (!data || data.length === 0) {
+    console.log('No data for pie chart');
+    return (
+      <div className="h-full w-full flex items-center justify-center text-white">
+        No data available
+      </div>
+    );
+  }
   return (
-    <ChartContainer config={config} className="h-full w-full" style={{ height: `${height}px` }}>
-      <PieChart>
-        <ChartTooltip 
-          cursor={false} 
-          content={<ChartTooltipContent hideLabel />} 
-        />
-        {showLegend && (
-          <ChartLegend 
-            content={<ChartLegendContent />} 
+    <div style={{ height: `${height}px`, width: '100%' }}>
+      <ChartContainer config={config} className="h-full w-full">
+        <PieChart>
+          <ChartTooltip 
+            cursor={false} 
+            content={<ChartTooltipContent hideLabel />} 
           />
-        )}
-        <Pie
-          data={data}
-          dataKey={dataKey}
-          nameKey={nameKey}
-          cx="50%"
-          cy="50%"
-          innerRadius={60}
-          outerRadius={120}
-          paddingAngle={2}
-        >
-          {data.map((entry, index) => {
-            const configKey = entry[nameKey]?.toLowerCase?.() || entry[nameKey] || entry.status?.toLowerCase?.() || `item-${index}`;
-            const color = config[configKey]?.color || `hsl(var(--chart-${(index % 8) + 1}))`;
-            return (
-              <Cell 
-                key={`cell-${index}`} 
-                fill={color}
-              />
-            );
-          })}
-        </Pie>
-      </PieChart>
-    </ChartContainer>
+          {showLegend && (
+            <ChartLegend 
+              content={<ChartLegendContent />} 
+            />
+          )}
+          <Pie
+            data={data}
+            dataKey={dataKey}
+            nameKey={nameKey}
+            cx="50%"
+            cy="50%"
+            innerRadius={60}
+            outerRadius={120}
+            paddingAngle={2}
+          >
+            {data.map((entry, index) => {
+              const configKey = entry[nameKey]?.toLowerCase?.() || entry[nameKey] || entry.status?.toLowerCase?.() || `item-${index}`;
+              const color = config[configKey]?.color || `hsl(var(--chart-${(index % 8) + 1}))`;
+              console.log('Pie cell color for', configKey, ':', color);
+              return (
+                <Cell 
+                  key={`cell-${index}`} 
+                  fill={color}
+                />
+              );
+            })}
+          </Pie>
+        </PieChart>
+      </ChartContainer>
+    </div>
   );
 }

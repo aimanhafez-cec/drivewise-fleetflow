@@ -17,14 +17,18 @@ interface FleetStatusReportProps {
 }
 
 export default function FleetStatusReport({ dateRange }: FleetStatusReportProps) {
+  console.log('FleetStatusReport component rendered with dateRange:', dateRange);
+  
   const { data: vehicles = [], isLoading } = useQuery({
     queryKey: ['vehicles'],
     queryFn: async () => {
+      console.log('Fetching vehicles for FleetStatusReport...');
       const { data, error } = await supabase
         .from('vehicles')
         .select('id, make, model, year, status, location, daily_rate');
       
       if (error) throw error;
+      console.log('FleetStatusReport vehicles data:', data);
       return data || [];
     },
   });
@@ -68,6 +72,9 @@ export default function FleetStatusReport({ dateRange }: FleetStatusReportProps)
     value: count,
     status: status // Include status for color mapping
   }));
+
+  console.log('FleetStatusReport pieData:', pieData);
+  console.log('FleetStatusReport FLEET_STATUS_CONFIG:', FLEET_STATUS_CONFIG);
 
   // Calculate utilization by location
   const utilizationData = vehicles.reduce((acc: Record<string, { total: number; rented: number }>, vehicle) => {
@@ -154,12 +161,18 @@ export default function FleetStatusReport({ dateRange }: FleetStatusReportProps)
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <StandardPieChart 
-              data={pieData}
-              config={FLEET_STATUS_CONFIG}
-              height={300}
-              showLegend={true}
-            />
+            {pieData.length > 0 ? (
+              <StandardPieChart 
+                data={pieData}
+                config={FLEET_STATUS_CONFIG}
+                height={300}
+                showLegend={true}
+              />
+            ) : (
+              <div className="text-white p-8 text-center">
+                No chart data available. pieData length: {pieData.length}
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -171,14 +184,20 @@ export default function FleetStatusReport({ dateRange }: FleetStatusReportProps)
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <StandardBarChart
-              data={utilizationChartData}
-              config={utilizationConfig}
-              height={300}
-              xAxisKey="location"
-              bars={[{ dataKey: "utilization", name: "Utilization %" }]}
-              showLegend={false}
-            />
+            {utilizationChartData.length > 0 ? (
+              <StandardBarChart
+                data={utilizationChartData}
+                config={utilizationConfig}
+                height={300}
+                xAxisKey="location"
+                bars={[{ dataKey: "utilization", name: "Utilization %" }]}
+                showLegend={false}
+              />
+            ) : (
+              <div className="text-white p-8 text-center">
+                No utilization data available. Data length: {utilizationChartData.length}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
