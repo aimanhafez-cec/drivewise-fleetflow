@@ -481,40 +481,35 @@ const Dashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="flex items-center gap-6">
-                  <div className="relative w-32 h-32 flex-shrink-0">
-                    {vehicleStatusData.length > 0 ? (
-                      <ResponsiveContainer width="100%" height="100%">
-                        <PieChart>
-                          <Pie 
-                            data={vehicleStatusData} 
-                            cx="50%" 
-                            cy="50%" 
-                            innerRadius={40} 
-                            outerRadius={60} 
-                            dataKey="value"
-                            stroke="none"
-                          >
-                            {vehicleStatusData.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={entry.color} />
-                            ))}
-                          </Pie>
-                          <Tooltip 
-                            contentStyle={{
-                              backgroundColor: 'rgba(10,122,125,0.9)',
-                              border: '1px solid #33CFCF',
-                              borderRadius: '8px',
-                              color: '#FFFFFF'
-                            }} 
-                          />
-                        </PieChart>
-                      </ResponsiveContainer>
-                    ) : (
-                      <div className="flex items-center justify-center w-full h-full">
-                        <span className="text-white/60 text-sm">Loading...</span>
-                      </div>
-                    )}
+                  <div className="relative w-32 h-32 flex-shrink-0 bg-black/20 rounded-lg">
+                    <ResponsiveContainer width={128} height={128}>
+                      <PieChart>
+                        <Pie 
+                          data={vehicleStatusData} 
+                          cx={64} 
+                          cy={64} 
+                          innerRadius={40} 
+                          outerRadius={60} 
+                          dataKey="value"
+                          stroke="#ffffff"
+                          strokeWidth={1}
+                        >
+                          {vehicleStatusData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                          ))}
+                        </Pie>
+                        <Tooltip 
+                          contentStyle={{
+                            backgroundColor: '#0A7A7D',
+                            border: '1px solid #33CFCF',
+                            borderRadius: '8px',
+                            color: '#FFFFFF'
+                          }} 
+                        />
+                      </PieChart>
+                    </ResponsiveContainer>
                     <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                      <span className="text-xl font-bold text-white">
+                      <span className="text-lg font-bold text-white">
                         {vehicleStatusData.reduce((sum, item) => sum + item.value, 0)}
                       </span>
                       <span className="text-xs text-white/80">Total</span>
@@ -598,53 +593,52 @@ const Dashboard = () => {
               <CardTitle className="text-white">Sales Status</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="h-64 w-full">
-                {salesData.length > 0 ? (
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={salesData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(199,228,229,0.3)" />
-                      <XAxis 
-                        dataKey="name" 
-                        stroke="#C7E4E5" 
-                        fontSize={12}
-                      />
-                      <YAxis 
-                        stroke="#C7E4E5" 
-                        fontSize={12}
-                      />
-                      <Tooltip 
-                        contentStyle={{
-                          backgroundColor: 'rgba(10,122,125,0.9)',
-                          border: '1px solid #33CFCF',
-                          borderRadius: '8px',
-                          color: '#FFFFFF'
-                        }} 
-                      />
-                      <Area 
-                        type="monotone" 
-                        dataKey="previousTotal" 
-                        stackId="1" 
-                        stroke="#007C7E" 
-                        fill="#007C7E" 
-                        fillOpacity={0.6} 
-                        name="Previous Total" 
-                      />
-                      <Area 
-                        type="monotone" 
-                        dataKey="total" 
-                        stackId="2" 
-                        stroke="#33CFCF" 
-                        fill="#33CFCF" 
-                        fillOpacity={0.8} 
-                        name="Total" 
-                      />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <div className="flex items-center justify-center w-full h-full">
-                    <span className="text-white/60">Loading chart...</span>
-                  </div>
-                )}
+              <div className="h-64 w-full bg-black/20 rounded-lg p-4">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart 
+                    data={salesData} 
+                    margin={{ top: 10, right: 10, left: 10, bottom: 10 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(199,228,229,0.3)" />
+                    <XAxis 
+                      dataKey="name" 
+                      stroke="#FFFFFF" 
+                      fontSize={12}
+                      tick={{ fill: '#FFFFFF' }}
+                    />
+                    <YAxis 
+                      stroke="#FFFFFF" 
+                      fontSize={12}
+                      tick={{ fill: '#FFFFFF' }}
+                    />
+                    <Tooltip 
+                      contentStyle={{
+                        backgroundColor: '#0A7A7D',
+                        border: '1px solid #33CFCF',
+                        borderRadius: '8px',
+                        color: '#FFFFFF'
+                      }} 
+                    />
+                    <Area 
+                      type="monotone" 
+                      dataKey="previousTotal" 
+                      stackId="1" 
+                      stroke="#007C7E" 
+                      fill="#007C7E" 
+                      fillOpacity={0.6} 
+                      name="Previous Total" 
+                    />
+                    <Area 
+                      type="monotone" 
+                      dataKey="total" 
+                      stackId="2" 
+                      stroke="#33CFCF" 
+                      fill="#33CFCF" 
+                      fillOpacity={0.8} 
+                      name="Total" 
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
               </div>
             </CardContent>
           </Card>
