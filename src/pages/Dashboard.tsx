@@ -6,14 +6,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { 
-  Car, Calendar, Users, DollarSign, AlertTriangle, Search, MapPin, Clock, CreditCard, Zap,
-  Home, Bell, User, Settings, BarChart3, FileText, Package, Shield, Plus, TrendingUp,
-  Menu, X, Calendar as CalendarIcon, BookOpen, Target, Wrench
-} from 'lucide-react';
+import { Car, Calendar, Users, DollarSign, AlertTriangle, Search, MapPin, Clock, CreditCard, Zap, Home, Bell, User, Settings, BarChart3, FileText, Package, Shield, Plus, TrendingUp, Menu, X, Calendar as CalendarIcon, BookOpen, Target, Wrench } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Area, AreaChart } from 'recharts';
 import { useNavigate } from 'react-router-dom';
-
 const Dashboard = () => {
   const navigate = useNavigate();
   const [customerSearchTerm, setCustomerSearchTerm] = React.useState('');
@@ -110,7 +105,6 @@ const Dashboard = () => {
       setSearchResults([]);
     }
   };
-
   const kpiStats = [{
     title: 'Reservations',
     value: reservationsCount.toString(),
@@ -148,32 +142,94 @@ const Dashboard = () => {
     color: 'text-destructive',
     iconBg: 'bg-teal-overlay'
   }];
-
-  const quickActions = [
-    { name: 'Reservations', icon: Calendar, path: '/reservations', description: 'Manage bookings' },
-    { name: 'Vehicles', icon: Car, path: '/vehicles', description: 'Fleet management' },
-    { name: 'Customers', icon: Users, path: '/customers', description: 'Customer database' },
-    { name: 'Reports', icon: BarChart3, path: '/reports', description: 'Analytics & insights' },
-    { name: 'Agreements', icon: FileText, path: '/agreements', description: 'Contract management' },
-    { name: 'Inspections', icon: Shield, path: '/inspections', description: 'Vehicle checks' },
-    { name: 'Planner', icon: CalendarIcon, path: '/planner', description: 'Schedule view' },
-    { name: 'Settings', icon: Settings, path: '/settings', description: 'System config' }
-  ];
-
-  const appCards = [
-    { name: 'Quick Book', icon: Zap, color: 'bg-teal-accent', path: '/instant-booking' },
-    { name: 'Reservations', icon: Calendar, color: 'bg-primary', path: '/reservations' },
-    { name: 'Fleet Status', icon: Car, color: 'bg-available', path: '/vehicles' },
-    { name: 'Revenue', icon: TrendingUp, color: 'bg-teal-light', path: '/reports' },
-    { name: 'Customers', icon: Users, color: 'bg-primary', path: '/customers' },
-    { name: 'Analytics', icon: BarChart3, color: 'bg-teal-accent', path: '/reports' },
-    { name: 'Maintenance', icon: Wrench, color: 'bg-maintenance', path: '/vehicles' },
-    { name: 'Agreements', icon: FileText, color: 'bg-primary', path: '/agreements' },
-    { name: 'Inspections', icon: Shield, color: 'bg-teal-light', path: '/inspections' }
-  ];
-
+  const quickActions = [{
+    name: 'Reservations',
+    icon: Calendar,
+    path: '/reservations',
+    description: 'Manage bookings'
+  }, {
+    name: 'Vehicles',
+    icon: Car,
+    path: '/vehicles',
+    description: 'Fleet management'
+  }, {
+    name: 'Customers',
+    icon: Users,
+    path: '/customers',
+    description: 'Customer database'
+  }, {
+    name: 'Reports',
+    icon: BarChart3,
+    path: '/reports',
+    description: 'Analytics & insights'
+  }, {
+    name: 'Agreements',
+    icon: FileText,
+    path: '/agreements',
+    description: 'Contract management'
+  }, {
+    name: 'Inspections',
+    icon: Shield,
+    path: '/inspections',
+    description: 'Vehicle checks'
+  }, {
+    name: 'Planner',
+    icon: CalendarIcon,
+    path: '/planner',
+    description: 'Schedule view'
+  }, {
+    name: 'Settings',
+    icon: Settings,
+    path: '/settings',
+    description: 'System config'
+  }];
+  const appCards = [{
+    name: 'Quick Book',
+    icon: Zap,
+    color: 'bg-teal-accent',
+    path: '/instant-booking'
+  }, {
+    name: 'Reservations',
+    icon: Calendar,
+    color: 'bg-primary',
+    path: '/reservations'
+  }, {
+    name: 'Fleet Status',
+    icon: Car,
+    color: 'bg-available',
+    path: '/vehicles'
+  }, {
+    name: 'Revenue',
+    icon: TrendingUp,
+    color: 'bg-teal-light',
+    path: '/reports'
+  }, {
+    name: 'Customers',
+    icon: Users,
+    color: 'bg-primary',
+    path: '/customers'
+  }, {
+    name: 'Analytics',
+    icon: BarChart3,
+    color: 'bg-teal-accent',
+    path: '/reports'
+  }, {
+    name: 'Maintenance',
+    icon: Wrench,
+    color: 'bg-maintenance',
+    path: '/vehicles'
+  }, {
+    name: 'Agreements',
+    icon: FileText,
+    color: 'bg-primary',
+    path: '/agreements'
+  }, {
+    name: 'Inspections',
+    icon: Shield,
+    color: 'bg-teal-light',
+    path: '/inspections'
+  }];
   const tabs = ['Suggestions', 'Me', 'My Team', 'My Client Groups'];
-
   const rateData = [{
     vehicleType: 'Full Size',
     mileage: 100,
@@ -203,7 +259,6 @@ const Dashboard = () => {
     mileage: 0,
     rate: 10
   }];
-
   const salesData = [{
     name: 'Jan',
     previousTotal: 2000,
@@ -229,18 +284,11 @@ const Dashboard = () => {
     previousTotal: 3800,
     total: 4800
   }];
-
-  return (
-    <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-background">
       {/* Header Bar */}
       <header className="bg-secondary h-16 flex items-center justify-between px-6 shadow-soft">
         <div className="flex items-center gap-4">
-          <Button 
-            variant="ghost" 
-            size="sm"
-            className="lg:hidden text-white hover:bg-teal-overlay"
-            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-          >
+          <Button variant="ghost" size="sm" className="lg:hidden text-white hover:bg-teal-overlay" onClick={() => setSidebarCollapsed(!sidebarCollapsed)}>
             <Menu className="h-5 w-5" />
           </Button>
           <div className="text-xl font-bold text-white">FleetMaster</div>
@@ -249,10 +297,7 @@ const Dashboard = () => {
         <div className="flex-1 max-w-md mx-8">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input 
-              placeholder="Search vehicles, customers, reservations..."
-              className="pl-10 bg-white text-gray-900 border-0 rounded-full shadow-sm"
-            />
+            <Input placeholder="Search vehicles, customers, reservations..." className="pl-10 bg-white text-gray-900 border-0 rounded-full shadow-sm" />
           </div>
         </div>
 
@@ -276,21 +321,13 @@ const Dashboard = () => {
           <div className="p-4">
             <h3 className={`text-white font-medium mb-4 ${sidebarCollapsed ? 'hidden' : 'block'}`}>Quick Actions</h3>
             <nav className="space-y-2">
-              {quickActions.map((action) => (
-                <button
-                  key={action.name}
-                  onClick={() => navigate(action.path)}
-                  className="w-full flex items-center gap-3 p-3 text-white hover:bg-teal-light rounded-lg transition-colors group"
-                >
+              {quickActions.map(action => <button key={action.name} onClick={() => navigate(action.path)} className="w-full flex items-center gap-3 p-3 text-white hover:bg-teal-light rounded-lg transition-colors group">
                   <action.icon className="h-5 w-5 text-teal-accent group-hover:text-white transition-colors" />
-                  {!sidebarCollapsed && (
-                    <div className="text-left">
+                  {!sidebarCollapsed && <div className="text-left">
                       <div className="font-medium">{action.name}</div>
                       <div className="text-xs text-muted opacity-80">{action.description}</div>
-                    </div>
-                  )}
-                </button>
-              ))}
+                    </div>}
+                </button>)}
             </nav>
           </div>
         </aside>
@@ -302,34 +339,14 @@ const Dashboard = () => {
             <h1 className="text-3xl font-bold text-white mb-6">Good morning, Fleet Manager</h1>
             
             <div className="flex gap-8 border-b border-teal-light">
-              {tabs.map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab.toLowerCase())}
-                  className={`pb-3 px-1 text-sm font-medium transition-colors relative ${
-                    activeTab === tab.toLowerCase() 
-                      ? 'text-white' 
-                      : 'text-muted hover:text-white'
-                  }`}
-                >
-                  {tab}
-                  {activeTab === tab.toLowerCase() && (
-                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-teal-accent"></div>
-                  )}
-                </button>
-              ))}
+              {tabs.map(tab => {})}
             </div>
           </div>
 
           {/* Apps Grid */}
           <div className="mb-8">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-              {appCards.map((app) => (
-                <Card 
-                  key={app.name}
-                  className="bg-card hover:bg-teal-light transition-all duration-300 cursor-pointer group border-0 shadow-card rounded-xl"
-                  onClick={() => navigate(app.path)}
-                >
+              {appCards.map(app => <Card key={app.name} className="bg-card hover:bg-teal-light transition-all duration-300 cursor-pointer group border-0 shadow-card rounded-xl" onClick={() => navigate(app.path)}>
                   <CardContent className="p-6 flex items-center gap-4">
                     <div className={`p-3 rounded-lg ${app.color} group-hover:shadow-lg transition-shadow`}>
                       <app.icon className="h-6 w-6 text-white" />
@@ -338,8 +355,7 @@ const Dashboard = () => {
                       <h3 className="text-white font-medium">{app.name}</h3>
                     </div>
                   </CardContent>
-                </Card>
-              ))}
+                </Card>)}
               
               {/* Add New Card */}
               <Card className="bg-transparent border-2 border-dashed border-teal-accent hover:bg-teal-overlay/20 transition-colors cursor-pointer group rounded-xl">
@@ -353,8 +369,7 @@ const Dashboard = () => {
 
           {/* KPI Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
-            {kpiStats.map((stat) => (
-              <Card key={stat.title} className="bg-card border-0 shadow-card rounded-xl">
+            {kpiStats.map(stat => <Card key={stat.title} className="bg-card border-0 shadow-card rounded-xl">
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div>
@@ -366,8 +381,7 @@ const Dashboard = () => {
                     </div>
                   </div>
                 </CardContent>
-              </Card>
-            ))}
+              </Card>)}
           </div>
 
           {/* Dashboard Content Grid */}
@@ -402,29 +416,18 @@ const Dashboard = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex gap-2">
-                  <Input 
-                    placeholder="Enter customer name..." 
-                    className="flex-1 bg-white text-gray-900" 
-                    value={customerSearchTerm} 
-                    onChange={(e) => {setCustomerSearchTerm(e.target.value); searchCustomerAgreements()}} 
-                  />
-                  <Button 
-                    className="bg-teal-accent hover:bg-teal-light text-white px-6" 
-                    onClick={searchCustomerAgreements}
-                  >
+                  <Input placeholder="Enter customer name..." className="flex-1 bg-white text-gray-900" value={customerSearchTerm} onChange={e => {
+                  setCustomerSearchTerm(e.target.value);
+                  searchCustomerAgreements();
+                }} />
+                  <Button className="bg-teal-accent hover:bg-teal-light text-white px-6" onClick={searchCustomerAgreements}>
                     Search
                   </Button>
                 </div>
                 
                 {/* Search Results */}
-                {searchResults.length > 0 && (
-                  <div className="mt-4 space-y-2 max-h-48 overflow-y-auto">
-                    {searchResults.map(agreement => (
-                      <div 
-                        key={agreement.id} 
-                        className="p-3 bg-teal-overlay/20 border border-teal-light rounded-lg hover:bg-teal-overlay/40 cursor-pointer transition-colors" 
-                        onClick={() => navigate(`/agreements/${agreement.id}`)}
-                      >
+                {searchResults.length > 0 && <div className="mt-4 space-y-2 max-h-48 overflow-y-auto">
+                    {searchResults.map(agreement => <div key={agreement.id} className="p-3 bg-teal-overlay/20 border border-teal-light rounded-lg hover:bg-teal-overlay/40 cursor-pointer transition-colors" onClick={() => navigate(`/agreements/${agreement.id}`)}>
                         <div className="flex justify-between items-start">
                           <div>
                             <p className="font-medium text-white">{agreement.customers?.full_name}</p>
@@ -444,14 +447,10 @@ const Dashboard = () => {
                             </p>
                           </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                      </div>)}
+                  </div>}
                 
-                {customerSearchTerm && searchResults.length === 0 && (
-                  <p className="text-muted text-sm mt-2">No agreements found for this customer.</p>
-                )}
+                {customerSearchTerm && searchResults.length === 0 && <p className="text-muted text-sm mt-2">No agreements found for this customer.</p>}
               </CardContent>
             </Card>
           </div>
@@ -476,9 +475,7 @@ const Dashboard = () => {
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
                         <Pie data={vehicleStatusData} cx="50%" cy="50%" innerRadius={40} outerRadius={60} dataKey="value">
-                          {vehicleStatusData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.color} />
-                          ))}
+                          {vehicleStatusData.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.color} />)}
                         </Pie>
                       </PieChart>
                     </ResponsiveContainer>
@@ -490,15 +487,15 @@ const Dashboard = () => {
                     </div>
                   </div>
                   <div className="flex-1">
-                    {vehicleStatusData.map((item, index) => (
-                      <div key={index} className="flex items-center justify-between py-1">
+                    {vehicleStatusData.map((item, index) => <div key={index} className="flex items-center justify-between py-1">
                         <div className="flex items-center gap-2">
-                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }}></div>
+                          <div className="w-3 h-3 rounded-full" style={{
+                        backgroundColor: item.color
+                      }}></div>
                           <span className="text-sm text-white">{item.name}</span>
                         </div>
                         <span className="text-sm font-medium text-white">{item.value}</span>
-                      </div>
-                    ))}
+                      </div>)}
                   </div>
                 </div>
               </CardContent>
@@ -546,13 +543,11 @@ const Dashboard = () => {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {rateData.map((row, index) => (
-                        <TableRow key={index} className="border-teal-light hover:bg-teal-overlay/20">
+                      {rateData.map((row, index) => <TableRow key={index} className="border-teal-light hover:bg-teal-overlay/20">
                           <TableCell className="font-medium text-white">{row.vehicleType}</TableCell>
                           <TableCell className="text-muted">{row.mileage}</TableCell>
                           <TableCell className="text-muted">{row.rate}</TableCell>
-                        </TableRow>
-                      ))}
+                        </TableRow>)}
                     </TableBody>
                   </Table>
                 </div>
@@ -572,14 +567,12 @@ const Dashboard = () => {
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(199,228,229,0.3)" />
                     <XAxis dataKey="name" stroke="#C7E4E5" />
                     <YAxis stroke="#C7E4E5" />
-                    <Tooltip 
-                      contentStyle={{ 
-                        backgroundColor: 'rgba(10,122,125,0.9)', 
-                        border: '1px solid #33CFCF',
-                        borderRadius: '8px',
-                        color: '#FFFFFF'
-                      }} 
-                    />
+                    <Tooltip contentStyle={{
+                    backgroundColor: 'rgba(10,122,125,0.9)',
+                    border: '1px solid #33CFCF',
+                    borderRadius: '8px',
+                    color: '#FFFFFF'
+                  }} />
                     <Area type="monotone" dataKey="previousTotal" stackId="1" stroke="#007C7E" fill="#007C7E" fillOpacity={0.6} name="Previous Total" />
                     <Area type="monotone" dataKey="total" stackId="2" stroke="#33CFCF" fill="#33CFCF" fillOpacity={0.8} name="Total" />
                   </AreaChart>
@@ -589,8 +582,6 @@ const Dashboard = () => {
           </Card>
         </main>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Dashboard;
