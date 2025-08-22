@@ -75,11 +75,11 @@ export const PlannerFilters: React.FC<PlannerFiltersProps> = ({
 
   return (
     <Card className="shadow-sm">
-      <CardContent className="p-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <CardContent className="p-2 sm:p-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
           {/* Vehicle Class */}
           <div className="space-y-2">
-            <Label htmlFor="flt-class">Vehicle Class</Label>
+            <Label htmlFor="flt-class" className="text-sm">Vehicle Class</Label>
             <VehicleClassSelect
               value={filters.vehicleClass || undefined}
               onChange={(value) => updateFilter("vehicleClass", typeof value === 'string' ? value : "")}
@@ -91,7 +91,7 @@ export const PlannerFilters: React.FC<PlannerFiltersProps> = ({
 
           {/* Customer */}
           <div className="space-y-2">
-            <Label htmlFor="flt-customer">Customer</Label>
+            <Label htmlFor="flt-customer" className="text-sm">Customer</Label>
             <CustomerSelect
               value={filters.customer || undefined}
               onChange={(value) => updateFilter("customer", typeof value === 'string' ? value : "")}
@@ -103,29 +103,31 @@ export const PlannerFilters: React.FC<PlannerFiltersProps> = ({
 
           {/* Date Range */}
           <div className="space-y-2">
-            <Label>Date Range</Label>
+            <Label className="text-sm">Date Range</Label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
                   className={cn(
-                    "w-full justify-start text-left font-normal",
+                    "w-full justify-start text-left font-normal text-sm",
                     !filters.dateRange.from && "text-muted-foreground"
                   )}
                 >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {filters.dateRange.from ? (
-                    filters.dateRange.to ? (
-                      <>
-                        {format(filters.dateRange.from, "LLL dd")} -{" "}
-                        {format(filters.dateRange.to, "LLL dd")}
-                      </>
+                  <CalendarIcon className="mr-2 h-4 w-4 shrink-0" />
+                  <span className="truncate">
+                    {filters.dateRange.from ? (
+                      filters.dateRange.to ? (
+                        <>
+                          {format(filters.dateRange.from, "MMM dd")} -{" "}
+                          {format(filters.dateRange.to, "MMM dd")}
+                        </>
+                      ) : (
+                        format(filters.dateRange.from, "MMM dd, y")
+                      )
                     ) : (
-                      format(filters.dateRange.from, "LLL dd, y")
-                    )
-                  ) : (
-                    "Pick dates"
-                  )}
+                      "Pick dates"
+                    )}
+                  </span>
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -136,7 +138,7 @@ export const PlannerFilters: React.FC<PlannerFiltersProps> = ({
                     to: filters.dateRange.to
                   }}
                   onSelect={(range) => updateFilter("dateRange", range || { from: undefined, to: undefined })}
-                  numberOfMonths={2}
+                  numberOfMonths={1}
                 />
               </PopoverContent>
             </Popover>
@@ -144,7 +146,7 @@ export const PlannerFilters: React.FC<PlannerFiltersProps> = ({
 
           {/* Action Buttons */}
           <div className="space-y-2">
-            <Label>&nbsp;</Label>
+            <Label className="text-sm">&nbsp;</Label>
             <div className="flex gap-2">
               <Button 
                 size="sm" 
@@ -153,7 +155,7 @@ export const PlannerFilters: React.FC<PlannerFiltersProps> = ({
                 data-testid="btn-search"
               >
                 <Search className="mr-2 h-4 w-4" />
-                Search
+                <span className="hidden sm:inline">Search</span>
               </Button>
               <Button 
                 variant="outline" 
@@ -172,13 +174,13 @@ export const PlannerFilters: React.FC<PlannerFiltersProps> = ({
         <div className="mt-4 space-y-3">
           {/* Status */}
           <div className="space-y-2">
-            <Label>Status</Label>
-            <div className="flex flex-wrap gap-2" data-testid="flt-status">
+            <Label className="text-sm">Status</Label>
+            <div className="flex flex-wrap gap-1 sm:gap-2" data-testid="flt-status">
               {statusOptions.map(status => (
                 <Badge
                   key={status}
                   variant={filters.status.includes(status) ? "default" : "outline"}
-                  className="cursor-pointer"
+                  className="cursor-pointer text-xs"
                   onClick={() => toggleStatus(status)}
                 >
                   {status}
@@ -192,7 +194,7 @@ export const PlannerFilters: React.FC<PlannerFiltersProps> = ({
 
           {/* Locations */}
           <div className="space-y-2">
-            <Label>Locations</Label>
+            <Label className="text-sm">Locations</Label>
             <LocationSelect
               value={filters.locations}
               onChange={(value) => updateFilter("locations", Array.isArray(value) ? value : value ? [value] : [])}

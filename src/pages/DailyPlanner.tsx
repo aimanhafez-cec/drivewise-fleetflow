@@ -413,20 +413,20 @@ const DailyPlanner: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 w-full min-w-0">
+    <div className="space-y-4 sm:space-y-6 w-full min-w-0 max-w-full overflow-hidden">
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Daily Planner</h1>
-          <p className="text-muted-foreground">Schedule and manage vehicle reservations and agreements</p>
+        <div className="min-w-0">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight truncate">Daily Planner</h1>
+          <p className="text-muted-foreground text-sm sm:text-base">Schedule and manage vehicle reservations and agreements</p>
         </div>
-        <div className="flex gap-2 flex-wrap">
-          <Button variant="outline" size="sm">
+        <div className="flex gap-2 flex-wrap w-full sm:w-auto">
+          <Button variant="outline" size="sm" className="flex-1 sm:flex-none">
             <Filter className="mr-2 h-4 w-4" />
             <span className="hidden sm:inline">Saved Views</span>
             <span className="sm:hidden">Views</span>
           </Button>
-          <Button onClick={() => setShowNewReservationModal(true)} size="sm">
+          <Button onClick={() => setShowNewReservationModal(true)} size="sm" className="flex-1 sm:flex-none">
             <Plus className="mr-2 h-4 w-4" />
             <span className="hidden sm:inline">New Reservation</span>
             <span className="sm:hidden">New</span>
@@ -451,10 +451,10 @@ const DailyPlanner: React.FC = () => {
       {/* Calendar Controls */}
       <Card>
         <CardHeader className="pb-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full sm:w-auto">
               <Tabs value={view} onValueChange={(v) => setView(v as ViewType)}>
-                <TabsList>
+                <TabsList className="grid w-full grid-cols-3 sm:w-auto">
                   <TabsTrigger value="month" data-testid="view-month">Month</TabsTrigger>
                   <TabsTrigger value="week" data-testid="view-week">Week</TabsTrigger>
                   <TabsTrigger value="day" data-testid="view-day">Day</TabsTrigger>
@@ -467,6 +467,7 @@ const DailyPlanner: React.FC = () => {
                   size="sm"
                   onClick={() => setResourceMode(!resourceMode)}
                   data-testid="toggle-resource"
+                  className="w-full sm:w-auto"
                 >
                   <Car className="mr-2 h-4 w-4" />
                   Resource View
@@ -474,12 +475,13 @@ const DailyPlanner: React.FC = () => {
               )}
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 w-full sm:w-auto">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => navigateDate("today")}
                 data-testid="btn-today"
+                className="flex-1 sm:flex-none"
               >
                 Today
               </Button>
@@ -502,10 +504,10 @@ const DailyPlanner: React.FC = () => {
             </div>
           </div>
 
-          <div className="text-xl font-semibold">{formatDateHeader()}</div>
+          <div className="text-lg sm:text-xl font-semibold truncate">{formatDateHeader()}</div>
         </CardHeader>
 
-        <CardContent>
+        <CardContent className="min-w-0 overflow-hidden">
           {resourceMode && (view === "week" || view === "day") ? (
             <ResourceView 
               events={events}

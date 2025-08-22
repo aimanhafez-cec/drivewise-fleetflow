@@ -171,14 +171,14 @@ const Vehicles = () => {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="space-y-4 sm:space-y-6 max-w-full overflow-hidden">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold">Vehicles</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold">Vehicles</h1>
         </div>
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-2 sm:space-x-4 w-full sm:w-auto">
           <Select value={`${itemsPerPage}`} onValueChange={(value) => setItemsPerPage(parseInt(value))}>
-            <SelectTrigger className="w-20">
+            <SelectTrigger className="w-16 sm:w-20">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -188,15 +188,16 @@ const Vehicles = () => {
               <SelectItem value="100">100</SelectItem>
             </SelectContent>
           </Select>
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" className="flex-shrink-0">
             <Filter className="mr-2 h-4 w-4" />
-            Filter
+            <span className="hidden sm:inline">Filter</span>
           </Button>
           <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
             <DialogTrigger asChild>
-              <Button onClick={handleAdd} className="bg-teal-500 hover:bg-teal-600">
+              <Button onClick={handleAdd} className="bg-teal-500 hover:bg-teal-600 flex-shrink-0">
                 <Plus className="mr-2 h-4 w-4" />
-                New Vehicle
+                <span className="hidden sm:inline">New Vehicle</span>
+                <span className="sm:hidden">New</span>
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -214,10 +215,10 @@ const Vehicles = () => {
         </div>
       </div>
 
-      <div className="flex items-center space-x-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
         <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-          <SelectTrigger className="w-48">
-            <SelectValue placeholder="Vehicle No." />
+          <SelectTrigger className="w-full sm:w-48">
+            <SelectValue placeholder="Vehicle Category" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Categories</SelectItem>
@@ -227,10 +228,10 @@ const Vehicles = () => {
               </SelectItem>)}
           </SelectContent>
         </Select>
-        <div className="relative flex-1 max-w-sm">
+        <div className="relative w-full sm:flex-1 sm:max-w-sm">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
           <Input
-            placeholder="Vehicle No."
+            placeholder="Search vehicles..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10"
@@ -238,94 +239,81 @@ const Vehicles = () => {
         </div>
       </div>
 
-      <div className="border rounded-lg overflow-x-auto">
-        <Table>
-          <TableHeader className="bg-slate-800 text-white">
-            <TableRow>
-              <TableHead className="text-white cursor-pointer" onClick={() => handleSort('id')}>
-                <div className="flex items-center">
-                  Vehicle No.
-                  {sortField === 'id' && (sortDirection === 'asc' ? <ChevronUp className="ml-1 h-4 w-4" /> : <ChevronDown className="ml-1 h-4 w-4" />)}
-                </div>
-              </TableHead>
-              <TableHead className="text-white cursor-pointer" onClick={() => handleSort('license_plate')}>
-                <div className="flex items-center">
-                  License No.
-                  {sortField === 'license_plate' && (sortDirection === 'asc' ? <ChevronUp className="ml-1 h-4 w-4" /> : <ChevronDown className="ml-1 h-4 w-4" />)}
-                </div>
-              </TableHead>
-              <TableHead className="text-white cursor-pointer" onClick={() => handleSort('color')}>
-                <div className="flex items-center">
-                  Color
-                  {sortField === 'color' && (sortDirection === 'asc' ? <ChevronUp className="ml-1 h-4 w-4" /> : <ChevronDown className="ml-1 h-4 w-4" />)}
-                </div>
-              </TableHead>
-              <TableHead className="text-white cursor-pointer" onClick={() => handleSort('make')}>
-                <div className="flex items-center">
-                  Make
-                  {sortField === 'make' && (sortDirection === 'asc' ? <ChevronUp className="ml-1 h-4 w-4" /> : <ChevronDown className="ml-1 h-4 w-4" />)}
-                </div>
-              </TableHead>
-              <TableHead className="text-white cursor-pointer" onClick={() => handleSort('model')}>
-                <div className="flex items-center">
-                  Model
-                  {sortField === 'model' && (sortDirection === 'asc' ? <ChevronUp className="ml-1 h-4 w-4" /> : <ChevronDown className="ml-1 h-4 w-4" />)}
-                </div>
-              </TableHead>
-              <TableHead className="text-white cursor-pointer" onClick={() => handleSort('year')}>
-                <div className="flex items-center">
-                  Year
-                  {sortField === 'year' && (sortDirection === 'asc' ? <ChevronUp className="ml-1 h-4 w-4" /> : <ChevronDown className="ml-1 h-4 w-4" />)}
-                </div>
-              </TableHead>
-              <TableHead className="text-white cursor-pointer" onClick={() => handleSort('status')}>
-                <div className="flex items-center">
-                  Status
-                  {sortField === 'status' && (sortDirection === 'asc' ? <ChevronUp className="ml-1 h-4 w-4" /> : <ChevronDown className="ml-1 h-4 w-4" />)}
-                </div>
-              </TableHead>
-              <TableHead className="text-white">Vehicle Type</TableHead>
-              <TableHead className="text-white">Current Location</TableHead>
-              <TableHead className="text-white">Owning Location</TableHead>
-              <TableHead className="text-white">Vin No.</TableHead>
-              <TableHead className="text-white">Insurance Company</TableHead>
-              <TableHead className="text-white">Fuel Type</TableHead>
-              <TableHead className="text-white">Transmission</TableHead>
-              <TableHead className="text-white">Tank Size</TableHead>
-              <TableHead className="text-white">Current Odometer</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {paginatedVehicles.map((vehicle, index) => (
-              <TableRow 
-                key={vehicle.id} 
-                className="hover:bg-muted/50 cursor-pointer"
-                onClick={() => navigate(`/vehicles/${vehicle.id}`)}
-              >
-                <TableCell className="font-medium">{startIndex + index + 1}</TableCell>
-                <TableCell>{vehicle.license_plate}</TableCell>
-                <TableCell>{vehicle.color || '-'}</TableCell>
-                <TableCell>{vehicle.make}</TableCell>
-                <TableCell>{vehicle.model}</TableCell>
-                <TableCell>{vehicle.year}</TableCell>
-                <TableCell>
-                  <Badge className={statusConfig[vehicle.status]?.className}>
-                    {statusConfig[vehicle.status]?.label}
-                  </Badge>
-                </TableCell>
-                <TableCell>{vehicle.subtype || vehicle.categories?.name || '-'}</TableCell>
-                <TableCell>{vehicle.location || '-'}</TableCell>
-                <TableCell>{vehicle.location || '-'}</TableCell>
-                <TableCell className="font-mono text-xs">{vehicle.vin}</TableCell>
-                <TableCell>-</TableCell>
-                <TableCell>{vehicle.engine_size || 'Gas'}</TableCell>
-                <TableCell>{vehicle.transmission || 'Automatic'}</TableCell>
-                <TableCell>-</TableCell>
-                <TableCell>{vehicle.odometer?.toLocaleString() || 0}</TableCell>
+      <div className="border rounded-lg overflow-hidden">
+        <div className="overflow-x-auto">
+          <Table className="min-w-full">
+            <TableHeader className="bg-slate-800 text-white">
+              <TableRow>
+                <TableHead className="text-white cursor-pointer min-w-[80px]" onClick={() => handleSort('id')}>
+                  <div className="flex items-center">
+                    Vehicle No.
+                    {sortField === 'id' && (sortDirection === 'asc' ? <ChevronUp className="ml-1 h-4 w-4" /> : <ChevronDown className="ml-1 h-4 w-4" />)}
+                  </div>
+                </TableHead>
+                <TableHead className="text-white cursor-pointer min-w-[100px]" onClick={() => handleSort('license_plate')}>
+                  <div className="flex items-center">
+                    License No.
+                    {sortField === 'license_plate' && (sortDirection === 'asc' ? <ChevronUp className="ml-1 h-4 w-4" /> : <ChevronDown className="ml-1 h-4 w-4" />)}
+                  </div>
+                </TableHead>
+                <TableHead className="text-white cursor-pointer min-w-[80px]" onClick={() => handleSort('make')}>
+                  <div className="flex items-center">
+                    Make
+                    {sortField === 'make' && (sortDirection === 'asc' ? <ChevronUp className="ml-1 h-4 w-4" /> : <ChevronDown className="ml-1 h-4 w-4" />)}
+                  </div>
+                </TableHead>
+                <TableHead className="text-white cursor-pointer min-w-[80px]" onClick={() => handleSort('model')}>
+                  <div className="flex items-center">
+                    Model
+                    {sortField === 'model' && (sortDirection === 'asc' ? <ChevronUp className="ml-1 h-4 w-4" /> : <ChevronDown className="ml-1 h-4 w-4" />)}
+                  </div>
+                </TableHead>
+                <TableHead className="text-white cursor-pointer min-w-[70px]" onClick={() => handleSort('year')}>
+                  <div className="flex items-center">
+                    Year
+                    {sortField === 'year' && (sortDirection === 'asc' ? <ChevronUp className="ml-1 h-4 w-4" /> : <ChevronDown className="ml-1 h-4 w-4" />)}
+                  </div>
+                </TableHead>
+                <TableHead className="text-white cursor-pointer min-w-[100px]" onClick={() => handleSort('status')}>
+                  <div className="flex items-center">
+                    Status
+                    {sortField === 'status' && (sortDirection === 'asc' ? <ChevronUp className="ml-1 h-4 w-4" /> : <ChevronDown className="ml-1 h-4 w-4" />)}
+                  </div>
+                </TableHead>
+                <TableHead className="text-white min-w-[100px] hidden md:table-cell">Type</TableHead>
+                <TableHead className="text-white min-w-[120px] hidden lg:table-cell">Location</TableHead>
+                <TableHead className="text-white min-w-[150px] hidden lg:table-cell">VIN</TableHead>
+                <TableHead className="text-white min-w-[100px] hidden xl:table-cell">Transmission</TableHead>
+                <TableHead className="text-white min-w-[120px] hidden xl:table-cell">Odometer</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {paginatedVehicles.map((vehicle, index) => (
+                <TableRow 
+                  key={vehicle.id} 
+                  className="hover:bg-muted/50 cursor-pointer"
+                  onClick={() => navigate(`/vehicles/${vehicle.id}`)}
+                >
+                  <TableCell className="font-medium">{startIndex + index + 1}</TableCell>
+                  <TableCell className="font-mono text-sm">{vehicle.license_plate}</TableCell>
+                  <TableCell>{vehicle.make}</TableCell>
+                  <TableCell>{vehicle.model}</TableCell>
+                  <TableCell>{vehicle.year}</TableCell>
+                  <TableCell>
+                    <Badge className={statusConfig[vehicle.status]?.className}>
+                      {statusConfig[vehicle.status]?.label}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="hidden md:table-cell">{vehicle.subtype || vehicle.categories?.name || '-'}</TableCell>
+                  <TableCell className="hidden lg:table-cell">{vehicle.location || '-'}</TableCell>
+                  <TableCell className="font-mono text-xs hidden lg:table-cell">{vehicle.vin}</TableCell>
+                  <TableCell className="hidden xl:table-cell">{vehicle.transmission || 'Automatic'}</TableCell>
+                  <TableCell className="hidden xl:table-cell">{vehicle.odometer?.toLocaleString() || 0}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </div>
 
       <div className="flex items-center justify-between">

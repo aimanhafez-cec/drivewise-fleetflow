@@ -106,20 +106,22 @@ const navigation = [
 
 const AppLayout = () => {
   return (
-    <SidebarProvider defaultOpen={true}>
-      <div className="min-h-screen flex w-full">
+    <SidebarProvider defaultOpen={false}>
+      <div className="min-h-screen flex w-full overflow-hidden">
         <AppSidebar />
-        <main className="flex-1 flex flex-col min-w-0">
-          <header className="h-12 flex items-center justify-between border-b px-4">
+        <main className="flex-1 flex flex-col min-w-0 w-full">
+          <header className="h-12 flex items-center justify-between border-b px-2 sm:px-4 shrink-0">
             <SidebarTrigger />
             <div className="flex items-center gap-2">
-              <QuickSearch />
+              <div className="hidden sm:block">
+                <QuickSearch />
+              </div>
               <Button variant="ghost" size="icon" aria-label="Notifications">
                 <Bell className="h-4 w-4" />
               </Button>
             </div>
           </header>
-          <div className="flex-1 p-4 md:p-6 min-w-0">
+          <div className="flex-1 p-2 sm:p-4 md:p-6 min-w-0 overflow-hidden">
             <Outlet />
           </div>
         </main>
@@ -133,7 +135,7 @@ function AppSidebar() {
   const { toast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
-  const { state, setOpen } = useSidebar();
+  const { state, open, setOpen } = useSidebar();
 
   const handleSignOut = async () => {
     const { error } = await signOut();
@@ -152,22 +154,12 @@ function AppSidebar() {
     }
   };
 
-  const handleMouseEnter = () => {
-    setOpen(true);
-  };
-
-  const handleMouseLeave = () => {
-    setOpen(false);
-  };
-
   const isActive = (path: string) => location.pathname === path;
 
   return (
     <Sidebar 
-      className={state === "collapsed" ? "w-14" : "w-60"} 
+      className="data-[state=open]:w-60 data-[state=closed]:w-0 md:data-[state=closed]:w-14"
       collapsible="icon"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
     >
       <SidebarContent>
         <SidebarGroup>
@@ -183,9 +175,8 @@ function AppSidebar() {
                         isActive ? "bg-muted text-primary font-medium" : "hover:bg-muted/50"
                       }
                     >
-                      <item.icon className="mr-2 h-4 w-4" />
-                      <span className="md:hidden">{item.title}</span>
-                      {state !== "collapsed" && <span className="hidden md:inline">{item.title}</span>}
+                      <item.icon className="h-4 w-4 shrink-0" />
+                      <span className="ml-2 truncate">{item.title}</span>
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -203,9 +194,8 @@ function AppSidebar() {
                     onClick={handleSignOut}
                     className="w-full text-left hover:bg-muted/50"
                   >
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span className="md:hidden">Sign Out</span>
-                    {state !== "collapsed" && <span className="hidden md:inline">Sign Out</span>}
+                    <LogOut className="h-4 w-4 shrink-0" />
+                    <span className="ml-2 truncate">Sign Out</span>
                   </button>
                 </SidebarMenuButton>
               </SidebarMenuItem>
