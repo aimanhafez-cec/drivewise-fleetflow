@@ -19,8 +19,8 @@ const InstantBooking = () => {
   } = useToast();
   const [step, setStep] = useState(1);
   const [bookingData, setBookingData] = useState<any>({
-    pickupDate: null,
-    returnDate: null,
+    pickupDate: '',
+    returnDate: '',
     pickupLocation: '',
     returnLocation: '',
     vehicleId: null,
