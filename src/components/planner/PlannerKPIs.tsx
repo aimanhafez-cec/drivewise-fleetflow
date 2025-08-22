@@ -100,10 +100,10 @@ export const PlannerKPIs: React.FC<PlannerKPIsProps> = ({ events }) => {
 
   const getVariantColor = (variant: string) => {
     switch (variant) {
-      case "success": return "text-green-600 bg-green-50 border-green-200";
-      case "warning": return "text-yellow-600 bg-yellow-50 border-yellow-200";
-      case "info": return "text-blue-600 bg-blue-50 border-blue-200";
-      case "destructive": return "text-red-600 bg-red-50 border-red-200";
+      case "success": return "text-available-foreground bg-available/10 border-available/20";
+      case "warning": return "text-maintenance-foreground bg-maintenance/10 border-maintenance/20";
+      case "info": return "text-primary-foreground bg-primary/10 border-primary/20";
+      case "destructive": return "text-destructive-foreground bg-destructive/10 border-destructive/20";
       default: return "text-muted-foreground bg-muted/50 border-border";
     }
   };

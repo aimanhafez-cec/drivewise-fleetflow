@@ -26,8 +26,8 @@
     --secondary: 0 0% 17%; /* #2B2B2B - Header bar */
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 183 31% 85%; /* #C7E4E5 - Secondary/muted text */
-    --muted-foreground: 183 95% 15%; /* Dark teal for readable text on muted backgrounds */
+    --muted: 183 31% 25%; /* #3A5F60 - Darker muted background for better contrast */
+    --muted-foreground: 0 0% 95%; /* Light text on muted backgrounds */
 
     --accent: 180 61% 51%; /* #33CFCF - Accent color */
     --accent-foreground: 0 0% 100%;
@@ -106,8 +106,8 @@
     --secondary: 0 0% 17%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 183 31% 85%;
-    --muted-foreground: 183 95% 15%; /* Dark teal for readable text on muted backgrounds */
+    --muted: 183 31% 25%; /* Same darker muted for dark mode */
+    --muted-foreground: 0 0% 95%; /* Light text on muted backgrounds */
 
     --accent: 180 61% 51%;
     --accent-foreground: 0 0% 100%;

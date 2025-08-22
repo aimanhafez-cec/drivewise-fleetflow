@@ -339,7 +339,14 @@ const Dashboard = () => {
             <h1 className="text-3xl font-bold text-white mb-6">Good morning, Fleet Manager</h1>
             
             <div className="flex gap-8 border-b border-teal-light">
-              {tabs.map(tab => {})}
+              {tabs.map(tab => (
+                <button
+                  key={tab}
+                  className="py-2 text-sm font-medium text-white hover:text-teal-accent transition-colors"
+                >
+                  {tab}
+                </button>
+              ))}
             </div>
           </div>
 

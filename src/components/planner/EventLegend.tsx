@@ -39,7 +39,7 @@ export const EventLegend: React.FC = () => {
   ];
 
   return (
-    <div className="bg-muted/50 p-4 rounded-lg">
+    <div className="bg-muted p-4 rounded-lg">
       <div className="flex flex-wrap gap-6">
         {legendItems.map((category) => (
           <div key={category.category} className="flex items-center gap-3">
@@ -47,16 +47,31 @@ export const EventLegend: React.FC = () => {
               {category.category}:
             </span>
             <div className="flex gap-2">
-              {category.items.map((item) => (
-                <Badge 
-                  key={item.label} 
-                  variant="outline" 
-                  className={`text-xs ${item.color} text-white border-transparent`}
-                >
-                  <item.icon className="mr-1 h-3 w-3" />
-                  {item.label}
-                </Badge>
-              ))}
+              {category.items.map((item) => {
+                const colorMap: Record<string, string> = {
+                  'bg-green-500': '#10b981',
+                  'bg-yellow-500': '#eab308', 
+                  'bg-gray-500': '#6b7280',
+                  'bg-blue-500': '#3b82f6',
+                  'bg-red-500': '#ef4444',
+                  'bg-gray-600': '#4b5563',
+                  'bg-purple-500': '#a855f7',
+                  'bg-orange-500': '#f97316',
+                  'bg-yellow-600': '#ca8a04'
+                };
+                
+                return (
+                  <Badge 
+                    key={item.label} 
+                    variant="outline" 
+                    className="text-xs text-white border-white/20 hover:bg-white/20"
+                    style={{ backgroundColor: colorMap[item.color] || '#6b7280' }}
+                  >
+                    <item.icon className="mr-1 h-3 w-3" />
+                    {item.label}
+                  </Badge>
+                );
+              })}
             </div>
           </div>
         ))}
