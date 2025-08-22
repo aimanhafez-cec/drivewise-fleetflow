@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { availableAddOns } from '@/lib/constants/addOns';
 
 export type Summary = {
   baseRate: number;
@@ -42,6 +43,7 @@ interface MiscCharge {
 interface FormData {
   reservationLines: ReservationLine[];
   selectedMiscCharges: string[];
+  addOnCharges?: Record<string, number>;
   promotionCode: string;
   discountValue: string | number | null;
   preAdjustment: number;
@@ -65,19 +67,22 @@ export const useReservationSummary = (formData: FormData): Summary => {
     // Ensure arrays exist and have default values
     const lines = formData.reservationLines || [];
     const selectedChargeIds = formData.selectedMiscCharges || [];
+    const addOnCharges = formData.addOnCharges || {};
     
     // Calculate base values from lines
     const linesNet = lines.reduce((sum, line) => sum + (line.lineNetPrice || 0), 0);
     const taxOnLines = lines.reduce((sum, line) => sum + (line.taxValue || 0), 0);
     
-    // Calculate miscellaneous charges
-    const selectedCharges = MISC_CHARGES.filter(charge => selectedChargeIds.includes(charge.id));
-    const miscTaxable = selectedCharges
-      .filter(charge => charge.taxable)
-      .reduce((sum, charge) => sum + charge.amount, 0);
-    const miscNonTaxable = selectedCharges
-      .filter(charge => !charge.taxable)
-      .reduce((sum, charge) => sum + charge.amount, 0);
+    // Calculate miscellaneous charges using actual add-on data
+    const selectedAddOns = availableAddOns.filter(addOn => selectedChargeIds.includes(addOn.id));
+    
+    // For now, treat all add-ons as taxable (you can modify this logic based on add-on properties)
+    const miscTaxable = selectedAddOns.reduce((sum, addOn) => {
+      const chargeAmount = addOnCharges[addOn.id] || 0;
+      return sum + chargeAmount;
+    }, 0);
+    
+    const miscNonTaxable = 0; // All add-ons are currently taxable
     
     // Calculate tax on misc taxable charges (standard 10% tax rate if no line tax rate available)
     const avgTaxRate = linesNet > 0 ? taxOnLines / linesNet : 0.1; // Default to 10% if no lines
@@ -159,6 +164,7 @@ export const useReservationSummary = (formData: FormData): Summary => {
   }, [
     formData.reservationLines,
     formData.selectedMiscCharges,
+    formData.addOnCharges,
     formData.promotionCode,
     formData.discountValue,
     formData.preAdjustment,
