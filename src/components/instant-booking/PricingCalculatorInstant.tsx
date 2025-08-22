@@ -259,6 +259,13 @@ const PricingCalculatorInstant: React.FC<PricingCalculatorInstantProps> = ({
             <span>Total Amount</span>
             <span>AED {pricingCalculation.totalAmount.toFixed(2)}</span>
           </div>
+
+          <Separator />
+
+          <div className="flex justify-between items-center">
+            <span className="text-muted-foreground">Security Amount</span>
+            <span>AED 1,500.00</span>
+          </div>
         </div>
 
         {/* Auto-Approval Status */}
