@@ -35,6 +35,8 @@ import RFQDetails from "./pages/RFQDetails";
 import CustomerDetails from "./pages/CustomerDetails";
 import InstantBooking from "./pages/InstantBooking";
 import Reports from "./pages/Reports";
+import CorporateLeasing from "./pages/CorporateLeasing";
+import NewCorporateLeasing from "./pages/NewCorporateLeasing";
 
 
 const queryClient = new QueryClient();
@@ -159,6 +161,14 @@ const App = () => (
               </ProtectedRoute>
             }>
               <Route index element={<Reports />} />
+            </Route>
+            <Route path="/corporate-leasing" element={
+              <ProtectedRoute>
+                <AppLayout />
+              </ProtectedRoute>
+            }>
+              <Route index element={<CorporateLeasing />} />
+              <Route path="new" element={<NewCorporateLeasing />} />
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

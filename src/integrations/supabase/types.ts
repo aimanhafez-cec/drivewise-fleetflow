@@ -215,6 +215,399 @@ export type Database = {
         }
         Relationships: []
       }
+      corporate_leasing_agreements: {
+        Row: {
+          admin_fee_per_fine_aed: number | null
+          agreement_no: string | null
+          approver_customer_email: string | null
+          approver_customer_name: string | null
+          bill_to_site_id: string | null
+          billing_cycle: Database["public"]["Enums"]["billing_cycle"]
+          billing_day: Database["public"]["Enums"]["billing_day"]
+          co_terminus_lines: boolean
+          committed_fleet_size: number | null
+          contract_end_date: string | null
+          contract_manager_id: string | null
+          contract_start_date: string | null
+          cost_allocation_mode: Database["public"]["Enums"]["cost_allocation_mode"]
+          created_at: string
+          created_by: string | null
+          credit_limit: number | null
+          credit_terms: Database["public"]["Enums"]["credit_terms"]
+          currency: string
+          customer_id: string
+          customer_po_no: string | null
+          customer_segment:
+            | Database["public"]["Enums"]["customer_segment"]
+            | null
+          deposit_amount_aed: number | null
+          discount_schema: Json | null
+          early_termination_allowed: boolean
+          early_termination_rule: string | null
+          framework_model: Database["public"]["Enums"]["framework_model"]
+          fuel_handling: string
+          id: string
+          insurance_excess_aed: number | null
+          insurance_responsibility: Database["public"]["Enums"]["insurance_responsibility"]
+          invoice_format: Database["public"]["Enums"]["invoice_format"]
+          legal_entity_id: string | null
+          line_item_granularity: Database["public"]["Enums"]["line_item_granularity"]
+          maintenance_policy: Database["public"]["Enums"]["maintenance_policy"]
+          master_term: Database["public"]["Enums"]["contract_term"]
+          notes: string | null
+          off_hire_notice_period: number
+          registration_responsibility: string
+          renewal_option: string | null
+          rental_type: Database["public"]["Enums"]["rental_type"]
+          replacement_sla_hours: number | null
+          replacement_vehicle_included: boolean
+          roadside_assistance_included: boolean
+          salik_darb_handling: string
+          security_instrument:
+            | Database["public"]["Enums"]["security_instrument"]
+            | null
+          signed_by_customer: string | null
+          signed_by_lessor: string | null
+          signed_date: string | null
+          sla_credits_enabled: boolean | null
+          sla_credits_percentage: number | null
+          status: Database["public"]["Enums"]["corporate_lease_status"]
+          telematics_consent: boolean | null
+          tolls_admin_fee_model: string
+          traffic_fines_handling: string
+          tyres_included_after_km: number | null
+          tyres_policy: string | null
+          updated_at: string
+          vat_code: string
+          workshop_preference: string
+        }
+        Insert: {
+          admin_fee_per_fine_aed?: number | null
+          agreement_no?: string | null
+          approver_customer_email?: string | null
+          approver_customer_name?: string | null
+          bill_to_site_id?: string | null
+          billing_cycle?: Database["public"]["Enums"]["billing_cycle"]
+          billing_day?: Database["public"]["Enums"]["billing_day"]
+          co_terminus_lines?: boolean
+          committed_fleet_size?: number | null
+          contract_end_date?: string | null
+          contract_manager_id?: string | null
+          contract_start_date?: string | null
+          cost_allocation_mode: Database["public"]["Enums"]["cost_allocation_mode"]
+          created_at?: string
+          created_by?: string | null
+          credit_limit?: number | null
+          credit_terms?: Database["public"]["Enums"]["credit_terms"]
+          currency?: string
+          customer_id: string
+          customer_po_no?: string | null
+          customer_segment?:
+            | Database["public"]["Enums"]["customer_segment"]
+            | null
+          deposit_amount_aed?: number | null
+          discount_schema?: Json | null
+          early_termination_allowed?: boolean
+          early_termination_rule?: string | null
+          framework_model: Database["public"]["Enums"]["framework_model"]
+          fuel_handling?: string
+          id?: string
+          insurance_excess_aed?: number | null
+          insurance_responsibility?: Database["public"]["Enums"]["insurance_responsibility"]
+          invoice_format?: Database["public"]["Enums"]["invoice_format"]
+          legal_entity_id?: string | null
+          line_item_granularity?: Database["public"]["Enums"]["line_item_granularity"]
+          maintenance_policy?: Database["public"]["Enums"]["maintenance_policy"]
+          master_term: Database["public"]["Enums"]["contract_term"]
+          notes?: string | null
+          off_hire_notice_period?: number
+          registration_responsibility?: string
+          renewal_option?: string | null
+          rental_type?: Database["public"]["Enums"]["rental_type"]
+          replacement_sla_hours?: number | null
+          replacement_vehicle_included?: boolean
+          roadside_assistance_included?: boolean
+          salik_darb_handling?: string
+          security_instrument?:
+            | Database["public"]["Enums"]["security_instrument"]
+            | null
+          signed_by_customer?: string | null
+          signed_by_lessor?: string | null
+          signed_date?: string | null
+          sla_credits_enabled?: boolean | null
+          sla_credits_percentage?: number | null
+          status?: Database["public"]["Enums"]["corporate_lease_status"]
+          telematics_consent?: boolean | null
+          tolls_admin_fee_model?: string
+          traffic_fines_handling?: string
+          tyres_included_after_km?: number | null
+          tyres_policy?: string | null
+          updated_at?: string
+          vat_code?: string
+          workshop_preference?: string
+        }
+        Update: {
+          admin_fee_per_fine_aed?: number | null
+          agreement_no?: string | null
+          approver_customer_email?: string | null
+          approver_customer_name?: string | null
+          bill_to_site_id?: string | null
+          billing_cycle?: Database["public"]["Enums"]["billing_cycle"]
+          billing_day?: Database["public"]["Enums"]["billing_day"]
+          co_terminus_lines?: boolean
+          committed_fleet_size?: number | null
+          contract_end_date?: string | null
+          contract_manager_id?: string | null
+          contract_start_date?: string | null
+          cost_allocation_mode?: Database["public"]["Enums"]["cost_allocation_mode"]
+          created_at?: string
+          created_by?: string | null
+          credit_limit?: number | null
+          credit_terms?: Database["public"]["Enums"]["credit_terms"]
+          currency?: string
+          customer_id?: string
+          customer_po_no?: string | null
+          customer_segment?:
+            | Database["public"]["Enums"]["customer_segment"]
+            | null
+          deposit_amount_aed?: number | null
+          discount_schema?: Json | null
+          early_termination_allowed?: boolean
+          early_termination_rule?: string | null
+          framework_model?: Database["public"]["Enums"]["framework_model"]
+          fuel_handling?: string
+          id?: string
+          insurance_excess_aed?: number | null
+          insurance_responsibility?: Database["public"]["Enums"]["insurance_responsibility"]
+          invoice_format?: Database["public"]["Enums"]["invoice_format"]
+          legal_entity_id?: string | null
+          line_item_granularity?: Database["public"]["Enums"]["line_item_granularity"]
+          maintenance_policy?: Database["public"]["Enums"]["maintenance_policy"]
+          master_term?: Database["public"]["Enums"]["contract_term"]
+          notes?: string | null
+          off_hire_notice_period?: number
+          registration_responsibility?: string
+          renewal_option?: string | null
+          rental_type?: Database["public"]["Enums"]["rental_type"]
+          replacement_sla_hours?: number | null
+          replacement_vehicle_included?: boolean
+          roadside_assistance_included?: boolean
+          salik_darb_handling?: string
+          security_instrument?:
+            | Database["public"]["Enums"]["security_instrument"]
+            | null
+          signed_by_customer?: string | null
+          signed_by_lessor?: string | null
+          signed_date?: string | null
+          sla_credits_enabled?: boolean | null
+          sla_credits_percentage?: number | null
+          status?: Database["public"]["Enums"]["corporate_lease_status"]
+          telematics_consent?: boolean | null
+          tolls_admin_fee_model?: string
+          traffic_fines_handling?: string
+          tyres_included_after_km?: number | null
+          tyres_policy?: string | null
+          updated_at?: string
+          vat_code?: string
+          workshop_preference?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "corporate_leasing_agreements_bill_to_site_id_fkey"
+            columns: ["bill_to_site_id"]
+            isOneToOne: false
+            referencedRelation: "customer_sites"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "corporate_leasing_agreements_legal_entity_id_fkey"
+            columns: ["legal_entity_id"]
+            isOneToOne: false
+            referencedRelation: "legal_entities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      corporate_leasing_lines: {
+        Row: {
+          actual_pickup_date: string | null
+          actual_return_date: string | null
+          additional_services: Json | null
+          agreement_id: string
+          cost_center_id: string | null
+          created_at: string
+          excess_km_rate_aed: number | null
+          id: string
+          included_services: Json | null
+          lease_end_date: string | null
+          lease_start_date: string
+          line_number: number
+          line_status: string
+          monthly_km_allowance: number | null
+          monthly_rate_aed: number
+          pickup_location_id: string | null
+          project_code: string | null
+          return_location_id: string | null
+          security_deposit_aed: number | null
+          setup_fee_aed: number | null
+          updated_at: string
+          vehicle_class_id: string | null
+          vehicle_id: string | null
+          vin: string | null
+        }
+        Insert: {
+          actual_pickup_date?: string | null
+          actual_return_date?: string | null
+          additional_services?: Json | null
+          agreement_id: string
+          cost_center_id?: string | null
+          created_at?: string
+          excess_km_rate_aed?: number | null
+          id?: string
+          included_services?: Json | null
+          lease_end_date?: string | null
+          lease_start_date: string
+          line_number: number
+          line_status?: string
+          monthly_km_allowance?: number | null
+          monthly_rate_aed: number
+          pickup_location_id?: string | null
+          project_code?: string | null
+          return_location_id?: string | null
+          security_deposit_aed?: number | null
+          setup_fee_aed?: number | null
+          updated_at?: string
+          vehicle_class_id?: string | null
+          vehicle_id?: string | null
+          vin?: string | null
+        }
+        Update: {
+          actual_pickup_date?: string | null
+          actual_return_date?: string | null
+          additional_services?: Json | null
+          agreement_id?: string
+          cost_center_id?: string | null
+          created_at?: string
+          excess_km_rate_aed?: number | null
+          id?: string
+          included_services?: Json | null
+          lease_end_date?: string | null
+          lease_start_date?: string
+          line_number?: number
+          line_status?: string
+          monthly_km_allowance?: number | null
+          monthly_rate_aed?: number
+          pickup_location_id?: string | null
+          project_code?: string | null
+          return_location_id?: string | null
+          security_deposit_aed?: number | null
+          setup_fee_aed?: number | null
+          updated_at?: string
+          vehicle_class_id?: string | null
+          vehicle_id?: string | null
+          vin?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "corporate_leasing_lines_agreement_id_fkey"
+            columns: ["agreement_id"]
+            isOneToOne: false
+            referencedRelation: "corporate_leasing_agreements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "corporate_leasing_lines_cost_center_id_fkey"
+            columns: ["cost_center_id"]
+            isOneToOne: false
+            referencedRelation: "cost_centers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cost_centers: {
+        Row: {
+          budget_limit: number | null
+          code: string
+          created_at: string
+          customer_id: string
+          description: string | null
+          id: string
+          is_active: boolean | null
+          manager_name: string | null
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          budget_limit?: number | null
+          code: string
+          created_at?: string
+          customer_id: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          manager_name?: string | null
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          budget_limit?: number | null
+          code?: string
+          created_at?: string
+          customer_id?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          manager_name?: string | null
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      customer_sites: {
+        Row: {
+          address: Json | null
+          contact_email: string | null
+          contact_person: string | null
+          contact_phone: string | null
+          created_at: string
+          customer_id: string
+          id: string
+          is_active: boolean | null
+          site_code: string | null
+          site_name: string
+          site_type: string | null
+          updated_at: string
+        }
+        Insert: {
+          address?: Json | null
+          contact_email?: string | null
+          contact_person?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          customer_id: string
+          id?: string
+          is_active?: boolean | null
+          site_code?: string | null
+          site_name: string
+          site_type?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: Json | null
+          contact_email?: string | null
+          contact_person?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          customer_id?: string
+          id?: string
+          is_active?: boolean | null
+          site_code?: string | null
+          site_name?: string
+          site_type?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       customers: {
         Row: {
           address: Json | null
@@ -793,6 +1186,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      legal_entities: {
+        Row: {
+          code: string
+          country_code: string | null
+          created_at: string
+          currency: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          tax_registration_no: string | null
+          updated_at: string
+          vat_rate: number | null
+        }
+        Insert: {
+          code: string
+          country_code?: string | null
+          created_at?: string
+          currency?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          tax_registration_no?: string | null
+          updated_at?: string
+          vat_rate?: number | null
+        }
+        Update: {
+          code?: string
+          country_code?: string | null
+          created_at?: string
+          currency?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          tax_registration_no?: string | null
+          updated_at?: string
+          vat_rate?: number | null
+        }
+        Relationships: []
       }
       payments: {
         Row: {
@@ -1473,6 +1905,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      generate_corporate_lease_no: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       generate_reservation_no: {
         Args: Record<PropertyKey, never>
         Returns: string
@@ -1484,7 +1920,25 @@ export type Database = {
     }
     Enums: {
       agreement_status: "active" | "completed" | "terminated" | "pending_return"
+      billing_cycle: "Monthly"
+      billing_day: "1st" | "15th" | "Month-End" | "Anniversary"
       booking_type: "INSTANT" | "STANDARD"
+      contract_term:
+        | "12 months"
+        | "24 months"
+        | "36 months"
+        | "48 months"
+        | "Open-ended"
+      corporate_lease_status:
+        | "draft"
+        | "pending_approval"
+        | "active"
+        | "suspended"
+        | "terminated"
+        | "expired"
+      cost_allocation_mode: "Per Vehicle" | "Per Cost Center" | "Project"
+      credit_terms: "Net 15" | "Net 30" | "Net 45" | "Custom"
+      customer_segment: "SME" | "Enterprise" | "Government"
       customer_type: "B2B" | "B2C" | "CORPORATE"
       damage_type:
         | "scratch"
@@ -1493,12 +1947,21 @@ export type Database = {
         | "missing_part"
         | "interior_damage"
         | "other"
+      framework_model: "Rate Card by Class" | "Fixed Rate per VIN"
+      insurance_responsibility: "Included (Lessor)" | "Customer Own Policy"
+      invoice_format: "Consolidated" | "Per Vehicle" | "Per Cost Center"
+      line_item_granularity:
+        | "Base Rent"
+        | "Base Rent + Add-ons"
+        | "Base Rent + Add-ons + Variable"
+      maintenance_policy: "Basic PM" | "Full (PM+wear)" | "Customer"
       payment_status:
         | "pending"
         | "processing"
         | "completed"
         | "failed"
         | "refunded"
+      rental_type: "Corporate Leasing"
       reservation_status:
         | "pending"
         | "confirmed"
@@ -1506,6 +1969,7 @@ export type Database = {
         | "completed"
         | "cancelled"
       rfq_status: "new" | "under_review" | "quoted" | "cancelled"
+      security_instrument: "None" | "Deposit per Vehicle" | "Bank Guarantee"
       user_role:
         | "admin"
         | "fleet_manager"
@@ -1647,7 +2111,27 @@ export const Constants = {
   public: {
     Enums: {
       agreement_status: ["active", "completed", "terminated", "pending_return"],
+      billing_cycle: ["Monthly"],
+      billing_day: ["1st", "15th", "Month-End", "Anniversary"],
       booking_type: ["INSTANT", "STANDARD"],
+      contract_term: [
+        "12 months",
+        "24 months",
+        "36 months",
+        "48 months",
+        "Open-ended",
+      ],
+      corporate_lease_status: [
+        "draft",
+        "pending_approval",
+        "active",
+        "suspended",
+        "terminated",
+        "expired",
+      ],
+      cost_allocation_mode: ["Per Vehicle", "Per Cost Center", "Project"],
+      credit_terms: ["Net 15", "Net 30", "Net 45", "Custom"],
+      customer_segment: ["SME", "Enterprise", "Government"],
       customer_type: ["B2B", "B2C", "CORPORATE"],
       damage_type: [
         "scratch",
@@ -1657,6 +2141,15 @@ export const Constants = {
         "interior_damage",
         "other",
       ],
+      framework_model: ["Rate Card by Class", "Fixed Rate per VIN"],
+      insurance_responsibility: ["Included (Lessor)", "Customer Own Policy"],
+      invoice_format: ["Consolidated", "Per Vehicle", "Per Cost Center"],
+      line_item_granularity: [
+        "Base Rent",
+        "Base Rent + Add-ons",
+        "Base Rent + Add-ons + Variable",
+      ],
+      maintenance_policy: ["Basic PM", "Full (PM+wear)", "Customer"],
       payment_status: [
         "pending",
         "processing",
@@ -1664,6 +2157,7 @@ export const Constants = {
         "failed",
         "refunded",
       ],
+      rental_type: ["Corporate Leasing"],
       reservation_status: [
         "pending",
         "confirmed",
@@ -1672,6 +2166,7 @@ export const Constants = {
         "cancelled",
       ],
       rfq_status: ["new", "under_review", "quoted", "cancelled"],
+      security_instrument: ["None", "Deposit per Vehicle", "Bank Guarantee"],
       user_role: [
         "admin",
         "fleet_manager",
