@@ -34,7 +34,7 @@ import NewRFQ from "./pages/NewRFQ";
 import RFQDetails from "./pages/RFQDetails";
 import CustomerDetails from "./pages/CustomerDetails";
 import InstantBooking from "./pages/InstantBooking";
-import ReportsNew from "./pages/ReportsNew";
+
 
 const queryClient = new QueryClient();
 
@@ -151,13 +151,6 @@ const App = () => (
               <Route index element={<Inspections />} />
               <Route path="new" element={<NewInspection />} />
               <Route path=":id" element={<InspectionDetails />} />
-            </Route>
-            <Route path="/reports" element={
-              <ProtectedRoute>
-                <AppLayout />
-              </ProtectedRoute>
-            }>
-              <Route index element={<ReportsNew />} />
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
