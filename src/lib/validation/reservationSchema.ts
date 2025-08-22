@@ -200,7 +200,7 @@ export const headerValidationSchema = z.object({
 
 export const lineValidationSchema = z.object({
   vehicleClassId: z.string().min(1, 'Vehicle Class is required'),
-  vehicleId: z.string().min(1, 'Vehicle is required'),
+  vehicleId: z.string().optional(), // Vehicle is optional - can be assigned later in agreement
   checkOutDate: z.date(),
   checkOutLocationId: z.string().min(1, 'Check-out Location is required'),
   checkInDate: z.date(),
