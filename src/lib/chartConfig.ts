@@ -1,19 +1,15 @@
 import { ChartConfig } from "@/components/ui/chart"
 
-// Enhanced 12-color palette with high contrast against teal background
+// Enhanced chart colors using CSS custom properties for consistency
 export const CHART_COLORS = {
-  primary: "hsl(220, 91%, 60%)", // Bright blue
-  secondary: "hsl(142, 76%, 36%)", // Green
-  accent: "hsl(346, 87%, 54%)", // Pink/Red
-  warning: "hsl(38, 92%, 50%)", // Orange
-  purple: "hsl(271, 76%, 53%)", // Purple
-  cyan: "hsl(185, 76%, 46%)", // Cyan
-  yellow: "hsl(54, 91%, 51%)", // Yellow
-  indigo: "hsl(239, 84%, 67%)", // Indigo
-  rose: "hsl(330, 81%, 60%)", // Rose
-  emerald: "hsl(142, 71%, 45%)", // Emerald
-  amber: "hsl(43, 96%, 56%)", // Amber
-  violet: "hsl(258, 90%, 66%)", // Violet
+  primary: "hsl(var(--chart-1))", // Teal accent
+  secondary: "hsl(var(--chart-2))", // Success green  
+  accent: "hsl(var(--chart-3))", // Warning yellow
+  warning: "hsl(var(--chart-4))", // Destructive red
+  purple: "hsl(var(--chart-5))", // Purple
+  orange: "hsl(var(--chart-6))", // Orange
+  blue: "hsl(var(--chart-7))", // Blue
+  pink: "hsl(var(--chart-8))", // Pink
 } as const
 
 // Revenue/Financial color scheme
@@ -31,7 +27,7 @@ export const STATUS_COLORS = {
   maintenance: CHART_COLORS.warning,
   damaged: CHART_COLORS.accent,
   reserved: CHART_COLORS.purple,
-  outOfService: CHART_COLORS.rose,
+  outOfService: CHART_COLORS.pink,
 } as const
 
 // Severity color scheme
@@ -39,7 +35,7 @@ export const SEVERITY_COLORS = {
   low: CHART_COLORS.secondary,
   medium: CHART_COLORS.warning,
   high: CHART_COLORS.accent,
-  critical: CHART_COLORS.rose,
+  critical: CHART_COLORS.pink,
 } as const
 
 // Default chart configurations
@@ -62,27 +58,27 @@ export const DEFAULT_CHART_CONFIG: ChartConfig = {
 export const FLEET_STATUS_CONFIG: ChartConfig = {
   available: {
     label: "Available",
-    color: STATUS_COLORS.available,
+    color: CHART_COLORS.secondary,
   },
   rented: {
-    label: "Rented",
-    color: STATUS_COLORS.rented,
+    label: "Rented", 
+    color: CHART_COLORS.primary,
   },
   maintenance: {
     label: "In Maintenance",
-    color: STATUS_COLORS.maintenance,
+    color: CHART_COLORS.accent,
   },
   damaged: {
     label: "Damaged",
-    color: STATUS_COLORS.damaged,
+    color: CHART_COLORS.warning,
   },
   reserved: {
     label: "Reserved",
-    color: STATUS_COLORS.reserved,
+    color: CHART_COLORS.purple,
   },
-  outOfService: {
+  "out of service": {
     label: "Out of Service",
-    color: STATUS_COLORS.outOfService,
+    color: CHART_COLORS.pink,
   },
 }
 
@@ -133,13 +129,9 @@ export const VEHICLE_CATEGORY_COLORS = [
   CHART_COLORS.accent,
   CHART_COLORS.warning,
   CHART_COLORS.purple,
-  CHART_COLORS.cyan,
-  CHART_COLORS.yellow,
-  CHART_COLORS.indigo,
-  CHART_COLORS.rose,
-  CHART_COLORS.emerald,
-  CHART_COLORS.amber,
-  CHART_COLORS.violet,
+  CHART_COLORS.orange,
+  CHART_COLORS.blue,
+  CHART_COLORS.pink,
 ]
 
 // NPS Score colors
@@ -174,6 +166,6 @@ export const AGING_CONFIG: ChartConfig = {
   },
   "90+": {
     label: "90+ Days",
-    color: CHART_COLORS.rose,
+    color: CHART_COLORS.pink,
   },
 }
