@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from '@/components/ui/chart';
-import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
 import { DateRange } from 'react-day-picker';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -158,36 +158,38 @@ const FleetStatusReport = ({ dateRange }: FleetStatusReportProps) => {
           <CardContent>
             <ChartContainer
               config={FLEET_STATUS_CONFIG}
-              className="h-[300px]"
+              className="h-[300px] w-full"
             >
-              <PieChart width={400} height={300}>
-                <Pie
-                  data={pieData.map(item => ({
-                    name: item.name.toLowerCase().replace(' ', '_'),
-                    value: item.value,
-                  }))}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={100}
-                  paddingAngle={5}
-                  dataKey="value"
-                  nameKey="name"
-                >
-                  {pieData.map((entry, index) => (
-                    <Cell 
-                      key={`cell-${index}`} 
-                      fill={FLEET_STATUS_CONFIG[entry.name.toLowerCase().replace(' ', '_') as keyof typeof FLEET_STATUS_CONFIG]?.color || VEHICLE_CATEGORY_COLORS[index % VEHICLE_CATEGORY_COLORS.length]} 
-                      stroke="hsl(var(--background))" 
-                      strokeWidth={2} 
-                    />
-                  ))}
-                </Pie>
-                <ChartTooltip 
-                  content={<ChartTooltipContent formatter={(value, name) => [formatNumber(Number(value)), name]} />} 
-                />
-                <ChartLegend content={<ChartLegendContent />} />
-              </PieChart>
+              <ResponsiveContainer>
+                <PieChart>
+                  <Pie
+                    data={pieData.map(item => ({
+                      name: item.name.toLowerCase().replace(' ', '_'),
+                      value: item.value,
+                    }))}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={100}
+                    paddingAngle={5}
+                    dataKey="value"
+                    nameKey="name"
+                  >
+                    {pieData.map((entry, index) => (
+                      <Cell 
+                        key={`cell-${index}`} 
+                        fill={FLEET_STATUS_CONFIG[entry.name.toLowerCase().replace(' ', '_') as keyof typeof FLEET_STATUS_CONFIG]?.color || VEHICLE_CATEGORY_COLORS[index % VEHICLE_CATEGORY_COLORS.length]} 
+                        stroke="hsl(var(--background))" 
+                        strokeWidth={2} 
+                      />
+                    ))}
+                  </Pie>
+                  <ChartTooltip 
+                    content={<ChartTooltipContent formatter={(value, name) => [formatNumber(Number(value)), name]} />} 
+                  />
+                  <ChartLegend content={<ChartLegendContent />} />
+                </PieChart>
+              </ResponsiveContainer>
             </ChartContainer>
           </CardContent>
         </Card>
@@ -202,33 +204,35 @@ const FleetStatusReport = ({ dateRange }: FleetStatusReportProps) => {
               config={{
                 utilization: { label: "Fleet Utilization", color: "hsl(220, 91%, 60%)" },
               }}
-              className="h-[300px]"
+              className="h-[300px] w-full"
             >
-              <BarChart width={400} height={300} data={utilizationData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
-                <XAxis 
-                  dataKey="location" 
-                  stroke="hsl(var(--muted-foreground))" 
-                  fontSize={12}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <YAxis 
-                  stroke="hsl(var(--muted-foreground))" 
-                  fontSize={12}
-                  tickLine={false}
-                  axisLine={false}
-                  tickFormatter={(value) => `${value}%`}
-                />
-                <ChartTooltip 
-                  content={<ChartTooltipContent formatter={percentageTooltipFormatter} />} 
-                />
-                <Bar 
-                  dataKey="utilization" 
-                  fill="hsl(220, 91%, 60%)" 
-                  radius={[4, 4, 0, 0]} 
-                />
-              </BarChart>
+              <ResponsiveContainer>
+                <BarChart data={utilizationData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+                  <XAxis 
+                    dataKey="location" 
+                    stroke="hsl(var(--muted-foreground))" 
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <YAxis 
+                    stroke="hsl(var(--muted-foreground))" 
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                    tickFormatter={(value) => `${value}%`}
+                  />
+                  <ChartTooltip 
+                    content={<ChartTooltipContent formatter={percentageTooltipFormatter} />} 
+                  />
+                  <Bar 
+                    dataKey="utilization" 
+                    fill="hsl(220, 91%, 60%)" 
+                    radius={[4, 4, 0, 0]} 
+                  />
+                </BarChart>
+              </ResponsiveContainer>
             </ChartContainer>
           </CardContent>
         </Card>
