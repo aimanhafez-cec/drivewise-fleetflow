@@ -40,11 +40,17 @@ const Dashboard = () => {
   } = useQuery({
     queryKey: ['dashboard-vehicle-status'],
     queryFn: async () => {
+      console.log('Fetching vehicle status data...');
       const {
         data,
         error
       } = await supabase.from('vehicles').select('status');
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching vehicle status:', error);
+        throw error;
+      }
+
+      console.log('Raw vehicle data:', data);
 
       // Count vehicles by status
       const statusCounts = data.reduce((acc, vehicle) => {
@@ -53,8 +59,10 @@ const Dashboard = () => {
         return acc;
       }, {} as Record<string, number>);
 
+      console.log('Status counts:', statusCounts);
+
       // Transform to chart format
-      return [{
+      const chartData = [{
         name: 'Available',
         value: statusCounts.available || 0,
         color: '#10B981'
@@ -71,6 +79,9 @@ const Dashboard = () => {
         value: statusCounts.out_of_service || 0,
         color: '#EF4444'
       }].filter(item => item.value > 0);
+
+      console.log('Final chart data:', chartData);
+      return chartData;
     }
   });
 
@@ -284,6 +295,9 @@ const Dashboard = () => {
     previousTotal: 3800,
     total: 4800
   }];
+
+  console.log('Vehicle status data for charts:', vehicleStatusData);
+  console.log('Sales data for charts:', salesData);
   return <div className="min-h-screen bg-background">
       {/* Header Bar */}
       <header className="bg-secondary h-16 flex items-center justify-between px-6 shadow-soft">
@@ -467,32 +481,38 @@ const Dashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="flex items-center gap-6">
-                  <div className="relative w-32 h-32">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie 
-                          data={vehicleStatusData} 
-                          cx="50%" 
-                          cy="50%" 
-                          innerRadius={40} 
-                          outerRadius={60} 
-                          dataKey="value"
-                          stroke="none"
-                        >
-                          {vehicleStatusData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.color} />
-                          ))}
-                        </Pie>
-                        <Tooltip 
-                          contentStyle={{
-                            backgroundColor: 'rgba(10,122,125,0.9)',
-                            border: '1px solid #33CFCF',
-                            borderRadius: '8px',
-                            color: '#FFFFFF'
-                          }} 
-                        />
-                      </PieChart>
-                    </ResponsiveContainer>
+                  <div className="relative w-32 h-32 flex-shrink-0">
+                    {vehicleStatusData.length > 0 ? (
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie 
+                            data={vehicleStatusData} 
+                            cx="50%" 
+                            cy="50%" 
+                            innerRadius={40} 
+                            outerRadius={60} 
+                            dataKey="value"
+                            stroke="none"
+                          >
+                            {vehicleStatusData.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry.color} />
+                            ))}
+                          </Pie>
+                          <Tooltip 
+                            contentStyle={{
+                              backgroundColor: 'rgba(10,122,125,0.9)',
+                              border: '1px solid #33CFCF',
+                              borderRadius: '8px',
+                              color: '#FFFFFF'
+                            }} 
+                          />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <div className="flex items-center justify-center w-full h-full">
+                        <span className="text-white/60 text-sm">Loading...</span>
+                      </div>
+                    )}
                     <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                       <span className="text-xl font-bold text-white">
                         {vehicleStatusData.reduce((sum, item) => sum + item.value, 0)}
@@ -500,16 +520,19 @@ const Dashboard = () => {
                       <span className="text-xs text-white/80">Total</span>
                     </div>
                   </div>
-                  <div className="flex-1">
-                    {vehicleStatusData.map((item, index) => <div key={index} className="flex items-center justify-between py-1">
+                  <div className="flex-1 min-w-0">
+                    {vehicleStatusData.map((item, index) => (
+                      <div key={index} className="flex items-center justify-between py-1">
                         <div className="flex items-center gap-2">
-                          <div className="w-3 h-3 rounded-full" style={{
-                        backgroundColor: item.color
-                      }}></div>
+                          <div 
+                            className="w-3 h-3 rounded-full flex-shrink-0" 
+                            style={{ backgroundColor: item.color }}
+                          />
                           <span className="text-sm text-white">{item.name}</span>
                         </div>
                         <span className="text-sm font-medium text-white">{item.value}</span>
-                      </div>)}
+                      </div>
+                    ))}
                   </div>
                 </div>
               </CardContent>
@@ -575,47 +598,53 @@ const Dashboard = () => {
               <CardTitle className="text-white">Sales Status</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="h-64">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={salesData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(199,228,229,0.3)" />
-                    <XAxis 
-                      dataKey="name" 
-                      stroke="#C7E4E5" 
-                      fontSize={12}
-                    />
-                    <YAxis 
-                      stroke="#C7E4E5" 
-                      fontSize={12}
-                    />
-                    <Tooltip 
-                      contentStyle={{
-                        backgroundColor: 'rgba(10,122,125,0.9)',
-                        border: '1px solid #33CFCF',
-                        borderRadius: '8px',
-                        color: '#FFFFFF'
-                      }} 
-                    />
-                    <Area 
-                      type="monotone" 
-                      dataKey="previousTotal" 
-                      stackId="1" 
-                      stroke="#007C7E" 
-                      fill="#007C7E" 
-                      fillOpacity={0.6} 
-                      name="Previous Total" 
-                    />
-                    <Area 
-                      type="monotone" 
-                      dataKey="total" 
-                      stackId="2" 
-                      stroke="#33CFCF" 
-                      fill="#33CFCF" 
-                      fillOpacity={0.8} 
-                      name="Total" 
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
+              <div className="h-64 w-full">
+                {salesData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={salesData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(199,228,229,0.3)" />
+                      <XAxis 
+                        dataKey="name" 
+                        stroke="#C7E4E5" 
+                        fontSize={12}
+                      />
+                      <YAxis 
+                        stroke="#C7E4E5" 
+                        fontSize={12}
+                      />
+                      <Tooltip 
+                        contentStyle={{
+                          backgroundColor: 'rgba(10,122,125,0.9)',
+                          border: '1px solid #33CFCF',
+                          borderRadius: '8px',
+                          color: '#FFFFFF'
+                        }} 
+                      />
+                      <Area 
+                        type="monotone" 
+                        dataKey="previousTotal" 
+                        stackId="1" 
+                        stroke="#007C7E" 
+                        fill="#007C7E" 
+                        fillOpacity={0.6} 
+                        name="Previous Total" 
+                      />
+                      <Area 
+                        type="monotone" 
+                        dataKey="total" 
+                        stackId="2" 
+                        stroke="#33CFCF" 
+                        fill="#33CFCF" 
+                        fillOpacity={0.8} 
+                        name="Total" 
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="flex items-center justify-center w-full h-full">
+                    <span className="text-white/60">Loading chart...</span>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
