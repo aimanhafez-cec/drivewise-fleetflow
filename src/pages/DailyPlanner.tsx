@@ -63,12 +63,9 @@ const DailyPlanner: React.FC = () => {
   const [conflictDialog, setConflictDialog] = useState<any>(null);
   const [filters, setFilters] = useState({
     vehicleClass: searchParams.get("class") || "",
-    vehicleMake: searchParams.get("make") || "",
-    vehicleModel: searchParams.get("model") || "",
-    vehicleVin: searchParams.get("vin") || "",
+    customer: searchParams.get("customer") || "",
     locations: searchParams.get("locations")?.split(",") || [],
     status: searchParams.get("status")?.split(",") || [],
-    salesperson: searchParams.get("salesperson") || "",
     dateRange: {
       from: searchParams.get("from") ? new Date(searchParams.get("from")!) : undefined,
       to: searchParams.get("to") ? new Date(searchParams.get("to")!) : undefined,
@@ -196,12 +193,9 @@ const DailyPlanner: React.FC = () => {
     // Update URL params
     const params = new URLSearchParams();
     if (newFilters.vehicleClass) params.set("class", newFilters.vehicleClass);
-    if (newFilters.vehicleMake) params.set("make", newFilters.vehicleMake);
-    if (newFilters.vehicleModel) params.set("model", newFilters.vehicleModel);
-    if (newFilters.vehicleVin) params.set("vin", newFilters.vehicleVin);
+    if (newFilters.customer) params.set("customer", newFilters.customer);
     if (newFilters.locations.length) params.set("locations", newFilters.locations.join(","));
     if (newFilters.status.length) params.set("status", newFilters.status.join(","));
-    if (newFilters.salesperson) params.set("salesperson", newFilters.salesperson);
     if (newFilters.dateRange.from) params.set("from", newFilters.dateRange.from.toISOString());
     if (newFilters.dateRange.to) params.set("to", newFilters.dateRange.to.toISOString());
     params.set("view", view);
@@ -211,12 +205,9 @@ const DailyPlanner: React.FC = () => {
   const resetFilters = () => {
     const emptyFilters = {
       vehicleClass: "",
-      vehicleMake: "",
-      vehicleModel: "",
-      vehicleVin: "",
+      customer: "",
       locations: [],
       status: [],
-      salesperson: "",
       dateRange: { from: undefined, to: undefined }
     };
     updateFilters(emptyFilters);

@@ -11,20 +11,16 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { 
   VehicleClassSelect,
-  VehicleMakeSelect,
-  VehicleModelSelect,
-  LocationSelect
+  LocationSelect,
+  CustomerSelect
 } from "@/components/ui/select-components";
 
 interface PlannerFiltersProps {
   filters: {
     vehicleClass: string;
-    vehicleMake: string;
-    vehicleModel: string;
-    vehicleVin: string;
+    customer: string;
     locations: string[];
     status: string[];
-    salesperson: string;
     dateRange: {
       from?: Date;
       to?: Date;
@@ -80,7 +76,7 @@ export const PlannerFilters: React.FC<PlannerFiltersProps> = ({
   return (
     <Card className="shadow-sm">
       <CardContent className="p-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Vehicle Class */}
           <div className="space-y-2">
             <Label htmlFor="flt-class">Vehicle Class</Label>
@@ -93,42 +89,15 @@ export const PlannerFilters: React.FC<PlannerFiltersProps> = ({
             />
           </div>
 
-          {/* Vehicle Make */}
+          {/* Customer */}
           <div className="space-y-2">
-            <Label htmlFor="flt-make">Make</Label>
-            <VehicleMakeSelect
-              value={filters.vehicleMake || undefined}
-              onChange={(value) => updateFilter("vehicleMake", typeof value === 'string' ? value : "")}
-              classId={filters.vehicleClass || undefined}
-              placeholder="All Makes"
+            <Label htmlFor="flt-customer">Customer</Label>
+            <CustomerSelect
+              value={filters.customer || undefined}
+              onChange={(value) => updateFilter("customer", typeof value === 'string' ? value : "")}
+              placeholder="Select Customer"
               allowClear={true}
-              data-testid="flt-make"
-            />
-          </div>
-
-          {/* Vehicle Model */}
-          <div className="space-y-2">
-            <Label htmlFor="flt-model">Model</Label>
-            <VehicleModelSelect
-              value={filters.vehicleModel || undefined}
-              onChange={(value) => updateFilter("vehicleModel", typeof value === 'string' ? value : "")}
-              make={filters.vehicleMake || undefined}
-              classId={filters.vehicleClass || undefined}
-              placeholder="All Models"
-              allowClear={true}
-              data-testid="flt-model"
-            />
-          </div>
-
-          {/* VIN Search */}
-          <div className="space-y-2">
-            <Label htmlFor="flt-vin">VIN/License</Label>
-            <Input
-              id="flt-vin"
-              data-testid="flt-vin"
-              placeholder="Search VIN or License"
-              value={filters.vehicleVin}
-              onChange={(e) => updateFilter("vehicleVin", e.target.value)}
+              data-testid="flt-customer"
             />
           </div>
 
@@ -248,14 +217,8 @@ export const PlannerFilters: React.FC<PlannerFiltersProps> = ({
               {filters.vehicleClass && (
                 <Badge variant="secondary">Class: {filters.vehicleClass}</Badge>
               )}
-              {filters.vehicleMake && (
-                <Badge variant="secondary">Make: {filters.vehicleMake}</Badge>
-              )}
-              {filters.vehicleModel && (
-                <Badge variant="secondary">Model: {filters.vehicleModel}</Badge>
-              )}
-              {filters.vehicleVin && (
-                <Badge variant="secondary">VIN: {filters.vehicleVin}</Badge>
+              {filters.customer && (
+                <Badge variant="secondary">Customer: {filters.customer}</Badge>
               )}
               {filters.status.length > 0 && (
                 <Badge variant="secondary">Status: {filters.status.length} selected</Badge>
