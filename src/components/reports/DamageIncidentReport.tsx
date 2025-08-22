@@ -231,3 +231,5 @@ export const DamageIncidentReport: React.FC<DamageIncidentReportProps> = ({ date
     </div>
   );
 };
+
+export default DamageIncidentReport;

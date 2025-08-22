@@ -25,7 +25,7 @@ import { cn } from '@/lib/utils';
 import FleetStatusReport from '@/components/reports/FleetStatusReport';
 import MaintenanceReport from '@/components/reports/MaintenanceReport';
 import ReservationsReport from '@/components/reports/ReservationsReport';
-import { DamageIncidentReport } from '@/components/reports/DamageIncidentReport';
+import DamageIncidentReport from '@/components/reports/DamageIncidentReport';
 
 interface DateRange {
   from: Date;
