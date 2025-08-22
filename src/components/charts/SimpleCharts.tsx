@@ -90,31 +90,33 @@ export const SimplePieChart: React.FC<SimplePieChartProps> = ({
   }
 
   return (
-    <ResponsiveContainer width="100%" height={height}>
-      <PieChart>
-        <Pie
-          data={data}
-          cx="50%"
-          cy="50%"
-          innerRadius={60}
-          outerRadius={120}
-          paddingAngle={2}
-          dataKey="value"
-        >
-          {data.map((entry, index) => (
-            <Cell 
-              key={`cell-${index}`} 
-              fill={CHART_COLORS[index % CHART_COLORS.length]} 
-            />
-          ))}
-        </Pie>
-        <Tooltip content={<SimpleTooltip formatter={formatter} />} />
-        <Legend 
-          wrapperStyle={{ color: '#ffffff' }}
-          formatter={(value) => <span style={{ color: '#ffffff' }}>{value}</span>}
-        />
-      </PieChart>
-    </ResponsiveContainer>
+    <div style={{ width: '100%', height: `${height}px` }}>
+      <ResponsiveContainer width="100%" height="100%">
+        <PieChart>
+          <Pie
+            data={data}
+            cx="50%"
+            cy="50%"
+            innerRadius={60}
+            outerRadius={120}
+            paddingAngle={2}
+            dataKey="value"
+          >
+            {data.map((entry, index) => (
+              <Cell 
+                key={`cell-${index}`} 
+                fill={CHART_COLORS[index % CHART_COLORS.length]} 
+              />
+            ))}
+          </Pie>
+          <Tooltip content={<SimpleTooltip formatter={formatter} />} />
+          <Legend 
+            wrapperStyle={{ color: '#ffffff' }}
+            formatter={(value) => <span style={{ color: '#ffffff' }}>{value}</span>}
+          />
+        </PieChart>
+      </ResponsiveContainer>
+    </div>
   );
 };
 
@@ -148,38 +150,40 @@ export const SimpleBarChart: React.FC<SimpleBarChartProps> = ({
   }
 
   return (
-    <ResponsiveContainer width="100%" height={height}>
-      <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
-        <XAxis 
-          dataKey={xAxisKey} 
-          tick={{ fill: '#ffffff' }}
-          axisLine={{ stroke: '#ffffff40' }}
-          tickLine={{ stroke: '#ffffff40' }}
-        />
-        <YAxis 
-          tick={{ fill: '#ffffff' }}
-          axisLine={{ stroke: '#ffffff40' }}
-          tickLine={{ stroke: '#ffffff40' }}
-        />
-        <Tooltip content={<SimpleTooltip formatter={formatter} />} />
-        {bars.length > 1 && (
-          <Legend 
-            wrapperStyle={{ color: '#ffffff' }}
-            formatter={(value) => <span style={{ color: '#ffffff' }}>{value}</span>}
+    <div style={{ width: '100%', height: `${height}px` }}>
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
+          <XAxis 
+            dataKey={xAxisKey} 
+            tick={{ fill: '#ffffff' }}
+            axisLine={{ stroke: '#ffffff40' }}
+            tickLine={{ stroke: '#ffffff40' }}
           />
-        )}
-        {bars.map((bar, index) => (
-          <Bar
-            key={bar.dataKey}
-            dataKey={bar.dataKey}
-            fill={bar.color || CHART_COLORS[index % CHART_COLORS.length]}
-            name={bar.name || bar.dataKey}
-            radius={[4, 4, 0, 0]}
+          <YAxis 
+            tick={{ fill: '#ffffff' }}
+            axisLine={{ stroke: '#ffffff40' }}
+            tickLine={{ stroke: '#ffffff40' }}
           />
-        ))}
-      </BarChart>
-    </ResponsiveContainer>
+          <Tooltip content={<SimpleTooltip formatter={formatter} />} />
+          {bars.length > 1 && (
+            <Legend 
+              wrapperStyle={{ color: '#ffffff' }}
+              formatter={(value) => <span style={{ color: '#ffffff' }}>{value}</span>}
+            />
+          )}
+          {bars.map((bar, index) => (
+            <Bar
+              key={bar.dataKey}
+              dataKey={bar.dataKey}
+              fill={bar.color || CHART_COLORS[index % CHART_COLORS.length]}
+              name={bar.name || bar.dataKey}
+              radius={[4, 4, 0, 0]}
+            />
+          ))}
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
   );
 };
 
@@ -213,40 +217,42 @@ export const SimpleLineChart: React.FC<SimpleLineChartProps> = ({
   }
 
   return (
-    <ResponsiveContainer width="100%" height={height}>
-      <LineChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
-        <XAxis 
-          dataKey={xAxisKey} 
-          tick={{ fill: '#ffffff' }}
-          axisLine={{ stroke: '#ffffff40' }}
-          tickLine={{ stroke: '#ffffff40' }}
-        />
-        <YAxis 
-          tick={{ fill: '#ffffff' }}
-          axisLine={{ stroke: '#ffffff40' }}
-          tickLine={{ stroke: '#ffffff40' }}
-        />
-        <Tooltip content={<SimpleTooltip formatter={formatter} />} />
-        {lines.length > 1 && (
-          <Legend 
-            wrapperStyle={{ color: '#ffffff' }}
-            formatter={(value) => <span style={{ color: '#ffffff' }}>{value}</span>}
+    <div style={{ width: '100%', height: `${height}px` }}>
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
+          <XAxis 
+            dataKey={xAxisKey} 
+            tick={{ fill: '#ffffff' }}
+            axisLine={{ stroke: '#ffffff40' }}
+            tickLine={{ stroke: '#ffffff40' }}
           />
-        )}
-        {lines.map((line, index) => (
-          <Line
-            key={line.dataKey}
-            type="monotone"
-            dataKey={line.dataKey}
-            stroke={line.color || CHART_COLORS[index % CHART_COLORS.length]}
-            strokeWidth={3}
-            name={line.name || line.dataKey}
-            dot={{ fill: line.color || CHART_COLORS[index % CHART_COLORS.length], strokeWidth: 0, r: 4 }}
-            activeDot={{ r: 6, strokeWidth: 0 }}
+          <YAxis 
+            tick={{ fill: '#ffffff' }}
+            axisLine={{ stroke: '#ffffff40' }}
+            tickLine={{ stroke: '#ffffff40' }}
           />
-        ))}
-      </LineChart>
-    </ResponsiveContainer>
+          <Tooltip content={<SimpleTooltip formatter={formatter} />} />
+          {lines.length > 1 && (
+            <Legend 
+              wrapperStyle={{ color: '#ffffff' }}
+              formatter={(value) => <span style={{ color: '#ffffff' }}>{value}</span>}
+            />
+          )}
+          {lines.map((line, index) => (
+            <Line
+              key={line.dataKey}
+              type="monotone"
+              dataKey={line.dataKey}
+              stroke={line.color || CHART_COLORS[index % CHART_COLORS.length]}
+              strokeWidth={3}
+              name={line.name || line.dataKey}
+              dot={{ fill: line.color || CHART_COLORS[index % CHART_COLORS.length], strokeWidth: 0, r: 4 }}
+              activeDot={{ r: 6, strokeWidth: 0 }}
+            />
+          ))}
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
   );
 };
