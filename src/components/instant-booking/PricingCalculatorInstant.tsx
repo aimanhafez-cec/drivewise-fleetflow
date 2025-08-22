@@ -140,7 +140,7 @@ const PricingCalculatorInstant: React.FC<PricingCalculatorInstantProps> = ({
       customerDiscount,
       discountedAmount,
       subtotalWithAddOns,
-      taxAmount,
+      vatAmount: taxAmount,
       totalAmount,
       rateType,
       dailyRate
@@ -255,7 +255,7 @@ const PricingCalculatorInstant: React.FC<PricingCalculatorInstantProps> = ({
 
           <div className="flex justify-between items-center">
             <span className="text-muted-foreground">VAT (5%)</span>
-            <span>AED {pricingCalculation.taxAmount.toFixed(2)}</span>
+            <span>AED {pricingCalculation.vatAmount.toFixed(2)}</span>
           </div>
 
           <Separator />
