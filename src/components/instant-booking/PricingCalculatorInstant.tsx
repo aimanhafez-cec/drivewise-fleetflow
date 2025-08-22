@@ -173,17 +173,22 @@ const PricingCalculatorInstant: React.FC<PricingCalculatorInstantProps> = ({
   // Update parent component
   useEffect(() => {
     if (pricingCalculation && autoApprovalStatus) {
-      onPricingUpdate({
+      const pricingData = {
         ...pricingCalculation,
         autoApproved: autoApprovalStatus.approved,
         approvalLimit: autoApprovalStatus.limit
-      });
-      setCalculatedPricing({
-        ...pricingCalculation,
-        autoApprovalStatus
-      });
+      };
+      
+      // Only update if the data has actually changed
+      if (JSON.stringify(calculatedPricing) !== JSON.stringify({ ...pricingCalculation, autoApprovalStatus })) {
+        onPricingUpdate(pricingData);
+        setCalculatedPricing({
+          ...pricingCalculation,
+          autoApprovalStatus
+        });
+      }
     }
-  }, [pricingCalculation, autoApprovalStatus, onPricingUpdate]);
+  }, [pricingCalculation, autoApprovalStatus]);
   if (!vehicle || !pricingCalculation) {
     return <Card className="shadow-card">
         <CardContent className="p-8 text-center">
