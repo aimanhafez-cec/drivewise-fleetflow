@@ -481,9 +481,9 @@ const Dashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="flex items-center gap-6">
-                  <div className="relative w-32 h-32 flex-shrink-0 bg-black/20 rounded-lg">
-                    <ResponsiveContainer width={128} height={128}>
-                      <PieChart>
+                  <div className="relative w-32 h-32 flex-shrink-0 border border-white/20 rounded">
+                    {vehicleStatusData.length > 0 ? (
+                      <PieChart width={128} height={128}>
                         <Pie 
                           data={vehicleStatusData} 
                           cx={64} 
@@ -507,7 +507,11 @@ const Dashboard = () => {
                           }} 
                         />
                       </PieChart>
-                    </ResponsiveContainer>
+                    ) : (
+                      <div className="flex items-center justify-center w-full h-full text-white text-xs">
+                        Loading chart...
+                      </div>
+                    )}
                     <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                       <span className="text-lg font-bold text-white">
                         {vehicleStatusData.reduce((sum, item) => sum + item.value, 0)}
@@ -593,9 +597,11 @@ const Dashboard = () => {
               <CardTitle className="text-white">Sales Status</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="h-64 w-full bg-black/20 rounded-lg p-4">
-                <ResponsiveContainer width="100%" height="100%">
+              <div className="h-64 w-full border border-white/20 rounded p-4">
+                {salesData.length > 0 ? (
                   <AreaChart 
+                    width={400}
+                    height={200}
                     data={salesData} 
                     margin={{ top: 10, right: 10, left: 10, bottom: 10 }}
                   >
@@ -638,7 +644,11 @@ const Dashboard = () => {
                       name="Total" 
                     />
                   </AreaChart>
-                </ResponsiveContainer>
+                ) : (
+                  <div className="flex items-center justify-center w-full h-full text-white">
+                    No sales data available
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
