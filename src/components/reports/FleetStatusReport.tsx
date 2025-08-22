@@ -64,6 +64,10 @@ const FleetStatusReport = ({ dateRange }: FleetStatusReportProps) => {
     color: getStatusColor(status),
   }));
 
+  console.log('Fleet Status - Raw status counts:', statusCounts);
+  console.log('Fleet Status - Pie data:', pieData);
+  console.log('Fleet Status - Chart config keys:', Object.keys(FLEET_STATUS_CONFIG));
+
   // Calculate utilization by location
   const utilizationByLocation = vehicles.reduce((acc, vehicle) => {
     if (!vehicle.location) return acc;
