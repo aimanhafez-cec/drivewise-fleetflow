@@ -83,18 +83,19 @@ const Agreements = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 max-w-full overflow-hidden">
       {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Agreements</h1>
-          <p className="text-muted-foreground">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="min-w-0 flex-1">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Agreements</h1>
+          <p className="text-muted-foreground text-sm sm:text-base">
             Manage rental agreements and contracts
           </p>
         </div>
-        <Button onClick={() => navigate('/agreements/new')}>
+        <Button onClick={() => navigate('/agreements/new')} className="w-full sm:w-auto">
           <Plus className="mr-2 h-4 w-4" />
-          New Agreement
+          <span className="hidden sm:inline">New Agreement</span>
+          <span className="sm:hidden">New</span>
         </Button>
       </div>
 
@@ -108,20 +109,21 @@ const Agreements = () => {
         </CardHeader>
         <CardContent>
           {agreements && agreements.length > 0 ? (
-            <Table id="agreements-table">
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Agreement No.</TableHead>
-                  <TableHead>Customer</TableHead>
-                  <TableHead>Vehicle</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Period</TableHead>
-                  <TableHead>Total Amount</TableHead>
-                  <TableHead>Balance Due</TableHead>
-                  <TableHead>Created</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
+            <div className="overflow-x-auto">
+              <Table id="agreements-table" className="min-w-full">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="min-w-[120px]">Agreement No.</TableHead>
+                    <TableHead className="min-w-[150px]">Customer</TableHead>
+                    <TableHead className="min-w-[120px] hidden sm:table-cell">Vehicle</TableHead>
+                    <TableHead className="min-w-[100px]">Status</TableHead>
+                    <TableHead className="min-w-[120px] hidden md:table-cell">Period</TableHead>
+                    <TableHead className="min-w-[100px] hidden lg:table-cell">Total Amount</TableHead>
+                    <TableHead className="min-w-[100px] hidden lg:table-cell">Balance Due</TableHead>
+                    <TableHead className="min-w-[100px] hidden xl:table-cell">Created</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
                 {agreements.map((agreement) => (
                   <TableRow 
                     key={agreement.id}
@@ -148,7 +150,7 @@ const Agreements = () => {
                         </p>
                       </div>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="hidden sm:table-cell">
                       {agreement.vehicles ? (
                         <div>
                           <p className="font-medium">
@@ -167,7 +169,7 @@ const Agreements = () => {
                         {agreement.status.replace('_', ' ').toUpperCase()}
                       </Badge>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="hidden md:table-cell">
                       <div className="text-sm">
                         {agreement.checkout_datetime && agreement.return_datetime ? (
                           <>
@@ -183,19 +185,20 @@ const Agreements = () => {
                         )}
                       </div>
                     </TableCell>
-                    <TableCell className="font-medium">
+                    <TableCell className="font-medium hidden lg:table-cell">
                       {formatCurrency(agreement.total_amount || 0)}
                     </TableCell>
-                    <TableCell className="font-medium text-destructive">
+                    <TableCell className="font-medium text-destructive hidden lg:table-cell">
                       {formatCurrency(agreement.total_amount || 0)}
                     </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
+                    <TableCell className="text-sm text-muted-foreground hidden xl:table-cell">
                       {format(new Date(agreement.created_at), 'MMM dd, yyyy')}
                     </TableCell>
                   </TableRow>
                 ))}
-              </TableBody>
-            </Table>
+                </TableBody>
+              </Table>
+            </div>
           ) : (
             <div className="text-center py-8">
               <FileText className="mx-auto h-12 w-12 text-muted-foreground" />
