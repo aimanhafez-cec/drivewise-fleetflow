@@ -296,8 +296,8 @@ const Dashboard = () => {
         
         <div className="flex-1 max-w-md mx-8">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input placeholder="Search vehicles, customers, reservations..." className="pl-10 bg-white text-gray-900 border-0 rounded-full shadow-sm" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-white/70" />
+            <Input placeholder="Search vehicles, customers, reservations..." className="pl-10 bg-white/10 text-white placeholder:text-white/70 border-0 rounded-full shadow-sm" />
           </div>
         </div>
 
@@ -325,7 +325,7 @@ const Dashboard = () => {
                   <action.icon className="h-5 w-5 text-teal-accent group-hover:text-white transition-colors" />
                   {!sidebarCollapsed && <div className="text-left">
                       <div className="font-medium">{action.name}</div>
-                      <div className="text-xs text-muted opacity-80">{action.description}</div>
+                      <div className="text-xs text-white/80 opacity-80">{action.description}</div>
                     </div>}
                 </button>)}
             </nav>
@@ -369,7 +369,7 @@ const Dashboard = () => {
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-muted mb-1">{stat.title}</p>
+                      <p className="text-sm text-white/80 mb-1">{stat.title}</p>
                       <p className="text-2xl font-bold text-white">{stat.value}</p>
                     </div>
                     <div className={`p-2 rounded-lg ${stat.iconBg}`}>
@@ -390,14 +390,14 @@ const Dashboard = () => {
               <CardContent>
                 <div className="flex gap-2">
                   <Select defaultValue="license">
-                    <SelectTrigger className="w-32 bg-white text-gray-900">
+                    <SelectTrigger className="w-32 bg-white/10 text-white border-white/20">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="license">License No.</SelectItem>
+                    <SelectContent className="bg-card border-white/20">
+                      <SelectItem value="license" className="text-white">License No.</SelectItem>
                     </SelectContent>
                   </Select>
-                  <Input placeholder="License No." className="flex-1 bg-white text-gray-900" />
+                  <Input placeholder="License No." className="flex-1 bg-white/10 text-white placeholder:text-white/70 border-white/20" />
                   <Button className="bg-teal-accent hover:bg-teal-light text-white px-6">
                     Search
                   </Button>
@@ -412,7 +412,7 @@ const Dashboard = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex gap-2">
-                  <Input placeholder="Enter customer name..." className="flex-1 bg-white text-gray-900" value={customerSearchTerm} onChange={e => {
+                  <Input placeholder="Enter customer name..." className="flex-1 bg-white/10 text-white placeholder:text-white/70 border-white/20" value={customerSearchTerm} onChange={e => {
                   setCustomerSearchTerm(e.target.value);
                   searchCustomerAgreements();
                 }} />
@@ -427,10 +427,10 @@ const Dashboard = () => {
                         <div className="flex justify-between items-start">
                           <div>
                             <p className="font-medium text-white">{agreement.customers?.full_name}</p>
-                            <p className="text-sm text-muted">
+                            <p className="text-sm text-white/80">
                               Agreement #{agreement.agreement_no || 'N/A'}
                             </p>
-                            <p className="text-sm text-muted">
+                            <p className="text-sm text-white/80">
                               {agreement.vehicles ? `${agreement.vehicles.year} ${agreement.vehicles.make} ${agreement.vehicles.model} (${agreement.vehicles.license_plate})` : 'No vehicle assigned'}
                             </p>
                           </div>
@@ -438,7 +438,7 @@ const Dashboard = () => {
                             <p className="text-sm font-medium text-white">
                               AED {agreement.total_amount || '0.00'}
                             </p>
-                            <p className="text-xs text-muted capitalize">
+                            <p className="text-xs text-white/80 capitalize">
                               {agreement.status}
                             </p>
                           </div>
@@ -446,7 +446,7 @@ const Dashboard = () => {
                       </div>)}
                   </div>}
                 
-                {customerSearchTerm && searchResults.length === 0 && <p className="text-muted text-sm mt-2">No agreements found for this customer.</p>}
+                {customerSearchTerm && searchResults.length === 0 && <p className="text-white/80 text-sm mt-2">No agreements found for this customer.</p>}
               </CardContent>
             </Card>
           </div>
@@ -457,11 +457,11 @@ const Dashboard = () => {
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="text-white">Vehicle Status</CardTitle>
                 <Select defaultValue="fullsize">
-                  <SelectTrigger className="w-32 bg-white text-gray-900">
+                  <SelectTrigger className="w-32 bg-white/10 text-white border-white/20">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="fullsize">Full Size</SelectItem>
+                  <SelectContent className="bg-card border-white/20">
+                    <SelectItem value="fullsize" className="text-white">Full Size</SelectItem>
                   </SelectContent>
                 </Select>
               </CardHeader>
@@ -479,7 +479,7 @@ const Dashboard = () => {
                       <span className="text-xl font-bold text-white">
                         {vehicleStatusData.reduce((sum, item) => sum + item.value, 0)}
                       </span>
-                      <span className="text-xs text-muted">Total</span>
+                      <span className="text-xs text-white/80">Total</span>
                     </div>
                   </div>
                   <div className="flex-1">
@@ -503,32 +503,32 @@ const Dashboard = () => {
                 <CardTitle className="text-white">Rate Summary</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-3 gap-2 mb-4">
-                  <Select defaultValue="middletown">
-                    <SelectTrigger className="bg-white text-gray-900">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="middletown">Middletown</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Select defaultValue="base">
-                    <SelectTrigger className="bg-white text-gray-900">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="base">base</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Select defaultValue="daily">
-                    <SelectTrigger className="bg-white text-gray-900">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="daily">Daily</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                 <div className="grid grid-cols-3 gap-2 mb-4">
+                   <Select defaultValue="middletown">
+                     <SelectTrigger className="bg-white/10 text-white border-white/20">
+                       <SelectValue />
+                     </SelectTrigger>
+                     <SelectContent className="bg-card border-white/20">
+                       <SelectItem value="middletown" className="text-white">Middletown</SelectItem>
+                     </SelectContent>
+                   </Select>
+                   <Select defaultValue="base">
+                     <SelectTrigger className="bg-white/10 text-white border-white/20">
+                       <SelectValue />
+                     </SelectTrigger>
+                     <SelectContent className="bg-card border-white/20">
+                       <SelectItem value="base" className="text-white">base</SelectItem>
+                     </SelectContent>
+                   </Select>
+                   <Select defaultValue="daily">
+                     <SelectTrigger className="bg-white/10 text-white border-white/20">
+                       <SelectValue />
+                     </SelectTrigger>
+                     <SelectContent className="bg-card border-white/20">
+                       <SelectItem value="daily" className="text-white">Daily</SelectItem>
+                     </SelectContent>
+                   </Select>
+                 </div>
                 <div className="overflow-x-auto">
                   <Table>
                     <TableHeader>
@@ -541,8 +541,8 @@ const Dashboard = () => {
                     <TableBody>
                       {rateData.map((row, index) => <TableRow key={index} className="border-teal-light hover:bg-teal-overlay/20">
                           <TableCell className="font-medium text-white">{row.vehicleType}</TableCell>
-                          <TableCell className="text-muted">{row.mileage}</TableCell>
-                          <TableCell className="text-muted">{row.rate}</TableCell>
+                           <TableCell className="text-white">{row.mileage}</TableCell>
+                           <TableCell className="text-white">{row.rate}</TableCell>
                         </TableRow>)}
                     </TableBody>
                   </Table>
