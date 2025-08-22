@@ -81,11 +81,11 @@ const MaintenanceReport = ({ dateRange }: MaintenanceReportProps) => {
 
   // Service type breakdown
   const serviceTypes = [
-    { type: 'Oil Change', count: 28, avgCost: 75 },
-    { type: 'Tire Rotation', count: 15, avgCost: 50 },
-    { type: 'Brake Inspection', count: 12, avgCost: 200 },
-    { type: 'General Service', count: 22, avgCost: 300 },
-    { type: 'Emergency Repair', count: 8, avgCost: 450 },
+    { type: 'Oil Change', count: 28, avgCost: 75, fill: VEHICLE_CATEGORY_COLORS[0] },
+    { type: 'Tire Rotation', count: 15, avgCost: 50, fill: VEHICLE_CATEGORY_COLORS[1] },
+    { type: 'Brake Inspection', count: 12, avgCost: 200, fill: VEHICLE_CATEGORY_COLORS[2] },
+    { type: 'General Service', count: 22, avgCost: 300, fill: VEHICLE_CATEGORY_COLORS[3] },
+    { type: 'Emergency Repair', count: 8, avgCost: 450, fill: VEHICLE_CATEGORY_COLORS[4] },
   ];
 
   if (isLoading) {
@@ -252,7 +252,6 @@ const MaintenanceReport = ({ dateRange }: MaintenanceReportProps) => {
                   <ChartLegend content={<ChartLegendContent />} />
                   <Bar 
                     dataKey="count" 
-                    fill="hsl(220, 91%, 60%)" 
                     radius={[4, 4, 0, 0]} 
                   />
                 </BarChart>
