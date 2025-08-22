@@ -1,49 +1,30 @@
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertTriangle } from 'lucide-react';
-import { StandardLineChart, StandardBarChart } from '@/components/charts';
-import { formatCurrency } from '@/lib/utils/currency';
-
-interface DateRange {
-  from?: Date;
-  to?: Date;
-}
+import { SimpleBarChart } from '@/components/charts';
+import { Calendar, Car, AlertTriangle, Users } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ReservationsReportProps {
-  dateRange?: DateRange;
+  dateRange: { from: Date; to: Date };
+  filters: {
+    branch: string;
+    vehicleType: string;
+    status: string;
+  };
 }
 
-export default function ReservationsReport({ dateRange }: ReservationsReportProps) {
+const ReservationsReport: React.FC<ReservationsReportProps> = ({ dateRange, filters }) => {
   const { data: reservations = [], isLoading } = useQuery({
     queryKey: ['reservations-report', dateRange],
     queryFn: async () => {
-      let query = supabase
-        .from('reservations')
-        .select('id, customer_id, vehicle_id, start_datetime, end_datetime, pickup_location, status, total_amount');
-
-      if (dateRange?.from) {
-        query = query.gte('start_datetime', dateRange.from.toISOString());
-      }
-      if (dateRange?.to) {
-        query = query.lte('start_datetime', dateRange.to.toISOString());
-      }
-
-      const { data, error } = await query;
-      if (error) throw error;
-      return data || [];
-    },
-  });
-
-  const { data: vehicles = [] } = useQuery({
-    queryKey: ['vehicles-reservations'],
-    queryFn: async () => {
       const { data, error } = await supabase
-        .from('vehicles')
-        .select('id, make, model, status');
+        .from('reservations')
+        .select('*')
+        .gte('start_datetime', dateRange.from.toISOString())
+        .lte('end_datetime', dateRange.to.toISOString());
       
       if (error) throw error;
       return data || [];
@@ -51,288 +32,182 @@ export default function ReservationsReport({ dateRange }: ReservationsReportProp
   });
 
   if (isLoading) {
-    return <div className="text-white">Loading...</div>;
+    return <div className="text-center py-8">Loading reservations data...</div>;
   }
 
-  // Calculate reservation statistics
-  const activeReservations = reservations.filter(r => r.status === 'confirmed' || r.status === 'checked_out').length;
-  const pendingReservations = reservations.filter(r => r.status === 'pending').length;
-  const completedReservations = reservations.filter(r => r.status === 'completed').length;
+  // Calculate KPIs
+  const upcomingBookings = reservations.filter(r => r.status === 'confirmed').length;
+  const availableFleet = 15; // Mock data
+  const overbookingAlerts = 2; // Mock data
+  const totalReservations = reservations.length;
 
-  // Calculate occupancy rate
-  const totalVehicles = vehicles.length;
-  const occupancyRate = totalVehicles > 0 ? Math.round((activeReservations / totalVehicles) * 100) : 0;
+  // Mock availability data by location
+  const availabilityData = [
+    { location: 'Downtown', available: 8, booked: 12, overbooked: 1 },
+    { location: 'Airport', available: 5, booked: 18, overbooked: 2 },
+    { location: 'Mall', available: 12, booked: 6, overbooked: 0 },
+    { location: 'North Branch', available: 9, booked: 10, overbooked: 0 }
+  ];
 
-  // Generate daily booking trends for current week
-  const today = new Date();
-  const weekStart = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay());
-  
-  const dailyTrends = Array.from({ length: 7 }, (_, i) => {
-    const date = new Date(weekStart);
-    date.setDate(weekStart.getDate() + i);
-    const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
-    
-    const dayBookings = reservations.filter(r => {
-      if (!r.start_datetime) return false;
-      const reservationDate = new Date(r.start_datetime);
-      return reservationDate.toDateString() === date.toDateString();
-    }).length;
-
-    return {
-      day: dayName,
-      bookings: dayBookings
-    };
-  });
-
-  // Calculate bookings by location
-  const locationBookings = reservations.reduce((acc: Record<string, { bookings: number; revenue: number }>, reservation) => {
-    const location = reservation.pickup_location || 'Unknown';
-    if (!acc[location]) {
-      acc[location] = { bookings: 0, revenue: 0 };
+  const upcomingReservations = [
+    {
+      bookingId: 'B001',
+      customer: 'John Smith',
+      vehicle: 'Toyota Camry',
+      pickupDate: '2024-02-15',
+      returnDate: '2024-02-18',
+      branch: 'Downtown',
+      status: 'confirmed'
+    },
+    {
+      bookingId: 'B002',
+      customer: 'Sarah Johnson',
+      vehicle: 'Honda Civic',
+      pickupDate: '2024-02-16',
+      returnDate: '2024-02-20',
+      branch: 'Airport',
+      status: 'confirmed'
+    },
+    {
+      bookingId: 'B003',
+      customer: 'Mike Wilson',
+      vehicle: 'Nissan Altima',
+      pickupDate: '2024-02-17',
+      returnDate: '2024-02-19',
+      branch: 'Mall',
+      status: 'pending'
     }
-    acc[location].bookings += 1;
-    acc[location].revenue += Number(reservation.total_amount) || 0;
-    return acc;
-  }, {});
+  ];
 
-  const locationData = Object.entries(locationBookings).map(([location, data]) => ({
-    location,
-    bookings: data.bookings,
-    revenue: data.revenue
-  })).sort((a, b) => b.bookings - a.bookings);
-
-  // Check for potential overbookings
-  const overbookings = reservations.filter(reservation => {
-    if (!reservation.vehicle_id || !reservation.start_datetime || !reservation.end_datetime) {
-      return false;
+  const kpiCards = [
+    {
+      title: 'Upcoming Bookings',
+      value: upcomingBookings,
+      icon: Calendar,
+      color: 'text-blue-600',
+      bgColor: 'bg-blue-50'
+    },
+    {
+      title: 'Available Fleet',
+      value: availableFleet,
+      icon: Car,
+      color: 'text-green-600',
+      bgColor: 'bg-green-50'
+    },
+    {
+      title: 'Overbooking Alerts',
+      value: overbookingAlerts,
+      icon: AlertTriangle,
+      color: 'text-red-600',
+      bgColor: 'bg-red-50'
+    },
+    {
+      title: 'Total Reservations',
+      value: totalReservations,
+      icon: Users,
+      color: 'text-purple-600',
+      bgColor: 'bg-purple-50'
     }
+  ];
 
-    const conflictingReservations = reservations.filter(other => {
-      if (other.id === reservation.id || other.vehicle_id !== reservation.vehicle_id) {
-        return false;
-      }
-      if (!other.start_datetime || !other.end_datetime) {
-        return false;
-      }
-
-      const start1 = new Date(reservation.start_datetime!);
-      const end1 = new Date(reservation.end_datetime!);
-      const start2 = new Date(other.start_datetime);
-      const end2 = new Date(other.end_datetime);
-
-      return (start1 < end2 && end1 > start2);
-    });
-
-    return conflictingReservations.length > 0;
-  });
-
-  // Get upcoming reservations (next 7 days)
-  const nextWeek = new Date();
-  nextWeek.setDate(nextWeek.getDate() + 7);
-  
-  const upcomingReservations = reservations.filter(r => {
-    if (!r.start_datetime) return false;
-    const startDate = new Date(r.start_datetime);
-    return startDate >= new Date() && startDate <= nextWeek;
-  }).slice(0, 10);
-
-  const trendsConfig = {
-    bookings: {
-      label: "Bookings",
-      color: "hsl(var(--chart-1))",
-    },
-  };
-
-  const locationConfig = {
-    bookings: {
-      label: "Bookings",
-      color: "hsl(var(--chart-2))",
-    },
-    revenue: {
-      label: "Revenue",
-      color: "hsl(var(--chart-1))",
-    },
+  const getStatusBadgeVariant = (status: string) => {
+    switch (status) {
+      case 'confirmed':
+        return 'default';
+      case 'pending':
+        return 'secondary';
+      case 'cancelled':
+        return 'destructive';
+      default:
+        return 'outline';
+    }
   };
 
   return (
     <div className="space-y-6">
-      {/* Overview Statistics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-white">Active Reservations</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-white">{activeReservations}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-white">Occupancy Rate</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-white">{occupancyRate}%</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-white">Pending Bookings</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-white">{pendingReservations}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-white">Overbooking Alerts</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-white">{overbookings.length}</div>
-          </CardContent>
-        </Card>
+      <div>
+        <h1 className="text-2xl font-bold text-foreground">Reservations & Availability</h1>
+        <p className="text-muted-foreground">Booking overview and fleet availability tracking</p>
       </div>
 
-      {/* Overbooking Alert */}
-      {overbookings.length > 0 && (
-        <Alert className="border-destructive">
-          <AlertTriangle className="h-4 w-4" />
-          <AlertDescription className="text-white">
-            Warning: {overbookings.length} potential overbooking conflict(s) detected. Please review vehicle assignments.
-          </AlertDescription>
-        </Alert>
-      )}
-
-      {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-white">Daily Booking Trends</CardTitle>
-            <CardDescription className="text-gray-300">
-              Bookings for the current week
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <StandardLineChart
-              data={dailyTrends}
-              config={trendsConfig}
-              height={300}
-              xAxisKey="day"
-              lines={[{ dataKey: "bookings", name: "Bookings" }]}
-              showLegend={false}
-            />
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-white">Bookings by Location</CardTitle>
-            <CardDescription className="text-gray-300">
-              Reservation volume and revenue by pickup location
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <StandardBarChart
-              data={locationData.slice(0, 5)}
-              config={locationConfig}
-              height={300}
-              xAxisKey="location"
-              bars={[
-                { dataKey: "bookings", name: "Bookings" },
-                { dataKey: "revenue", name: "Revenue" }
-              ]}
-            />
-          </CardContent>
-        </Card>
+      {/* KPI Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {kpiCards.map((kpi, index) => (
+          <Card key={index} className="border-border">
+            <CardContent className="p-4">
+              <div className="flex items-center space-x-3">
+                <div className={`p-2 rounded-lg ${kpi.bgColor}`}>
+                  <kpi.icon className={`h-5 w-5 ${kpi.color}`} />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">{kpi.title}</p>
+                  <p className="text-lg font-bold text-card-foreground">{kpi.value}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
-      {/* Upcoming Reservations Table */}
-      <Card>
+      {/* Availability Heatmap */}
+      <Card className="border-border">
         <CardHeader>
-          <CardTitle className="text-white">Upcoming Reservations</CardTitle>
-          <CardDescription className="text-gray-300">
-            Reservations starting in the next 7 days
-          </CardDescription>
+          <CardTitle className="text-card-foreground">Availability by Location</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <SimpleBarChart
+            data={availabilityData}
+            xAxisKey="location"
+            bars={[
+              { dataKey: 'available', name: 'Available', color: 'hsl(var(--chart-1))' },
+              { dataKey: 'booked', name: 'Booked', color: 'hsl(var(--chart-2))' },
+              { dataKey: 'overbooked', name: 'Overbooked', color: 'hsl(var(--chart-3))' }
+            ]}
+            height={300}
+          />
+        </CardContent>
+      </Card>
+
+      {/* Reservations Table */}
+      <Card className="border-border">
+        <CardHeader>
+          <CardTitle className="text-card-foreground">Upcoming Reservations</CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="text-white">Start Date</TableHead>
-                <TableHead className="text-white">Location</TableHead>
-                <TableHead className="text-white">Status</TableHead>
-                <TableHead className="text-white">Amount</TableHead>
+                <TableHead className="text-muted-foreground">Booking ID</TableHead>
+                <TableHead className="text-muted-foreground">Customer</TableHead>
+                <TableHead className="text-muted-foreground">Vehicle</TableHead>
+                <TableHead className="text-muted-foreground">Pick-up Date</TableHead>
+                <TableHead className="text-muted-foreground">Return Date</TableHead>
+                <TableHead className="text-muted-foreground">Branch</TableHead>
+                <TableHead className="text-muted-foreground">Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {upcomingReservations.map((reservation) => (
-                <TableRow key={reservation.id}>
-                  <TableCell className="text-white">
-                    {reservation.start_datetime ? 
-                      new Date(reservation.start_datetime).toLocaleDateString() : 'N/A'
-                    }
-                  </TableCell>
-                  <TableCell className="text-white">{reservation.pickup_location || 'N/A'}</TableCell>
+                <TableRow key={reservation.bookingId} className="hover:bg-muted/50 cursor-pointer">
+                  <TableCell className="font-mono text-sm text-card-foreground">{reservation.bookingId}</TableCell>
+                  <TableCell className="text-card-foreground">{reservation.customer}</TableCell>
+                  <TableCell className="text-card-foreground">{reservation.vehicle}</TableCell>
+                  <TableCell className="text-muted-foreground">{reservation.pickupDate}</TableCell>
+                  <TableCell className="text-muted-foreground">{reservation.returnDate}</TableCell>
+                  <TableCell className="text-muted-foreground">{reservation.branch}</TableCell>
                   <TableCell>
-                    <Badge variant={reservation.status === 'confirmed' ? 'default' : 'secondary'}>
+                    <Badge variant={getStatusBadgeVariant(reservation.status)}>
                       {reservation.status}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-white">{formatCurrency(Number(reservation.total_amount) || 0)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </CardContent>
       </Card>
-
-      {/* Overbooking Details */}
-      {overbookings.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-white">Overbooking Conflicts</CardTitle>
-            <CardDescription className="text-gray-300">
-              Vehicles with overlapping reservations that need attention
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="text-white">Vehicle</TableHead>
-                  <TableHead className="text-white">Start Date</TableHead>
-                  <TableHead className="text-white">End Date</TableHead>
-                  <TableHead className="text-white">Status</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {overbookings.slice(0, 10).map((reservation) => {
-                  const vehicle = vehicles.find(v => v.id === reservation.vehicle_id);
-                  return (
-                    <TableRow key={reservation.id}>
-                      <TableCell className="text-white">
-                        {vehicle ? `${vehicle.make} ${vehicle.model}` : 'Unknown Vehicle'}
-                      </TableCell>
-                      <TableCell className="text-white">
-                        {reservation.start_datetime ? 
-                          new Date(reservation.start_datetime).toLocaleDateString() : 'N/A'
-                        }
-                      </TableCell>
-                      <TableCell className="text-white">
-                        {reservation.end_datetime ? 
-                          new Date(reservation.end_datetime).toLocaleDateString() : 'N/A'
-                        }
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="destructive">{reservation.status}</Badge>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
-      )}
     </div>
   );
-}
+};
+
+export default ReservationsReport;

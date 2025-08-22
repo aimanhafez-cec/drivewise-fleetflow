@@ -1,238 +1,187 @@
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { StandardPieChart, StandardBarChart } from '@/components/charts';
-import { FLEET_STATUS_CONFIG } from '@/lib/chartConfig';
-import { formatCurrency } from '@/lib/utils/currency';
-
-interface DateRange {
-  from?: Date;
-  to?: Date;
-}
+import { SimplePieChart, SimpleBarChart } from '@/components/charts';
+import { Car, Users, Wrench, Clock, TrendingUp, AlertCircle } from 'lucide-react';
+import { useAllVehicles } from '@/hooks/useVehicles';
 
 interface FleetStatusReportProps {
-  dateRange?: DateRange;
+  dateRange: { from: Date; to: Date };
+  filters: {
+    branch: string;
+    vehicleType: string;
+    status: string;
+  };
 }
 
-export default function FleetStatusReport({ dateRange }: FleetStatusReportProps) {
-  console.log('FleetStatusReport component rendered with dateRange:', dateRange);
-  
-  const { data: vehicles = [], isLoading } = useQuery({
-    queryKey: ['vehicles'],
-    queryFn: async () => {
-      console.log('Fetching vehicles for FleetStatusReport...');
-      const { data, error } = await supabase
-        .from('vehicles')
-        .select('id, make, model, year, status, location, daily_rate');
-      
-      if (error) throw error;
-      console.log('FleetStatusReport vehicles data:', data);
-      return data || [];
-    },
-  });
-
-  const { data: reservations = [] } = useQuery({
-    queryKey: ['reservations', dateRange],
-    queryFn: async () => {
-      let query = supabase
-        .from('reservations')
-        .select('vehicle_id, pickup_location')
-        .eq('status', 'confirmed');
-
-      if (dateRange?.from) {
-        query = query.gte('start_datetime', dateRange.from.toISOString());
-      }
-      if (dateRange?.to) {
-        query = query.lte('end_datetime', dateRange.to.toISOString());
-      }
-
-      const { data, error } = await query;
-      if (error) throw error;
-      return data || [];
-    },
-    enabled: !isLoading,
-  });
+const FleetStatusReport: React.FC<FleetStatusReportProps> = ({ dateRange, filters }) => {
+  const { data: vehicles = [], isLoading } = useAllVehicles();
 
   if (isLoading) {
-    return <div className="text-white">Loading...</div>;
+    return <div className="text-center py-8">Loading fleet data...</div>;
   }
 
-  // Calculate status counts
-  const statusCounts = vehicles.reduce((acc: Record<string, number>, vehicle) => {
-    const status = vehicle.status || 'available';
-    acc[status] = (acc[status] || 0) + 1;
-    return acc;
-  }, {});
+  // Calculate KPIs
+  const totalVehicles = vehicles.length;
+  const availableVehicles = vehicles.filter(v => v.status === 'available').length;
+  const rentedVehicles = vehicles.filter(v => v.status === 'rented').length;
+  const maintenanceVehicles = vehicles.filter(v => v.status === 'maintenance').length;
+  const utilizationRate = totalVehicles > 0 ? Math.round((rentedVehicles / totalVehicles) * 100) : 0;
+  const overdueReturns = 3; // Mock data
 
-  // Prepare data for pie chart
-  const pieData = Object.entries(statusCounts).map(([status, count]) => ({
-    name: status,
-    value: count,
-    status: status // Include status for color mapping
-  }));
+  // Chart data
+  const statusData = [
+    { name: 'Available', value: availableVehicles, fill: 'hsl(var(--chart-1))' },
+    { name: 'Rented', value: rentedVehicles, fill: 'hsl(var(--chart-2))' },
+    { name: 'Maintenance', value: maintenanceVehicles, fill: 'hsl(var(--chart-3))' }
+  ];
 
-  console.log('FleetStatusReport pieData:', pieData);
-  console.log('FleetStatusReport FLEET_STATUS_CONFIG:', FLEET_STATUS_CONFIG);
+  const utilizationData = [
+    { location: 'Downtown', utilization: 85 },
+    { location: 'Airport', utilization: 92 },
+    { location: 'Mall', utilization: 67 },
+    { location: 'North Branch', utilization: 74 }
+  ];
 
-  // Calculate utilization by location
-  const utilizationData = vehicles.reduce((acc: Record<string, { total: number; rented: number }>, vehicle) => {
-    const location = vehicle.location || 'Unknown';
-    if (!acc[location]) {
-      acc[location] = { total: 0, rented: 0 };
-    }
-    acc[location].total += 1;
-    if (vehicle.status === 'rented') {
-      acc[location].rented += 1;
-    }
-    return acc;
-  }, {});
-
-  const utilizationChartData = Object.entries(utilizationData).map(([location, data]) => ({
-    location,
-    utilization: data.total > 0 ? Math.round((data.rented / data.total) * 100) : 0,
-    total: data.total,
-    rented: data.rented
-  }));
-
-  const utilizationConfig = {
-    utilization: {
-      label: "Utilization %",
-      color: "hsl(var(--chart-1))",
+  const kpiCards = [
+    {
+      title: 'Total Vehicles',
+      value: totalVehicles,
+      icon: Car,
+      color: 'text-blue-600',
+      bgColor: 'bg-blue-50'
     },
-  };
+    {
+      title: 'Available',
+      value: availableVehicles,
+      icon: Car,
+      color: 'text-green-600',
+      bgColor: 'bg-green-50'
+    },
+    {
+      title: 'Rented',
+      value: rentedVehicles,
+      icon: Users,
+      color: 'text-orange-600',
+      bgColor: 'bg-orange-50'
+    },
+    {
+      title: 'In Maintenance',
+      value: maintenanceVehicles,
+      icon: Wrench,
+      color: 'text-red-600',
+      bgColor: 'bg-red-50'
+    },
+    {
+      title: 'Utilization %',
+      value: `${utilizationRate}%`,
+      icon: TrendingUp,
+      color: 'text-purple-600',
+      bgColor: 'bg-purple-50'
+    },
+    {
+      title: 'Overdue Returns',
+      value: overdueReturns,
+      icon: AlertCircle,
+      color: 'text-red-600',
+      bgColor: 'bg-red-50'
+    }
+  ];
 
-  const getStatusVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
+  const getStatusBadgeVariant = (status: string) => {
     switch (status) {
-      case 'available': return 'default';
-      case 'rented': return 'secondary';
-      case 'maintenance': return 'outline';
-      case 'damaged': return 'destructive';
-      default: return 'outline';
+      case 'available':
+        return 'default';
+      case 'rented':
+        return 'secondary';
+      case 'maintenance':
+        return 'destructive';
+      default:
+        return 'outline';
     }
   };
 
   return (
     <div className="space-y-6">
-      {/* Status Overview Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-white">Available</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-white">{statusCounts.available || 0}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-white">Rented</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-white">{statusCounts.rented || 0}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-white">Maintenance</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-white">{statusCounts.maintenance || 0}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-white">Out of Service</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-white">{statusCounts['out of service'] || 0}</div>
-          </CardContent>
-        </Card>
+      <div>
+        <h1 className="text-2xl font-bold text-foreground">Fleet Status & Utilization</h1>
+        <p className="text-muted-foreground">Overview of vehicle availability and utilization metrics</p>
+      </div>
+
+      {/* KPI Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        {kpiCards.map((kpi, index) => (
+          <Card key={index} className="border-border">
+            <CardContent className="p-4">
+              <div className="flex items-center space-x-3">
+                <div className={`p-2 rounded-lg ${kpi.bgColor}`}>
+                  <kpi.icon className={`h-5 w-5 ${kpi.color}`} />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">{kpi.title}</p>
+                  <p className="text-lg font-bold text-card-foreground">{kpi.value}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
+        <Card className="border-border">
           <CardHeader>
-            <CardTitle className="text-white">Fleet Status Distribution</CardTitle>
-            <CardDescription className="text-gray-300">
-              Breakdown of vehicle status across the fleet
-            </CardDescription>
+            <CardTitle className="text-card-foreground">Fleet Status Distribution</CardTitle>
           </CardHeader>
           <CardContent>
-            {pieData.length > 0 ? (
-              <StandardPieChart 
-                data={pieData}
-                config={FLEET_STATUS_CONFIG}
-                height={300}
-                showLegend={true}
-              />
-            ) : (
-              <div className="text-white p-8 text-center">
-                No chart data available. pieData length: {pieData.length}
-              </div>
-            )}
+            <SimplePieChart data={statusData} height={300} />
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-border">
           <CardHeader>
-            <CardTitle className="text-white">Utilization by Location</CardTitle>
-            <CardDescription className="text-gray-300">
-              Vehicle utilization percentage by location
-            </CardDescription>
+            <CardTitle className="text-card-foreground">Utilization by Location</CardTitle>
           </CardHeader>
           <CardContent>
-            {utilizationChartData.length > 0 ? (
-              <StandardBarChart
-                data={utilizationChartData}
-                config={utilizationConfig}
-                height={300}
-                xAxisKey="location"
-                bars={[{ dataKey: "utilization", name: "Utilization %" }]}
-                showLegend={false}
-              />
-            ) : (
-              <div className="text-white p-8 text-center">
-                No utilization data available. Data length: {utilizationChartData.length}
-              </div>
-            )}
+            <SimpleBarChart
+              data={utilizationData}
+              xAxisKey="location"
+              bars={[{ dataKey: 'utilization', name: 'Utilization %', color: 'hsl(var(--chart-2))' }]}
+              height={300}
+            />
           </CardContent>
         </Card>
       </div>
 
-      {/* Vehicle List */}
-      <Card>
+      {/* Vehicle Table */}
+      <Card className="border-border">
         <CardHeader>
-          <CardTitle className="text-white">All Vehicles</CardTitle>
-          <CardDescription className="text-gray-300">
-            Complete list of vehicles with their current status
-          </CardDescription>
+          <CardTitle className="text-card-foreground">Vehicle Details</CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="text-white">Vehicle</TableHead>
-                <TableHead className="text-white">Status</TableHead>
-                <TableHead className="text-white">Location</TableHead>
-                <TableHead className="text-white">Daily Rate</TableHead>
+                <TableHead className="text-muted-foreground">Vehicle ID</TableHead>
+                <TableHead className="text-muted-foreground">Make & Model</TableHead>
+                <TableHead className="text-muted-foreground">Status</TableHead>
+                <TableHead className="text-muted-foreground">Location</TableHead>
+                <TableHead className="text-muted-foreground">License Plate</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {vehicles.map((vehicle) => (
-                <TableRow key={vehicle.id}>
-                  <TableCell className="text-white">
-                    {vehicle.make} {vehicle.model} ({vehicle.year})
-                  </TableCell>
+              {vehicles.slice(0, 10).map((vehicle) => (
+                <TableRow key={vehicle.id} className="hover:bg-muted/50 cursor-pointer">
+                  <TableCell className="font-mono text-sm text-card-foreground">{vehicle.id.slice(0, 8)}</TableCell>
+                  <TableCell className="text-card-foreground">{vehicle.make} {vehicle.model} ({vehicle.year})</TableCell>
                   <TableCell>
-                    <Badge variant={getStatusVariant(vehicle.status)}>
+                    <Badge variant={getStatusBadgeVariant(vehicle.status)}>
                       {vehicle.status}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-white">{vehicle.location || 'N/A'}</TableCell>
-                  <TableCell className="text-white">{formatCurrency(vehicle.daily_rate || 0)}</TableCell>
+                  <TableCell className="text-muted-foreground">Downtown</TableCell>
+                  <TableCell className="font-mono text-sm text-card-foreground">{vehicle.license_plate}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -241,4 +190,6 @@ export default function FleetStatusReport({ dateRange }: FleetStatusReportProps)
       </Card>
     </div>
   );
-}
+};
+
+export default FleetStatusReport;
