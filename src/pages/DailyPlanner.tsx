@@ -106,24 +106,68 @@ const DailyPlanner: React.FC = () => {
   const { data: events = [], isLoading } = useQuery({
     queryKey: ["planner-events", dateRange.start.toISOString(), dateRange.end.toISOString(), filters],
     queryFn: async () => {
-      // For now, let's fetch from reservations and agreements
+      // Build reservations query with filters
+      let reservationsQuery = supabase
+        .from("reservations")
+        .select(`
+          id, status, start_datetime, end_datetime, pickup_location, return_location, ro_number,
+          customers!inner(full_name),
+          vehicles(id, category_id, categories(name))
+        `)
+        .gte("start_datetime", dateRange.start.toISOString())
+        .lte("start_datetime", dateRange.end.toISOString());
+
+      // Apply vehicle class filter
+      if (filters.vehicleClass) {
+        reservationsQuery = reservationsQuery.eq("vehicles.category_id", filters.vehicleClass);
+      }
+
+      // Apply customer filter (search by name)
+      if (filters.customer) {
+        reservationsQuery = reservationsQuery.ilike("customers.full_name", `%${filters.customer}%`);
+      }
+
+      // Apply status filter
+      if (filters.status.length > 0) {
+        reservationsQuery = reservationsQuery.in("status", filters.status as any);
+      }
+
+      // Apply locations filter
+      if (filters.locations.length > 0) {
+        reservationsQuery = reservationsQuery.or(
+          filters.locations.map(loc => `pickup_location.eq.${loc},return_location.eq.${loc}`).join(',')
+        );
+      }
+
+      // Build agreements query with filters
+      let agreementsQuery = supabase
+        .from("agreements")
+        .select(`
+          id, status, checkout_datetime, return_datetime, agreement_no,
+          customers!inner(full_name),
+          vehicles(id, category_id, categories(name))
+        `)
+        .gte("checkout_datetime", dateRange.start.toISOString())
+        .lte("checkout_datetime", dateRange.end.toISOString());
+
+      // Apply vehicle class filter to agreements
+      if (filters.vehicleClass) {
+        agreementsQuery = agreementsQuery.eq("vehicles.category_id", filters.vehicleClass);
+      }
+
+      // Apply customer filter to agreements
+      if (filters.customer) {
+        agreementsQuery = agreementsQuery.ilike("customers.full_name", `%${filters.customer}%`);
+      }
+
+      // Apply status filter to agreements
+      if (filters.status.length > 0) {
+        agreementsQuery = agreementsQuery.in("status", filters.status as any);
+      }
+
       const [reservationsResult, agreementsResult] = await Promise.all([
-        supabase
-          .from("reservations")
-          .select(`
-            id, status, start_datetime, end_datetime, pickup_location, return_location, ro_number,
-            customers!inner(full_name)
-          `)
-          .gte("start_datetime", dateRange.start.toISOString())
-          .lte("start_datetime", dateRange.end.toISOString()),
-        supabase
-          .from("agreements")
-          .select(`
-            id, status, checkout_datetime, return_datetime, agreement_no,
-            customers!inner(full_name)
-          `)
-          .gte("checkout_datetime", dateRange.start.toISOString())
-          .lte("checkout_datetime", dateRange.end.toISOString())
+        reservationsQuery,
+        agreementsQuery
       ]);
 
       const plannerEvents: PlannerEvent[] = [];
