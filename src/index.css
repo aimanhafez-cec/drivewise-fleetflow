@@ -292,6 +292,17 @@
 
   body {
     @apply bg-background text-foreground;
+    background-image: url('/lovable-uploads/99d4eb9e-6b11-43c7-a796-65c11be11231.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+  }
+
+  /* Remove background image from specific pages */
+  body:has([data-page="new-reservation"]),
+  body:has([data-page="vehicles"]) {
+    background-image: none;
   }
 
   /* Corporate Teal Dashboard Enhancements */

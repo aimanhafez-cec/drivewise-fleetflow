@@ -1136,7 +1136,7 @@ const NewReservation = () => {
     };
     validation.validateForm(validationData);
   };
-  return <div className="flex flex-col lg:flex-row gap-6 h-full">
+  return <div className="flex flex-col lg:flex-row gap-6 h-full" data-page="new-reservation">
       {/* Main Content */}
       <div className="flex-1 space-y-6 min-w-0 overflow-y-auto">
         {/* Breadcrumbs */}
