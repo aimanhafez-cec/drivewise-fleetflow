@@ -470,12 +470,30 @@ const Dashboard = () => {
                   <div className="relative w-32 h-32">
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
-                        <Pie data={vehicleStatusData} cx="50%" cy="50%" innerRadius={40} outerRadius={60} dataKey="value">
-                          {vehicleStatusData.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.color} />)}
+                        <Pie 
+                          data={vehicleStatusData} 
+                          cx="50%" 
+                          cy="50%" 
+                          innerRadius={40} 
+                          outerRadius={60} 
+                          dataKey="value"
+                          stroke="none"
+                        >
+                          {vehicleStatusData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                          ))}
                         </Pie>
+                        <Tooltip 
+                          contentStyle={{
+                            backgroundColor: 'rgba(10,122,125,0.9)',
+                            border: '1px solid #33CFCF',
+                            borderRadius: '8px',
+                            color: '#FFFFFF'
+                          }} 
+                        />
                       </PieChart>
                     </ResponsiveContainer>
-                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                       <span className="text-xl font-bold text-white">
                         {vehicleStatusData.reduce((sum, item) => sum + item.value, 0)}
                       </span>
@@ -559,18 +577,43 @@ const Dashboard = () => {
             <CardContent>
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={salesData}>
+                  <AreaChart data={salesData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(199,228,229,0.3)" />
-                    <XAxis dataKey="name" stroke="#C7E4E5" />
-                    <YAxis stroke="#C7E4E5" />
-                    <Tooltip contentStyle={{
-                    backgroundColor: 'rgba(10,122,125,0.9)',
-                    border: '1px solid #33CFCF',
-                    borderRadius: '8px',
-                    color: '#FFFFFF'
-                  }} />
-                    <Area type="monotone" dataKey="previousTotal" stackId="1" stroke="#007C7E" fill="#007C7E" fillOpacity={0.6} name="Previous Total" />
-                    <Area type="monotone" dataKey="total" stackId="2" stroke="#33CFCF" fill="#33CFCF" fillOpacity={0.8} name="Total" />
+                    <XAxis 
+                      dataKey="name" 
+                      stroke="#C7E4E5" 
+                      fontSize={12}
+                    />
+                    <YAxis 
+                      stroke="#C7E4E5" 
+                      fontSize={12}
+                    />
+                    <Tooltip 
+                      contentStyle={{
+                        backgroundColor: 'rgba(10,122,125,0.9)',
+                        border: '1px solid #33CFCF',
+                        borderRadius: '8px',
+                        color: '#FFFFFF'
+                      }} 
+                    />
+                    <Area 
+                      type="monotone" 
+                      dataKey="previousTotal" 
+                      stackId="1" 
+                      stroke="#007C7E" 
+                      fill="#007C7E" 
+                      fillOpacity={0.6} 
+                      name="Previous Total" 
+                    />
+                    <Area 
+                      type="monotone" 
+                      dataKey="total" 
+                      stackId="2" 
+                      stroke="#33CFCF" 
+                      fill="#33CFCF" 
+                      fillOpacity={0.8} 
+                      name="Total" 
+                    />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
