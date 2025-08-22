@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, LineChart, Line, ScatterChart, Scatter } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, LineChart, Line, ScatterChart, Scatter } from 'recharts';
 import { DateRange } from 'react-day-picker';
 import { formatCurrency } from '@/lib/utils/currency';
 import { TrendingUp, TrendingDown, Target, Award, AlertCircle } from 'lucide-react';
@@ -224,19 +224,17 @@ const ProfitabilityReport = ({ dateRange }: ProfitabilityReportProps) => {
             }}
             className="h-[400px]"
           >
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={categoryProfitability}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
-                <XAxis dataKey="category" stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                <ChartTooltip 
-                  content={<ChartTooltipContent formatter={(value) => [formatCurrency(Number(value)), 'Amount']} />} 
-                />
-                <Bar dataKey="revenue" fill="hsl(var(--chart-1))" radius={[0, 0, 0, 0]} />
-                <Bar dataKey="costs" fill="hsl(var(--chart-2))" radius={[0, 0, 0, 0]} />
-                <Bar dataKey="profit" fill="hsl(var(--chart-3))" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+            <BarChart width={750} height={400} data={categoryProfitability}>
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+              <XAxis dataKey="category" stroke="hsl(var(--muted-foreground))" fontSize={12} />
+              <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
+              <ChartTooltip 
+                content={<ChartTooltipContent formatter={(value) => [formatCurrency(Number(value)), 'Amount']} />} 
+              />
+              <Bar dataKey="revenue" fill="hsl(var(--chart-1))" radius={[0, 0, 0, 0]} />
+              <Bar dataKey="costs" fill="hsl(var(--chart-2))" radius={[0, 0, 0, 0]} />
+              <Bar dataKey="profit" fill="hsl(var(--chart-3))" radius={[4, 4, 0, 0]} />
+            </BarChart>
           </ChartContainer>
         </CardContent>
       </Card>

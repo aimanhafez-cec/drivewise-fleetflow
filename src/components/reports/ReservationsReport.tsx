@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from '@/components/ui/chart';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, BarChart, Bar } from 'recharts';
 import { DateRange } from 'react-day-picker';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -211,36 +211,34 @@ const ReservationsReport = ({ dateRange }: ReservationsReportProps) => {
               config={MONTHLY_TRENDS_CONFIG}
               className="h-[300px]"
             >
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={dailyBookings} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
-                  <XAxis 
-                    dataKey="day" 
-                    stroke="hsl(var(--muted-foreground))" 
-                    fontSize={12}
-                    tickLine={false}
-                    axisLine={false}
-                  />
-                  <YAxis 
-                    stroke="hsl(var(--muted-foreground))" 
-                    fontSize={12}
-                    tickLine={false}
-                    axisLine={false}
-                  />
-                  <ChartTooltip 
-                    content={<ChartTooltipContent formatter={(value, name) => [formatNumber(Number(value)), name]} />} 
-                  />
-                  <ChartLegend content={<ChartLegendContent />} />
-                  <Area
-                    type="monotone"
-                    dataKey="bookings"
-                    stroke={MONTHLY_TRENDS_CONFIG.bookings.color}
-                    fill={MONTHLY_TRENDS_CONFIG.bookings.color}
-                    fillOpacity={0.3}
-                    strokeWidth={2}
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
+              <AreaChart width={400} height={300} data={dailyBookings} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+                <XAxis 
+                  dataKey="day" 
+                  stroke="hsl(var(--muted-foreground))" 
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <YAxis 
+                  stroke="hsl(var(--muted-foreground))" 
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <ChartTooltip 
+                  content={<ChartTooltipContent formatter={(value, name) => [formatNumber(Number(value)), name]} />} 
+                />
+                <ChartLegend content={<ChartLegendContent />} />
+                <Area
+                  type="monotone"
+                  dataKey="bookings"
+                  stroke={MONTHLY_TRENDS_CONFIG.bookings.color}
+                  fill={MONTHLY_TRENDS_CONFIG.bookings.color}
+                  fillOpacity={0.3}
+                  strokeWidth={2}
+                />
+              </AreaChart>
             </ChartContainer>
           </CardContent>
         </Card>
@@ -257,35 +255,33 @@ const ReservationsReport = ({ dateRange }: ReservationsReportProps) => {
               }}
               className="h-[300px]"
             >
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={locationData.slice(0, 5)} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
-                  <XAxis 
-                    dataKey="location" 
-                    angle={-45} 
-                    textAnchor="end" 
-                    height={80}
-                    stroke="hsl(var(--muted-foreground))" 
-                    fontSize={12}
-                    tickLine={false}
-                    axisLine={false}
-                  />
-                  <YAxis 
-                    stroke="hsl(var(--muted-foreground))" 
-                    fontSize={12}
-                    tickLine={false}
-                    axisLine={false}
-                  />
-                  <ChartTooltip 
-                    content={<ChartTooltipContent formatter={(value, name) => [formatNumber(Number(value)), name]} />} 
-                  />
-                  <Bar 
-                    dataKey="bookings" 
-                    fill="hsl(142, 76%, 36%)" 
-                    radius={[4, 4, 0, 0]} 
-                  />
-                </BarChart>
-              </ResponsiveContainer>
+              <BarChart width={400} height={300} data={locationData.slice(0, 5)} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+                <XAxis 
+                  dataKey="location" 
+                  angle={-45} 
+                  textAnchor="end" 
+                  height={80}
+                  stroke="hsl(var(--muted-foreground))" 
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <YAxis 
+                  stroke="hsl(var(--muted-foreground))" 
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <ChartTooltip 
+                  content={<ChartTooltipContent formatter={(value, name) => [formatNumber(Number(value)), name]} />} 
+                />
+                <Bar 
+                  dataKey="bookings" 
+                  fill="hsl(142, 76%, 36%)" 
+                  radius={[4, 4, 0, 0]} 
+                />
+              </BarChart>
             </ChartContainer>
           </CardContent>
         </Card>
