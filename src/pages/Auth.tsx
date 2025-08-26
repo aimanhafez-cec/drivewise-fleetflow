@@ -149,7 +149,7 @@ const Auth = () => {
                 {error && <Alert variant="destructive">
                     <AlertDescription>{error}</AlertDescription>
                   </Alert>}
-                <Button type="submit" disabled={isLoading} className="w-full bg-teal-950 hover:bg-teal-800">
+                <Button type="submit" disabled={isLoading} className="w-full bg-green-700 hover:bg-green-600">
                   {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Sign In
                 </Button>
