@@ -3,7 +3,7 @@ import { StandaloneInspectionWizard } from "@/components/inspection/StandaloneIn
 
 const NewInspection: React.FC = () => {
   useEffect(() => { 
-    document.title = "New Inspection | CEC Car Rental"; 
+    document.title = "New Inspection | Core Car Rental"; 
   }, []);
 
   return <StandaloneInspectionWizard />;

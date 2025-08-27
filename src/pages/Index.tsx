@@ -65,12 +65,12 @@ const Index = () => {
             <div className="flex justify-center mb-6">
               <img 
                 src="/lovable-uploads/0fe8cfa9-3548-415c-bc9c-114a2b91ae82.png" 
-                alt="CEC Car Rental Logo" 
+                alt="Core Car Rental Logo" 
                 className="h-20 w-20"
               />
             </div>
             <h1 className="text-5xl font-bold tracking-tight mb-6">
-              CEC Car Rental
+              Core Car Rental
             </h1>
             <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
               Complete car rental management system with fleet tracking, 
@@ -137,7 +137,7 @@ const Index = () => {
             Ready to streamline your rental business?
           </h2>
           <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Join hundreds of rental companies already using CEC Car Rental 
+            Join hundreds of rental companies already using Core Car Rental 
             to manage their operations more efficiently.
           </p>
           <Button 

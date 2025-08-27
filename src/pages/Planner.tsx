@@ -20,7 +20,7 @@ const Planner: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    document.title = "Rental Daily Planner | CEC Car Rental";
+    document.title = "Rental Daily Planner | Core Car Rental";
   }, []);
 
   const start = startOfToday();

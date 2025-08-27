@@ -75,7 +75,7 @@ const InspectionDetails: React.FC = () => {
   const [inspectionType, setInspectionType] = useState<'OUT' | 'IN'>('OUT');
 
   useEffect(() => {
-    document.title = `Inspection Details | CEC Car Rental`;
+    document.title = `Inspection Details | Core Car Rental`;
   }, []);
 
   // Query both inspection tables to find the inspection

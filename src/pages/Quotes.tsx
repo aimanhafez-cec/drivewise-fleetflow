@@ -34,7 +34,7 @@ const Quotes: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    document.title = "Quotations | CEC Car Rental";
+    document.title = "Quotations | Core Car Rental";
   }, []);
 
   const { data: quotes = [] } = useQuery({

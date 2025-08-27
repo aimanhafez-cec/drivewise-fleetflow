@@ -17,7 +17,7 @@ const RFQDetails: React.FC = () => {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    document.title = "RFQ Details | CEC Car Rental";
+    document.title = "RFQ Details | Core Car Rental";
   }, []);
 
   const { data: rfq, isLoading } = useQuery({

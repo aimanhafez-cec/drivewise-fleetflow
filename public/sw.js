@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cec-rental-v1';
+const CACHE_NAME = 'core-rental-v1';
 const urlsToCache = [
   '/',
   '/static/js/bundle.js',

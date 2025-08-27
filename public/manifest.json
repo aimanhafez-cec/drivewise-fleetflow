@@ -1,6 +1,6 @@
 {
-  "name": "CEC Car Rental",
-  "short_name": "CEC Rental",
+  "name": "Core Car Rental",
+  "short_name": "Core Rental",
   "description": "Professional car rental management system",
   "start_url": "/",
   "display": "standalone",

@@ -68,7 +68,7 @@ const QuoteDetails: React.FC = () => {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    document.title = "Quote Details | CEC Car Rental";
+    document.title = "Quote Details | Core Car Rental";
   }, []);
 
   const { data: quote, isLoading } = useQuery({

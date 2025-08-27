@@ -121,9 +121,9 @@ const Auth = () => {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <img src="/lovable-uploads/0fe8cfa9-3548-415c-bc9c-114a2b91ae82.png" alt="CEC Car Rental Logo" className="h-12 w-12" />
+            <img src="/lovable-uploads/0fe8cfa9-3548-415c-bc9c-114a2b91ae82.png" alt="Core Car Rental Logo" className="h-12 w-12" />
           </div>
-          <CardTitle className="text-2xl">CEC Car Rental</CardTitle>
+          <CardTitle className="text-2xl">Core Car Rental</CardTitle>
           <CardDescription>
             Sign in to your account to access the rental management system
           </CardDescription>

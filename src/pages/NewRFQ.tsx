@@ -3,7 +3,7 @@ import { RFQWizard } from "@/components/rfqs/RFQWizard";
 
 const NewRFQ: React.FC = () => {
   useEffect(() => {
-    document.title = "New RFQ | CEC Car Rental";
+    document.title = "New RFQ | Core Car Rental";
   }, []);
 
   return <RFQWizard />;

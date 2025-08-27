@@ -45,7 +45,7 @@ const Inspections: React.FC = () => {
   const [dateFilter, setDateFilter] = useState("all");
 
   useEffect(() => { 
-    document.title = "Inspections | CEC Car Rental"; 
+    document.title = "Inspections | Core Car Rental"; 
   }, []);
 
   // Fetch unified inspections from all tables
