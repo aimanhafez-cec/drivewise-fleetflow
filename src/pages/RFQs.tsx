@@ -63,7 +63,7 @@ const RFQs: React.FC = () => {
     const variants = {
       new: "default",
       under_review: "secondary",
-      quoted: "outline", 
+      quoted: "destructive", 
       cancelled: "destructive",
     } as const;
 
