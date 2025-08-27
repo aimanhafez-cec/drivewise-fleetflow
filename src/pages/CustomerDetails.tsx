@@ -448,7 +448,7 @@ const CustomerDetails = () => {
           <TabsContent value="claims">
             <Card>
               <CardContent className="p-6">
-                <p className="text-muted-foreground">Claims functionality will be implemented here.</p>
+                <p className="text-zinc-950">Claims functionality will be implemented here.</p>
               </CardContent>
             </Card>
           </TabsContent>
