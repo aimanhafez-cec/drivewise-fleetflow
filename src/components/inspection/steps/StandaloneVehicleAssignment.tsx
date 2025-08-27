@@ -22,7 +22,7 @@ export const StandaloneVehicleAssignment: React.FC<StandaloneVehicleAssignmentPr
     <div id="step-vehicle" className="space-y-6">
       <div>
         <h3 className="text-lg font-semibold mb-2">Vehicle Selection</h3>
-        <p className="text-muted-foreground">
+        <p className="text-card-foreground">
           Choose the vehicle you want to inspect.
         </p>
       </div>
@@ -36,7 +36,7 @@ export const StandaloneVehicleAssignment: React.FC<StandaloneVehicleAssignmentPr
             value={selectedVehicleId || ''}
             onValueChange={onVehicleSelect}
           >
-            <SelectTrigger id="select-vehicle">
+            <SelectTrigger id="select-vehicle" className="text-muted-foreground">
               <SelectValue placeholder="Choose a vehicle..." />
             </SelectTrigger>
             <SelectContent>

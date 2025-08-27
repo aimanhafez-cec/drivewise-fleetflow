@@ -215,7 +215,7 @@ export const InspectionChecklist: React.FC<InspectionChecklistProps> = ({
     <div id="step-checklist" className="space-y-6">
       <div>
         <h3 className="text-lg font-semibold mb-2">Walk-Around Checklist</h3>
-        <p className="text-muted-foreground">
+        <p className="text-card-foreground">
           Inspect each section of the vehicle and mark as OK or Damage.
         </p>
       </div>
@@ -257,7 +257,7 @@ export const InspectionChecklist: React.FC<InspectionChecklistProps> = ({
                 <div key={item.id} className="space-y-3">
                   <div>
                     <h4 className="font-medium">{item.name}</h4>
-                    <p className="text-sm text-muted-foreground">{item.description}</p>
+                    <p className="text-sm text-card-foreground">{item.description}</p>
                   </div>
                   
                   <RadioGroup
@@ -333,6 +333,7 @@ export const InspectionChecklist: React.FC<InspectionChecklistProps> = ({
                     size="sm"
                     variant="outline"
                     onClick={() => handleAddExtraDamage(section.name)}
+                    className="text-muted-foreground"
                   >
                     <Plus className="h-3 w-3 mr-1" />
                     Add Damage

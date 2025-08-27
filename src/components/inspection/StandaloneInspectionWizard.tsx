@@ -244,8 +244,8 @@ export const StandaloneInspectionWizard: React.FC<StandaloneInspectionWizardProp
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">New Vehicle Inspection</h1>
-          <p className="text-muted-foreground">Complete comprehensive vehicle inspection with damage mapping and photos</p>
+          <h1 className="text-3xl font-bold tracking-tight text-card-foreground">New Vehicle Inspection</h1>
+          <p className="text-card-foreground">Complete comprehensive vehicle inspection with damage mapping and photos</p>
         </div>
         <Button variant="outline" onClick={handleClose}>
           <X className="mr-2 h-4 w-4" />
@@ -272,7 +272,7 @@ export const StandaloneInspectionWizard: React.FC<StandaloneInspectionWizardProp
                   key={step.key}
                   id={step.id}
                   className={`flex flex-col items-center text-xs ${
-                    index <= getCurrentStepIndex() ? 'text-primary' : 'text-muted-foreground'
+                    index <= getCurrentStepIndex() ? 'text-primary' : 'text-card-foreground'
                   }`}
                 >
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-1 ${
