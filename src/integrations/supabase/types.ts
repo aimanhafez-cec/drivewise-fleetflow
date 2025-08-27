@@ -1818,6 +1818,7 @@ export type Database = {
           monthly_rate: number | null
           odometer: number | null
           ownership_type: string | null
+          photo_url: string | null
           status: Database["public"]["Enums"]["vehicle_status"]
           subtype: string | null
           transmission: string | null
@@ -1844,6 +1845,7 @@ export type Database = {
           monthly_rate?: number | null
           odometer?: number | null
           ownership_type?: string | null
+          photo_url?: string | null
           status?: Database["public"]["Enums"]["vehicle_status"]
           subtype?: string | null
           transmission?: string | null
@@ -1870,6 +1872,7 @@ export type Database = {
           monthly_rate?: number | null
           odometer?: number | null
           ownership_type?: string | null
+          photo_url?: string | null
           status?: Database["public"]["Enums"]["vehicle_status"]
           subtype?: string | null
           transmission?: string | null

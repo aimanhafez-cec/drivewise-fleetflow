@@ -34,6 +34,7 @@ interface Vehicle {
   category_id: string;
   subtype: string;
   ownership_type: string;
+  photo_url?: string;
   categories?: {
     name: string;
     icon: string;
@@ -280,6 +281,7 @@ const Vehicles = () => {
                     {sortField === 'status' && (sortDirection === 'asc' ? <ChevronUp className="ml-1 h-4 w-4" /> : <ChevronDown className="ml-1 h-4 w-4" />)}
                   </div>
                 </TableHead>
+                <TableHead className="text-white min-w-[80px]">Photo</TableHead>
                 <TableHead className="text-white min-w-[100px] hidden md:table-cell">Type</TableHead>
                 <TableHead className="text-white min-w-[120px] hidden lg:table-cell">Location</TableHead>
                 <TableHead className="text-white min-w-[150px] hidden lg:table-cell">VIN</TableHead>
@@ -303,6 +305,19 @@ const Vehicles = () => {
                     <Badge className={statusConfig[vehicle.status]?.className}>
                       {statusConfig[vehicle.status]?.label}
                     </Badge>
+                  </TableCell>
+                  <TableCell>
+                    {vehicle.photo_url ? (
+                      <img 
+                        src={vehicle.photo_url} 
+                        alt={`${vehicle.make} ${vehicle.model}`}
+                        className="w-16 h-12 object-cover rounded-md"
+                      />
+                    ) : (
+                      <div className="w-16 h-12 bg-muted rounded-md flex items-center justify-center text-xs text-muted-foreground">
+                        No Photo
+                      </div>
+                    )}
                   </TableCell>
                   <TableCell className="hidden md:table-cell">{vehicle.subtype || vehicle.categories?.name || '-'}</TableCell>
                   <TableCell className="hidden lg:table-cell">{vehicle.location || '-'}</TableCell>
