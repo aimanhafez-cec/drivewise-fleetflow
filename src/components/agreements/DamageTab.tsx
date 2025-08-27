@@ -104,18 +104,18 @@ export const DamageTab: React.FC<DamageTabProps> = ({ agreementId, agreementLine
       <Card>
         <CardContent className="pt-6">
           <div className="flex items-center gap-4">
-            <span className="text-sm font-medium text-white">Severity Legend:</span>
+            <span className="text-sm font-medium text-card-foreground">Severity Legend:</span>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-              <span className="text-sm text-white">Low</span>
+              <span className="text-sm text-card-foreground">Low</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-              <span className="text-sm text-white">Medium</span>
+              <span className="text-sm text-card-foreground">Medium</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-              <span className="text-sm text-white">High</span>
+              <span className="text-sm text-card-foreground">High</span>
             </div>
           </div>
         </CardContent>
@@ -125,9 +125,9 @@ export const DamageTab: React.FC<DamageTabProps> = ({ agreementId, agreementLine
       {agreementLines.map((line, index) => (
         <Card key={line.id} id={`damage-card-line-${index + 1}`}>
           <CardHeader>
-            <CardTitle className="flex items-center justify-between text-white">
+            <CardTitle className="flex items-center justify-between text-card-foreground">
               <span>Line {index + 1} - Vehicle Damage</span>
-              <Badge variant="outline">{line.vehicle?.make} {line.vehicle?.model}</Badge>
+              <Badge variant="outline" className="text-card-foreground">{line.vehicle?.make} {line.vehicle?.model}</Badge>
             </CardTitle>
           </CardHeader>
           <CardContent>

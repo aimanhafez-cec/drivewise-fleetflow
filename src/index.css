@@ -155,8 +155,8 @@
     --background: 183 85% 20%; /* #075E61 - Background teal */
     --foreground: 0 0% 100%; /* #FFFFFF - Primary text */
 
-    --card: 182 85% 26%; /* #0A7A7D - Card background */
-    --card-foreground: 0 0% 100%; /* #FFFFFF */
+    --card-foreground: 0 0% 0%; /* #0A7A7D - Card background */
+    --card: 0 0% 100%; /* #FFFFFF */
 
     --popover: 182 85% 26%;
     --popover-foreground: 0 0% 100%;

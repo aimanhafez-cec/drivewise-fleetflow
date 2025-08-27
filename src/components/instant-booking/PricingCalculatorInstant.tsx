@@ -225,7 +225,7 @@ const PricingCalculatorInstant: React.FC<PricingCalculatorInstantProps> = ({
         {/* Pricing Breakdown */}
         <div className="space-y-3">
           <div className="flex justify-between items-center">
-            <span className="text-muted-foreground">
+            <span className="text-card-foreground">
               Base Rate ({pricingCalculation.rateType}) - {pricingCalculation.days} days
             </span>
             <span>AED {pricingCalculation.baseAmount.toFixed(2)}</span>
@@ -242,19 +242,19 @@ const PricingCalculatorInstant: React.FC<PricingCalculatorInstantProps> = ({
             </div>}
 
           {pricingCalculation.addOnTotal > 0 && <div className="flex justify-between items-center">
-              <span className="text-muted-foreground">Add-ons Total</span>
+              <span className="text-card-foreground">Add-ons Total</span>
               <span>AED {pricingCalculation.addOnTotal.toFixed(2)}</span>
             </div>}
 
           <Separator />
 
           <div className="flex justify-between items-center">
-            <span className="text-muted-foreground">Subtotal</span>
+            <span className="text-card-foreground">Subtotal</span>
             <span>AED {pricingCalculation.subtotalWithAddOns.toFixed(2)}</span>
           </div>
 
           <div className="flex justify-between items-center">
-            <span className="text-muted-foreground">VAT (5%)</span>
+            <span className="text-card-foreground">VAT (5%)</span>
             <span>AED {pricingCalculation.vatAmount.toFixed(2)}</span>
           </div>
 
@@ -268,7 +268,7 @@ const PricingCalculatorInstant: React.FC<PricingCalculatorInstantProps> = ({
           <Separator />
 
           <div className="flex justify-between items-center">
-            <span className="text-muted-foreground">Security Amount</span>
+            <span className="text-card-foreground">Security Amount</span>
             <span>AED 1,500.00</span>
           </div>
         </div>
@@ -290,15 +290,15 @@ const PricingCalculatorInstant: React.FC<PricingCalculatorInstantProps> = ({
         </div>
 
         {/* Rate Details */}
-        <div className="grid grid-cols-2 gap-4 p-4 rounded-lg bg-[#000a0e]/[0.53]">
+        <div className="grid grid-cols-2 gap-4 p-4 rounded-lg bg-background">
           <div className="text-center">
-            <p className="text-2xl font-bold text-primary">
+            <p className="text-2xl font-bold text-foreground">
               AED {pricingCalculation.dailyRate}
             </p>
-            <p className="text-sm text-card-foreground">Daily Rate</p>
+            <p className="text-sm text-foreground">Daily Rate</p>
           </div>
           <div className="text-center">
-            <p className="text-2xl font-bold text-primary">
+            <p className="text-2xl font-bold text-foreground">
               AED {(pricingCalculation.totalAmount / pricingCalculation.days).toFixed(0)}
             </p>
             <p className="text-sm text-foreground">Effective Daily</p>

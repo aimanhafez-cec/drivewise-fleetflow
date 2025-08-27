@@ -203,15 +203,15 @@ const CustomerDetector: React.FC<CustomerDetectorProps> = ({
               </div>
             </div>
 
-            <Button variant="outline" onClick={() => onCustomerSelect(null)} className="w-full">
+            <Button variant="outline" onClick={() => onCustomerSelect(null)} className="w-full text-muted-foreground">
               Change Customer
             </Button>
           </div> :
       // Customer Selection/Creation
       <Tabs defaultValue="existing" className="w-full">
             <TabsList className="grid w-full grid-cols-2 bg-transparent">
-              <TabsTrigger value="existing" className="text-card-foreground data-[state=active]:text-card-foreground">Existing Customer</TabsTrigger>
-              <TabsTrigger value="new" className="text-card-foreground data-[state=active]:text-card-foreground">New Customer</TabsTrigger>
+              <TabsTrigger value="existing" className="text-card-foreground data-[state=active]:text-muted-foreground">Existing Customer</TabsTrigger>
+              <TabsTrigger value="new" className="text-card-foreground data-[state=active]:text-muted-foreground">New Customer</TabsTrigger>
             </TabsList>
 
             <TabsContent value="existing" className="space-y-4">
@@ -268,7 +268,7 @@ const CustomerDetector: React.FC<CustomerDetectorProps> = ({
                         ...prev,
                         full_name: e.target.value
                       }))} 
-                      className="mt-1 text-card-foreground bg-card/50 border-card-foreground/20" 
+                      className="mt-1 text-card-foreground border-card-foreground/20 text-muted-foreground" 
                     />
                   </div>
                   <div>
@@ -276,21 +276,21 @@ const CustomerDetector: React.FC<CustomerDetectorProps> = ({
                     <Input id="new-email" type="email" value={newCustomer.email} onChange={e => setNewCustomer(prev => ({
                       ...prev,
                       email: e.target.value
-                    }))} className="mt-1" />
+                    }))} className="mt-1 text-muted-foreground" />
                   </div>
                   <div>
                     <Label htmlFor="new-phone">Phone</Label>
                     <Input id="new-phone" value={newCustomer.phone} onChange={e => setNewCustomer(prev => ({
                       ...prev,
                       phone: e.target.value
-                    }))} className="mt-1" />
+                    }))} className="mt-1 text-muted-foreground" />
                   </div>
                   <div>
                     <Label htmlFor="customer-type">Customer Type</Label>
                     <select id="customer-type" value={newCustomer.customer_type} onChange={e => setNewCustomer(prev => ({
                       ...prev,
                       customer_type: e.target.value as 'B2B' | 'B2C' | 'CORPORATE'
-                    }))} className="mt-1 w-full px-3 py-2 border rounded-md bg-background">
+                    }))} className="mt-1 text-muted-foreground w-full px-3 py-2 border rounded-md bg-background">
                       <option value="B2C">Individual</option>
                       <option value="B2B">B2B - Business</option>
                       <option value="CORPORATE">Corporate Account</option>
@@ -301,56 +301,56 @@ const CustomerDetector: React.FC<CustomerDetectorProps> = ({
                     <Input id="date-of-birth" type="date" value={newCustomer.date_of_birth} onChange={e => setNewCustomer(prev => ({
                       ...prev,
                       date_of_birth: e.target.value
-                    }))} className="mt-1" />
+                    }))} className="mt-1 text-muted-foreground" />
                   </div>
                 </div>
               </div>
 
               {/* Identification Documents */}
               <div>
-                <h4 className="text-sm font-medium text-muted-foreground mb-3">Identification Documents</h4>
+                <h4 className="text-sm font-medium text-card-foreground mb-3">Identification Documents</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="national-id">National ID / Social Security</Label>
                     <Input id="national-id" value={newCustomer.national_id} onChange={e => setNewCustomer(prev => ({
                       ...prev,
                       national_id: e.target.value
-                    }))} className="mt-1" placeholder="For local customers" />
+                    }))} className="mt-1 text-muted-foreground" placeholder="For local customers" />
                   </div>
                   <div>
                     <Label htmlFor="passport-number">Passport Number</Label>
                     <Input id="passport-number" value={newCustomer.passport_number} onChange={e => setNewCustomer(prev => ({
                       ...prev,
                       passport_number: e.target.value
-                    }))} className="mt-1" placeholder="For tourists/international customers" />
+                    }))} className="mt-1 text-muted-foreground" placeholder="For tourists/international customers" />
                   </div>
                   <div>
                     <Label htmlFor="license-number">Driver's License Number</Label>
                     <Input id="license-number" value={newCustomer.license_number} onChange={e => setNewCustomer(prev => ({
                       ...prev,
                       license_number: e.target.value
-                    }))} className="mt-1" />
+                    }))} className="mt-1 text-muted-foreground" />
                   </div>
                   <div>
                     <Label htmlFor="license-expiry">License Expiry Date</Label>
                     <Input id="license-expiry" type="date" value={newCustomer.license_expiry} onChange={e => setNewCustomer(prev => ({
                       ...prev,
                       license_expiry: e.target.value
-                    }))} className="mt-1" />
+                    }))} className="mt-1 text-muted-foreground" />
                   </div>
                 </div>
               </div>
 
               {/* Additional Details */}
               <div>
-                <h4 className="text-sm font-medium text-muted-foreground mb-3">Additional Details</h4>
+                <h4 className="text-sm font-medium text-card-foreground mb-3">Additional Details</h4>
                 <div className="grid grid-cols-1 gap-4">
                   <div>
                     <Label htmlFor="address">Address</Label>
                     <Input id="address" value={newCustomer.address} onChange={e => setNewCustomer(prev => ({
                       ...prev,
                       address: e.target.value
-                    }))} className="mt-1" placeholder="Full address including city and postal code" />
+                    }))} className="mt-1 text-muted-foreground" placeholder="Full address including city and postal code" />
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
@@ -358,14 +358,14 @@ const CustomerDetector: React.FC<CustomerDetectorProps> = ({
                       <Input id="emergency-contact-name" value={newCustomer.emergency_contact_name} onChange={e => setNewCustomer(prev => ({
                         ...prev,
                         emergency_contact_name: e.target.value
-                      }))} className="mt-1" />
+                      }))} className="mt-1 text-muted-foreground" />
                     </div>
                     <div>
                       <Label htmlFor="emergency-contact-phone">Emergency Contact Phone</Label>
                       <Input id="emergency-contact-phone" value={newCustomer.emergency_contact_phone} onChange={e => setNewCustomer(prev => ({
                         ...prev,
                         emergency_contact_phone: e.target.value
-                      }))} className="mt-1" />
+                      }))} className="mt-1 text-muted-foreground" />
                     </div>
                   </div>
                 </div>

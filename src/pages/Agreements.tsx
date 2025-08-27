@@ -112,7 +112,7 @@ const Agreements = () => {
             <div className="overflow-x-auto">
               <Table id="agreements-table" className="min-w-full">
                 <TableHeader>
-                  <TableRow>
+                  <TableRow className="bg-muted">
                     <TableHead className="min-w-[120px]">Agreement No.</TableHead>
                     <TableHead className="min-w-[150px]">Customer</TableHead>
                     <TableHead className="min-w-[120px] hidden sm:table-cell">Vehicle</TableHead>
@@ -145,7 +145,7 @@ const Agreements = () => {
                         <p className="font-medium">
                           {agreement.profiles?.full_name || 'Unknown Customer'}
                         </p>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-sm text-card-foreground">
                           {agreement.profiles?.email}
                         </p>
                       </div>
@@ -156,12 +156,12 @@ const Agreements = () => {
                           <p className="font-medium">
                             {agreement.vehicles.make} {agreement.vehicles.model}
                           </p>
-                          <p className="text-sm text-muted-foreground">
+                          <p className="text-sm text-card-foreground">
                             {agreement.vehicles.license_plate}
                           </p>
                         </div>
                       ) : (
-                        <span className="text-muted-foreground">No vehicle assigned</span>
+                        <span className="text-card-foreground">No vehicle assigned</span>
                       )}
                     </TableCell>
                     <TableCell>
@@ -176,12 +176,12 @@ const Agreements = () => {
                             <p>
                               {format(new Date(agreement.checkout_datetime), 'MMM dd, yyyy')}
                             </p>
-                            <p className="text-muted-foreground">
+                            <p className="text-card-foreground">
                               → {format(new Date(agreement.return_datetime), 'MMM dd, yyyy')}
                             </p>
                           </>
                         ) : (
-                          <span className="text-muted-foreground">Dates TBD</span>
+                          <span className="text-card-foreground">Dates TBD</span>
                         )}
                       </div>
                     </TableCell>
@@ -191,7 +191,7 @@ const Agreements = () => {
                     <TableCell className="font-medium text-destructive hidden lg:table-cell">
                       {formatCurrency(agreement.total_amount || 0)}
                     </TableCell>
-                    <TableCell className="text-sm text-muted-foreground hidden xl:table-cell">
+                    <TableCell className="text-sm text-card-foreground hidden xl:table-cell">
                       {format(new Date(agreement.created_at), 'MMM dd, yyyy')}
                     </TableCell>
                   </TableRow>
@@ -201,9 +201,9 @@ const Agreements = () => {
             </div>
           ) : (
             <div className="text-center py-8">
-              <FileText className="mx-auto h-12 w-12 text-muted-foreground" />
+              <FileText className="mx-auto h-12 w-12 text-card-foreground" />
               <h3 className="mt-4 text-lg font-semibold">No agreements found</h3>
-              <p className="text-muted-foreground">
+              <p className="text-card-foreground">
                 Create your first agreement to get started.
               </p>
               <Button 

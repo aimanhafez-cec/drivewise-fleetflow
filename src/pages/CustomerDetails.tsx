@@ -294,98 +294,98 @@ const CustomerDetails = () => {
         <CardContent className="p-6">
           <div className="grid grid-cols-6 gap-4">
             <div>
-              <Label htmlFor="fullName" className="text-sm font-medium text-muted-foreground">Full Name</Label>
+              <Label htmlFor="fullName" className="text-sm font-medium text-card-foreground">Full Name</Label>
               <Input 
                 id="fullName" 
                 value={isEditing ? (editData.full_name ?? customer.full_name) : customer.full_name}
                 onChange={(e) => handleInputChange('full_name', e.target.value)}
                 readOnly={!isEditing}
-                className="mt-1" 
+                className="mt-1 text-muted-foreground" 
               />
             </div>
             <div>
-              <Label htmlFor="phoneNo" className="text-sm font-medium text-muted-foreground">Phone No.</Label>
+              <Label htmlFor="phoneNo" className="text-sm font-medium text-card-foreground">Phone No.</Label>
               <Input 
                 id="phoneNo" 
                 value={isEditing ? (editData.phone ?? customer.phone ?? '') : (customer.phone || '')}
                 onChange={(e) => handleInputChange('phone', e.target.value)}
                 readOnly={!isEditing}
-                className="mt-1" 
+                className="mt-1 text-muted-foreground" 
               />
             </div>
             <div>
-              <Label htmlFor="email" className="text-sm font-medium text-muted-foreground">Email</Label>
+              <Label htmlFor="email" className="text-sm font-medium text-card-foreground">Email</Label>
               <Input 
                 id="email" 
                 value={isEditing ? (editData.email ?? customer.email) : customer.email}
                 onChange={(e) => handleInputChange('email', e.target.value)}
                 readOnly={!isEditing}
-                className="mt-1" 
+                className="mt-1 text-muted-foreground" 
               />
             </div>
             <div>
-              <Label htmlFor="licenseNo" className="text-sm font-medium text-muted-foreground">License No.</Label>
+              <Label htmlFor="licenseNo" className="text-sm font-medium text-card-foreground">License No.</Label>
               <Input 
                 id="licenseNo" 
                 value={isEditing ? (editData.license_number ?? customer.license_number ?? '') : (customer.license_number || '')}
                 onChange={(e) => handleInputChange('license_number', e.target.value)}
                 readOnly={!isEditing}
-                className="mt-1" 
+                className="mt-1 text-muted-foreground" 
               />
             </div>
             <div>
-              <Label htmlFor="licenseExpiry" className="text-sm font-medium text-muted-foreground">License Expiry Date</Label>
+              <Label htmlFor="licenseExpiry" className="text-sm font-medium text-card-foreground">License Expiry Date</Label>
               <Input 
                 id="licenseExpiry" 
                 type={isEditing ? "date" : "text"}
                 value={isEditing ? (editData.license_expiry ?? customer.license_expiry ?? '') : formatDate(customer.license_expiry)}
                 onChange={(e) => handleInputChange('license_expiry', e.target.value)}
                 readOnly={!isEditing}
-                className="mt-1" 
+                className="mt-1 text-muted-foreground" 
               />
             </div>
             <div>
-              <Label htmlFor="dateOfBirth" className="text-sm font-medium text-muted-foreground">Date of Birth</Label>
+              <Label htmlFor="dateOfBirth" className="text-sm font-medium text-card-foreground">Date of Birth</Label>
               <Input 
                 id="dateOfBirth" 
                 type={isEditing ? "date" : "text"}
                 value={isEditing ? (editData.date_of_birth ?? customer.date_of_birth ?? '') : formatDate(customer.date_of_birth)}
                 onChange={(e) => handleInputChange('date_of_birth', e.target.value)}
                 readOnly={!isEditing}
-                className="mt-1" 
+                className="mt-1 text-muted-foreground" 
               />
             </div>
           </div>
           
           {/* Address field */}
           <div className="mt-4">
-            <Label htmlFor="address" className="text-sm font-medium text-muted-foreground">Address</Label>
+            <Label htmlFor="address" className="text-sm font-medium text-card-foreground">Address</Label>
             {isEditing ? (
               <Textarea 
                 id="address" 
                 value={editData.address ? JSON.stringify(editData.address) : formatAddress(customer.address)}
                 onChange={(e) => handleInputChange('address', e.target.value)}
-                className="mt-1" 
+                className="mt-1 text-muted-foreground" 
               />
             ) : (
               <Input 
                 id="address" 
                 value={formatAddress(customer.address)}
                 readOnly
-                className="mt-1" 
+                className="mt-1 text-muted-foreground" 
               />
             )}
           </div>
 
           {/* Notes field */}
           <div className="mt-4">
-            <Label htmlFor="notes" className="text-sm font-medium text-muted-foreground">Notes</Label>
+            <Label htmlFor="notes" className="text-sm font-medium text-card-foreground">Notes</Label>
             <Textarea 
               id="notes" 
               value={isEditing ? (editData.notes ?? customer.notes ?? '') : (customer.notes || '')}
               onChange={(e) => handleInputChange('notes', e.target.value)}
               readOnly={!isEditing}
-              className="mt-1" 
+              className="mt-1 text-muted-foreground" 
               rows={3}
             />
           </div>
@@ -428,40 +428,40 @@ const CustomerDetails = () => {
                   <CardContent className="space-y-4">
                     <div className="grid grid-cols-3 gap-4">
                       <div>
-                        <Label className="text-sm font-medium text-muted-foreground">Full Name</Label>
-                        <Input value={customer.full_name} readOnly className="mt-1" />
+                        <Label className="text-sm font-medium text-card-foreground">Full Name</Label>
+                        <Input value={customer.full_name} readOnly className="mt-1 text-muted-foreground" />
                       </div>
                       <div>
-                        <Label className="text-sm font-medium text-muted-foreground">Email</Label>
-                        <Input value={customer.email} readOnly className="mt-1" />
+                        <Label className="text-sm font-medium text-card-foreground">Email</Label>
+                        <Input value={customer.email} readOnly className="mt-1 text-muted-foreground" />
                       </div>
                       <div>
-                        <Label className="text-sm font-medium text-muted-foreground">Phone</Label>
-                        <Input value={customer.phone || 'Not provided'} readOnly className="mt-1" />
+                        <Label className="text-sm font-medium text-card-foreground">Phone</Label>
+                        <Input value={customer.phone || 'Not provided'} readOnly className="mt-1 text-muted-foreground" />
                       </div>
                     </div>
                     <div className="grid grid-cols-3 gap-4">
                       <div>
-                        <Label className="text-sm font-medium text-muted-foreground">License Number</Label>
-                        <Input value={customer.license_number || 'Not provided'} readOnly className="mt-1" />
+                        <Label className="text-sm font-medium text-card-foreground">License Number</Label>
+                        <Input value={customer.license_number || 'Not provided'} readOnly className="mt-1 text-muted-foreground" />
                       </div>
                       <div>
-                        <Label className="text-sm font-medium text-muted-foreground">License Expiry</Label>
-                        <Input value={formatDate(customer.license_expiry)} readOnly className="mt-1" />
+                        <Label className="text-sm font-medium text-card-foreground">License Expiry</Label>
+                        <Input value={formatDate(customer.license_expiry)} readOnly className="mt-1 text-muted-foreground" />
                       </div>
                       <div>
-                        <Label className="text-sm font-medium text-muted-foreground">Date of Birth</Label>
-                        <Input value={formatDate(customer.date_of_birth)} readOnly className="mt-1" />
+                        <Label className="text-sm font-medium text-card-foreground">Date of Birth</Label>
+                        <Input value={formatDate(customer.date_of_birth)} readOnly className="mt-1 text-muted-foreground" />
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <Label className="text-sm font-medium text-muted-foreground">Address</Label>
-                        <Textarea value={formatAddress(customer.address)} readOnly className="mt-1" rows={2} />
+                        <Label className="text-sm font-medium text-card-foreground">Address</Label>
+                        <Textarea value={formatAddress(customer.address)} readOnly className="mt-1 text-muted-foreground" rows={2} />
                       </div>
                       <div>
-                        <Label className="text-sm font-medium text-muted-foreground">Credit Rating</Label>
-                        <Input value={customer.credit_rating ? `${customer.credit_rating} (${getCreditRatingBadge(customer.credit_rating).label})` : 'Not rated'} readOnly className="mt-1" />
+                        <Label className="text-sm font-medium text-card-foreground">Credit Rating</Label>
+                        <Input value={customer.credit_rating ? `${customer.credit_rating} (${getCreditRatingBadge(customer.credit_rating).label})` : 'Not rated'} readOnly className="mt-1 text-muted-foreground" />
                       </div>
                     </div>
                   </CardContent>
@@ -480,7 +480,7 @@ const CustomerDetails = () => {
                   <CardContent className="space-y-4">
                     {summaryStats.map((stat, index) => (
                       <div key={index} className="flex items-center justify-between py-2">
-                        <span className="text-sm text-muted-foreground">{stat.label}</span>
+                        <span className="text-sm text-card-foreground">{stat.label}</span>
                         <span className={`text-sm font-medium ${stat.color}`}>
                           {stat.value}
                         </span>

@@ -35,7 +35,7 @@ export const InspectionFilters: React.FC<InspectionFiltersProps> = ({
       <CardContent className="p-4">
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-2">
-            <Filter className="h-4 w-4 text-muted-foreground" />
+            <Filter className="h-4 w-4 text-card-foreground" />
             <h3 className="font-medium">Filters</h3>
             {hasActiveFilters && (
               <Button
@@ -64,7 +64,7 @@ export const InspectionFilters: React.FC<InspectionFiltersProps> = ({
 
             {/* Type Filter */}
             <Select value={typeFilter} onValueChange={onTypeFilterChange}>
-              <SelectTrigger>
+              <SelectTrigger className="text-muted-foreground">
                 <SelectValue placeholder="All Types" />
               </SelectTrigger>
               <SelectContent>
@@ -77,7 +77,7 @@ export const InspectionFilters: React.FC<InspectionFiltersProps> = ({
 
             {/* Status Filter */}
             <Select value={statusFilter} onValueChange={onStatusFilterChange}>
-              <SelectTrigger>
+              <SelectTrigger className="text-muted-foreground">
                 <SelectValue placeholder="All Statuses" />
               </SelectTrigger>
               <SelectContent>
@@ -92,7 +92,7 @@ export const InspectionFilters: React.FC<InspectionFiltersProps> = ({
 
             {/* Date Filter */}
             <Select value={dateFilter} onValueChange={onDateFilterChange}>
-              <SelectTrigger>
+              <SelectTrigger className="text-muted-foreground">
                 <SelectValue placeholder="All Dates" />
               </SelectTrigger>
               <SelectContent>

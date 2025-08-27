@@ -257,7 +257,7 @@ const Inspections: React.FC = () => {
                 <FileText className="h-5 w-5 text-primary" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-muted-foreground">Total</p>
+                <p className="text-sm font-medium text-card-foreground">Total</p>
                 <p className="text-2xl font-bold">{stats.total}</p>
               </div>
             </div>
@@ -271,7 +271,7 @@ const Inspections: React.FC = () => {
                 <ClipboardCheck className="h-5 w-5 text-green-600 dark:text-green-400" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-muted-foreground">Completed</p>
+                <p className="text-sm font-medium text-card-foreground">Completed</p>
                 <p className="text-2xl font-bold">{stats.locked}</p>
               </div>
             </div>
@@ -285,7 +285,7 @@ const Inspections: React.FC = () => {
                 <BarChart3 className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-muted-foreground">Drafts</p>
+                <p className="text-sm font-medium text-card-foreground">Drafts</p>
                 <p className="text-2xl font-bold">{stats.drafts}</p>
               </div>
             </div>
@@ -299,7 +299,7 @@ const Inspections: React.FC = () => {
                 <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-muted-foreground">Issues</p>
+                <p className="text-sm font-medium text-card-foreground">Issues</p>
                 <p className="text-2xl font-bold">{stats.failed}</p>
               </div>
             </div>

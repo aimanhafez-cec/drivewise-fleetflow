@@ -239,7 +239,7 @@ const Vehicles = () => {
         </div>
       </div>
 
-      <div className="border rounded-lg overflow-hidden">
+      <div className="border rounded-lg overflow-hidden bg-card">
         <div className="overflow-x-auto">
           <Table className="min-w-full">
             <TableHeader className="bg-slate-800 text-white">
@@ -291,7 +291,7 @@ const Vehicles = () => {
               {paginatedVehicles.map((vehicle, index) => (
                 <TableRow 
                   key={vehicle.id} 
-                  className="hover:bg-muted/50 cursor-pointer"
+                  className="hover:bg-muted/50 cursor-pointer text-card-foreground"
                   onClick={() => navigate(`/vehicles/${vehicle.id}`)}
                 >
                   <TableCell className="font-medium">{startIndex + index + 1}</TableCell>

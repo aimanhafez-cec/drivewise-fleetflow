@@ -41,16 +41,16 @@ export const ReservationSearch: React.FC<ReservationSearchProps> = ({
           <div className="flex gap-2">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Search by customer name, reservation number..." value={filters.query || ''} onChange={e => updateFilter('query', e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSearch()} className="pl-10 bg-slate-50" />
+              <Input placeholder="Search by customer name, reservation number..." value={filters.query || ''} onChange={e => updateFilter('query', e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSearch()} className="pl-10 text-muted-foreground" />
             </div>
             <Button onClick={() => setShowFilters(!showFilters)} variant="outline" size="icon">
-              <Filter className="h-4 w-4" />
+              <Filter className="h-4 w-4 text-muted-foreground" />
             </Button>
             <Button onClick={handleSearch} disabled={isLoading}>
               Search
             </Button>
-            {(filters.query || filters.status || filters.dateFrom || filters.dateTo) && <Button onClick={handleClear} variant="outline">
-                <X className="h-4 w-4 mr-2" />
+            {(filters.query || filters.status || filters.dateFrom || filters.dateTo) && <Button onClick={handleClear} variant="outline" className="text-muted-foreground">
+                <X className="h-4 w-4 mr-2 text-muted-foreground" />
                 Clear
               </Button>}
           </div>

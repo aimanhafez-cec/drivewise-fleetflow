@@ -64,12 +64,12 @@ const Quotes: React.FC = () => {
       <Card>
         <CardHeader>
           <CardTitle>Recent Quotes</CardTitle>
-          <CardDescription>Latest quotations created for customers</CardDescription>
+          <CardDescription className="text-card-foreground">Latest quotations created for customers</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
             {quotes.length === 0 && (
-              <p className="text-sm text-muted-foreground">No quotes yet. Create your first one.</p>
+              <p className="text-sm text-card-foreground">No quotes yet. Create your first one.</p>
             )}
             {quotes.map((q) => (
               <div key={q.id} className="flex items-center justify-between p-4 border rounded-lg">
@@ -79,7 +79,7 @@ const Quotes: React.FC = () => {
                   </div>
                   <div>
                     <p className="text-sm font-medium">{q.quote_number}</p>
-                    <p className="text-xs text-muted-foreground">Created {new Date(q.created_at).toLocaleString()}</p>
+                    <p className="text-xs text-card-foreground">Created {new Date(q.created_at).toLocaleString()}</p>
                   </div>
                 </div>
                 <div className="text-right">

@@ -82,7 +82,7 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
           <CheckCircle className="h-5 w-5" />
           Booking Confirmation
         </CardTitle>
-        <CardDescription>
+        <CardDescription className="text-card-foreground">
           Review your booking details and confirm your instant reservation
         </CardDescription>
       </CardHeader>
@@ -238,7 +238,7 @@ const BookingConfirmation: React.FC<BookingConfirmationProps> = ({
         {/* Confirmation Button */}
         <Button 
           onClick={onConfirm} 
-          className="w-full bg-gradient-primary hover:opacity-90 text-white py-6 text-lg font-semibold" 
+          className="w-full bg-background hover:opacity-90 text-white py-6 text-lg font-semibold" 
           disabled={isLoading || totalAmount === 0}
         >
           {isLoading ? (

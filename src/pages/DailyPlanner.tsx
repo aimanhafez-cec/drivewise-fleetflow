@@ -467,7 +467,7 @@ const DailyPlanner: React.FC = () => {
                   size="sm"
                   onClick={() => setResourceMode(!resourceMode)}
                   data-testid="toggle-resource"
-                  className="w-full sm:w-auto"
+                  className="w-full sm:w-auto text-muted-foreground"
                 >
                   <Car className="mr-2 h-4 w-4" />
                   Resource View
@@ -481,7 +481,7 @@ const DailyPlanner: React.FC = () => {
                 size="sm"
                 onClick={() => navigateDate("today")}
                 data-testid="btn-today"
-                className="flex-1 sm:flex-none"
+                className="flex-1 sm:flex-none text-muted-foreground"
               >
                 Today
               </Button>
@@ -489,17 +489,17 @@ const DailyPlanner: React.FC = () => {
                 variant="outline"
                 size="sm"
                 onClick={() => navigateDate("prev")}
-                data-testid="btn-prev"
+                data-testid="btn-prev text-muted-foreground"
               >
-                <ChevronLeft className="h-4 w-4" />
+                <ChevronLeft className="h-4 w-4 text-muted-foreground" />
               </Button>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => navigateDate("next")}
-                data-testid="btn-next"
+                data-testid="btn-next text-muted-foreground"
               >
-                <ChevronRight className="h-4 w-4" />
+                <ChevronRight className="h-4 w-4 text-muted-foreground" />
               </Button>
             </div>
           </div>

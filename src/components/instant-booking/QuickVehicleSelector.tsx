@@ -107,7 +107,7 @@ const QuickVehicleSelector: React.FC<QuickVehicleSelectorProps> = ({
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="mt-4 px-3 py-2 border rounded-md bg-background w-full"
+            className="mt-4 px-3 py-2 border rounded-md bg-background w-full text-white"
           >
             <option value="">Select Category</option>
             {categories.map(category => (
@@ -144,7 +144,7 @@ const QuickVehicleSelector: React.FC<QuickVehicleSelectorProps> = ({
                 <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
                   <Filter className="h-4 w-4" />
                   {categoryName}
-                  <Badge variant="outline">{vehicles.length} available</Badge>
+                  <Badge variant="outline text-black">{vehicles.length} available</Badge>
                 </h3>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -222,7 +222,7 @@ const QuickVehicleSelector: React.FC<QuickVehicleSelectorProps> = ({
                           {/* Selection Button */}
                           <Button
                             variant={selectedVehicleId === vehicle.id ? "default" : "outline"}
-                            className="w-full mt-3"
+                            className="w-full mt-3 text-muted-foreground"
                             onClick={(e) => {
                               e.stopPropagation();
                               onVehicleSelect(vehicle.id);
@@ -242,18 +242,18 @@ const QuickVehicleSelector: React.FC<QuickVehicleSelectorProps> = ({
 
         {/* Quick Stats */}
         {filteredVehicles.length > 0 && (
-          <div className="mt-6 p-4 bg-muted/50 rounded-lg">
+          <div className="mt-6 p-4 bg-background rounded-lg">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
               <div>
-                <p className="text-2xl font-bold text-primary">{filteredVehicles.length}</p>
+                <p className="text-2xl font-bold text-muted-foreground">{filteredVehicles.length}</p>
                 <p className="text-sm text-muted-foreground">Available Vehicles</p>
               </div>
               <div>
-                <p className="text-2xl font-bold text-primary">{Object.keys(vehiclesByCategory).length}</p>
+                <p className="text-2xl font-bold text-muted-foreground">{Object.keys(vehiclesByCategory).length}</p>
                 <p className="text-sm text-muted-foreground">Categories</p>
               </div>
               <div>
-                <p className="text-2xl font-bold text-primary">
+                <p className="text-2xl font-bold text-muted-foreground">
                   {Math.min(...filteredVehicles.map(v => v.daily_rate || 0).filter(r => r > 0)) || 0}
                 </p>
                 <p className="text-sm text-muted-foreground">From AED/day</p>

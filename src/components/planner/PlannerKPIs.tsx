@@ -116,7 +116,7 @@ export const PlannerKPIs: React.FC<PlannerKPIsProps> = ({ events }) => {
           className={`cursor-pointer transition-colors hover:bg-muted/50 ${getVariantColor(kpi.variant)}`}
           data-testid={kpi.testId}
         >
-          <CardContent className="p-4">
+          <CardContent className="p-4 bg-background">
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-2xl font-bold">
