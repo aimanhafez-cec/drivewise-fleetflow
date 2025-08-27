@@ -169,7 +169,7 @@ const QuickVehicleSelector: React.FC<QuickVehicleSelectorProps> = ({
                               <h4 className="font-semibold text-base">
                                 {vehicle.make} {vehicle.model}
                               </h4>
-                              <p className="text-sm text-muted-foreground">
+                              <p className="text-sm text-card-foreground">
                                 {vehicle.year} • {vehicle.license_plate}
                               </p>
                             </div>
@@ -181,7 +181,7 @@ const QuickVehicleSelector: React.FC<QuickVehicleSelectorProps> = ({
                           {/* Vehicle Details */}
                           <div className="space-y-2">
                             <div className="flex items-center gap-2 text-sm">
-                              <Car className="h-4 w-4 text-muted-foreground" />
+                              <Car className="h-4 w-4 text-card-foreground" />
                               <span>{vehicle.category?.name || 'Standard'}</span>
                             </div>
                             
@@ -196,7 +196,7 @@ const QuickVehicleSelector: React.FC<QuickVehicleSelectorProps> = ({
                             )}
                             
                             <div className="flex items-center gap-2 text-sm">
-                              <MapPin className="h-4 w-4 text-muted-foreground" />
+                              <MapPin className="h-4 w-4 text-card-foreground" />
                               <span>Available at {pickupLocation}</span>
                             </div>
 
@@ -213,7 +213,7 @@ const QuickVehicleSelector: React.FC<QuickVehicleSelectorProps> = ({
                                   <p className="text-lg font-bold">
                                     AED {vehicle.daily_rate}
                                   </p>
-                                  <p className="text-xs text-muted-foreground">per day</p>
+                                  <p className="text-xs text-card-foreground">per day</p>
                                 </div>
                               )}
                             </div>
