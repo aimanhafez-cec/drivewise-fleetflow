@@ -157,21 +157,21 @@ export const InspectionSummary: React.FC<InspectionSummaryProps> = ({
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <span>Total Items Checked:</span>
-              <Badge variant="outline">{checklistSummary.total}</Badge>
+              <Badge variant="outline" className="text-card-foreground">{checklistSummary.total}</Badge>
             </div>
             <div className="flex items-center justify-between">
               <span className="flex items-center gap-2">
                 <CheckCircle className="h-4 w-4 text-green-600" />
                 OK Items:
               </span>
-              <Badge variant="default">{checklistSummary.ok}</Badge>
+              <Badge variant="default" className="text-card-foreground">{checklistSummary.ok}</Badge>
             </div>
             <div className="flex items-center justify-between">
               <span className="flex items-center gap-2">
                 <AlertTriangle className="h-4 w-4 text-red-600" />
                 Damage Items:
               </span>
-              <Badge variant={checklistSummary.damages > 0 ? 'destructive' : 'outline'}>
+              <Badge variant={checklistSummary.damages > 0 ? 'destructive' : 'outline'} className="text-card-foreground">
                 {checklistSummary.damages}
               </Badge>
             </div>
@@ -192,7 +192,7 @@ export const InspectionSummary: React.FC<InspectionSummaryProps> = ({
                 <Gauge className="h-4 w-4" />
                 Odometer (Out):
               </span>
-              <Badge variant="outline">
+              <Badge variant="outline" className="text-card-foreground">
                 {inspectionData.metrics?.odometer?.toLocaleString() || 'Not set'}
               </Badge>
             </div>
@@ -201,7 +201,7 @@ export const InspectionSummary: React.FC<InspectionSummaryProps> = ({
                 <Fuel className="h-4 w-4" />
                 Fuel Level (Out):
               </span>
-              <Badge variant="outline">
+              <Badge variant="outline" className="text-card-foreground">
                 {inspectionData.metrics?.fuelLevel || 'Not set'}
               </Badge>
             </div>
@@ -210,7 +210,7 @@ export const InspectionSummary: React.FC<InspectionSummaryProps> = ({
                 <Package className="h-4 w-4" />
                 Extras Issued:
               </span>
-              <Badge variant="outline">
+              <Badge variant="outline" className="text-card-foreground">
                 {inspectionData.metrics?.extras?.length || 0}
               </Badge>
             </div>
@@ -300,7 +300,7 @@ export const InspectionSummary: React.FC<InspectionSummaryProps> = ({
                     onTouchEnd={stopDrawing}
                   />
                   <div className="flex justify-between items-center mt-2">
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-card-foreground">
                       Sign above using your mouse, finger, or Apple Pencil
                     </p>
                     <Button

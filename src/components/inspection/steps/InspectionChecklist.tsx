@@ -215,7 +215,7 @@ export const InspectionChecklist: React.FC<InspectionChecklistProps> = ({
     <div id="step-checklist" className="space-y-6">
       <div>
         <h3 className="text-lg font-semibold mb-2">Walk-Around Checklist</h3>
-        <p className="text-card-foreground">
+        <p className="text-muted-foreground">
           Inspect each section of the vehicle and mark as OK or Damage.
         </p>
       </div>
