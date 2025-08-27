@@ -30,6 +30,7 @@ interface VehicleFormData {
   category_id: string;
   subtype: string;
   ownership_type: string;
+  photo_url: string;
 }
 
 interface Vehicle {
@@ -53,6 +54,7 @@ interface Vehicle {
   category_id: string;
   subtype: string;
   ownership_type: string;
+  photo_url?: string;
 }
 
 interface VehicleFormProps {
@@ -115,6 +117,7 @@ const VehicleForm: React.FC<VehicleFormProps> = ({ vehicle, onSuccess }) => {
         category_id: vehicle.category_id || '',
         subtype: vehicle.subtype || '',
         ownership_type: vehicle.ownership_type || 'owned',
+        photo_url: vehicle.photo_url || '',
       });
     }
   }, [vehicle, reset]);
@@ -366,6 +369,15 @@ const VehicleForm: React.FC<VehicleFormProps> = ({ vehicle, onSuccess }) => {
             placeholder="e.g., 2.4L"
           />
         </div>
+      </div>
+
+      <div>
+        <Label htmlFor="photo_url">Photo URL</Label>
+        <Input
+          id="photo_url"
+          {...register('photo_url')}
+          placeholder="https://example.com/vehicle-photo.jpg"
+        />
       </div>
 
       <div>
