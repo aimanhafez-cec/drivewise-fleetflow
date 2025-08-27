@@ -1,246 +1,314 @@
 import React, { useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { Calendar } from '@/components/ui/calendar';
+import { DateRange } from 'react-day-picker';
+import { Calendar as CalendarIcon, Download, Filter, RefreshCw } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { 
-  CalendarIcon, 
-  Download, 
-  FileText, 
-  Sheet, 
-  File,
-  Car,
-  Wrench,
-  Calendar as CalendarIcon2,
-  AlertTriangle,
-  ChevronDown,
-  ChevronRight
-} from 'lucide-react';
-import { format } from 'date-fns';
+import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
+import { format } from 'date-fns';
 import FleetStatusReport from '@/components/reports/FleetStatusReport';
 import MaintenanceReport from '@/components/reports/MaintenanceReport';
 import ReservationsReport from '@/components/reports/ReservationsReport';
-import DamageIncidentReport from '@/components/reports/DamageIncidentReport';
-
-interface DateRange {
-  from: Date;
-  to: Date;
-}
+import DamageReport from '@/components/reports/DamageReport';
+import RentalHistoryReport from '@/components/reports/RentalHistoryReport';
+import PreferencesTrendsReport from '@/components/reports/PreferencesTrendsReport';
+import SatisfactionFeedbackReport from '@/components/reports/SatisfactionFeedbackReport';
+import LateReturnAnalysisReport from '@/components/reports/LateReturnAnalysisReport';
+import RevenueBreakdownReport from '@/components/reports/RevenueBreakdownReport';
+import CostAnalysisReport from '@/components/reports/CostAnalysisReport';
+import ProfitabilityReport from '@/components/reports/ProfitabilityReport';
+import OutstandingPaymentsReport from '@/components/reports/OutstandingPaymentsReport';
 
 const Reports = () => {
-  const [dateRange, setDateRange] = useState<DateRange>({
-    from: new Date(new Date().setDate(new Date().getDate() - 30)),
-    to: new Date()
+  const [date, setDate] = useState<DateRange | undefined>({
+    from: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+    to: new Date(),
   });
-  const [selectedBranch, setSelectedBranch] = useState<string>('all');
-  const [selectedVehicleType, setSelectedVehicleType] = useState<string>('all');
-  const [selectedStatus, setSelectedStatus] = useState<string>('all');
-  const [activeReport, setActiveReport] = useState('fleet-status');
-  const [expandedCategories, setExpandedCategories] = useState<string[]>(['internal-operations']);
-
-  const toggleCategory = (categoryId: string) => {
-    setExpandedCategories(prev =>
-      prev.includes(categoryId)
-        ? prev.filter(id => id !== categoryId)
-        : [...prev, categoryId]
-    );
-  };
-
-  const exportData = (format: 'pdf' | 'excel' | 'csv') => {
-    // TODO: Implement export functionality
-    console.log(`Exporting ${activeReport} as ${format}`);
-  };
-
-  const reportCategories = [
-    {
-      id: 'internal-operations',
-      title: 'Internal Operations Reports',
-      reports: [
-        { id: 'fleet-status', title: 'Fleet Status & Utilization', icon: Car },
-        { id: 'maintenance', title: 'Maintenance & Service Schedule', icon: Wrench },
-        { id: 'reservations', title: 'Reservations & Availability', icon: CalendarIcon2 },
-        { id: 'damage', title: 'Vehicle Damage & Incident', icon: AlertTriangle }
-      ]
-    },
-    {
-      id: 'customer-insights',
-      title: 'Customer Insights Reports',
-      reports: []
-    },
-    {
-      id: 'financial',
-      title: 'Financial Reports',
-      reports: []
-    }
-  ];
-
-  const renderReportContent = () => {
-    switch (activeReport) {
-      case 'fleet-status':
-        return <FleetStatusReport dateRange={dateRange} filters={{ branch: selectedBranch, vehicleType: selectedVehicleType, status: selectedStatus }} />;
-      case 'maintenance':
-        return <MaintenanceReport dateRange={dateRange} filters={{ branch: selectedBranch, vehicleType: selectedVehicleType, status: selectedStatus }} />;
-      case 'reservations':
-        return <ReservationsReport dateRange={dateRange} filters={{ branch: selectedBranch, vehicleType: selectedVehicleType, status: selectedStatus }} />;
-      case 'damage':
-        return <DamageIncidentReport dateRange={dateRange} filters={{ branch: selectedBranch, vehicleType: selectedVehicleType, status: selectedStatus }} />;
-      default:
-        return <div className="text-center text-muted-foreground py-8">Select a report from the sidebar</div>;
-    }
-  };
 
   return (
-    <div className="h-screen flex bg-background">
-      {/* Sidebar */}
-      <div className="w-80 border-r bg-card">
-        <div className="p-6">
-          <h2 className="text-lg font-semibold text-card-foreground">Reports Dashboard</h2>
-          <p className="text-sm text-muted-foreground mt-1">Internal operations insights</p>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Reports Dashboard</h1>
+          <p className="text-muted-foreground mt-2">
+            Comprehensive analytics for fleet operations and customer insights
+          </p>
         </div>
         
-        <div className="px-3">
-          {reportCategories.map((category) => (
-            <div key={category.id} className="mb-2">
+        <div className="flex items-center gap-2">
+          <Popover>
+            <PopoverTrigger asChild>
               <Button
-                variant="ghost"
-                className="w-full justify-start text-left h-auto p-3"
-                onClick={() => toggleCategory(category.id)}
-              >
-                {expandedCategories.includes(category.id) ? (
-                  <ChevronDown className="mr-2 h-4 w-4 text-muted-foreground" />
-                ) : (
-                  <ChevronRight className="mr-2 h-4 w-4 text-muted-foreground" />
+                id="date"
+                variant="outline"
+                className={cn(
+                  "w-[300px] justify-start text-left font-normal",
+                  !date && "text-muted-foreground"
                 )}
-                <span className="font-medium text-card-foreground">{category.title}</span>
-              </Button>
-              
-              {expandedCategories.includes(category.id) && (
-                <div className="ml-6 space-y-1">
-                  {category.reports.length > 0 ? (
-                    category.reports.map((report) => (
-                      <Button
-                        key={report.id}
-                        variant={activeReport === report.id ? "secondary" : "ghost"}
-                        className="w-full justify-start text-left h-auto p-2"
-                        onClick={() => setActiveReport(report.id)}
-                      >
-                        <report.icon className="mr-2 h-4 w-4" />
-                        <span className="text-sm">{report.title}</span>
-                      </Button>
-                    ))
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {date?.from ? (
+                  date.to ? (
+                    <>
+                      {format(date.from, "LLL dd, y")} -{" "}
+                      {format(date.to, "LLL dd, y")}
+                    </>
                   ) : (
-                    <div className="px-2 py-1 text-xs text-muted-foreground">
-                      Coming soon...
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          ))}
+                    format(date.from, "LLL dd, y")
+                  )
+                ) : (
+                  <span>Pick a date range</span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                initialFocus
+                mode="range"
+                defaultMonth={date?.from}
+                selected={date}
+                onSelect={setDate}
+                numberOfMonths={2}
+              />
+            </PopoverContent>
+          </Popover>
+          
+          <Button variant="outline" size="sm">
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Refresh
+          </Button>
+          
+          <Button variant="outline" size="sm">
+            <Download className="h-4 w-4 mr-2" />
+            Export
+          </Button>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col">
-        {/* Filters Bar */}
-        <div className="border-b bg-card px-6 py-4">
-          <div className="flex flex-wrap items-center gap-4">
-            {/* Date Range Picker */}
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline" className="justify-start text-left font-normal">
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {dateRange.from && dateRange.to ? (
-                    `${format(dateRange.from, 'MMM dd')} - ${format(dateRange.to, 'MMM dd')}`
-                  ) : (
-                    'Select date range'
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="range"
-                  selected={{ from: dateRange.from, to: dateRange.to }}
-                  onSelect={(range) => {
-                    if (range?.from && range?.to) {
-                      setDateRange({ from: range.from, to: range.to });
-                    }
-                  }}
-                  numberOfMonths={2}
-                />
-              </PopoverContent>
-            </Popover>
+      {/* Main Report Tabs */}
+      <Tabs defaultValue="operations" className="space-y-4">
+        <TabsList className="grid w-full grid-cols-3 relative z-10 bg-teal-800/40 border border-teal-700/60 backdrop-blur-sm">
+          <TabsTrigger 
+            value="operations"
+            className="text-teal-100/80 data-[state=active]:text-white data-[state=active]:bg-teal-700 data-[state=active]:shadow hover:text-teal-100 focus-visible:ring-2 focus-visible:ring-teal-400"
+          >
+            Internal Operations Reports
+          </TabsTrigger>
+          <TabsTrigger 
+            value="customer-insights"
+            className="text-teal-100/80 data-[state=active]:text-white data-[state=active]:bg-teal-700 data-[state=active]:shadow hover:text-teal-100 focus-visible:ring-2 focus-visible:ring-teal-400"
+          >
+            Customer Insight Reports
+          </TabsTrigger>
+          <TabsTrigger 
+            value="financial"
+            className="text-teal-100/80 data-[state=active]:text-white data-[state=active]:bg-teal-700 data-[state=active]:shadow hover:text-teal-100 focus-visible:ring-2 focus-visible:ring-teal-400"
+          >
+            Financial Reports
+          </TabsTrigger>
+        </TabsList>
 
-            {/* Branch Filter */}
-            <Select value={selectedBranch} onValueChange={setSelectedBranch}>
-              <SelectTrigger className="w-40">
-                <SelectValue placeholder="All branches" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All branches</SelectItem>
-                <SelectItem value="downtown">Downtown</SelectItem>
-                <SelectItem value="airport">Airport</SelectItem>
-                <SelectItem value="mall">Mall Location</SelectItem>
-              </SelectContent>
-            </Select>
-
-            {/* Vehicle Type Filter */}
-            <Select value={selectedVehicleType} onValueChange={setSelectedVehicleType}>
-              <SelectTrigger className="w-40">
-                <SelectValue placeholder="All vehicle types" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All types</SelectItem>
-                <SelectItem value="economy">Economy</SelectItem>
-                <SelectItem value="compact">Compact</SelectItem>
-                <SelectItem value="suv">SUV</SelectItem>
-                <SelectItem value="luxury">Luxury</SelectItem>
-              </SelectContent>
-            </Select>
-
-            {/* Status Filter */}
-            <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-              <SelectTrigger className="w-40">
-                <SelectValue placeholder="All statuses" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All statuses</SelectItem>
-                <SelectItem value="available">Available</SelectItem>
-                <SelectItem value="rented">Rented</SelectItem>
-                <SelectItem value="maintenance">Maintenance</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <Separator orientation="vertical" className="h-6" />
-
-            {/* Export Buttons */}
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={() => exportData('pdf')}>
-                <FileText className="mr-2 h-4 w-4" />
-                PDF
-              </Button>
-              <Button variant="outline" size="sm" onClick={() => exportData('excel')}>
-                <Sheet className="mr-2 h-4 w-4" />
-                Excel
-              </Button>
-              <Button variant="outline" size="sm" onClick={() => exportData('csv')}>
-                <File className="mr-2 h-4 w-4" />
-                CSV
-              </Button>
-            </div>
+        {/* Internal Operations Reports */}
+        <TabsContent value="operations" className="space-y-6">
+          {/* Overview Cards */}
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Total Vehicles</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">127</div>
+                <p className="text-xs text-muted-foreground">
+                  +2 from last month
+                </p>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Fleet Utilization</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">73.2%</div>
+                <p className="text-xs text-muted-foreground">
+                  +5.1% from last month
+                </p>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Active Reservations</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">93</div>
+                <p className="text-xs text-muted-foreground">
+                  +12% from last week
+                </p>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Maintenance Alerts</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">8</div>
+                <p className="text-xs text-muted-foreground">
+                  3 overdue services
+                </p>
+              </CardContent>
+            </Card>
           </div>
-        </div>
 
-        {/* Report Content */}
-        <div className="flex-1 p-6 overflow-auto">
-          {renderReportContent()}
-        </div>
-      </div>
+          {/* Operations Sub-tabs */}
+          <Tabs defaultValue="fleet-status" className="space-y-4">
+            <TabsList className="relative z-10 bg-teal-800/40 border border-teal-700/60 backdrop-blur-sm">
+              <TabsTrigger 
+                value="fleet-status"
+                className="text-teal-100/80 data-[state=active]:text-white data-[state=active]:bg-teal-700 data-[state=active]:shadow hover:text-teal-100 focus-visible:ring-2 focus-visible:ring-teal-400"
+              >
+                Fleet Status & Utilization
+              </TabsTrigger>
+              <TabsTrigger 
+                value="maintenance"
+                className="text-teal-100/80 data-[state=active]:text-white data-[state=active]:bg-teal-700 data-[state=active]:shadow hover:text-teal-100 focus-visible:ring-2 focus-visible:ring-teal-400"
+              >
+                Maintenance & Service
+              </TabsTrigger>
+              <TabsTrigger 
+                value="reservations"
+                className="text-teal-100/80 data-[state=active]:text-white data-[state=active]:bg-teal-700 data-[state=active]:shadow hover:text-teal-100 focus-visible:ring-2 focus-visible:ring-teal-400"
+              >
+                Reservations & Availability
+              </TabsTrigger>
+              <TabsTrigger 
+                value="damage"
+                className="text-teal-100/80 data-[state=active]:text-white data-[state=active]:bg-teal-700 data-[state=active]:shadow hover:text-teal-100 focus-visible:ring-2 focus-visible:ring-teal-400"
+              >
+                Vehicle Damage & Incidents
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="fleet-status" className="space-y-4">
+              <FleetStatusReport dateRange={date} />
+            </TabsContent>
+
+            <TabsContent value="maintenance" className="space-y-4">
+              <MaintenanceReport dateRange={date} />
+            </TabsContent>
+
+            <TabsContent value="reservations" className="space-y-4">
+              <ReservationsReport dateRange={date} />
+            </TabsContent>
+
+            <TabsContent value="damage" className="space-y-4">
+              <DamageReport dateRange={date} />
+            </TabsContent>
+          </Tabs>
+        </TabsContent>
+
+        {/* Customer Insight Reports */}
+        <TabsContent value="customer-insights" className="space-y-6">
+          {/* Customer Insights Sub-tabs */}
+          <Tabs defaultValue="rental-history" className="space-y-4">
+            <TabsList className="relative z-10 bg-teal-800/40 border border-teal-700/60 backdrop-blur-sm">
+              <TabsTrigger 
+                value="rental-history"
+                className="text-teal-100/80 data-[state=active]:text-white data-[state=active]:bg-teal-700 data-[state=active]:shadow hover:text-teal-100 focus-visible:ring-2 focus-visible:ring-teal-400"
+              >
+                Rental History & Loyalty
+              </TabsTrigger>
+              <TabsTrigger 
+                value="preferences"
+                className="text-teal-100/80 data-[state=active]:text-white data-[state=active]:bg-teal-700 data-[state=active]:shadow hover:text-teal-100 focus-visible:ring-2 focus-visible:ring-teal-400"
+              >
+                Preferences & Trends
+              </TabsTrigger>
+              <TabsTrigger 
+                value="satisfaction"
+                className="text-teal-100/80 data-[state=active]:text-white data-[state=active]:bg-teal-700 data-[state=active]:shadow hover:text-teal-100 focus-visible:ring-2 focus-visible:ring-teal-400"
+              >
+                Satisfaction & Feedback
+              </TabsTrigger>
+              <TabsTrigger 
+                value="late-returns"
+                className="text-teal-100/80 data-[state=active]:text-white data-[state=active]:bg-teal-700 data-[state=active]:shadow hover:text-teal-100 focus-visible:ring-2 focus-visible:ring-teal-400"
+              >
+                Late Return Analysis
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="rental-history" className="space-y-4">
+              <RentalHistoryReport dateRange={date} />
+            </TabsContent>
+
+            <TabsContent value="preferences" className="space-y-4">
+              <PreferencesTrendsReport dateRange={date} />
+            </TabsContent>
+
+            <TabsContent value="satisfaction" className="space-y-4">
+              <SatisfactionFeedbackReport dateRange={date} />
+            </TabsContent>
+
+            <TabsContent value="late-returns" className="space-y-4">
+              <LateReturnAnalysisReport dateRange={date} />
+            </TabsContent>
+          </Tabs>
+        </TabsContent>
+
+        {/* Financial Reports */}
+        <TabsContent value="financial" className="space-y-6">
+          {/* Financial Reports Sub-tabs */}
+          <Tabs defaultValue="revenue-breakdown" className="space-y-4">
+            <TabsList className="relative z-10 bg-teal-800/40 border border-teal-700/60 backdrop-blur-sm">
+              <TabsTrigger 
+                value="revenue-breakdown"
+                className="text-teal-100/80 data-[state=active]:text-white data-[state=active]:bg-teal-700 data-[state=active]:shadow hover:text-teal-100 focus-visible:ring-2 focus-visible:ring-teal-400"
+              >
+                Revenue Breakdown & Trends
+              </TabsTrigger>
+              <TabsTrigger 
+                value="cost-analysis"
+                className="text-teal-100/80 data-[state=active]:text-white data-[state=active]:bg-teal-700 data-[state=active]:shadow hover:text-teal-100 focus-visible:ring-2 focus-visible:ring-teal-400"
+              >
+                Cost Analysis & Expenses
+              </TabsTrigger>
+              <TabsTrigger 
+                value="profitability"
+                className="text-teal-100/80 data-[state=active]:text-white data-[state=active]:bg-teal-700 data-[state=active]:shadow hover:text-teal-100 focus-visible:ring-2 focus-visible:ring-teal-400"
+              >
+                Profitability Analysis
+              </TabsTrigger>
+              <TabsTrigger 
+                value="outstanding-payments"
+                className="text-teal-100/80 data-[state=active]:text-white data-[state=active]:bg-teal-700 data-[state=active]:shadow hover:text-teal-100 focus-visible:ring-2 focus-visible:ring-teal-400"
+              >
+                Outstanding Payments
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="revenue-breakdown" className="space-y-4">
+              <RevenueBreakdownReport dateRange={date} />
+            </TabsContent>
+
+            <TabsContent value="cost-analysis" className="space-y-4">
+              <CostAnalysisReport dateRange={date} />
+            </TabsContent>
+
+            <TabsContent value="profitability" className="space-y-4">
+              <ProfitabilityReport dateRange={date} />
+            </TabsContent>
+
+            <TabsContent value="outstanding-payments" className="space-y-4">
+              <OutstandingPaymentsReport dateRange={date} />
+            </TabsContent>
+          </Tabs>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
