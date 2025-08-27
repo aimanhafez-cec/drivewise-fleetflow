@@ -305,7 +305,7 @@ const Dashboard = () => {
           <Button variant="ghost" size="sm" className="lg:hidden text-white hover:bg-teal-overlay" onClick={() => setSidebarCollapsed(!sidebarCollapsed)}>
             <Menu className="h-5 w-5" />
           </Button>
-          <div className="text-xl font-bold text-white">FleetMaster</div>
+          <div className="text-xl font-bold text-white">Fleet Master</div>
         </div>
         
         <div className="flex-1 max-w-md mx-8">
