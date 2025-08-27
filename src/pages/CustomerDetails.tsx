@@ -440,7 +440,7 @@ const CustomerDetails = () => {
           <TabsContent value="deposit">
             <Card>
               <CardContent className="p-6">
-                <p className="text-muted-foreground">Deposit Summary functionality will be implemented here.</p>
+                <p className="text-gray-950">Deposit Summary functionality will be implemented here.</p>
               </CardContent>
             </Card>
           </TabsContent>
