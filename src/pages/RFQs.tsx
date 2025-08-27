@@ -152,7 +152,6 @@ const RFQs: React.FC = () => {
                     <TableCell>
                       <div>
                         <div className="font-medium">{rfq.customer?.full_name}</div>
-                        <div className="text-sm text-card-foreground">{rfq.customer?.email}</div>
                       </div>
                     </TableCell>
                     <TableCell>
