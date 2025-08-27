@@ -295,11 +295,11 @@ const ReservationsReport = ({ dateRange }: ReservationsReportProps) => {
       <Card>
         <CardHeader>
           <CardTitle>Upcoming Reservations</CardTitle>
-          <CardDescription>Next 20 reservations scheduled</CardDescription>
+          <CardDescription className="text-card-foreground">Next 20 reservations scheduled</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
-            <TableHeader>
+            <TableHeader className="bg-muted">
               <TableRow>
                 <TableHead>Reservation ID</TableHead>
                 <TableHead>Start Date</TableHead>

@@ -318,11 +318,11 @@ const LateReturnAnalysisReport: React.FC<LateReturnAnalysisReportProps> = ({ dat
       <Card>
         <CardHeader>
           <CardTitle>Frequent Late Return Customers</CardTitle>
-          <CardDescription>Customers with multiple late returns</CardDescription>
+          <CardDescription className="text-card-foreground">Customers with multiple late returns</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
-            <TableHeader>
+            <TableHeader className="bg-muted">
               <TableRow>
                 <TableHead>Customer</TableHead>
                 <TableHead>Type</TableHead>
@@ -362,11 +362,11 @@ const LateReturnAnalysisReport: React.FC<LateReturnAnalysisReportProps> = ({ dat
       <Card>
         <CardHeader>
           <CardTitle>Recent Late Returns</CardTitle>
-          <CardDescription>Latest instances of late vehicle returns</CardDescription>
+          <CardDescription className="text-card-foreground">Latest instances of late vehicle returns</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
-            <TableHeader>
+            <TableHeader className="bg-muted">
               <TableRow>
                 <TableHead>Customer</TableHead>
                 <TableHead>Vehicle</TableHead>

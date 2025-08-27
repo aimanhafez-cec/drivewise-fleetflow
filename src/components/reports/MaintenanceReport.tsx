@@ -279,11 +279,11 @@ const MaintenanceReport = ({ dateRange }: MaintenanceReportProps) => {
       <Card>
         <CardHeader>
           <CardTitle>Service Schedule</CardTitle>
-          <CardDescription>Upcoming maintenance for all vehicles</CardDescription>
+          <CardDescription className="text-card-foreground">Upcoming maintenance for all vehicles</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
-            <TableHeader>
+            <TableHeader className="bg-muted">
               <TableRow>
                 <TableHead>Vehicle</TableHead>
                 <TableHead>License Plate</TableHead>

@@ -465,11 +465,11 @@ const DamageReport = ({ dateRange }: DamageReportProps) => {
         <Card>
           <CardHeader>
             <CardTitle>Most Damaged Vehicles</CardTitle>
-            <CardDescription>Vehicles with the highest incident rates</CardDescription>
+            <CardDescription className="text-card-foreground">Vehicles with the highest incident rates</CardDescription>
           </CardHeader>
           <CardContent>
             <Table>
-              <TableHeader>
+              <TableHeader className="bg-muted">
                 <TableRow>
                   <TableHead>Vehicle</TableHead>
                   <TableHead>Incidents</TableHead>

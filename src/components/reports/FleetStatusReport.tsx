@@ -242,11 +242,11 @@ const FleetStatusReport = ({ dateRange }: FleetStatusReportProps) => {
       <Card>
         <CardHeader>
           <CardTitle>Vehicle Status Details</CardTitle>
-          <CardDescription>Complete list of vehicles with current status and location</CardDescription>
+          <CardDescription className="text-card-foreground">Complete list of vehicles with current status and location</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
-            <TableHeader>
+            <TableHeader className="bg-muted">
               <TableRow>
                 <TableHead>Vehicle</TableHead>
                 <TableHead>License Plate</TableHead>

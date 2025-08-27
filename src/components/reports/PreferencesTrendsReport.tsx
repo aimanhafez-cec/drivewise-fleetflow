@@ -213,7 +213,7 @@ const PreferencesTrendsReport: React.FC<PreferencesTrendsReportProps> = ({ dateR
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{vehiclePreferences?.categories[0]?.name || 'N/A'}</div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-card-foreground">
               {vehiclePreferences?.categories[0]?.percentage.toFixed(1)}% of all bookings
             </p>
           </CardContent>
@@ -230,7 +230,7 @@ const PreferencesTrendsReport: React.FC<PreferencesTrendsReportProps> = ({ dateR
                 current.bookings > peak.bookings ? current : peak
               ).month}
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-card-foreground">
               Highest booking month
             </p>
           </CardContent>
@@ -243,7 +243,7 @@ const PreferencesTrendsReport: React.FC<PreferencesTrendsReportProps> = ({ dateR
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{locationPreferences?.[0]?.location || 'N/A'}</div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-card-foreground">
               {locationPreferences?.[0]?.count || 0} reservations
             </p>
           </CardContent>
@@ -260,7 +260,7 @@ const PreferencesTrendsReport: React.FC<PreferencesTrendsReportProps> = ({ dateR
                 ? `${addOnPreferences.reduce((sum, addon) => sum + addon.count, 0)}` 
                 : '0'}
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-card-foreground">
               Total add-ons selected
             </p>
           </CardContent>
@@ -273,7 +273,7 @@ const PreferencesTrendsReport: React.FC<PreferencesTrendsReportProps> = ({ dateR
         <Card>
           <CardHeader>
             <CardTitle>Vehicle Category Preferences</CardTitle>
-            <CardDescription>Most popular vehicle categories</CardDescription>
+            <CardDescription className='text-card-foreground'>Most popular vehicle categories</CardDescription>
           </CardHeader>
           <CardContent>
             <ChartContainer 
@@ -318,7 +318,7 @@ const PreferencesTrendsReport: React.FC<PreferencesTrendsReportProps> = ({ dateR
         <Card>
           <CardHeader>
             <CardTitle>Seasonal Booking Trends</CardTitle>
-            <CardDescription>Bookings by month</CardDescription>
+            <CardDescription className='text-card-foreground'>Bookings by month</CardDescription>
           </CardHeader>
           <CardContent>
             <ChartContainer 
@@ -360,7 +360,7 @@ const PreferencesTrendsReport: React.FC<PreferencesTrendsReportProps> = ({ dateR
         <Card>
           <CardHeader>
             <CardTitle>Booking Channels</CardTitle>
-            <CardDescription>Distribution of booking types</CardDescription>
+            <CardDescription className='text-card-foreground'>Distribution of booking types</CardDescription>
           </CardHeader>
           <CardContent>
             <ChartContainer 
@@ -404,7 +404,7 @@ const PreferencesTrendsReport: React.FC<PreferencesTrendsReportProps> = ({ dateR
         <Card>
           <CardHeader>
             <CardTitle>Location Preferences</CardTitle>
-            <CardDescription>Most popular pickup/return locations</CardDescription>
+            <CardDescription className='text-card-foreground'>Most popular pickup/return locations</CardDescription>
           </CardHeader>
           <CardContent>
             <ChartContainer 
@@ -449,11 +449,11 @@ const PreferencesTrendsReport: React.FC<PreferencesTrendsReportProps> = ({ dateR
       <Card>
         <CardHeader>
           <CardTitle>Popular Add-ons</CardTitle>
-          <CardDescription>Most frequently selected additional services</CardDescription>
+          <CardDescription className='text-card-foreground'>Most frequently selected additional services</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
-            <TableHeader>
+            <TableHeader className='bg-muted'>
               <TableRow>
                 <TableHead>Add-on</TableHead>
                 <TableHead>Times Selected</TableHead>
