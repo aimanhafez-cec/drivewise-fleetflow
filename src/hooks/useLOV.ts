@@ -76,7 +76,9 @@ export const useLOV = <T extends LOVItem>(
       }
 
       // Apply ordering
-      query = query.order(orderBy);
+      const [column, direction] = orderBy.split(' ');
+      const ascending = direction?.toLowerCase() === 'asc';
+      query = query.order(column, { ascending });
 
       const { data, error } = await query;
 
