@@ -65,7 +65,7 @@ const App = () => (
             }>
               <Route index element={<InstantBooking />} />
             </Route>
-              <Route path="/reservations" element={
+            <Route path="/reservations" element={
                 <ProtectedRoute>
                   <AppLayout />
                 </ProtectedRoute>
