@@ -119,13 +119,15 @@
   }
 
   /* Form field improvements */
-  .form-field-mobile {
-    @apply space-y-2 min-w-0;
-  }
+    /* Fix form labels and text to use proper card foreground colors */
+    .form-field-mobile label {
+      @apply text-sm font-medium leading-none text-card-foreground;
+    }
 
-  .form-field-mobile label {
-    @apply text-sm font-medium leading-none;
-  }
+    /* Ensure all form text uses card foreground */
+    .form-field-mobile {
+      @apply space-y-2 min-w-0 text-card-foreground;
+    }
 
   .form-field-mobile input,
   .form-field-mobile select,
