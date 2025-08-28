@@ -230,12 +230,12 @@ export const CorporateLeasingWizard: React.FC = () => {
         <CardHeader>
           <CardTitle className="text-card-foreground">Corporate Leasing Agreement</CardTitle>
           <div className="space-y-2">
-            <div className="flex justify-between text-sm text-muted-foreground">
+            <div className="flex justify-between text-sm text-foreground">
               <span>Step {currentStep + 1} of {STEPS.length}</span>
               <span>{Math.round(progress)}% complete</span>
             </div>
             <Progress value={progress} className="w-full" />
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-foreground">
               {STEPS[currentStep].title}: {STEPS[currentStep].description}
             </p>
           </div>

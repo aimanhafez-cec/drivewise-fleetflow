@@ -174,7 +174,7 @@
     --secondary-foreground: 0 0% 100%;
 
     --muted: 183 31% 25%; /* #3A5F60 - Darker muted background for better contrast */
-    --muted-foreground: 0 0% 95%; /* Light text on muted backgrounds */
+    --muted-foreground: 0 0% 45%; /* Darker text for better contrast */
 
     --accent: 180 61% 51%; /* #33CFCF - Accent color */
     --accent-foreground: 0 0% 100%;
@@ -254,7 +254,7 @@
     --secondary-foreground: 0 0% 100%;
 
     --muted: 183 31% 25%; /* Same darker muted for dark mode */
-    --muted-foreground: 0 0% 95%; /* Light text on muted backgrounds */
+    --muted-foreground: 0 0% 55%; /* Darker text for better contrast in dark mode */
 
     --accent: 180 61% 51%;
     --accent-foreground: 0 0% 100%;
