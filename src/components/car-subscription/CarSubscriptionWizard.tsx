@@ -134,7 +134,9 @@ export const CarSubscriptionWizard: React.FC = () => {
     resolver: zodResolver(carSubscriptionSchema),
     defaultValues: {
       customer_type: 'B2C',
+      customer_id: '',
       subscription_model: 'By Class',
+      start_date: '',
       renewal_cycle: 'Monthly (anniversary)',
       minimum_commitment: 'None',
       cancellation_notice: '14',
