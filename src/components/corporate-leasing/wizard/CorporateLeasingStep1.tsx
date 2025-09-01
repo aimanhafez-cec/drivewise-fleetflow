@@ -66,20 +66,15 @@ export const CorporateLeasingStep1: React.FC<CorporateLeasingStep1Props> = ({ fo
                     
                     // Find the selected customer and auto-fill related fields
                     const selectedCustomer = customers.find(customer => customer.id === value);
-                    console.log('Selected customer:', selectedCustomer); // Debug log
                     
                     if (selectedCustomer) {
                       // Auto-fill credit limit
                       if (selectedCustomer.credit_limit) {
-                        console.log('Setting credit_limit:', selectedCustomer.credit_limit); // Debug log
                         form.setValue('credit_limit', selectedCustomer.credit_limit);
                       }
                       // Auto-fill PO/BPA number
                       if (selectedCustomer.default_po_bpa_no) {
-                        console.log('Setting customer_po_no:', selectedCustomer.default_po_bpa_no); // Debug log
                         form.setValue('customer_po_no', selectedCustomer.default_po_bpa_no);
-                      } else {
-                        console.log('No default_po_bpa_no found for customer'); // Debug log
                       }
                     }
                     
