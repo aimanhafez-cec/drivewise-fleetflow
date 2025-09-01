@@ -1444,8 +1444,8 @@ const NewReservation = () => {
             <AccordionContent className="px-6 pb-6">
               <Tabs defaultValue="vehicles" className="w-full">
                 <TabsList className="grid w-full grid-cols-2 mb-4 bg-muted">
-                  <TabsTrigger value="vehicles" className="text-foreground data-[state=active]:bg-background data-[state=active]:text-foreground">Vehicle Information</TabsTrigger>
-                  <TabsTrigger value="drivers" className="text-foreground data-[state=active]:bg-background data-[state=active]:text-foreground">Driver Information</TabsTrigger>
+                  <TabsTrigger value="vehicles" className="text-muted-foreground data-[state=active]:bg-background data-[state=active]:text-foreground font-medium">Vehicle Information</TabsTrigger>
+                  <TabsTrigger value="drivers" className="text-muted-foreground data-[state=active]:bg-background data-[state=active]:text-foreground font-medium">Driver Information</TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="vehicles" className="space-y-6">
