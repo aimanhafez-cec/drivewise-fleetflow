@@ -497,10 +497,22 @@
   .white-cards-page .text-3xl,
   .white-cards-page .text-2xl,
   .white-cards-page .text-xl,
-  .white-cards-page p:contains("Fields marked with an asterisk"),
-  .white-cards-page .text-sm:contains("Fields marked"),
-  .white-cards-page [class*="text-"]:contains("asterisk"),
-  .white-cards-page span:contains("required") {
+  .white-cards-page .text-3xl.font-bold,
+  .white-cards-page p.text-sm.text-muted-foreground,
+  .white-cards-page .text-muted-foreground,
+  .white-cards-page [data-page="new-reservation"] h1,
+  .white-cards-page [data-page="new-reservation"] .text-3xl,
+  .white-cards-page [data-page="new-reservation"] p.text-sm {
+    color: hsl(0 0% 100%) !important;
+  }
+
+  /* Breadcrumb text should be white */
+  .white-cards-page .breadcrumb,
+  .white-cards-page [data-radix-breadcrumb-list] *,
+  .white-cards-page nav[aria-label="breadcrumb"] *,
+  .white-cards-page a[href="/reservations"],
+  .white-cards-page .breadcrumb-item,
+  .white-cards-page .breadcrumb-link {
     color: hsl(0 0% 100%) !important;
   }
 
