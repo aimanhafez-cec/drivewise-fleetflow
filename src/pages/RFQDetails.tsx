@@ -145,9 +145,9 @@ const RFQDetails: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{rfq.customer?.full_name}</div>
-            <p className="text-sm text-muted-foreground">{rfq.customer?.email}</p>
+            <p className="text-sm text-card-foreground">{rfq.customer?.email}</p>
             {rfq.customer?.phone && (
-              <p className="text-sm text-muted-foreground">{rfq.customer.phone}</p>
+              <p className="text-sm text-card-foreground">{rfq.customer.phone}</p>
             )}
           </CardContent>
         </Card>
@@ -164,7 +164,7 @@ const RFQDetails: React.FC = () => {
               )}{" "}
               days
             </div>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-card-foreground">
               {format(new Date(rfq.pickup_at), "MMM dd")} - {format(new Date(rfq.return_at), "MMM dd, yyyy")}
             </p>
           </CardContent>
@@ -176,7 +176,7 @@ const RFQDetails: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{rfq.vehicle_type?.name || "Any"}</div>
-            <p className="text-sm text-muted-foreground">{rfq.vehicle_type?.description}</p>
+            <p className="text-sm text-card-foreground">{rfq.vehicle_type?.description}</p>
           </CardContent>
         </Card>
       </div>
@@ -199,14 +199,14 @@ const RFQDetails: React.FC = () => {
               <CardContent className="space-y-4">
                 <div>
                   <label className="text-sm font-medium">Pickup</label>
-                  <div className="text-sm text-muted-foreground">
+                  <div className="text-sm text-card-foreground">
                     {format(new Date(rfq.pickup_at), "MMM dd, yyyy 'at' h:mm a")}
                   </div>
                   <div className="text-sm">{rfq.pickup_loc_id}</div>
                 </div>
                 <div>
                   <label className="text-sm font-medium">Return</label>
-                  <div className="text-sm text-muted-foreground">
+                  <div className="text-sm text-card-foreground">
                     {format(new Date(rfq.return_at), "MMM dd, yyyy 'at' h:mm a")}
                   </div>
                   <div className="text-sm">{rfq.return_loc_id}</div>
@@ -271,7 +271,7 @@ const RFQDetails: React.FC = () => {
                   <div className="w-2 h-2 bg-primary rounded-full" />
                   <div>
                     <span className="font-medium">RFQ Created</span>
-                    <span className="text-muted-foreground ml-2">
+                    <span className="text-card-foreground ml-2">
                       {format(new Date(rfq.created_at), "MMM dd, yyyy 'at' h:mm a")}
                     </span>
                   </div>
@@ -281,7 +281,7 @@ const RFQDetails: React.FC = () => {
                     <div className="w-2 h-2 bg-destructive rounded-full" />
                     <div>
                       <span className="font-medium">RFQ Cancelled</span>
-                      <span className="text-muted-foreground ml-2">
+                      <span className="text-card-foreground ml-2">
                         {format(new Date(rfq.updated_at), "MMM dd, yyyy 'at' h:mm a")}
                       </span>
                     </div>
@@ -298,7 +298,7 @@ const RFQDetails: React.FC = () => {
               <CardTitle>Documents</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-8 text-muted-foreground">
+              <div className="text-center py-8 text-card-foreground">
                 <FileText className="h-8 w-8 mx-auto mb-2" />
                 <p>No documents attached</p>
               </div>

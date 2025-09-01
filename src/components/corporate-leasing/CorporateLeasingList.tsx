@@ -119,11 +119,11 @@ export const CorporateLeasingList: React.FC = () => {
                 placeholder="Search by agreement number..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
+                className="pl-10 text-muted-foreground"
               />
             </div>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" className="flex items-center gap-2">
+              <Button variant="outline" size="sm" className="flex items-center gap-2 text-muted-foreground">
                 <Filter className="h-4 w-4" />
                 Filters
               </Button>
@@ -134,12 +134,12 @@ export const CorporateLeasingList: React.FC = () => {
         <CardContent>
           {isLoading ? (
             <div className="flex items-center justify-center h-32">
-              <p className="text-muted-foreground">Loading agreements...</p>
+              <p className="text-card-foreground">Loading agreements...</p>
             </div>
           ) : agreements.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-32 text-center">
-              <FileText className="h-8 w-8 text-muted-foreground mb-2" />
-              <p className="text-muted-foreground">No corporate leasing agreements found</p>
+              <FileText className="h-8 w-8 text-card-foreground mb-2" />
+              <p className="text-card-foreground">No corporate leasing agreements found</p>
               <Button 
                 variant="link" 
                 onClick={handleCreateNew}

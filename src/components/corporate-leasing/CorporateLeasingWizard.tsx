@@ -189,6 +189,7 @@ export const CorporateLeasingWizard: React.FC<CorporateLeasingWizardProps> = ({
   });
 
   const handleNext = async () => {
+    console.log('Next button clicked, current step:', currentStep);
     const currentStepFields = getCurrentStepFields();
     console.log('Step:', currentStep, 'Required fields:', currentStepFields);
     
@@ -205,13 +206,20 @@ export const CorporateLeasingWizard: React.FC<CorporateLeasingWizardProps> = ({
         }
       });
     }
+    console.log('Validating fields:', currentStepFields);
     
-    if (isValid) {
-      if (currentStep < STEPS.length - 1) {
-        setCurrentStep(currentStep + 1);
-      } else {
-        await handleSubmit();
-      }
+    const isValid = await form.trigger(currentStepFields);
+    console.log('Validation result:', isValid);
+    
+    if (!isValid) {
+      console.log('Form errors:', form.formState.errors);
+      return;
+    }
+    
+    if (currentStep < STEPS.length - 1) {
+      setCurrentStep(currentStep + 1);
+    } else {
+      await handleSubmit();
     }
   };
 
@@ -326,12 +334,12 @@ export const CorporateLeasingWizard: React.FC<CorporateLeasingWizardProps> = ({
             {isEditMode ? 'Edit Corporate Leasing Agreement' : 'Corporate Leasing Agreement'}
           </CardTitle>
           <div className="space-y-2">
-            <div className="flex justify-between text-sm text-muted-foreground">
+            <div className="flex justify-between text-sm text-foreground">
               <span>Step {currentStep + 1} of {STEPS.length}</span>
               <span>{Math.round(progress)}% complete</span>
             </div>
             <Progress value={progress} className="w-full" />
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-foreground">
               {STEPS[currentStep].title}: {STEPS[currentStep].description}
             </p>
           </div>

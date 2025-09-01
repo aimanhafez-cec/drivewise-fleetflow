@@ -11,22 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { 
-  ArrowLeft,
-  Edit,
-  Save,
-  Calendar,
-  FileText,
-  MoreHorizontal,
-  Info,
-  Shield,
-  CreditCard,
-  DollarSign,
-  User,
-  Phone,
-  Mail
-} from 'lucide-react';
-
+import { ArrowLeft, Edit, Save, Calendar, FileText, MoreHorizontal, Info, Shield, CreditCard, DollarSign, User, Phone, Mail } from 'lucide-react';
 interface Customer {
   id: string;
   full_name: string;
@@ -45,178 +30,200 @@ interface Customer {
   created_at: string;
   updated_at: string;
 }
-
 const CustomerDetails = () => {
-  const { id } = useParams();
+  const {
+    id
+  } = useParams();
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const {
+    toast
+  } = useToast();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState('summary');
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState<Partial<Customer>>({});
 
   // Fetch customer data
-  const { data: customer, isLoading, error } = useQuery({
+  const {
+    data: customer,
+    isLoading,
+    error
+  } = useQuery({
     queryKey: ['customer', id],
     queryFn: async () => {
       if (!id) throw new Error('Customer ID is required');
-      
-      const { data, error } = await supabase
-        .from('customers')
-        .select('*')
-        .eq('id', id)
-        .maybeSingle();
-
+      const {
+        data,
+        error
+      } = await supabase.from('customers').select('*').eq('id', id).maybeSingle();
       if (error) throw error;
       if (!data) throw new Error('Customer not found');
-      
       return data as Customer;
     },
-    enabled: !!id,
+    enabled: !!id
   });
 
   // Fetch customer statistics
-  const { data: stats } = useQuery({
+  const {
+    data: stats
+  } = useQuery({
     queryKey: ['customer-stats', id],
     queryFn: async () => {
       if (!id) return null;
-
-      const [reservationsResult, agreementsResult, paymentsResult, ticketsResult] = await Promise.all([
-        supabase.from('reservations').select('status, total_amount').eq('customer_id', id),
-        supabase.from('agreements').select('status, total_amount').eq('customer_id', id),
-        supabase.from('payments').select('status, amount').eq('customer_id', id),
-        supabase.from('traffic_tickets').select('status').eq('customer_id', id)
-      ]);
-
+      const [reservationsResult, agreementsResult, paymentsResult, ticketsResult] = await Promise.all([supabase.from('reservations').select('status, total_amount').eq('customer_id', id), supabase.from('agreements').select('status, total_amount').eq('customer_id', id), supabase.from('payments').select('status, amount').eq('customer_id', id), supabase.from('traffic_tickets').select('status').eq('customer_id', id)]);
       const reservations = reservationsResult.data || [];
       const agreements = agreementsResult.data || [];
       const payments = paymentsResult.data || [];
       const tickets = ticketsResult.data || [];
-
       return {
-        totalRevenue: reservations.reduce((sum, r) => sum + (r.total_amount || 0), 0) + 
-                     agreements.reduce((sum, a) => sum + (a.total_amount || 0), 0),
+        totalRevenue: reservations.reduce((sum, r) => sum + (r.total_amount || 0), 0) + agreements.reduce((sum, a) => sum + (a.total_amount || 0), 0),
         openedReservations: reservations.length,
         confirmedReservations: reservations.filter(r => r.status === 'confirmed').length,
-        noShowReservations: 0, // Note: no_show status not available in current schema
+        noShowReservations: 0,
+        // Note: no_show status not available in current schema
         cancelledReservations: reservations.filter(r => r.status === 'cancelled').length,
         openedAgreements: agreements.filter(a => a.status === 'active').length,
         closedAgreements: agreements.filter(a => a.status === 'completed').length,
         totalTickets: tickets.length,
-        pendingPayments: payments.filter(p => p.status === 'pending').length,
+        pendingPayments: payments.filter(p => p.status === 'pending').length
       };
     },
-    enabled: !!id,
+    enabled: !!id
   });
 
   // Update customer mutation
   const updateCustomerMutation = useMutation({
     mutationFn: async (updates: Partial<Customer>) => {
       if (!id) throw new Error('Customer ID is required');
-      
-      const { error } = await supabase
-        .from('customers')
-        .update(updates)
-        .eq('id', id);
-
+      const {
+        error
+      } = await supabase.from('customers').update(updates).eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['customer', id] });
+      queryClient.invalidateQueries({
+        queryKey: ['customer', id]
+      });
       setIsEditing(false);
       setEditData({});
       toast({
         title: "Success",
-        description: "Customer updated successfully",
+        description: "Customer updated successfully"
       });
     },
     onError: (error: any) => {
       toast({
         title: "Error",
         description: error.message,
-        variant: "destructive",
+        variant: "destructive"
       });
-    },
+    }
   });
-
   const handleSave = () => {
     updateCustomerMutation.mutate(editData);
   };
-
   const handleInputChange = (field: keyof Customer, value: any) => {
-    setEditData(prev => ({ ...prev, [field]: value }));
+    setEditData(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
-
   const formatDate = (dateString: string) => {
     if (!dateString) return 'Not provided';
     return new Date(dateString).toLocaleDateString();
   };
-
   const formatAddress = (address: any) => {
     if (!address) return 'Not provided';
     if (typeof address === 'string') return address;
-    
     const parts = [];
     if (address.street) parts.push(address.street);
     if (address.city) parts.push(address.city);
     if (address.state) parts.push(address.state);
     if (address.zip) parts.push(address.zip);
-    
     return parts.length > 0 ? parts.join(', ') : 'Not provided';
   };
-
   const getCreditRatingBadge = (rating: number) => {
-    if (rating >= 750) return { label: 'Excellent', color: 'bg-green-500' };
-    if (rating >= 700) return { label: 'Good', color: 'bg-blue-500' };
-    if (rating >= 650) return { label: 'Fair', color: 'bg-yellow-500' };
-    if (rating >= 600) return { label: 'Poor', color: 'bg-orange-500' };
-    return { label: 'Very Poor', color: 'bg-red-500' };
+    if (rating >= 750) return {
+      label: 'Excellent',
+      color: 'bg-green-500'
+    };
+    if (rating >= 700) return {
+      label: 'Good',
+      color: 'bg-blue-500'
+    };
+    if (rating >= 650) return {
+      label: 'Fair',
+      color: 'bg-yellow-500'
+    };
+    if (rating >= 600) return {
+      label: 'Poor',
+      color: 'bg-orange-500'
+    };
+    return {
+      label: 'Very Poor',
+      color: 'bg-red-500'
+    };
   };
-
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-64">
+    return <div className="flex items-center justify-center h-64">
         <div className="text-lg">Loading customer details...</div>
-      </div>
-    );
+      </div>;
   }
-
   if (error || !customer) {
-    return (
-      <div className="flex flex-col items-center justify-center h-64 space-y-4">
+    return <div className="flex flex-col items-center justify-center h-64 space-y-4">
         <div className="text-lg text-destructive">Customer not found</div>
         <Button onClick={() => navigate('/customers')}>
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Customers
         </Button>
-      </div>
-    );
+      </div>;
   }
-
-  const summaryStats = [
-    { label: 'Total Revenue', value: `AED ${(stats?.totalRevenue || 0).toLocaleString()}`, color: 'text-emerald-500' },
-    { label: 'Opened Reservations', value: stats?.openedReservations || 0, color: 'text-blue-500' },
-    { label: 'Confirmed Reservations', value: stats?.confirmedReservations || 0, color: 'text-blue-500' },
-    { label: 'No Show Reservations', value: stats?.noShowReservations || 0, color: 'text-gray-500' },
-    { label: 'Cancelled Reservations', value: stats?.cancelledReservations || 0, color: 'text-red-500' },
-    { label: 'Opened Agreements', value: stats?.openedAgreements || 0, color: 'text-purple-500' },
-    { label: 'Closed Agreements', value: stats?.closedAgreements || 0, color: 'text-green-500' },
-    { label: 'Total Traffic Tickets', value: stats?.totalTickets || 0, color: 'text-gray-500' },
-    { label: 'Pending Payments', value: stats?.pendingPayments || 0, color: 'text-orange-500' },
-    { label: 'Total Rentals', value: customer.total_rentals || 0, color: 'text-blue-500' },
-  ];
-
-  return (
-    <div className="space-y-6 p-6">
+  const summaryStats = [{
+    label: 'Total Revenue',
+    value: `AED ${(stats?.totalRevenue || 0).toLocaleString()}`,
+    color: 'text-emerald-500'
+  }, {
+    label: 'Opened Reservations',
+    value: stats?.openedReservations || 0,
+    color: 'text-blue-500'
+  }, {
+    label: 'Confirmed Reservations',
+    value: stats?.confirmedReservations || 0,
+    color: 'text-blue-500'
+  }, {
+    label: 'No Show Reservations',
+    value: stats?.noShowReservations || 0,
+    color: 'text-gray-500'
+  }, {
+    label: 'Cancelled Reservations',
+    value: stats?.cancelledReservations || 0,
+    color: 'text-red-500'
+  }, {
+    label: 'Opened Agreements',
+    value: stats?.openedAgreements || 0,
+    color: 'text-purple-500'
+  }, {
+    label: 'Closed Agreements',
+    value: stats?.closedAgreements || 0,
+    color: 'text-green-500'
+  }, {
+    label: 'Total Traffic Tickets',
+    value: stats?.totalTickets || 0,
+    color: 'text-gray-500'
+  }, {
+    label: 'Pending Payments',
+    value: stats?.pendingPayments || 0,
+    color: 'text-orange-500'
+  }, {
+    label: 'Total Rentals',
+    value: customer.total_rentals || 0,
+    color: 'text-blue-500'
+  }];
+  return <div className="space-y-6 p-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => navigate('/customers')}
-            className="p-2"
-          >
+          <Button variant="ghost" size="sm" onClick={() => navigate('/customers')} className="p-2">
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div className="flex items-center gap-4">
@@ -235,49 +242,29 @@ const CustomerDetails = () => {
                   <Mail className="h-4 w-4" />
                   <span>{customer.email}</span>
                 </div>
-                {customer.credit_rating && (
-                  <Badge 
-                    variant="secondary" 
-                    className={`${getCreditRatingBadge(customer.credit_rating).color} text-white`}
-                  >
+                {customer.credit_rating && <Badge variant="secondary" className={`${getCreditRatingBadge(customer.credit_rating).color} text-white`}>
                     {getCreditRatingBadge(customer.credit_rating).label}
-                  </Badge>
-                )}
+                  </Badge>}
               </div>
             </div>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          {isEditing ? (
-            <>
-              <Button 
-                variant="outline" 
-                onClick={() => {
-                  setIsEditing(false);
-                  setEditData({});
-                }}
-              >
+          {isEditing ? <>
+              <Button variant="outline" onClick={() => {
+            setIsEditing(false);
+            setEditData({});
+          }}>
                 Cancel
               </Button>
-              <Button 
-                onClick={handleSave}
-                disabled={updateCustomerMutation.isPending}
-                className="bg-emerald-500 hover:bg-emerald-600 text-white"
-              >
+              <Button onClick={handleSave} disabled={updateCustomerMutation.isPending} className="bg-emerald-500 hover:bg-emerald-600 text-white">
                 <Save className="mr-2 h-4 w-4" />
                 {updateCustomerMutation.isPending ? 'Saving...' : 'Save'}
               </Button>
-            </>
-          ) : (
-            <Button 
-              variant="outline" 
-              onClick={() => setIsEditing(true)}
-              className="bg-blue-900 text-white hover:bg-blue-800"
-            >
+            </> : <Button variant="outline" onClick={() => setIsEditing(true)} className="bg-blue-900 text-white hover:bg-blue-800">
               <Edit className="mr-2 h-4 w-4" />
               Edit
-            </Button>
-          )}
+            </Button>}
           <Button className="bg-emerald-500 hover:bg-emerald-600 text-white">
             <Calendar className="mr-2 h-4 w-4" />
             Reservation
@@ -294,100 +281,41 @@ const CustomerDetails = () => {
         <CardContent className="p-6">
           <div className="grid grid-cols-6 gap-4">
             <div>
-              <Label htmlFor="fullName" className="text-sm font-medium text-muted-foreground">Full Name</Label>
-              <Input 
-                id="fullName" 
-                value={isEditing ? (editData.full_name ?? customer.full_name) : customer.full_name}
-                onChange={(e) => handleInputChange('full_name', e.target.value)}
-                readOnly={!isEditing}
-                className="mt-1" 
-              />
+              <Label htmlFor="fullName" className="text-sm font-medium text-card-foreground">Full Name</Label>
+              <Input id="fullName" value={isEditing ? editData.full_name ?? customer.full_name : customer.full_name} onChange={e => handleInputChange('full_name', e.target.value)} readOnly={!isEditing} className="mt-1 text-muted-foreground" />
             </div>
             <div>
-              <Label htmlFor="phoneNo" className="text-sm font-medium text-muted-foreground">Phone No.</Label>
-              <Input 
-                id="phoneNo" 
-                value={isEditing ? (editData.phone ?? customer.phone ?? '') : (customer.phone || '')}
-                onChange={(e) => handleInputChange('phone', e.target.value)}
-                readOnly={!isEditing}
-                className="mt-1" 
-              />
+              <Label htmlFor="phoneNo" className="text-sm font-medium text-card-foreground">Phone No.</Label>
+              <Input id="phoneNo" value={isEditing ? editData.phone ?? customer.phone ?? '' : customer.phone || ''} onChange={e => handleInputChange('phone', e.target.value)} readOnly={!isEditing} className="mt-1 text-muted-foreground" />
             </div>
             <div>
-              <Label htmlFor="email" className="text-sm font-medium text-muted-foreground">Email</Label>
-              <Input 
-                id="email" 
-                value={isEditing ? (editData.email ?? customer.email) : customer.email}
-                onChange={(e) => handleInputChange('email', e.target.value)}
-                readOnly={!isEditing}
-                className="mt-1" 
-              />
+              <Label htmlFor="email" className="text-sm font-medium text-card-foreground">Email</Label>
+              <Input id="email" value={isEditing ? editData.email ?? customer.email : customer.email} onChange={e => handleInputChange('email', e.target.value)} readOnly={!isEditing} className="mt-1 text-muted-foreground" />
             </div>
             <div>
-              <Label htmlFor="licenseNo" className="text-sm font-medium text-muted-foreground">License No.</Label>
-              <Input 
-                id="licenseNo" 
-                value={isEditing ? (editData.license_number ?? customer.license_number ?? '') : (customer.license_number || '')}
-                onChange={(e) => handleInputChange('license_number', e.target.value)}
-                readOnly={!isEditing}
-                className="mt-1" 
-              />
+              <Label htmlFor="licenseNo" className="text-sm font-medium text-card-foreground">License No.</Label>
+              <Input id="licenseNo" value={isEditing ? editData.license_number ?? customer.license_number ?? '' : customer.license_number || ''} onChange={e => handleInputChange('license_number', e.target.value)} readOnly={!isEditing} className="mt-1 text-muted-foreground" />
             </div>
             <div>
-              <Label htmlFor="licenseExpiry" className="text-sm font-medium text-muted-foreground">License Expiry Date</Label>
-              <Input 
-                id="licenseExpiry" 
-                type={isEditing ? "date" : "text"}
-                value={isEditing ? (editData.license_expiry ?? customer.license_expiry ?? '') : formatDate(customer.license_expiry)}
-                onChange={(e) => handleInputChange('license_expiry', e.target.value)}
-                readOnly={!isEditing}
-                className="mt-1" 
-              />
+              <Label htmlFor="licenseExpiry" className="text-sm font-medium text-card-foreground">License Expiry Date</Label>
+              <Input id="licenseExpiry" type={isEditing ? "date" : "text"} value={isEditing ? editData.license_expiry ?? customer.license_expiry ?? '' : formatDate(customer.license_expiry)} onChange={e => handleInputChange('license_expiry', e.target.value)} readOnly={!isEditing} className="mt-1 text-muted-foreground" />
             </div>
             <div>
-              <Label htmlFor="dateOfBirth" className="text-sm font-medium text-muted-foreground">Date of Birth</Label>
-              <Input 
-                id="dateOfBirth" 
-                type={isEditing ? "date" : "text"}
-                value={isEditing ? (editData.date_of_birth ?? customer.date_of_birth ?? '') : formatDate(customer.date_of_birth)}
-                onChange={(e) => handleInputChange('date_of_birth', e.target.value)}
-                readOnly={!isEditing}
-                className="mt-1" 
-              />
+              <Label htmlFor="dateOfBirth" className="text-sm font-medium text-card-foreground">Date of Birth</Label>
+              <Input id="dateOfBirth" type={isEditing ? "date" : "text"} value={isEditing ? editData.date_of_birth ?? customer.date_of_birth ?? '' : formatDate(customer.date_of_birth)} onChange={e => handleInputChange('date_of_birth', e.target.value)} readOnly={!isEditing} className="mt-1 text-muted-foreground" />
             </div>
           </div>
           
           {/* Address field */}
           <div className="mt-4">
-            <Label htmlFor="address" className="text-sm font-medium text-muted-foreground">Address</Label>
-            {isEditing ? (
-              <Textarea 
-                id="address" 
-                value={editData.address ? JSON.stringify(editData.address) : formatAddress(customer.address)}
-                onChange={(e) => handleInputChange('address', e.target.value)}
-                className="mt-1" 
-              />
-            ) : (
-              <Input 
-                id="address" 
-                value={formatAddress(customer.address)}
-                readOnly
-                className="mt-1" 
-              />
-            )}
+            <Label htmlFor="address" className="text-sm font-medium text-card-foreground">Address</Label>
+            {isEditing ? <Textarea id="address" value={editData.address ? JSON.stringify(editData.address) : formatAddress(customer.address)} onChange={e => handleInputChange('address', e.target.value)} className="mt-1 text-muted-foreground" /> : <Input id="address" value={formatAddress(customer.address)} readOnly className="mt-1 text-muted-foreground" />}
           </div>
 
           {/* Notes field */}
           <div className="mt-4">
-            <Label htmlFor="notes" className="text-sm font-medium text-muted-foreground">Notes</Label>
-            <Textarea 
-              id="notes" 
-              value={isEditing ? (editData.notes ?? customer.notes ?? '') : (customer.notes || '')}
-              onChange={(e) => handleInputChange('notes', e.target.value)}
-              readOnly={!isEditing}
-              className="mt-1" 
-              rows={3}
-            />
+            <Label htmlFor="notes" className="text-sm font-medium text-card-foreground">Notes</Label>
+            <Textarea id="notes" value={isEditing ? editData.notes ?? customer.notes ?? '' : customer.notes || ''} onChange={e => handleInputChange('notes', e.target.value)} readOnly={!isEditing} className="mt-1 text-muted-foreground" rows={3} />
           </div>
         </CardContent>
       </Card>
@@ -428,40 +356,40 @@ const CustomerDetails = () => {
                   <CardContent className="space-y-4">
                     <div className="grid grid-cols-3 gap-4">
                       <div>
-                        <Label className="text-sm font-medium text-muted-foreground">Full Name</Label>
-                        <Input value={customer.full_name} readOnly className="mt-1" />
+                        <Label className="text-sm font-medium text-card-foreground">Full Name</Label>
+                        <Input value={customer.full_name} readOnly className="mt-1 text-muted-foreground" />
                       </div>
                       <div>
-                        <Label className="text-sm font-medium text-muted-foreground">Email</Label>
-                        <Input value={customer.email} readOnly className="mt-1" />
+                        <Label className="text-sm font-medium text-card-foreground">Email</Label>
+                        <Input value={customer.email} readOnly className="mt-1 text-muted-foreground" />
                       </div>
                       <div>
-                        <Label className="text-sm font-medium text-muted-foreground">Phone</Label>
-                        <Input value={customer.phone || 'Not provided'} readOnly className="mt-1" />
+                        <Label className="text-sm font-medium text-card-foreground">Phone</Label>
+                        <Input value={customer.phone || 'Not provided'} readOnly className="mt-1 text-muted-foreground" />
                       </div>
                     </div>
                     <div className="grid grid-cols-3 gap-4">
                       <div>
-                        <Label className="text-sm font-medium text-muted-foreground">License Number</Label>
-                        <Input value={customer.license_number || 'Not provided'} readOnly className="mt-1" />
+                        <Label className="text-sm font-medium text-card-foreground">License Number</Label>
+                        <Input value={customer.license_number || 'Not provided'} readOnly className="mt-1 text-muted-foreground" />
                       </div>
                       <div>
-                        <Label className="text-sm font-medium text-muted-foreground">License Expiry</Label>
-                        <Input value={formatDate(customer.license_expiry)} readOnly className="mt-1" />
+                        <Label className="text-sm font-medium text-card-foreground">License Expiry</Label>
+                        <Input value={formatDate(customer.license_expiry)} readOnly className="mt-1 text-muted-foreground" />
                       </div>
                       <div>
-                        <Label className="text-sm font-medium text-muted-foreground">Date of Birth</Label>
-                        <Input value={formatDate(customer.date_of_birth)} readOnly className="mt-1" />
+                        <Label className="text-sm font-medium text-card-foreground">Date of Birth</Label>
+                        <Input value={formatDate(customer.date_of_birth)} readOnly className="mt-1 text-muted-foreground" />
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <Label className="text-sm font-medium text-muted-foreground">Address</Label>
-                        <Textarea value={formatAddress(customer.address)} readOnly className="mt-1" rows={2} />
+                        <Label className="text-sm font-medium text-card-foreground">Address</Label>
+                        <Textarea value={formatAddress(customer.address)} readOnly className="mt-1 text-muted-foreground" rows={2} />
                       </div>
                       <div>
-                        <Label className="text-sm font-medium text-muted-foreground">Credit Rating</Label>
-                        <Input value={customer.credit_rating ? `${customer.credit_rating} (${getCreditRatingBadge(customer.credit_rating).label})` : 'Not rated'} readOnly className="mt-1" />
+                        <Label className="text-sm font-medium text-card-foreground">Credit Rating</Label>
+                        <Input value={customer.credit_rating ? `${customer.credit_rating} (${getCreditRatingBadge(customer.credit_rating).label})` : 'Not rated'} readOnly className="mt-1 text-muted-foreground" />
                       </div>
                     </div>
                   </CardContent>
@@ -478,14 +406,12 @@ const CustomerDetails = () => {
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    {summaryStats.map((stat, index) => (
-                      <div key={index} className="flex items-center justify-between py-2">
-                        <span className="text-sm text-muted-foreground">{stat.label}</span>
+                    {summaryStats.map((stat, index) => <div key={index} className="flex items-center justify-between py-2">
+                        <span className="text-sm text-card-foreground">{stat.label}</span>
                         <span className={`text-sm font-medium ${stat.color}`}>
                           {stat.value}
                         </span>
-                      </div>
-                    ))}
+                      </div>)}
                   </CardContent>
                 </Card>
               </div>
@@ -497,12 +423,7 @@ const CustomerDetails = () => {
               <CardContent className="p-6">
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold">Customer Notes</h3>
-                  <Textarea 
-                    value={customer.notes || 'No notes available'}
-                    readOnly
-                    rows={10}
-                    className="w-full"
-                  />
+                  <Textarea value={customer.notes || 'No notes available'} readOnly rows={10} className="w-full" />
                 </div>
               </CardContent>
             </Card>
@@ -511,7 +432,7 @@ const CustomerDetails = () => {
           <TabsContent value="documents">
             <Card>
               <CardContent className="p-6">
-                <p className="text-muted-foreground">Documents functionality will be implemented here.</p>
+                <p className="text-gray-950">Documents functionality will be implemented here.</p>
               </CardContent>
             </Card>
           </TabsContent>
@@ -519,7 +440,7 @@ const CustomerDetails = () => {
           <TabsContent value="deposit">
             <Card>
               <CardContent className="p-6">
-                <p className="text-muted-foreground">Deposit Summary functionality will be implemented here.</p>
+                <p className="text-gray-950">Deposit Summary functionality will be implemented here.</p>
               </CardContent>
             </Card>
           </TabsContent>
@@ -527,14 +448,12 @@ const CustomerDetails = () => {
           <TabsContent value="claims">
             <Card>
               <CardContent className="p-6">
-                <p className="text-muted-foreground">Claims functionality will be implemented here.</p>
+                <p className="text-zinc-950">Claims functionality will be implemented here.</p>
               </CardContent>
             </Card>
           </TabsContent>
         </div>
       </Tabs>
-    </div>
-  );
+    </div>;
 };
-
 export default CustomerDetails;

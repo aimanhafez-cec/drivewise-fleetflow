@@ -78,34 +78,34 @@ export const AgreementLinesTable: React.FC<AgreementLinesTableProps> = ({
     <>
       <Card>
         <CardHeader>
-          <CardTitle className="text-white">Agreement Lines</CardTitle>
+          <CardTitle className="text-card-foreground">Agreement Lines</CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="text-white">Vehicle</TableHead>
-                <TableHead className="text-white">Check Out</TableHead>
-                <TableHead className="text-white">Check In</TableHead>
-                <TableHead className="text-white">Segments</TableHead>
-                <TableHead className="text-white">Line Net</TableHead>
-                <TableHead className="text-white">Tax</TableHead>
-                <TableHead className="text-white">Line Total</TableHead>
-                <TableHead className="text-white">Actions</TableHead>
+                <TableHead className="text-card-foreground">Vehicle</TableHead>
+                <TableHead className="text-card-foreground">Check Out</TableHead>
+                <TableHead className="text-card-foreground">Check In</TableHead>
+                <TableHead className="text-card-foreground">Segments</TableHead>
+                <TableHead className="text-card-foreground">Line Net</TableHead>
+                <TableHead className="text-card-foreground">Tax</TableHead>
+                <TableHead className="text-card-foreground">Line Total</TableHead>
+                <TableHead className="text-card-foreground">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {lines.map((line) => (
                 <TableRow key={line.id}>
-                  <TableCell className="text-white">
+                  <TableCell className="text-card-foreground">
                     <div>
-                      <div className="font-medium text-white">
+                      <div className="font-medium text-card-foreground">
                         {line.vehicle ? `${line.vehicle.make} ${line.vehicle.model}` : 
-                          <span className="text-white">No Vehicle Assigned</span>
+                          <span className="text-card-foreground">No Vehicle Assigned</span>
                         }
                       </div>
                       {line.vehicle?.license_plate && (
-                        <div className="text-sm text-white">
+                        <div className="text-sm text-card-foreground">
                           {line.vehicle.license_plate}
                         </div>
                       )}
@@ -116,18 +116,18 @@ export const AgreementLinesTable: React.FC<AgreementLinesTableProps> = ({
                       )}
                     </div>
                   </TableCell>
-                  <TableCell className="text-white">
+                  <TableCell className="text-card-foreground">
                     {line.check_out_at ? format(new Date(line.check_out_at), 'MMM dd, yyyy\nHH:mm') : '-'}
                   </TableCell>
-                  <TableCell className="text-white">
+                  <TableCell className="text-card-foreground">
                     {line.check_in_at ? format(new Date(line.check_in_at), 'MMM dd, yyyy\nHH:mm') : '-'}
                   </TableCell>
-                  <TableCell className="text-white">
+                  <TableCell className="text-card-foreground">
                     {getSegmentBadges(line)}
                   </TableCell>
-                  <TableCell className="text-white">{formatCurrency(line.line_net || 0)}</TableCell>
-                  <TableCell className="text-white">{formatCurrency(line.tax_value || 0)}</TableCell>
-                  <TableCell className="font-medium text-white">
+                  <TableCell className="text-card-foreground">{formatCurrency(line.line_net || 0)}</TableCell>
+                  <TableCell className="text-card-foreground">{formatCurrency(line.tax_value || 0)}</TableCell>
+                  <TableCell className="font-medium text-card-foreground">
                     {formatCurrency(line.line_total || 0)}
                   </TableCell>
                   <TableCell>
@@ -148,8 +148,9 @@ export const AgreementLinesTable: React.FC<AgreementLinesTableProps> = ({
                           size="sm" 
                           variant="outline"
                           onClick={() => handleExchangeClick(line)}
+                          className="text-muted-foreground"
                         >
-                          <RefreshCw className="h-3 w-3 mr-1" />
+                          <RefreshCw className="h-3 w-3 mr-1 text-muted-foreground" />
                           Exchange Vehicle
                         </Button>
                       )}
@@ -161,7 +162,7 @@ export const AgreementLinesTable: React.FC<AgreementLinesTableProps> = ({
           </Table>
 
           {lines.length === 0 && (
-            <div className="text-center py-8 text-white">
+            <div className="text-center py-8 text-card-foreground">
               No agreement lines found
             </div>
           )}

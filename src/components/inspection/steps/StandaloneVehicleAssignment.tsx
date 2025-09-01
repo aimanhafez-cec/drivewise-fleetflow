@@ -22,7 +22,7 @@ export const StandaloneVehicleAssignment: React.FC<StandaloneVehicleAssignmentPr
     <div id="step-vehicle" className="space-y-6">
       <div>
         <h3 className="text-lg font-semibold mb-2">Vehicle Selection</h3>
-        <p className="text-muted-foreground">
+        <p className="text-card-foreground">
           Choose the vehicle you want to inspect.
         </p>
       </div>
@@ -36,7 +36,7 @@ export const StandaloneVehicleAssignment: React.FC<StandaloneVehicleAssignmentPr
             value={selectedVehicleId || ''}
             onValueChange={onVehicleSelect}
           >
-            <SelectTrigger id="select-vehicle">
+            <SelectTrigger id="select-vehicle" className="text-muted-foreground">
               <SelectValue placeholder="Choose a vehicle..." />
             </SelectTrigger>
             <SelectContent>
@@ -50,22 +50,22 @@ export const StandaloneVehicleAssignment: React.FC<StandaloneVehicleAssignmentPr
 
           {selectedVehicle && (
             <div className="p-4 bg-muted rounded-lg">
-              <h4 className="font-medium mb-2 flex items-center gap-2">
+              <h4 className="font-medium mb-2 flex items-center gap-2 text-muted-foreground">
                 <CheckCircle className="h-4 w-4 text-green-600" />
                 Selected Vehicle Details
               </h4>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
                   <span className="text-muted-foreground">Make/Model:</span>
-                  <p>{selectedVehicle.make} {selectedVehicle.model}</p>
+                  <p className="text-muted-foreground">{selectedVehicle.make} {selectedVehicle.model}</p>
                 </div>
                 <div>
                   <span className="text-muted-foreground">Year:</span>
-                  <p>{selectedVehicle.year}</p>
+                  <p className="text-muted-foreground">{selectedVehicle.year}</p>
                 </div>
                 <div>
                   <span className="text-muted-foreground">License:</span>
-                  <p>{selectedVehicle.license_plate}</p>
+                  <p className="text-muted-foreground">{selectedVehicle.license_plate}</p>
                 </div>
                 <div>
                   <span className="text-muted-foreground">Status:</span>
@@ -75,11 +75,11 @@ export const StandaloneVehicleAssignment: React.FC<StandaloneVehicleAssignmentPr
                 </div>
                 <div>
                   <span className="text-muted-foreground">VIN:</span>
-                  <p>{(selectedVehicle as any).vin || 'Not specified'}</p>
+                  <p className="text-muted-foreground">{(selectedVehicle as any).vin || 'Not specified'}</p>
                 </div>
                 <div>
                   <span className="text-muted-foreground">Category:</span>
-                  <p>{selectedVehicle.category_id || 'Not specified'}</p>
+                  <p className="text-muted-foreground">{selectedVehicle.category_id || 'Not specified'}</p>
                 </div>
               </div>
             </div>

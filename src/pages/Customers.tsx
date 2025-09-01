@@ -194,24 +194,24 @@ const Customers = () => {
               <CardContent className="space-y-4">
                 <div className="space-y-2 text-sm">
                   <div className="flex items-center gap-2">
-                    <Mail className="h-4 w-4 text-muted-foreground" />
+                    <Mail className="h-4 w-4 text-card-foreground" />
                     <span className="truncate">{customer.email}</span>
                   </div>
                   {customer.phone && (
                     <div className="flex items-center gap-2">
-                      <Phone className="h-4 w-4 text-muted-foreground" />
+                      <Phone className="h-4 w-4 text-card-foreground" />
                       <span>{customer.phone}</span>
                     </div>
                   )}
                   {customer.license_number && (
                     <div className="flex items-center gap-2">
-                      <CreditCard className="h-4 w-4 text-muted-foreground" />
+                      <CreditCard className="h-4 w-4 text-card-foreground" />
                       <span>License: {customer.license_number}</span>
                     </div>
                   )}
                   {customer.license_expiry && (
                     <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-muted-foreground" />
+                      <Calendar className="h-4 w-4 text-card-foreground" />
                       <span>Expires: {formatDate(customer.license_expiry)}</span>
                     </div>
                   )}
@@ -219,18 +219,18 @@ const Customers = () => {
 
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <div className="text-muted-foreground">Total Rentals</div>
+                    <div className="text-card-foreground">Total Rentals</div>
                     <div className="font-semibold">{customer.total_rentals || 0}</div>
                   </div>
                   <div>
-                    <div className="text-muted-foreground">Total Spent</div>
+                    <div className="text-card-foreground">Total Spent</div>
                     <div className="font-semibold">AED {(customer.total_spent || 0).toLocaleString()}</div>
                   </div>
                 </div>
 
                 {customer.address && (
                   <div className="text-sm">
-                    <div className="text-muted-foreground">Address</div>
+                    <div className="text-card-foreground">Address</div>
                     <div className="text-xs">
                       {typeof customer.address === 'object' ? (
                         <>
@@ -256,9 +256,9 @@ const Customers = () => {
                       e.stopPropagation();
                       navigate(`/customers/${customer.id}`);
                     }}
-                    className="flex-1"
+                    className="flex-1 text-muted-foreground"
                   >
-                    <Edit className="mr-2 h-4 w-4" />
+                    <Edit className="mr-2 h-4 w-4 text-muted-foreground" />
                     Edit
                   </Button>
                   <Button 

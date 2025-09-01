@@ -283,47 +283,47 @@ export default function VehicleDetails() {
         <CardContent className="p-6">
           <div className="grid grid-cols-6 gap-4">
             <div>
-              <Label className="text-sm font-medium text-muted-foreground">Make</Label>
-              <Input value={vehicle.make} readOnly className="mt-1" />
+              <Label className="text-sm font-medium text-card-foreground">Make</Label>
+              <Input value={vehicle.make} readOnly className="mt-1 text-muted-foreground" />
             </div>
             <div>
-              <Label className="text-sm font-medium text-muted-foreground">Model</Label>
-              <Input value={vehicle.model} readOnly className="mt-1" />
+              <Label className="text-sm font-medium text-card-foreground">Model</Label>
+              <Input value={vehicle.model} readOnly className="mt-1 text-muted-foreground" />
             </div>
             <div>
-              <Label className="text-sm font-medium text-muted-foreground">Year</Label>
-              <Input value={vehicle.year} readOnly className="mt-1" />
+              <Label className="text-sm font-medium text-card-foreground">Year</Label>
+              <Input value={vehicle.year} readOnly className="mt-1 text-muted-foreground" />
             </div>
             <div>
-              <Label className="text-sm font-medium text-muted-foreground">License Plate</Label>
-              <Input value={vehicle.license_plate} readOnly className="mt-1" />
+              <Label className="text-sm font-medium text-card-foreground">License Plate</Label>
+              <Input value={vehicle.license_plate} readOnly className="mt-1 text-muted-foreground" />
             </div>
             <div>
-              <Label className="text-sm font-medium text-muted-foreground">VIN</Label>
-              <Input value={vehicle.vin} readOnly className="mt-1" />
+              <Label className="text-sm font-medium text-card-foreground">VIN</Label>
+              <Input value={vehicle.vin} readOnly className="mt-1 text-muted-foreground" />
             </div>
             <div>
-              <Label className="text-sm font-medium text-muted-foreground">Color</Label>
-              <Input value={vehicle.color || 'Not specified'} readOnly className="mt-1" />
+              <Label className="text-sm font-medium text-card-foreground">Color</Label>
+              <Input value={vehicle.color || 'Not specified'} readOnly className="mt-1 text-muted-foreground" />
             </div>
           </div>
           
           <div className="grid grid-cols-4 gap-4 mt-4">
             <div>
-              <Label className="text-sm font-medium text-muted-foreground">Transmission</Label>
-              <Input value={vehicle.transmission || 'Not specified'} readOnly className="mt-1" />
+              <Label className="text-sm font-medium text-card-foreground">Transmission</Label>
+              <Input value={vehicle.transmission || 'Not specified'} readOnly className="mt-1 text-muted-foreground" />
             </div>
             <div>
-              <Label className="text-sm font-medium text-muted-foreground">Engine Size</Label>
-              <Input value={vehicle.engine_size || 'Not specified'} readOnly className="mt-1" />
+              <Label className="text-sm font-medium text-card-foreground">Engine Size</Label>
+              <Input value={vehicle.engine_size || 'Not specified'} readOnly className="mt-1 text-muted-foreground" />
             </div>
             <div>
-              <Label className="text-sm font-medium text-muted-foreground">Fuel Level</Label>
-              <Input value={getFuelLevelInfo(vehicle.fuel_level).label} readOnly className="mt-1" />
+              <Label className="text-sm font-medium text-card-foreground">Fuel Level</Label>
+              <Input value={getFuelLevelInfo(vehicle.fuel_level).label} readOnly className="mt-1 text-muted-foreground" />
             </div>
             <div>
-              <Label className="text-sm font-medium text-muted-foreground">Location</Label>
-              <Input value={vehicle.location || 'Not specified'} readOnly className="mt-1" />
+              <Label className="text-sm font-medium text-card-foreground">Location</Label>
+              <Input value={vehicle.location || 'Not specified'} readOnly className="mt-1 text-muted-foreground" />
             </div>
           </div>
         </CardContent>
@@ -380,30 +380,30 @@ export default function VehicleDetails() {
                   <CardContent className="space-y-4">
                     <div className="grid grid-cols-3 gap-4">
                       <div>
-                        <Label className="text-sm font-medium text-muted-foreground">Make</Label>
-                        <Input value={vehicle.make} readOnly className="mt-1" />
+                        <Label className="text-sm font-medium text-card-foreground">Make</Label>
+                        <Input value={vehicle.make} readOnly className="mt-1 text-muted-foreground" />
                       </div>
                       <div>
-                        <Label className="text-sm font-medium text-muted-foreground">Model</Label>
-                        <Input value={vehicle.model} readOnly className="mt-1" />
+                        <Label className="text-sm font-medium text-card-foreground">Model</Label>
+                        <Input value={vehicle.model} readOnly className="mt-1 text-muted-foreground" />
                       </div>
                       <div>
-                        <Label className="text-sm font-medium text-muted-foreground">Year</Label>
-                        <Input value={vehicle.year} readOnly className="mt-1" />
+                        <Label className="text-sm font-medium text-card-foreground">Year</Label>
+                        <Input value={vehicle.year} readOnly className="mt-1 text-muted-foreground" />
                       </div>
                     </div>
                     <div className="grid grid-cols-3 gap-4">
                       <div>
-                        <Label className="text-sm font-medium text-muted-foreground">VIN</Label>
-                        <Input value={vehicle.vin} readOnly className="mt-1" />
+                        <Label className="text-sm font-medium text-card-foreground">VIN</Label>
+                        <Input value={vehicle.vin} readOnly className="mt-1 text-muted-foreground" />
                       </div>
                       <div>
-                        <Label className="text-sm font-medium text-muted-foreground">License Plate</Label>
-                        <Input value={vehicle.license_plate} readOnly className="mt-1" />
+                        <Label className="text-sm font-medium text-card-foreground">License Plate</Label>
+                        <Input value={vehicle.license_plate} readOnly className="mt-1 text-muted-foreground" />
                       </div>
                       <div>
-                        <Label className="text-sm font-medium text-muted-foreground">Color</Label>
-                        <Input value={vehicle.color || 'Not specified'} readOnly className="mt-1" />
+                        <Label className="text-sm font-medium text-card-foreground">Color</Label>
+                        <Input value={vehicle.color || 'Not specified'} readOnly className="mt-1 text-muted-foreground" />
                       </div>
                     </div>
                   </CardContent>
@@ -420,32 +420,32 @@ export default function VehicleDetails() {
                   <CardContent className="space-y-4">
                     <div className="grid grid-cols-3 gap-4">
                       <div>
-                        <Label className="text-sm font-medium text-muted-foreground">Status</Label>
-                        <div className="mt-1">
+                        <Label className="text-sm font-medium text-card-foreground">Status</Label>
+                        <div className="mt-1 text-muted-foreground">
                           <Badge className={getStatusInfo(vehicle.status).color}>
                             {getStatusInfo(vehicle.status).label}
                           </Badge>
                         </div>
                       </div>
                       <div>
-                        <Label className="text-sm font-medium text-muted-foreground">Fuel Level </Label>
+                        <Label className="text-sm font-medium text-card-foreground">Fuel Level </Label>
                         <Badge className={getFuelLevelInfo(vehicle.fuel_level).color}>
                           {getFuelLevelInfo(vehicle.fuel_level).label}
                         </Badge>
                       </div>
                       <div>
-                        <Label className="text-sm font-medium text-muted-foreground">Odometer</Label>
-                        <Input value={`${(vehicle.odometer || 0).toLocaleString()} km`} readOnly className="mt-1" />
+                        <Label className="text-sm font-medium text-card-foreground">Odometer</Label>
+                        <Input value={`${(vehicle.odometer || 0).toLocaleString()} km`} readOnly className="mt-1 text-muted-foreground" />
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <Label className="text-sm font-medium text-muted-foreground">Location</Label>
-                        <Input value={vehicle.location || 'Not specified'} readOnly className="mt-1" />
+                        <Label className="text-sm font-medium text-card-foreground">Location</Label>
+                        <Input value={vehicle.location || 'Not specified'} readOnly className="mt-1 text-muted-foreground" />
                       </div>
                       <div>
-                        <Label className="text-sm font-medium text-muted-foreground">Category</Label>
-                        <Input value={vehicle.categories?.name || 'Uncategorized'} readOnly className="mt-1" />
+                        <Label className="text-sm font-medium text-card-foreground">Category</Label>
+                        <Input value={vehicle.categories?.name || 'Uncategorized'} readOnly className="mt-1 text-muted-foreground" />
                       </div>
                     </div>
                   </CardContent>
@@ -464,7 +464,7 @@ export default function VehicleDetails() {
                   <CardContent className="space-y-4">
                     {summaryStats.map((stat, index) => (
                       <div key={index} className="flex justify-between items-center py-2 border-b last:border-b-0">
-                        <span className="text-sm text-muted-foreground">{stat.label}</span>
+                        <span className="text-sm text-card-foreground">{stat.label}</span>
                         <span className={`text-sm font-medium ${stat.color}`}>{stat.value}</span>
                       </div>
                     ))}
@@ -484,7 +484,7 @@ export default function VehicleDetails() {
               </div>
               <div className="border rounded-lg overflow-hidden">
                 <Table>
-                  <TableHeader className="bg-blue-900">
+                  <TableHeader className="bg-muted">
                     <TableRow>
                       <TableHead className="text-white">Employee ↕</TableHead>
                       <TableHead className="text-white">Note ↕</TableHead>
@@ -498,7 +498,7 @@ export default function VehicleDetails() {
                       <TableHead className="text-white">Actions ↕</TableHead>
                     </TableRow>
                   </TableHeader>
-                  <TableBody>
+                  <TableBody className="bg-card text-card-foreground">
                     <TableRow>
                       <TableCell>System User</TableCell>
                       <TableCell>Service</TableCell>
@@ -521,7 +521,7 @@ export default function VehicleDetails() {
           <TabsContent value="reservations">
             <Card>
               <CardContent className="p-6">
-                <p className="text-muted-foreground">Vehicle reservations will be displayed here...</p>
+                <p className="text-card-foreground">Vehicle reservations will be displayed here...</p>
               </CardContent>
             </Card>
           </TabsContent>
@@ -529,7 +529,7 @@ export default function VehicleDetails() {
           <TabsContent value="damages">
             <Card>
               <CardContent className="p-6">
-                <p className="text-muted-foreground">Vehicle damage history will be displayed here...</p>
+                <p className="text-card-foreground">Vehicle damage history will be displayed here...</p>
               </CardContent>
             </Card>
           </TabsContent>
@@ -537,7 +537,7 @@ export default function VehicleDetails() {
           <TabsContent value="maintenance">
             <Card>
               <CardContent className="p-6">
-                <p className="text-muted-foreground">Vehicle maintenance records will be displayed here...</p>
+                <p className="text-card-foreground">Vehicle maintenance records will be displayed here...</p>
               </CardContent>
             </Card>
           </TabsContent>
@@ -545,7 +545,7 @@ export default function VehicleDetails() {
           <TabsContent value="expenses">
             <Card>
               <CardContent className="p-6">
-                <p className="text-muted-foreground">Vehicle expenses will be displayed here...</p>
+                <p className="text-card-foreground">Vehicle expenses will be displayed here...</p>
               </CardContent>
             </Card>
           </TabsContent>
@@ -553,7 +553,7 @@ export default function VehicleDetails() {
           <TabsContent value="documents">
             <Card>
               <CardContent className="p-6">
-                <p className="text-muted-foreground">Vehicle documents will be displayed here...</p>
+                <p className="text-card-foreground">Vehicle documents will be displayed here...</p>
               </CardContent>
             </Card>
           </TabsContent>
@@ -561,7 +561,7 @@ export default function VehicleDetails() {
           <TabsContent value="agreement-track">
             <Card>
               <CardContent className="p-6">
-                <p className="text-muted-foreground">Agreement tracking will be displayed here...</p>
+                <p className="text-card-foreground">Agreement tracking will be displayed here...</p>
               </CardContent>
             </Card>
           </TabsContent>
@@ -569,7 +569,7 @@ export default function VehicleDetails() {
           <TabsContent value="tasks">
             <Card>
               <CardContent className="p-6">
-                <p className="text-muted-foreground">Vehicle tasks will be displayed here...</p>
+                <p className="text-card-foreground">Vehicle tasks will be displayed here...</p>
               </CardContent>
             </Card>
           </TabsContent>
@@ -577,7 +577,7 @@ export default function VehicleDetails() {
           <TabsContent value="history">
             <Card>
               <CardContent className="p-6">
-                <p className="text-muted-foreground">Vehicle history will be displayed here...</p>
+                <p className="text-card-foreground">Vehicle history will be displayed here...</p>
               </CardContent>
             </Card>
           </TabsContent>

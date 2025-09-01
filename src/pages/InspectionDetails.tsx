@@ -259,7 +259,7 @@ const InspectionDetails: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-2">
-              <ClipboardCheck className="h-4 w-4 text-muted-foreground" />
+              <ClipboardCheck className="h-4 w-4 text-card-foreground" />
               <span className="font-medium">{inspection.type} Inspection</span>
             </div>
           </CardContent>
@@ -271,7 +271,7 @@ const InspectionDetails: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-muted-foreground" />
+              <Clock className="h-4 w-4 text-card-foreground" />
               <span className="text-sm">
                 {new Date(
                   inspection.type === 'LEGACY' 
@@ -294,13 +294,13 @@ const InspectionDetails: React.FC = () => {
             <div className="grid gap-4 md:grid-cols-2">
               <div>
                 <Label className="text-sm font-medium">Agreement</Label>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-card-foreground">
                   {inspection.agreements.agreement_no}
                 </p>
               </div>
               <div>
                 <Label className="text-sm font-medium">Vehicle ID</Label>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-card-foreground">
                   {inspection.agreements.vehicle_id}
                 </p>
               </div>
@@ -311,13 +311,13 @@ const InspectionDetails: React.FC = () => {
             <div className="grid gap-4 md:grid-cols-2">
               <div>
                 <Label className="text-sm font-medium">Vehicle</Label>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-card-foreground">
                   {inspection.vehicles.make} {inspection.vehicles.model} ({inspection.vehicles.year})
                 </p>
               </div>
               <div>
                 <Label className="text-sm font-medium">License Plate</Label>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-card-foreground">
                   {inspection.vehicles.license_plate}
                 </p>
               </div>
@@ -328,8 +328,8 @@ const InspectionDetails: React.FC = () => {
             <div>
               <Label className="text-sm font-medium">Location</Label>
               <div className="flex items-center gap-2 mt-1">
-                <MapPin className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">
+                <MapPin className="h-4 w-4 text-card-foreground" />
+                <span className="text-sm text-card-foreground">
                   {inspection.location_id}
                 </span>
               </div>
@@ -351,7 +351,7 @@ const InspectionDetails: React.FC = () => {
                   <Label className="text-sm font-medium capitalize">
                     {key.replace(/([A-Z])/g, ' $1').trim()}
                   </Label>
-                  <p className="text-sm text-muted-foreground">{String(value)}</p>
+                  <p className="text-sm text-card-foreground">{String(value)}</p>
                 </div>
               ))}
             </div>
@@ -370,13 +370,13 @@ const InspectionDetails: React.FC = () => {
               {inspection.odometer && (
                 <div>
                   <Label className="text-sm font-medium">Odometer</Label>
-                  <p className="text-sm text-muted-foreground">{inspection.odometer}</p>
+                  <p className="text-sm text-card-foreground">{inspection.odometer}</p>
                 </div>
               )}
               {inspection.fuel_level && (
                 <div>
                   <Label className="text-sm font-medium">Fuel Level</Label>
-                  <p className="text-sm text-muted-foreground">{inspection.fuel_level}%</p>
+                  <p className="text-sm text-card-foreground">{inspection.fuel_level}%</p>
                 </div>
               )}
             </div>
@@ -414,7 +414,7 @@ const InspectionDetails: React.FC = () => {
             <CardTitle>Notes</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+            <p className="text-sm text-card-foreground whitespace-pre-wrap">
               {inspection.notes}
             </p>
           </CardContent>
@@ -428,7 +428,7 @@ const InspectionDetails: React.FC = () => {
             <CardTitle>Damage Markers</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-card-foreground">
               {inspection.damage_marker_ids.length} damage marker(s) associated with this inspection
             </p>
           </CardContent>

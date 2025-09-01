@@ -94,6 +94,11 @@ const navigation = [
     icon: Building2,
   },
   {
+    title: 'Car Subscriptions',
+    url: '/car-subscriptions',
+    icon: Car,
+  },
+  {
     title: 'Reports',
     url: '/reports',
     icon: BarChart3,

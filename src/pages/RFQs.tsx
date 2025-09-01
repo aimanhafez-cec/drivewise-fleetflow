@@ -63,7 +63,7 @@ const RFQs: React.FC = () => {
     const variants = {
       new: "default",
       under_review: "secondary",
-      quoted: "outline", 
+      quoted: "destructive", 
       cancelled: "destructive",
     } as const;
 
@@ -104,7 +104,7 @@ const RFQs: React.FC = () => {
               </div>
             </div>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger id="flt-status" className="w-[200px]">
+              <SelectTrigger id="flt-status" className="w-[200px] text-muted-foreground">
                 <SelectValue placeholder="Filter by status" />
               </SelectTrigger>
               <SelectContent>
@@ -127,7 +127,7 @@ const RFQs: React.FC = () => {
         <CardContent>
           <Table id="rfqs-table">
             <TableHeader>
-              <TableRow>
+              <TableRow className="text-card-foreground bg-slate-800">
                 <TableHead>RFQ #</TableHead>
                 <TableHead>Customer</TableHead>
                 <TableHead>Trip Dates</TableHead>
@@ -140,25 +140,24 @@ const RFQs: React.FC = () => {
             </TableHeader>
             <TableBody>
               {isLoading ? (
-                <TableRow>
+                <TableRow className="text-card-foreground">
                   <TableCell colSpan={8} className="text-center py-8">
                     Loading RFQs...
                   </TableCell>
                 </TableRow>
               ) : rfqs && rfqs.length > 0 ? (
                 rfqs.map((rfq) => (
-                  <TableRow key={rfq.id} className="cursor-pointer hover:bg-muted/50">
+                  <TableRow key={rfq.id} className="cursor-pointer hover:bg-muted/50 text-card-foreground">
                     <TableCell className="font-medium">{rfq.rfq_no}</TableCell>
                     <TableCell>
                       <div>
                         <div className="font-medium">{rfq.customer?.full_name}</div>
-                        <div className="text-sm text-muted-foreground">{rfq.customer?.email}</div>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="text-sm">
                         <div>{format(new Date(rfq.pickup_at), "MMM dd, yyyy")}</div>
-                        <div className="text-muted-foreground">
+                        <div className="text-card-foreground">
                           {format(new Date(rfq.return_at), "MMM dd, yyyy")}
                         </div>
                       </div>
@@ -166,12 +165,12 @@ const RFQs: React.FC = () => {
                     <TableCell>
                       <div className="text-sm">
                         <div>From: {rfq.pickup_loc_id}</div>
-                        <div className="text-muted-foreground">To: {rfq.return_loc_id}</div>
+                        <div className="text-card-foreground">To: {rfq.return_loc_id}</div>
                       </div>
                     </TableCell>
-                    <TableCell>{rfq.vehicle_type?.name || "Any"}</TableCell>
-                    <TableCell>{getStatusBadge(rfq.status)}</TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
+                    <TableCell className="text-card-foreground">{rfq.vehicle_type?.name || "Any"}</TableCell>
+                    <TableCell className="text-card-foreground">{getStatusBadge(rfq.status)}</TableCell>
+                    <TableCell className="text-sm text-card-foreground">
                       {format(new Date(rfq.created_at), "MMM dd, yyyy")}
                     </TableCell>
                     <TableCell>
@@ -179,6 +178,7 @@ const RFQs: React.FC = () => {
                         variant="outline"
                         size="sm"
                         onClick={() => navigate(`/rfqs/${rfq.id}`)}
+                        className="text-muted-foreground"
                       >
                         View
                       </Button>
@@ -186,7 +186,7 @@ const RFQs: React.FC = () => {
                   </TableRow>
                 ))
               ) : (
-                <TableRow>
+                <TableRow className="text-card-foreground">
                   <TableCell colSpan={8} className="text-center py-8">
                     <div className="text-muted-foreground">
                       <Filter className="h-8 w-8 mx-auto mb-2" />

@@ -152,7 +152,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
         >
           {dayEvents.length === 0 ? (
             <div 
-              className="flex items-center justify-center h-full text-muted-foreground cursor-pointer hover:bg-muted/30 rounded"
+              className="flex items-center justify-center h-full text-card-foreground cursor-pointer hover:bg-muted/30 rounded"
               onClick={() => onCreateEvent(currentDate)}
             >
               <div className="text-center">
@@ -255,7 +255,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
             return (
               <div 
                 key={i} 
-                className="min-h-[60px] sm:min-h-[100px] p-1 border rounded bg-background cursor-pointer hover:bg-muted/50"
+                className="min-h-[60px] sm:min-h-[100px] p-1 border rounded bg-muted/50 cursor-pointer hover:bg-muted"
                 onDragOver={handleDragOver}
                 onDrop={(e) => handleDrop(e, {
                   newStart: date,

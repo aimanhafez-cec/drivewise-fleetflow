@@ -1,218 +1,370 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { SimpleBarChart } from '@/components/charts';
-import { Wrench, Calendar, AlertTriangle, Clock } from 'lucide-react';
-import { useAllVehicles } from '@/hooks/useVehicles';
+import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from '@/components/ui/chart';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, LineChart, Line } from 'recharts';
+import { DateRange } from 'react-day-picker';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { AlertTriangle, Calendar, Clock, Wrench, CheckCircle } from 'lucide-react';
+import { formatDistanceToNow, isBefore, addDays } from 'date-fns';
+import { formatCurrency } from '@/lib/utils/currency';
+import { MONTHLY_TRENDS_CONFIG, VEHICLE_CATEGORY_COLORS } from '@/lib/chartConfig';
+import { formatNumber, currencyTooltipFormatter } from '@/lib/utils/chartUtils';
 
 interface MaintenanceReportProps {
-  dateRange: { from: Date; to: Date };
-  filters: {
-    branch: string;
-    vehicleType: string;
-    status: string;
-  };
+  dateRange?: DateRange;
 }
 
-const MaintenanceReport: React.FC<MaintenanceReportProps> = ({ dateRange, filters }) => {
-  const { data: vehicles = [], isLoading } = useAllVehicles();
+const MaintenanceReport = ({ dateRange }: MaintenanceReportProps) => {
+  // Fetch vehicles with maintenance-related data
+  const { data: vehicles = [], isLoading } = useQuery({
+    queryKey: ['vehicles-maintenance'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('vehicles')
+        .select('id, make, model, year, license_plate, status, odometer, created_at, location')
+        .order('make, model');
+      
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
+  // Mock maintenance data (in a real app, this would come from a maintenance table)
+  const generateMaintenanceData = (vehicles: any[]) => {
+    return vehicles.map((vehicle) => {
+      // Simulate maintenance records
+      const lastServiceDays = Math.floor(Math.random() * 180) + 30; // 30-210 days ago
+      const nextServiceDays = Math.floor(Math.random() * 60) + 30; // 30-90 days from now
+      const lastService = new Date();
+      lastService.setDate(lastService.getDate() - lastServiceDays);
+      
+      const nextService = new Date();
+      nextService.setDate(nextService.getDate() + nextServiceDays);
+      
+      const serviceInterval = 5000 + Math.floor(Math.random() * 5000); // 5k-10k miles
+      const milesSinceService = Math.floor(Math.random() * serviceInterval);
+      
+      return {
+        ...vehicle,
+        lastService,
+        nextService,
+        milesSinceService,
+        serviceInterval,
+        isOverdue: isBefore(nextService, new Date()),
+        isDueSoon: !isBefore(nextService, new Date()) && isBefore(nextService, addDays(new Date(), 30)),
+        estimatedCost: 150 + Math.floor(Math.random() * 300),
+        serviceType: ['Oil Change', 'Tire Rotation', 'Brake Inspection', 'General Service'][Math.floor(Math.random() * 4)],
+        downtime: Math.floor(Math.random() * 3) + 1, // 1-3 days
+      };
+    });
+  };
+
+  const maintenanceData = generateMaintenanceData(vehicles);
+
+  // Calculate statistics
+  const overdueServices = maintenanceData.filter(v => v.isOverdue);
+  const dueSoonServices = maintenanceData.filter(v => v.isDueSoon);
+  const inMaintenance = vehicles.filter(v => v.status === 'maintenance');
+
+  // Monthly maintenance trend (mock data)
+  const monthlyTrend = [
+    { month: 'Jan', services: 12, cost: 1800 },
+    { month: 'Feb', services: 8, cost: 1200 },
+    { month: 'Mar', services: 15, cost: 2250 },
+    { month: 'Apr', services: 11, cost: 1650 },
+    { month: 'May', services: 9, cost: 1350 },
+    { month: 'Jun', services: 13, cost: 1950 },
+  ];
+
+  // Service type breakdown
+  const serviceTypes = [
+    { type: 'Oil Change', count: 28, avgCost: 75, fill: VEHICLE_CATEGORY_COLORS[0] },
+    { type: 'Tire Rotation', count: 15, avgCost: 50, fill: VEHICLE_CATEGORY_COLORS[1] },
+    { type: 'Brake Inspection', count: 12, avgCost: 200, fill: VEHICLE_CATEGORY_COLORS[2] },
+    { type: 'General Service', count: 22, avgCost: 300, fill: VEHICLE_CATEGORY_COLORS[3] },
+    { type: 'Emergency Repair', count: 8, avgCost: 450, fill: VEHICLE_CATEGORY_COLORS[4] },
+  ];
 
   if (isLoading) {
-    return <div className="text-center py-8">Loading maintenance data...</div>;
+    return <div>Loading maintenance report...</div>;
   }
-
-  // Mock maintenance data
-  const vehiclesDue7Days = 5;
-  const vehiclesDue30Days = 12;
-  const openRepairTickets = 8;
-  const avgDowntime = 2.5;
-
-  const maintenanceSchedule = [
-    {
-      vehicleId: 'V001',
-      make: 'Toyota',
-      model: 'Camry',
-      lastService: '2024-01-15',
-      nextServiceDue: '2024-02-15',
-      openTickets: 1,
-      downtimeDays: 3,
-      status: 'overdue'
-    },
-    {
-      vehicleId: 'V002',
-      make: 'Honda',
-      model: 'Civic',
-      lastService: '2024-01-20',
-      nextServiceDue: '2024-02-20',
-      openTickets: 0,
-      downtimeDays: 0,
-      status: 'due_soon'
-    },
-    {
-      vehicleId: 'V003',
-      make: 'Nissan',
-      model: 'Altima',
-      lastService: '2024-01-10',
-      nextServiceDue: '2024-02-25',
-      openTickets: 2,
-      downtimeDays: 5,
-      status: 'in_service'
-    }
-  ];
-
-  const serviceTypeData = [
-    { type: 'Oil Change', count: 15, avgCost: 45 },
-    { type: 'Tire Rotation', count: 8, avgCost: 25 },
-    { type: 'Brake Service', count: 5, avgCost: 180 },
-    { type: 'Engine Repair', count: 3, avgCost: 350 }
-  ];
-
-  const kpiCards = [
-    {
-      title: 'Due Next 7 Days',
-      value: vehiclesDue7Days,
-      icon: Calendar,
-      color: 'text-orange-600',
-      bgColor: 'bg-orange-50'
-    },
-    {
-      title: 'Due Next 30 Days',
-      value: vehiclesDue30Days,
-      icon: Calendar,
-      color: 'text-yellow-600',
-      bgColor: 'bg-yellow-50'
-    },
-    {
-      title: 'Open Repair Tickets',
-      value: openRepairTickets,
-      icon: AlertTriangle,
-      color: 'text-red-600',
-      bgColor: 'bg-red-50'
-    },
-    {
-      title: 'Avg. Downtime (Days)',
-      value: avgDowntime,
-      icon: Clock,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50'
-    }
-  ];
-
-  const getStatusBadgeVariant = (status: string) => {
-    switch (status) {
-      case 'overdue':
-        return 'destructive';
-      case 'due_soon':
-        return 'secondary';
-      case 'in_service':
-        return 'outline';
-      default:
-        return 'default';
-    }
-  };
-
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case 'overdue':
-        return 'Overdue';
-      case 'due_soon':
-        return 'Due Soon';
-      case 'in_service':
-        return 'In Service';
-      default:
-        return 'Up to Date';
-    }
-  };
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Maintenance & Service Schedule</h1>
-        <p className="text-muted-foreground">Vehicle maintenance tracking and service scheduling</p>
+      {/* Maintenance Overview */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Overdue Services</CardTitle>
+            <AlertTriangle className="h-4 w-4 text-destructive" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-destructive">{overdueServices.length}</div>
+            <p className="text-xs text-muted-foreground">Require immediate attention</p>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Due Soon</CardTitle>
+            <Calendar className="h-4 w-4 text-warning" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-warning">{dueSoonServices.length}</div>
+            <p className="text-xs text-muted-foreground">Due within 30 days</p>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">In Maintenance</CardTitle>
+            <Wrench className="h-4 w-4 text-primary" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{inMaintenance.length}</div>
+            <p className="text-xs text-muted-foreground">Currently being serviced</p>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Avg. Downtime</CardTitle>
+            <Clock className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">2.1 days</div>
+            <p className="text-xs text-muted-foreground">Per service event</p>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {kpiCards.map((kpi, index) => (
-          <Card key={index} className="border-border">
-            <CardContent className="p-4">
-              <div className="flex items-center space-x-3">
-                <div className={`p-2 rounded-lg ${kpi.bgColor}`}>
-                  <kpi.icon className={`h-5 w-5 ${kpi.color}`} />
+      {/* Charts */}
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Monthly Service Trend</CardTitle>
+            <CardDescription>Number of services completed per month</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer
+              config={MONTHLY_TRENDS_CONFIG}
+              className="h-[300px]"
+            >
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={monthlyTrend} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+                  <XAxis 
+                    dataKey="month" 
+                    stroke="hsl(var(--muted-foreground))" 
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <YAxis 
+                    yAxisId="left" 
+                    stroke="hsl(var(--muted-foreground))" 
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <YAxis 
+                    yAxisId="right" 
+                    orientation="right" 
+                    stroke="hsl(var(--muted-foreground))" 
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                    tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
+                  />
+                  <ChartTooltip 
+                    content={<ChartTooltipContent formatter={(value, name) => [
+                      name === 'cost' ? formatCurrency(Number(value)) : formatNumber(Number(value)),
+                      name === 'services' ? 'Services' : 'Cost'
+                    ]} />}
+                  />
+                  <ChartLegend content={<ChartLegendContent />} />
+                  <Line 
+                    yAxisId="left"
+                    type="monotone" 
+                    dataKey="services" 
+                    stroke={MONTHLY_TRENDS_CONFIG.services.color}
+                    strokeWidth={3}
+                    dot={{ fill: MONTHLY_TRENDS_CONFIG.services.color, strokeWidth: 2, r: 6 }}
+                  />
+                  <Line 
+                    yAxisId="right"
+                    type="monotone" 
+                    dataKey="cost" 
+                    stroke={MONTHLY_TRENDS_CONFIG.costs.color}
+                    strokeWidth={3}
+                    dot={{ fill: MONTHLY_TRENDS_CONFIG.costs.color, strokeWidth: 2, r: 6 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </ChartContainer>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Service Type Breakdown</CardTitle>
+            <CardDescription>Most common maintenance services</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer
+              config={serviceTypes.reduce((acc, service, index) => ({
+                ...acc,
+                [service.type.toLowerCase().replace(' ', '_')]: { 
+                  label: service.type, 
+                  color: VEHICLE_CATEGORY_COLORS[index % VEHICLE_CATEGORY_COLORS.length] 
+                }
+              }), {})}
+              className="h-[300px]"
+            >
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={serviceTypes} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+                  <XAxis 
+                    dataKey="type" 
+                    angle={-45} 
+                    textAnchor="end" 
+                    height={80} 
+                    stroke="hsl(var(--muted-foreground))" 
+                    fontSize={11}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <YAxis 
+                    stroke="hsl(var(--muted-foreground))" 
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <ChartTooltip 
+                    content={<ChartTooltipContent formatter={(value, name) => [
+                      formatNumber(Number(value)), 
+                      name === 'count' ? 'Services' : name === 'avgCost' ? 'Avg Cost' : name
+                    ]} />}
+                  />
+                  <ChartLegend content={<ChartLegendContent />} />
+                  <Bar 
+                    dataKey="count" 
+                    radius={[4, 4, 0, 0]} 
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            </ChartContainer>
+            <div className="grid grid-cols-2 gap-2 mt-4 text-sm">
+              {serviceTypes.map((service, index) => (
+                <div key={service.type} className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div 
+                      className="w-3 h-3 rounded-sm" 
+                      style={{ backgroundColor: VEHICLE_CATEGORY_COLORS[index % VEHICLE_CATEGORY_COLORS.length] }}
+                    />
+                    <span>{service.type}</span>
+                  </div>
+                  <span className="font-medium">{formatCurrency(service.avgCost)}</span>
                 </div>
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">{kpi.title}</p>
-                  <p className="text-lg font-bold text-card-foreground">{kpi.value}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Service Type Analysis */}
-      <Card className="border-border">
+      {/* Service Schedule Table */}
+      <Card>
         <CardHeader>
-          <CardTitle className="text-card-foreground">Service Type Analysis</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <SimpleBarChart
-            data={serviceTypeData}
-            xAxisKey="type"
-            bars={[
-              { dataKey: 'count', name: 'Service Count', color: 'hsl(var(--chart-1))' },
-              { dataKey: 'avgCost', name: 'Avg Cost ($)', color: 'hsl(var(--chart-2))' }
-            ]}
-            height={300}
-          />
-        </CardContent>
-      </Card>
-
-      {/* Maintenance Schedule Table */}
-      <Card className="border-border">
-        <CardHeader>
-          <CardTitle className="text-card-foreground">Maintenance Schedule</CardTitle>
+          <CardTitle>Service Schedule</CardTitle>
+          <CardDescription className="text-card-foreground">Upcoming maintenance for all vehicles</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
-            <TableHeader>
+            <TableHeader className="bg-muted">
               <TableRow>
-                <TableHead className="text-muted-foreground">Vehicle ID</TableHead>
-                <TableHead className="text-muted-foreground">Vehicle</TableHead>
-                <TableHead className="text-muted-foreground">Last Service</TableHead>
-                <TableHead className="text-muted-foreground">Next Service Due</TableHead>
-                <TableHead className="text-muted-foreground">Open Tickets</TableHead>
-                <TableHead className="text-muted-foreground">Downtime Days</TableHead>
-                <TableHead className="text-muted-foreground">Status</TableHead>
+                <TableHead>Vehicle</TableHead>
+                <TableHead>License Plate</TableHead>
+                <TableHead>Last Service</TableHead>
+                <TableHead>Next Service</TableHead>
+                <TableHead>Service Type</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Est. Cost</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {maintenanceSchedule.map((item) => (
-                <TableRow key={item.vehicleId} className="hover:bg-muted/50 cursor-pointer">
-                  <TableCell className="font-mono text-sm text-card-foreground">{item.vehicleId}</TableCell>
-                  <TableCell className="text-card-foreground">{item.make} {item.model}</TableCell>
-                  <TableCell className="text-muted-foreground">{item.lastService}</TableCell>
-                  <TableCell className="text-muted-foreground">{item.nextServiceDue}</TableCell>
-                  <TableCell className="text-center">
-                    {item.openTickets > 0 ? (
-                      <Badge variant="destructive">{item.openTickets}</Badge>
-                    ) : (
-                      <span className="text-muted-foreground">-</span>
-                    )}
-                  </TableCell>
-                  <TableCell className="text-center text-card-foreground">{item.downtimeDays}</TableCell>
+              {maintenanceData
+                .sort((a, b) => a.nextService.getTime() - b.nextService.getTime())
+                .slice(0, 20)
+                .map((vehicle) => (
+                <TableRow key={vehicle.id}>
                   <TableCell>
-                    <Badge variant={getStatusBadgeVariant(item.status)}>
-                      {getStatusLabel(item.status)}
+                    {vehicle.make} {vehicle.model} ({vehicle.year})
+                  </TableCell>
+                  <TableCell className="font-mono">{vehicle.license_plate}</TableCell>
+                  <TableCell>
+                    {formatDistanceToNow(vehicle.lastService, { addSuffix: true })}
+                  </TableCell>
+                  <TableCell>
+                    {formatDistanceToNow(vehicle.nextService, { addSuffix: true })}
+                  </TableCell>
+                  <TableCell>{vehicle.serviceType}</TableCell>
+                  <TableCell>
+                    <Badge variant={
+                      vehicle.isOverdue ? 'destructive' : 
+                      vehicle.isDueSoon ? 'outline' : 'default'
+                    }>
+                      {vehicle.isOverdue ? 'Overdue' : 
+                       vehicle.isDueSoon ? 'Due Soon' : 'Scheduled'}
                     </Badge>
                   </TableCell>
+                  <TableCell>{formatCurrency(vehicle.estimatedCost)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </CardContent>
       </Card>
+
+      {/* Current Maintenance Jobs */}
+      {inMaintenance.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Current Maintenance Jobs</CardTitle>
+            <CardDescription>Vehicles currently being serviced</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Vehicle</TableHead>
+                  <TableHead>Location</TableHead>
+                  <TableHead>Started</TableHead>
+                  <TableHead>Est. Completion</TableHead>
+                  <TableHead>Status</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {inMaintenance.map((vehicle) => (
+                  <TableRow key={vehicle.id}>
+                    <TableCell>
+                      {vehicle.make} {vehicle.model} ({vehicle.year})
+                    </TableCell>
+                    <TableCell>{vehicle.location || 'Main Garage'}</TableCell>
+                    <TableCell>2 days ago</TableCell>
+                    <TableCell>Tomorrow</TableCell>
+                    <TableCell>
+                      <Badge variant="outline">In Progress</Badge>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };

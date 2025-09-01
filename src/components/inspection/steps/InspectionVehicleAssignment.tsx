@@ -94,7 +94,7 @@ export const InspectionVehicleAssignment: React.FC<InspectionVehicleAssignmentPr
                 <p className="font-medium">
                   {currentVehicle.year} {currentVehicle.make} {currentVehicle.model}
                 </p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-card-foreground">
                   License: {currentVehicle.license_plate}
                 </p>
               </div>
@@ -128,7 +128,7 @@ export const InspectionVehicleAssignment: React.FC<InspectionVehicleAssignmentPr
             />
 
           {selectedVehicle && (
-            <div className="p-4 bg-muted rounded-lg">
+            <div className="p-4 bg-muted rounded-lg text-muted-foreground">
               <h4 className="font-medium mb-2">Selected Vehicle Details</h4>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>

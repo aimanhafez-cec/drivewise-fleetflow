@@ -305,7 +305,7 @@ const Dashboard = () => {
           <Button variant="ghost" size="sm" className="lg:hidden text-white hover:bg-teal-overlay" onClick={() => setSidebarCollapsed(!sidebarCollapsed)}>
             <Menu className="h-5 w-5" />
           </Button>
-          <div className="text-xl font-bold text-white">FleetMaster</div>
+          <div className="text-xl font-bold text-white">Fleet Master</div>
         </div>
         
         <div className="flex-1 max-w-md mx-8">
@@ -362,7 +362,7 @@ const Dashboard = () => {
                       <app.icon className="h-6 w-6 text-white" />
                     </div>
                     <div>
-                      <h3 className="text-white font-medium">{app.name}</h3>
+                      <h3 className="text-black font-medium">{app.name}</h3>
                     </div>
                   </CardContent>
                 </Card>)}
@@ -383,8 +383,8 @@ const Dashboard = () => {
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-white/80 mb-1">{stat.title}</p>
-                      <p className="text-2xl font-bold text-white">{stat.value}</p>
+                      <p className="text-sm text-black/80 mb-1">{stat.title}</p>
+                      <p className="text-2xl font-bold text-black">{stat.value}</p>
                     </div>
                     <div className={`p-2 rounded-lg ${stat.iconBg}`}>
                       <stat.icon className={`h-5 w-5 ${stat.color}`} />
@@ -399,19 +399,19 @@ const Dashboard = () => {
             {/* Quick Lookup */}
             <Card className="bg-card border-0 shadow-card rounded-xl">
               <CardHeader>
-                <CardTitle className="text-white">Quick Lookup</CardTitle>
+                <CardTitle className="text-black">Quick Lookup</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex gap-2">
                   <Select defaultValue="license">
-                    <SelectTrigger className="w-32 bg-white/10 text-white border-white/20">
+                    <SelectTrigger className="w-32 bg-black/10 text-black border-black/20">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-card border-white/20">
-                      <SelectItem value="license" className="text-white">License No.</SelectItem>
+                    <SelectContent className="bg-card border-black/20">
+                      <SelectItem value="license" className="text-black">License No.</SelectItem>
                     </SelectContent>
                   </Select>
-                  <Input placeholder="License No." className="flex-1 bg-white/10 text-white placeholder:text-white/70 border-white/20" />
+                  <Input placeholder="License No." className="flex-1 bg-black/10 text-black placeholder:text-black/70 border-black/20" />
                   <Button className="bg-teal-accent hover:bg-teal-light text-white px-6">
                     Search
                   </Button>
@@ -422,15 +422,15 @@ const Dashboard = () => {
             {/* Customer Agreement Search */}
             <Card className="bg-card border-0 shadow-card rounded-xl">
               <CardHeader>
-                <CardTitle className="text-white">Search Customer Agreements</CardTitle>
+                <CardTitle className="text-black">Search Customer Agreements</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex gap-2">
-                  <Input placeholder="Enter customer name..." className="flex-1 bg-white/10 text-white placeholder:text-white/70 border-white/20" value={customerSearchTerm} onChange={e => {
+                  <Input placeholder="Enter customer name..." className="flex-1 bg-black/10 text-black placeholder:text-black/70 border-black/20" value={customerSearchTerm} onChange={e => {
                   setCustomerSearchTerm(e.target.value);
                   searchCustomerAgreements();
                 }} />
-                  <Button className="bg-teal-accent hover:bg-teal-light text-white px-6" onClick={searchCustomerAgreements}>
+                  <Button className="bg-teal-accent hover:bg-teal-light text-black px-6" onClick={searchCustomerAgreements}>
                     Search
                   </Button>
                 </div>
@@ -440,19 +440,19 @@ const Dashboard = () => {
                     {searchResults.map(agreement => <div key={agreement.id} className="p-3 bg-teal-overlay/20 border border-teal-light rounded-lg hover:bg-teal-overlay/40 cursor-pointer transition-colors" onClick={() => navigate(`/agreements/${agreement.id}`)}>
                         <div className="flex justify-between items-start">
                           <div>
-                            <p className="font-medium text-white">{agreement.customers?.full_name}</p>
-                            <p className="text-sm text-white/80">
+                            <p className="font-medium text-black">{agreement.customers?.full_name}</p>
+                            <p className="text-sm text-black/80">
                               Agreement #{agreement.agreement_no || 'N/A'}
                             </p>
-                            <p className="text-sm text-white/80">
+                            <p className="text-sm text-black/80">
                               {agreement.vehicles ? `${agreement.vehicles.year} ${agreement.vehicles.make} ${agreement.vehicles.model} (${agreement.vehicles.license_plate})` : 'No vehicle assigned'}
                             </p>
                           </div>
                           <div className="text-right">
-                            <p className="text-sm font-medium text-white">
+                            <p className="text-sm font-medium text-black">
                               AED {agreement.total_amount || '0.00'}
                             </p>
-                            <p className="text-xs text-white/80 capitalize">
+                            <p className="text-xs text-black/80 capitalize">
                               {agreement.status}
                             </p>
                           </div>
@@ -460,7 +460,7 @@ const Dashboard = () => {
                       </div>)}
                   </div>}
                 
-                {customerSearchTerm && searchResults.length === 0 && <p className="text-white/80 text-sm mt-2">No agreements found for this customer.</p>}
+                {customerSearchTerm && searchResults.length === 0 && <p className="text-black/80 text-sm mt-2">No agreements found for this customer.</p>}
               </CardContent>
             </Card>
           </div>
@@ -469,19 +469,19 @@ const Dashboard = () => {
             {/* Vehicle Status */}
             <Card className="bg-card border-0 shadow-card rounded-xl">
               <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle className="text-white">Vehicle Status</CardTitle>
+                <CardTitle className="text-black">Vehicle Status</CardTitle>
                 <Select defaultValue="fullsize">
-                  <SelectTrigger className="w-32 bg-white/10 text-white border-white/20">
+                  <SelectTrigger className="w-32 bg-black/10 text-black border-black/20">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-card border-white/20">
-                    <SelectItem value="fullsize" className="text-white">Full Size</SelectItem>
+                  <SelectContent className="bg-card border-black/20">
+                    <SelectItem value="fullsize" className="text-black">Full Size</SelectItem>
                   </SelectContent>
                 </Select>
               </CardHeader>
               <CardContent>
                 <div className="flex items-center gap-6">
-                  <div className="relative w-32 h-32 flex-shrink-0 border border-white/20 rounded">
+                  <div className="relative w-32 h-32 flex-shrink-0 border border-black/20 rounded">
                     {vehicleStatusData.length > 0 ? (
                       <PieChart width={128} height={128}>
                         <Pie 
@@ -508,15 +508,15 @@ const Dashboard = () => {
                         />
                       </PieChart>
                     ) : (
-                      <div className="flex items-center justify-center w-full h-full text-white text-xs">
+                      <div className="flex items-center justify-center w-full h-full text-black text-xs">
                         Loading chart...
                       </div>
                     )}
                     <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                      <span className="text-lg font-bold text-white">
+                      <span className="text-lg font-bold text-black">
                         {vehicleStatusData.reduce((sum, item) => sum + item.value, 0)}
                       </span>
-                      <span className="text-xs text-white/80">Total</span>
+                      <span className="text-xs text-black/80">Total</span>
                     </div>
                   </div>
                   <div className="flex-1 min-w-0">
@@ -527,9 +527,9 @@ const Dashboard = () => {
                             className="w-3 h-3 rounded-full flex-shrink-0" 
                             style={{ backgroundColor: item.color }}
                           />
-                          <span className="text-sm text-white">{item.name}</span>
+                          <span className="text-sm text-black">{item.name}</span>
                         </div>
-                        <span className="text-sm font-medium text-white">{item.value}</span>
+                        <span className="text-sm font-medium text-black">{item.value}</span>
                       </div>
                     ))}
                   </div>
@@ -540,32 +540,32 @@ const Dashboard = () => {
             {/* Rate Summary */}
             <Card className="bg-card border-0 shadow-card rounded-xl">
               <CardHeader>
-                <CardTitle className="text-white">Rate Summary</CardTitle>
+                <CardTitle className="text-black">Rate Summary</CardTitle>
               </CardHeader>
               <CardContent>
                  <div className="grid grid-cols-3 gap-2 mb-4">
                    <Select defaultValue="middletown">
-                     <SelectTrigger className="bg-white/10 text-white border-white/20">
+                     <SelectTrigger className="bg-black/10 text-black border-black/20">
                        <SelectValue />
                      </SelectTrigger>
-                     <SelectContent className="bg-card border-white/20">
-                       <SelectItem value="middletown" className="text-white">Middletown</SelectItem>
+                     <SelectContent className="bg-card border-black/20">
+                       <SelectItem value="middletown" className="text-black">Middletown</SelectItem>
                      </SelectContent>
                    </Select>
                    <Select defaultValue="base">
-                     <SelectTrigger className="bg-white/10 text-white border-white/20">
+                     <SelectTrigger className="bg-black/10 text-black border-black/20">
                        <SelectValue />
                      </SelectTrigger>
-                     <SelectContent className="bg-card border-white/20">
-                       <SelectItem value="base" className="text-white">base</SelectItem>
+                     <SelectContent className="bg-card border-black/20">
+                       <SelectItem value="base" className="text-black">base</SelectItem>
                      </SelectContent>
                    </Select>
                    <Select defaultValue="daily">
-                     <SelectTrigger className="bg-white/10 text-white border-white/20">
+                     <SelectTrigger className="bg-black/10 text-black border-black/20">
                        <SelectValue />
                      </SelectTrigger>
-                     <SelectContent className="bg-card border-white/20">
-                       <SelectItem value="daily" className="text-white">Daily</SelectItem>
+                     <SelectContent className="bg-card border-black/20">
+                       <SelectItem value="daily" className="text-black">Daily</SelectItem>
                      </SelectContent>
                    </Select>
                  </div>
@@ -580,9 +580,9 @@ const Dashboard = () => {
                     </TableHeader>
                     <TableBody>
                       {rateData.map((row, index) => <TableRow key={index} className="border-teal-light hover:bg-teal-overlay/20">
-                          <TableCell className="font-medium text-white">{row.vehicleType}</TableCell>
-                           <TableCell className="text-white">{row.mileage}</TableCell>
-                           <TableCell className="text-white">{row.rate}</TableCell>
+                          <TableCell className="font-medium text-black">{row.vehicleType}</TableCell>
+                           <TableCell className="text-black">{row.mileage}</TableCell>
+                           <TableCell className="text-black">{row.rate}</TableCell>
                         </TableRow>)}
                     </TableBody>
                   </Table>
@@ -594,10 +594,10 @@ const Dashboard = () => {
           {/* Sales Status */}
           <Card className="bg-card border-0 shadow-card rounded-xl">
             <CardHeader>
-              <CardTitle className="text-white">Sales Status</CardTitle>
+              <CardTitle className="text-black">Sales Status</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="h-64 w-full border border-white/20 rounded p-4">
+              <div className="h-64 w-full border border-black/20 rounded p-4">
                 {salesData.length > 0 ? (
                   <AreaChart 
                     width={400}
@@ -608,21 +608,21 @@ const Dashboard = () => {
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(199,228,229,0.3)" />
                     <XAxis 
                       dataKey="name" 
-                      stroke="#FFFFFF" 
+                      stroke="#000000ff" 
                       fontSize={12}
-                      tick={{ fill: '#FFFFFF' }}
+                      tick={{ fill: '#000000ff' }}
                     />
                     <YAxis 
-                      stroke="#FFFFFF" 
+                      stroke="#000000ff" 
                       fontSize={12}
-                      tick={{ fill: '#FFFFFF' }}
+                      tick={{ fill: '#000000ff' }}
                     />
                     <Tooltip 
                       contentStyle={{
                         backgroundColor: '#0A7A7D',
                         border: '1px solid #33CFCF',
                         borderRadius: '8px',
-                        color: '#FFFFFF'
+                        color: '#000000ff'
                       }} 
                     />
                     <Area 

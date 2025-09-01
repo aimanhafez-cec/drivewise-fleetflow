@@ -257,7 +257,7 @@ export const InspectionChecklist: React.FC<InspectionChecklistProps> = ({
                 <div key={item.id} className="space-y-3">
                   <div>
                     <h4 className="font-medium">{item.name}</h4>
-                    <p className="text-sm text-muted-foreground">{item.description}</p>
+                    <p className="text-sm text-card-foreground">{item.description}</p>
                   </div>
                   
                   <RadioGroup
@@ -333,6 +333,7 @@ export const InspectionChecklist: React.FC<InspectionChecklistProps> = ({
                     size="sm"
                     variant="outline"
                     onClick={() => handleAddExtraDamage(section.name)}
+                    className="text-muted-foreground"
                   >
                     <Plus className="h-3 w-3 mr-1" />
                     Add Damage

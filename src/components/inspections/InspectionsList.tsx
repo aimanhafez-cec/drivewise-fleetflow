@@ -153,7 +153,7 @@ export const InspectionsList: React.FC<InspectionsListProps> = ({
       <CardContent className="p-0">
         <Table>
           <TableHeader>
-            <TableRow>
+            <TableRow className="bg-muted">
               <TableHead>Inspection</TableHead>
               <TableHead>Vehicle</TableHead>
               <TableHead>Agreement/Reservation</TableHead>
@@ -173,7 +173,7 @@ export const InspectionsList: React.FC<InspectionsListProps> = ({
                       <p className="font-medium">
                         {inspection.type} #{inspection.id.slice(0, 8)}
                       </p>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-card-foreground">
                         {inspection.type === 'OUT' ? 'Check-Out' : 
                          inspection.type === 'IN' ? 'Check-In' : 'Standard'} Inspection
                       </p>
@@ -183,7 +183,7 @@ export const InspectionsList: React.FC<InspectionsListProps> = ({
                 
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <Car className="h-4 w-4 text-muted-foreground" />
+                    <Car className="h-4 w-4 text-card-foreground" />
                     <span className="text-sm">{getVehicleInfo(inspection)}</span>
                   </div>
                 </TableCell>
@@ -194,7 +194,7 @@ export const InspectionsList: React.FC<InspectionsListProps> = ({
                 
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-muted-foreground" />
+                    <Clock className="h-4 w-4 text-card-foreground" />
                     <span className="text-sm">
                       {formatDate(inspection.performed_at || inspection.inspection_date || '')}
                     </span>
@@ -204,11 +204,11 @@ export const InspectionsList: React.FC<InspectionsListProps> = ({
                 <TableCell>
                   {inspection.location_id ? (
                     <div className="flex items-center gap-2">
-                      <MapPin className="h-4 w-4 text-muted-foreground" />
+                      <MapPin className="h-4 w-4 text-card-foreground" />
                       <span className="text-sm">{inspection.location_id}</span>
                     </div>
                   ) : (
-                    <span className="text-sm text-muted-foreground">-</span>
+                    <span className="text-sm text-card-foreground">-</span>
                   )}
                 </TableCell>
                 

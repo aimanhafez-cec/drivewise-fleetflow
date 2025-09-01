@@ -39,6 +39,8 @@ import CorporateLeasing from "./pages/CorporateLeasing";
 import NewCorporateLeasing from "./pages/NewCorporateLeasing";
 import CorporateLeasingDetails from "./pages/CorporateLeasingDetails";
 import CorporateLeasingEdit from "./pages/CorporateLeasingEdit";
+import { CarSubscriptions } from "./pages/CarSubscriptions";
+import { NewCarSubscription } from "./pages/NewCarSubscription";
 
 
 const queryClient = new QueryClient();
@@ -67,7 +69,7 @@ const App = () => (
             }>
               <Route index element={<InstantBooking />} />
             </Route>
-              <Route path="/reservations" element={
+            <Route path="/reservations" element={
                 <ProtectedRoute>
                   <AppLayout />
                 </ProtectedRoute>
@@ -173,6 +175,14 @@ const App = () => (
               <Route path="new" element={<NewCorporateLeasing />} />
               <Route path=":id" element={<CorporateLeasingDetails />} />
               <Route path=":id/edit" element={<CorporateLeasingEdit />} />
+            </Route>
+            <Route path="/car-subscriptions" element={
+              <ProtectedRoute>
+                <AppLayout />
+              </ProtectedRoute>
+            }>
+              <Route index element={<CarSubscriptions />} />
+              <Route path="new" element={<NewCarSubscription />} />
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

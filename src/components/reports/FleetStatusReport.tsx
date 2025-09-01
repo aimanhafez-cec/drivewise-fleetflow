@@ -1,187 +1,274 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { SimplePieChart, SimpleBarChart } from '@/components/charts';
-import { Car, Users, Wrench, Clock, TrendingUp, AlertCircle } from 'lucide-react';
-import { useAllVehicles } from '@/hooks/useVehicles';
+import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from '@/components/ui/chart';
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
+import { DateRange } from 'react-day-picker';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { AlertTriangle, Car, CheckCircle, Wrench } from 'lucide-react';
+import { formatCurrency } from '@/lib/utils/currency';
+import { FLEET_STATUS_CONFIG, VEHICLE_CATEGORY_COLORS } from '@/lib/chartConfig';
+import { formatNumber, percentageTooltipFormatter } from '@/lib/utils/chartUtils';
 
 interface FleetStatusReportProps {
-  dateRange: { from: Date; to: Date };
-  filters: {
-    branch: string;
-    vehicleType: string;
-    status: string;
-  };
+  dateRange?: DateRange;
 }
 
-const FleetStatusReport: React.FC<FleetStatusReportProps> = ({ dateRange, filters }) => {
-  const { data: vehicles = [], isLoading } = useAllVehicles();
+const FleetStatusReport = ({ dateRange }: FleetStatusReportProps) => {
+  // Fetch vehicles data
+  const { data: vehicles = [], isLoading } = useQuery({
+    queryKey: ['vehicles-fleet-status'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('vehicles')
+        .select('id, make, model, year, license_plate, status, category_id, location, daily_rate, created_at')
+        .order('make, model');
+      
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
+  // Fetch reservations for utilization calculation
+  const { data: reservations = [] } = useQuery({
+    queryKey: ['reservations-utilization', dateRange],
+    queryFn: async () => {
+      let query = supabase
+        .from('reservations')
+        .select('id, vehicle_id, start_datetime, end_datetime, status');
+      
+      if (dateRange?.from) {
+        query = query.gte('start_datetime', dateRange.from.toISOString());
+      }
+      if (dateRange?.to) {
+        query = query.lte('end_datetime', dateRange.to.toISOString());
+      }
+
+      const { data, error } = await query;
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
+  // Process data
+  const statusCounts = vehicles.reduce((acc, vehicle) => {
+    acc[vehicle.status] = (acc[vehicle.status] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  const pieData = Object.entries(statusCounts).map(([status, count]) => ({
+    name: status.replace('_', ' ').toUpperCase(),
+    value: count,
+    color: getStatusColor(status),
+  }));
+
+  // Calculate utilization by location
+  const utilizationByLocation = vehicles.reduce((acc, vehicle) => {
+    if (!vehicle.location) return acc;
+    
+    const vehicleReservations = reservations.filter(r => r.vehicle_id === vehicle.id);
+    const totalDays = dateRange?.from && dateRange?.to 
+      ? Math.ceil((dateRange.to.getTime() - dateRange.from.getTime()) / (1000 * 60 * 60 * 24))
+      : 30;
+    
+    const rentalDays = vehicleReservations.reduce((sum, res) => {
+      if (!res.start_datetime || !res.end_datetime) return sum;
+      const start = new Date(res.start_datetime);
+      const end = new Date(res.end_datetime);
+      return sum + Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+    }, 0);
+    
+    if (!acc[vehicle.location]) {
+      acc[vehicle.location] = { totalVehicles: 0, totalRentalDays: 0, totalPossibleDays: 0 };
+    }
+    
+    acc[vehicle.location].totalVehicles++;
+    acc[vehicle.location].totalRentalDays += rentalDays;
+    acc[vehicle.location].totalPossibleDays += totalDays;
+    
+    return acc;
+  }, {} as Record<string, { totalVehicles: number; totalRentalDays: number; totalPossibleDays: number }>);
+
+  const utilizationData = Object.entries(utilizationByLocation).map(([location, data]) => ({
+    location,
+    utilization: data.totalPossibleDays > 0 
+      ? Math.round((data.totalRentalDays / data.totalPossibleDays) * 100)
+      : 0,
+    vehicles: data.totalVehicles,
+  }));
 
   if (isLoading) {
-    return <div className="text-center py-8">Loading fleet data...</div>;
+    return <div>Loading fleet status...</div>;
   }
-
-  // Calculate KPIs
-  const totalVehicles = vehicles.length;
-  const availableVehicles = vehicles.filter(v => v.status === 'available').length;
-  const rentedVehicles = vehicles.filter(v => v.status === 'rented').length;
-  const maintenanceVehicles = vehicles.filter(v => v.status === 'maintenance').length;
-  const utilizationRate = totalVehicles > 0 ? Math.round((rentedVehicles / totalVehicles) * 100) : 0;
-  const overdueReturns = 3; // Mock data
-
-  // Chart data
-  const statusData = [
-    { name: 'Available', value: availableVehicles, fill: 'hsl(var(--chart-1))' },
-    { name: 'Rented', value: rentedVehicles, fill: 'hsl(var(--chart-2))' },
-    { name: 'Maintenance', value: maintenanceVehicles, fill: 'hsl(var(--chart-3))' }
-  ];
-
-  const utilizationData = [
-    { location: 'Downtown', utilization: 85 },
-    { location: 'Airport', utilization: 92 },
-    { location: 'Mall', utilization: 67 },
-    { location: 'North Branch', utilization: 74 }
-  ];
-
-  const kpiCards = [
-    {
-      title: 'Total Vehicles',
-      value: totalVehicles,
-      icon: Car,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50'
-    },
-    {
-      title: 'Available',
-      value: availableVehicles,
-      icon: Car,
-      color: 'text-green-600',
-      bgColor: 'bg-green-50'
-    },
-    {
-      title: 'Rented',
-      value: rentedVehicles,
-      icon: Users,
-      color: 'text-orange-600',
-      bgColor: 'bg-orange-50'
-    },
-    {
-      title: 'In Maintenance',
-      value: maintenanceVehicles,
-      icon: Wrench,
-      color: 'text-red-600',
-      bgColor: 'bg-red-50'
-    },
-    {
-      title: 'Utilization %',
-      value: `${utilizationRate}%`,
-      icon: TrendingUp,
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-50'
-    },
-    {
-      title: 'Overdue Returns',
-      value: overdueReturns,
-      icon: AlertCircle,
-      color: 'text-red-600',
-      bgColor: 'bg-red-50'
-    }
-  ];
-
-  const getStatusBadgeVariant = (status: string) => {
-    switch (status) {
-      case 'available':
-        return 'default';
-      case 'rented':
-        return 'secondary';
-      case 'maintenance':
-        return 'destructive';
-      default:
-        return 'outline';
-    }
-  };
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Fleet Status & Utilization</h1>
-        <p className="text-muted-foreground">Overview of vehicle availability and utilization metrics</p>
-      </div>
-
-      {/* KPI Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        {kpiCards.map((kpi, index) => (
-          <Card key={index} className="border-border">
-            <CardContent className="p-4">
-              <div className="flex items-center space-x-3">
-                <div className={`p-2 rounded-lg ${kpi.bgColor}`}>
-                  <kpi.icon className={`h-5 w-5 ${kpi.color}`} />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">{kpi.title}</p>
-                  <p className="text-lg font-bold text-card-foreground">{kpi.value}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+      {/* Status Overview */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Available</CardTitle>
+            <CheckCircle className="h-4 w-4 text-success" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{statusCounts.available || 0}</div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Rented</CardTitle>
+            <Car className="h-4 w-4 text-primary" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{statusCounts.rented || 0}</div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Maintenance</CardTitle>
+            <Wrench className="h-4 w-4 text-warning" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{statusCounts.maintenance || 0}</div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Out of Service</CardTitle>
+            <AlertTriangle className="h-4 w-4 text-destructive" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{statusCounts.out_of_service || 0}</div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="border-border">
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card>
           <CardHeader>
-            <CardTitle className="text-card-foreground">Fleet Status Distribution</CardTitle>
+            <CardTitle>Fleet Status Distribution</CardTitle>
+            <CardDescription>Current status breakdown of all vehicles</CardDescription>
           </CardHeader>
           <CardContent>
-            <SimplePieChart data={statusData} height={300} />
+            <ChartContainer
+              config={FLEET_STATUS_CONFIG}
+              className="h-[300px]"
+            >
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={pieData.map(item => ({
+                      name: item.name.toLowerCase().replace(' ', '_'),
+                      value: item.value,
+                    }))}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={100}
+                    paddingAngle={5}
+                    dataKey="value"
+                    nameKey="name"
+                  >
+                    {pieData.map((entry, index) => (
+                      <Cell 
+                        key={`cell-${index}`} 
+                        fill={FLEET_STATUS_CONFIG[entry.name.toLowerCase().replace(' ', '_') as keyof typeof FLEET_STATUS_CONFIG]?.color || VEHICLE_CATEGORY_COLORS[index % VEHICLE_CATEGORY_COLORS.length]} 
+                        stroke="hsl(var(--background))" 
+                        strokeWidth={2} 
+                      />
+                    ))}
+                  </Pie>
+                  <ChartTooltip 
+                    content={<ChartTooltipContent formatter={(value, name) => [formatNumber(Number(value)), name]} />} 
+                  />
+                  <ChartLegend content={<ChartLegendContent />} />
+                </PieChart>
+              </ResponsiveContainer>
+            </ChartContainer>
           </CardContent>
         </Card>
 
-        <Card className="border-border">
+        <Card>
           <CardHeader>
-            <CardTitle className="text-card-foreground">Utilization by Location</CardTitle>
+            <CardTitle>Utilization by Location</CardTitle>
+            <CardDescription>Fleet utilization percentage by location</CardDescription>
           </CardHeader>
           <CardContent>
-            <SimpleBarChart
-              data={utilizationData}
-              xAxisKey="location"
-              bars={[{ dataKey: 'utilization', name: 'Utilization %', color: 'hsl(var(--chart-2))' }]}
-              height={300}
-            />
+            <ChartContainer
+              config={{
+                utilization: { label: "Fleet Utilization", color: "hsl(220, 91%, 60%)" },
+              }}
+              className="h-[300px]"
+            >
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={utilizationData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+                  <XAxis 
+                    dataKey="location" 
+                    stroke="hsl(var(--muted-foreground))" 
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <YAxis 
+                    stroke="hsl(var(--muted-foreground))" 
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                    tickFormatter={(value) => `${value}%`}
+                  />
+                  <ChartTooltip 
+                    content={<ChartTooltipContent formatter={percentageTooltipFormatter} />} 
+                  />
+                  <Bar 
+                    dataKey="utilization" 
+                    fill="hsl(220, 91%, 60%)" 
+                    radius={[4, 4, 0, 0]} 
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            </ChartContainer>
           </CardContent>
         </Card>
       </div>
 
-      {/* Vehicle Table */}
-      <Card className="border-border">
+      {/* Detailed Vehicle List */}
+      <Card>
         <CardHeader>
-          <CardTitle className="text-card-foreground">Vehicle Details</CardTitle>
+          <CardTitle>Vehicle Status Details</CardTitle>
+          <CardDescription className="text-card-foreground">Complete list of vehicles with current status and location</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
-            <TableHeader>
+            <TableHeader className="bg-muted">
               <TableRow>
-                <TableHead className="text-muted-foreground">Vehicle ID</TableHead>
-                <TableHead className="text-muted-foreground">Make & Model</TableHead>
-                <TableHead className="text-muted-foreground">Status</TableHead>
-                <TableHead className="text-muted-foreground">Location</TableHead>
-                <TableHead className="text-muted-foreground">License Plate</TableHead>
+                <TableHead>Vehicle</TableHead>
+                <TableHead>License Plate</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Location</TableHead>
+                <TableHead>Daily Rate</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {vehicles.slice(0, 10).map((vehicle) => (
-                <TableRow key={vehicle.id} className="hover:bg-muted/50 cursor-pointer">
-                  <TableCell className="font-mono text-sm text-card-foreground">{vehicle.id.slice(0, 8)}</TableCell>
-                  <TableCell className="text-card-foreground">{vehicle.make} {vehicle.model} ({vehicle.year})</TableCell>
+              {vehicles.map((vehicle) => (
+                <TableRow key={vehicle.id}>
                   <TableCell>
-                    <Badge variant={getStatusBadgeVariant(vehicle.status)}>
-                      {vehicle.status}
+                    {vehicle.make} {vehicle.model} ({vehicle.year})
+                  </TableCell>
+                  <TableCell className="font-mono">{vehicle.license_plate}</TableCell>
+                  <TableCell>
+                    <Badge variant={getStatusVariant(vehicle.status)}>
+                      {vehicle.status.replace('_', ' ')}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-muted-foreground">Downtown</TableCell>
-                  <TableCell className="font-mono text-sm text-card-foreground">{vehicle.license_plate}</TableCell>
+                  <TableCell>{vehicle.location || 'Not Set'}</TableCell>
+                  <TableCell>{formatCurrency(vehicle.daily_rate || 0)}/day</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -191,5 +278,25 @@ const FleetStatusReport: React.FC<FleetStatusReportProps> = ({ dateRange, filter
     </div>
   );
 };
+
+function getStatusColor(status: string): string {
+  switch (status) {
+    case 'available': return 'hsl(var(--success))';
+    case 'rented': return 'hsl(var(--primary))';
+    case 'maintenance': return 'hsl(var(--warning))';
+    case 'out_of_service': return 'hsl(var(--destructive))';
+    default: return 'hsl(var(--muted))';
+  }
+}
+
+function getStatusVariant(status: string): "default" | "secondary" | "destructive" | "outline" {
+  switch (status) {
+    case 'available': return 'default';
+    case 'rented': return 'secondary';
+    case 'maintenance': return 'outline';
+    case 'out_of_service': return 'destructive';
+    default: return 'outline';
+  }
+}
 
 export default FleetStatusReport;

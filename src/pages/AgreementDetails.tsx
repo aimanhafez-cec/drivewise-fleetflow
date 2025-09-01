@@ -205,23 +205,23 @@ const AgreementDetails = () => {
         {/* Customer Information */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg text-white">Customer Information</CardTitle>
+            <CardTitle className="text-lg text-card-foreground">Customer Information</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <p className="text-sm font-medium text-white">Customer Name</p>
-              <p className="font-medium text-white">
+              <p className="text-sm font-medium text-card-foreground">Customer Name</p>
+              <p className="font-medium text-card-foreground">
                 {agreement.profiles?.full_name || 'Unknown Customer'}
               </p>
             </div>
             <div>
-              <p className="text-sm font-medium text-white">Email</p>
-              <p className="text-white">{agreement.profiles?.email || 'N/A'}</p>
+              <p className="text-sm font-medium text-card-foreground">Email</p>
+              <p className="text-card-foreground">{agreement.profiles?.email || 'N/A'}</p>
             </div>
             {agreement.profiles?.phone && (
               <div>
-                <p className="text-sm font-medium text-white">Phone</p>
-                <p className="text-white">{agreement.profiles.phone}</p>
+                <p className="text-sm font-medium text-card-foreground">Phone</p>
+                <p className="text-card-foreground">{agreement.profiles.phone}</p>
               </div>
             )}
           </CardContent>
@@ -230,7 +230,7 @@ const AgreementDetails = () => {
         {/* Vehicle Information */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg text-white">Vehicle Information</CardTitle>
+            <CardTitle className="text-lg text-card-foreground">Vehicle Information</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {(() => {
@@ -238,34 +238,34 @@ const AgreementDetails = () => {
               return vehicleFromLine ? (
                 <>
                   <div>
-                    <p className="text-sm font-medium text-white">Vehicle</p>
-                    <p className="font-medium text-white">
+                    <p className="text-sm font-medium text-card-foreground">Vehicle</p>
+                    <p className="font-medium text-card-foreground">
                       {vehicleFromLine.year} {vehicleFromLine.make} {vehicleFromLine.model}
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-white">License Plate</p>
-                    <p className="text-white">{vehicleFromLine.license_plate}</p>
+                    <p className="text-sm font-medium text-card-foreground">License Plate</p>
+                    <p className="text-card-foreground">{vehicleFromLine.license_plate}</p>
                   </div>
                   {vehicleFromLine.color && (
                     <div>
-                      <p className="text-sm font-medium text-white">Color</p>
-                      <p className="text-white">{vehicleFromLine.color}</p>
+                      <p className="text-sm font-medium text-card-foreground">Color</p>
+                      <p className="text-card-foreground">{vehicleFromLine.color}</p>
                     </div>
                   )}
                   {vehicleFromLine.vin && (
                     <div>
-                      <p className="text-sm font-medium text-white">VIN</p>
-                      <p className="font-mono text-sm text-white">{vehicleFromLine.vin}</p>
+                      <p className="text-sm font-medium text-card-foreground">VIN</p>
+                      <p className="font-mono text-sm text-card-foreground">{vehicleFromLine.vin}</p>
                     </div>
                   )}
                   <div>
-                    <p className="text-sm font-medium text-white">Status</p>
-                    <p className="capitalize text-white">{vehicleFromLine.status}</p>
+                    <p className="text-sm font-medium text-card-foreground">Status</p>
+                    <p className="capitalize text-card-foreground">{vehicleFromLine.status}</p>
                   </div>
                 </>
               ) : (
-                <p className="text-white">No vehicle assigned</p>
+                <p className="text-card-foreground">No vehicle assigned</p>
               );
             })()}
           </CardContent>
@@ -274,21 +274,21 @@ const AgreementDetails = () => {
         {/* Financial Information */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg text-white">Financial Details</CardTitle>
+            <CardTitle className="text-lg text-card-foreground">Financial Details</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <p className="text-sm font-medium text-white">Agreement Date</p>
-              <p className="text-white">{format(new Date(agreement.agreement_date), 'MMM dd, yyyy')}</p>
+              <p className="text-sm font-medium text-card-foreground">Agreement Date</p>
+              <p className="text-card-foreground">{format(new Date(agreement.agreement_date), 'MMM dd, yyyy')}</p>
             </div>
             <div>
-              <p className="text-sm font-medium text-white">Total Amount</p>
-              <p className="text-xl font-bold text-white">
+              <p className="text-sm font-medium text-card-foreground">Total Amount</p>
+              <p className="text-xl font-bold text-card-foreground">
                 {formatCurrency(agreement.total_amount || 0)}
               </p>
             </div>
             <div>
-              <p className="text-sm font-medium text-white">Status</p>
+              <p className="text-sm font-medium text-card-foreground">Status</p>
               <Badge className={getStatusColor(agreement.status)}>
                 {agreement.status.replace('_', ' ').toUpperCase()}
               </Badge>
@@ -340,10 +340,10 @@ const AgreementDetails = () => {
         <TabsContent value="payments">
           <Card>
             <CardHeader>
-              <CardTitle className="text-white">Payment Records</CardTitle>
+              <CardTitle className="text-card-foreground">Payment Records</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-white text-center py-8">
+              <p className="text-card-foreground text-center py-8">
                 No payment records found
               </p>
             </CardContent>
@@ -353,13 +353,13 @@ const AgreementDetails = () => {
         <TabsContent value="notes">
           <Card>
             <CardHeader>
-              <CardTitle className="text-white">Notes</CardTitle>
+              <CardTitle className="text-card-foreground">Notes</CardTitle>
             </CardHeader>
             <CardContent>
               {agreement.notes ? (
-                <p className="whitespace-pre-wrap text-white">{agreement.notes}</p>
+                <p className="whitespace-pre-wrap text-card-foreground">{agreement.notes}</p>
               ) : (
-                <p className="text-white">No notes available</p>
+                <p className="text-card-foreground">No notes available</p>
               )}
             </CardContent>
           </Card>

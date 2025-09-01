@@ -124,13 +124,13 @@ const Auth = () => {
             <img src="/lovable-uploads/0fe8cfa9-3548-415c-bc9c-114a2b91ae82.png" alt="Core Car Rental Logo" className="h-12 w-12" />
           </div>
           <CardTitle className="text-2xl">Core Car Rental</CardTitle>
-          <CardDescription>
+          <CardDescription className="text-gray-950">
             Sign in to your account to access the rental management system
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs value={mode} onValueChange={setMode}>
-            <TabsList className="grid w-full grid-cols-3 bg-transparent">
+            <TabsList className="grid w-full grid-cols-3 bg-slate-400">
               <TabsTrigger value="signin">Sign In</TabsTrigger>
               <TabsTrigger value="signup">Sign Up</TabsTrigger>
               <TabsTrigger value="reset">Reset</TabsTrigger>
@@ -149,7 +149,7 @@ const Auth = () => {
                 {error && <Alert variant="destructive">
                     <AlertDescription>{error}</AlertDescription>
                   </Alert>}
-                <Button type="submit" disabled={isLoading} className="w-full bg-green-700 hover:bg-green-600">
+                <Button type="submit" disabled={isLoading} className="w-full bg-red-800 hover:bg-red-700">
                   {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Sign In
                 </Button>

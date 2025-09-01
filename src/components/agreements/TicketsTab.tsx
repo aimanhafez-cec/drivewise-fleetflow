@@ -367,36 +367,36 @@ export const TicketsTab: React.FC<TicketsTabProps> = ({
           <Table id="tickets-table">
             <TableHeader>
               <TableRow>
-                <TableHead>Date</TableHead>
-                <TableHead>Location</TableHead>
-                <TableHead>Authority</TableHead>
-                <TableHead>Type/Code</TableHead>
-                <TableHead>Amount</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Due Date</TableHead>
-                <TableHead>Actions</TableHead>
+                <TableHead className="text-card-foreground">Date</TableHead>
+                <TableHead className="text-card-foreground">Location</TableHead>
+                <TableHead className="text-card-foreground">Authority</TableHead>
+                <TableHead className="text-card-foreground">Type/Code</TableHead>
+                <TableHead className="text-card-foreground">Amount</TableHead>
+                <TableHead className="text-card-foreground">Status</TableHead>
+                <TableHead className="text-card-foreground">Due Date</TableHead>
+                <TableHead className="text-card-foreground">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {tickets && tickets.length > 0 ? tickets.map(ticket => <TableRow key={ticket.id}>
-                    <TableCell>{format(new Date(ticket.ticket_date), 'MMM dd, yyyy')}</TableCell>
-                    <TableCell>-</TableCell>
-                    <TableCell>-</TableCell>
-                    <TableCell>{ticket.violation_type}</TableCell>
-                    <TableCell>
+                    <TableCell className="text-card-foreground">{format(new Date(ticket.ticket_date), 'MMM dd, yyyy')}</TableCell>
+                    <TableCell className="text-card-foreground">-</TableCell>
+                    <TableCell className="text-card-foreground">-</TableCell>
+                    <TableCell className="text-card-foreground">{ticket.violation_type}</TableCell>
+                    <TableCell className="text-card-foreground">
                       <div className="flex items-center gap-1">
                         {formatCurrency(Number(ticket.fine_amount) || 0)}
                       </div>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="text-card-foreground">
                       <Badge variant={getStatusColor(ticket.status)}>
                         {ticket.status}
                       </Badge>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="text-card-foreground">
                       {ticket.court_date ? format(new Date(ticket.court_date), 'MMM dd, yyyy') : '-'}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="text-card-foreground">
                       <div className="flex gap-1">
                         {ticket.status === 'PENDING' && <>
                             <Button size="sm" variant="outline" onClick={() => handleMarkPaid(ticket.id)}>
@@ -412,7 +412,7 @@ export const TicketsTab: React.FC<TicketsTabProps> = ({
                       </div>
                     </TableCell>
                   </TableRow>) : <TableRow>
-                  <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={8} className="text-center py-8 text-card-foreground">
                     No traffic tickets found
                   </TableCell>
                 </TableRow>}

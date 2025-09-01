@@ -118,7 +118,7 @@ export const CorporateLeasingStep2: React.FC<CorporateLeasingStep2Props> = ({ fo
               </FormControl>
               <div className="space-y-1 leading-none">
                 <FormLabel>Co-terminus Lines</FormLabel>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-foreground/70">
                   If enabled, all line end dates will align to the master agreement end date
                 </p>
               </div>

@@ -97,7 +97,7 @@ const SatisfactionFeedbackReport: React.FC<SatisfactionFeedbackReportProps> = ({
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{averageRating.toFixed(1)}/5.0</div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-card-foreground">
               From {mockRatingsData.reduce((sum, m) => sum + m.responses, 0)} reviews
             </p>
           </CardContent>
@@ -110,7 +110,7 @@ const SatisfactionFeedbackReport: React.FC<SatisfactionFeedbackReportProps> = ({
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{npsScore.toFixed(0)}</div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-card-foreground">
               {totalResponses} total responses
             </p>
           </CardContent>
@@ -123,7 +123,7 @@ const SatisfactionFeedbackReport: React.FC<SatisfactionFeedbackReportProps> = ({
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{mockComplaints.length}</div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-card-foreground">
               This period
             </p>
           </CardContent>
@@ -136,7 +136,7 @@ const SatisfactionFeedbackReport: React.FC<SatisfactionFeedbackReportProps> = ({
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{resolutionRate.toFixed(0)}%</div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-card-foreground">
               {resolvedComplaints} of {mockComplaints.length} resolved
             </p>
           </CardContent>
@@ -230,11 +230,11 @@ const SatisfactionFeedbackReport: React.FC<SatisfactionFeedbackReportProps> = ({
       <Card>
         <CardHeader>
           <CardTitle>Recent Complaints</CardTitle>
-          <CardDescription>Latest customer complaints and resolution status</CardDescription>
+          <CardDescription className="text-card-foreground">Latest customer complaints and resolution status</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
-            <TableHeader>
+            <TableHeader className="bg-muted">
               <TableRow>
                 <TableHead>Customer</TableHead>
                 <TableHead>Category</TableHead>
@@ -254,7 +254,7 @@ const SatisfactionFeedbackReport: React.FC<SatisfactionFeedbackReportProps> = ({
                   <TableRow key={complaint.id}>
                     <TableCell className="font-medium">{complaint.customer}</TableCell>
                     <TableCell>
-                      <Badge variant="outline">{complaint.category}</Badge>
+                      <Badge variant="outline" className="text-card-foreground">{complaint.category}</Badge>
                     </TableCell>
                     <TableCell className="max-w-xs truncate">{complaint.description}</TableCell>
                     <TableCell>
@@ -279,7 +279,7 @@ const SatisfactionFeedbackReport: React.FC<SatisfactionFeedbackReportProps> = ({
         <CardContent className="pt-6">
           <div className="flex items-center gap-2 text-muted-foreground">
             <AlertCircle className="h-4 w-4" />
-            <p className="text-sm">
+            <p className="text-sm text-card-foreground">
               <strong>Note:</strong> This report currently displays mock data. To fully implement customer satisfaction tracking, 
               you would need to add feedback, ratings, and complaints tables to your database, and integrate with your customer communication system.
             </p>
