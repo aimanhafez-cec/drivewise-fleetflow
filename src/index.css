@@ -500,8 +500,8 @@
     color: hsl(0 0% 100%) !important;
   }
 
-  .white-cards-page .text-muted-foreground {
-    color: hsl(0 0% 40%) !important;
+  .text-muted-foreground {
+    color: hsl(0, 0%, 100%) !important;
   }
 
   /* Target accordion items specifically */
@@ -523,8 +523,7 @@
   /* Force override any text color utilities */
   .white-cards-page .text-primary-foreground,
   .white-cards-page .text-secondary-foreground,
-  .white-cards-page .text-accent-foreground,
-  .white-cards-page .text-muted-foreground {
+  .white-cards-page .text-accent-foreground{
     color: hsl(0 0% 0%) !important;
   }
 
