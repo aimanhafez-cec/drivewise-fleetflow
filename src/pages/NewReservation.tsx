@@ -1192,17 +1192,10 @@ const NewReservation = () => {
                 {/* Entry Date */}
                 <div className="space-y-2">
                   <Label className="text-foreground">Reservation Entry Date <span className="text-destructive">*</span></Label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !formData.entryDate && "text-black", formData.entryDate && "text-foreground", errors.entryDate && "border-destructive")}>
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {formData.entryDate ? format(formData.entryDate, "PPP") : <span>Pick entry date</span>}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar mode="single" selected={formData.entryDate} onSelect={date => updateFormData('entryDate', date || new Date())} initialFocus />
-                    </PopoverContent>
-                  </Popover>
+                  <Button variant="outline" className={cn("w-full justify-start text-left font-normal text-foreground", errors.entryDate && "border-destructive")} disabled>
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {format(formData.entryDate, "PPP")}
+                  </Button>
                   {errors.entryDate && <p className="text-sm text-destructive">{errors.entryDate}</p>}
                 </div>
 
