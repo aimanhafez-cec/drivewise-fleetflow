@@ -518,12 +518,25 @@
     color: hsl(0 0% 0%) !important;
   }
 
-  /* Make input field text white */
+  /* Make input field text white - comprehensive selectors with high specificity */
   .white-cards-page input,
   .white-cards-page textarea,
   .white-cards-page select,
   .white-cards-page [role="combobox"],
-  .white-cards-page [data-radix-select-trigger] {
+  .white-cards-page [data-radix-select-trigger],
+  .white-cards-page [data-radix-select-value],
+  .white-cards-page [cmdk-input],
+  .white-cards-page .command-input input,
+  .white-cards-page [data-radix-combobox-trigger],
+  .white-cards-page [class*="CommandInput"] input,
+  .white-cards-page [class*="Select"] input,
+  .white-cards-page input[type="text"],
+  .white-cards-page input[type="email"],
+  .white-cards-page input[type="number"],
+  .white-cards-page input[type="tel"],
+  .white-cards-page input[type="date"],
+  .white-cards-page input[type="datetime-local"],
+  .white-cards-page input[type="time"] {
     color: hsl(0 0% 100%) !important;
   }
 
