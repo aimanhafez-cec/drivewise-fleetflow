@@ -151,7 +151,7 @@ export const CorporateLeasingList: React.FC = () => {
           ) : (
             <div className="overflow-x-auto">
               <Table>
-                <TableHeader>
+                <TableHeader className="bg-muted">
                   <TableRow>
                     <TableHead>Agreement No.</TableHead>
                     <TableHead>Customer</TableHead>
