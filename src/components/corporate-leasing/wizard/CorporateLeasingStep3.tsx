@@ -85,7 +85,7 @@ export const CorporateLeasingStep3: React.FC<CorporateLeasingStep3Props> = ({ fo
       </div>
 
       <div className="bg-muted/50 p-4 rounded-lg">
-        <h4 className="font-medium text-foreground mb-2">Default Settings</h4>
+        <h4 className="font-medium text-card-foreground mb-2">Default Settings</h4>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-muted-foreground">
           <div>
             <span className="font-medium">Billing Cycle:</span> Monthly (Fixed)

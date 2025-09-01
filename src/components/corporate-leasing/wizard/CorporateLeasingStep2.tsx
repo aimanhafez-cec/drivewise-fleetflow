@@ -118,7 +118,7 @@ export const CorporateLeasingStep2: React.FC<CorporateLeasingStep2Props> = ({ fo
               </FormControl>
               <div className="space-y-1 leading-none">
                 <FormLabel>Co-terminus Lines</FormLabel>
-                <p className="text-sm text-foreground/70">
+                <p className="text-sm text-card-foreground/70">
                   If enabled, all line end dates will align to the master agreement end date
                 </p>
               </div>
@@ -144,7 +144,7 @@ export const CorporateLeasingStep2: React.FC<CorporateLeasingStep2Props> = ({ fo
                 />
               </FormControl>
               <div className="space-y-1 leading-none">
-                <FormLabel className="text-foreground">Allow Early Termination</FormLabel>
+                <FormLabel className="text-card-foreground">Allow Early Termination</FormLabel>
                 <p className="text-sm text-muted-foreground">
                   Enable early termination with penalty rules
                 </p>

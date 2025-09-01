@@ -235,7 +235,7 @@ export const AgreementWizardStep3: React.FC<AgreementWizardStep3Props> = ({
                   <span>Advance Paid:</span>
                   <span>{formatCurrency(0)}</span>
                 </div>
-                <div className="flex justify-between font-medium text-foreground">
+                <div className="flex justify-between font-medium text-card-foreground">
                   <span>Balance Due:</span>
                   <span>{formatCurrency(grandTotal)}</span>
                 </div>

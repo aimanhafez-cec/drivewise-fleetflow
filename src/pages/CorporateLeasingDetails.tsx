@@ -137,9 +137,9 @@ const CorporateLeasingDetails = () => {
   if (!agreement) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px]">
-        <FileText className="h-12 w-12 text-foreground" />
-        <h3 className="mt-4 text-lg font-semibold text-foreground">Agreement not found</h3>
-        <p className="text-foreground">
+        <FileText className="h-12 w-12 text-card-foreground" />
+        <h3 className="mt-4 text-lg font-semibold text-card-foreground">Agreement not found</h3>
+        <p className="text-card-foreground">
           The corporate leasing agreement you're looking for doesn't exist.
         </p>
         <Button 
@@ -178,10 +178,10 @@ const CorporateLeasingDetails = () => {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-foreground">
+            <h1 className="text-3xl font-bold tracking-tight text-card-foreground">
               {agreement.agreement_no || `Draft Agreement #${agreement.id.slice(0, 8)}`}
             </h1>
-            <p className="text-foreground">
+            <p className="text-card-foreground">
               Created on {format(new Date(agreement.created_at), 'MMMM dd, yyyy')}
             </p>
           </div>

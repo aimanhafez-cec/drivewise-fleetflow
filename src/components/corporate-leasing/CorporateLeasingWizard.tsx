@@ -324,16 +324,16 @@ export const CorporateLeasingWizard: React.FC<CorporateLeasingWizardProps> = ({
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <Card>
         <CardHeader>
-          <CardTitle className="text-foreground">
+          <CardTitle className="text-card-foreground">
             {isEditMode ? 'Edit Corporate Leasing Agreement' : 'Corporate Leasing Agreement'}
           </CardTitle>
           <div className="space-y-2">
-            <div className="flex justify-between text-sm text-foreground">
+            <div className="flex justify-between text-sm text-card-foreground">
               <span>Step {currentStep + 1} of {STEPS.length}</span>
               <span>{Math.round(progress)}% complete</span>
             </div>
             <Progress value={progress} className="w-full" />
-            <p className="text-sm text-foreground">
+            <p className="text-sm text-card-foreground">
               {STEPS[currentStep].title}: {STEPS[currentStep].description}
             </p>
           </div>
