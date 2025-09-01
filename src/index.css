@@ -557,4 +557,25 @@
   .white-cards-page textarea::placeholder {
     color: hsl(0 0% 60%) !important;
   }
+
+  /* Make form field backgrounds white */
+  .white-cards-page input,
+  .white-cards-page textarea,
+  .white-cards-page select,
+  .white-cards-page [role="combobox"],
+  .white-cards-page [data-radix-select-trigger],
+  .white-cards-page [data-radix-select-content],
+  .white-cards-page [cmdk-input-wrapper],
+  .white-cards-page [cmdk-input],
+  .white-cards-page .bg-background,
+  .white-cards-page .bg-popover,
+  .white-cards-page input[class*="bg-"],
+  .white-cards-page textarea[class*="bg-"],
+  .white-cards-page [data-radix-select-trigger][class*="bg-"],
+  .white-cards-page [role="combobox"][class*="bg-"],
+  .white-cards-page div[cmdk-input-wrapper],
+  .white-cards-page *[class*="bg-background"],
+  .white-cards-page *[class*="bg-popover"] {
+    background-color: hsl(0 0% 100%) !important;
+  }
 }
