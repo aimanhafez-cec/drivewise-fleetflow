@@ -490,6 +490,20 @@
     color: hsl(0 0% 0%) !important;
   }
 
+  /* Main headings and important text should be white */
+  .white-cards-page h1,
+  .white-cards-page h2,
+  .white-cards-page h3,
+  .white-cards-page .text-3xl,
+  .white-cards-page .text-2xl,
+  .white-cards-page .text-xl,
+  .white-cards-page p:contains("Fields marked with an asterisk"),
+  .white-cards-page .text-sm:contains("Fields marked"),
+  .white-cards-page [class*="text-"]:contains("asterisk"),
+  .white-cards-page span:contains("required") {
+    color: hsl(0 0% 100%) !important;
+  }
+
   .white-cards-page .text-muted-foreground {
     color: hsl(0 0% 40%) !important;
   }
