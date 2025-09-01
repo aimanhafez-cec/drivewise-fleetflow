@@ -250,7 +250,6 @@ const NewReservation = () => {
     depositMethodId: '',
     depositPaymentMethodId: '',
     cancellationCharges: 0,
-    
     // Referral Information - Loyalty Program
     referralCustomerId: '',
     referralCode: ''
@@ -437,7 +436,7 @@ const NewReservation = () => {
       const totalHours = Math.ceil((formData.checkInDate.getTime() - formData.checkOutDate.getTime()) / (1000 * 60 * 60));
       const totalDays = Math.ceil(totalHours / 24);
       updateFormData('totalDays', totalDays);
-      
+
       // Recalculate add-on charges based on new total days
       if (formData.selectedMiscCharges && formData.selectedMiscCharges.length > 0) {
         const newCharges: Record<string, number> = {};
@@ -1452,7 +1451,7 @@ const NewReservation = () => {
             <AccordionContent className="px-6 pb-6">
               <Tabs defaultValue="vehicles" className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="vehicles">Vehicle Information</TabsTrigger>
+                  <TabsTrigger value="vehicles" className="text-slate-950">Vehicle Information</TabsTrigger>
                   <TabsTrigger value="drivers">Driver Information</TabsTrigger>
                 </TabsList>
                 
@@ -1737,74 +1736,61 @@ const NewReservation = () => {
               <div className="flex items-center gap-2">
                 <Plus className="h-5 w-5" />
                 <span className="font-semibold text-foreground">Miscellaneous Charges</span>
-                {(formData.selectedMiscCharges || []).length > 0 && (
-                  <Badge variant="secondary" className="ml-2">
+                {(formData.selectedMiscCharges || []).length > 0 && <Badge variant="secondary" className="ml-2">
                     {(formData.selectedMiscCharges || []).length} selected
-                  </Badge>
-                )}
+                  </Badge>}
               </div>
             </AccordionTrigger>
             <AccordionContent className="px-6 pb-6">
               <div className="space-y-6">
                 {/* Add-ons Selection */}
                 <div className="space-y-8">
-                  {addOnCategories.map((category) => {
-                    const categoryAddOns = categorizeAddOns(category);
-                    if (categoryAddOns.length === 0) return null;
-
-                    return (
-                      <div key={category} className="space-y-4">
+                  {addOnCategories.map(category => {
+                  const categoryAddOns = categorizeAddOns(category);
+                  if (categoryAddOns.length === 0) return null;
+                  return <div key={category} className="space-y-4">
                         <h3 className="font-semibold text-lg text-card-foreground border-b border-card-foreground/20 pb-2">
                           {category}
                         </h3>
                         <div className="grid gap-4">
-                          {categoryAddOns.map((addOn) => {
-                            const isSelected = (formData.selectedMiscCharges || []).includes(addOn.id);
-                            const rentalDays = formData.totalDays || 1;
-                            const cost = calculateAddOnCost(addOn, rentalDays);
-                            const IconComponent = addOn.icon;
-
-                            return (
-                              <div
-                                key={addOn.id}
-                                className={`
+                          {categoryAddOns.map(addOn => {
+                        const isSelected = (formData.selectedMiscCharges || []).includes(addOn.id);
+                        const rentalDays = formData.totalDays || 1;
+                        const cost = calculateAddOnCost(addOn, rentalDays);
+                        const IconComponent = addOn.icon;
+                        return <div key={addOn.id} className={`
                                   relative p-4 border rounded-lg cursor-pointer transition-all hover:shadow-md
-                                  ${isSelected 
-                                    ? 'border-primary bg-primary/5 shadow-sm' 
-                                    : 'border-card-foreground/20 bg-card hover:border-primary/50'
-                                  }
-                                `}
-                                onClick={() => {
-                                  if (isSelected) {
-                                    const newSelected = (formData.selectedMiscCharges || []).filter(id => id !== addOn.id);
-                                    const newCharges = { ...formData.addOnCharges };
-                                    delete newCharges[addOn.id];
-                                    updateFormData('selectedMiscCharges', newSelected);
-                                    updateFormData('addOnCharges', newCharges);
-                                  } else {
-                                    const newSelected = [...(formData.selectedMiscCharges || []), addOn.id];
-                                    const newCharges = { ...formData.addOnCharges, [addOn.id]: cost };
-                                    updateFormData('selectedMiscCharges', newSelected);
-                                    updateFormData('addOnCharges', newCharges);
-                                  }
-                                }}
-                              >
+                                  ${isSelected ? 'border-primary bg-primary/5 shadow-sm' : 'border-card-foreground/20 bg-card hover:border-primary/50'}
+                                `} onClick={() => {
+                          if (isSelected) {
+                            const newSelected = (formData.selectedMiscCharges || []).filter(id => id !== addOn.id);
+                            const newCharges = {
+                              ...formData.addOnCharges
+                            };
+                            delete newCharges[addOn.id];
+                            updateFormData('selectedMiscCharges', newSelected);
+                            updateFormData('addOnCharges', newCharges);
+                          } else {
+                            const newSelected = [...(formData.selectedMiscCharges || []), addOn.id];
+                            const newCharges = {
+                              ...formData.addOnCharges,
+                              [addOn.id]: cost
+                            };
+                            updateFormData('selectedMiscCharges', newSelected);
+                            updateFormData('addOnCharges', newCharges);
+                          }
+                        }}>
                                 <div className="flex items-start gap-4">
-                                  <Checkbox 
-                                    checked={isSelected}
-                                    onChange={() => {}} // Controlled by parent click
-                                    className="mt-1"
-                                  />
+                                  <Checkbox checked={isSelected} onChange={() => {}} // Controlled by parent click
+                            className="mt-1" />
                                   
                                   <div className="flex-1">
                                     <div className="flex items-center gap-2 mb-2">
                                       <IconComponent className="h-5 w-5 text-white" />
                                       <h4 className="font-medium text-card-foreground">{addOn.name}</h4>
-                                      {addOn.popular && (
-                                        <Badge variant="secondary" className="text-xs">
+                                      {addOn.popular && <Badge variant="secondary" className="text-xs">
                                           Popular
-                                        </Badge>
-                                      )}
+                                        </Badge>}
                                     </div>
                                     <p className="text-sm text-card-foreground/70 mb-3">
                                       {addOn.description}
@@ -1813,44 +1799,34 @@ const NewReservation = () => {
                                     <div className="flex items-center justify-between">
                                       <div className="text-lg font-bold text-red-600">
                                         AED {cost.toFixed(0)}
-                                        {addOn.isFlat ? (
-                                          <span className="text-xs text-card-foreground/70 ml-1">(flat rate)</span>
-                                        ) : (
-                                          <span className="text-xs text-card-foreground/70 ml-1">
+                                        {addOn.isFlat ? <span className="text-xs text-card-foreground/70 ml-1">(flat rate)</span> : <span className="text-xs text-card-foreground/70 ml-1">
                                             ({rentalDays} day{rentalDays > 1 ? 's' : ''} × AED {addOn.amount})
-                                          </span>
-                                        )}
+                                          </span>}
                                       </div>
                                     </div>
                                   </div>
                                 </div>
-                              </div>
-                            );
-                          })}
+                              </div>;
+                      })}
                         </div>
-                      </div>
-                    );
-                  })}
+                      </div>;
+                })}
                 </div>
 
                 {/* Selected Add-ons Summary */}
-                {(formData.selectedMiscCharges || []).length > 0 && (
-                  <Card className="shadow-card">
+                {(formData.selectedMiscCharges || []).length > 0 && <Card className="shadow-card">
                     <CardHeader>
                       <CardTitle className="text-lg text-card-foreground">Selected Add-ons Summary</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-3">
-                        {(formData.selectedMiscCharges || []).map((addOnId) => {
-                          const addOn = availableAddOns.find(a => a.id === addOnId);
-                          if (!addOn) return null;
-                          
-                          const rentalDays = formData.totalDays || 1;
-                          const cost = calculateAddOnCost(addOn, rentalDays);
-                          const IconComponent = addOn.icon;
-                          
-                          return (
-                            <div key={addOnId} className="flex items-center justify-between p-3 bg-card-foreground/5 rounded-lg border border-card-foreground/10">
+                        {(formData.selectedMiscCharges || []).map(addOnId => {
+                      const addOn = availableAddOns.find(a => a.id === addOnId);
+                      if (!addOn) return null;
+                      const rentalDays = formData.totalDays || 1;
+                      const cost = calculateAddOnCost(addOn, rentalDays);
+                      const IconComponent = addOn.icon;
+                      return <div key={addOnId} className="flex items-center justify-between p-3 bg-card-foreground/5 rounded-lg border border-card-foreground/10">
                               <div className="flex items-center gap-2 flex-1">
                                 <IconComponent className="h-4 w-4 text-white" />
                                 <div className="flex-1 min-w-0">
@@ -1863,9 +1839,8 @@ const NewReservation = () => {
                               <div className="text-right">
                                 <p className="font-bold text-sm text-red-600">AED {cost.toFixed(0)}</p>
                               </div>
-                            </div>
-                          );
-                        })}
+                            </div>;
+                    })}
                         
                         <div className="border-t border-card-foreground/20 pt-3 mt-3">
                           <div className="flex justify-between items-center">
@@ -1877,8 +1852,7 @@ const NewReservation = () => {
                         </div>
                       </div>
                     </CardContent>
-                  </Card>
-                )}
+                  </Card>}
               </div>
             </AccordionContent>
           </AccordionItem>
@@ -2056,24 +2030,14 @@ const NewReservation = () => {
               <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label className="text-foreground">Referred by Customer</Label>
-                  <CustomerSelect
-                    value={formData.referralCustomerId}
-                    onChange={value => updateFormData('referralCustomerId', value)}
-                    placeholder="Select referring customer"
-                    className="w-full"
-                  />
+                  <CustomerSelect value={formData.referralCustomerId} onChange={value => updateFormData('referralCustomerId', value)} placeholder="Select referring customer" className="w-full" />
                   <p className="text-sm text-card-foreground/70">
                     Select the existing customer who referred this reservation
                   </p>
                 </div>
                 <div className="space-y-2">
                   <Label className="text-foreground">Referral Code</Label>
-                  <Input 
-                    value={formData.referralCode} 
-                    onChange={e => updateFormData('referralCode', e.target.value)} 
-                    placeholder="Enter referral code (optional)"
-                    className="text-white placeholder:text-white/70" 
-                  />
+                  <Input value={formData.referralCode} onChange={e => updateFormData('referralCode', e.target.value)} placeholder="Enter referral code (optional)" className="text-white placeholder:text-white/70" />
                   <p className="text-sm text-card-foreground/70">
                     Optional code for tracking referral campaigns
                   </p>
