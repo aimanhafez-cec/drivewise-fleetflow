@@ -1192,7 +1192,7 @@ const NewReservation = () => {
                 {/* Entry Date */}
                 <div className="space-y-2">
                   <Label className="text-foreground">Reservation Entry Date <span className="text-destructive">*</span></Label>
-                  <Button variant="outline" className={cn("w-full justify-start text-left font-normal text-foreground", errors.entryDate && "border-destructive")} disabled>
+                  <Button variant="outline" className={cn("w-full justify-start text-left font-normal text-black", errors.entryDate && "border-destructive")} disabled>
                     <CalendarIcon className="mr-2 h-4 w-4" />
                     {format(formData.entryDate, "PPP")}
                   </Button>
