@@ -200,10 +200,17 @@ export const CarSubscriptionWizard: React.FC = () => {
   };
 
   const handleNext = async () => {
+    console.log('CarSubscription: Next button clicked, current step:', currentStep);
     const currentStepFields = getCurrentStepFields();
+    console.log('CarSubscription: Step:', currentStep, 'Required fields:', currentStepFields);
+    console.log('CarSubscription: Validating fields:', currentStepFields);
+    
     const isValid = await form.trigger(currentStepFields);
+    console.log('CarSubscription: Validation result:', isValid);
     
     if (!isValid) {
+      const errors = form.formState.errors;
+      console.log('CarSubscription: Validation errors:', errors);
       return;
     }
     
