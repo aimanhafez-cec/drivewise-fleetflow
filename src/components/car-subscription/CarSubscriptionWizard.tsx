@@ -205,8 +205,30 @@ export const CarSubscriptionWizard: React.FC = () => {
     console.log('CarSubscription: Next button clicked, current step:', currentStep);
     const currentStepFields = getCurrentStepFields();
     console.log('CarSubscription: Step:', currentStep, 'Required fields:', currentStepFields);
-    console.log('CarSubscription: Validating fields:', currentStepFields);
     
+    // For Step 0, only validate required fields that actually have values
+    if (currentStep === 0) {
+      const step0Values = form.getValues();
+      console.log('CarSubscription: Step 0 values:', step0Values);
+      
+      // Check required fields manually for step 0
+      if (!step0Values.customer_type) {
+        console.log('CarSubscription: Customer type is required');
+        return;
+      }
+      if (!step0Values.customer_id) {
+        console.log('CarSubscription: Customer ID is required');
+        return;
+      }
+      
+      // Step 0 validation passed
+      console.log('CarSubscription: Step 0 validation passed');
+      setCurrentStep(currentStep + 1);
+      return;
+    }
+    
+    // For other steps, use the normal validation
+    console.log('CarSubscription: Validating fields:', currentStepFields);
     const isValid = await form.trigger(currentStepFields);
     console.log('CarSubscription: Validation result:', isValid);
     
