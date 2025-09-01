@@ -549,13 +549,13 @@
   .white-cards-page *[class*="text-"] input,
   .white-cards-page *[class*="text-"] textarea,
   .white-cards-page *[class*="text-"] select {
-    color: hsl(0 0% 100%) !important;
+    color: hsl(0 0% 0%) !important;
   }
 
   /* Keep placeholder text visible */
   .white-cards-page input::placeholder,
   .white-cards-page textarea::placeholder {
-    color: hsl(0 0% 60%) !important;
+    color: hsl(0 0% 0%) !important;
   }
 
   /* Make form field backgrounds white */
