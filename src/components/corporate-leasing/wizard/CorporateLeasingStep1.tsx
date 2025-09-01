@@ -142,7 +142,7 @@ export const CorporateLeasingStep1: React.FC<CorporateLeasingStep1Props> = ({ fo
             <FormItem>
               <FormLabel className="text-card-foreground">Customer PO / BPA No.</FormLabel>
               <FormControl>
-                <Input {...field} placeholder="Enter PO or BPA number..." className="text-card-foreground bg-background" />
+                <Input {...field} placeholder="Enter PO or BPA number..." className="text-muted-foreground bg-background" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -183,6 +183,7 @@ export const CorporateLeasingStep1: React.FC<CorporateLeasingStep1Props> = ({ fo
                   {...field} 
                   onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
                   placeholder="Enter credit limit..." 
+                   className='text-muted-foreground'
                 />
               </FormControl>
               <FormMessage />
@@ -221,7 +222,7 @@ export const CorporateLeasingStep1: React.FC<CorporateLeasingStep1Props> = ({ fo
             <FormItem>
               <FormLabel>Customer Approver Name</FormLabel>
               <FormControl>
-                <Input {...field} placeholder="Enter approver name..." />
+                <Input {...field} placeholder="Enter approver name..." className='text-muted-foreground' />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -235,7 +236,7 @@ export const CorporateLeasingStep1: React.FC<CorporateLeasingStep1Props> = ({ fo
             <FormItem>
               <FormLabel>Customer Approver Email</FormLabel>
               <FormControl>
-                <Input type="email" {...field} placeholder="Enter approver email..." />
+                <Input type="email" {...field} placeholder="Enter approver email..." className='text-muted-foreground' />
               </FormControl>
               <FormMessage />
             </FormItem>

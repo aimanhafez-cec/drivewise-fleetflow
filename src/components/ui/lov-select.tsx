@@ -105,7 +105,7 @@ export const LOVSelect = forwardRef<HTMLButtonElement, LOVSelectProps>(({
   return <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button ref={ref} variant="outline" role="combobox" aria-expanded={open} className={cn("w-full justify-between", error && "border-destructive", className)} disabled={disabled} data-testid={testId} {...props}>
-          <div className="flex-1 text-left truncate bg-transparent">
+          <div className="flex-1 text-left truncate bg-transparent text-muted-foreground">
             {displayValue()}
           </div>
           <div className="flex items-center gap-1">
