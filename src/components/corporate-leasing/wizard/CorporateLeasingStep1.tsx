@@ -140,9 +140,9 @@ export const CorporateLeasingStep1: React.FC<CorporateLeasingStep1Props> = ({ fo
           name="customer_po_no"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Customer PO / BPA No.</FormLabel>
+              <FormLabel className="text-foreground">Customer PO / BPA No.</FormLabel>
               <FormControl>
-                <Input {...field} placeholder="Enter PO or BPA number..." />
+                <Input {...field} placeholder="Enter PO or BPA number..." className="text-foreground bg-background" />
               </FormControl>
               <FormMessage />
             </FormItem>
