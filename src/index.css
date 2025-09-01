@@ -472,24 +472,49 @@
     }
   }
 
-  /* White cards override for New Reservation page */
+  /* White cards override for New Reservation page - Comprehensive targeting */
   .white-cards-page .card-with-background,
-  .white-cards-page [class*="rounded-lg border bg-card"] {
+  .white-cards-page [class*="bg-card"],
+  .white-cards-page [data-accordion-content],
+  .white-cards-page [data-radix-accordion-content],
+  .white-cards-page .bg-card,
+  .white-cards-page [class*="AccordionItem"],
+  .white-cards-page [class*="Card"] {
     background-color: hsl(0 0% 100%) !important;
     color: hsl(0 0% 0%) !important;
     border-color: hsl(0 0% 85%) !important;
   }
 
-  .white-cards-page .card-with-background *,
-  .white-cards-page [class*="rounded-lg border bg-card"] * {
-    color: hsl(0 0% 0%) !important;
-  }
-
-  .white-cards-page .text-card-foreground {
+  /* All text elements inside white cards page */
+  .white-cards-page *:not(button):not([role="button"]) {
     color: hsl(0 0% 0%) !important;
   }
 
   .white-cards-page .text-muted-foreground {
     color: hsl(0 0% 40%) !important;
+  }
+
+  /* Target accordion items specifically */
+  .white-cards-page [data-radix-accordion-item],
+  .white-cards-page .border.rounded-lg,
+  .white-cards-page div[class*="border"][class*="rounded"] {
+    background-color: hsl(0 0% 100%) !important;
+    border-color: hsl(0 0% 85%) !important;
+  }
+
+  /* Force override any background utilities */
+  .white-cards-page .bg-primary,
+  .white-cards-page .bg-secondary,
+  .white-cards-page .bg-accent,
+  .white-cards-page .bg-muted {
+    background-color: hsl(0 0% 100%) !important;
+  }
+
+  /* Force override any text color utilities */
+  .white-cards-page .text-primary-foreground,
+  .white-cards-page .text-secondary-foreground,
+  .white-cards-page .text-accent-foreground,
+  .white-cards-page .text-muted-foreground {
+    color: hsl(0 0% 0%) !important;
   }
 }
