@@ -218,16 +218,6 @@ export const CarSubscriptionWizard: React.FC = () => {
   };
 
   const handleSubmit = async () => {
-    const isFormValid = await form.trigger();
-    if (!isFormValid) {
-      toast({
-        title: "Validation Error",
-        description: "Please check all required fields before submitting.",
-        variant: "destructive"
-      });
-      return;
-    }
-
     setIsSubmitting(true);
     try {
       const formData = form.getValues();
