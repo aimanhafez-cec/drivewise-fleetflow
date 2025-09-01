@@ -1151,7 +1151,7 @@ const NewReservation = () => {
 
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">New Reservation</h1>
+          <h1 className="text-3xl font-bold tracking-tight text-white/[0.31]">New Reservation</h1>
           <p className="text-sm mt-2 text-foreground">
             Fields marked with an asterisk (*) are required.
           </p>
