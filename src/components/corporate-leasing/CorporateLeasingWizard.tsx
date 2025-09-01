@@ -192,6 +192,7 @@ export const CorporateLeasingWizard: React.FC<CorporateLeasingWizardProps> = ({
     console.log('Next button clicked, current step:', currentStep);
     const currentStepFields = getCurrentStepFields();
     console.log('Step:', currentStep, 'Required fields:', currentStepFields);
+    console.log('Validating fields:', currentStepFields);
     
     const isValid = await form.trigger(currentStepFields);
     console.log('Validation result:', isValid);
@@ -205,13 +206,6 @@ export const CorporateLeasingWizard: React.FC<CorporateLeasingWizardProps> = ({
           console.log(`Field '${field}' has error:`, errors[field]);
         }
       });
-    }
-    console.log('Validating fields:', currentStepFields);
-    
-    const isValid = await form.trigger(currentStepFields);
-    console.log('Validation result:', isValid);
-    
-    if (!isValid) {
       console.log('Form errors:', form.formState.errors);
       return;
     }

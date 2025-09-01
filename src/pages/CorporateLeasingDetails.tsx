@@ -137,9 +137,9 @@ const CorporateLeasingDetails = () => {
   if (!agreement) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px]">
-        <FileText className="h-12 w-12 text-white" />
-        <h3 className="mt-4 text-lg font-semibold text-white">Agreement not found</h3>
-        <p className="text-white">
+        <FileText className="h-12 w-12 text-foreground" />
+        <h3 className="mt-4 text-lg font-semibold text-foreground">Agreement not found</h3>
+        <p className="text-foreground">
           The corporate leasing agreement you're looking for doesn't exist.
         </p>
         <Button 
@@ -178,10 +178,10 @@ const CorporateLeasingDetails = () => {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-white">
+            <h1 className="text-3xl font-bold tracking-tight text-foreground">
               {agreement.agreement_no || `Draft Agreement #${agreement.id.slice(0, 8)}`}
             </h1>
-            <p className="text-white">
+            <p className="text-foreground">
               Created on {format(new Date(agreement.created_at), 'MMMM dd, yyyy')}
             </p>
           </div>
@@ -206,28 +206,28 @@ const CorporateLeasingDetails = () => {
         {/* Customer Information */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg text-white">Customer Information</CardTitle>
+            <CardTitle className="text-lg text-card-foreground">Customer Information</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <p className="text-sm font-medium text-white">Customer Name</p>
-              <p className="font-medium text-white">
+              <p className="text-sm font-medium text-card-foreground">Customer Name</p>
+              <p className="font-medium text-card-foreground">
                 {agreement.customers?.full_name || 'Unknown Customer'}
               </p>
             </div>
             <div>
-              <p className="text-sm font-medium text-white">Email</p>
-              <p className="text-white">{agreement.customers?.email || 'N/A'}</p>
+              <p className="text-sm font-medium text-card-foreground">Email</p>
+              <p className="text-card-foreground">{agreement.customers?.email || 'N/A'}</p>
             </div>
             {agreement.customers?.phone && (
               <div>
-                <p className="text-sm font-medium text-white">Phone</p>
-                <p className="text-white">{agreement.customers.phone}</p>
+                <p className="text-sm font-medium text-card-foreground">Phone</p>
+                <p className="text-card-foreground">{agreement.customers.phone}</p>
               </div>
             )}
             <div>
-              <p className="text-sm font-medium text-white">Customer Segment</p>
-              <p className="text-white">{agreement.customer_segment || 'N/A'}</p>
+              <p className="text-sm font-medium text-card-foreground">Customer Segment</p>
+              <p className="text-card-foreground">{agreement.customer_segment || 'N/A'}</p>
             </div>
           </CardContent>
         </Card>
@@ -235,29 +235,29 @@ const CorporateLeasingDetails = () => {
         {/* Legal Entity & Billing */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg text-white">Legal Entity & Billing</CardTitle>
+            <CardTitle className="text-lg text-card-foreground">Legal Entity & Billing</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <p className="text-sm font-medium text-white">Legal Entity</p>
-              <p className="font-medium text-white">
+              <p className="text-sm font-medium text-card-foreground">Legal Entity</p>
+              <p className="font-medium text-card-foreground">
                 {agreement.legal_entities?.name || 'N/A'}
               </p>
             </div>
             <div>
-              <p className="text-sm font-medium text-white">Bill-to Site</p>
-              <p className="text-white">
+              <p className="text-sm font-medium text-card-foreground">Bill-to Site</p>
+              <p className="text-card-foreground">
                 {agreement.customer_sites?.site_name || 'N/A'}
               </p>
             </div>
             <div>
-              <p className="text-sm font-medium text-white">Credit Terms</p>
-              <p className="text-white">{agreement.credit_terms}</p>
+              <p className="text-sm font-medium text-card-foreground">Credit Terms</p>
+              <p className="text-card-foreground">{agreement.credit_terms}</p>
             </div>
             {agreement.credit_limit && (
               <div>
-                <p className="text-sm font-medium text-white">Credit Limit</p>
-                <p className="text-white">{formatCurrency(agreement.credit_limit)}</p>
+                <p className="text-sm font-medium text-card-foreground">Credit Limit</p>
+                <p className="text-card-foreground">{formatCurrency(agreement.credit_limit)}</p>
               </div>
             )}
           </CardContent>
@@ -266,20 +266,20 @@ const CorporateLeasingDetails = () => {
         {/* Contract Terms */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg text-white">Contract Terms</CardTitle>
+            <CardTitle className="text-lg text-card-foreground">Contract Terms</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <p className="text-sm font-medium text-white">Framework Model</p>
-              <p className="text-white">{agreement.framework_model}</p>
+              <p className="text-sm font-medium text-card-foreground">Framework Model</p>
+              <p className="text-card-foreground">{agreement.framework_model}</p>
             </div>
             <div>
-              <p className="text-sm font-medium text-white">Master Term</p>
-              <p className="text-white">{agreement.master_term}</p>
+              <p className="text-sm font-medium text-card-foreground">Master Term</p>
+              <p className="text-card-foreground">{agreement.master_term}</p>
             </div>
             <div>
-              <p className="text-sm font-medium text-white">Contract Start</p>
-              <p className="text-white">
+              <p className="text-sm font-medium text-card-foreground">Contract Start</p>
+              <p className="text-card-foreground">
                 {agreement.contract_start_date 
                   ? format(new Date(agreement.contract_start_date), 'MMM dd, yyyy')
                   : 'Not set'
@@ -287,8 +287,8 @@ const CorporateLeasingDetails = () => {
               </p>
             </div>
             <div>
-              <p className="text-sm font-medium text-white">Contract End</p>
-              <p className="text-white">
+              <p className="text-sm font-medium text-card-foreground">Contract End</p>
+              <p className="text-card-foreground">
                 {agreement.contract_end_date 
                   ? format(new Date(agreement.contract_end_date), 'MMM dd, yyyy')
                   : 'Not set'
@@ -313,53 +313,53 @@ const CorporateLeasingDetails = () => {
           <div className="grid gap-6 md:grid-cols-2">
             <Card>
               <CardHeader>
-                <CardTitle className="text-white">Contract Scope</CardTitle>
+                <CardTitle className="text-card-foreground">Contract Scope</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-white">Cost Allocation Mode:</span>
-                  <span className="text-white font-medium">{agreement.cost_allocation_mode}</span>
+                  <span className="text-card-foreground">Cost Allocation Mode:</span>
+                  <span className="text-card-foreground font-medium">{agreement.cost_allocation_mode}</span>
                 </div>
                 {agreement.committed_fleet_size && (
                   <div className="flex justify-between">
-                    <span className="text-white">Committed Fleet Size:</span>
-                    <span className="text-white font-medium">{agreement.committed_fleet_size} vehicles</span>
+                    <span className="text-card-foreground">Committed Fleet Size:</span>
+                    <span className="text-card-foreground font-medium">{agreement.committed_fleet_size} vehicles</span>
                   </div>
                 )}
                 <div className="flex justify-between">
-                  <span className="text-white">Co-terminus Lines:</span>
-                  <span className="text-white font-medium">{agreement.co_terminus_lines ? 'Yes' : 'No'}</span>
+                  <span className="text-card-foreground">Co-terminus Lines:</span>
+                  <span className="text-card-foreground font-medium">{agreement.co_terminus_lines ? 'Yes' : 'No'}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-white">Off-hire Notice:</span>
-                  <span className="text-white font-medium">{agreement.off_hire_notice_period} days</span>
+                  <span className="text-card-foreground">Off-hire Notice:</span>
+                  <span className="text-card-foreground font-medium">{agreement.off_hire_notice_period} days</span>
                 </div>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader>
-                <CardTitle className="text-white">Financial Security</CardTitle>
+                <CardTitle className="text-card-foreground">Financial Security</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-white">Security Instrument:</span>
-                  <span className="text-white font-medium">{agreement.security_instrument}</span>
+                  <span className="text-card-foreground">Security Instrument:</span>
+                  <span className="text-card-foreground font-medium">{agreement.security_instrument}</span>
                 </div>
                 {agreement.deposit_amount_aed && (
                   <div className="flex justify-between">
-                    <span className="text-white">Deposit Amount:</span>
-                    <span className="text-white font-medium">{formatCurrency(agreement.deposit_amount_aed)}</span>
+                    <span className="text-card-foreground">Deposit Amount:</span>
+                    <span className="text-card-foreground font-medium">{formatCurrency(agreement.deposit_amount_aed)}</span>
                   </div>
                 )}
                 <div className="flex justify-between">
-                  <span className="text-white">SLA Credits:</span>
-                  <span className="text-white font-medium">{agreement.sla_credits_enabled ? 'Enabled' : 'Disabled'}</span>
+                  <span className="text-card-foreground">SLA Credits:</span>
+                  <span className="text-card-foreground font-medium">{agreement.sla_credits_enabled ? 'Enabled' : 'Disabled'}</span>
                 </div>
                 {agreement.sla_credits_percentage && (
                   <div className="flex justify-between">
-                    <span className="text-white">SLA Credits %:</span>
-                    <span className="text-white font-medium">{agreement.sla_credits_percentage}%</span>
+                    <span className="text-card-foreground">SLA Credits %:</span>
+                    <span className="text-card-foreground font-medium">{agreement.sla_credits_percentage}%</span>
                   </div>
                 )}
               </CardContent>
@@ -371,35 +371,35 @@ const CorporateLeasingDetails = () => {
           <div className="grid gap-6 md:grid-cols-2">
             <Card>
               <CardHeader>
-                <CardTitle className="text-white">Responsibilities & Inclusions</CardTitle>
+                <CardTitle className="text-card-foreground">Responsibilities & Inclusions</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-white">Insurance:</span>
-                  <span className="text-white font-medium">{agreement.insurance_responsibility}</span>
+                  <span className="text-card-foreground">Insurance:</span>
+                  <span className="text-card-foreground font-medium">{agreement.insurance_responsibility}</span>
                 </div>
                 {agreement.insurance_excess_aed && (
                   <div className="flex justify-between">
-                    <span className="text-white">Insurance Excess:</span>
-                    <span className="text-white font-medium">{formatCurrency(agreement.insurance_excess_aed)}</span>
+                    <span className="text-card-foreground">Insurance Excess:</span>
+                    <span className="text-card-foreground font-medium">{formatCurrency(agreement.insurance_excess_aed)}</span>
                   </div>
                 )}
                 <div className="flex justify-between">
-                  <span className="text-white">Maintenance:</span>
-                  <span className="text-white font-medium">{agreement.maintenance_policy}</span>
+                  <span className="text-card-foreground">Maintenance:</span>
+                  <span className="text-card-foreground font-medium">{agreement.maintenance_policy}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-white">Roadside Assistance:</span>
-                  <span className="text-white font-medium">{agreement.roadside_assistance_included ? 'Included' : 'Not Included'}</span>
+                  <span className="text-card-foreground">Roadside Assistance:</span>
+                  <span className="text-card-foreground font-medium">{agreement.roadside_assistance_included ? 'Included' : 'Not Included'}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-white">Replacement Vehicle:</span>
-                  <span className="text-white font-medium">{agreement.replacement_vehicle_included ? 'Included' : 'Not Included'}</span>
+                  <span className="text-card-foreground">Replacement Vehicle:</span>
+                  <span className="text-card-foreground font-medium">{agreement.replacement_vehicle_included ? 'Included' : 'Not Included'}</span>
                 </div>
                 {agreement.replacement_sla_hours && (
                   <div className="flex justify-between">
-                    <span className="text-white">Replacement SLA:</span>
-                    <span className="text-white font-medium">{agreement.replacement_sla_hours} hours</span>
+                    <span className="text-card-foreground">Replacement SLA:</span>
+                    <span className="text-card-foreground font-medium">{agreement.replacement_sla_hours} hours</span>
                   </div>
                 )}
               </CardContent>
@@ -407,26 +407,26 @@ const CorporateLeasingDetails = () => {
 
             <Card>
               <CardHeader>
-                <CardTitle className="text-white">Operational Policies</CardTitle>
+                <CardTitle className="text-card-foreground">Operational Policies</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-white">Salik/Darb Handling:</span>
-                  <span className="text-white font-medium">{agreement.salik_darb_handling}</span>
+                  <span className="text-card-foreground">Salik/Darb Handling:</span>
+                  <span className="text-card-foreground font-medium">{agreement.salik_darb_handling}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-white">Traffic Fines:</span>
-                  <span className="text-white font-medium">{agreement.traffic_fines_handling}</span>
+                  <span className="text-card-foreground">Traffic Fines:</span>
+                  <span className="text-card-foreground font-medium">{agreement.traffic_fines_handling}</span>
                 </div>
                 {agreement.admin_fee_per_fine_aed && (
                   <div className="flex justify-between">
-                    <span className="text-white">Admin Fee per Fine:</span>
-                    <span className="text-white font-medium">{formatCurrency(agreement.admin_fee_per_fine_aed)}</span>
+                    <span className="text-card-foreground">Admin Fee per Fine:</span>
+                    <span className="text-card-foreground font-medium">{formatCurrency(agreement.admin_fee_per_fine_aed)}</span>
                   </div>
                 )}
                 <div className="flex justify-between">
-                  <span className="text-white">Fuel Handling:</span>
-                  <span className="text-white font-medium">{agreement.fuel_handling}</span>
+                  <span className="text-card-foreground">Fuel Handling:</span>
+                  <span className="text-card-foreground font-medium">{agreement.fuel_handling}</span>
                 </div>
               </CardContent>
             </Card>
@@ -436,15 +436,15 @@ const CorporateLeasingDetails = () => {
         <TabsContent value="lines">
           <Card>
             <CardHeader>
-              <CardTitle className="text-white">Lease Lines</CardTitle>
+              <CardTitle className="text-card-foreground">Lease Lines</CardTitle>
             </CardHeader>
             <CardContent>
               {agreement.corporate_leasing_lines && agreement.corporate_leasing_lines.length > 0 ? (
-                <p className="text-white">
+                <p className="text-card-foreground">
                   {agreement.corporate_leasing_lines.length} lease line(s) configured
                 </p>
               ) : (
-                <p className="text-white text-center py-8">
+                <p className="text-card-foreground text-center py-8">
                   No lease lines configured yet
                 </p>
               )}
@@ -455,28 +455,28 @@ const CorporateLeasingDetails = () => {
         <TabsContent value="billing">
           <Card>
             <CardHeader>
-              <CardTitle className="text-white">Billing Configuration</CardTitle>
+              <CardTitle className="text-card-foreground">Billing Configuration</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex justify-between">
-                <span className="text-white">Billing Day:</span>
-                <span className="text-white font-medium">{agreement.billing_day}</span>
+                <span className="text-card-foreground">Billing Day:</span>
+                <span className="text-card-foreground font-medium">{agreement.billing_day}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-white">Invoice Format:</span>
-                <span className="text-white font-medium">{agreement.invoice_format}</span>
+                <span className="text-card-foreground">Invoice Format:</span>
+                <span className="text-card-foreground font-medium">{agreement.invoice_format}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-white">Line Item Granularity:</span>
-                <span className="text-white font-medium">{agreement.line_item_granularity}</span>
+                <span className="text-card-foreground">Line Item Granularity:</span>
+                <span className="text-card-foreground font-medium">{agreement.line_item_granularity}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-white">Currency:</span>
-                <span className="text-white font-medium">{agreement.currency}</span>
+                <span className="text-card-foreground">Currency:</span>
+                <span className="text-card-foreground font-medium">{agreement.currency}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-white">VAT Code:</span>
-                <span className="text-white font-medium">{agreement.vat_code}</span>
+                <span className="text-card-foreground">VAT Code:</span>
+                <span className="text-card-foreground font-medium">{agreement.vat_code}</span>
               </div>
             </CardContent>
           </Card>
@@ -485,13 +485,13 @@ const CorporateLeasingDetails = () => {
         <TabsContent value="notes">
           <Card>
             <CardHeader>
-              <CardTitle className="text-white">Notes</CardTitle>
+              <CardTitle className="text-card-foreground">Notes</CardTitle>
             </CardHeader>
             <CardContent>
               {agreement.notes ? (
-                <p className="whitespace-pre-wrap text-white">{agreement.notes}</p>
+                <p className="whitespace-pre-wrap text-card-foreground">{agreement.notes}</p>
               ) : (
-                <p className="text-white">No notes available</p>
+                <p className="text-card-foreground">No notes available</p>
               )}
             </CardContent>
           </Card>
