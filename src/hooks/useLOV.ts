@@ -76,7 +76,15 @@ export const useLOV = <T extends LOVItem>(
       }
 
       // Apply ordering
-      query = query.order(orderBy);
+      if (orderBy.includes(' desc')) {
+        const column = orderBy.replace(' desc', '');
+        query = query.order(column, { ascending: false });
+      } else if (orderBy.includes(' asc')) {
+        const column = orderBy.replace(' asc', '');
+        query = query.order(column, { ascending: true });
+      } else {
+        query = query.order(orderBy, { ascending: true });
+      }
 
       const { data, error } = await query;
 
