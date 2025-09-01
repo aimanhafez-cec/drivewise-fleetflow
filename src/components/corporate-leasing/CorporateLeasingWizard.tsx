@@ -194,10 +194,10 @@ export const CorporateLeasingWizard: React.FC<CorporateLeasingWizardProps> = ({
     console.log('Step:', currentStep, 'Required fields:', currentStepFields);
     console.log('Validating fields:', currentStepFields);
     
-    const isValid = await form.trigger(currentStepFields);
-    console.log('Validation result:', isValid);
+    const validationResult = await form.trigger(currentStepFields);
+    console.log('Validation result:', validationResult);
     
-    if (!isValid) {
+    if (!validationResult) {
       const errors = form.formState.errors;
       console.log('Validation errors:', errors);
       // Show which specific fields have errors
