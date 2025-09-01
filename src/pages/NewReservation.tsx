@@ -1194,9 +1194,9 @@ const NewReservation = () => {
                   <Label className="text-foreground">Reservation Entry Date <span className="text-destructive">*</span></Label>
                   <Popover>
                     <PopoverTrigger asChild>
-                      <Button variant="outline" className={cn("w-full justify-start text-left font-normal text-foreground", !formData.entryDate && "text-foreground", errors.entryDate && "border-destructive")}>
+                      <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !formData.entryDate && "text-black", formData.entryDate && "text-foreground", errors.entryDate && "border-destructive")}>
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {formData.entryDate ? format(formData.entryDate, "PPP") : <span className="text-black">Pick entry date</span>}
+                        {formData.entryDate ? format(formData.entryDate, "PPP") : <span>Pick entry date</span>}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
