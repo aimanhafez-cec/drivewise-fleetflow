@@ -92,7 +92,15 @@ const STEPS = [
   { title: 'Financial Security & Compliance', description: 'Security and consent' }
 ];
 
-export const CorporateLeasingWizard: React.FC = () => {
+interface CorporateLeasingWizardProps {
+  initialData?: any;
+  isEditMode?: boolean;
+}
+
+export const CorporateLeasingWizard: React.FC<CorporateLeasingWizardProps> = ({ 
+  initialData, 
+  isEditMode = false 
+}) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
@@ -100,7 +108,54 @@ export const CorporateLeasingWizard: React.FC = () => {
 
   const form = useForm<CorporateLeasingFormData>({
     resolver: zodResolver(corporateLeasingSchema),
-    defaultValues: {
+    defaultValues: isEditMode && initialData ? {
+      legal_entity_id: initialData.legal_entity_id || '',
+      customer_id: initialData.customer_id || '',
+      customer_segment: initialData.customer_segment,
+      bill_to_site_id: initialData.bill_to_site_id || '',
+      contract_manager_id: initialData.contract_manager_id,
+      customer_po_no: initialData.customer_po_no || '',
+      credit_terms: initialData.credit_terms || 'Net 30',
+      credit_limit: initialData.credit_limit,
+      approver_customer_name: initialData.approver_customer_name,
+      approver_customer_email: initialData.approver_customer_email,
+      cost_allocation_mode: initialData.cost_allocation_mode || 'Per Vehicle',
+      framework_model: initialData.framework_model || 'Rate Card by Class',
+      committed_fleet_size: initialData.committed_fleet_size,
+      master_term: initialData.master_term || '24 months',
+      co_terminus_lines: initialData.co_terminus_lines || false,
+      off_hire_notice_period: initialData.off_hire_notice_period || 30,
+      early_termination_allowed: initialData.early_termination_allowed || false,
+      early_termination_rule: initialData.early_termination_rule,
+      renewal_option: initialData.renewal_option,
+      billing_day: initialData.billing_day || 'Anniversary',
+      invoice_format: initialData.invoice_format || 'Consolidated',
+      line_item_granularity: initialData.line_item_granularity || 'Base Rent + Add-ons',
+      discount_schema: initialData.discount_schema,
+      insurance_responsibility: initialData.insurance_responsibility || 'Included (Lessor)',
+      insurance_excess_aed: initialData.insurance_excess_aed,
+      maintenance_policy: initialData.maintenance_policy || 'Full (PM+wear)',
+      tyres_policy: initialData.tyres_policy,
+      tyres_included_after_km: initialData.tyres_included_after_km,
+      roadside_assistance_included: initialData.roadside_assistance_included ?? true,
+      registration_responsibility: initialData.registration_responsibility || 'Lessor',
+      replacement_vehicle_included: initialData.replacement_vehicle_included ?? true,
+      replacement_sla_hours: initialData.replacement_sla_hours,
+      workshop_preference: initialData.workshop_preference || 'OEM',
+      salik_darb_handling: initialData.salik_darb_handling || 'Rebill Actual (monthly)',
+      tolls_admin_fee_model: initialData.tolls_admin_fee_model || 'Per-invoice',
+      traffic_fines_handling: initialData.traffic_fines_handling || 'Auto Rebill + Admin Fee',
+      admin_fee_per_fine_aed: initialData.admin_fee_per_fine_aed || 25,
+      fuel_handling: initialData.fuel_handling || 'Customer Fuel',
+      security_instrument: initialData.security_instrument || 'None',
+      deposit_amount_aed: initialData.deposit_amount_aed,
+      sla_credits_enabled: initialData.sla_credits_enabled || false,
+      sla_credits_percentage: initialData.sla_credits_percentage,
+      telematics_consent: initialData.telematics_consent || false,
+      contract_start_date: initialData.contract_start_date,
+      contract_end_date: initialData.contract_end_date,
+      notes: initialData.notes
+    } : {
       legal_entity_id: '',
       customer_id: '',
       bill_to_site_id: '',
@@ -189,32 +244,52 @@ export const CorporateLeasingWizard: React.FC = () => {
     setIsSubmitting(true);
     
     try {
-      // Generate agreement number
-      const { data: agreementNo } = await supabase.rpc('generate_corporate_lease_no');
-      
       const formData = form.getValues();
       
-      const { error } = await supabase
-        .from('corporate_leasing_agreements')
-        .insert({
-          ...formData,
-          agreement_no: agreementNo,
-          status: 'draft'
+      if (isEditMode && initialData) {
+        // Update existing agreement
+        const { error } = await supabase
+          .from('corporate_leasing_agreements')
+          .update({
+            ...formData,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', initialData.id);
+
+        if (error) throw error;
+
+        toast({
+          title: "Success",
+          description: "Corporate leasing agreement updated successfully",
         });
 
-      if (error) throw error;
+        navigate(`/corporate-leasing/${initialData.id}`);
+      } else {
+        // Create new agreement
+        const { data: agreementNo } = await supabase.rpc('generate_corporate_lease_no');
+        
+        const { error } = await supabase
+          .from('corporate_leasing_agreements')
+          .insert({
+            ...formData,
+            agreement_no: agreementNo,
+            status: 'draft'
+          });
 
-      toast({
-        title: "Success",
-        description: "Corporate leasing agreement created successfully",
-      });
+        if (error) throw error;
 
-      navigate('/corporate-leasing');
+        toast({
+          title: "Success",
+          description: "Corporate leasing agreement created successfully",
+        });
+
+        navigate('/corporate-leasing');
+      }
     } catch (error) {
-      console.error('Error creating corporate leasing agreement:', error);
+      console.error('Error saving corporate leasing agreement:', error);
       toast({
         title: "Error",
-        description: "Failed to create corporate leasing agreement",
+        description: `Failed to ${isEditMode ? 'update' : 'create'} corporate leasing agreement`,
         variant: "destructive",
       });
     } finally {
@@ -247,7 +322,9 @@ export const CorporateLeasingWizard: React.FC = () => {
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <Card>
         <CardHeader>
-          <CardTitle className="text-foreground">Corporate Leasing Agreement</CardTitle>
+          <CardTitle className="text-foreground">
+            {isEditMode ? 'Edit Corporate Leasing Agreement' : 'Corporate Leasing Agreement'}
+          </CardTitle>
           <div className="space-y-2">
             <div className="flex justify-between text-sm text-muted-foreground">
               <span>Step {currentStep + 1} of {STEPS.length}</span>
@@ -284,7 +361,7 @@ export const CorporateLeasingWizard: React.FC = () => {
                   className="flex items-center gap-2"
                 >
                   {currentStep === STEPS.length - 1 ? (
-                    isSubmitting ? 'Creating...' : 'Create Agreement'
+                    isSubmitting ? (isEditMode ? 'Updating...' : 'Creating...') : (isEditMode ? 'Update Agreement' : 'Create Agreement')
                   ) : (
                     <>
                       Next
