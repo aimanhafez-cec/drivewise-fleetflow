@@ -471,4 +471,25 @@
       padding-right: 1.5rem;
     }
   }
+
+  /* White cards override for New Reservation page */
+  .white-cards-page .card-with-background,
+  .white-cards-page [class*="rounded-lg border bg-card"] {
+    background-color: hsl(0 0% 100%) !important;
+    color: hsl(0 0% 0%) !important;
+    border-color: hsl(0 0% 85%) !important;
+  }
+
+  .white-cards-page .card-with-background *,
+  .white-cards-page [class*="rounded-lg border bg-card"] * {
+    color: hsl(0 0% 0%) !important;
+  }
+
+  .white-cards-page .text-card-foreground {
+    color: hsl(0 0% 0%) !important;
+  }
+
+  .white-cards-page .text-muted-foreground {
+    color: hsl(0 0% 40%) !important;
+  }
 }
