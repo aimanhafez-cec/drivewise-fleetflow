@@ -485,36 +485,12 @@
     border-color: hsl(0 0% 85%) !important;
   }
 
-  /* All text elements inside white cards page - exclude form elements */
+  /* All text elements inside white cards page - exclude form elements - MAKE ALL WHITE */
   .white-cards-page *:not(button):not([role="button"]):not(input):not(textarea):not(select):not([role="combobox"]):not([data-radix-select-trigger]):not([data-radix-select-value]) {
-    color: hsl(0 0% 0%) !important;
-  }
-
-  /* Main headings and important text should be white */
-  .white-cards-page h1,
-  .white-cards-page h2,
-  .white-cards-page h3,
-  .white-cards-page .text-3xl,
-  .white-cards-page .text-2xl,
-  .white-cards-page .text-xl,
-  .white-cards-page .text-3xl.font-bold,
-  .white-cards-page p.text-sm.text-muted-foreground,
-  .white-cards-page .text-muted-foreground,
-  .white-cards-page [data-page="new-reservation"] h1,
-  .white-cards-page [data-page="new-reservation"] .text-3xl,
-  .white-cards-page [data-page="new-reservation"] p.text-sm {
     color: hsl(0 0% 100%) !important;
   }
 
-  /* Breadcrumb text should be white */
-  .white-cards-page .breadcrumb,
-  .white-cards-page [data-radix-breadcrumb-list] *,
-  .white-cards-page nav[aria-label="breadcrumb"] *,
-  .white-cards-page a[href="/reservations"],
-  .white-cards-page .breadcrumb-item,
-  .white-cards-page .breadcrumb-link {
-    color: hsl(0 0% 100%) !important;
-  }
+  /* Override muted text to be white too */
 
   .white-cards-page .text-muted-foreground {
     color: hsl(0 0% 40%) !important;
