@@ -29,7 +29,7 @@ export const CarSubscriptionStep8: React.FC<CarSubscriptionStep8Props> = ({ form
               <FormLabel>Geo Restrictions *</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className='text-muted-foreground'>
                     <SelectValue placeholder="Select geographic restrictions" />
                   </SelectTrigger>
                 </FormControl>
@@ -54,7 +54,7 @@ export const CarSubscriptionStep8: React.FC<CarSubscriptionStep8Props> = ({ form
               <FormLabel>Mileage Rollover *</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className='text-muted-foreground'>
                     <SelectValue placeholder="Select mileage rollover policy" />
                   </SelectTrigger>
                 </FormControl>
@@ -76,7 +76,7 @@ export const CarSubscriptionStep8: React.FC<CarSubscriptionStep8Props> = ({ form
               <FormLabel>Vehicle Swap Rules *</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className='text-muted-foreground'>
                     <SelectValue placeholder="Select swap rules" />
                   </SelectTrigger>
                 </FormControl>
@@ -101,7 +101,7 @@ export const CarSubscriptionStep8: React.FC<CarSubscriptionStep8Props> = ({ form
               <FormLabel>Early Cancellation Fee *</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className='text-muted-foreground'>
                     <SelectValue placeholder="Select cancellation fee type" />
                   </SelectTrigger>
                 </FormControl>
@@ -134,6 +134,7 @@ export const CarSubscriptionStep8: React.FC<CarSubscriptionStep8Props> = ({ form
                     placeholder={earlyCancellationFee === 'Fixed AED' ? "300.00" : "50"}
                     {...field}
                     onChange={(e) => field.onChange(Number(e.target.value))}
+                      className='text-muted-foreground'
                   />
                 </FormControl>
                 <FormMessage />
@@ -165,7 +166,7 @@ export const CarSubscriptionStep8: React.FC<CarSubscriptionStep8Props> = ({ form
 
       <div className="bg-purple-50 p-4 rounded-lg">
         <h4 className="font-medium mb-2">Usage Policy Guidelines</h4>
-        <div className="text-sm text-muted-foreground space-y-1">
+        <div className="text-sm text-card-foreground space-y-1">
           <p><strong>UAE-only:</strong> Vehicle restricted to UAE borders and off-road prohibited</p>
           <p><strong>GCC Allowed:</strong> Cross-border travel to GCC countries permitted</p>
           <p><strong>Mileage Rollover:</strong> Unused monthly KM can be carried forward (with limits)</p>

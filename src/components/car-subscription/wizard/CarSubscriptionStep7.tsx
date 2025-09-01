@@ -28,7 +28,7 @@ export const CarSubscriptionStep7: React.FC<CarSubscriptionStep7Props> = ({ form
               <FormLabel>Security Deposit *</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className='text-muted-foreground'>
                     <SelectValue placeholder="Select security deposit option" />
                   </SelectTrigger>
                 </FormControl>
@@ -59,6 +59,7 @@ export const CarSubscriptionStep7: React.FC<CarSubscriptionStep7Props> = ({ form
                     placeholder="Security deposit amount"
                     {...field}
                     onChange={(e) => field.onChange(Number(e.target.value))}
+                     className='text-muted-foreground'
                   />
                 </FormControl>
                 <FormMessage />
@@ -75,7 +76,7 @@ export const CarSubscriptionStep7: React.FC<CarSubscriptionStep7Props> = ({ form
               <FormLabel>Payment Method *</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className='text-muted-foreground'>
                     <SelectValue placeholder="Select payment method" />
                   </SelectTrigger>
                 </FormControl>
@@ -100,7 +101,7 @@ export const CarSubscriptionStep7: React.FC<CarSubscriptionStep7Props> = ({ form
               <FormLabel>Auto-charge Retries *</FormLabel>
               <Select onValueChange={(value) => field.onChange(Number(value))} defaultValue={field.value?.toString()}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className='text-muted-foreground'>
                     <SelectValue placeholder="Select retry attempts" />
                   </SelectTrigger>
                 </FormControl>
@@ -123,7 +124,7 @@ export const CarSubscriptionStep7: React.FC<CarSubscriptionStep7Props> = ({ form
           <div className="space-y-2">
             <label className="text-sm font-medium">Dunning Rules</label>
             <div className="p-3 bg-gray-50 rounded-md">
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-card-foreground">
                 Email/SMS Day 0/3/7 → Suspend Day X
               </p>
             </div>
@@ -132,7 +133,7 @@ export const CarSubscriptionStep7: React.FC<CarSubscriptionStep7Props> = ({ form
           <div className="space-y-2">
             <label className="text-sm font-medium">Suspension Behavior</label>
             <Select defaultValue="Notice only">
-              <SelectTrigger>
+              <SelectTrigger className='text-muted-foreground'>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -146,7 +147,7 @@ export const CarSubscriptionStep7: React.FC<CarSubscriptionStep7Props> = ({ form
 
       <div className="bg-red-50 p-4 rounded-lg">
         <h4 className="font-medium mb-2">Payment Processing</h4>
-        <div className="text-sm text-muted-foreground space-y-1">
+        <div className="text-sm text-card-foreground space-y-1">
           <p><strong>Card Autopay:</strong> Automatic monthly charging. Recommended for subscriptions.</p>
           <p><strong>Direct Debit:</strong> Bank account deduction. Requires customer authorization.</p>
           <p><strong>Invoice (Corporate):</strong> Manual invoice payment. Suitable for corporate customers.</p>

@@ -260,7 +260,7 @@ export const CarSubscriptionWizard: React.FC = () => {
       <Card>
         <CardHeader>
           <CardTitle>New Car Subscription</CardTitle>
-          <CardDescription>
+          <CardDescription className="text-card-foreground">
             Step {currentStep + 1} of {STEPS.length}: {STEPS[currentStep].title}
           </CardDescription>
         </CardHeader>

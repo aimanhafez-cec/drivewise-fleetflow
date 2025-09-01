@@ -27,7 +27,7 @@ export const CarSubscriptionStep6: React.FC<CarSubscriptionStep6Props> = ({ form
               <FormLabel>Salik/Darb Handling *</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className='text-muted-foreground'>
                     <SelectValue placeholder="Select Salik/Darb handling method" />
                   </SelectTrigger>
                 </FormControl>
@@ -74,7 +74,7 @@ export const CarSubscriptionStep6: React.FC<CarSubscriptionStep6Props> = ({ form
               <FormLabel>Admin Fee Model (Tolls)</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className='text-muted-foreground'>
                     <SelectValue placeholder="Select admin fee model" />
                   </SelectTrigger>
                 </FormControl>
@@ -101,7 +101,7 @@ export const CarSubscriptionStep6: React.FC<CarSubscriptionStep6Props> = ({ form
               <FormLabel>Traffic Fines Handling *</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className='text-muted-foreground'>
                     <SelectValue placeholder="Select fines handling method" />
                   </SelectTrigger>
                 </FormControl>
@@ -128,6 +128,7 @@ export const CarSubscriptionStep6: React.FC<CarSubscriptionStep6Props> = ({ form
                   placeholder="50.00"
                   {...field}
                   onChange={(e) => field.onChange(Number(e.target.value))}
+                   className='text-muted-foreground'
                 />
               </FormControl>
               <FormMessage />
@@ -138,7 +139,7 @@ export const CarSubscriptionStep6: React.FC<CarSubscriptionStep6Props> = ({ form
 
       <div className="bg-orange-50 p-4 rounded-lg">
         <h4 className="font-medium mb-2">UAE Subscription Reality</h4>
-        <div className="text-sm text-muted-foreground space-y-2">
+        <div className="text-sm text-card-foreground space-y-2">
           <p><strong>Rebill Actual (Safer):</strong> Customer pays actual Salik/Darb charges plus optional admin fee. No disputes over allowances.</p>
           <p><strong>Included Allowance:</strong> Monthly cap on tolls included in subscription. Excess charges rebilled to customer.</p>
           <p><strong>Traffic Fines:</strong> Auto-rebill with admin fee is recommended. Customer disputes can be handled while keeping AR aging active.</p>

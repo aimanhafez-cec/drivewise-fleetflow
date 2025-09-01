@@ -28,7 +28,7 @@ export const CarSubscriptionStep4: React.FC<CarSubscriptionStep4Props> = ({ form
               <FormLabel>Plan *</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className='text-muted-foreground'>
                     <SelectValue placeholder="Select subscription plan" />
                   </SelectTrigger>
                 </FormControl>
@@ -58,6 +58,7 @@ export const CarSubscriptionStep4: React.FC<CarSubscriptionStep4Props> = ({ form
                   placeholder="2500.00"
                   {...field}
                   onChange={(e) => field.onChange(Number(e.target.value))}
+                  className='text-muted-foreground'
                 />
               </FormControl>
               <FormMessage />
@@ -77,6 +78,7 @@ export const CarSubscriptionStep4: React.FC<CarSubscriptionStep4Props> = ({ form
                   placeholder="2500"
                   {...field}
                   onChange={(e) => field.onChange(Number(e.target.value))}
+                  className='text-muted-foreground'
                 />
               </FormControl>
               <FormMessage />
@@ -97,6 +99,7 @@ export const CarSubscriptionStep4: React.FC<CarSubscriptionStep4Props> = ({ form
                   placeholder="0.50"
                   {...field}
                   onChange={(e) => field.onChange(Number(e.target.value))}
+                  className='text-muted-foreground'
                 />
               </FormControl>
               <FormMessage />
@@ -112,7 +115,7 @@ export const CarSubscriptionStep4: React.FC<CarSubscriptionStep4Props> = ({ form
               <FormLabel>Extra Drivers Included *</FormLabel>
               <Select onValueChange={(value) => field.onChange(Number(value))} defaultValue={field.value?.toString()}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className='text-muted-foreground'>
                     <SelectValue placeholder="Select number of extra drivers" />
                   </SelectTrigger>
                 </FormControl>
@@ -135,7 +138,7 @@ export const CarSubscriptionStep4: React.FC<CarSubscriptionStep4Props> = ({ form
               <FormLabel>Delivery/Collection *</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className='text-muted-foreground'>
                     <SelectValue placeholder="Select delivery option" />
                   </SelectTrigger>
                 </FormControl>
@@ -197,7 +200,7 @@ export const CarSubscriptionStep4: React.FC<CarSubscriptionStep4Props> = ({ form
               <FormLabel>VAT Code *</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className='text-muted-foreground'>
                     <SelectValue placeholder="Select VAT code" />
                   </SelectTrigger>
                 </FormControl>
@@ -219,7 +222,7 @@ export const CarSubscriptionStep4: React.FC<CarSubscriptionStep4Props> = ({ form
               <FormLabel>Billing Day *</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className='text-muted-foreground'>
                     <SelectValue placeholder="Select billing day" />
                   </SelectTrigger>
                 </FormControl>
@@ -239,7 +242,7 @@ export const CarSubscriptionStep4: React.FC<CarSubscriptionStep4Props> = ({ form
 
       <div className="bg-green-50 p-4 rounded-lg">
         <h4 className="font-medium mb-2">Plan Details</h4>
-        <div className="text-sm text-muted-foreground">
+        <div className="text-sm text-card-foreground">
           {plan === 'Essential' && (
             <p>Basic subscription with essential services included. Lower monthly fee, basic KM allowance.</p>
           )}

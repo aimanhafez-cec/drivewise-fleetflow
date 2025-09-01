@@ -34,7 +34,7 @@ export const CarSubscriptionStep9: React.FC<CarSubscriptionStep9Props> = ({ form
                 <FormLabel>Maintenance Trigger *</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
-                    <SelectTrigger>
+                    <SelectTrigger className='text-muted-foreground'>
                       <SelectValue placeholder="Select maintenance trigger" />
                     </SelectTrigger>
                   </FormControl>
@@ -85,6 +85,7 @@ export const CarSubscriptionStep9: React.FC<CarSubscriptionStep9Props> = ({ form
                       placeholder="12"
                       {...field}
                       onChange={(e) => field.onChange(Number(e.target.value))}
+                      className='text-muted-foreground'
                     />
                   </FormControl>
                   <FormMessage />
@@ -101,7 +102,7 @@ export const CarSubscriptionStep9: React.FC<CarSubscriptionStep9Props> = ({ form
                 <FormLabel>Preferred Workshop *</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
-                    <SelectTrigger>
+                    <SelectTrigger className='text-muted-foreground'>
                       <SelectValue placeholder="Select preferred workshop" />
                     </SelectTrigger>
                   </FormControl>
@@ -126,7 +127,7 @@ export const CarSubscriptionStep9: React.FC<CarSubscriptionStep9Props> = ({ form
             <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
               <div className="space-y-0.5">
                 <FormLabel className="text-base">Auto-Create Service Jobs</FormLabel>
-                <div className="text-sm text-muted-foreground">
+                <div className="text-sm text-card-foreground">
                   Automatically create maintenance tasks in OFS/Service Logistics
                 </div>
               </div>
@@ -151,7 +152,7 @@ export const CarSubscriptionStep9: React.FC<CarSubscriptionStep9Props> = ({ form
             <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
               <div className="space-y-0.5">
                 <FormLabel className="text-base">Telematics Device</FormLabel>
-                <div className="text-sm text-muted-foreground">
+                <div className="text-sm text-card-foreground">
                   Install GPS tracking device in vehicle
                 </div>
               </div>
@@ -191,7 +192,7 @@ export const CarSubscriptionStep9: React.FC<CarSubscriptionStep9Props> = ({ form
                 <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                   <div className="space-y-0.5">
                     <FormLabel className="text-base">Tracking Consent</FormLabel>
-                    <div className="text-sm text-muted-foreground">
+                    <div className="text-sm text-card-foreground">
                       Customer consent for GPS tracking and data collection
                     </div>
                   </div>
@@ -215,7 +216,7 @@ export const CarSubscriptionStep9: React.FC<CarSubscriptionStep9Props> = ({ form
               <FormLabel>Condition Report Cadence *</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className='text-muted-foreground'>
                     <SelectValue placeholder="Select condition report frequency" />
                   </SelectTrigger>
                 </FormControl>
@@ -235,7 +236,7 @@ export const CarSubscriptionStep9: React.FC<CarSubscriptionStep9Props> = ({ form
 
       <div className="bg-green-50 p-4 rounded-lg">
         <h4 className="font-medium mb-2">Service Operations</h4>
-        <div className="text-sm text-muted-foreground space-y-1">
+        <div className="text-sm text-card-foreground space-y-1">
           <p><strong>OEM Workshop:</strong> Authorized dealer service centers</p>
           <p><strong>In-house:</strong> Company-owned service facilities</p>
           <p><strong>Partner:</strong> Approved third-party service providers</p>

@@ -35,6 +35,7 @@ export const CarSubscriptionStep3: React.FC<CarSubscriptionStep3Props> = ({ form
                 <Input
                   type="date"
                   {...field}
+                  className='text-muted-foreground'
                 />
               </FormControl>
               <FormMessage />
@@ -50,7 +51,7 @@ export const CarSubscriptionStep3: React.FC<CarSubscriptionStep3Props> = ({ form
               <FormLabel>Renewal Cycle *</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className="text-muted-foreground">
                     <SelectValue placeholder="Select renewal cycle" />
                   </SelectTrigger>
                 </FormControl>
@@ -75,7 +76,7 @@ export const CarSubscriptionStep3: React.FC<CarSubscriptionStep3Props> = ({ form
               <FormLabel>Minimum Commitment *</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className="text-muted-foreground">
                     <SelectValue placeholder="Select minimum commitment" />
                   </SelectTrigger>
                 </FormControl>
@@ -100,7 +101,7 @@ export const CarSubscriptionStep3: React.FC<CarSubscriptionStep3Props> = ({ form
               <FormLabel>Cancellation Notice *</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className="text-muted-foreground">
                     <SelectValue placeholder="Select cancellation notice period" />
                   </SelectTrigger>
                 </FormControl>
@@ -128,7 +129,7 @@ export const CarSubscriptionStep3: React.FC<CarSubscriptionStep3Props> = ({ form
             <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
               <div className="space-y-0.5">
                 <FormLabel className="text-base">Swap Allowed</FormLabel>
-                <div className="text-sm text-muted-foreground">
+                <div className="text-sm text-card-foreground">
                   Allow customer to swap vehicles during subscription
                 </div>
               </div>
@@ -151,7 +152,7 @@ export const CarSubscriptionStep3: React.FC<CarSubscriptionStep3Props> = ({ form
                 <FormLabel>Swap Frequency *</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
-                    <SelectTrigger>
+                    <SelectTrigger className='text-muted-foreground'>
                       <SelectValue placeholder="Select swap frequency" />
                     </SelectTrigger>
                   </FormControl>
@@ -180,7 +181,7 @@ export const CarSubscriptionStep3: React.FC<CarSubscriptionStep3Props> = ({ form
             <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
               <div className="space-y-0.5">
                 <FormLabel className="text-base">Pause/Freeze Allowed</FormLabel>
-                <div className="text-sm text-muted-foreground">
+                <div className="text-sm text-card-foreground">
                   Allow customer to temporarily pause subscription
                 </div>
               </div>

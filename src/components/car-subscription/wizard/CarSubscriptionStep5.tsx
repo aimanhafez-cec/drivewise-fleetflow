@@ -28,7 +28,7 @@ export const CarSubscriptionStep5: React.FC<CarSubscriptionStep5Props> = ({ form
               <FormLabel>Insurance *</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className='text-muted-foreground'>
                     <SelectValue placeholder="Select insurance type" />
                   </SelectTrigger>
                 </FormControl>
@@ -53,7 +53,7 @@ export const CarSubscriptionStep5: React.FC<CarSubscriptionStep5Props> = ({ form
               <FormLabel>Maintenance *</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className='text-muted-foreground'>
                     <SelectValue placeholder="Select maintenance inclusion" />
                   </SelectTrigger>
                 </FormControl>
@@ -78,7 +78,7 @@ export const CarSubscriptionStep5: React.FC<CarSubscriptionStep5Props> = ({ form
               <FormLabel>Tyres *</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className='text-muted-foreground'>
                     <SelectValue placeholder="Select tyres inclusion" />
                   </SelectTrigger>
                 </FormControl>
@@ -103,7 +103,7 @@ export const CarSubscriptionStep5: React.FC<CarSubscriptionStep5Props> = ({ form
               <FormLabel>Roadside Assistance *</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className='text-muted-foreground'>
                     <SelectValue placeholder="Select roadside assistance" />
                   </SelectTrigger>
                 </FormControl>
@@ -125,7 +125,7 @@ export const CarSubscriptionStep5: React.FC<CarSubscriptionStep5Props> = ({ form
               <FormLabel>Registration & Renewal *</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className='text-muted-foreground'>
                     <SelectValue placeholder="Select registration handling" />
                   </SelectTrigger>
                 </FormControl>
@@ -147,7 +147,7 @@ export const CarSubscriptionStep5: React.FC<CarSubscriptionStep5Props> = ({ form
               <FormLabel>Replacement Vehicle *</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className='text-muted-foreground'>
                     <SelectValue placeholder="Select replacement vehicle policy" />
                   </SelectTrigger>
                 </FormControl>
@@ -185,7 +185,7 @@ export const CarSubscriptionStep5: React.FC<CarSubscriptionStep5Props> = ({ form
 
       <div className="bg-blue-50 p-4 rounded-lg">
         <h4 className="font-medium mb-2">All-Inclusive Benefits</h4>
-        <div className="text-sm text-muted-foreground space-y-1">
+        <div className="text-sm text-card-foreground space-y-1">
           <p><strong>Comprehensive Insurance:</strong> Full coverage with minimal customer liability</p>
           <p><strong>Maintenance Included:</strong> All scheduled maintenance covered</p>
           <p><strong>Tyres Included:</strong> Tyre replacement and repairs covered</p>

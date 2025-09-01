@@ -38,7 +38,7 @@ export const CarSubscriptionStep10: React.FC<CarSubscriptionStep10Props> = ({ fo
               <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                 <div className="space-y-0.5">
                   <FormLabel className="text-base">Auto-Renew</FormLabel>
-                  <div className="text-sm text-muted-foreground">
+                  <div className="text-sm text-card-foreground">
                     Automatically renew subscription at end of cycle
                   </div>
                 </div>
@@ -60,7 +60,7 @@ export const CarSubscriptionStep10: React.FC<CarSubscriptionStep10Props> = ({ fo
                 <FormLabel>Swap Request Flow *</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
-                    <SelectTrigger>
+                    <SelectTrigger className='text-muted-foreground'>
                       <SelectValue placeholder="Select swap request flow" />
                     </SelectTrigger>
                   </FormControl>
@@ -84,7 +84,7 @@ export const CarSubscriptionStep10: React.FC<CarSubscriptionStep10Props> = ({ fo
               <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                 <div className="space-y-0.5">
                   <FormLabel className="text-base">Exit Inspection Required</FormLabel>
-                  <div className="text-sm text-muted-foreground">
+                  <div className="text-sm text-card-foreground">
                     Mandatory inspection before subscription termination
                   </div>
                 </div>
@@ -106,7 +106,7 @@ export const CarSubscriptionStep10: React.FC<CarSubscriptionStep10Props> = ({ fo
                 <FormLabel>Final Billing *</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
-                    <SelectTrigger>
+                    <SelectTrigger className='text-muted-foreground'>
                       <SelectValue placeholder="Select final billing method" />
                     </SelectTrigger>
                   </FormControl>
@@ -134,7 +134,7 @@ export const CarSubscriptionStep10: React.FC<CarSubscriptionStep10Props> = ({ fo
               <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                 <div className="space-y-0.5">
                   <FormLabel className="text-base">Buyout Offer Available</FormLabel>
-                  <div className="text-sm text-muted-foreground">
+                  <div className="text-sm text-card-foreground">
                     Allow customer to purchase vehicle at end of subscription
                   </div>
                 </div>
@@ -226,23 +226,23 @@ export const CarSubscriptionStep10: React.FC<CarSubscriptionStep10Props> = ({ fo
             <label className="text-sm font-medium">Condition Report Out</label>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
-                <p className="text-sm text-muted-foreground">Front</p>
-                <p className="text-xs text-muted-foreground">Click to upload</p>
+                <p className="text-sm text-card-foreground">Front</p>
+                <p className="text-xs text-card-foreground">Click to upload</p>
               </div>
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
-                <p className="text-sm text-muted-foreground">Rear</p>
-                <p className="text-xs text-muted-foreground">Click to upload</p>
+                <p className="text-sm text-card-foreground">Rear</p>
+                <p className="text-xs text-card-foreground">Click to upload</p>
               </div>
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
-                <p className="text-sm text-muted-foreground">Left</p>
-                <p className="text-xs text-muted-foreground">Click to upload</p>
+                <p className="text-sm text-card-foreground">Left</p>
+                <p className="text-xs text-card-foreground">Click to upload</p>
               </div>
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
-                <p className="text-sm text-muted-foreground">Right</p>
-                <p className="text-xs text-muted-foreground">Click to upload</p>
+                <p className="text-sm text-card-foreground">Right</p>
+                <p className="text-xs text-card-foreground">Click to upload</p>
               </div>
             </div>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-card-foreground">
               Vehicle condition photos and notes required for handover
             </p>
           </div>
@@ -269,7 +269,7 @@ export const CarSubscriptionStep10: React.FC<CarSubscriptionStep10Props> = ({ fo
 
       <div className="bg-blue-50 p-4 rounded-lg">
         <h4 className="font-medium mb-2">Subscription Lifecycle</h4>
-        <div className="text-sm text-muted-foreground space-y-1">
+        <div className="text-sm text-card-foreground space-y-1">
           <p><strong>Self-service App:</strong> Customers can request swaps through mobile app</p>
           <p><strong>Pro-rata Billing:</strong> Final bill calculated based on actual usage days</p>
           <p><strong>Exit Inspection:</strong> Ensures vehicle condition assessment before return</p>

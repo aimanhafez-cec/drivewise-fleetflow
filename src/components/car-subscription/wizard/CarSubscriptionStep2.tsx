@@ -27,7 +27,7 @@ export const CarSubscriptionStep2: React.FC<CarSubscriptionStep2Props> = ({ form
               <FormLabel>Subscription Model *</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className="text-muted-foreground">
                     <SelectValue placeholder="Select subscription model" />
                   </SelectTrigger>
                 </FormControl>
@@ -128,7 +128,7 @@ export const CarSubscriptionStep2: React.FC<CarSubscriptionStep2Props> = ({ form
 
       <div className="bg-blue-50 p-4 rounded-lg">
         <h4 className="font-medium mb-2">Subscription Model Information</h4>
-        <div className="text-sm text-muted-foreground space-y-1">
+        <div className="text-sm text-card-foreground space-y-1">
           <p><strong>By Class:</strong> Customer subscribes to a vehicle class (e.g., Economy, SUV). Actual vehicle assigned based on availability.</p>
           <p><strong>By Specific VIN:</strong> Customer subscribes to a specific vehicle. Plate number and odometer reading are recorded at start.</p>
         </div>

@@ -23,7 +23,7 @@ export const CarSubscriptionStep1: React.FC<CarSubscriptionStep1Props> = ({ form
               <FormLabel>Customer Type *</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className="text-muted-foreground">
                     <SelectValue placeholder="Select customer type" />
                   </SelectTrigger>
                 </FormControl>
@@ -80,7 +80,7 @@ export const CarSubscriptionStep1: React.FC<CarSubscriptionStep1Props> = ({ form
           <Input placeholder="Mobile number" />
           <Input placeholder="Email address" />
         </div>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-card-foreground">
           Primary drivers are optional but recommended for extra driver rule checks
         </p>
       </div>
@@ -89,19 +89,19 @@ export const CarSubscriptionStep1: React.FC<CarSubscriptionStep1Props> = ({ form
         <h4 className="font-medium">KYC Documents</h4>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
-            <p className="text-sm text-muted-foreground">Emirates ID</p>
-            <p className="text-xs text-muted-foreground">Click to upload</p>
+            <p className="text-sm text-card-foreground">Emirates ID</p>
+            <p className="text-xs text-card-foreground">Click to upload</p>
           </div>
           <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
-            <p className="text-sm text-muted-foreground">Passport</p>
-            <p className="text-xs text-muted-foreground">Click to upload</p>
+            <p className="text-sm text-card-foreground">Passport</p>
+            <p className="text-xs text-card-foreground">Click to upload</p>
           </div>
           <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
-            <p className="text-sm text-muted-foreground">License</p>
-            <p className="text-xs text-muted-foreground">Click to upload</p>
+            <p className="text-sm text-card-foreground">License</p>
+            <p className="text-xs text-card-foreground">Click to upload</p>
           </div>
         </div>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-card-foreground">
           KYC documents are required. Please validate expiry dates.
         </p>
       </div>
