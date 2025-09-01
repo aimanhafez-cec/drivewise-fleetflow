@@ -145,7 +145,7 @@ export const CorporateLeasingStep2: React.FC<CorporateLeasingStep2Props> = ({ fo
               </FormControl>
               <div className="space-y-1 leading-none">
                 <FormLabel className="text-card-foreground">Allow Early Termination</FormLabel>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-card-foreground">
                   Enable early termination with penalty rules
                 </p>
               </div>

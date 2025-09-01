@@ -172,7 +172,7 @@ export const CorporateLeasingStep4: React.FC<CorporateLeasingStep4Props> = ({ fo
               </FormControl>
               <div className="space-y-1 leading-none">
                 <FormLabel>Include Roadside Assistance</FormLabel>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-card-foreground">
                   24/7 roadside assistance coverage included in the agreement
                 </p>
               </div>
@@ -199,7 +199,7 @@ export const CorporateLeasingStep4: React.FC<CorporateLeasingStep4Props> = ({ fo
               </FormControl>
               <div className="space-y-1 leading-none">
                 <FormLabel>Include Replacement Vehicle</FormLabel>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-card-foreground">
                   Provide replacement vehicle during maintenance or repairs
                 </p>
               </div>

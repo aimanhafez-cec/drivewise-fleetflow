@@ -174,7 +174,7 @@ export const CorporateLeasingStep6: React.FC<CorporateLeasingStep6Props> = ({ fo
               </FormControl>
               <div className="space-y-1 leading-none">
                 <FormLabel>Enable SLA Credits</FormLabel>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-card-foreground">
                   Provide credits for service level agreement breaches
                 </p>
               </div>
@@ -219,7 +219,7 @@ export const CorporateLeasingStep6: React.FC<CorporateLeasingStep6Props> = ({ fo
               </FormControl>
               <div className="space-y-1 leading-none">
                 <FormLabel>Data Privacy & Telematics Consent</FormLabel>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-card-foreground">
                   Customer consents to vehicle telematics data collection and processing for fleet management purposes
                 </p>
               </div>
