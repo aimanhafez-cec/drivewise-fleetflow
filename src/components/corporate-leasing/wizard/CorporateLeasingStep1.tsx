@@ -63,6 +63,20 @@ export const CorporateLeasingStep1: React.FC<CorporateLeasingStep1Props> = ({ fo
                   value={field.value}
                   onChange={(value) => {
                     field.onChange(value);
+                    
+                    // Find the selected customer and auto-fill related fields
+                    const selectedCustomer = customers.find(customer => customer.id === value);
+                    if (selectedCustomer) {
+                      // Auto-fill credit limit
+                      if (selectedCustomer.credit_limit) {
+                        form.setValue('credit_limit', selectedCustomer.credit_limit);
+                      }
+                      // Auto-fill PO/BPA number
+                      if (selectedCustomer.default_po_bpa_no) {
+                        form.setValue('customer_po_no', selectedCustomer.default_po_bpa_no);
+                      }
+                    }
+                    
                     // Clear bill_to_site when customer changes
                     form.setValue('bill_to_site_id', undefined);
                   }}

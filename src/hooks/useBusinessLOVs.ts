@@ -8,10 +8,12 @@ export interface Customer {
   phone?: string;
   email?: string;
   status: string;
+  credit_limit?: number;
+  default_po_bpa_no?: string;
 }
 
 export const useCustomers = (searchQuery?: string) => {
-  const result = useLOV<Customer>('customers', 'id, full_name, phone, email', {
+  const result = useLOV<Customer>('customers', 'id, full_name, phone, email, credit_limit, default_po_bpa_no', {
     searchFields: ['full_name', 'email'],
     orderBy: 'full_name'
   });
@@ -30,7 +32,7 @@ export const useCustomers = (searchQuery?: string) => {
 };
 
 export const useCustomerById = (id?: string) => {
-  return useLOVById<Customer>('customers', 'id, full_name, phone, email', id);
+  return useLOVById<Customer>('customers', 'id, full_name, phone, email, credit_limit, default_po_bpa_no', id);
 };
 
 // Vehicle Categories (Classes)

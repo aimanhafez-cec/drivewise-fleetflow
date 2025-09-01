@@ -185,6 +185,258 @@ export type Database = {
           },
         ]
       }
+      car_subscriptions: {
+        Row: {
+          admin_fee_model: string | null
+          admin_fee_per_fine: number | null
+          auto_charge_retries: number
+          auto_create_service_jobs: boolean
+          auto_renew: boolean
+          bill_to_contact: string | null
+          billing_day: Database["public"]["Enums"]["billing_day_type"]
+          buyout_amount: number | null
+          buyout_offer: boolean | null
+          cancellation_notice: Database["public"]["Enums"]["cancellation_notice"]
+          condition_report_cadence: Database["public"]["Enums"]["condition_report_cadence"]
+          condition_report_out: Json | null
+          contract_end_date: string | null
+          contract_freeze_fee: number | null
+          contract_start_date: string | null
+          created_at: string
+          created_by: string | null
+          customer_id: string
+          customer_type: Database["public"]["Enums"]["customer_type"]
+          delivery_collection: string
+          deposit_amount: number | null
+          dunning_rules: string
+          early_cancellation_amount: number | null
+          early_cancellation_fee: Database["public"]["Enums"]["early_cancellation_fee_type"]
+          excess_km_rate: number
+          exit_inspection: boolean
+          extra_drivers_included: number
+          final_billing: Database["public"]["Enums"]["final_billing_type"]
+          fuel_level_out: string | null
+          geo_restrictions: Database["public"]["Enums"]["geo_restrictions"]
+          id: string
+          included_km_month: number
+          insurance: Database["public"]["Enums"]["insurance_type"]
+          joining_setup_fee: number | null
+          maintenance: Database["public"]["Enums"]["maintenance_inclusion"]
+          maintenance_km_interval: number | null
+          maintenance_month_interval: number | null
+          maintenance_trigger: Database["public"]["Enums"]["maintenance_trigger"]
+          mileage_rollover: Database["public"]["Enums"]["mileage_rollover"]
+          minimum_commitment: Database["public"]["Enums"]["minimum_commitment"]
+          monthly_fee: number
+          notes: string | null
+          odometer_out: number | null
+          pause_freeze_allowed: boolean
+          pause_freeze_limit: number | null
+          payment_method: Database["public"]["Enums"]["payment_method_type"]
+          plan: Database["public"]["Enums"]["subscription_plan"]
+          plate_no: string | null
+          preferred_workshop: Database["public"]["Enums"]["preferred_workshop"]
+          registration_renewal: Database["public"]["Enums"]["maintenance_inclusion"]
+          renewal_cycle: Database["public"]["Enums"]["renewal_cycle"]
+          rental_type: string
+          replacement_sla: number | null
+          replacement_sla_unit:
+            | Database["public"]["Enums"]["replacement_sla_unit"]
+            | null
+          replacement_vehicle: Database["public"]["Enums"]["maintenance_inclusion"]
+          roadside_assistance: Database["public"]["Enums"]["maintenance_inclusion"]
+          salik_darb_allowance_cap: number | null
+          salik_darb_handling: Database["public"]["Enums"]["salik_handling"]
+          security_deposit: string
+          signed_date: string | null
+          start_date: string
+          status: Database["public"]["Enums"]["car_subscription_status"]
+          subscription_id: string | null
+          subscription_model: Database["public"]["Enums"]["subscription_model"]
+          suspension_behavior: Database["public"]["Enums"]["suspension_behavior"]
+          swap_allowed: boolean
+          swap_frequency: Database["public"]["Enums"]["swap_frequency"]
+          swap_request_flow: Database["public"]["Enums"]["swap_request_flow"]
+          telematics_device: boolean | null
+          telematics_device_id: string | null
+          tracking_consent: boolean | null
+          traffic_fines_handling: string
+          tyres: Database["public"]["Enums"]["maintenance_inclusion"]
+          updated_at: string
+          upgrade_downgrade_fee: number | null
+          vat_code: string
+          vehicle_class_id: string | null
+          vehicle_id: string | null
+          vehicle_swap_rules: Database["public"]["Enums"]["vehicle_swap_rules"]
+        }
+        Insert: {
+          admin_fee_model?: string | null
+          admin_fee_per_fine?: number | null
+          auto_charge_retries?: number
+          auto_create_service_jobs?: boolean
+          auto_renew?: boolean
+          bill_to_contact?: string | null
+          billing_day?: Database["public"]["Enums"]["billing_day_type"]
+          buyout_amount?: number | null
+          buyout_offer?: boolean | null
+          cancellation_notice?: Database["public"]["Enums"]["cancellation_notice"]
+          condition_report_cadence?: Database["public"]["Enums"]["condition_report_cadence"]
+          condition_report_out?: Json | null
+          contract_end_date?: string | null
+          contract_freeze_fee?: number | null
+          contract_start_date?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_id: string
+          customer_type: Database["public"]["Enums"]["customer_type"]
+          delivery_collection?: string
+          deposit_amount?: number | null
+          dunning_rules?: string
+          early_cancellation_amount?: number | null
+          early_cancellation_fee?: Database["public"]["Enums"]["early_cancellation_fee_type"]
+          excess_km_rate: number
+          exit_inspection?: boolean
+          extra_drivers_included?: number
+          final_billing?: Database["public"]["Enums"]["final_billing_type"]
+          fuel_level_out?: string | null
+          geo_restrictions?: Database["public"]["Enums"]["geo_restrictions"]
+          id?: string
+          included_km_month: number
+          insurance?: Database["public"]["Enums"]["insurance_type"]
+          joining_setup_fee?: number | null
+          maintenance?: Database["public"]["Enums"]["maintenance_inclusion"]
+          maintenance_km_interval?: number | null
+          maintenance_month_interval?: number | null
+          maintenance_trigger?: Database["public"]["Enums"]["maintenance_trigger"]
+          mileage_rollover?: Database["public"]["Enums"]["mileage_rollover"]
+          minimum_commitment?: Database["public"]["Enums"]["minimum_commitment"]
+          monthly_fee: number
+          notes?: string | null
+          odometer_out?: number | null
+          pause_freeze_allowed?: boolean
+          pause_freeze_limit?: number | null
+          payment_method?: Database["public"]["Enums"]["payment_method_type"]
+          plan?: Database["public"]["Enums"]["subscription_plan"]
+          plate_no?: string | null
+          preferred_workshop?: Database["public"]["Enums"]["preferred_workshop"]
+          registration_renewal?: Database["public"]["Enums"]["maintenance_inclusion"]
+          renewal_cycle?: Database["public"]["Enums"]["renewal_cycle"]
+          rental_type?: string
+          replacement_sla?: number | null
+          replacement_sla_unit?:
+            | Database["public"]["Enums"]["replacement_sla_unit"]
+            | null
+          replacement_vehicle?: Database["public"]["Enums"]["maintenance_inclusion"]
+          roadside_assistance?: Database["public"]["Enums"]["maintenance_inclusion"]
+          salik_darb_allowance_cap?: number | null
+          salik_darb_handling?: Database["public"]["Enums"]["salik_handling"]
+          security_deposit?: string
+          signed_date?: string | null
+          start_date: string
+          status?: Database["public"]["Enums"]["car_subscription_status"]
+          subscription_id?: string | null
+          subscription_model?: Database["public"]["Enums"]["subscription_model"]
+          suspension_behavior?: Database["public"]["Enums"]["suspension_behavior"]
+          swap_allowed?: boolean
+          swap_frequency?: Database["public"]["Enums"]["swap_frequency"]
+          swap_request_flow?: Database["public"]["Enums"]["swap_request_flow"]
+          telematics_device?: boolean | null
+          telematics_device_id?: string | null
+          tracking_consent?: boolean | null
+          traffic_fines_handling?: string
+          tyres?: Database["public"]["Enums"]["maintenance_inclusion"]
+          updated_at?: string
+          upgrade_downgrade_fee?: number | null
+          vat_code?: string
+          vehicle_class_id?: string | null
+          vehicle_id?: string | null
+          vehicle_swap_rules?: Database["public"]["Enums"]["vehicle_swap_rules"]
+        }
+        Update: {
+          admin_fee_model?: string | null
+          admin_fee_per_fine?: number | null
+          auto_charge_retries?: number
+          auto_create_service_jobs?: boolean
+          auto_renew?: boolean
+          bill_to_contact?: string | null
+          billing_day?: Database["public"]["Enums"]["billing_day_type"]
+          buyout_amount?: number | null
+          buyout_offer?: boolean | null
+          cancellation_notice?: Database["public"]["Enums"]["cancellation_notice"]
+          condition_report_cadence?: Database["public"]["Enums"]["condition_report_cadence"]
+          condition_report_out?: Json | null
+          contract_end_date?: string | null
+          contract_freeze_fee?: number | null
+          contract_start_date?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string
+          customer_type?: Database["public"]["Enums"]["customer_type"]
+          delivery_collection?: string
+          deposit_amount?: number | null
+          dunning_rules?: string
+          early_cancellation_amount?: number | null
+          early_cancellation_fee?: Database["public"]["Enums"]["early_cancellation_fee_type"]
+          excess_km_rate?: number
+          exit_inspection?: boolean
+          extra_drivers_included?: number
+          final_billing?: Database["public"]["Enums"]["final_billing_type"]
+          fuel_level_out?: string | null
+          geo_restrictions?: Database["public"]["Enums"]["geo_restrictions"]
+          id?: string
+          included_km_month?: number
+          insurance?: Database["public"]["Enums"]["insurance_type"]
+          joining_setup_fee?: number | null
+          maintenance?: Database["public"]["Enums"]["maintenance_inclusion"]
+          maintenance_km_interval?: number | null
+          maintenance_month_interval?: number | null
+          maintenance_trigger?: Database["public"]["Enums"]["maintenance_trigger"]
+          mileage_rollover?: Database["public"]["Enums"]["mileage_rollover"]
+          minimum_commitment?: Database["public"]["Enums"]["minimum_commitment"]
+          monthly_fee?: number
+          notes?: string | null
+          odometer_out?: number | null
+          pause_freeze_allowed?: boolean
+          pause_freeze_limit?: number | null
+          payment_method?: Database["public"]["Enums"]["payment_method_type"]
+          plan?: Database["public"]["Enums"]["subscription_plan"]
+          plate_no?: string | null
+          preferred_workshop?: Database["public"]["Enums"]["preferred_workshop"]
+          registration_renewal?: Database["public"]["Enums"]["maintenance_inclusion"]
+          renewal_cycle?: Database["public"]["Enums"]["renewal_cycle"]
+          rental_type?: string
+          replacement_sla?: number | null
+          replacement_sla_unit?:
+            | Database["public"]["Enums"]["replacement_sla_unit"]
+            | null
+          replacement_vehicle?: Database["public"]["Enums"]["maintenance_inclusion"]
+          roadside_assistance?: Database["public"]["Enums"]["maintenance_inclusion"]
+          salik_darb_allowance_cap?: number | null
+          salik_darb_handling?: Database["public"]["Enums"]["salik_handling"]
+          security_deposit?: string
+          signed_date?: string | null
+          start_date?: string
+          status?: Database["public"]["Enums"]["car_subscription_status"]
+          subscription_id?: string | null
+          subscription_model?: Database["public"]["Enums"]["subscription_model"]
+          suspension_behavior?: Database["public"]["Enums"]["suspension_behavior"]
+          swap_allowed?: boolean
+          swap_frequency?: Database["public"]["Enums"]["swap_frequency"]
+          swap_request_flow?: Database["public"]["Enums"]["swap_request_flow"]
+          telematics_device?: boolean | null
+          telematics_device_id?: string | null
+          tracking_consent?: boolean | null
+          traffic_fines_handling?: string
+          tyres?: Database["public"]["Enums"]["maintenance_inclusion"]
+          updated_at?: string
+          upgrade_downgrade_fee?: number | null
+          vat_code?: string
+          vehicle_class_id?: string | null
+          vehicle_id?: string | null
+          vehicle_swap_rules?: Database["public"]["Enums"]["vehicle_swap_rules"]
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           created_at: string
@@ -618,6 +870,7 @@ export type Database = {
           credit_rating: number | null
           customer_type: Database["public"]["Enums"]["customer_type"] | null
           date_of_birth: string | null
+          default_po_bpa_no: string | null
           email: string
           emergency_contact: Json | null
           full_name: string
@@ -642,6 +895,7 @@ export type Database = {
           credit_rating?: number | null
           customer_type?: Database["public"]["Enums"]["customer_type"] | null
           date_of_birth?: string | null
+          default_po_bpa_no?: string | null
           email: string
           emergency_contact?: Json | null
           full_name: string
@@ -666,6 +920,7 @@ export type Database = {
           credit_rating?: number | null
           customer_type?: Database["public"]["Enums"]["customer_type"] | null
           date_of_birth?: string | null
+          default_po_bpa_no?: string | null
           email?: string
           emergency_contact?: Json | null
           full_name?: string
@@ -1636,6 +1891,256 @@ export type Database = {
         }
         Relationships: []
       }
+      subscription_billing_history: {
+        Row: {
+          actual_km: number | null
+          admin_fees: number | null
+          base_monthly_fee: number
+          billing_period_end: string
+          billing_period_start: string
+          billing_status: string | null
+          created_at: string
+          excess_km: number | null
+          excess_km_charges: number | null
+          fine_charges: number | null
+          id: string
+          included_km: number
+          invoice_id: string | null
+          other_charges: number | null
+          salik_darb_charges: number | null
+          subscription_id: string
+          subtotal: number
+          total_amount: number
+          vat_amount: number
+        }
+        Insert: {
+          actual_km?: number | null
+          admin_fees?: number | null
+          base_monthly_fee: number
+          billing_period_end: string
+          billing_period_start: string
+          billing_status?: string | null
+          created_at?: string
+          excess_km?: number | null
+          excess_km_charges?: number | null
+          fine_charges?: number | null
+          id?: string
+          included_km: number
+          invoice_id?: string | null
+          other_charges?: number | null
+          salik_darb_charges?: number | null
+          subscription_id: string
+          subtotal: number
+          total_amount: number
+          vat_amount: number
+        }
+        Update: {
+          actual_km?: number | null
+          admin_fees?: number | null
+          base_monthly_fee?: number
+          billing_period_end?: string
+          billing_period_start?: string
+          billing_status?: string | null
+          created_at?: string
+          excess_km?: number | null
+          excess_km_charges?: number | null
+          fine_charges?: number | null
+          id?: string
+          included_km?: number
+          invoice_id?: string | null
+          other_charges?: number | null
+          salik_darb_charges?: number | null
+          subscription_id?: string
+          subtotal?: number
+          total_amount?: number
+          vat_amount?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscription_billing_history_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "car_subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      subscription_kyc_documents: {
+        Row: {
+          created_at: string
+          document_type: string
+          document_url: string
+          expiry_date: string | null
+          id: string
+          subscription_id: string
+        }
+        Insert: {
+          created_at?: string
+          document_type: string
+          document_url: string
+          expiry_date?: string | null
+          id?: string
+          subscription_id: string
+        }
+        Update: {
+          created_at?: string
+          document_type?: string
+          document_url?: string
+          expiry_date?: string | null
+          id?: string
+          subscription_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscription_kyc_documents_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "car_subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      subscription_primary_drivers: {
+        Row: {
+          created_at: string
+          driver_name: string
+          email: string | null
+          id: string
+          mobile: string | null
+          subscription_id: string
+        }
+        Insert: {
+          created_at?: string
+          driver_name: string
+          email?: string | null
+          id?: string
+          mobile?: string | null
+          subscription_id: string
+        }
+        Update: {
+          created_at?: string
+          driver_name?: string
+          email?: string | null
+          id?: string
+          mobile?: string | null
+          subscription_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscription_primary_drivers_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "car_subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      subscription_swap_history: {
+        Row: {
+          condition_report_in: Json | null
+          condition_report_out: Json | null
+          created_at: string
+          created_by: string | null
+          fuel_level_in: string | null
+          fuel_level_out: string | null
+          id: string
+          new_vehicle_id: string | null
+          odometer_in: number | null
+          odometer_out: number | null
+          old_vehicle_id: string | null
+          subscription_id: string
+          swap_date: string
+          swap_reason: string | null
+          upgrade_fee: number | null
+        }
+        Insert: {
+          condition_report_in?: Json | null
+          condition_report_out?: Json | null
+          created_at?: string
+          created_by?: string | null
+          fuel_level_in?: string | null
+          fuel_level_out?: string | null
+          id?: string
+          new_vehicle_id?: string | null
+          odometer_in?: number | null
+          odometer_out?: number | null
+          old_vehicle_id?: string | null
+          subscription_id: string
+          swap_date: string
+          swap_reason?: string | null
+          upgrade_fee?: number | null
+        }
+        Update: {
+          condition_report_in?: Json | null
+          condition_report_out?: Json | null
+          created_at?: string
+          created_by?: string | null
+          fuel_level_in?: string | null
+          fuel_level_out?: string | null
+          id?: string
+          new_vehicle_id?: string | null
+          odometer_in?: number | null
+          odometer_out?: number | null
+          old_vehicle_id?: string | null
+          subscription_id?: string
+          swap_date?: string
+          swap_reason?: string | null
+          upgrade_fee?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscription_swap_history_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "car_subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      subscription_usage_tracking: {
+        Row: {
+          created_at: string
+          id: string
+          km_driven: number | null
+          location_data: Json | null
+          odometer_reading: number | null
+          salik_darb_amount: number | null
+          salik_darb_events: number | null
+          subscription_id: string
+          tracking_date: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          km_driven?: number | null
+          location_data?: Json | null
+          odometer_reading?: number | null
+          salik_darb_amount?: number | null
+          salik_darb_events?: number | null
+          subscription_id: string
+          tracking_date: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          km_driven?: number | null
+          location_data?: Json | null
+          odometer_reading?: number | null
+          salik_darb_amount?: number | null
+          salik_darb_events?: number | null
+          subscription_id?: string
+          tracking_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscription_usage_tracking_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "car_subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       traffic_tickets: {
         Row: {
           agreement_id: string | null
@@ -1818,6 +2323,7 @@ export type Database = {
           monthly_rate: number | null
           odometer: number | null
           ownership_type: string | null
+          photo_url: string | null
           status: Database["public"]["Enums"]["vehicle_status"]
           subtype: string | null
           transmission: string | null
@@ -1844,6 +2350,7 @@ export type Database = {
           monthly_rate?: number | null
           odometer?: number | null
           ownership_type?: string | null
+          photo_url?: string | null
           status?: Database["public"]["Enums"]["vehicle_status"]
           subtype?: string | null
           transmission?: string | null
@@ -1870,6 +2377,7 @@ export type Database = {
           monthly_rate?: number | null
           odometer?: number | null
           ownership_type?: string | null
+          photo_url?: string | null
           status?: Database["public"]["Enums"]["vehicle_status"]
           subtype?: string | null
           transmission?: string | null
@@ -1917,12 +2425,29 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      generate_subscription_id: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
     }
     Enums: {
       agreement_status: "active" | "completed" | "terminated" | "pending_return"
       billing_cycle: "Monthly"
       billing_day: "1st" | "15th" | "Month-End" | "Anniversary"
+      billing_day_type: "Anniversary" | "1st" | "15th"
       booking_type: "INSTANT" | "STANDARD"
+      cancellation_notice: "0" | "7" | "14" | "30"
+      car_subscription_status:
+        | "draft"
+        | "active"
+        | "suspended"
+        | "cancelled"
+        | "expired"
+      condition_report_cadence:
+        | "On start"
+        | "On swap"
+        | "Monthly"
+        | "On start and swap"
       contract_term:
         | "12 months"
         | "24 months"
@@ -1947,21 +2472,36 @@ export type Database = {
         | "missing_part"
         | "interior_damage"
         | "other"
+      early_cancellation_fee_type: "None" | "Fixed AED" | "% of remaining month"
+      final_billing_type: "Pro-rata" | "Full month"
       framework_model: "Rate Card by Class" | "Fixed Rate per VIN"
+      geo_restrictions: "UAE-only" | "GCC Allowed" | "Off-road Prohibited"
       insurance_responsibility: "Included (Lessor)" | "Customer Own Policy"
+      insurance_type: "Comprehensive" | "Basic" | "Customer's Own"
       invoice_format: "Consolidated" | "Per Vehicle" | "Per Cost Center"
       line_item_granularity:
         | "Base Rent"
         | "Base Rent + Add-ons"
         | "Base Rent + Add-ons + Variable"
+      maintenance_inclusion: "Included" | "Excluded"
       maintenance_policy: "Basic PM" | "Full (PM+wear)" | "Customer"
+      maintenance_trigger: "Every X km" | "Every Y months" | "Both (first due)"
+      mileage_rollover: "No" | "Yes"
+      minimum_commitment: "None" | "1" | "3" | "6"
+      payment_method_type:
+        | "Card Autopay"
+        | "Direct Debit"
+        | "Invoice (Corporate)"
       payment_status:
         | "pending"
         | "processing"
         | "completed"
         | "failed"
         | "refunded"
+      preferred_workshop: "OEM" | "In-house" | "Partner"
+      renewal_cycle: "Monthly (anniversary)" | "3-Monthly"
       rental_type: "Corporate Leasing"
+      replacement_sla_unit: "Hours" | "Days"
       reservation_status:
         | "pending"
         | "confirmed"
@@ -1969,7 +2509,13 @@ export type Database = {
         | "completed"
         | "cancelled"
       rfq_status: "new" | "under_review" | "quoted" | "cancelled"
+      salik_handling: "Rebill Actual" | "Included Allowance"
       security_instrument: "None" | "Deposit per Vehicle" | "Bank Guarantee"
+      subscription_model: "By Class" | "By Specific VIN"
+      subscription_plan: "Essential" | "Standard" | "Premium" | "Custom"
+      suspension_behavior: "Disallow driving" | "Notice only"
+      swap_frequency: "1 per month" | "1 per quarter" | "None"
+      swap_request_flow: "Self-service App" | "Call Center" | "Branch"
       user_role:
         | "admin"
         | "fleet_manager"
@@ -1983,6 +2529,7 @@ export type Database = {
         | "maintenance"
         | "out_of_service"
         | "reserved"
+      vehicle_swap_rules: "Same class" | "Up to +1 class (fee)"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2113,7 +2660,22 @@ export const Constants = {
       agreement_status: ["active", "completed", "terminated", "pending_return"],
       billing_cycle: ["Monthly"],
       billing_day: ["1st", "15th", "Month-End", "Anniversary"],
+      billing_day_type: ["Anniversary", "1st", "15th"],
       booking_type: ["INSTANT", "STANDARD"],
+      cancellation_notice: ["0", "7", "14", "30"],
+      car_subscription_status: [
+        "draft",
+        "active",
+        "suspended",
+        "cancelled",
+        "expired",
+      ],
+      condition_report_cadence: [
+        "On start",
+        "On swap",
+        "Monthly",
+        "On start and swap",
+      ],
       contract_term: [
         "12 months",
         "24 months",
@@ -2141,15 +2703,32 @@ export const Constants = {
         "interior_damage",
         "other",
       ],
+      early_cancellation_fee_type: [
+        "None",
+        "Fixed AED",
+        "% of remaining month",
+      ],
+      final_billing_type: ["Pro-rata", "Full month"],
       framework_model: ["Rate Card by Class", "Fixed Rate per VIN"],
+      geo_restrictions: ["UAE-only", "GCC Allowed", "Off-road Prohibited"],
       insurance_responsibility: ["Included (Lessor)", "Customer Own Policy"],
+      insurance_type: ["Comprehensive", "Basic", "Customer's Own"],
       invoice_format: ["Consolidated", "Per Vehicle", "Per Cost Center"],
       line_item_granularity: [
         "Base Rent",
         "Base Rent + Add-ons",
         "Base Rent + Add-ons + Variable",
       ],
+      maintenance_inclusion: ["Included", "Excluded"],
       maintenance_policy: ["Basic PM", "Full (PM+wear)", "Customer"],
+      maintenance_trigger: ["Every X km", "Every Y months", "Both (first due)"],
+      mileage_rollover: ["No", "Yes"],
+      minimum_commitment: ["None", "1", "3", "6"],
+      payment_method_type: [
+        "Card Autopay",
+        "Direct Debit",
+        "Invoice (Corporate)",
+      ],
       payment_status: [
         "pending",
         "processing",
@@ -2157,7 +2736,10 @@ export const Constants = {
         "failed",
         "refunded",
       ],
+      preferred_workshop: ["OEM", "In-house", "Partner"],
+      renewal_cycle: ["Monthly (anniversary)", "3-Monthly"],
       rental_type: ["Corporate Leasing"],
+      replacement_sla_unit: ["Hours", "Days"],
       reservation_status: [
         "pending",
         "confirmed",
@@ -2166,7 +2748,13 @@ export const Constants = {
         "cancelled",
       ],
       rfq_status: ["new", "under_review", "quoted", "cancelled"],
+      salik_handling: ["Rebill Actual", "Included Allowance"],
       security_instrument: ["None", "Deposit per Vehicle", "Bank Guarantee"],
+      subscription_model: ["By Class", "By Specific VIN"],
+      subscription_plan: ["Essential", "Standard", "Premium", "Custom"],
+      suspension_behavior: ["Disallow driving", "Notice only"],
+      swap_frequency: ["1 per month", "1 per quarter", "None"],
+      swap_request_flow: ["Self-service App", "Call Center", "Branch"],
       user_role: [
         "admin",
         "fleet_manager",
@@ -2182,6 +2770,7 @@ export const Constants = {
         "out_of_service",
         "reserved",
       ],
+      vehicle_swap_rules: ["Same class", "Up to +1 class (fee)"],
     },
   },
 } as const
