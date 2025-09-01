@@ -536,7 +536,19 @@
   .white-cards-page input[type="tel"],
   .white-cards-page input[type="date"],
   .white-cards-page input[type="datetime-local"],
-  .white-cards-page input[type="time"] {
+  .white-cards-page input[type="time"],
+  .white-cards-page input.text-base,
+  .white-cards-page input.text-sm,
+  .white-cards-page textarea.text-base,
+  .white-cards-page textarea.text-sm,
+  .white-cards-page [data-radix-select-trigger].text-sm,
+  .white-cards-page [role="combobox"].text-sm,
+  .white-cards-page .flex.items-center input,
+  .white-cards-page div input[type],
+  .white-cards-page [cmdk-input-wrapper] [cmdk-input],
+  .white-cards-page *[class*="text-"] input,
+  .white-cards-page *[class*="text-"] textarea,
+  .white-cards-page *[class*="text-"] select {
     color: hsl(0 0% 100%) !important;
   }
 
