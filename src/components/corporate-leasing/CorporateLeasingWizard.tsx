@@ -101,6 +101,11 @@ export const CorporateLeasingWizard: React.FC = () => {
   const form = useForm<CorporateLeasingFormData>({
     resolver: zodResolver(corporateLeasingSchema),
     defaultValues: {
+      legal_entity_id: '',
+      customer_id: '',
+      bill_to_site_id: '',
+      customer_po_no: '',
+      credit_limit: undefined,
       credit_terms: 'Net 30',
       cost_allocation_mode: 'Per Vehicle',
       framework_model: 'Rate Card by Class',
