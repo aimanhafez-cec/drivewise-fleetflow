@@ -135,7 +135,21 @@ export const CorporateLeasingWizard: React.FC = () => {
 
   const handleNext = async () => {
     const currentStepFields = getCurrentStepFields();
+    console.log('Step:', currentStep, 'Required fields:', currentStepFields);
+    
     const isValid = await form.trigger(currentStepFields);
+    console.log('Validation result:', isValid);
+    
+    if (!isValid) {
+      const errors = form.formState.errors;
+      console.log('Validation errors:', errors);
+      // Show which specific fields have errors
+      currentStepFields.forEach(field => {
+        if (errors[field]) {
+          console.log(`Field '${field}' has error:`, errors[field]);
+        }
+      });
+    }
     
     if (isValid) {
       if (currentStep < STEPS.length - 1) {
