@@ -228,7 +228,7 @@ export const CorporateLeasingWizard: React.FC = () => {
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <Card>
         <CardHeader>
-          <CardTitle className="text-white">Corporate Leasing Agreement</CardTitle>
+          <CardTitle className="text-foreground">Corporate Leasing Agreement</CardTitle>
           <div className="space-y-2">
             <div className="flex justify-between text-sm text-muted-foreground">
               <span>Step {currentStep + 1} of {STEPS.length}</span>
