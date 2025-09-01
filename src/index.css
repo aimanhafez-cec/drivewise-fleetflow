@@ -577,5 +577,6 @@
   .white-cards-page *[class*="bg-background"],
   .white-cards-page *[class*="bg-popover"] {
     background-color: hsl(0 0% 100%) !important;
+    border: 1px solid hsl(0 0% 0%) !important;
   }
 }
