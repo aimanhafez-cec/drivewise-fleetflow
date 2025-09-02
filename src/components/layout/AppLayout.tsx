@@ -172,20 +172,20 @@ function AppSidebar() {
       className="data-[state=open]:w-64 data-[state=closed]:w-0 md:data-[state=closed]:w-16 border-r"
       collapsible="icon"
     >
-      <SidebarContent className="pt-2">
-        <SidebarGroup>
-          <SidebarGroupLabel className="px-3 py-2 text-xs font-semibold text-sidebar-foreground/70">
+      <SidebarContent className="pt-2 overflow-visible">
+        <SidebarGroup className="px-2">
+          <SidebarGroupLabel className="px-1 py-2 text-xs font-semibold text-sidebar-foreground/70 group-data-[collapsible=icon]:hidden">
             Core Car Rental
           </SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu className="space-y-1 px-2">
+            <SidebarMenu className="space-y-1">
               {navigation.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild className="h-10 px-3">
+                  <SidebarMenuButton asChild className="h-10 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:p-2">
                     <NavLink
                       to={item.url}
                       className={({ isActive }) =>
-                        `flex items-center justify-center md:justify-start gap-3 rounded-md transition-colors min-h-[44px] ${
+                        `flex items-center justify-center group-data-[collapsible=icon]:justify-center group-data-[collapsible=expanded]:justify-start gap-3 rounded-md transition-colors min-h-[44px] group-data-[collapsible=icon]:min-h-[40px] ${
                           isActive 
                             ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" 
                             : "hover:bg-sidebar-accent/50 text-sidebar-foreground"
@@ -193,7 +193,7 @@ function AppSidebar() {
                       }
                     >
                       <item.icon className="h-5 w-5 shrink-0 !text-black dark:!text-white" />
-                      <span className="truncate text-sm group-data-[collapsible=icon]:sr-only">{item.title}</span>
+                      <span className="truncate text-sm group-data-[collapsible=icon]:hidden">{item.title}</span>
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -202,17 +202,17 @@ function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
         
-        <SidebarGroup className="mt-auto">
+        <SidebarGroup className="mt-auto px-2">
           <SidebarGroupContent>
-            <SidebarMenu className="px-2">
+            <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild className="h-10 px-3">
+                <SidebarMenuButton asChild className="h-10 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:p-2">
                   <button
                     onClick={handleSignOut}
-                    className="w-full flex items-center justify-center md:justify-start gap-3 text-left hover:bg-sidebar-accent/50 text-sidebar-foreground rounded-md transition-colors min-h-[44px]"
+                    className="w-full flex items-center justify-center group-data-[collapsible=icon]:justify-center group-data-[collapsible=expanded]:justify-start gap-3 text-left hover:bg-sidebar-accent/50 text-sidebar-foreground rounded-md transition-colors min-h-[44px] group-data-[collapsible=icon]:min-h-[40px]"
                   >
                     <LogOut className="h-5 w-5 shrink-0 !text-black dark:!text-white" />
-                    <span className="truncate text-sm group-data-[collapsible=icon]:sr-only">Sign Out</span>
+                    <span className="truncate text-sm group-data-[collapsible=icon]:hidden">Sign Out</span>
                   </button>
                 </SidebarMenuButton>
               </SidebarMenuItem>
