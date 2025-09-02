@@ -136,7 +136,7 @@ const Reports = () => {
 
           {/* Operations Sub-tabs */}
           <Tabs defaultValue="fleet-status" className="space-y-4">
-            <TabsList>
+            <TabsList className="bg-slate-950">
               <TabsTrigger value="fleet-status">
                 Fleet Status & Utilization
               </TabsTrigger>
