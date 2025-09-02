@@ -1,14 +1,14 @@
 {
-  "name": "Core Car Rental",
-  "short_name": "Core Rental",
-  "description": "Professional car rental management system",
+  "name": "DriveWise FleetFlow",
+  "short_name": "FleetFlow",
+  "description": "Complete fleet management and car rental solution with instant booking, vehicle tracking, and comprehensive reporting",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#0f172a",
+  "background_color": "#0f172a",
+  "theme_color": "#3b82f6",
   "orientation": "portrait-primary",
   "scope": "/",
-  "categories": ["business", "productivity"],
+  "categories": ["business", "productivity", "automotive"],
   "icons": [
     {
       "src": "/lovable-uploads/0fe8cfa9-3548-415c-bc9c-114a2b91ae82.png",
@@ -25,6 +25,18 @@
   ],
   "shortcuts": [
     {
+      "name": "Instant Booking",
+      "short_name": "Instant Book",
+      "description": "Quick vehicle booking in minutes",
+      "url": "/instant-booking",
+      "icons": [
+        {
+          "src": "/lovable-uploads/0fe8cfa9-3548-415c-bc9c-114a2b91ae82.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
       "name": "New Reservation",
       "short_name": "New Booking",
       "description": "Create a new reservation",
@@ -39,8 +51,20 @@
     {
       "name": "Dashboard",
       "short_name": "Dashboard",
-      "description": "View dashboard",
+      "description": "View fleet dashboard",
       "url": "/dashboard",
+      "icons": [
+        {
+          "src": "/lovable-uploads/0fe8cfa9-3548-415c-bc9c-114a2b91ae82.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Fleet Management",
+      "short_name": "Vehicles",
+      "description": "Manage vehicle fleet",
+      "url": "/vehicles",
       "icons": [
         {
           "src": "/lovable-uploads/0fe8cfa9-3548-415c-bc9c-114a2b91ae82.png",
