@@ -115,17 +115,19 @@ export const AgreementActions: React.FC<AgreementActionsProps> = ({
 
   return (
     <>
-      <div className="flex items-center space-x-2">
+      <div className="flex flex-wrap items-center gap-2 sm:space-x-2">
         {canStartOutInspection && (
           <Button
             id="btn-start-inspection-out"
             variant="default"
             size="sm"
             onClick={() => handleStartInspection('OUT')}
-            className="bg-blue-600 hover:bg-blue-700"
+            className="bg-blue-600 hover:bg-blue-700 min-w-0 flex-1 sm:flex-none"
           >
-            <ClipboardCheck className="mr-2 h-4 w-4" />
-            Start Inspection (OUT)
+            <ClipboardCheck className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="text-xs sm:text-sm">
+              <span className="hidden sm:inline">Start </span>Inspection (OUT)
+            </span>
           </Button>
         )}
         
@@ -135,39 +137,48 @@ export const AgreementActions: React.FC<AgreementActionsProps> = ({
             variant="default"
             size="sm"
             onClick={() => handleStartInspection('IN')}
-            className="bg-orange-600 hover:bg-orange-700"
+            className="bg-orange-600 hover:bg-orange-700 min-w-0 flex-1 sm:flex-none"
           >
-            <ClipboardX className="mr-2 h-4 w-4" />
-            Start Inspection (IN)
+            <ClipboardX className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="text-xs sm:text-sm">
+              <span className="hidden sm:inline">Start </span>Inspection (IN)
+            </span>
           </Button>
         )}
         
-        <Button 
-          id="btn-email-agreement"
-          variant="outline" 
-          size="sm" 
-          onClick={handleEmail}
-        >
-          <Mail className="mr-2 h-4 w-4" />
-          Email
-        </Button>
-        <Button 
-          id="btn-print-agreement"
-          variant="outline" 
-          size="sm" 
-          onClick={handlePrint}
-        >
-          <Printer className="mr-2 h-4 w-4" />
-          Print
-        </Button>
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={handleDownload}
-        >
-          <Download className="mr-2 h-4 w-4" />
-          Download
-        </Button>
+        <div className="flex flex-wrap gap-2 sm:flex-nowrap">
+          <Button 
+            id="btn-email-agreement"
+            variant="outline" 
+            size="sm" 
+            onClick={handleEmail}
+            className="min-w-0"
+          >
+            <Mail className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="text-xs sm:text-sm">Email</span>
+          </Button>
+          <Button 
+            id="btn-print-agreement"
+            variant="outline" 
+            size="sm" 
+            onClick={handlePrint}
+            className="min-w-0"
+          >
+            <Printer className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="text-xs sm:text-sm">Print</span>
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={handleDownload}
+            className="min-w-0"
+          >
+            <Download className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="text-xs sm:text-sm">
+              <span className="hidden xs:inline">Down</span>load
+            </span>
+          </Button>
+        </div>
       </div>
 
       {showInspectionWizard && agreementLines.length > 0 && (

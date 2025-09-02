@@ -144,7 +144,7 @@ const AgreementDetails = () => {
   }
 
   return (
-    <div id="agreement-details-page" className="space-y-6">
+    <div id="agreement-details-page" className="space-y-4 sm:space-y-6 p-4 sm:p-6">
       {/* Breadcrumbs */}
       <Breadcrumb>
         <BreadcrumbList>
@@ -159,136 +159,142 @@ const AgreementDetails = () => {
       </Breadcrumb>
 
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
+      <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
+        <div className="flex items-start space-x-4">
           <Button 
             variant="ghost" 
             onClick={() => navigate('/agreements')}
-            className="p-2"
+            className="p-2 shrink-0"
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight text-white">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white break-words">
               Agreement {agreement.agreement_no || `#${agreement.id.slice(0, 8)}`}
             </h1>
-            <p className="text-white">
+            <p className="text-sm sm:text-base text-white/70 mt-1">
               Created on {format(new Date(agreement.created_at), 'MMMM dd, yyyy')}
             </p>
           </div>
         </div>
-        <div className="flex items-center space-x-2">
-          <Badge className={getStatusColor(agreement.status)}>
-            {agreement.status.replace('_', ' ').toUpperCase()}
-          </Badge>
-          {fromReservation && (
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => navigate(`/reservations/${fromReservation}`)}
-            >
-              <Eye className="mr-2 h-4 w-4" />
-              View Reservation
-            </Button>
-          )}
-          <AgreementActions 
-            agreementId={agreement.id}
-            agreementNo={agreement.agreement_no || `AGR-${agreement.id.slice(0, 8)}`}
-            agreementStatus={agreement.status}
-            agreementLines={agreement.agreement_lines || []}
-          />
+        
+        <div className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-2">
+          <div className="flex items-center justify-between sm:justify-start space-x-2">
+            <Badge className={getStatusColor(agreement.status)}>
+              {agreement.status.replace('_', ' ').toUpperCase()}
+            </Badge>
+            {fromReservation && (
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => navigate(`/reservations/${fromReservation}`)}
+                className="text-xs"
+              >
+                <Eye className="mr-1 h-3 w-3" />
+                <span className="hidden xs:inline">View </span>Reservation
+              </Button>
+            )}
+          </div>
+          <div className="w-full sm:w-auto">
+            <AgreementActions 
+              agreementId={agreement.id}
+              agreementNo={agreement.agreement_no || `AGR-${agreement.id.slice(0, 8)}`}
+              agreementStatus={agreement.status}
+              agreementLines={agreement.agreement_lines || []}
+            />
+          </div>
         </div>
       </div>
 
       {/* Details Cards */}
-      <div className="grid gap-6 md:grid-cols-3">
+      <div className="grid gap-4 sm:gap-6 lg:grid-cols-3">
         {/* Customer Information */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg text-card-foreground">Customer Information</CardTitle>
+        <Card className="lg:col-span-1">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base sm:text-lg text-card-foreground">Customer Information</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-3 sm:space-y-4">
             <div>
-              <p className="text-sm font-medium text-card-foreground">Customer Name</p>
-              <p className="font-medium text-card-foreground">
+              <p className="text-xs sm:text-sm font-medium text-card-foreground/70 mb-1">Customer Name</p>
+              <p className="font-medium text-sm sm:text-base text-card-foreground break-words">
                 {agreement.profiles?.full_name || 'Unknown Customer'}
               </p>
             </div>
             <div>
-              <p className="text-sm font-medium text-card-foreground">Email</p>
-              <p className="text-card-foreground">{agreement.profiles?.email || 'N/A'}</p>
+              <p className="text-xs sm:text-sm font-medium text-card-foreground/70 mb-1">Email</p>
+              <p className="text-sm sm:text-base text-card-foreground break-all">{agreement.profiles?.email || 'N/A'}</p>
             </div>
             {agreement.profiles?.phone && (
               <div>
-                <p className="text-sm font-medium text-card-foreground">Phone</p>
-                <p className="text-card-foreground">{agreement.profiles.phone}</p>
+                <p className="text-xs sm:text-sm font-medium text-card-foreground/70 mb-1">Phone</p>
+                <p className="text-sm sm:text-base text-card-foreground">{agreement.profiles.phone}</p>
               </div>
             )}
           </CardContent>
         </Card>
 
         {/* Vehicle Information */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg text-card-foreground">Vehicle Information</CardTitle>
+        <Card className="lg:col-span-1">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base sm:text-lg text-card-foreground">Vehicle Information</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-3 sm:space-y-4">
             {(() => {
               const vehicleFromLine = agreement.agreement_lines?.find(line => line.vehicle_id)?.vehicle;
               return vehicleFromLine ? (
                 <>
                   <div>
-                    <p className="text-sm font-medium text-card-foreground">Vehicle</p>
-                    <p className="font-medium text-card-foreground">
+                    <p className="text-xs sm:text-sm font-medium text-card-foreground/70 mb-1">Vehicle</p>
+                    <p className="font-medium text-sm sm:text-base text-card-foreground break-words">
                       {vehicleFromLine.year} {vehicleFromLine.make} {vehicleFromLine.model}
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-card-foreground">License Plate</p>
-                    <p className="text-card-foreground">{vehicleFromLine.license_plate}</p>
+                    <p className="text-xs sm:text-sm font-medium text-card-foreground/70 mb-1">License Plate</p>
+                    <p className="text-sm sm:text-base text-card-foreground font-mono">{vehicleFromLine.license_plate}</p>
                   </div>
                   {vehicleFromLine.color && (
                     <div>
-                      <p className="text-sm font-medium text-card-foreground">Color</p>
-                      <p className="text-card-foreground">{vehicleFromLine.color}</p>
+                      <p className="text-xs sm:text-sm font-medium text-card-foreground/70 mb-1">Color</p>
+                      <p className="text-sm sm:text-base text-card-foreground">{vehicleFromLine.color}</p>
                     </div>
                   )}
                   {vehicleFromLine.vin && (
                     <div>
-                      <p className="text-sm font-medium text-card-foreground">VIN</p>
-                      <p className="font-mono text-sm text-card-foreground">{vehicleFromLine.vin}</p>
+                      <p className="text-xs sm:text-sm font-medium text-card-foreground/70 mb-1">VIN</p>
+                      <p className="font-mono text-xs sm:text-sm text-card-foreground break-all">{vehicleFromLine.vin}</p>
                     </div>
                   )}
                   <div>
-                    <p className="text-sm font-medium text-card-foreground">Status</p>
-                    <p className="capitalize text-card-foreground">{vehicleFromLine.status}</p>
+                    <p className="text-xs sm:text-sm font-medium text-card-foreground/70 mb-1">Status</p>
+                    <p className="capitalize text-sm sm:text-base text-card-foreground">{vehicleFromLine.status}</p>
                   </div>
                 </>
               ) : (
-                <p className="text-card-foreground">No vehicle assigned</p>
+                <p className="text-sm sm:text-base text-card-foreground/70">No vehicle assigned</p>
               );
             })()}
           </CardContent>
         </Card>
 
         {/* Financial Information */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg text-card-foreground">Financial Details</CardTitle>
+        <Card className="lg:col-span-1">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base sm:text-lg text-card-foreground">Financial Details</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-3 sm:space-y-4">
             <div>
-              <p className="text-sm font-medium text-card-foreground">Agreement Date</p>
-              <p className="text-card-foreground">{format(new Date(agreement.agreement_date), 'MMM dd, yyyy')}</p>
+              <p className="text-xs sm:text-sm font-medium text-card-foreground/70 mb-1">Agreement Date</p>
+              <p className="text-sm sm:text-base text-card-foreground">{format(new Date(agreement.agreement_date), 'MMM dd, yyyy')}</p>
             </div>
             <div>
-              <p className="text-sm font-medium text-card-foreground">Total Amount</p>
-              <p className="text-xl font-bold text-card-foreground">
+              <p className="text-xs sm:text-sm font-medium text-card-foreground/70 mb-1">Total Amount</p>
+              <p className="text-lg sm:text-xl font-bold text-card-foreground">
                 {formatCurrency(agreement.total_amount || 0)}
               </p>
             </div>
             <div>
-              <p className="text-sm font-medium text-card-foreground">Status</p>
+              <p className="text-xs sm:text-sm font-medium text-card-foreground/70 mb-1">Status</p>
               <Badge className={getStatusColor(agreement.status)}>
                 {agreement.status.replace('_', ' ').toUpperCase()}
               </Badge>
@@ -298,16 +304,18 @@ const AgreementDetails = () => {
       </div>
 
       {/* Tabs */}
-      <Tabs defaultValue="summary" className="space-y-6">
-        <TabsList>
-          <TabsTrigger value="summary">Summary</TabsTrigger>
-          <TabsTrigger id="tab-damage" value="damage">Damage</TabsTrigger>
-          <TabsTrigger id="tab-tickets" value="tickets">Tickets</TabsTrigger>
-          <TabsTrigger value="payments">Payments</TabsTrigger>
-          <TabsTrigger value="notes">Notes</TabsTrigger>
-        </TabsList>
+      <Tabs defaultValue="summary" className="space-y-4 sm:space-y-6">
+        <div className="overflow-x-auto">
+          <TabsList className="flex w-max min-w-full sm:w-full">
+            <TabsTrigger value="summary" className="flex-1 sm:flex-none">Summary</TabsTrigger>
+            <TabsTrigger id="tab-damage" value="damage" className="flex-1 sm:flex-none">Damage</TabsTrigger>
+            <TabsTrigger id="tab-tickets" value="tickets" className="flex-1 sm:flex-none">Tickets</TabsTrigger>
+            <TabsTrigger value="payments" className="flex-1 sm:flex-none">Payments</TabsTrigger>
+            <TabsTrigger value="notes" className="flex-1 sm:flex-none">Notes</TabsTrigger>
+          </TabsList>
+        </div>
 
-        <TabsContent value="summary" className="space-y-6">
+        <TabsContent value="summary" className="space-y-4 sm:space-y-6">
           <AgreementLinesTable
             agreementId={id!}
             lines={agreement.agreement_lines || []}
