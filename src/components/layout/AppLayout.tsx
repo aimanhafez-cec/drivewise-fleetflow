@@ -185,7 +185,7 @@ function AppSidebar() {
                     <NavLink
                       to={item.url}
                       className={({ isActive }) =>
-                        `flex items-center gap-3 rounded-md transition-colors min-h-[44px] ${
+                        `flex items-center justify-center md:justify-start gap-3 rounded-md transition-colors min-h-[44px] ${
                           isActive 
                             ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" 
                             : "hover:bg-sidebar-accent/50 text-sidebar-foreground"
@@ -193,7 +193,7 @@ function AppSidebar() {
                       }
                     >
                       <item.icon className="h-5 w-5 shrink-0 text-sidebar-foreground" />
-                      <span className="truncate text-sm">{item.title}</span>
+                      <span className="truncate text-sm group-data-[collapsible=icon]:sr-only">{item.title}</span>
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -209,10 +209,10 @@ function AppSidebar() {
                 <SidebarMenuButton asChild className="h-10 px-3">
                   <button
                     onClick={handleSignOut}
-                    className="w-full flex items-center gap-3 text-left hover:bg-sidebar-accent/50 text-sidebar-foreground rounded-md transition-colors min-h-[44px]"
+                    className="w-full flex items-center justify-center md:justify-start gap-3 text-left hover:bg-sidebar-accent/50 text-sidebar-foreground rounded-md transition-colors min-h-[44px]"
                   >
                     <LogOut className="h-5 w-5 shrink-0 text-sidebar-foreground" />
-                    <span className="truncate text-sm">Sign Out</span>
+                    <span className="truncate text-sm group-data-[collapsible=icon]:sr-only">Sign Out</span>
                   </button>
                 </SidebarMenuButton>
               </SidebarMenuItem>
