@@ -62,11 +62,21 @@ const CustomerDetector: React.FC<CustomerDetectorProps> = ({
     queryKey: ['customer-search', searchTerm],
     queryFn: async () => {
       if (!searchTerm || searchTerm.length < 2) return [];
-      const {
-        data,
-        error
-      } = await supabase.from('customers').select('*').or(`full_name.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%,phone.ilike.%${searchTerm}%`).limit(10);
-      if (error) throw error;
+      
+      console.log('Searching customers with term:', searchTerm);
+      
+      const { data, error } = await supabase
+        .from('customers')
+        .select('*')
+        .or(`full_name.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%,phone.ilike.%${searchTerm}%`)
+        .limit(10);
+        
+      console.log('Search results:', data, 'Error:', error);
+      
+      if (error) {
+        console.error('Search error:', error);
+        throw error;
+      }
       return data as Customer[];
     },
     enabled: searchTerm.length >= 2
