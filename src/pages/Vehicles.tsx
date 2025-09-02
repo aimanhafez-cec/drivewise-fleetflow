@@ -10,8 +10,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Search, Filter, ChevronUp, ChevronDown } from 'lucide-react';
+import { Plus, Search, Filter, ChevronUp, ChevronDown, Car } from 'lucide-react';
 import VehicleForm from '@/components/vehicles/VehicleForm';
+import { Card, CardContent } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 
 interface Vehicle {
   id: string;
@@ -175,11 +177,12 @@ const Vehicles = () => {
     <div className="space-y-4 sm:space-y-6 max-w-full overflow-hidden" data-page="vehicles">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold">Vehicles</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Vehicles</h1>
+          <p className="text-muted-foreground text-sm sm:text-base">Manage your fleet inventory</p>
         </div>
-        <div className="flex items-center space-x-2 sm:space-x-4 w-full sm:w-auto">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-4 w-full sm:w-auto">
           <Select value={`${itemsPerPage}`} onValueChange={(value) => setItemsPerPage(parseInt(value))}>
-            <SelectTrigger className="w-16 sm:w-20">
+            <SelectTrigger className="w-20 sm:w-24">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -189,13 +192,13 @@ const Vehicles = () => {
               <SelectItem value="100">100</SelectItem>
             </SelectContent>
           </Select>
-          <Button variant="outline" size="sm" className="flex-shrink-0">
+          <Button variant="outline" size="sm" className="min-h-[44px] px-3">
             <Filter className="mr-2 h-4 w-4" />
             <span className="hidden sm:inline">Filter</span>
           </Button>
           <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
             <DialogTrigger asChild>
-              <Button onClick={handleAdd} className="bg-teal-500 hover:bg-teal-600 flex-shrink-0">
+              <Button onClick={handleAdd} className="bg-teal-500 hover:bg-teal-600 min-h-[44px] px-3">
                 <Plus className="mr-2 h-4 w-4" />
                 <span className="hidden sm:inline">New Vehicle</span>
                 <span className="sm:hidden">New</span>
@@ -216,17 +219,19 @@ const Vehicles = () => {
         </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
+      <div className="flex flex-col gap-4 sm:gap-0 sm:flex-row items-start sm:items-center sm:space-x-4">
         <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-          <SelectTrigger className="w-full sm:w-48">
+          <SelectTrigger className="w-full sm:w-48 min-h-[44px]">
             <SelectValue placeholder="Vehicle Category" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Categories</SelectItem>
             <SelectItem value="uncategorized">Uncategorized</SelectItem>
-            {categories?.map(category => <SelectItem key={category.id} value={category.id}>
+            {categories?.map(category => 
+              <SelectItem key={category.id} value={category.id}>
                 {category.name} - {category.description || ""}
-              </SelectItem>)}
+              </SelectItem>
+            )}
           </SelectContent>
         </Select>
         <div className="relative w-full sm:flex-1 sm:max-w-sm">
@@ -235,78 +240,113 @@ const Vehicles = () => {
             placeholder="Search vehicles..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
+            className="pl-10 min-h-[44px]"
           />
         </div>
       </div>
 
-      <div className="border rounded-lg overflow-hidden bg-card">
-        <div className="overflow-x-auto">
-          <Table className="min-w-full">
-            <TableHeader className="bg-slate-800 text-white">
-              <TableRow>
-                <TableHead className="text-white cursor-pointer min-w-[80px]" onClick={() => handleSort('id')}>
-                  <div className="flex items-center">
-                    Vehicle No.
-                    {sortField === 'id' && (sortDirection === 'asc' ? <ChevronUp className="ml-1 h-4 w-4" /> : <ChevronDown className="ml-1 h-4 w-4" />)}
-                  </div>
-                </TableHead>
-                <TableHead className="text-white cursor-pointer min-w-[100px]" onClick={() => handleSort('license_plate')}>
-                  <div className="flex items-center">
-                    License No.
-                    {sortField === 'license_plate' && (sortDirection === 'asc' ? <ChevronUp className="ml-1 h-4 w-4" /> : <ChevronDown className="ml-1 h-4 w-4" />)}
-                  </div>
-                </TableHead>
-                <TableHead className="text-white cursor-pointer min-w-[80px]" onClick={() => handleSort('make')}>
-                  <div className="flex items-center">
-                    Make
-                    {sortField === 'make' && (sortDirection === 'asc' ? <ChevronUp className="ml-1 h-4 w-4" /> : <ChevronDown className="ml-1 h-4 w-4" />)}
-                  </div>
-                </TableHead>
-                <TableHead className="text-white cursor-pointer min-w-[80px]" onClick={() => handleSort('model')}>
-                  <div className="flex items-center">
-                    Model
-                    {sortField === 'model' && (sortDirection === 'asc' ? <ChevronUp className="ml-1 h-4 w-4" /> : <ChevronDown className="ml-1 h-4 w-4" />)}
-                  </div>
-                </TableHead>
-                <TableHead className="text-white cursor-pointer min-w-[70px]" onClick={() => handleSort('year')}>
-                  <div className="flex items-center">
-                    Year
-                    {sortField === 'year' && (sortDirection === 'asc' ? <ChevronUp className="ml-1 h-4 w-4" /> : <ChevronDown className="ml-1 h-4 w-4" />)}
-                  </div>
-                </TableHead>
-                <TableHead className="text-white cursor-pointer min-w-[100px]" onClick={() => handleSort('status')}>
-                  <div className="flex items-center">
-                    Status
-                    {sortField === 'status' && (sortDirection === 'asc' ? <ChevronUp className="ml-1 h-4 w-4" /> : <ChevronDown className="ml-1 h-4 w-4" />)}
-                  </div>
-                </TableHead>
-                <TableHead className="text-white min-w-[80px]">Photo</TableHead>
-                <TableHead className="text-white min-w-[100px] hidden md:table-cell">Type</TableHead>
-                <TableHead className="text-white min-w-[120px] hidden lg:table-cell">Location</TableHead>
-                <TableHead className="text-white min-w-[150px] hidden lg:table-cell">VIN</TableHead>
-                <TableHead className="text-white min-w-[100px] hidden xl:table-cell">Transmission</TableHead>
-                <TableHead className="text-white min-w-[120px] hidden xl:table-cell">Odometer</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {paginatedVehicles.map((vehicle, index) => (
-                <TableRow 
-                  key={vehicle.id} 
-                  className="hover:bg-muted/50 cursor-pointer text-card-foreground"
-                  onClick={() => navigate(`/vehicles/${vehicle.id}`)}
-                >
-                  <TableCell className="font-medium">{startIndex + index + 1}</TableCell>
-                  <TableCell className="font-mono text-sm">{vehicle.license_plate}</TableCell>
-                  <TableCell>{vehicle.make}</TableCell>
-                  <TableCell>{vehicle.model}</TableCell>
-                  <TableCell>{vehicle.year}</TableCell>
-                  <TableCell>
-                    <Badge className={statusConfig[vehicle.status]?.className}>
-                      {statusConfig[vehicle.status]?.label}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
+      {/* Responsive Table/Cards View */}
+      <div>
+        {/* Desktop Table */}
+        <div className="hidden md:block">
+          <div className="border rounded-lg overflow-hidden bg-card">
+            <div className="overflow-x-auto">
+              <Table className="min-w-full">
+                <TableHeader className="bg-slate-800 text-white">
+                  <TableRow>
+                    <TableHead className="text-white cursor-pointer min-w-[80px]" onClick={() => handleSort('id')}>
+                      <div className="flex items-center">
+                        Vehicle No.
+                        {sortField === 'id' && (sortDirection === 'asc' ? <ChevronUp className="ml-1 h-4 w-4" /> : <ChevronDown className="ml-1 h-4 w-4" />)}
+                      </div>
+                    </TableHead>
+                    <TableHead className="text-white cursor-pointer min-w-[100px]" onClick={() => handleSort('license_plate')}>
+                      <div className="flex items-center">
+                        License No.
+                        {sortField === 'license_plate' && (sortDirection === 'asc' ? <ChevronUp className="ml-1 h-4 w-4" /> : <ChevronDown className="ml-1 h-4 w-4" />)}
+                      </div>
+                    </TableHead>
+                    <TableHead className="text-white cursor-pointer min-w-[80px]" onClick={() => handleSort('make')}>
+                      <div className="flex items-center">
+                        Make
+                        {sortField === 'make' && (sortDirection === 'asc' ? <ChevronUp className="ml-1 h-4 w-4" /> : <ChevronDown className="ml-1 h-4 w-4" />)}
+                      </div>
+                    </TableHead>
+                    <TableHead className="text-white cursor-pointer min-w-[80px]" onClick={() => handleSort('model')}>
+                      <div className="flex items-center">
+                        Model
+                        {sortField === 'model' && (sortDirection === 'asc' ? <ChevronUp className="ml-1 h-4 w-4" /> : <ChevronDown className="ml-1 h-4 w-4" />)}
+                      </div>
+                    </TableHead>
+                    <TableHead className="text-white cursor-pointer min-w-[70px]" onClick={() => handleSort('year')}>
+                      <div className="flex items-center">
+                        Year
+                        {sortField === 'year' && (sortDirection === 'asc' ? <ChevronUp className="ml-1 h-4 w-4" /> : <ChevronDown className="ml-1 h-4 w-4" />)}
+                      </div>
+                    </TableHead>
+                    <TableHead className="text-white cursor-pointer min-w-[100px]" onClick={() => handleSort('status')}>
+                      <div className="flex items-center">
+                        Status
+                        {sortField === 'status' && (sortDirection === 'asc' ? <ChevronUp className="ml-1 h-4 w-4" /> : <ChevronDown className="ml-1 h-4 w-4" />)}
+                      </div>
+                    </TableHead>
+                    <TableHead className="text-white min-w-[80px]">Photo</TableHead>
+                    <TableHead className="text-white min-w-[100px] hidden lg:table-cell">Type</TableHead>
+                    <TableHead className="text-white min-w-[120px] hidden xl:table-cell">Location</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {paginatedVehicles.map((vehicle, index) => (
+                    <TableRow 
+                      key={vehicle.id} 
+                      className="hover:bg-muted/50 cursor-pointer text-card-foreground"
+                      onClick={() => navigate(`/vehicles/${vehicle.id}`)}
+                    >
+                      <TableCell className="font-medium">{startIndex + index + 1}</TableCell>
+                      <TableCell className="font-mono text-sm">{vehicle.license_plate}</TableCell>
+                      <TableCell>{vehicle.make}</TableCell>
+                      <TableCell>{vehicle.model}</TableCell>
+                      <TableCell>{vehicle.year}</TableCell>
+                      <TableCell>
+                        <Badge className={statusConfig[vehicle.status]?.className}>
+                          {statusConfig[vehicle.status]?.label}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {vehicle.photo_url ? (
+                          <img 
+                            src={vehicle.photo_url} 
+                            alt={`${vehicle.make} ${vehicle.model}`}
+                            className="w-16 h-12 object-cover rounded-md"
+                          />
+                        ) : (
+                          <div className="w-16 h-12 bg-muted rounded-md flex items-center justify-center text-xs text-muted-foreground">
+                            No Photo
+                          </div>
+                        )}
+                      </TableCell>
+                      <TableCell className="hidden lg:table-cell">{vehicle.subtype || vehicle.categories?.name || '-'}</TableCell>
+                      <TableCell className="hidden xl:table-cell">{vehicle.location || '-'}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Cards */}
+        <div className="md:hidden space-y-4">
+          {paginatedVehicles.map((vehicle, index) => (
+            <Card 
+              key={vehicle.id}
+              className="cursor-pointer hover:shadow-md transition-all duration-200"
+              onClick={() => navigate(`/vehicles/${vehicle.id}`)}
+            >
+              <CardContent className="p-4">
+                <div className="flex items-start gap-3">
+                  {/* Vehicle Photo */}
+                  <div className="shrink-0">
                     {vehicle.photo_url ? (
                       <img 
                         src={vehicle.photo_url} 
@@ -314,33 +354,61 @@ const Vehicles = () => {
                         className="w-16 h-12 object-cover rounded-md"
                       />
                     ) : (
-                      <div className="w-16 h-12 bg-muted rounded-md flex items-center justify-center text-xs text-muted-foreground">
-                        No Photo
+                      <div className="w-16 h-12 bg-muted rounded-md flex items-center justify-center">
+                        <Car className="h-6 w-6 text-muted-foreground" />
                       </div>
                     )}
-                  </TableCell>
-                  <TableCell className="hidden md:table-cell">{vehicle.subtype || vehicle.categories?.name || '-'}</TableCell>
-                  <TableCell className="hidden lg:table-cell">{vehicle.location || '-'}</TableCell>
-                  <TableCell className="font-mono text-xs hidden lg:table-cell">{vehicle.vin}</TableCell>
-                  <TableCell className="hidden xl:table-cell">{vehicle.transmission || 'Automatic'}</TableCell>
-                  <TableCell className="hidden xl:table-cell">{vehicle.odometer?.toLocaleString() || 0}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                  </div>
+
+                  {/* Vehicle Info */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                      <div>
+                        <h3 className="font-semibold text-card-foreground truncate">
+                          {vehicle.make} {vehicle.model} ({vehicle.year})
+                        </h3>
+                        <p className="text-sm text-muted-foreground font-mono">
+                          {vehicle.license_plate}
+                        </p>
+                      </div>
+                      <Badge className={statusConfig[vehicle.status]?.className}>
+                        {statusConfig[vehicle.status]?.label}
+                      </Badge>
+                    </div>
+
+                    {/* Additional Details */}
+                    <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
+                      <div>
+                        <span className="font-medium">Type:</span> {vehicle.subtype || vehicle.categories?.name || '-'}
+                      </div>
+                      <div>
+                        <span className="font-medium">Location:</span> {vehicle.location || '-'}
+                      </div>
+                      <div className="col-span-2">
+                        <span className="font-medium">VIN:</span> {vehicle.vin}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       </div>
 
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="text-sm text-muted-foreground">
-          Rows per Page: {itemsPerPage} | Current Page: {currentPage}
+          Showing {Math.min(startIndex + 1, sortedVehicles.length)}-{Math.min(startIndex + itemsPerPage, sortedVehicles.length)} of {sortedVehicles.length} vehicles
         </div>
         <Pagination>
           <PaginationContent>
             <PaginationItem>
               <PaginationPrevious 
                 onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                className={cn(
+                  "min-h-[44px]",
+                  currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'
+                )}
               />
             </PaginationItem>
             {[...Array(Math.min(5, totalPages))].map((_, i) => {
@@ -350,7 +418,7 @@ const Vehicles = () => {
                   <PaginationLink
                     onClick={() => setCurrentPage(pageNumber)}
                     isActive={currentPage === pageNumber}
-                    className="cursor-pointer"
+                    className="cursor-pointer min-h-[44px] min-w-[44px]"
                   >
                     {pageNumber}
                   </PaginationLink>
@@ -360,7 +428,10 @@ const Vehicles = () => {
             <PaginationItem>
               <PaginationNext 
                 onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                className={cn(
+                  "min-h-[44px]",
+                  currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'
+                )}
               />
             </PaginationItem>
           </PaginationContent>
@@ -369,12 +440,13 @@ const Vehicles = () => {
 
       {filteredVehicles.length === 0 && !isLoading && (
         <div className="text-center py-12">
-          <h3 className="text-lg font-semibold mb-2">No vehicles found</h3>
+          <Car className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+          <h3 className="text-lg font-semibold mb-2 text-foreground">No vehicles found</h3>
           <p className="text-muted-foreground mb-4">
             {searchTerm ? 'Try adjusting your search terms.' : 'Get started by adding your first vehicle.'}
           </p>
           {!searchTerm && (
-            <Button onClick={handleAdd}>
+            <Button onClick={handleAdd} className="min-h-[44px]">
               <Plus className="mr-2 h-4 w-4" />
               Add Vehicle
             </Button>

@@ -121,16 +121,17 @@ const Customers = () => {
 
   return (
     <div className="space-y-6 w-full min-w-0">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="flex flex-col gap-4 sm:gap-0 sm:flex-row justify-between items-start sm:items-center">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold">Customers</h1>
-          <p className="text-muted-foreground">Manage your customer database</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Customers</h1>
+          <p className="text-muted-foreground text-sm sm:text-base">Manage your customer database</p>
         </div>
         <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
           <DialogTrigger asChild>
-            <Button onClick={handleAdd}>
+            <Button onClick={handleAdd} className="min-h-[44px] px-4">
               <Plus className="mr-2 h-4 w-4" />
-              Add Customer
+              <span className="hidden sm:inline">Add Customer</span>
+              <span className="sm:hidden">Add</span>
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
@@ -147,14 +148,14 @@ const Customers = () => {
         </Dialog>
       </div>
 
-      <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
+      <div className="flex flex-col gap-4 sm:gap-0 sm:flex-row items-start sm:items-center sm:space-x-4">
         <div className="relative w-full sm:flex-1 sm:max-w-sm">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
           <Input
             placeholder="Search customers..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
+            className="pl-10 min-h-[44px]"
           />
         </div>
         <div className="text-sm text-muted-foreground">
@@ -162,7 +163,7 @@ const Customers = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
         {filteredCustomers.map((customer) => {
           const creditBadge = getCreditRatingBadge(customer.credit_rating || 0);
           
@@ -172,18 +173,18 @@ const Customers = () => {
               className="hover:shadow-lg transition-shadow cursor-pointer"
               onClick={() => navigate(`/customers/${customer.id}`)}
             >
-              <CardHeader className="pb-2">
-                <div className="flex justify-between items-start">
-                  <div className="flex items-center gap-2">
-                    <Users className="h-5 w-5 text-primary" />
-                    <CardTitle className="text-lg">
+              <CardHeader className="pb-3">
+                <div className="flex justify-between items-start gap-2">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <Users className="h-4 w-4 sm:h-5 sm:w-5 text-primary shrink-0" />
+                    <CardTitle className="text-base sm:text-lg truncate">
                       {customer.full_name}
                     </CardTitle>
                   </div>
                   {customer.credit_rating && (
                     <Badge 
                       variant="secondary" 
-                      className={`${creditBadge.color} text-white`}
+                      className={`${creditBadge.color} text-white text-xs shrink-0`}
                     >
                       {creditBadge.label}
                     </Badge>
@@ -191,47 +192,47 @@ const Customers = () => {
                 </div>
               </CardHeader>
               
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-3 sm:space-y-4">
                 <div className="space-y-2 text-sm">
                   <div className="flex items-center gap-2">
-                    <Mail className="h-4 w-4 text-card-foreground" />
-                    <span className="truncate">{customer.email}</span>
+                    <Mail className="h-4 w-4 text-muted-foreground shrink-0" />
+                    <span className="truncate text-card-foreground">{customer.email}</span>
                   </div>
                   {customer.phone && (
                     <div className="flex items-center gap-2">
-                      <Phone className="h-4 w-4 text-card-foreground" />
-                      <span>{customer.phone}</span>
+                      <Phone className="h-4 w-4 text-muted-foreground shrink-0" />
+                      <span className="text-card-foreground">{customer.phone}</span>
                     </div>
                   )}
                   {customer.license_number && (
                     <div className="flex items-center gap-2">
-                      <CreditCard className="h-4 w-4 text-card-foreground" />
-                      <span>License: {customer.license_number}</span>
+                      <CreditCard className="h-4 w-4 text-muted-foreground shrink-0" />
+                      <span className="text-card-foreground">License: {customer.license_number}</span>
                     </div>
                   )}
                   {customer.license_expiry && (
                     <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-card-foreground" />
-                      <span>Expires: {formatDate(customer.license_expiry)}</span>
+                      <Calendar className="h-4 w-4 text-muted-foreground shrink-0" />
+                      <span className="text-card-foreground">Expires: {formatDate(customer.license_expiry)}</span>
                     </div>
                   )}
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 text-sm">
+                <div className="grid grid-cols-2 gap-3 sm:gap-4 text-sm">
                   <div>
-                    <div className="text-card-foreground">Total Rentals</div>
-                    <div className="font-semibold">{customer.total_rentals || 0}</div>
+                    <div className="text-muted-foreground text-xs">Total Rentals</div>
+                    <div className="font-semibold text-card-foreground">{customer.total_rentals || 0}</div>
                   </div>
                   <div>
-                    <div className="text-card-foreground">Total Spent</div>
-                    <div className="font-semibold">AED {(customer.total_spent || 0).toLocaleString()}</div>
+                    <div className="text-muted-foreground text-xs">Total Spent</div>
+                    <div className="font-semibold text-card-foreground">AED {(customer.total_spent || 0).toLocaleString()}</div>
                   </div>
                 </div>
 
                 {customer.address && (
                   <div className="text-sm">
-                    <div className="text-card-foreground">Address</div>
-                    <div className="text-xs">
+                    <div className="text-muted-foreground text-xs mb-1">Address</div>
+                    <div className="text-xs text-card-foreground">
                       {typeof customer.address === 'object' ? (
                         <>
                           {customer.address.street && <div>{customer.address.street}</div>}
@@ -256,16 +257,19 @@ const Customers = () => {
                       e.stopPropagation();
                       navigate(`/customers/${customer.id}`);
                     }}
-                    className="flex-1 text-muted-foreground"
+                    className="flex-1 min-h-[44px] text-xs sm:text-sm"
                   >
-                    <Edit className="mr-2 h-4 w-4 text-muted-foreground" />
+                    <Edit className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                     Edit
                   </Button>
                   <Button 
                     variant="outline" 
                     size="sm"
-                    onClick={() => deleteCustomerMutation.mutate(customer.id)}
-                    className="text-destructive hover:text-destructive"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      deleteCustomerMutation.mutate(customer.id);
+                    }}
+                    className="text-destructive hover:text-destructive min-h-[44px] px-3 text-xs sm:text-sm"
                   >
                     Delete
                   </Button>

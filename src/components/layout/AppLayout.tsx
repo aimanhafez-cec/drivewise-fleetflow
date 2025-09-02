@@ -121,18 +121,18 @@ const AppLayout = () => {
       <div className="min-h-screen flex w-full overflow-hidden">
         <AppSidebar />
         <main className="flex-1 flex flex-col min-w-0 w-full">
-          <header className="h-12 flex items-center justify-between border-b px-2 sm:px-4 shrink-0">
-            <SidebarTrigger />
-            <div className="flex items-center gap-2">
+          <header className="h-14 sm:h-12 flex items-center justify-between border-b px-3 sm:px-4 shrink-0 bg-background">
+            <SidebarTrigger className="p-2 hover:bg-muted rounded-md" />
+            <div className="flex items-center gap-2 sm:gap-3">
               <div className="hidden sm:block">
                 <QuickSearch />
               </div>
-              <Button variant="ghost" size="icon" aria-label="Notifications">
-                <Bell className="h-4 w-4" />
+              <Button variant="ghost" size="icon" aria-label="Notifications" className="h-9 w-9 sm:h-8 sm:w-8">
+                <Bell className="h-5 w-5 sm:h-4 sm:w-4" />
               </Button>
             </div>
           </header>
-          <div className="flex-1 p-2 sm:p-4 md:p-6 min-w-0 overflow-hidden">
+          <div className="flex-1 p-3 sm:p-4 md:p-6 min-w-0 overflow-auto">
             <Outlet />
           </div>
         </main>
@@ -169,25 +169,31 @@ function AppSidebar() {
 
   return (
     <Sidebar 
-      className="data-[state=open]:w-60 data-[state=closed]:w-0 md:data-[state=closed]:w-14"
+      className="data-[state=open]:w-64 data-[state=closed]:w-0 md:data-[state=closed]:w-16 border-r"
       collapsible="icon"
     >
-      <SidebarContent>
+      <SidebarContent className="pt-2">
         <SidebarGroup>
-          <SidebarGroupLabel>Core Car Rental</SidebarGroupLabel>
+          <SidebarGroupLabel className="px-3 py-2 text-xs font-semibold text-sidebar-foreground/70">
+            Core Car Rental
+          </SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className="space-y-1 px-2">
               {navigation.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton asChild className="h-10 px-3">
                     <NavLink
                       to={item.url}
                       className={({ isActive }) =>
-                        isActive ? "bg-muted text-primary font-medium" : "hover:bg-muted/50"
+                        `flex items-center gap-3 rounded-md transition-colors min-h-[44px] ${
+                          isActive 
+                            ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" 
+                            : "hover:bg-sidebar-accent/50 text-sidebar-foreground"
+                        }`
                       }
                     >
-                      <item.icon className="h-4 w-4 shrink-0" />
-                      <span className="ml-2 truncate">{item.title}</span>
+                      <item.icon className="h-5 w-5 shrink-0" />
+                      <span className="truncate text-sm">{item.title}</span>
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -198,15 +204,15 @@ function AppSidebar() {
         
         <SidebarGroup className="mt-auto">
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className="px-2">
               <SidebarMenuItem>
-                <SidebarMenuButton asChild>
+                <SidebarMenuButton asChild className="h-10 px-3">
                   <button
                     onClick={handleSignOut}
-                    className="w-full text-left hover:bg-muted/50"
+                    className="w-full flex items-center gap-3 text-left hover:bg-sidebar-accent/50 text-sidebar-foreground rounded-md transition-colors min-h-[44px]"
                   >
-                    <LogOut className="h-4 w-4 shrink-0" />
-                    <span className="ml-2 truncate">Sign Out</span>
+                    <LogOut className="h-5 w-5 shrink-0" />
+                    <span className="truncate text-sm">Sign Out</span>
                   </button>
                 </SidebarMenuButton>
               </SidebarMenuItem>

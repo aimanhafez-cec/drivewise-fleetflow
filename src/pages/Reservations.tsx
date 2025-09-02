@@ -145,27 +145,27 @@ const Reservations = () => {
       </div>
     );
   }
-  return <div className="space-y-6 w-full min-w-0">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+  return <div className="space-y-4 sm:space-y-6 w-full min-w-0">
+      <div className="flex flex-col gap-4 sm:gap-0 sm:flex-row items-start sm:items-center justify-between">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">Open Reservations</h1>
-            <p className="text-white">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">Open Reservations</h1>
+            <p className="text-muted-foreground text-sm sm:text-base">
               Manage active customer reservations and bookings
             </p>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <Button id="btn-new-reservation" onClick={() => navigate('/reservations/new')} size="sm" className="text-white">
+          <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+            <Button id="btn-new-reservation" onClick={() => navigate('/reservations/new')} size="sm" className="min-h-[44px] px-3">
               <Plus className="mr-2 h-4 w-4" />
               <span className="hidden sm:inline">New Reservation</span>
               <span className="sm:hidden">New</span>
             </Button>
             
-            <Button variant="outline" onClick={() => navigate('/daily-planner')} size="sm" className="text-white">
+            <Button variant="outline" onClick={() => navigate('/daily-planner')} size="sm" className="min-h-[44px] px-3">
               <Calendar className="mr-2 h-4 w-4" />
               <span className="hidden sm:inline">Planner</span>
             </Button>
             
-            <Button variant="outline" onClick={() => navigate('/agreements')} size="sm" className="text-white">
+            <Button variant="outline" onClick={() => navigate('/agreements')} size="sm" className="min-h-[44px] px-3">
               <FileText className="mr-2 h-4 w-4" />
               <span className="hidden sm:inline">Agreements</span>
             </Button>
@@ -179,15 +179,15 @@ const Reservations = () => {
       />
 
       {/* Summary Cards */}
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-3 sm:gap-4 grid-cols-2 md:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-card-foreground">Open Reservations</CardTitle>
+            <CardTitle className="text-xs sm:text-sm font-medium text-card-foreground">Open Reservations</CardTitle>
             <Calendar className="h-4 w-4 text-card-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-card-foreground">{counts?.total || 0}</div>
-            <p className="text-xs text-card-foreground">
+            <div className="text-xl sm:text-2xl font-bold text-card-foreground">{counts?.total || 0}</div>
+            <p className="text-xs text-muted-foreground">
               Not yet converted
             </p>
           </CardContent>
@@ -195,12 +195,12 @@ const Reservations = () => {
         
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-card-foreground">Confirmed</CardTitle>
+            <CardTitle className="text-xs sm:text-sm font-medium text-card-foreground">Confirmed</CardTitle>
             <Car className="h-4 w-4 text-card-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-card-foreground">{counts?.confirmed || 0}</div>
-            <p className="text-xs text-card-foreground">
+            <div className="text-xl sm:text-2xl font-bold text-card-foreground">{counts?.confirmed || 0}</div>
+            <p className="text-xs text-muted-foreground">
               Ready to proceed
             </p>
           </CardContent>
@@ -208,27 +208,27 @@ const Reservations = () => {
         
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-card-foreground">Pending</CardTitle>
+            <CardTitle className="text-xs sm:text-sm font-medium text-card-foreground">Pending</CardTitle>
             <Clock className="h-4 w-4 text-card-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-card-foreground">{counts?.pending || 0}</div>
-            <p className="text-xs text-card-foreground">
+            <div className="text-xl sm:text-2xl font-bold text-card-foreground">{counts?.pending || 0}</div>
+            <p className="text-xs text-muted-foreground">
               Awaiting confirmation
             </p>
           </CardContent>
         </Card>
         
-        <Card>
+        <Card className="col-span-2 md:col-span-1">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-card-foreground">Revenue</CardTitle>
+            <CardTitle className="text-xs sm:text-sm font-medium text-card-foreground">Revenue</CardTitle>
             <Calendar className="h-4 w-4 text-card-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-card-foreground">
+            <div className="text-xl sm:text-2xl font-bold text-card-foreground">
               {formatCurrency(reservations?.reduce((sum, r) => sum + (r.total_amount || 0), 0) || 0)}
             </div>
-            <p className="text-xs text-card-foreground">
+            <p className="text-xs text-muted-foreground">
               From open reservations
             </p>
           </CardContent>
@@ -245,24 +245,24 @@ const Reservations = () => {
         </CardHeader>
         <CardContent>
           {reservations && reservations.length > 0 ? (
-            <div id="reservations-table" className="space-y-4">
+            <div id="reservations-table" className="space-y-3 sm:space-y-4">
               {reservations.map(reservation => (
                 <div 
                   key={reservation.id} 
-                  className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 border rounded-lg hover:bg-muted/50" 
+                  className="flex flex-col gap-3 p-3 sm:p-4 border rounded-lg hover:bg-muted/50 transition-colors" 
                 >
                   <div 
-                    className="flex items-center space-x-4 flex-1 cursor-pointer min-w-0"
+                    className="flex items-start gap-3 cursor-pointer min-w-0 flex-1"
                     onClick={() => navigate(`/reservations/${reservation.id}`)}
                   >
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 flex-shrink-0">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 shrink-0">
                       <User className="h-5 w-5 text-card-foreground" />
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-medium leading-none truncate text-card-foreground">
                         {reservation.profiles?.full_name || 'Unknown Customer'}
                       </p>
-                      <p className="text-sm text-card-foreground truncate">
+                      <p className="text-xs sm:text-sm text-muted-foreground truncate mt-1">
                         {reservation.vehicles ? 
                           `${reservation.vehicles.make} ${reservation.vehicles.model}` : 
                           'No vehicle assigned'
@@ -271,20 +271,22 @@ const Reservations = () => {
                     </div>
                   </div>
                   
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full sm:w-auto">
-                    <div className="text-left sm:text-center">
-                      <p className="text-sm font-medium text-card-foreground">
-                        {reservation.start_datetime && reservation.end_datetime ? (
-                          <>
-                            {format(new Date(reservation.start_datetime), 'MMM dd')} - {format(new Date(reservation.end_datetime), 'MMM dd, yyyy')}
-                          </>
-                        ) : (
-                          'Dates TBD'
-                        )}
-                      </p>
-                      <p className="text-sm text-card-foreground">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm">
+                      <div>
+                        <span className="font-medium text-card-foreground">
+                          {reservation.start_datetime && reservation.end_datetime ? (
+                            <>
+                              {format(new Date(reservation.start_datetime), 'MMM dd')} - {format(new Date(reservation.end_datetime), 'MMM dd, yyyy')}
+                            </>
+                          ) : (
+                            'Dates TBD'
+                          )}
+                        </span>
+                      </div>
+                      <div className="text-muted-foreground">
                         {formatCurrency(reservation.total_amount || 0)}
-                      </p>
+                      </div>
                     </div>
                     
                     <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full sm:w-auto">
@@ -298,7 +300,7 @@ const Reservations = () => {
                           e.stopPropagation();
                           handleConvertToAgreement(reservation);
                         }}
-                        className="w-full sm:w-auto text-white"
+                        className="w-full sm:w-auto min-h-[44px] px-3"
                       >
                         <span className="hidden sm:inline">Convert to Agreement</span>
                         <span className="sm:hidden">Convert</span>
@@ -309,14 +311,14 @@ const Reservations = () => {
               ))}
             </div>
           ) : (
-            <div className="text-center py-8">
-              <Calendar className="mx-auto h-12 w-12 text-card-foreground" />
-              <h3 className="mt-4 text-lg font-semibold text-card-foreground">No open reservations</h3>
-              <p className="text-card-foreground">
+            <div className="text-center py-8 sm:py-12">
+              <Calendar className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+              <h3 className="text-lg font-semibold text-card-foreground mb-2">No open reservations</h3>
+              <p className="text-muted-foreground text-sm sm:text-base mb-4">
                 Create your first reservation to get started.
               </p>
               <Button 
-                className="mt-4 text-white"
+                className="min-h-[44px] px-4"
                 onClick={() => navigate('/reservations/new')}
               >
                 <Plus className="mr-2 h-4 w-4" />

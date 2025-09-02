@@ -298,71 +298,25 @@ const Dashboard = () => {
 
   console.log('Vehicle status data for charts:', vehicleStatusData);
   console.log('Sales data for charts:', salesData);
-  return <div className="min-h-screen bg-background">
-      {/* Header Bar */}
-      <header className="bg-secondary h-16 flex items-center justify-between px-6 shadow-soft">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="sm" className="lg:hidden text-white hover:bg-teal-overlay" onClick={() => setSidebarCollapsed(!sidebarCollapsed)}>
-            <Menu className="h-5 w-5" />
-          </Button>
-          <div className="text-xl font-bold text-white">Fleet Master</div>
-        </div>
-        
-        <div className="flex-1 max-w-md mx-8">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-white/70" />
-            <Input placeholder="Search vehicles, customers, reservations..." className="pl-10 bg-white/10 text-white placeholder:text-white/70 border-0 rounded-full shadow-sm" />
-          </div>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <Button variant="ghost" size="sm" className="text-white hover:bg-teal-overlay">
-            <Home className="h-5 w-5" />
-          </Button>
-          <Button variant="ghost" size="sm" className="text-white hover:bg-teal-overlay relative">
-            <Bell className="h-5 w-5" />
-            <span className="absolute -top-1 -right-1 h-3 w-3 bg-destructive rounded-full"></span>
-          </Button>
-          <Button variant="ghost" size="sm" className="text-white hover:bg-teal-overlay">
-            <User className="h-5 w-5" />
-          </Button>
-        </div>
-      </header>
-
-      <div className="flex">
-        {/* Quick Actions Sidebar */}
-        <aside className={`${sidebarCollapsed ? 'w-16' : 'w-64'} bg-teal-overlay/80 transition-all duration-300 min-h-[calc(100vh-4rem)] lg:block ${sidebarCollapsed ? 'fixed lg:relative' : 'hidden lg:block'} z-20`}>
-          <div className="p-4">
-            <h3 className={`text-white font-medium mb-4 ${sidebarCollapsed ? 'hidden' : 'block'}`}>Quick Actions</h3>
-            <nav className="space-y-2">
-              {quickActions.map(action => <button key={action.name} onClick={() => navigate(action.path)} className="w-full flex items-center gap-3 p-3 text-white hover:bg-teal-light rounded-lg transition-colors group">
-                  <action.icon className="h-5 w-5 text-teal-accent group-hover:text-white transition-colors" />
-                  {!sidebarCollapsed && <div className="text-left">
-                      <div className="font-medium">{action.name}</div>
-                      <div className="text-xs text-white/80 opacity-80">{action.description}</div>
-                    </div>}
-                </button>)}
-            </nav>
-          </div>
-        </aside>
-
+  return <div className="w-full min-w-0 space-y-4 sm:space-y-6">
         {/* Main Content */}
-        <main className="flex-1 p-6">
+        <div className="w-full">
           {/* Greeting */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-white mb-6">Good morning, Fleet Manager</h1>
+          <div className="mb-6 sm:mb-8">
+            <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Good morning, Fleet Manager</h1>
+            <p className="text-white/80 text-sm sm:text-base">Manage your fleet operations efficiently</p>
           </div>
 
           {/* Apps Grid */}
-          <div className="mb-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+          <div className="mb-6 sm:mb-8">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 mb-6">
               {appCards.map(app => <Card key={app.name} className="bg-card hover:bg-teal-light transition-all duration-300 cursor-pointer group border-0 shadow-card rounded-xl" onClick={() => navigate(app.path)}>
-                  <CardContent className="p-6 flex items-center gap-4">
-                    <div className={`p-3 rounded-lg ${app.color} group-hover:shadow-lg transition-shadow`}>
-                      <app.icon className="h-6 w-6 text-white" />
+                  <CardContent className="p-3 sm:p-6 flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
+                    <div className={`p-2 sm:p-3 rounded-lg ${app.color} group-hover:shadow-lg transition-shadow`}>
+                      <app.icon className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                     </div>
-                    <div>
-                      <h3 className="text-black font-medium">{app.name}</h3>
+                    <div className="text-center sm:text-left">
+                      <h3 className="text-black font-medium text-sm sm:text-base">{app.name}</h3>
                     </div>
                   </CardContent>
                 </Card>)}
@@ -378,16 +332,16 @@ const Dashboard = () => {
           </div>
 
           {/* KPI Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 mb-6 sm:mb-8">
             {kpiStats.map(stat => <Card key={stat.title} className="bg-card border-0 shadow-card rounded-xl">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-black/80 mb-1">{stat.title}</p>
-                      <p className="text-2xl font-bold text-black">{stat.value}</p>
+                <CardContent className="p-3 sm:p-4">
+                  <div className="flex flex-col sm:flex-row items-center sm:justify-between gap-2">
+                    <div className="text-center sm:text-left">
+                      <p className="text-xs sm:text-sm text-black/80 mb-1">{stat.title}</p>
+                      <p className="text-lg sm:text-2xl font-bold text-black">{stat.value}</p>
                     </div>
                     <div className={`p-2 rounded-lg ${stat.iconBg}`}>
-                      <stat.icon className={`h-5 w-5 ${stat.color}`} />
+                      <stat.icon className={`h-4 w-4 sm:h-5 sm:w-5 ${stat.color}`} />
                     </div>
                   </div>
                 </CardContent>
@@ -395,7 +349,7 @@ const Dashboard = () => {
           </div>
 
           {/* Dashboard Content Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
             {/* Quick Lookup */}
             <Card className="bg-card border-0 shadow-card rounded-xl">
               <CardHeader>
@@ -465,7 +419,7 @@ const Dashboard = () => {
             </Card>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
             {/* Vehicle Status */}
             <Card className="bg-card border-0 shadow-card rounded-xl">
               <CardHeader className="flex flex-row items-center justify-between">
@@ -652,8 +606,7 @@ const Dashboard = () => {
               </div>
             </CardContent>
           </Card>
-        </main>
-      </div>
+        </div>
     </div>;
 };
 export default Dashboard;
