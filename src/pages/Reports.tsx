@@ -20,20 +20,16 @@ import RevenueBreakdownReport from '@/components/reports/RevenueBreakdownReport'
 import CostAnalysisReport from '@/components/reports/CostAnalysisReport';
 import ProfitabilityReport from '@/components/reports/ProfitabilityReport';
 import OutstandingPaymentsReport from '@/components/reports/OutstandingPaymentsReport';
-
 const Reports = () => {
   const [date, setDate] = useState<DateRange | undefined>({
     from: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
-    to: new Date(),
+    to: new Date()
   });
-
   useEffect(() => {
     console.log('Reports component mounted with date range:', date);
     console.log('All report components should be available');
   }, [date]);
-
-  return (
-    <div className="space-y-6">
+  return <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
@@ -46,38 +42,16 @@ const Reports = () => {
         <div className="flex items-center gap-2">
           <Popover>
             <PopoverTrigger asChild>
-              <Button
-                id="date"
-                variant="outline"
-                className={cn(
-                  "w-[300px] justify-start text-left font-normal",
-                  !date && "text-muted-foreground"
-                )}
-              >
+              <Button id="date" variant="outline" className={cn("w-[300px] justify-start text-left font-normal", !date && "text-muted-foreground")}>
                 <CalendarIcon className="mr-2 h-4 w-4" />
-                {date?.from ? (
-                  date.to ? (
-                    <>
+                {date?.from ? date.to ? <>
                       {format(date.from, "LLL dd, y")} -{" "}
                       {format(date.to, "LLL dd, y")}
-                    </>
-                  ) : (
-                    format(date.from, "LLL dd, y")
-                  )
-                ) : (
-                  <span>Pick a date range</span>
-                )}
+                    </> : format(date.from, "LLL dd, y") : <span>Pick a date range</span>}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                initialFocus
-                mode="range"
-                defaultMonth={date?.from}
-                selected={date}
-                onSelect={setDate}
-                numberOfMonths={2}
-              />
+              <Calendar initialFocus mode="range" defaultMonth={date?.from} selected={date} onSelect={setDate} numberOfMonths={2} />
             </PopoverContent>
           </Popover>
           
@@ -95,7 +69,7 @@ const Reports = () => {
 
       {/* Main Report Tabs */}
       <Tabs defaultValue="operations" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-3 bg-slate-950">
           <TabsTrigger value="operations">
             Internal Operations Reports
           </TabsTrigger>
@@ -199,7 +173,7 @@ const Reports = () => {
         <TabsContent value="customer-insights" className="space-y-6">
           {/* Customer Insights Sub-tabs */}
           <Tabs defaultValue="rental-history" className="space-y-4">
-            <TabsList>
+            <TabsList className="bg-slate-950">
               <TabsTrigger value="rental-history">
                 Rental History & Loyalty
               </TabsTrigger>
@@ -269,8 +243,6 @@ const Reports = () => {
           </Tabs>
         </TabsContent>
       </Tabs>
-    </div>
-  );
+    </div>;
 };
-
 export default Reports;
