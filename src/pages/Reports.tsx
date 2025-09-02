@@ -90,23 +90,14 @@ const Reports = () => {
 
       {/* Main Report Tabs */}
       <Tabs defaultValue="operations" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-3 relative z-10 bg-teal-800/40 border border-teal-700/60 backdrop-blur-sm">
-          <TabsTrigger 
-            value="operations"
-            className="text-teal-100/80 data-[state=active]:text-white data-[state=active]:bg-teal-700 data-[state=active]:shadow hover:text-teal-100 focus-visible:ring-2 focus-visible:ring-teal-400"
-          >
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="operations">
             Internal Operations Reports
           </TabsTrigger>
-          <TabsTrigger 
-            value="customer-insights"
-            className="text-teal-100/80 data-[state=active]:text-white data-[state=active]:bg-teal-700 data-[state=active]:shadow hover:text-teal-100 focus-visible:ring-2 focus-visible:ring-teal-400"
-          >
+          <TabsTrigger value="customer-insights">
             Customer Insight Reports
           </TabsTrigger>
-          <TabsTrigger 
-            value="financial"
-            className="text-teal-100/80 data-[state=active]:text-white data-[state=active]:bg-teal-700 data-[state=active]:shadow hover:text-teal-100 focus-visible:ring-2 focus-visible:ring-teal-400"
-          >
+          <TabsTrigger value="financial">
             Financial Reports
           </TabsTrigger>
         </TabsList>
@@ -166,29 +157,17 @@ const Reports = () => {
 
           {/* Operations Sub-tabs */}
           <Tabs defaultValue="fleet-status" className="space-y-4">
-            <TabsList className="relative z-10 bg-teal-800/40 border border-teal-700/60 backdrop-blur-sm">
-              <TabsTrigger 
-                value="fleet-status"
-                className="text-teal-100/80 data-[state=active]:text-white data-[state=active]:bg-teal-700 data-[state=active]:shadow hover:text-teal-100 focus-visible:ring-2 focus-visible:ring-teal-400"
-              >
+            <TabsList>
+              <TabsTrigger value="fleet-status">
                 Fleet Status & Utilization
               </TabsTrigger>
-              <TabsTrigger 
-                value="maintenance"
-                className="text-teal-100/80 data-[state=active]:text-white data-[state=active]:bg-teal-700 data-[state=active]:shadow hover:text-teal-100 focus-visible:ring-2 focus-visible:ring-teal-400"
-              >
+              <TabsTrigger value="maintenance">
                 Maintenance & Service
               </TabsTrigger>
-              <TabsTrigger 
-                value="reservations"
-                className="text-teal-100/80 data-[state=active]:text-white data-[state=active]:bg-teal-700 data-[state=active]:shadow hover:text-teal-100 focus-visible:ring-2 focus-visible:ring-teal-400"
-              >
+              <TabsTrigger value="reservations">
                 Reservations & Availability
               </TabsTrigger>
-              <TabsTrigger 
-                value="damage"
-                className="text-teal-100/80 data-[state=active]:text-white data-[state=active]:bg-teal-700 data-[state=active]:shadow hover:text-teal-100 focus-visible:ring-2 focus-visible:ring-teal-400"
-              >
+              <TabsTrigger value="damage">
                 Vehicle Damage & Incidents
               </TabsTrigger>
             </TabsList>
@@ -215,29 +194,17 @@ const Reports = () => {
         <TabsContent value="customer-insights" className="space-y-6">
           {/* Customer Insights Sub-tabs */}
           <Tabs defaultValue="rental-history" className="space-y-4">
-            <TabsList className="relative z-10 bg-teal-800/40 border border-teal-700/60 backdrop-blur-sm">
-              <TabsTrigger 
-                value="rental-history"
-                className="text-teal-100/80 data-[state=active]:text-white data-[state=active]:bg-teal-700 data-[state=active]:shadow hover:text-teal-100 focus-visible:ring-2 focus-visible:ring-teal-400"
-              >
+            <TabsList>
+              <TabsTrigger value="rental-history">
                 Rental History & Loyalty
               </TabsTrigger>
-              <TabsTrigger 
-                value="preferences"
-                className="text-teal-100/80 data-[state=active]:text-white data-[state=active]:bg-teal-700 data-[state=active]:shadow hover:text-teal-100 focus-visible:ring-2 focus-visible:ring-teal-400"
-              >
+              <TabsTrigger value="preferences">
                 Preferences & Trends
               </TabsTrigger>
-              <TabsTrigger 
-                value="satisfaction"
-                className="text-teal-100/80 data-[state=active]:text-white data-[state=active]:bg-teal-700 data-[state=active]:shadow hover:text-teal-100 focus-visible:ring-2 focus-visible:ring-teal-400"
-              >
+              <TabsTrigger value="satisfaction">
                 Satisfaction & Feedback
               </TabsTrigger>
-              <TabsTrigger 
-                value="late-returns"
-                className="text-teal-100/80 data-[state=active]:text-white data-[state=active]:bg-teal-700 data-[state=active]:shadow hover:text-teal-100 focus-visible:ring-2 focus-visible:ring-teal-400"
-              >
+              <TabsTrigger value="late-returns">
                 Late Return Analysis
               </TabsTrigger>
             </TabsList>
@@ -264,29 +231,17 @@ const Reports = () => {
         <TabsContent value="financial" className="space-y-6">
           {/* Financial Reports Sub-tabs */}
           <Tabs defaultValue="revenue-breakdown" className="space-y-4">
-            <TabsList className="relative z-10 bg-teal-800/40 border border-teal-700/60 backdrop-blur-sm">
-              <TabsTrigger 
-                value="revenue-breakdown"
-                className="text-teal-100/80 data-[state=active]:text-white data-[state=active]:bg-teal-700 data-[state=active]:shadow hover:text-teal-100 focus-visible:ring-2 focus-visible:ring-teal-400"
-              >
+            <TabsList>
+              <TabsTrigger value="revenue-breakdown">
                 Revenue Breakdown & Trends
               </TabsTrigger>
-              <TabsTrigger 
-                value="cost-analysis"
-                className="text-teal-100/80 data-[state=active]:text-white data-[state=active]:bg-teal-700 data-[state=active]:shadow hover:text-teal-100 focus-visible:ring-2 focus-visible:ring-teal-400"
-              >
+              <TabsTrigger value="cost-analysis">
                 Cost Analysis & Expenses
               </TabsTrigger>
-              <TabsTrigger 
-                value="profitability"
-                className="text-teal-100/80 data-[state=active]:text-white data-[state=active]:bg-teal-700 data-[state=active]:shadow hover:text-teal-100 focus-visible:ring-2 focus-visible:ring-teal-400"
-              >
+              <TabsTrigger value="profitability">
                 Profitability Analysis
               </TabsTrigger>
-              <TabsTrigger 
-                value="outstanding-payments"
-                className="text-teal-100/80 data-[state=active]:text-white data-[state=active]:bg-teal-700 data-[state=active]:shadow hover:text-teal-100 focus-visible:ring-2 focus-visible:ring-teal-400"
-              >
+              <TabsTrigger value="outstanding-payments">
                 Outstanding Payments
               </TabsTrigger>
             </TabsList>
