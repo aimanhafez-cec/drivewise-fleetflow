@@ -192,7 +192,7 @@ function AppSidebar() {
                         }`
                       }
                     >
-                      <item.icon className="h-5 w-5 shrink-0" />
+                      <item.icon className="h-5 w-5 shrink-0 text-sidebar-foreground" />
                       <span className="truncate text-sm">{item.title}</span>
                     </NavLink>
                   </SidebarMenuButton>
@@ -211,7 +211,7 @@ function AppSidebar() {
                     onClick={handleSignOut}
                     className="w-full flex items-center gap-3 text-left hover:bg-sidebar-accent/50 text-sidebar-foreground rounded-md transition-colors min-h-[44px]"
                   >
-                    <LogOut className="h-5 w-5 shrink-0" />
+                    <LogOut className="h-5 w-5 shrink-0 text-sidebar-foreground" />
                     <span className="truncate text-sm">Sign Out</span>
                   </button>
                 </SidebarMenuButton>
