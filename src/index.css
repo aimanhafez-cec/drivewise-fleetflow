@@ -219,8 +219,9 @@
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-quick: all 0.2s ease-out;
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 10% 3.9%;
+    /* Light mode sidebar - ensure high contrast */
+    --sidebar-background: 255 255 255; /* Pure white background */
+    --sidebar-foreground: 0 0 0; /* Pure black text/icons */
     --sidebar-primary: 240 5.9% 10%;
     --sidebar-primary-foreground: 0 0% 98%;
     --sidebar-accent: 240 4.8% 95.9%;
