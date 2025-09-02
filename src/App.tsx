@@ -43,156 +43,159 @@ import CorporateLeasingEdit from "./pages/CorporateLeasingEdit";
 import { CarSubscriptions } from "./pages/CarSubscriptions";
 import { NewCarSubscription } from "./pages/NewCarSubscription";
 
-
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <PWAInstallPrompt />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Navigate to="/auth" replace />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/dashboard" element={
-              <ProtectedRoute>
-                <AppLayout />
-              </ProtectedRoute>
-            }>
-              <Route index element={<Dashboard />} />
-            </Route>
-            <Route path="/instant-booking" element={
-              <ProtectedRoute>
-                <AppLayout />
-              </ProtectedRoute>
-            }>
-              <Route index element={<InstantBooking />} />
-            </Route>
-            <Route path="/reservations" element={
+const App = () => {
+  console.log('App component is rendering');
+  
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <PWAInstallPrompt />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Navigate to="/dashboard" replace />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/dashboard" element={
                 <ProtectedRoute>
                   <AppLayout />
                 </ProtectedRoute>
               }>
-                <Route index element={<Reservations />} />
-                <Route path="new" element={<NewReservation />} />
-                <Route path="new-multi" element={<ReservationsMulti />} />
-                <Route path=":id" element={<ReservationDetailsPage />} />
+                <Route index element={<Dashboard />} />
               </Route>
-            <Route path="/vehicles" element={
-              <ProtectedRoute>
-                <AppLayout />
-              </ProtectedRoute>
-            }>
-              <Route index element={<Vehicles />} />
-              <Route path=":id" element={<VehicleDetails />} />
-            </Route>
-            <Route path="/customers" element={
-              <ProtectedRoute>
-                <AppLayout />
-              </ProtectedRoute>
-            }>
-              <Route index element={<Customers />} />
-              <Route path=":id" element={<CustomerDetails />} />
-            </Route>
-            <Route path="/planner" element={
-              <ProtectedRoute>
-                <AppLayout />
-              </ProtectedRoute>
-            }>
-              <Route index element={<Planner />} />
-            </Route>
-            <Route path="/daily-planner" element={
-              <ProtectedRoute>
-                <AppLayout />
-              </ProtectedRoute>
-            }>
-              <Route index element={<DailyPlanner />} />
-            </Route>
-            <Route path="/agreements" element={
-              <ProtectedRoute>
-                <AppLayout />
-              </ProtectedRoute>
-            }>
-              <Route index element={<Agreements />} />
-              <Route path="new" element={<AgreementWizardPage />} />
-              <Route path=":id" element={<AgreementDetails />} />
-            </Route>
-            <Route path="/payments" element={
-              <ProtectedRoute>
-                <AppLayout />
-              </ProtectedRoute>
-            }>
-              <Route index element={<div>Payments - Coming Soon</div>} />
-            </Route>
-            <Route path="/settings" element={
-              <ProtectedRoute>
-                <AppLayout />
-              </ProtectedRoute>
-            }>
-              <Route index element={<div>Settings - Coming Soon</div>} />
-            </Route>
-            <Route path="/quotes" element={
-              <ProtectedRoute>
-                <AppLayout />
-              </ProtectedRoute>
-            }>
-              <Route index element={<Quotes />} />
-              <Route path="new" element={<NewQuote />} />
-              <Route path=":id" element={<QuoteDetails />} />
-            </Route>
-            <Route path="/rfqs" element={
-              <ProtectedRoute>
-                <AppLayout />
-              </ProtectedRoute>
-            }>
-              <Route index element={<RFQs />} />
-              <Route path="new" element={<NewRFQ />} />
-              <Route path=":id" element={<RFQDetails />} />
-            </Route>
-            <Route path="/inspections" element={
-              <ProtectedRoute>
-                <AppLayout />
-              </ProtectedRoute>
-            }>
-              <Route index element={<Inspections />} />
-              <Route path="new" element={<NewInspection />} />
-              <Route path=":id" element={<InspectionDetails />} />
-            </Route>
-            <Route path="/reports" element={
-              <ProtectedRoute>
-                <AppLayout />
-              </ProtectedRoute>
-            }>
-              <Route index element={<Reports />} />
-            </Route>
-            <Route path="/corporate-leasing" element={
-              <ProtectedRoute>
-                <AppLayout />
-              </ProtectedRoute>
-            }>
-              <Route index element={<CorporateLeasing />} />
-              <Route path="new" element={<NewCorporateLeasing />} />
-              <Route path=":id" element={<CorporateLeasingDetails />} />
-              <Route path=":id/edit" element={<CorporateLeasingEdit />} />
-            </Route>
-            <Route path="/car-subscriptions" element={
-              <ProtectedRoute>
-                <AppLayout />
-              </ProtectedRoute>
-            }>
-              <Route index element={<CarSubscriptions />} />
-              <Route path="new" element={<NewCarSubscription />} />
-            </Route>
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </AuthProvider>
-  </QueryClientProvider>
-);
+              <Route path="/instant-booking" element={
+                <ProtectedRoute>
+                  <AppLayout />
+                </ProtectedRoute>
+              }>
+                <Route index element={<InstantBooking />} />
+              </Route>
+              <Route path="/reservations" element={
+                  <ProtectedRoute>
+                    <AppLayout />
+                  </ProtectedRoute>
+                }>
+                  <Route index element={<Reservations />} />
+                  <Route path="new" element={<NewReservation />} />
+                  <Route path="new-multi" element={<ReservationsMulti />} />
+                  <Route path=":id" element={<ReservationDetailsPage />} />
+                </Route>
+              <Route path="/vehicles" element={
+                <ProtectedRoute>
+                  <AppLayout />
+                </ProtectedRoute>
+              }>
+                <Route index element={<Vehicles />} />
+                <Route path=":id" element={<VehicleDetails />} />
+              </Route>
+              <Route path="/customers" element={
+                <ProtectedRoute>
+                  <AppLayout />
+                </ProtectedRoute>
+              }>
+                <Route index element={<Customers />} />
+                <Route path=":id" element={<CustomerDetails />} />
+              </Route>
+              <Route path="/planner" element={
+                <ProtectedRoute>
+                  <AppLayout />
+                </ProtectedRoute>
+              }>
+                <Route index element={<Planner />} />
+              </Route>
+              <Route path="/daily-planner" element={
+                <ProtectedRoute>
+                  <AppLayout />
+                </ProtectedRoute>
+              }>
+                <Route index element={<DailyPlanner />} />
+              </Route>
+              <Route path="/agreements" element={
+                <ProtectedRoute>
+                  <AppLayout />
+                </ProtectedRoute>
+              }>
+                <Route index element={<Agreements />} />
+                <Route path="new" element={<AgreementWizardPage />} />
+                <Route path=":id" element={<AgreementDetails />} />
+              </Route>
+              <Route path="/payments" element={
+                <ProtectedRoute>
+                  <AppLayout />
+                </ProtectedRoute>
+              }>
+                <Route index element={<div>Payments - Coming Soon</div>} />
+              </Route>
+              <Route path="/settings" element={
+                <ProtectedRoute>
+                  <AppLayout />
+                </ProtectedRoute>
+              }>
+                <Route index element={<div>Settings - Coming Soon</div>} />
+              </Route>
+              <Route path="/quotes" element={
+                <ProtectedRoute>
+                  <AppLayout />
+                </ProtectedRoute>
+              }>
+                <Route index element={<Quotes />} />
+                <Route path="new" element={<NewQuote />} />
+                <Route path=":id" element={<QuoteDetails />} />
+              </Route>
+              <Route path="/rfqs" element={
+                <ProtectedRoute>
+                  <AppLayout />
+                </ProtectedRoute>
+              }>
+                <Route index element={<RFQs />} />
+                <Route path="new" element={<NewRFQ />} />
+                <Route path=":id" element={<RFQDetails />} />
+              </Route>
+              <Route path="/inspections" element={
+                <ProtectedRoute>
+                  <AppLayout />
+                </ProtectedRoute>
+              }>
+                <Route index element={<Inspections />} />
+                <Route path="new" element={<NewInspection />} />
+                <Route path=":id" element={<InspectionDetails />} />
+              </Route>
+              <Route path="/reports" element={
+                <ProtectedRoute>
+                  <AppLayout />
+                </ProtectedRoute>
+              }>
+                <Route index element={<Reports />} />
+              </Route>
+              <Route path="/corporate-leasing" element={
+                <ProtectedRoute>
+                  <AppLayout />
+                </ProtectedRoute>
+              }>
+                <Route index element={<CorporateLeasing />} />
+                <Route path="new" element={<NewCorporateLeasing />} />
+                <Route path=":id" element={<CorporateLeasingDetails />} />
+                <Route path=":id/edit" element={<CorporateLeasingEdit />} />
+              </Route>
+              <Route path="/car-subscriptions" element={
+                <ProtectedRoute>
+                  <AppLayout />
+                </ProtectedRoute>
+              }>
+                <Route index element={<CarSubscriptions />} />
+                <Route path="new" element={<NewCarSubscription />} />
+              </Route>
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </AuthProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
