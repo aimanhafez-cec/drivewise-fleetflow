@@ -98,7 +98,7 @@ const PWAInstallPrompt = () => {
             </div>
             <div className="flex-1 space-y-2">
               <h3 className="font-semibold text-sm text-card-foreground">
-                Install FleetFlow App
+                Install Core Car Rental App
               </h3>
               <p className="text-xs text-muted-foreground">
                 Install our app for faster access, offline support, and a better mobile experience.

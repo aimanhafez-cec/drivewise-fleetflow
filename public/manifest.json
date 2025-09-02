@@ -1,7 +1,7 @@
 {
-  "name": "DriveWise FleetFlow",
-  "short_name": "FleetFlow",
-  "description": "Complete fleet management and car rental solution with instant booking, vehicle tracking, and comprehensive reporting",
+  "name": "Core Car Rental",
+  "short_name": "Core Rental",
+  "description": "Professional car rental management system with instant booking, fleet tracking, and comprehensive reporting",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0f172a",
