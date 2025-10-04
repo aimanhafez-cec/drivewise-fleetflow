@@ -148,7 +148,7 @@ const Auth = () => {
         {/* Left side - Branding (hidden on mobile) */}
         <div className="hidden lg:flex flex-col gap-6 p-8">
           <div className="flex items-center gap-3">
-            <Car className="h-12 w-12 text-primary" />
+            <img src="/logo.svg" alt="Core Car Rental Logo" className="h-12 w-12" />
             <div>
               <h1 className="text-4xl font-bold text-card-foreground">Core Car Rental</h1>
               <p className="text-muted-foreground">Professional fleet management</p>
@@ -184,7 +184,7 @@ const Auth = () => {
         <Card className="w-full backdrop-blur-xl bg-card/80 border-border/50 shadow-2xl">
           <CardHeader className="space-y-1 flex flex-col items-center pb-4">
             <div className="lg:hidden flex items-center gap-2 mb-2">
-              <Car className="h-8 w-8 text-primary" />
+              <img src="/logo.svg" alt="Core Car Rental Logo" className="h-8 w-8" />
               <h1 className="text-2xl font-bold text-card-foreground">Core Car Rental</h1>
             </div>
             <CardTitle className="text-2xl font-bold">
