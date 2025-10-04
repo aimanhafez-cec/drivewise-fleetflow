@@ -185,7 +185,7 @@ function AppSidebar() {
                     <NavLink
                       to={item.url}
                       className={({ isActive }) =>
-                        `flex items-center justify-center group-data-[collapsible=icon]:justify-center group-data-[collapsible=expanded]:justify-start gap-3 rounded-md transition-colors min-h-[44px] group-data-[collapsible=icon]:min-h-[40px] ${
+                        `flex items-center justify-start group-data-[collapsible=icon]:justify-center gap-3 rounded-md transition-colors min-h-[44px] group-data-[collapsible=icon]:min-h-[40px] ${
                           isActive 
                             ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" 
                             : "hover:bg-sidebar-accent/50 text-sidebar-foreground"
@@ -209,7 +209,7 @@ function AppSidebar() {
                 <SidebarMenuButton asChild className="h-10 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:p-2">
                   <button
                     onClick={handleSignOut}
-                    className="w-full flex items-center justify-center group-data-[collapsible=icon]:justify-center group-data-[collapsible=expanded]:justify-start gap-3 text-left hover:bg-sidebar-accent/50 text-sidebar-foreground rounded-md transition-colors min-h-[44px] group-data-[collapsible=icon]:min-h-[40px]"
+                    className="w-full flex items-center justify-start group-data-[collapsible=icon]:justify-center gap-3 text-left hover:bg-sidebar-accent/50 text-sidebar-foreground rounded-md transition-colors min-h-[44px] group-data-[collapsible=icon]:min-h-[40px]"
                   >
                     <LogOut className="h-5 w-5 shrink-0 !text-black dark:!text-white" />
                     <span className="truncate text-sm group-data-[collapsible=icon]:hidden">Sign Out</span>
