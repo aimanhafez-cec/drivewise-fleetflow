@@ -54,7 +54,7 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
-				/* Corporate Teal Theme Colors */
+				/* Functional Status Colors */
 				available: {
 					DEFAULT: 'hsl(var(--available))',
 					foreground: 'hsl(var(--available-foreground))'
@@ -74,18 +74,6 @@ export default {
 				'out-of-service': {
 					DEFAULT: 'hsl(var(--out-of-service))',
 					foreground: 'hsl(var(--out-of-service-foreground))'
-				},
-				'teal-overlay': {
-					DEFAULT: 'hsl(var(--teal-overlay))',
-					foreground: 'hsl(var(--foreground))'
-				},
-				'teal-light': {
-					DEFAULT: 'hsl(var(--teal-light))',
-					foreground: 'hsl(var(--foreground))'
-				},
-				'teal-accent': {
-					DEFAULT: 'hsl(var(--teal-accent))',
-					foreground: 'hsl(var(--foreground))'
 				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',

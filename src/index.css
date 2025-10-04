@@ -153,130 +153,111 @@
 
 @layer base {
   :root {
-    /* Corporate Teal Dashboard Theme */
-    --background: 183 85% 20%; /* #075E61 - Background teal */
-    --foreground: 0 0% 100%; /* #FFFFFF - Primary text */
+    /* Clean Minimalist Theme */
+    --background: 0 0% 100%; /* Pure white */
+    --foreground: 215 25% 27%; /* Charcoal #374151 */
 
-    --card-foreground: 0 0% 0%; /* #0A7A7D - Card background */
-    --card: 0 0% 100%; /* #FFFFFF */
+    --card: 0 0% 100%; /* White cards */
+    --card-foreground: 215 25% 27%; /* Charcoal text */
 
-    --popover: 182 85% 26%;
-    --popover-foreground: 0 0% 100%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 25% 27%;
 
-    /* Corporate Teal Primary Colors */
-    --primary: 181 100% 25%; /* #007C7E - Light teal overlay */
+    /* Blue Primary Colors */
+    --primary: 217 91% 60%; /* Blue #3B82F6 */
     --primary-foreground: 0 0% 100%;
-    --primary-light: 181 99% 31%; /* #019C9E - Lighter teal overlay */
-    --primary-glow: 180 61% 51%; /* #33CFCF - Accent icons/hover */
+    --primary-light: 217 91% 70%; /* Lighter blue */
+    --primary-glow: 217 91% 80%; /* Lightest blue for hover */
 
-    /* Header and Secondary Elements */
-    --secondary: 0 0% 17%; /* #2B2B2B - Header bar */
-    --secondary-foreground: 0 0% 100%;
+    /* Gray Secondary Elements */
+    --secondary: 220 14% 96%; /* Light gray #F3F4F6 */
+    --secondary-foreground: 215 25% 27%;
 
-    --muted: 183 31% 25%; /* #3A5F60 - Darker muted background for better contrast */
-    --muted-foreground: 0 0% 35%; /* Much darker text for better contrast */
+    --muted: 220 13% 91%; /* Gray #E5E7EB */
+    --muted-foreground: 215 20% 65%; /* Medium gray text */
 
-    --accent: 180 61% 51%; /* #33CFCF - Accent color */
-    --accent-foreground: 0 0% 100%;
+    --accent: 220 14% 96%; /* Light gray */
+    --accent-foreground: 215 25% 27%;
 
-    /* Corporate Teal Status Colors */
-    --available: 142 69% 38%;
+    /* Functional Status Colors */
+    --available: 142 76% 36%; /* Green #10B981 */
     --available-foreground: 0 0% 100%;
-    --maintenance: 48 96% 53%;
+    --maintenance: 38 92% 50%; /* Amber #F59E0B */
     --maintenance-foreground: 0 0% 100%;
-    --reserved: 181 100% 25%;
+    --reserved: 217 91% 60%; /* Blue #3B82F6 */
     --reserved-foreground: 0 0% 100%;
-    --rented: 180 61% 51%;
+    --rented: 217 91% 70%; /* Light blue #60A5FA */
     --rented-foreground: 0 0% 100%;
-    --out-of-service: 0 84% 60%;
+    --out-of-service: 0 84% 60%; /* Red #EF4444 */
     --out-of-service-foreground: 0 0% 100%;
 
-    /* Dashboard Accent Colors */
-    --teal-overlay: 181 100% 25%; /* #007C7E */
-    --teal-light: 181 99% 31%; /* #019C9E */
-    --teal-accent: 180 61% 51%; /* #33CFCF */
-
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 181 99% 31%;
-    --input: 0 0% 100%;
-    --ring: 180 61% 51%;
+    --border: 220 13% 91%; /* Gray borders */
+    --input: 220 13% 91%; /* Gray input borders */
+    --ring: 217 91% 60%; /* Blue focus ring */
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;
 
-    /* Corporate Teal Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(181 100% 25%), hsl(180 61% 51%));
-    --gradient-dashboard: linear-gradient(180deg, hsl(183 85% 20%), hsl(181 100% 25%));
-    --gradient-card: linear-gradient(135deg, rgba(10,122,125,0.9), rgba(1,156,158,0.8));
-
-    /* Elegant Shadows */
-    --shadow-elegant: 0 10px 30px -10px rgba(0,0,0,0.3);
-    --shadow-card: 0 8px 25px -8px rgba(0,0,0,0.2);
-    --shadow-soft: 0 4px 12px -4px rgba(0,0,0,0.15);
-
-    /* Smooth Animations */
-    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-quick: all 0.2s ease-out;
-
-    /* Light mode sidebar - ensure high contrast */
-    --sidebar-background: 0 0% 100%; /* Pure white background */
-    --sidebar-foreground: 0 0% 0%; /* Pure black text/icons */
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
+    /* Sidebar */
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 215 25% 27%;
+    --sidebar-primary: 217 91% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 14% 96%;
+    --sidebar-accent-foreground: 215 25% 27%;
     --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-ring: 217 91% 60%;
   }
 
-  /* Dark mode maintains the same corporate teal theme */
+  /* Dark mode */
   .dark {
-    --background: 183 85% 20%; /* Same teal background */
-    --foreground: 0 0% 100%;
+    --background: 222 47% 11%; /* Dark slate #0F172A */
+    --foreground: 210 40% 98%; /* Light text */
 
-    --card: 182 85% 26%;
-    --card-foreground: 0 0% 100%;
+    --card: 222 47% 11%;
+    --card-foreground: 210 40% 98%;
 
-    --popover: 182 85% 26%;
-    --popover-foreground: 0 0% 100%;
+    --popover: 222 47% 11%;
+    --popover-foreground: 210 40% 98%;
 
-    --primary: 181 100% 25%;
+    --primary: 217 91% 60%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 0 0% 17%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 98%;
 
-    --muted: 183 31% 25%; /* Same darker muted for dark mode */
-    --muted-foreground: 0 0% 70%; /* Lighter text for dark mode */
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
 
-    --accent: 180 61% 51%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 217 33% 17%;
+    --accent-foreground: 210 40% 98%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 181 99% 31%;
-    --input: 0 0% 100%;
-    --ring: 180 61% 51%;
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 217 91% 60%;
     
-    --sidebar-background: 240 10% 3.9%;
-    --sidebar-foreground: 0 0% 95%;
-    --sidebar-primary: 180 61% 51%;
-    --sidebar-primary-foreground: 240 10% 3.9%;
-    --sidebar-accent: 240 5% 8%;
-    --sidebar-accent-foreground: 0 0% 95%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 180 61% 51%;
+    --sidebar-background: 222 47% 11%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 217 91% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 217 33% 17%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 217 33% 17%;
+    --sidebar-ring: 217 91% 60%;
 
-    /* Chart Colors for Beautiful Data Visualization */
-    --chart-1: 180 61% 51%; /* Teal accent */
-    --chart-2: 142 69% 38%; /* Success green */
-    --chart-3: 48 96% 53%; /* Warning yellow */
-    --chart-4: 0 84% 60%; /* Destructive red */
+    /* Chart Colors */
+    --chart-1: 217 91% 60%; /* Blue */
+    --chart-2: 142 76% 36%; /* Green */
+    --chart-3: 38 92% 50%; /* Amber */
+    --chart-4: 0 84% 60%; /* Red */
     --chart-5: 268 85% 66%; /* Purple */
     --chart-6: 31 81% 56%; /* Orange */
-    --chart-7: 215 100% 61%; /* Blue */
+    --chart-7: 199 89% 48%; /* Cyan */
     --chart-8: 340 75% 55%; /* Pink */
   }
 }
@@ -287,55 +268,7 @@
   }
 
   body {
-    @apply bg-background text-card-foreground;
-    background-image: url('/lovable-uploads/99d4eb9e-6b11-43c7-a796-65c11be11231.png');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-  }
-
-  /* Remove background image from specific pages */
-  body:has([data-page="new-reservation"]),
-  body:has([data-page="vehicles"]) {
-    background-image: none;
-  }
-
-  /* Corporate Teal Dashboard Enhancements */
-  .shadow-soft {
-    box-shadow: var(--shadow-soft);
-  }
-
-  .shadow-card {
-    box-shadow: var(--shadow-card);
-  }
-
-  .shadow-elegant {
-    box-shadow: var(--shadow-elegant);
-  }
-
-  /* Smooth transitions for dashboard elements */
-  .transition-dashboard {
-    transition: var(--transition-smooth);
-  }
-
-  /* Custom scrollbar for teal theme */
-  ::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: rgba(0, 124, 126, 0.1);
-    border-radius: 3px;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: hsl(var(--teal-accent));
-    border-radius: 3px;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background: hsl(var(--teal-light));
+    @apply bg-background text-foreground;
   }
 
   /* Fix datetime-local calendar icon color */
@@ -385,41 +318,12 @@
 
   /* Card hover animations */
   .app-card {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.2s ease;
   }
 
   .app-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 40px -12px rgba(0, 0, 0, 0.3);
-  }
-
-  /* Icon glow effect */
-  .icon-glow:hover {
-    filter: drop-shadow(0 0 8px hsl(var(--teal-accent)));
-  }
-
-  /* Tab underline animation */
-  .tab-underline {
-    position: relative;
-    overflow: hidden;
-  }
-
-  .tab-underline::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background: hsl(var(--teal-accent));
-    transform: scaleX(0);
-    transform-origin: right;
-    transition: transform 0.3s ease;
-  }
-
-  .tab-underline.active::after {
-    transform: scaleX(1);
-    transform-origin: left;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.1);
   }
 
   /* Improve responsive behavior for all screens */
@@ -477,25 +381,19 @@
   .white-cards-page [class*="AccordionItem"],
   .white-cards-page [class*="Card"] {
     background-color: hsl(0 0% 100%) !important;
-    color: hsl(0 0% 0%) !important;
-    border-color: hsl(0 0% 85%) !important;
+    color: hsl(215 25% 27%) !important;
+    border-color: hsl(220 13% 91%) !important;
   }
 
-  /* All text elements inside white cards page - exclude form elements - KEEP BLACK */
+  /* All text elements inside white cards page */
   .white-cards-page *:not(button):not([role="button"]):not(input):not(textarea):not(select):not([role="combobox"]):not([data-radix-select-trigger]):not([data-radix-select-value]) {
-    color: hsl(0 0% 0%) !important;
+    color: hsl(215 25% 27%) !important;
   }
 
-  /* Only main headings and breadcrumb should be white */
+  /* Page title should remain visible on background */
   .white-cards-page h1,
-  .white-cards-page .text-3xl.font-bold,
-  .white-cards-page nav[aria-label="breadcrumb"] *,
-  .white-cards-page [data-radix-breadcrumb-list] * {
-    color: hsl(0 0% 100%) !important;
-  }
-
-  .text-muted-foreground {
-    color: hsl(0, 0%, 100%) !important;
+  .white-cards-page .text-3xl.font-bold {
+    color: hsl(215 25% 27%) !important;
   }
 
   /* Target accordion items specifically */
@@ -503,22 +401,16 @@
   .white-cards-page .border.rounded-lg,
   .white-cards-page div[class*="border"][class*="rounded"] {
     background-color: hsl(0 0% 100%) !important;
-    border-color: hsl(0 0% 85%) !important;
+    border-color: hsl(220 13% 91%) !important;
   }
 
-  /* Force override any background utilities */
-  .white-cards-page .bg-primary,
-  .white-cards-page .bg-secondary,
-  .white-cards-page .bg-accent,
-  .white-cards-page .bg-muted {
+  /* Form inputs */
+  .white-cards-page input,
+  .white-cards-page textarea,
+  .white-cards-page select {
+    color: hsl(215 25% 27%) !important;
     background-color: hsl(0 0% 100%) !important;
-  }
-
-  /* Force override any text color utilities */
-  .white-cards-page .text-primary-foreground,
-  .white-cards-page .text-secondary-foreground,
-  .white-cards-page .text-accent-foreground{
-    color: hsl(0 0% 0%) !important;
+    border-color: hsl(220 13% 91%) !important;
   }
 
   /* Make input field text white - comprehensive selectors with high specificity */
