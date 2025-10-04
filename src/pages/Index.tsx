@@ -64,7 +64,7 @@ const Index = () => {
           <div className="text-center max-w-4xl mx-auto">
             <div className="flex justify-center mb-6">
               <img 
-                src="/lovable-uploads/0fe8cfa9-3548-415c-bc9c-114a2b91ae82.png" 
+                src="/logo.svg" 
                 alt="Core Car Rental Logo" 
                 className="h-20 w-20"
               />
