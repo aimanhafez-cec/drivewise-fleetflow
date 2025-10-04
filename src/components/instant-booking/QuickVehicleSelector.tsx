@@ -107,7 +107,7 @@ const QuickVehicleSelector: React.FC<QuickVehicleSelectorProps> = ({
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="mt-4 px-3 py-2 border rounded-md bg-background w-full text-white"
+            className="mt-4 px-3 py-2 border rounded-md bg-background w-full text-foreground"
           >
             <option value="">Select Category</option>
             {categories.map(category => (
@@ -222,7 +222,7 @@ const QuickVehicleSelector: React.FC<QuickVehicleSelectorProps> = ({
                           {/* Selection Button */}
                           <Button
                             variant={selectedVehicleId === vehicle.id ? "default" : "outline"}
-                            className="w-full mt-3 text-muted-foreground"
+                            className="w-full mt-3"
                             onClick={(e) => {
                               e.stopPropagation();
                               onVehicleSelect(vehicle.id);
@@ -245,15 +245,15 @@ const QuickVehicleSelector: React.FC<QuickVehicleSelectorProps> = ({
           <div className="mt-6 p-4 bg-background rounded-lg">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
               <div>
-                <p className="text-2xl font-bold text-muted-foreground">{filteredVehicles.length}</p>
+                <p className="text-2xl font-bold text-foreground">{filteredVehicles.length}</p>
                 <p className="text-sm text-muted-foreground">Available Vehicles</p>
               </div>
               <div>
-                <p className="text-2xl font-bold text-muted-foreground">{Object.keys(vehiclesByCategory).length}</p>
+                <p className="text-2xl font-bold text-foreground">{Object.keys(vehiclesByCategory).length}</p>
                 <p className="text-sm text-muted-foreground">Categories</p>
               </div>
               <div>
-                <p className="text-2xl font-bold text-muted-foreground">
+                <p className="text-2xl font-bold text-foreground">
                   {Math.min(...filteredVehicles.map(v => v.daily_rate || 0).filter(r => r > 0)) || 0}
                 </p>
                 <p className="text-sm text-muted-foreground">From AED/day</p>

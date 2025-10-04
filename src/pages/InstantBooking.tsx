@@ -129,8 +129,8 @@ const InstantBooking = () => {
         
         {/* Header */}
         <div className="text-center space-y-2">
-          <h1 className="text-3xl font-bold text-white">Instant Booking</h1>
-          <p className="text-white/70">Book your vehicle in minutes</p>
+          <h1 className="text-3xl font-bold text-foreground">Instant Booking</h1>
+          <p className="text-muted-foreground">Book your vehicle in minutes</p>
         </div>
 
         {/* Main Content */}
@@ -150,7 +150,7 @@ const InstantBooking = () => {
                           type="datetime-local"
                           value={bookingData.pickupDate}
                           onChange={(e) => handleDataChange('pickupDate', e.target.value)}
-                          className="w-full p-2 border rounded-lg text-white bg-background"
+                          className="w-full p-2 border rounded-lg text-foreground bg-background"
                         />
                       </div>
                       <div>
@@ -159,7 +159,7 @@ const InstantBooking = () => {
                           type="datetime-local"
                           value={bookingData.returnDate}
                           onChange={(e) => handleDataChange('returnDate', e.target.value)}
-                          className="w-full p-2 border rounded-lg text-white bg-background"
+                          className="w-full p-2 border rounded-lg text-foreground bg-background"
                         />
                       </div>
                     </div>
@@ -170,7 +170,7 @@ const InstantBooking = () => {
                         <select
                           value={bookingData.pickupLocation}
                           onChange={(e) => handleDataChange('pickupLocation', e.target.value)}
-                          className="w-full p-2 border rounded-lg text-white bg-background"
+                          className="w-full p-2 border rounded-lg text-foreground bg-background"
                         >
                           <option value="">Select pickup location</option>
                           <option value="airport-terminal-1">Airport Terminal 1</option>
@@ -184,7 +184,7 @@ const InstantBooking = () => {
                         <select
                           value={bookingData.returnLocation}
                           onChange={(e) => handleDataChange('returnLocation', e.target.value)}
-                          className="w-full p-2 border rounded-lg text-white bg-background"
+                          className="w-full p-2 border rounded-lg text-foreground bg-background"
                         >
                           <option value="">Select return location</option>
                           <option value="airport-terminal-1">Airport Terminal 1</option>
@@ -260,12 +260,12 @@ const InstantBooking = () => {
             {/* Progress Indicator */}
             <div className="mb-6">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-white">Progress</span>
-                <span className="text-sm text-white/70">{step}/{step === 7 ? '7' : '6'}</span>
+                <span className="text-sm font-medium text-foreground">Progress</span>
+                <span className="text-sm text-muted-foreground">{step}/{step === 7 ? '7' : '6'}</span>
               </div>
               <div className="w-full bg-secondary rounded-full h-2">
                 <div 
-                  className="bg-white h-2 rounded-full transition-all duration-500 ease-in-out"
+                  className="bg-primary h-2 rounded-full transition-all duration-500 ease-in-out"
                   style={{ width: `${(step / (step === 7 ? 7 : 6)) * 100}%` }}
                 />
               </div>
