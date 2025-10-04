@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import * as React from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
@@ -22,18 +22,18 @@ const Auth = () => {
   const {
     toast
   } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [mode, setMode] = useState(searchParams.get('mode') || 'signin');
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [error, setError] = React.useState('');
+  const [mode, setMode] = React.useState(searchParams.get('mode') || 'signin');
 
   // Form states
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [fullName, setFullName] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
+  const [fullName, setFullName] = React.useState('');
+  const [confirmPassword, setConfirmPassword] = React.useState('');
 
   // Redirect if already authenticated
-  useEffect(() => {
+  React.useEffect(() => {
     if (user && !loading) {
       navigate('/dashboard', {
         replace: true
@@ -121,7 +121,7 @@ const Auth = () => {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <img src="/lovable-uploads/0fe8cfa9-3548-415c-bc9c-114a2b91ae82.png" alt="Core Car Rental Logo" className="h-12 w-12" />
+            <img src="/logo.svg" alt="Core Car Rental Logo" className="h-12 w-12" />
           </div>
           <CardTitle className="text-2xl">Core Car Rental</CardTitle>
           <CardDescription className="text-gray-950">
