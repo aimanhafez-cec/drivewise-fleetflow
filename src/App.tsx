@@ -47,7 +47,7 @@ import { NewCarSubscription } from "./pages/NewCarSubscription";
 const queryClient = new QueryClient();
 
 const App = () => {
-  console.log('App component is rendering');
+  console.log('App rendering. React version:', React.version);
   
   return (
     <QueryClientProvider client={queryClient}>
