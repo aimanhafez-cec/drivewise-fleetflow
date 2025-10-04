@@ -152,7 +152,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
         >
           {dayEvents.length === 0 ? (
             <div 
-              className="flex items-center justify-center h-full text-card-foreground cursor-pointer hover:bg-muted/30 rounded"
+              className="flex items-center justify-center h-full text-foreground cursor-pointer hover:bg-muted/30 rounded"
               onClick={() => onCreateEvent(currentDate)}
             >
               <div className="text-center">
@@ -210,7 +210,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                 >
                   {dayEvents.length === 0 ? (
                     <div 
-                      className="h-full flex items-center justify-center cursor-pointer hover:bg-muted/30 rounded text-muted-foreground"
+                      className="h-full flex items-center justify-center cursor-pointer hover:bg-muted/30 rounded text-foreground"
                       onClick={() => onCreateEvent(day)}
                     >
                       <Plus className="h-4 w-4 sm:h-5 sm:w-5" />
@@ -219,7 +219,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                     <>
                       {dayEvents.map(event => renderEventPill(event, true))}
                       <div 
-                        className="mt-2 p-1 border border-dashed border-muted-foreground/30 rounded cursor-pointer hover:border-muted-foreground/50 text-center text-muted-foreground text-xs"
+                        className="mt-2 p-1 border border-dashed border-muted-foreground/30 rounded cursor-pointer hover:border-muted-foreground/50 text-center text-foreground text-xs"
                         onClick={() => onCreateEvent(day)}
                       >
                         <Plus className="h-3 w-3 mx-auto" />
@@ -286,12 +286,12 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                     </EventContextMenu>
                   ))}
                   {dayEvents.length > 2 && (
-                    <div className="text-xs text-muted-foreground">
+                    <div className="text-xs text-foreground">
                       +{dayEvents.length - 2}
                     </div>
                   )}
                   {dayEvents.length === 0 && (
-                    <div className="flex items-center justify-center h-8 sm:h-16 text-muted-foreground">
+                    <div className="flex items-center justify-center h-8 sm:h-16 text-foreground">
                       <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
                     </div>
                   )}

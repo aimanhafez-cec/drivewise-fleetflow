@@ -135,7 +135,7 @@ export const ConflictDialog: React.FC<ConflictDialogProps> = ({
                       <Car className="h-4 w-4" />
                       <div className="text-left">
                         <div className="font-medium">{suggestion.vehicleLabel}</div>
-                        <div className="text-sm text-muted-foreground">
+                        <div className="text-sm text-foreground/70">
                           {suggestion.available ? "Available for this period" : "Not available"}
                         </div>
                       </div>

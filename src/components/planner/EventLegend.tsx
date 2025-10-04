@@ -64,7 +64,7 @@ export const EventLegend: React.FC = () => {
                   <Badge 
                     key={item.label} 
                     variant="outline" 
-                    className="text-xs text-white border-white/20 hover:bg-white/20"
+                    className="text-xs text-white border-transparent"
                     style={{ backgroundColor: colorMap[item.color] || '#6b7280' }}
                   >
                     <item.icon className="mr-1 h-3 w-3" />

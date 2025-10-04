@@ -180,7 +180,7 @@ export const PlannerFilters: React.FC<PlannerFiltersProps> = ({
                 <Badge
                   key={status}
                   variant={filters.status.includes(status) ? "default" : "outline"}
-                  className="cursor-pointer text-xs text-card-foreground"
+                  className="cursor-pointer text-xs"
                   onClick={() => toggleStatus(status)}
                 >
                   {status}

@@ -104,7 +104,7 @@ export const PlannerKPIs: React.FC<PlannerKPIsProps> = ({ events }) => {
       case "warning": return "text-maintenance-foreground bg-maintenance/10 border-maintenance/20";
       case "info": return "text-primary-foreground bg-primary/10 border-primary/20";
       case "destructive": return "text-destructive-foreground bg-destructive/10 border-destructive/20";
-      default: return "text-muted-foreground bg-muted/50 border-border";
+      default: return "text-foreground bg-muted/50 border-border";
     }
   };
 

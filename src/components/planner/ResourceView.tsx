@@ -112,7 +112,7 @@ export const ResourceView: React.FC<ResourceViewProps> = ({
           <div className="w-40 flex-shrink-0"></div>
           <div className="flex-1 grid grid-cols-24 border-l">
             {timeSlots.map((hour, i) => (
-              <div key={i} className="text-xs text-center py-2 border-r bg-muted/50">
+              <div key={i} className="text-xs text-center py-2 border-r bg-muted/50 text-foreground">
                 {format(hour, "HH:mm")}
               </div>
             ))}
@@ -195,7 +195,7 @@ export const ResourceView: React.FC<ResourceViewProps> = ({
                   onClick={() => onCreateEvent(dateRange.start, vehicle.id)}
                 >
                   {vehicleEvents.length === 0 && (
-                    <div className="absolute inset-0 flex items-center justify-center text-muted-foreground text-sm cursor-pointer hover:bg-muted/20 rounded">
+                    <div className="absolute inset-0 flex items-center justify-center text-foreground text-sm cursor-pointer hover:bg-muted/20 rounded">
                       <div className="text-center">
                         <Plus className="h-4 w-4 mx-auto mb-1" />
                         <div>Click to assign</div>
