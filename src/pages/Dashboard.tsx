@@ -16,6 +16,15 @@ const Dashboard = () => {
   
   const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
 
+  // Dynamic greeting based on time of day
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning';
+    if (hour < 17) return 'Good afternoon';
+    if (hour < 21) return 'Good evening';
+    return 'Good night';
+  };
+
   // Fetch current reservations count
   const {
     data: reservationsCount = 0
@@ -303,7 +312,7 @@ const Dashboard = () => {
         <div className="w-full">
           {/* Greeting */}
           <div className="mb-6 sm:mb-8">
-            <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">Good morning, Fleet Manager</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">{getGreeting()}, Fleet Manager</h1>
             <p className="text-muted-foreground text-sm sm:text-base">Manage your fleet operations efficiently</p>
           </div>
 
