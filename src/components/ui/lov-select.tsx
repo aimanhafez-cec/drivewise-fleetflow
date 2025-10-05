@@ -92,7 +92,7 @@ export const LOVSelect = forwardRef<HTMLButtonElement, LOVSelectProps>(({
   // Display value for trigger
   const displayValue = () => {
     if (selectedItems.length === 0) {
-      return <span className="text-slate-50">{placeholder}</span>;
+      return <span className="text-muted-foreground">{placeholder}</span>;
     }
     if (multiple) {
       if (selectedItems.length === 1) {

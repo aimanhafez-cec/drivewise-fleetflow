@@ -156,9 +156,9 @@ export const CorporateLeasingWizard: React.FC<CorporateLeasingWizardProps> = ({
       contract_end_date: initialData.contract_end_date,
       notes: initialData.notes
     } : {
-      legal_entity_id: '',
-      customer_id: '',
-      bill_to_site_id: '',
+      legal_entity_id: undefined,
+      customer_id: undefined,
+      bill_to_site_id: undefined,
       customer_po_no: '',
       credit_limit: undefined,
       credit_terms: 'Net 30',
