@@ -512,6 +512,7 @@ const Dashboard = () => {
                      </SelectTrigger>
                      <SelectContent>
                        <SelectItem value="base">base</SelectItem>
+                       <SelectItem value="teacher">teacher</SelectItem>
                      </SelectContent>
                    </Select>
                    <Select defaultValue="daily">
