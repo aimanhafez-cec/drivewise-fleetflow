@@ -17,6 +17,7 @@ import {
   ContactPersonSelect,
   SalesOfficeSelect,
   SalesRepSelect,
+  CustomerSiteSelect,
 } from "@/components/ui/select-components";
 import { CustomerSelect } from "@/components/ui/select-components";
 import { OpportunityViewDialog } from "@/components/quotes/OpportunityViewDialog";
@@ -58,10 +59,10 @@ export const QuoteWizardStep1: React.FC<QuoteWizardStep1Props> = ({
 
   // Auto-fill account name when customer is selected (for organizations)
   useEffect(() => {
-    if (data.customer_type === "Organization" && selectedCustomer?.full_name) {
+    if ((data.customer_type === "B2B" || data.customer_type === "CORPORATE") && selectedCustomer?.full_name) {
       onChange({ account_name: selectedCustomer.full_name });
     }
-  }, [data.customer_type, selectedCustomer?.full_name]);
+  }, [data.customer_type, selectedCustomer?.full_name, onChange]);
 
   // Auto-calculate duration when dates change
   useEffect(() => {
@@ -101,7 +102,6 @@ export const QuoteWizardStep1: React.FC<QuoteWizardStep1Props> = ({
             selected={value ? new Date(value) : undefined}
             onSelect={(date) => handleDateSelect(field, date)}
             initialFocus
-            className="pointer-events-auto"
           />
         </PopoverContent>
       </Popover>
@@ -266,11 +266,11 @@ export const QuoteWizardStep1: React.FC<QuoteWizardStep1Props> = ({
 
                 <div className="space-y-2">
                   <Label htmlFor="customer_bill_to">Customer Bill To</Label>
-                  <Input
-                    id="customer_bill_to"
+                  <CustomerSiteSelect
+                    customerId={data.customer_id}
                     value={data.customer_bill_to || ""}
-                    onChange={(e) => onChange({ customer_bill_to: e.target.value })}
-                    placeholder="e.g., Head Office, Branch Name"
+                    onChange={(value) => onChange({ customer_bill_to: value })}
+                    placeholder="Select customer site"
                   />
                 </div>
 
@@ -314,19 +314,12 @@ export const QuoteWizardStep1: React.FC<QuoteWizardStep1Props> = ({
 
                 <div className="space-y-2">
                   <Label htmlFor="customer_bill_to">Customer Bill To</Label>
-                  <Select
+                  <CustomerSiteSelect
+                    customerId={data.customer_id}
                     value={data.customer_bill_to || ""}
-                    onValueChange={(value) => onChange({ customer_bill_to: value })}
-                  >
-                    <SelectTrigger id="customer_bill_to">
-                      <SelectValue placeholder="Select address" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Address 1">Address 1</SelectItem>
-                      <SelectItem value="Address 2">Address 2</SelectItem>
-                      <SelectItem value="Address 3">Address 3</SelectItem>
-                    </SelectContent>
-                  </Select>
+                    onChange={(value) => onChange({ customer_bill_to: value })}
+                    placeholder="Select customer site"
+                  />
                 </div>
               </div>
             )}

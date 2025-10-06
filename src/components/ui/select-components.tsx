@@ -10,7 +10,8 @@ import {
   useVehicleOptions,
   useBusinessUnits,
   usePaymentTerms,
-  useReservationTypes
+  useReservationTypes,
+  useCustomerSites
 } from '@/hooks/useBusinessLOVs';
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -396,6 +397,28 @@ export const SalesRepSelect: React.FC<SalesRepSelectProps> = ({ salesOfficeId, .
       isLoading={isLoading}
       disabled={props.disabled || !salesOfficeId}
       placeholder={props.placeholder || "Select sales rep..."}
+    />
+  );
+};
+
+// Customer Site Select
+interface CustomerSiteSelectProps extends BaseSelectProps {
+  customerId?: string;
+}
+
+export const CustomerSiteSelect: React.FC<CustomerSiteSelectProps> = ({
+  customerId,
+  ...props
+}) => {
+  const { items, isLoading } = useCustomerSites(customerId);
+  
+  return (
+    <LOVSelect
+      {...props}
+      items={items}
+      isLoading={isLoading}
+      disabled={props.disabled || !customerId}
+      placeholder="Select customer site..."
     />
   );
 };

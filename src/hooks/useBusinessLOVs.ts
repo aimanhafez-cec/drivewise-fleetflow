@@ -313,3 +313,49 @@ export const useReservationTypes = () => {
     refetch: () => Promise.resolve()
   };
 };
+
+// Customer Sites
+export interface CustomerSite {
+  id: string;
+  label: string;
+  site_name: string;
+  site_code?: string;
+  site_type?: string;
+  contact_person?: string;
+}
+
+export const useCustomerSites = (customerId?: string) => {
+  const dependencies: Record<string, any> = {};
+  if (customerId) {
+    dependencies.customer_id = customerId;
+    dependencies.is_active = true;
+  }
+  
+  // If no customerId, return empty result
+  if (!customerId) {
+    return {
+      items: [],
+      isLoading: false,
+      error: null,
+      updateSearch: () => {},
+      searchQuery: '',
+      fetchNextPage: () => Promise.resolve(),
+      hasNextPage: false,
+      isFetchingNextPage: false,
+      refetch: () => Promise.resolve()
+    };
+  }
+  
+  const result = useLOV<CustomerSite>('customer_sites', 'id, site_name, site_code, site_type, contact_person', {
+    dependencies,
+    orderBy: 'site_name'
+  });
+  
+  return {
+    ...result,
+    items: result.items.map(item => ({
+      ...item,
+      label: item.site_code ? `${item.site_name} (${item.site_code})` : item.site_name
+    }))
+  };
+};
