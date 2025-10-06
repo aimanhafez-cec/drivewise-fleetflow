@@ -142,20 +142,6 @@ export function DatePicker({
           </PopoverContent>
         </Popover>
         
-        {/* Manual Input - Positioned absolutely */}
-        <div className="absolute right-10 top-0 bottom-0 flex items-center pointer-events-none">
-          <Input
-            type="text"
-            value={inputValue}
-            onChange={handleInputChange}
-            onBlur={handleInputBlur}
-            disabled={disabled}
-            placeholder="MM/DD/YYYY"
-            className="w-28 h-8 text-xs pointer-events-auto border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
-            aria-label="Manual date input"
-          />
-        </div>
-        
         {/* Clear Button */}
         {dateValue && !disabled && (
           <Button
