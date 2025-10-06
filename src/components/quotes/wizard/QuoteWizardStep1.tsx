@@ -4,13 +4,9 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
 import { Eye, User, Building2 } from "lucide-react";
 import { format } from "date-fns";
-import { DatePicker } from "@/components/ui/date-picker";
-import { formatDateForSubmission } from "@/lib/utils/dateUtils";
 import {
   LegalEntitySelect,
   BusinessUnitSelect,
@@ -75,10 +71,6 @@ export const QuoteWizardStep1: React.FC<QuoteWizardStep1Props> = ({
       onChange({ duration_days: diffDays });
     }
   }, [data.contract_effective_from, data.contract_effective_to]);
-
-  const handleDateChange = (field: string, date: Date | null) => {
-    onChange({ [field]: formatDateForSubmission(date) });
-  };
 
   return (
     <div className="space-y-6">
@@ -387,14 +379,18 @@ export const QuoteWizardStep1: React.FC<QuoteWizardStep1Props> = ({
 
           {/* Row 6: Quote Date, Quote Type & Currency */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <DatePicker
-              id="quote_date"
-              label="Quote Date"
-              value={data.quote_date}
-              onChange={(date) => handleDateChange("quote_date", date)}
-              error={errors.quote_date}
-              required
-            />
+            <div className="space-y-2">
+              <Label htmlFor="quote_date">Quote Date *</Label>
+              <Input
+                id="quote_date"
+                type="date"
+                value={data.quote_date || ""}
+                onChange={(e) => onChange({ quote_date: e.target.value })}
+              />
+              {errors.quote_date && (
+                <p className="text-sm text-destructive">{errors.quote_date}</p>
+              )}
+            </div>
 
             <div className="space-y-2">
               <Label htmlFor="quote_type">Quote Type *</Label>
@@ -437,27 +433,42 @@ export const QuoteWizardStep1: React.FC<QuoteWizardStep1Props> = ({
 
           {/* Row 7: Contract Dates & Duration */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <DatePicker
-              id="validity_date_to"
-              label="Validity Date To"
-              value={data.validity_date_to}
-              onChange={(date) => handleDateChange("validity_date_to", date)}
-              error={errors.validity_date_to}
-            />
-            <DatePicker
-              id="contract_effective_from"
-              label="Contract Effective From"
-              value={data.contract_effective_from}
-              onChange={(date) => handleDateChange("contract_effective_from", date)}
-              error={errors.contract_effective_from}
-            />
-            <DatePicker
-              id="contract_effective_to"
-              label="Contract Effective To"
-              value={data.contract_effective_to}
-              onChange={(date) => handleDateChange("contract_effective_to", date)}
-              error={errors.contract_effective_to}
-            />
+            <div className="space-y-2">
+              <Label htmlFor="validity_date_to">Validity Date To</Label>
+              <Input
+                id="validity_date_to"
+                type="date"
+                value={data.validity_date_to || ""}
+                onChange={(e) => onChange({ validity_date_to: e.target.value })}
+              />
+              {errors.validity_date_to && (
+                <p className="text-sm text-destructive">{errors.validity_date_to}</p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="contract_effective_from">Contract Effective From</Label>
+              <Input
+                id="contract_effective_from"
+                type="date"
+                value={data.contract_effective_from || ""}
+                onChange={(e) => onChange({ contract_effective_from: e.target.value })}
+              />
+              {errors.contract_effective_from && (
+                <p className="text-sm text-destructive">{errors.contract_effective_from}</p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="contract_effective_to">Contract Effective To</Label>
+              <Input
+                id="contract_effective_to"
+                type="date"
+                value={data.contract_effective_to || ""}
+                onChange={(e) => onChange({ contract_effective_to: e.target.value })}
+              />
+              {errors.contract_effective_to && (
+                <p className="text-sm text-destructive">{errors.contract_effective_to}</p>
+              )}
+            </div>
 
             <div className="space-y-2">
               <Label htmlFor="duration_days">Duration (Days)</Label>
