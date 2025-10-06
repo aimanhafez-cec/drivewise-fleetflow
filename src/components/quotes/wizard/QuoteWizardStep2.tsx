@@ -204,6 +204,39 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
+              <Label htmlFor="currency">Currency</Label>
+              <Input
+                id="currency"
+                value={data.currency || "AED"}
+                disabled
+                className="bg-muted"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="default_price_list_id">Default Price List *</Label>
+              <PriceListSelect
+                value={data.default_price_list_id || ""}
+                onChange={(value) => onChange({ default_price_list_id: value })}
+                placeholder="Select price list"
+              />
+              {errors.default_price_list_id && <FormError message={errors.default_price_list_id} />}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="annual_escalation_percentage">Annual Escalation %</Label>
+              <Input
+                id="annual_escalation_percentage"
+                type="number"
+                min="0"
+                max="20"
+                step="0.5"
+                value={data.annual_escalation_percentage || 5}
+                onChange={(e) => onChange({ annual_escalation_percentage: parseFloat(e.target.value) })}
+              />
+            </div>
+
+            <div className="space-y-2">
               <Label htmlFor="vat_percentage">VAT % *</Label>
               <Select
                 value={data.vat_percentage?.toString() || "5"}
@@ -224,26 +257,6 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="default_price_list_id">Default Price List *</Label>
-              <PriceListSelect
-                value={data.default_price_list_id || ""}
-                onChange={(value) => onChange({ default_price_list_id: value })}
-                placeholder="Select price list"
-              />
-              {errors.default_price_list_id && <FormError message={errors.default_price_list_id} />}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="currency">Currency</Label>
-              <Input
-                id="currency"
-                value={data.currency || "AED"}
-                disabled
-                className="bg-muted"
-              />
-            </div>
-
-            <div className="space-y-2">
               <Label htmlFor="withholding_tax_percentage">Withholding Tax %</Label>
               <Input
                 id="withholding_tax_percentage"
@@ -253,19 +266,6 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
                 step="0.1"
                 value={data.withholding_tax_percentage || 0}
                 onChange={(e) => onChange({ withholding_tax_percentage: parseFloat(e.target.value) })}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="annual_escalation_percentage">Annual Escalation %</Label>
-              <Input
-                id="annual_escalation_percentage"
-                type="number"
-                min="0"
-                max="20"
-                step="0.5"
-                value={data.annual_escalation_percentage || 5}
-                onChange={(e) => onChange({ annual_escalation_percentage: parseFloat(e.target.value) })}
               />
             </div>
           </div>
