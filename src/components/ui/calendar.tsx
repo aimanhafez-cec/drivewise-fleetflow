@@ -20,12 +20,12 @@ function Calendar({
       classNames={{
         months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
         month: "space-y-4",
-        caption: "flex justify-center pt-1 relative items-center",
+        caption: "flex justify-center pt-1 pb-2 relative items-center",
         caption_label: "text-sm font-medium",
-        caption_dropdowns: "flex gap-2 justify-center",
-        dropdown: "border border-input rounded-md px-2 py-1 text-sm bg-background hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring",
-        dropdown_month: "w-[120px]",
-        dropdown_year: "w-[80px]",
+        caption_dropdowns: "flex justify-between items-center gap-2 w-full px-2",
+        dropdown: "border border-input rounded-md px-2 py-1 text-sm bg-background hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring whitespace-nowrap",
+        dropdown_month: "w-[48%]",
+        dropdown_year: "w-[48%]",
         nav: "space-x-1 flex items-center",
         nav_button: cn(
           buttonVariants({ variant: "outline" }),
@@ -33,7 +33,7 @@ function Calendar({
         ),
         nav_button_previous: "absolute left-1",
         nav_button_next: "absolute right-1",
-        table: "w-full border-collapse space-y-1",
+        table: "w-full border-collapse space-y-1 mt-2",
         head_row: "flex",
         head_cell:
           "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]",
