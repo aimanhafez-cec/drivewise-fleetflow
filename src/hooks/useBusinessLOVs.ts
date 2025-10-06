@@ -368,8 +368,7 @@ export const usePriceLists = () => {
   const staticPriceLists: PriceList[] = [
     { id: 'standard', name: 'Standard Corporate Price List', description: 'Default pricing for corporate clients', is_default: true, label: 'Standard Corporate Price List' },
     { id: 'premium', name: 'Premium Price List', description: 'Premium tier pricing', is_default: false, label: 'Premium Price List' },
-    { id: 'government', name: 'Government Rate', description: 'Special pricing for government entities', is_default: false, label: 'Government Rate' },
-    { id: 'wholesale', name: 'Wholesale Rate', description: 'Volume-based pricing', is_default: false, label: 'Wholesale Rate' }
+    { id: 'government', name: 'Government Rate', description: 'Special pricing for government entities', is_default: false, label: 'Government Rate' }
   ];
 
   return {
