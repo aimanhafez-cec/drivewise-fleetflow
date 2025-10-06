@@ -8,11 +8,9 @@ export const BILLING_PLANS = [
 ] as const;
 
 export const PRORATION_RULES = [
-  { id: 'none', label: 'No Proration', value: 'none' },
+  { id: 'none', label: 'No Proration (Full Month Billing)', value: 'none' },
   { id: 'first-only', label: 'First Period Only', value: 'first-only' },
-  { id: 'last-only', label: 'Last Period Only', value: 'last-only' },
-  { id: 'first-last', label: 'First & Last Period Only', value: 'first-last' },
-  { id: 'all-periods', label: 'All Partial Periods', value: 'all-periods' },
+  { id: 'first-last', label: 'First & Last Periods', value: 'first-last' },
 ] as const;
 
 export const VAT_RATES = [
