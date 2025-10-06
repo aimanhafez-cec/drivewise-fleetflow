@@ -158,7 +158,7 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="billing_start_date">Billing Start Date *</Label>
+              <Label htmlFor="billing_start_date">Billing Start Date</Label>
               <Input
                 id="billing_start_date"
                 type="date"
