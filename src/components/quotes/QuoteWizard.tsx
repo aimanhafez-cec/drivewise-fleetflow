@@ -9,9 +9,6 @@ import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, ArrowRight, Send } from "lucide-react";
 import { QuoteWizardStep1 } from "./wizard/QuoteWizardStep1";
 import { QuoteWizardStep2 } from "./wizard/QuoteWizardStep2";
-import { QuoteWizardStep3 } from "./wizard/QuoteWizardStep3";
-import { QuoteWizardStep4 } from "./wizard/QuoteWizardStep4";
-import { QuoteWizardStep5 } from "./wizard/QuoteWizardStep5";
 
 interface QuoteData {
   // Header fields from Step 1
@@ -103,11 +100,8 @@ interface QuoteData {
 }
 
 const steps = [
-  { id: 1, title: "Customer", description: "Select customer" },
-  { id: 2, title: "Trip Details", description: "Pickup & return info" },
-  { id: 3, title: "Vehicle", description: "Choose vehicle type" },
-  { id: 4, title: "Pricing", description: "Rates & add-ons" },
-  { id: 5, title: "Review", description: "Final review & send" },
+  { id: 1, title: "Header", description: "Quote header information" },
+  { id: 2, title: "Financials", description: "Billing, deposits & payment terms" },
 ];
 
 export const QuoteWizard: React.FC = () => {
@@ -275,19 +269,17 @@ export const QuoteWizard: React.FC = () => {
         }
         break;
       case 2:
-        if (!quoteData.pickup_at) newErrors.pickup_at = "Pickup date/time is required";
-        if (!quoteData.pickup_location) newErrors.pickup_location = "Pickup location is required";
-        if (!quoteData.return_at) newErrors.return_at = "Return date/time is required";
-        if (!quoteData.return_location) newErrors.return_location = "Return location is required";
-        break;
-      case 3:
-        if (!quoteData.vehicle_type_id && !quoteData.vehicle_id) {
-          newErrors.vehicle = "Vehicle or vehicle type is required";
-        }
-        break;
-      case 4:
-        if (!quoteData.items || quoteData.items.length === 0) {
-          newErrors.items = "At least one line item is required";
+        // Financial required fields
+        if (!quoteData.payment_terms_id) newErrors.payment_terms_id = "Payment terms is required";
+        if (!quoteData.billing_plan) newErrors.billing_plan = "Billing plan is required";
+        if (!quoteData.billing_start_date) newErrors.billing_start_date = "Billing start date is required";
+        if (quoteData.vat_percentage === undefined) newErrors.vat_percentage = "VAT % is required";
+        if (!quoteData.default_price_list_id) newErrors.default_price_list_id = "Price list is required";
+        if (!quoteData.deposit_type) newErrors.deposit_type = "Deposit type is required";
+        if (!quoteData.default_deposit_amount) newErrors.default_deposit_amount = "Deposit amount is required";
+        if (!quoteData.payment_method) newErrors.payment_method = "Payment method is required";
+        if (quoteData.invoice_consolidation && !quoteData.invoice_to_email) {
+          newErrors.invoice_to_email = "Invoice email is required when consolidation is enabled";
         }
         break;
     }
@@ -327,30 +319,6 @@ export const QuoteWizard: React.FC = () => {
           <QuoteWizardStep2
             data={quoteData}
             onChange={(data) => updateQuoteData(2, data)}
-            errors={errors}
-          />
-        );
-      case 3:
-        return (
-          <QuoteWizardStep3
-            data={quoteData}
-            onChange={(data) => updateQuoteData(3, data)}
-            errors={errors}
-          />
-        );
-      case 4:
-        return (
-          <QuoteWizardStep4
-            data={quoteData}
-            onChange={(data) => updateQuoteData(4, data)}
-            errors={errors}
-          />
-        );
-      case 5:
-        return (
-          <QuoteWizardStep5
-            data={quoteData}
-            onChange={(data) => updateQuoteData(5, data)}
             errors={errors}
           />
         );
@@ -470,7 +438,7 @@ export const QuoteWizard: React.FC = () => {
           Back
         </Button>
 
-        {currentStep < steps.length ? (
+        {currentStep < 2 ? (
           <Button
             id="btn-wiz-next"
             onClick={handleNext}

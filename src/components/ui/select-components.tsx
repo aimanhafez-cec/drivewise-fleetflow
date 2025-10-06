@@ -11,7 +11,8 @@ import {
   useBusinessUnits,
   usePaymentTerms,
   useReservationTypes,
-  useCustomerSites
+  useCustomerSites,
+  usePriceLists
 } from '@/hooks/useBusinessLOVs';
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -419,6 +420,20 @@ export const CustomerSiteSelect: React.FC<CustomerSiteSelectProps> = ({
       isLoading={isLoading}
       disabled={props.disabled || !customerId}
       placeholder="Select customer site..."
+    />
+  );
+};
+
+// Price List Select
+export const PriceListSelect: React.FC<BaseSelectProps> = (props) => {
+  const { items, isLoading } = usePriceLists();
+  
+  return (
+    <LOVSelect
+      {...props}
+      items={items}
+      isLoading={isLoading}
+      placeholder={props.placeholder || "Select price list..."}
     />
   );
 };
