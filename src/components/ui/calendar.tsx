@@ -16,23 +16,23 @@ function Calendar({
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
-      className={cn("p-2 pointer-events-auto", className)}
+      className={cn("p-3 pointer-events-auto", className)}
       classNames={{
         months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
         month: "space-y-4",
-        caption: "flex justify-between items-center pt-2 pb-2 relative px-1",
-        caption_label: "text-[13px] font-medium mr-2",
-        caption_dropdowns: "flex items-center gap-3 flex-1",
-        dropdown: "border border-input rounded-md px-3 py-1.5 text-[13px] bg-background hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring whitespace-nowrap min-w-[100px]",
-        dropdown_month: "flex-1",
-        dropdown_year: "flex-1",
+        caption: "flex justify-between items-center pt-2 pb-2 relative px-8",
+        caption_label: "text-[11px] font-medium hidden",
+        caption_dropdowns: "flex items-center gap-2 justify-center",
+        dropdown: "border border-input rounded-md px-2 py-1 text-[11px] bg-background hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring whitespace-nowrap",
+        dropdown_month: "w-[110px]",
+        dropdown_year: "w-[80px]",
         nav: "space-x-1 flex items-center",
         nav_button: cn(
           buttonVariants({ variant: "outline" }),
           "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 border-0"
         ),
-        nav_button_previous: "absolute left-0",
-        nav_button_next: "absolute right-0",
+        nav_button_previous: "absolute left-1",
+        nav_button_next: "absolute right-1",
         table: "w-full border-collapse space-y-1 mt-2",
         head_row: "flex",
         head_cell:
