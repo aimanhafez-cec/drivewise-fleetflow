@@ -281,6 +281,12 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+            <p className="text-sm text-blue-800">
+              <strong>Note:</strong> Deposit and advance rent amounts are set per vehicle. 
+              These defaults will apply to each vehicle line in your quote.
+            </p>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="deposit_type">Deposit Type *</Label>
@@ -303,7 +309,7 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="default_deposit_amount">Default Deposit Amount (AED) *</Label>
+              <Label htmlFor="default_deposit_amount">Deposit Amount per Vehicle (AED) *</Label>
               <Input
                 id="default_deposit_amount"
                 type="number"
@@ -312,11 +318,12 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
                 value={data.default_deposit_amount || 2500}
                 onChange={(e) => onChange({ default_deposit_amount: parseFloat(e.target.value) })}
               />
+              <p className="text-xs text-muted-foreground">This amount will be applied to each vehicle line added in the quote.</p>
               {errors.default_deposit_amount && <FormError message={errors.default_deposit_amount} />}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="default_advance_rent_months">Default Advance Rent Months</Label>
+              <Label htmlFor="default_advance_rent_months">Advance Rent per Vehicle (Months)</Label>
               <Input
                 id="default_advance_rent_months"
                 type="number"
@@ -325,6 +332,7 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
                 value={data.default_advance_rent_months ?? 0}
                 onChange={(e) => onChange({ default_advance_rent_months: parseInt(e.target.value) })}
               />
+              <p className="text-xs text-muted-foreground">Number of months to collect upfront for each vehicle. Can be adjusted per line if needed.</p>
             </div>
           </div>
         </CardContent>
@@ -573,14 +581,14 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
           </div>
 
           <div className="border-t pt-4 mt-4">
-            <h4 className="font-semibold mb-3">Upfront Due Breakdown</h4>
+            <h4 className="font-semibold mb-3">Upfront Due per Vehicle</h4>
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span>Deposit:</span>
+                <span>Deposit (per vehicle):</span>
                 <span className="font-medium">{upfrontDue.deposit.toFixed(2)} AED</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span>Advance Rent ({upfrontDue.advanceMonths} months):</span>
+                <span>Advance Rent ({upfrontDue.advanceMonths} months per vehicle):</span>
                 <span className="font-medium">{upfrontDue.advanceRent.toFixed(2)} AED</span>
               </div>
               <div className="flex justify-between text-sm">
@@ -588,9 +596,12 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
                 <span className="font-medium">{upfrontDue.initialFees.toFixed(2)} AED</span>
               </div>
               <div className="flex justify-between text-lg font-bold border-t pt-2 mt-2">
-                <span>Total Upfront Due:</span>
+                <span>Total Upfront Due (per vehicle):</span>
                 <span className="text-primary">{upfrontDue.total.toFixed(2)} AED</span>
               </div>
+              <p className="text-xs text-muted-foreground mt-2">
+                * Multiply by number of vehicles for total upfront amount
+              </p>
             </div>
           </div>
         </CardContent>

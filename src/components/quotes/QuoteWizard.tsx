@@ -119,8 +119,8 @@ export const QuoteWizard: React.FC = () => {
     billing_plan: "monthly",
     proration_rule: "first-last",
     deposit_type: "refundable",
-    default_deposit_amount: 2500,
-    default_advance_rent_months: 1,
+    default_deposit_amount: 2500, // Per vehicle default
+    default_advance_rent_months: 1, // Per vehicle default
     annual_escalation_percentage: 5,
     grace_period_days: 5,
     late_fee_percentage: 2,
@@ -276,7 +276,7 @@ export const QuoteWizard: React.FC = () => {
         if (quoteData.vat_percentage === undefined) newErrors.vat_percentage = "VAT % is required";
         if (!quoteData.default_price_list_id) newErrors.default_price_list_id = "Price list is required";
         if (!quoteData.deposit_type) newErrors.deposit_type = "Deposit type is required";
-        if (!quoteData.default_deposit_amount) newErrors.default_deposit_amount = "Deposit amount is required";
+        if (!quoteData.default_deposit_amount) newErrors.default_deposit_amount = "Deposit amount per vehicle is required";
         if (!quoteData.payment_method) newErrors.payment_method = "Payment method is required";
         if (quoteData.invoice_consolidation && !quoteData.invoice_to_email) {
           newErrors.invoice_to_email = "Invoice email is required when consolidation is enabled";
