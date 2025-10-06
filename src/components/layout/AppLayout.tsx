@@ -16,7 +16,8 @@ import {
   MessageCircleQuestion,
   Zap,
   BarChart3,
-  Building2
+  Building2,
+  FileCheck
 } from 'lucide-react';
 import {
   Sidebar,
@@ -77,6 +78,11 @@ const navigation = [
     title: 'Quotes',
     url: '/quotes',
     icon: FileText,
+  },
+  {
+    title: 'Manage Quotations',
+    url: '/manage-quotations',
+    icon: FileCheck,
   },
   {
     title: 'Inspections',
