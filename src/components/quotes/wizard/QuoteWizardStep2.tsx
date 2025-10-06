@@ -231,7 +231,7 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
                 min="0"
                 max="20"
                 step="0.5"
-                value={data.annual_escalation_percentage || 5}
+                value={data.annual_escalation_percentage ?? 0}
                 onChange={(e) => onChange({ annual_escalation_percentage: parseFloat(e.target.value) })}
               />
             </div>
