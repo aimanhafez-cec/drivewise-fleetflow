@@ -1,4 +1,4 @@
-import { format, parse, isValid } from "date-fns";
+import { format, parse, isValid, differenceInMonths, differenceInDays, addMonths, differenceInYears, addYears } from "date-fns";
 
 /**
  * Parse manual date input in various formats
@@ -59,4 +59,45 @@ export function formatDateForSubmission(date: Date | null | undefined): string |
 export function isValidDateRange(start: Date | null, end: Date | null): boolean {
   if (!start || !end) return true; // Allow partial ranges
   return start <= end;
+}
+
+/**
+ * Format duration between two dates in a readable format
+ * Accounts for varying month lengths (31, 30, 28/29 days)
+ * Returns format like: "11 months, 29 days" or "1 year, 2 months, 5 days"
+ */
+export function formatDurationInMonthsAndDays(startDate: Date, endDate: Date): string {
+  if (!startDate || !endDate) return "";
+  
+  try {
+    // Calculate years
+    const years = differenceInYears(endDate, startDate);
+    const dateAfterYears = years > 0 ? addYears(startDate, years) : startDate;
+    
+    // Calculate remaining months after years
+    const months = differenceInMonths(endDate, dateAfterYears);
+    const dateAfterMonths = months > 0 ? addMonths(dateAfterYears, months) : dateAfterYears;
+    
+    // Calculate remaining days after months
+    const days = differenceInDays(endDate, dateAfterMonths);
+    
+    // Build the readable string
+    const parts: string[] = [];
+    
+    if (years > 0) {
+      parts.push(`${years} year${years > 1 ? 's' : ''}`);
+    }
+    
+    if (months > 0) {
+      parts.push(`${months} month${months > 1 ? 's' : ''}`);
+    }
+    
+    if (days > 0) {
+      parts.push(`${days} day${days > 1 ? 's' : ''}`);
+    }
+    
+    return parts.length > 0 ? parts.join(', ') : "0 days";
+  } catch {
+    return "";
+  }
 }

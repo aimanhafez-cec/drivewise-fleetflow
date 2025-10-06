@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Eye, User, Building2 } from "lucide-react";
 import { format } from "date-fns";
+import { formatDurationInMonthsAndDays } from "@/lib/utils/dateUtils";
 import {
   LegalEntitySelect,
   BusinessUnitSelect,
@@ -471,11 +472,18 @@ export const QuoteWizardStep1: React.FC<QuoteWizardStep1Props> = ({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="duration_days">Duration (Days)</Label>
+              <Label htmlFor="duration_days">Duration</Label>
               <Input
                 id="duration_days"
-                type="number"
-                value={data.duration_days || ""}
+                type="text"
+                value={
+                  data.contract_effective_from && data.contract_effective_to
+                    ? formatDurationInMonthsAndDays(
+                        new Date(data.contract_effective_from),
+                        new Date(data.contract_effective_to)
+                      )
+                    : ""
+                }
                 disabled
                 placeholder="Auto-calculated"
               />
