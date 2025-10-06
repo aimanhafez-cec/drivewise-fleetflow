@@ -23,6 +23,7 @@ import NotFound from "./pages/NotFound";
 import Quotes from "./pages/Quotes";
 import NewQuote from "./pages/NewQuote";
 import QuoteDetails from "./pages/QuoteDetails";
+import ManageQuotations from "./pages/ManageQuotations";
 import Inspections from "./pages/Inspections";
 import NewInspection from "./pages/NewInspection";
 import InspectionDetails from "./pages/InspectionDetails";
@@ -145,6 +146,13 @@ const App = () => {
                 <Route index element={<Quotes />} />
                 <Route path="new" element={<NewQuote />} />
                 <Route path=":id" element={<QuoteDetails />} />
+              </Route>
+              <Route path="/manage-quotations" element={
+                <ProtectedRoute>
+                  <AppLayout />
+                </ProtectedRoute>
+              }>
+                <Route index element={<ManageQuotations />} />
               </Route>
               <Route path="/rfqs" element={
                 <ProtectedRoute>
