@@ -120,7 +120,7 @@ export function DatePicker({
             </Button>
           </PopoverTrigger>
           <PopoverContent 
-            className="w-[300px] p-0 rounded-lg border-[#e0e0e0] bg-white shadow-lg" 
+            className="w-[280px] p-0 rounded-lg border-[#e0e0e0] bg-white shadow-lg" 
             align="start"
           >
             <Calendar
