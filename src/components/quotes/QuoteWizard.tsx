@@ -14,21 +14,53 @@ import { QuoteWizardStep4 } from "./wizard/QuoteWizardStep4";
 import { QuoteWizardStep5 } from "./wizard/QuoteWizardStep5";
 
 interface QuoteData {
-  customer_id: string;
-  pickup_at: string;
-  pickup_location: string;
-  return_at: string;
-  return_location: string;
+  // Header fields from Step 1
+  legal_entity_id?: string;
+  business_unit_id?: string;
+  opportunity_id?: string;
+  quote_number?: string;
+  quote_description?: string;
+  customer_type?: string;
+  customer_id?: string;
+  account_name?: string;
+  customer_bill_to?: string;
+  contact_person_id?: string;
+  project?: string;
+  sales_office_id?: string;
+  sales_rep_id?: string;
+  quote_entry_date?: string;
+  status?: string;
+  win_loss_reason?: string;
+  version?: number;
+  quote_date?: string;
+  quote_type?: string;
+  currency?: string;
+  validity_date_to?: string;
+  contract_effective_from?: string;
+  contract_effective_to?: string;
+  duration_days?: number;
+  
+  // Trip details from Step 2
+  pickup_at?: string;
+  pickup_location?: string;
+  return_at?: string;
+  return_location?: string;
+  
+  // Vehicle from Step 3
   vehicle_type_id?: string;
   vehicle_id?: string;
-  items: Array<{
+  
+  // Pricing from Step 4
+  items?: Array<{
     description: string;
     qty: number;
     rate: number;
   }>;
-  tax_rate: number;
-  notes: string;
-  expires_at: string;
+  tax_rate?: number;
+  
+  // Other fields
+  notes?: string;
+  expires_at?: string;
 }
 
 const steps = [
@@ -45,6 +77,10 @@ export const QuoteWizard: React.FC = () => {
     items: [],
     tax_rate: 0.08,
     notes: "",
+    status: "draft",
+    version: 1,
+    currency: "AED",
+    quote_entry_date: new Date().toISOString().split("T")[0],
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   
@@ -169,8 +205,19 @@ export const QuoteWizard: React.FC = () => {
 
     switch (step) {
       case 1:
-        if (!quoteData.customer_id) {
-          newErrors.customer = "Customer is required";
+        // Required fields validation
+        if (!quoteData.legal_entity_id) newErrors.legal_entity_id = "Legal entity is required";
+        if (!quoteData.business_unit_id) newErrors.business_unit_id = "Business unit is required";
+        if (!quoteData.customer_type) newErrors.customer_type = "Customer type is required";
+        if (!quoteData.customer_id) newErrors.customer_id = "Customer is required";
+        if (!quoteData.sales_office_id) newErrors.sales_office_id = "Sales office is required";
+        if (!quoteData.sales_rep_id) newErrors.sales_rep_id = "Sales representative is required";
+        if (!quoteData.quote_date) newErrors.quote_date = "Quote date is required";
+        if (!quoteData.quote_type) newErrors.quote_type = "Quote type is required";
+        
+        // Win/Loss reason required if status is won or lost
+        if ((quoteData.status === "won" || quoteData.status === "lost") && !quoteData.win_loss_reason) {
+          newErrors.win_loss_reason = "Win/Loss reason is required for this status";
         }
         break;
       case 2:

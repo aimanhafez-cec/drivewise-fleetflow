@@ -185,6 +185,44 @@ export type Database = {
           },
         ]
       }
+      business_units: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          is_active: boolean | null
+          legal_entity_id: string | null
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          legal_entity_id?: string | null
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          legal_entity_id?: string | null
+          name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_units_legal_entity_id_fkey"
+            columns: ["legal_entity_id"]
+            isOneToOne: false
+            referencedRelation: "legal_entities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       car_subscriptions: {
         Row: {
           admin_fee_model: string | null
@@ -466,6 +504,50 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      contact_persons: {
+        Row: {
+          created_at: string
+          customer_id: string
+          email: string | null
+          full_name: string
+          id: string
+          is_primary: boolean | null
+          phone: string | null
+          position: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          customer_id: string
+          email?: string | null
+          full_name: string
+          id?: string
+          is_primary?: boolean | null
+          phone?: string | null
+          position?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          customer_id?: string
+          email?: string | null
+          full_name?: string
+          id?: string
+          is_primary?: boolean | null
+          phone?: string | null
+          position?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contact_persons_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       corporate_leasing_agreements: {
         Row: {
@@ -1481,6 +1563,82 @@ export type Database = {
         }
         Relationships: []
       }
+      opportunities: {
+        Row: {
+          created_at: string
+          customer_id: string
+          id: string
+          notes_assumptions: string | null
+          opportunity_no: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          customer_id: string
+          id?: string
+          notes_assumptions?: string | null
+          opportunity_no: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          customer_id?: string
+          id?: string
+          notes_assumptions?: string | null
+          opportunity_no?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "opportunities_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      opportunity_packages: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          opportunity_id: string
+          package_name: string
+          qty: number
+          uom: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          opportunity_id: string
+          package_name: string
+          qty?: number
+          uom?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          opportunity_id?: string
+          package_name?: string
+          qty?: number
+          uom?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "opportunity_packages_opportunity_id_fkey"
+            columns: ["opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "opportunities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payments: {
         Row: {
           amount: number
@@ -1613,62 +1771,167 @@ export type Database = {
       }
       quotes: {
         Row: {
+          account_name: string | null
+          business_unit_id: string | null
+          contact_person_id: string | null
+          contract_effective_from: string | null
+          contract_effective_to: string | null
           created_at: string
           created_by: string | null
+          currency: string | null
+          customer_bill_to: string | null
           customer_id: string
+          customer_type: string | null
+          duration_days: number | null
           id: string
           items: Json
+          legal_entity_id: string | null
           notes: string | null
+          opportunity_id: string | null
+          project: string | null
+          quote_date: string | null
+          quote_description: string | null
+          quote_entry_date: string | null
           quote_number: string
+          quote_type: string | null
           rfq_id: string | null
+          sales_office_id: string | null
+          sales_rep_id: string | null
           status: string
           subtotal: number
           tax_amount: number
           total_amount: number
           updated_at: string
           valid_until: string | null
+          validity_date_to: string | null
           vehicle_id: string | null
+          version: number | null
+          win_loss_reason: string | null
         }
         Insert: {
+          account_name?: string | null
+          business_unit_id?: string | null
+          contact_person_id?: string | null
+          contract_effective_from?: string | null
+          contract_effective_to?: string | null
           created_at?: string
           created_by?: string | null
+          currency?: string | null
+          customer_bill_to?: string | null
           customer_id: string
+          customer_type?: string | null
+          duration_days?: number | null
           id?: string
           items?: Json
+          legal_entity_id?: string | null
           notes?: string | null
+          opportunity_id?: string | null
+          project?: string | null
+          quote_date?: string | null
+          quote_description?: string | null
+          quote_entry_date?: string | null
           quote_number: string
+          quote_type?: string | null
           rfq_id?: string | null
+          sales_office_id?: string | null
+          sales_rep_id?: string | null
           status?: string
           subtotal?: number
           tax_amount?: number
           total_amount?: number
           updated_at?: string
           valid_until?: string | null
+          validity_date_to?: string | null
           vehicle_id?: string | null
+          version?: number | null
+          win_loss_reason?: string | null
         }
         Update: {
+          account_name?: string | null
+          business_unit_id?: string | null
+          contact_person_id?: string | null
+          contract_effective_from?: string | null
+          contract_effective_to?: string | null
           created_at?: string
           created_by?: string | null
+          currency?: string | null
+          customer_bill_to?: string | null
           customer_id?: string
+          customer_type?: string | null
+          duration_days?: number | null
           id?: string
           items?: Json
+          legal_entity_id?: string | null
           notes?: string | null
+          opportunity_id?: string | null
+          project?: string | null
+          quote_date?: string | null
+          quote_description?: string | null
+          quote_entry_date?: string | null
           quote_number?: string
+          quote_type?: string | null
           rfq_id?: string | null
+          sales_office_id?: string | null
+          sales_rep_id?: string | null
           status?: string
           subtotal?: number
           tax_amount?: number
           total_amount?: number
           updated_at?: string
           valid_until?: string | null
+          validity_date_to?: string | null
           vehicle_id?: string | null
+          version?: number | null
+          win_loss_reason?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "quotes_business_unit_id_fkey"
+            columns: ["business_unit_id"]
+            isOneToOne: false
+            referencedRelation: "business_units"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quotes_contact_person_id_fkey"
+            columns: ["contact_person_id"]
+            isOneToOne: false
+            referencedRelation: "contact_persons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quotes_legal_entity_id_fkey"
+            columns: ["legal_entity_id"]
+            isOneToOne: false
+            referencedRelation: "legal_entities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quotes_opportunity_id_fkey"
+            columns: ["opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "opportunities"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "quotes_rfq_id_fkey"
             columns: ["rfq_id"]
             isOneToOne: false
             referencedRelation: "rfqs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quotes_sales_office_id_fkey"
+            columns: ["sales_office_id"]
+            isOneToOne: false
+            referencedRelation: "sales_offices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quotes_sales_rep_id_fkey"
+            columns: ["sales_rep_id"]
+            isOneToOne: false
+            referencedRelation: "sales_representatives"
             referencedColumns: ["id"]
           },
           {
@@ -1890,6 +2153,71 @@ export type Database = {
           vehicle_type_id?: string | null
         }
         Relationships: []
+      }
+      sales_offices: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          is_active: boolean | null
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      sales_representatives: {
+        Row: {
+          created_at: string
+          email: string | null
+          full_name: string
+          id: string
+          is_active: boolean | null
+          sales_office_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          full_name: string
+          id?: string
+          is_active?: boolean | null
+          sales_office_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          full_name?: string
+          id?: string
+          is_active?: boolean | null
+          sales_office_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_representatives_sales_office_id_fkey"
+            columns: ["sales_office_id"]
+            isOneToOne: false
+            referencedRelation: "sales_offices"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       subscription_billing_history: {
         Row: {
@@ -2137,6 +2465,59 @@ export type Database = {
             columns: ["subscription_id"]
             isOneToOne: false
             referencedRelation: "car_subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      support_tickets: {
+        Row: {
+          assigned_to: string | null
+          category: string
+          created_at: string
+          customer_id: string
+          id: string
+          message: string
+          priority: string
+          resolved_at: string | null
+          status: string
+          subject: string
+          ticket_no: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          category: string
+          created_at?: string
+          customer_id: string
+          id?: string
+          message: string
+          priority?: string
+          resolved_at?: string | null
+          status?: string
+          subject: string
+          ticket_no: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_to?: string | null
+          category?: string
+          created_at?: string
+          customer_id?: string
+          id?: string
+          message?: string
+          priority?: string
+          resolved_at?: string | null
+          status?: string
+          subject?: string
+          ticket_no?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_tickets_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
             referencedColumns: ["id"]
           },
         ]
@@ -2426,6 +2807,10 @@ export type Database = {
         Returns: string
       }
       generate_subscription_id: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      generate_ticket_no: {
         Args: Record<PropertyKey, never>
         Returns: string
       }

@@ -12,6 +12,8 @@ import {
   usePaymentTerms,
   useReservationTypes
 } from '@/hooks/useBusinessLOVs';
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface BaseSelectProps {
   value?: string | string[];
@@ -215,6 +217,179 @@ export const ReservationTypeSelect: React.FC<BaseSelectProps> = (props) => {
       items={items}
       isLoading={isLoading}
       placeholder="Select reservation type"
+    />
+  );
+};
+
+// Quote-specific LOV components
+export const OpportunitySelect: React.FC<BaseSelectProps> = (props) => {
+  const [searchQuery, setSearchQuery] = React.useState("");
+  const { data: opportunities = [], isLoading } = useQuery({
+    queryKey: ["opportunities", searchQuery],
+    queryFn: async () => {
+      let query = supabase
+        .from("opportunities")
+        .select("*")
+        .order("opportunity_no", { ascending: false });
+
+      if (searchQuery) {
+        query = query.or(`opportunity_no.ilike.%${searchQuery}%`);
+      }
+
+      const { data, error } = await query.limit(50);
+      if (error) throw error;
+
+      return (data || []).map((item: any) => ({
+        id: item.id,
+        label: item.opportunity_no,
+      }));
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
+  return (
+    <LOVSelect
+      {...props}
+      items={opportunities}
+      isLoading={isLoading}
+      onSearch={setSearchQuery}
+      placeholder={props.placeholder || "Select opportunity..."}
+    />
+  );
+};
+
+export const LegalEntitySelect: React.FC<BaseSelectProps> = (props) => {
+  const { data: legalEntities = [], isLoading } = useQuery({
+    queryKey: ["legal_entities"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("legal_entities")
+        .select("*")
+        .eq("is_active", true)
+        .order("name");
+      if (error) throw error;
+
+      return (data || []).map((item: any) => ({
+        id: item.id,
+        label: item.name,
+      }));
+    },
+    staleTime: 10 * 60 * 1000,
+  });
+
+  return (
+    <LOVSelect
+      {...props}
+      items={legalEntities}
+      isLoading={isLoading}
+      placeholder={props.placeholder || "Select legal entity..."}
+    />
+  );
+};
+
+interface ContactPersonSelectProps extends BaseSelectProps {
+  customerId?: string;
+}
+
+export const ContactPersonSelect: React.FC<ContactPersonSelectProps> = ({ customerId, ...props }) => {
+  const { data: contactPersons = [], isLoading } = useQuery({
+    queryKey: ["contact_persons", customerId],
+    queryFn: async () => {
+      if (!customerId) return [];
+      const { data, error } = await supabase
+        .from("contact_persons")
+        .select("*")
+        .eq("customer_id", customerId)
+        .order("is_primary", { ascending: false })
+        .order("full_name");
+      if (error) throw error;
+
+      return (data || []).map((item: any) => ({
+        id: item.id,
+        label: `${item.full_name}${item.position ? ` (${item.position})` : ""}`,
+      }));
+    },
+    enabled: !!customerId,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  return (
+    <LOVSelect
+      {...props}
+      items={contactPersons}
+      isLoading={isLoading}
+      disabled={props.disabled || !customerId}
+      placeholder={props.placeholder || "Select contact person..."}
+    />
+  );
+};
+
+export const SalesOfficeSelect: React.FC<BaseSelectProps> = (props) => {
+  const { data: salesOffices = [], isLoading } = useQuery({
+    queryKey: ["sales_offices"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("sales_offices")
+        .select("*")
+        .eq("is_active", true)
+        .order("name");
+      if (error) throw error;
+
+      return (data || []).map((item: any) => ({
+        id: item.id,
+        label: item.name,
+      }));
+    },
+    staleTime: 10 * 60 * 1000,
+  });
+
+  return (
+    <LOVSelect
+      {...props}
+      items={salesOffices}
+      isLoading={isLoading}
+      placeholder={props.placeholder || "Select sales office..."}
+    />
+  );
+};
+
+interface SalesRepSelectProps extends BaseSelectProps {
+  salesOfficeId?: string;
+}
+
+export const SalesRepSelect: React.FC<SalesRepSelectProps> = ({ salesOfficeId, ...props }) => {
+  const { data: salesReps = [], isLoading } = useQuery({
+    queryKey: ["sales_representatives", salesOfficeId],
+    queryFn: async () => {
+      let query = supabase
+        .from("sales_representatives")
+        .select("*")
+        .eq("is_active", true);
+
+      if (salesOfficeId) {
+        query = query.eq("sales_office_id", salesOfficeId);
+      }
+
+      query = query.order("full_name");
+
+      const { data, error } = await query;
+      if (error) throw error;
+
+      return (data || []).map((item: any) => ({
+        id: item.id,
+        label: `${item.full_name}${item.email ? ` (${item.email})` : ""}`,
+      }));
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
+  return (
+    <LOVSelect
+      {...props}
+      items={salesReps}
+      isLoading={isLoading}
+      disabled={props.disabled || !salesOfficeId}
+      placeholder={props.placeholder || "Select sales rep..."}
     />
   );
 };
