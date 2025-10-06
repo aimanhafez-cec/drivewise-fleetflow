@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { addMonths, format as formatDate } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -58,6 +59,36 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
   };
 
   const upfrontDue = calculateUpfrontDue();
+
+  // Auto-calculate billing start date based on contract effective from + billing plan offset
+  useEffect(() => {
+    if (data.contract_effective_from && data.billing_plan && !data._manualBillingDate) {
+      const effectiveDate = new Date(data.contract_effective_from);
+      let monthsToAdd = 1; // Default to 1 month
+
+      switch (data.billing_plan) {
+        case 'monthly':
+          monthsToAdd = 1;
+          break;
+        case 'quarterly':
+          monthsToAdd = 3;
+          break;
+        case 'semi-annual':
+          monthsToAdd = 6;
+          break;
+        case 'annual':
+          monthsToAdd = 12;
+          break;
+      }
+
+      const calculatedDate = addMonths(effectiveDate, monthsToAdd);
+      const formattedDate = formatDate(calculatedDate, 'yyyy-MM-dd');
+      
+      onChange({ 
+        billing_start_date: formattedDate
+      });
+    }
+  }, [data.contract_effective_from, data.billing_plan]);
 
   // Add initial fee row
   const addInitialFee = () => {
@@ -132,7 +163,10 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
                 id="billing_start_date"
                 type="date"
                 value={data.billing_start_date || ""}
-                onChange={(e) => onChange({ billing_start_date: e.target.value })}
+                onChange={(e) => onChange({ 
+                  billing_start_date: e.target.value,
+                  _manualBillingDate: true
+                })}
               />
               {errors.billing_start_date && <FormError message={errors.billing_start_date} />}
             </div>
