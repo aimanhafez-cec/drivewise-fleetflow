@@ -359,3 +359,34 @@ export const useCustomerSites = (customerId?: string) => {
     }))
   };
 };
+
+// Price Lists
+export interface PriceList {
+  id: string;
+  label: string;
+  name: string;
+  description?: string;
+  is_default?: boolean;
+}
+
+export const usePriceLists = () => {
+  // Return static price lists since the table doesn't exist yet in the database
+  const staticPriceLists: PriceList[] = [
+    { id: 'standard', name: 'Standard Corporate Price List', description: 'Default pricing for corporate clients', is_default: true, label: 'Standard Corporate Price List' },
+    { id: 'premium', name: 'Premium Price List', description: 'Premium tier pricing', is_default: false, label: 'Premium Price List' },
+    { id: 'government', name: 'Government Rate', description: 'Special pricing for government entities', is_default: false, label: 'Government Rate' },
+    { id: 'wholesale', name: 'Wholesale Rate', description: 'Volume-based pricing', is_default: false, label: 'Wholesale Rate' }
+  ];
+
+  return {
+    items: staticPriceLists,
+    isLoading: false,
+    error: null,
+    updateSearch: () => {},
+    searchQuery: '',
+    fetchNextPage: () => Promise.resolve(),
+    hasNextPage: false,
+    isFetchingNextPage: false,
+    refetch: () => Promise.resolve()
+  };
+};

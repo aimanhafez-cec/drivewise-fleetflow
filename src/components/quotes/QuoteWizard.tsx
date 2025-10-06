@@ -50,7 +50,46 @@ interface QuoteData {
   vehicle_type_id?: string;
   vehicle_id?: string;
   
-  // Pricing from Step 4
+  // Financial Section from Step 4 (19 fields)
+  // 1. Billing & Payment Terms
+  payment_terms_id?: string;
+  billing_plan?: string; // monthly, quarterly, semi-annual, annual
+  billing_start_date?: string;
+  proration_rule?: string; // none, first-only, last-only, first-last, all-periods
+  
+  // 2. Tax & Pricing
+  vat_percentage?: number;
+  default_price_list_id?: string;
+  withholding_tax_percentage?: number;
+  
+  // 3. Deposits & Advances
+  deposit_type?: string; // refundable, non-refundable, pre-authorization
+  default_deposit_amount?: number;
+  default_advance_rent_months?: number;
+  annual_escalation_percentage?: number;
+  
+  // 4. Initial Fees (header)
+  initial_fees?: Array<{
+    fee_type: string;
+    description: string;
+    amount: number;
+  }>;
+  
+  // 5. Late Fee Policy
+  grace_period_days?: number;
+  late_fee_percentage?: number;
+  
+  // 6. Invoice & Payment Settings
+  invoice_consolidation?: boolean;
+  invoice_to_email?: string;
+  payment_method?: string; // bank-transfer, credit-card, cheque, direct-debit
+  customer_po_number?: string;
+  
+  // 7. Financial Summary (calculated + FX rate)
+  fx_rate_type?: string; // corporate, spot, fixed, market
+  upfront_due?: number; // Auto-calculated: deposit + advance rent + initial fees
+  
+  // Legacy pricing fields (keep for backward compatibility)
   items?: Array<{
     description: string;
     qty: number;
@@ -81,6 +120,21 @@ export const QuoteWizard: React.FC = () => {
     version: 1,
     currency: "AED",
     quote_entry_date: new Date().toISOString().split("T")[0],
+    // Financial defaults
+    vat_percentage: 5, // UAE standard 5%
+    billing_plan: "monthly",
+    proration_rule: "first-last",
+    deposit_type: "refundable",
+    default_deposit_amount: 2500,
+    default_advance_rent_months: 1,
+    annual_escalation_percentage: 5,
+    grace_period_days: 5,
+    late_fee_percentage: 2,
+    invoice_consolidation: false,
+    payment_method: "bank-transfer",
+    fx_rate_type: "corporate",
+    withholding_tax_percentage: 0,
+    initial_fees: [],
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   
