@@ -213,13 +213,19 @@ export const QuoteWizardStep1: React.FC<QuoteWizardStep1Props> = ({
                   <SelectValue placeholder="Select customer type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Organization">
+                  <SelectItem value="B2B">
                     <div className="flex items-center gap-2">
                       <Building2 className="h-4 w-4" />
                       Organization
                     </div>
                   </SelectItem>
-                  <SelectItem value="Person">
+                  <SelectItem value="CORPORATE">
+                    <div className="flex items-center gap-2">
+                      <Building2 className="h-4 w-4" />
+                      Corporate
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="B2C">
                     <div className="flex items-center gap-2">
                       <User className="h-4 w-4" />
                       Person
@@ -233,13 +239,14 @@ export const QuoteWizardStep1: React.FC<QuoteWizardStep1Props> = ({
             </div>
 
             {/* Organization Fields */}
-            {data.customer_type === "Organization" && (
+            {(data.customer_type === "B2B" || data.customer_type === "CORPORATE") && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border rounded-lg bg-muted/50">
                 <div className="space-y-2 md:col-span-2">
                   <Label htmlFor="customer_id">Customer Organization Name *</Label>
                   <CustomerSelect
                     value={data.customer_id || ""}
                     onChange={(value) => onChange({ customer_id: value })}
+                    customerType={data.customer_type}
                     placeholder="Search and select organization"
                   />
                   {errors.customer_id && (
@@ -290,13 +297,14 @@ export const QuoteWizardStep1: React.FC<QuoteWizardStep1Props> = ({
             )}
 
             {/* Person Fields */}
-            {data.customer_type === "Person" && (
+            {data.customer_type === "B2C" && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border rounded-lg bg-muted/50">
                 <div className="space-y-2 md:col-span-2">
                   <Label htmlFor="customer_id">Customer Name *</Label>
                   <CustomerSelect
                     value={data.customer_id || ""}
                     onChange={(value) => onChange({ customer_id: value })}
+                    customerType="B2C"
                     placeholder="Search and select person"
                   />
                   {errors.customer_id && (

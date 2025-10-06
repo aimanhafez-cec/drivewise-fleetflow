@@ -12,8 +12,14 @@ export interface Customer {
   default_po_bpa_no?: string;
 }
 
-export const useCustomers = (searchQuery?: string) => {
+export const useCustomers = (searchQuery?: string, customerType?: string) => {
+  const dependencies: Record<string, any> = {};
+  if (customerType) {
+    dependencies.customer_type = customerType;
+  }
+  
   const result = useLOV<Customer>('customers', 'id, full_name, phone, email, credit_limit, default_po_bpa_no', {
+    dependencies,
     searchFields: ['full_name', 'email'],
     orderBy: 'full_name'
   });

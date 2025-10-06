@@ -29,18 +29,24 @@ interface BaseSelectProps {
 // Customer Select
 interface CustomerSelectProps extends BaseSelectProps {
   statusFilter?: string;
+  customerType?: string;
 }
 
 export const CustomerSelect: React.FC<CustomerSelectProps> = ({
   statusFilter,
+  customerType,
   ...props
 }) => {
-  const { items, isLoading, updateSearch, fetchNextPage, hasNextPage, isFetchingNextPage } = useCustomers();
+  const { items, isLoading, updateSearch, fetchNextPage, hasNextPage, isFetchingNextPage } = useCustomers(undefined, customerType);
+  
+  const filteredItems = statusFilter
+    ? items.filter(item => item.status === statusFilter)
+    : items;
   
   return (
     <LOVSelect
       {...props}
-      items={items}
+      items={filteredItems}
       isLoading={isLoading}
       placeholder="Search customer by name, phone, or email"
       onSearch={updateSearch}
