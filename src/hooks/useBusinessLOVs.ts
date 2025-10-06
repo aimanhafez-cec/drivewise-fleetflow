@@ -235,23 +235,18 @@ export interface BusinessUnit {
 }
 
 export const useBusinessUnits = () => {
-  // Return static business units since the table doesn't exist in the database
-  const staticUnits: BusinessUnit[] = [
-    { id: 'main', name: 'Main Business Unit', label: 'Main Business Unit' },
-    { id: 'branch1', name: 'Branch Office 1', label: 'Branch Office 1' },
-    { id: 'branch2', name: 'Branch Office 2', label: 'Branch Office 2' }
-  ];
-
+  const result = useLOV<BusinessUnit>('business_units', 'id, name', {
+    dependencies: {
+      is_active: true
+    }
+  });
+  
   return {
-    items: staticUnits,
-    isLoading: false,
-    error: null,
-    updateSearch: () => {},
-    searchQuery: '',
-    fetchNextPage: () => Promise.resolve(),
-    hasNextPage: false,
-    isFetchingNextPage: false,
-    refetch: () => Promise.resolve()
+    ...result,
+    items: result.items.map(item => ({
+      ...item,
+      label: item.name
+    }))
   };
 };
 
