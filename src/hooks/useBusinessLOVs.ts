@@ -263,8 +263,7 @@ export const usePaymentTerms = () => {
   const staticTerms: PaymentTerm[] = [
     { id: 'net30', name: 'Net 30 Days', days: 30, label: 'Net 30 Days' },
     { id: 'net15', name: 'Net 15 Days', days: 15, label: 'Net 15 Days' },
-    { id: 'cod', name: 'Cash on Delivery', days: 0, label: 'Cash on Delivery' },
-    { id: 'prepaid', name: 'Prepaid', days: -1, label: 'Prepaid' }
+    { id: 'immediate', name: 'Immediate', days: 0, label: 'Immediate' }
   ];
 
   return {

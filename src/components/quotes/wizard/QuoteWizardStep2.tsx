@@ -221,6 +221,19 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
                 onChange={(e) => onChange({ withholding_tax_percentage: parseFloat(e.target.value) })}
               />
             </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="annual_escalation_percentage">Annual Escalation %</Label>
+              <Input
+                id="annual_escalation_percentage"
+                type="number"
+                min="0"
+                max="20"
+                step="0.5"
+                value={data.annual_escalation_percentage || 5}
+                onChange={(e) => onChange({ annual_escalation_percentage: parseFloat(e.target.value) })}
+              />
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -275,21 +288,8 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
                 type="number"
                 min="0"
                 max="3"
-                value={data.default_advance_rent_months || 1}
+                value={data.default_advance_rent_months ?? 0}
                 onChange={(e) => onChange({ default_advance_rent_months: parseInt(e.target.value) })}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="annual_escalation_percentage">Annual Escalation %</Label>
-              <Input
-                id="annual_escalation_percentage"
-                type="number"
-                min="0"
-                max="20"
-                step="0.5"
-                value={data.annual_escalation_percentage || 5}
-                onChange={(e) => onChange({ annual_escalation_percentage: parseFloat(e.target.value) })}
               />
             </div>
           </div>
