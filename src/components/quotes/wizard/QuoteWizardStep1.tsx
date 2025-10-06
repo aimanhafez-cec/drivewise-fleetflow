@@ -7,9 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
-import { CalendarIcon, Eye, User, Building2 } from "lucide-react";
+import { Eye, User, Building2 } from "lucide-react";
 import { format } from "date-fns";
-import { cn } from "@/lib/utils";
+import { DatePicker } from "@/components/ui/date-picker";
+import { formatDateForSubmission } from "@/lib/utils/dateUtils";
 import {
   LegalEntitySelect,
   BusinessUnitSelect,
@@ -75,39 +76,9 @@ export const QuoteWizardStep1: React.FC<QuoteWizardStep1Props> = ({
     }
   }, [data.contract_effective_from, data.contract_effective_to]);
 
-  const handleDateSelect = (field: string, date: Date | undefined) => {
-    onChange({ [field]: date ? format(date, "yyyy-MM-dd") : null });
+  const handleDateChange = (field: string, date: Date | null) => {
+    onChange({ [field]: formatDateForSubmission(date) });
   };
-
-  const renderDatePicker = (field: string, label: string, value: string | null) => (
-    <div className="space-y-2">
-      <Label htmlFor={field}>{label}</Label>
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button
-            id={field}
-            variant="outline"
-            className={cn(
-              "w-full justify-start text-left font-normal",
-              !value && "text-muted-foreground"
-            )}
-          >
-            <CalendarIcon className="mr-2 h-4 w-4" />
-            {value ? format(new Date(value), "PPP") : <span>Pick a date</span>}
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-auto p-0" align="start">
-          <Calendar
-            mode="single"
-            selected={value ? new Date(value) : undefined}
-            onSelect={(date) => handleDateSelect(field, date)}
-            initialFocus
-          />
-        </PopoverContent>
-      </Popover>
-      {errors[field] && <p className="text-sm text-destructive">{errors[field]}</p>}
-    </div>
-  );
 
   return (
     <div className="space-y-6">
@@ -416,7 +387,14 @@ export const QuoteWizardStep1: React.FC<QuoteWizardStep1Props> = ({
 
           {/* Row 6: Quote Date, Quote Type & Currency */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {renderDatePicker("quote_date", "Quote Date *", data.quote_date)}
+            <DatePicker
+              id="quote_date"
+              label="Quote Date"
+              value={data.quote_date}
+              onChange={(date) => handleDateChange("quote_date", date)}
+              error={errors.quote_date}
+              required
+            />
 
             <div className="space-y-2">
               <Label htmlFor="quote_type">Quote Type *</Label>
@@ -459,9 +437,27 @@ export const QuoteWizardStep1: React.FC<QuoteWizardStep1Props> = ({
 
           {/* Row 7: Contract Dates & Duration */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {renderDatePicker("validity_date_to", "Validity Date To", data.validity_date_to)}
-            {renderDatePicker("contract_effective_from", "Contract Effective From", data.contract_effective_from)}
-            {renderDatePicker("contract_effective_to", "Contract Effective To", data.contract_effective_to)}
+            <DatePicker
+              id="validity_date_to"
+              label="Validity Date To"
+              value={data.validity_date_to}
+              onChange={(date) => handleDateChange("validity_date_to", date)}
+              error={errors.validity_date_to}
+            />
+            <DatePicker
+              id="contract_effective_from"
+              label="Contract Effective From"
+              value={data.contract_effective_from}
+              onChange={(date) => handleDateChange("contract_effective_from", date)}
+              error={errors.contract_effective_from}
+            />
+            <DatePicker
+              id="contract_effective_to"
+              label="Contract Effective To"
+              value={data.contract_effective_to}
+              onChange={(date) => handleDateChange("contract_effective_to", date)}
+              error={errors.contract_effective_to}
+            />
 
             <div className="space-y-2">
               <Label htmlFor="duration_days">Duration (Days)</Label>
