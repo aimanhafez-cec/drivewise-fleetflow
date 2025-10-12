@@ -268,7 +268,7 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="px-4 space-y-1.5">
+        <div className="px-4 space-y-1">
           {/* Search Bar */}
           <div className="relative mb-0">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-3.5 w-3.5" />
@@ -283,7 +283,7 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
           {/* Filters Row */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 mt-0">
             {/* Vehicle Class */}
-            <div className="space-y-0.5">
+            <div>
               <Label className="text-[10px]">Vehicle Class</Label>
               <Select value={selectedClass} onValueChange={setSelectedClass}>
                 <SelectTrigger className="h-9">
@@ -301,7 +301,7 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
             </div>
 
             {/* Make */}
-            <div className="space-y-0.5">
+            <div>
               <Label className="text-[10px]">Make</Label>
               <Select value={selectedMake} onValueChange={setSelectedMake}>
                 <SelectTrigger className="h-9">
@@ -319,7 +319,7 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
             </div>
 
             {/* Model */}
-            <div className="space-y-0.5">
+            <div>
               <Label className="text-[10px]">Model</Label>
               <Select
                 value={selectedModel}
@@ -341,7 +341,7 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
             </div>
 
             {/* Year */}
-            <div className="space-y-0.5">
+            <div>
               <Label className="text-[10px]">Year</Label>
               <Select value={selectedYear} onValueChange={setSelectedYear}>
                 <SelectTrigger className="h-9">
@@ -359,7 +359,7 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
             </div>
 
             {/* Location */}
-            <div className="space-y-0.5">
+            <div>
               <Label className="text-[10px]">Location</Label>
               <Select value={selectedLocation} onValueChange={setSelectedLocation}>
                 <SelectTrigger className="h-9">
@@ -377,8 +377,7 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
             </div>
 
             {/* Show Available Only Toggle */}
-            <div className="space-y-0.5">
-              <Label className="text-[10px]">&nbsp;</Label>
+            <div>
               <Button
                 type="button"
                 variant={showAvailableOnly ? "default" : "outline"}
@@ -397,8 +396,7 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
             </div>
 
             {/* Reset Button */}
-            <div className="space-y-0.5">
-              <Label className="text-[10px]">&nbsp;</Label>
+            <div>
               <Button
                 type="button"
                 variant="outline"
@@ -412,7 +410,7 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
           </div>
 
           {/* Results Count */}
-          <div className="text-[11px] text-muted-foreground bg-muted/30 px-3 py-1 rounded-md inline-block">
+          <div className="text-[11px] text-muted-foreground bg-muted/30 px-3 py-1 rounded-md inline-block -mt-1">
             {isLoading ? (
               'Loading vehicles...'
             ) : (
@@ -440,8 +438,7 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
               </p>
             </div>
           ) : (
-            <div className="border rounded-lg overflow-hidden">
-      <table className="w-full">
+      <table className="w-full border border-border rounded-lg overflow-hidden">
         <thead className="bg-background sticky top-0 z-10 shadow-sm border-b">
           <tr>
             <th className="text-center p-2 text-xs font-semibold w-12">
@@ -499,7 +496,6 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
                   })}
                 </tbody>
               </table>
-            </div>
           )}
         </div>
 
