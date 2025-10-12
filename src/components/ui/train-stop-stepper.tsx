@@ -27,12 +27,12 @@ export const TrainStopStepper: React.FC<TrainStopStepperProps> = ({
       <div className="hidden md:block">
         <div className="relative flex items-center justify-between">
           {/* Gray background line */}
-          <div className="absolute top-6 left-0 right-0 h-0.5 bg-border z-0" />
+          <div className="absolute top-5 left-0 right-0 h-0.5 bg-border z-0" />
           
           {/* Green progress overlay */}
           {completedSteps.length > 0 && (
             <div 
-              className="absolute top-6 left-0 h-0.5 bg-green-600 z-[1] transition-all duration-500"
+              className="absolute top-5 left-0 h-0.5 bg-green-600 z-[1] transition-all duration-500"
               style={{ 
                 width: `${(completedSteps.length / (steps.length - 1)) * 100}%` 
               }}
@@ -54,9 +54,9 @@ export const TrainStopStepper: React.FC<TrainStopStepperProps> = ({
                   className={cn(
                     "rounded-full transition-all duration-300 flex items-center justify-center font-semibold",
                     "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
-                    isCompleted && "w-12 h-12 bg-green-600 hover:bg-green-700 cursor-pointer shadow-sm",
-                    isCurrent && "w-12 h-12 bg-primary hover:bg-primary/90 cursor-pointer shadow-sm",
-                    isUpcoming && "w-12 h-12 border-2 border-muted-foreground/30 bg-background cursor-not-allowed"
+                    isCompleted && "w-10 h-10 bg-green-600 hover:bg-green-700 cursor-pointer",
+                    isCurrent && "w-10 h-10 bg-primary hover:bg-primary/90 cursor-pointer",
+                    isUpcoming && "w-10 h-10 border-2 border-muted-foreground/30 bg-background cursor-not-allowed"
                   )}
                   aria-label={`${step.title} - ${isCompleted ? 'Completed' : isCurrent ? 'Current' : 'Upcoming'}`}
                   aria-current={isCurrent ? 'step' : undefined}
@@ -118,9 +118,9 @@ export const TrainStopStepper: React.FC<TrainStopStepperProps> = ({
                 <div
                   className={cn(
                     "rounded-full flex items-center justify-center font-semibold flex-shrink-0 transition-all duration-300",
-                    isCompleted && "w-10 h-10 bg-green-600 shadow-sm",
-                    isCurrent && "w-10 h-10 bg-primary shadow-sm",
-                    isUpcoming && "w-10 h-10 border-2 border-muted-foreground/30 bg-background"
+                    isCompleted && "w-8 h-8 bg-green-600",
+                    isCurrent && "w-8 h-8 bg-primary",
+                    isUpcoming && "w-8 h-8 border-2 border-muted-foreground/30 bg-background"
                   )}
                 >
                   {isCompleted ? (
