@@ -193,17 +193,18 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
           selectedLines={selectedLines}
           onSelectLine={handleSelectLine}
           onSelectAll={handleSelectAll}
-          headerDefaults={{
-            deposit_amount: data.default_deposit_amount,
-            advance_rent_months: data.default_advance_rent_months,
-            insurance_coverage_package: data.insurance_coverage_package,
-            insurance_excess_aed: data.insurance_excess_aed,
-            insurance_glass_tire_cover: data.insurance_glass_tire_cover,
-            insurance_pai_enabled: data.insurance_pai_enabled,
-            insurance_territorial_coverage: data.insurance_territorial_coverage,
-            default_pickup_location_id: data.default_pickup_location_id,
-            default_return_location_id: data.default_return_location_id,
-          }}
+                  headerDefaults={{
+                    deposit_amount: data.default_deposit_amount,
+                    advance_rent_months: data.default_advance_rent_months,
+                    insurance_coverage_package: data.insurance_coverage_package,
+                    insurance_excess_aed: data.insurance_excess_aed,
+                    insurance_glass_tire_cover: data.insurance_glass_tire_cover,
+                    insurance_pai_enabled: data.insurance_pai_enabled,
+                    insurance_territorial_coverage: data.insurance_territorial_coverage,
+                    default_pickup_location_id: data.default_pickup_location_id,
+                    default_return_location_id: data.default_return_location_id,
+                    default_price_list_id: data.default_price_list_id,
+                  }}
         />
 
         {/* Summary Panel */}

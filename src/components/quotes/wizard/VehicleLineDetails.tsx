@@ -24,6 +24,7 @@ interface VehicleLineDetailsProps {
     insurance_territorial_coverage?: string;
     default_pickup_location_id?: string;
     default_return_location_id?: string;
+    default_price_list_id?: string;
   };
 }
 
@@ -36,6 +37,34 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
 }) => {
   const { items: locations = [], isLoading: locationsLoading } = useLocations();
   const linePrefix = `line_${line.line_no - 1}`;
+
+  // Get default monthly rate from price list based on vehicle class
+  const getDefaultMonthlyRate = (): number => {
+    // Mock rates by vehicle class and price list
+    // In production, this would fetch from a price_list_rates table
+    const ratesByClass: Record<string, Record<string, number>> = {
+      'standard': { 'economy': 1200, 'compact': 1500, 'midsize': 2000, 'suv': 3500, 'luxury': 5000 },
+      'premium': { 'economy': 1400, 'compact': 1800, 'midsize': 2400, 'suv': 4200, 'luxury': 6000 },
+      'government': { 'economy': 1000, 'compact': 1300, 'midsize': 1800, 'suv': 3000, 'luxury': 4500 },
+    };
+
+    const priceListId = headerDefaults?.default_price_list_id || 'standard';
+    const vehicleClassName = line.category_name?.toLowerCase() || 'midsize';
+    
+    return ratesByClass[priceListId]?.[vehicleClassName] || 2000;
+  };
+
+  // Track if monthly rate has been customized
+  const defaultRate = getDefaultMonthlyRate();
+  const isRateCustomized = line.monthly_rate !== undefined && line.monthly_rate !== defaultRate;
+
+  // Auto-default monthly rate from price list when vehicle class is selected
+  useEffect(() => {
+    if (line.vehicle_class_id && (!line.monthly_rate || line.monthly_rate === 0)) {
+      const defaultRate = getDefaultMonthlyRate();
+      onUpdate('monthly_rate', defaultRate);
+    }
+  }, [line.vehicle_class_id, headerDefaults?.default_price_list_id]);
 
   // Auto-calculate lease term from dates
   useEffect(() => {
@@ -231,19 +260,52 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor={`rate_${line.line_no}`}>
+            <Label htmlFor={`rate_${line.line_no}`} className="flex items-center gap-2">
               {line.rate_type === 'daily' ? 'Daily' : line.rate_type === 'weekly' ? 'Weekly' : 'Monthly'} Rate (AED) *
+              {isRateCustomized && (
+                <Badge variant="secondary" className="text-xs">Customized</Badge>
+              )}
             </Label>
-            <Input
-              id={`rate_${line.line_no}`}
-              type="number"
-              min="0"
-              step="100"
-              value={line.monthly_rate || ""}
-              onChange={(e) => onUpdate('monthly_rate', parseFloat(e.target.value) || 0)}
-              placeholder="3000"
-            />
+            <div className="relative">
+              <Input
+                id={`rate_${line.line_no}`}
+                type="number"
+                min="0"
+                step="100"
+                value={line.monthly_rate || ""}
+                onChange={(e) => onUpdate('monthly_rate', parseFloat(e.target.value) || 0)}
+                placeholder="Auto-defaulted from price list"
+              />
+              {isRateCustomized && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 h-7 text-xs"
+                  onClick={() => onUpdate('monthly_rate', defaultRate)}
+                >
+                  Reset
+                </Button>
+              )}
+            </div>
             {errors[`${linePrefix}_rate`] && <FormError message={errors[`${linePrefix}_rate`]} />}
+            <p className="text-xs text-muted-foreground">
+              Default from price list: {defaultRate.toFixed(2)} AED/month
+            </p>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor={`line_subtotal_${line.line_no}`}>Line Subtotal (Total Contract Value)</Label>
+            <Input
+              id={`line_subtotal_${line.line_no}`}
+              type="text"
+              value={`${((line.monthly_rate || 0) * (line.lease_term_months || 0)).toFixed(2)} AED`}
+              disabled
+              className="bg-muted font-semibold"
+            />
+            <p className="text-xs text-muted-foreground">
+              {line.monthly_rate || 0} AED/month × {line.lease_term_months || 0} months
+            </p>
           </div>
         </div>
 
@@ -543,6 +605,15 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
                   {((line.deposit_amount || 0) + (line.advance_rent_months || 0) * (line.monthly_rate || 0)).toFixed(2)} AED
                 </span>
               </div>
+              <div className="flex justify-between text-sm border-t pt-2 mt-2">
+                <span className="font-semibold">Line Subtotal:</span>
+                <span className="font-bold text-primary">
+                  {((line.monthly_rate || 0) * (line.lease_term_months || 0)).toFixed(2)} AED
+                </span>
+              </div>
+              <p className="text-xs text-muted-foreground text-right">
+                {line.monthly_rate || 0} × {line.lease_term_months || 0} months
+              </p>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Duration:</span>
                 <span className="font-medium">{line.duration_months || 0} months</span>

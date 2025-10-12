@@ -26,6 +26,7 @@ interface VehicleLineTableProps {
     insurance_territorial_coverage?: string;
     default_pickup_location_id?: string;
     default_return_location_id?: string;
+    default_price_list_id?: string;
   };
 }
 
