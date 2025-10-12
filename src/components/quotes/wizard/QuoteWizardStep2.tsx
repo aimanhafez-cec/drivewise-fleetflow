@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { addMonths, format as formatDate } from "date-fns";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -279,6 +279,11 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
             <DollarSign className="h-5 w-5" />
             Deposits & Advances
           </CardTitle>
+          <CardDescription className="mt-2">
+            Define the customer's refundable security deposit and any advance rental months to be collected 
+            before contract activation. These protect the company's financial exposure and must be settled 
+            before vehicle handover.
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
@@ -356,6 +361,10 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
               Add Fee
             </Button>
           </div>
+          <CardDescription className="mt-2">
+            One-time, non-refundable setup and administrative charges collected before vehicle delivery. 
+            These cover preparation, documentation, delivery, and system setup costs and appear in the upfront due total.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           {data.initial_fees && data.initial_fees.length > 0 ? (

@@ -22,9 +22,9 @@ export const VAT_RATES = [
 ] as const;
 
 export const DEPOSIT_TYPES = [
-  { id: 'refundable', label: 'Refundable', value: 'refundable' },
-  { id: 'non-refundable', label: 'Non-Refundable', value: 'non-refundable' },
-  { id: 'pre-authorization', label: 'Pre-Authorization (Credit Card)', value: 'pre-authorization' },
+  { id: 'refundable', label: 'Refundable Deposit', value: 'refundable' },
+  { id: 'non-refundable', label: 'Non-Refundable Deposit', value: 'non-refundable' },
+  { id: 'bank-guarantee', label: 'Bank Guarantee', value: 'bank-guarantee' },
 ] as const;
 
 export const PAYMENT_METHODS = [
@@ -51,11 +51,12 @@ export const CURRENCIES = [
 ] as const;
 
 export const INITIAL_FEE_TYPES = [
-  { id: 'registration', label: 'Registration Fee', value: 'registration' },
-  { id: 'delivery', label: 'Delivery Fee', value: 'delivery' },
+  { id: 'registration', label: 'Registration / Admin Handling Fee', value: 'registration' },
+  { id: 'delivery', label: 'Delivery / Logistics Fee', value: 'delivery' },
   { id: 'processing', label: 'Processing Fee', value: 'processing' },
   { id: 'documentation', label: 'Documentation Fee', value: 'documentation' },
   { id: 'setup', label: 'Setup Fee', value: 'setup' },
+  { id: 'onboarding', label: 'Onboarding / Training Fee', value: 'onboarding' },
   { id: 'other', label: 'Other Fee', value: 'other' },
 ] as const;
 
