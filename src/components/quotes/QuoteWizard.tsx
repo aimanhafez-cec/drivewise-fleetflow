@@ -4,7 +4,7 @@ import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
+import { TrainStopStepper } from "@/components/ui/train-stop-stepper";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, ArrowRight, Send } from "lucide-react";
 import { QuoteWizardStep1 } from "./wizard/QuoteWizardStep1";
@@ -150,6 +150,7 @@ const steps = [
 
 export const QuoteWizard: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(1);
+  const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [quoteData, setQuoteData] = useState<Partial<QuoteData>>({
     items: [],
     tax_rate: 0.08,
@@ -409,12 +410,29 @@ export const QuoteWizard: React.FC = () => {
 
   const handleNext = () => {
     if (validateStep(currentStep)) {
+      // Mark current step as completed
+      if (!completedSteps.includes(currentStep)) {
+        setCompletedSteps(prev => [...prev, currentStep]);
+      }
       setCurrentStep(prev => Math.min(prev + 1, steps.length));
     }
   };
 
   const handleBack = () => {
     setCurrentStep(prev => Math.max(prev - 1, 1));
+  };
+
+  const handleStepClick = (stepId: number) => {
+    // Only allow clicking on current or completed steps
+    if (stepId <= currentStep) {
+      setCurrentStep(stepId);
+    } else {
+      toast({
+        title: "Complete current step first",
+        description: "Please complete the current step before proceeding.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleSubmit = () => {
@@ -470,8 +488,6 @@ export const QuoteWizard: React.FC = () => {
     }
   };
 
-  const progressPercentage = (currentStep / steps.length) * 100;
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -488,30 +504,15 @@ export const QuoteWizard: React.FC = () => {
         </Button>
       </div>
 
-      {/* Progress */}
+      {/* Train Stop Progress Indicator */}
       <Card>
-        <CardContent className="pt-6">
-          <div className="space-y-4">
-            <Progress value={progressPercentage} className="w-full" />
-            <div className="flex justify-between text-sm">
-              {steps.map((step) => (
-                <div
-                  key={step.id}
-                  className={`text-center ${
-                    step.id === currentStep
-                      ? "text-primary font-medium"
-                      : step.id < currentStep
-                      ? "text-green-600"
-                      : "text-muted-foreground"
-                  }`}
-                >
-                  <div id={`wiz-step-${step.title.toLowerCase().replace(" ", "-")}`}>
-                    {step.title}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+        <CardContent className="pt-6 pb-4">
+          <TrainStopStepper
+            steps={steps}
+            currentStep={currentStep}
+            completedSteps={completedSteps}
+            onStepClick={handleStepClick}
+          />
         </CardContent>
       </Card>
 
