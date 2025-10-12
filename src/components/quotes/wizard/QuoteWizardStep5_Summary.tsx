@@ -10,7 +10,7 @@ interface QuoteWizardStep4Props {
   errors: Record<string, string>;
 }
 
-export const QuoteWizardStep4: React.FC<QuoteWizardStep4Props> = ({
+export const QuoteWizardStep5_Summary: React.FC<QuoteWizardStep4Props> = ({
   data,
   onChange,
   errors,

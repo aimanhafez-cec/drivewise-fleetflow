@@ -31,6 +31,12 @@ interface VehicleLineCardProps {
     rate_type: 'monthly' | 'weekly' | 'daily';
     lease_term_months?: number;
     end_date?: string;
+    // Phase 3C: Insurance overrides
+    insurance_coverage_package?: string;
+    insurance_excess_aed?: number;
+    insurance_glass_tire_cover?: boolean;
+    insurance_pai_enabled?: boolean;
+    insurance_territorial_coverage?: string;
   };
   onUpdate: (field: string, value: any) => void;
   onRemove: () => void;
@@ -405,6 +411,73 @@ export const VehicleLineCard: React.FC<VehicleLineCardProps> = ({
                 Advance: {line.advance_rent_months || 0} × {line.monthly_rate || 0} = {((line.advance_rent_months || 0) * (line.monthly_rate || 0)).toFixed(2)} AED
               </p>
               {errors[`${linePrefix}_advance`] && <FormError message={errors[`${linePrefix}_advance`]} />}
+            </div>
+          </div>
+        </div>
+
+        {/* SECTION 6: Insurance (Optional Override) */}
+        <div className="mb-6">
+          <h4 className="text-sm font-semibold mb-3 text-muted-foreground">
+            Insurance Coverage (Optional Override)
+          </h4>
+          <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg mb-4">
+            <p className="text-xs text-blue-800">
+              <strong>Inherited from header:</strong> {line.insurance_coverage_package || 'comprehensive'} • 
+              {line.insurance_excess_aed ?? 1500} AED excess • 
+              {line.insurance_territorial_coverage || 'uae-only'}
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            
+            {/* Coverage Package Override */}
+            <div className="space-y-2">
+              <Label htmlFor={`ins_pkg_${line.line_no}`}>Coverage Package</Label>
+              <Select
+                value={line.insurance_coverage_package || ""}
+                onValueChange={(value) => onUpdate('insurance_coverage_package', value)}
+              >
+                <SelectTrigger id={`ins_pkg_${line.line_no}`}>
+                  <SelectValue placeholder="Use header default" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Use header default</SelectItem>
+                  <SelectItem value="cdw">CDW</SelectItem>
+                  <SelectItem value="comprehensive">Comprehensive</SelectItem>
+                  <SelectItem value="full-zero-excess">Full / Zero Excess</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Excess Override */}
+            <div className="space-y-2">
+              <Label htmlFor={`ins_excess_${line.line_no}`}>Excess (AED)</Label>
+              <Input
+                id={`ins_excess_${line.line_no}`}
+                type="number"
+                min="0"
+                step="100"
+                value={line.insurance_excess_aed ?? ""}
+                onChange={(e) => onUpdate('insurance_excess_aed', parseFloat(e.target.value) || 0)}
+                placeholder="Use header default"
+              />
+            </div>
+
+            {/* Territorial Override */}
+            <div className="space-y-2">
+              <Label htmlFor={`ins_terr_${line.line_no}`}>Territorial Coverage</Label>
+              <Select
+                value={line.insurance_territorial_coverage || ""}
+                onValueChange={(value) => onUpdate('insurance_territorial_coverage', value)}
+              >
+                <SelectTrigger id={`ins_terr_${line.line_no}`}>
+                  <SelectValue placeholder="Use header default" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Use header default</SelectItem>
+                  <SelectItem value="uae-only">UAE Only</SelectItem>
+                  <SelectItem value="gcc">GCC Coverage</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </div>

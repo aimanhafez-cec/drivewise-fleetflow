@@ -15,7 +15,7 @@ interface QuoteWizardStep3Props {
   errors: Record<string, string>;
 }
 
-export const QuoteWizardStep3: React.FC<QuoteWizardStep3Props> = ({
+export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
   data,
   onChange,
   errors,
@@ -49,6 +49,12 @@ export const QuoteWizardStep3: React.FC<QuoteWizardStep3Props> = ({
       rate_type: 'monthly' as const,
       lease_term_months: undefined,
       end_date: undefined,
+      // Phase 3C: Inherit insurance defaults from header
+      insurance_coverage_package: data.insurance_coverage_package || 'comprehensive',
+      insurance_excess_aed: data.insurance_excess_aed ?? 1500,
+      insurance_glass_tire_cover: data.insurance_glass_tire_cover ?? true,
+      insurance_pai_enabled: data.insurance_pai_enabled ?? false,
+      insurance_territorial_coverage: data.insurance_territorial_coverage || 'uae-only',
     };
     onChange({ quote_items: [...currentLines, newLine] });
   };

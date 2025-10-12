@@ -9,8 +9,9 @@ import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, ArrowRight, Send } from "lucide-react";
 import { QuoteWizardStep1 } from "./wizard/QuoteWizardStep1";
 import { QuoteWizardStep2 } from "./wizard/QuoteWizardStep2";
-import { QuoteWizardStep3 } from "./wizard/QuoteWizardStep3";
-import { QuoteWizardStep4 } from "./wizard/QuoteWizardStep4";
+import { QuoteWizardStep3_Insurance } from "./wizard/QuoteWizardStep3_Insurance";
+import { QuoteWizardStep4_Vehicles } from "./wizard/QuoteWizardStep4_Vehicles";
+import { QuoteWizardStep5_Summary } from "./wizard/QuoteWizardStep5_Summary";
 
 interface QuoteData {
   // Header fields from Step 1
@@ -71,6 +72,12 @@ interface QuoteData {
     rate_type: 'monthly' | 'weekly' | 'daily';
     lease_term_months?: number;
     end_date?: string;
+    // Phase 3C: Insurance overrides per line
+    insurance_coverage_package?: string;
+    insurance_excess_aed?: number;
+    insurance_glass_tire_cover?: boolean;
+    insurance_pai_enabled?: boolean;
+    insurance_territorial_coverage?: string;
   }>;
   
   // Financial Section from Step 4 (19 fields)
@@ -112,6 +119,14 @@ interface QuoteData {
   fx_rate_type?: string; // corporate, spot, fixed, market
   upfront_due?: number; // Auto-calculated: deposit + advance rent + initial fees
   
+  // Phase 3C: Insurance Header Defaults
+  insurance_coverage_package?: 'cdw' | 'comprehensive' | 'full-zero-excess';
+  insurance_excess_aed?: number;
+  insurance_glass_tire_cover?: boolean;
+  insurance_pai_enabled?: boolean;
+  insurance_territorial_coverage?: 'uae-only' | 'gcc';
+  insurance_coverage_summary?: string;
+
   // Legacy pricing fields (keep for backward compatibility)
   items?: Array<{
     description: string;
@@ -128,8 +143,9 @@ interface QuoteData {
 const steps = [
   { id: 1, title: "Header", description: "Quote header information" },
   { id: 2, title: "Financials", description: "Billing, deposits & payment terms" },
-  { id: 3, title: "Vehicles", description: "Vehicle selection & configuration" },
-  { id: 4, title: "Summary", description: "Review & finalize quote" },
+  { id: 3, title: "Insurance", description: "Insurance coverage settings" },
+  { id: 4, title: "Vehicles", description: "Vehicle selection & configuration" },
+  { id: 5, title: "Summary", description: "Review & finalize quote" },
 ];
 
 export const QuoteWizard: React.FC = () => {
@@ -158,6 +174,13 @@ export const QuoteWizard: React.FC = () => {
     fx_rate_type: "corporate",
     withholding_tax_percentage: 0,
     initial_fees: [],
+    // Phase 3C: Insurance defaults
+    insurance_coverage_package: 'comprehensive',
+    insurance_excess_aed: 1500,
+    insurance_glass_tire_cover: true,
+    insurance_pai_enabled: false,
+    insurance_territorial_coverage: 'uae-only',
+    insurance_coverage_summary: '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   
@@ -312,6 +335,18 @@ export const QuoteWizard: React.FC = () => {
         }
         break;
       case 3:
+        // Insurance validation
+        if (!quoteData.insurance_coverage_package) {
+          newErrors.insurance_coverage_package = "Coverage package is required";
+        }
+        if (quoteData.insurance_excess_aed === undefined || quoteData.insurance_excess_aed < 0) {
+          newErrors.insurance_excess_aed = "Valid excess amount is required";
+        }
+        if (!quoteData.insurance_territorial_coverage) {
+          newErrors.insurance_territorial_coverage = "Territorial coverage is required";
+        }
+        break;
+      case 4:
         // Vehicle selection validation
         if (quoteData.quote_type === 'Corporate lease') {
           // Multi-vehicle validation
@@ -363,6 +398,9 @@ export const QuoteWizard: React.FC = () => {
           }
         }
         break;
+      case 5:
+        // Final step - no additional validation
+        break;
     }
 
     setErrors(newErrors);
@@ -405,7 +443,7 @@ export const QuoteWizard: React.FC = () => {
         );
       case 3:
         return (
-          <QuoteWizardStep3
+          <QuoteWizardStep3_Insurance
             data={quoteData}
             onChange={(data) => updateQuoteData(3, data)}
             errors={errors}
@@ -413,9 +451,17 @@ export const QuoteWizard: React.FC = () => {
         );
       case 4:
         return (
-          <QuoteWizardStep4
+          <QuoteWizardStep4_Vehicles
             data={quoteData}
             onChange={(data) => updateQuoteData(4, data)}
+            errors={errors}
+          />
+        );
+      case 5:
+        return (
+          <QuoteWizardStep5_Summary
+            data={quoteData}
+            onChange={(data) => updateQuoteData(5, data)}
             errors={errors}
           />
         );
