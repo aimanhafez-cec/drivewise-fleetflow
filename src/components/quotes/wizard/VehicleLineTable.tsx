@@ -78,9 +78,18 @@ export const VehicleLineTable: React.FC<VehicleLineTableProps> = ({
         <TableBody>
           {lines.map((line, index) => {
             const isExpanded = expandedLines.includes(line.line_no);
-            const itemCode = line._vehicleMeta?.item_code || 'N/A';
+            
+            // Generate item code on the fly if missing (for legacy data)
+            const itemCode = line._vehicleMeta?.item_code || 
+              (line._vehicleMeta ? 
+                `${line._vehicleMeta.make.substring(0,3)}-${line._vehicleMeta.model.substring(0,3)}-${line._vehicleMeta.year}`.toUpperCase() 
+                : 'N/A');
+            
             const itemDescription = line._vehicleMeta?.item_description || 
-              (line._vehicleMeta ? `${line._vehicleMeta.year} ${line._vehicleMeta.make} ${line._vehicleMeta.model}` : 'Not selected');
+              (line._vehicleMeta ? 
+                `${line._vehicleMeta.make} ${line._vehicleMeta.model} ${line._vehicleMeta.year} - ${line._vehicleMeta.category_name}` 
+                : 'Not selected');
+            
             const category = line._vehicleMeta?.category_name || 'N/A';
             
             return (
@@ -105,7 +114,9 @@ export const VehicleLineTable: React.FC<VehicleLineTableProps> = ({
                     )}
                   </TableCell>
                   <TableCell>
-                    <Badge variant="outline">{category}</Badge>
+                    <Badge variant="outline" className="inline-block max-w-[120px] truncate">
+                      {category}
+                    </Badge>
                   </TableCell>
                   <TableCell>{formatDate(line.pickup_at)}</TableCell>
                   <TableCell className="text-right">{line.duration_months || 0} mo</TableCell>
