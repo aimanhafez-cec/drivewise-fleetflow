@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { FormError } from "@/components/ui/form-error";
 import { useLocations } from "@/hooks/useBusinessLOVs";
+import { formatDurationInMonthsAndDays } from "@/lib/utils/dateUtils";
 
 interface VehicleLineDetailsProps {
   line: any;
@@ -36,6 +37,27 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
   const { items: locations = [], isLoading: locationsLoading } = useLocations();
   const linePrefix = `line_${line.line_no - 1}`;
 
+  // Auto-calculate lease term from dates
+  useEffect(() => {
+    if (line.pickup_at && line.return_at) {
+      const from = new Date(line.pickup_at);
+      const to = new Date(line.return_at);
+      
+      // Calculate months (rounded to nearest month)
+      const diffTime = Math.abs(to.getTime() - from.getTime());
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      const months = Math.round(diffDays / 30.44); // Average days per month
+      
+      // Update both duration_months and lease_term_months
+      if (line.duration_months !== months) {
+        onUpdate('duration_months', months);
+      }
+      if (line.lease_term_months !== months) {
+        onUpdate('lease_term_months', months);
+      }
+    }
+  }, [line.pickup_at, line.return_at, line.duration_months, line.lease_term_months, onUpdate]);
+
   // Helper to check if a field is customized
   const isCustomized = (field: string, lineValue: any, defaultValue: any) => {
     if (defaultValue === undefined) return false;
@@ -49,46 +71,6 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
 
   return (
     <div className="space-y-6 max-w-6xl">
-      {/* Item Master Information */}
-      {line._vehicleMeta && (
-        <Card className="bg-blue-50 border-blue-200">
-          <CardContent className="pt-4">
-            <h4 className="font-semibold text-sm mb-3">Vehicle Specification - Line {line.line_no}</h4>
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-3 text-sm">
-              <div>
-                <span className="text-muted-foreground text-xs">Item Code:</span>
-                <div className="font-mono font-semibold text-primary">
-                  {line._vehicleMeta.item_code || 'N/A'}
-                </div>
-              </div>
-              <div>
-                <span className="text-muted-foreground text-xs">Make:</span>
-                <div className="font-medium">{line._vehicleMeta.make}</div>
-              </div>
-              <div>
-                <span className="text-muted-foreground text-xs">Model:</span>
-                <div className="font-medium">{line._vehicleMeta.model}</div>
-              </div>
-              <div>
-                <span className="text-muted-foreground text-xs">Year:</span>
-                <div className="font-medium">{line._vehicleMeta.year}</div>
-              </div>
-              {line._vehicleMeta.color && (
-                <div>
-                  <span className="text-muted-foreground text-xs">Color:</span>
-                  <div className="font-medium">{line._vehicleMeta.color}</div>
-                </div>
-              )}
-            </div>
-            <div className="mt-2 text-xs text-muted-foreground">
-              {line._vehicleMeta._itemCodeMeta && (
-                <span>{line._vehicleMeta._itemCodeMeta.available_qty} vehicles available</span>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {/* SECTION 1: Delivery & Collection */}
         <div className="space-y-4">
@@ -210,19 +192,25 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor={`term_${line.line_no}`}>Lease Term (Months)</Label>
+            <Label htmlFor={`term_${line.line_no}`}>Lease Term</Label>
             <Input
               id={`term_${line.line_no}`}
-              type="number"
-              min="1"
-              max="60"
-              value={line.lease_term_months || line.duration_months || ""}
-              onChange={(e) => {
-                const term = parseInt(e.target.value) || 0;
-                onUpdate('lease_term_months', term);
-                onUpdate('duration_months', term);
-              }}
+              type="text"
+              value={
+                line.pickup_at && line.return_at
+                  ? formatDurationInMonthsAndDays(
+                      new Date(line.pickup_at),
+                      new Date(line.return_at)
+                    )
+                  : ""
+              }
+              disabled
+              placeholder="Auto-calculated from dates"
+              className="bg-muted"
             />
+            <p className="text-xs text-muted-foreground">
+              Duration: {line.duration_months || 0} months
+            </p>
           </div>
 
           <div className="space-y-2">
