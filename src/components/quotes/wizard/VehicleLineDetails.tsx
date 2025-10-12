@@ -25,6 +25,7 @@ interface VehicleLineDetailsProps {
     default_pickup_location_id?: string;
     default_return_location_id?: string;
     default_price_list_id?: string;
+    billing_plan?: string;
   };
 }
 
@@ -38,33 +39,64 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
   const { items: locations = [], isLoading: locationsLoading } = useLocations();
   const linePrefix = `line_${line.line_no - 1}`;
 
-  // Get default monthly rate from price list based on vehicle class
-  const getDefaultMonthlyRate = (): number => {
-    // Mock rates by vehicle class and price list
-    // In production, this would fetch from a price_list_rates table
-    const ratesByClass: Record<string, Record<string, number>> = {
+  // Get billing period information based on billing plan
+  const getBillingPeriodInfo = () => {
+    const plan = headerDefaults?.billing_plan || 'monthly';
+    
+    switch (plan) {
+      case 'quarterly':
+        return { label: 'Quarterly', unit: 'quarter', multiplier: 3, abbrev: 'per quarter' };
+      case 'semi-annual':
+        return { label: 'Semi-Annual', unit: 'period', multiplier: 6, abbrev: 'per 6 months' };
+      case 'annual':
+        return { label: 'Annual', unit: 'year', multiplier: 12, abbrev: 'per year' };
+      case 'monthly':
+      default:
+        return { label: 'Monthly', unit: 'month', multiplier: 1, abbrev: 'per month' };
+    }
+  };
+
+  const periodInfo = getBillingPeriodInfo();
+
+  // Get default per-period rate from price list based on vehicle class
+  const getDefaultPerPeriodRate = (): number => {
+    // Mock MONTHLY base rates by vehicle class and price list
+    // These will be multiplied by billing cycle to get per-period rate
+    const monthlyRatesByClass: Record<string, Record<string, number>> = {
       'standard': { 'economy': 1200, 'compact': 1500, 'midsize': 2000, 'suv': 3500, 'luxury': 5000 },
       'premium': { 'economy': 1400, 'compact': 1800, 'midsize': 2400, 'suv': 4200, 'luxury': 6000 },
       'government': { 'economy': 1000, 'compact': 1300, 'midsize': 1800, 'suv': 3000, 'luxury': 4500 },
     };
 
     const priceListId = headerDefaults?.default_price_list_id || 'standard';
-    const vehicleClassName = line.category_name?.toLowerCase() || 'midsize';
+    const vehicleClassName = line._vehicleMeta?.category_name?.toLowerCase() || 'midsize';
+    const monthlyRate = monthlyRatesByClass[priceListId]?.[vehicleClassName] || 2000;
     
-    return ratesByClass[priceListId]?.[vehicleClassName] || 2000;
+    // Multiply by billing cycle to get per-period rate
+    const { multiplier } = periodInfo;
+    return monthlyRate * multiplier;
   };
 
-  // Track if monthly rate has been customized
-  const defaultRate = getDefaultMonthlyRate();
+  // Track if per-period rate has been customized
+  const defaultRate = getDefaultPerPeriodRate();
   const isRateCustomized = line.monthly_rate !== undefined && line.monthly_rate !== defaultRate;
 
-  // Auto-default monthly rate from price list when vehicle class is selected
+  // Calculate number of billing periods in the lease term
+  const calculateBillingPeriods = (): number => {
+    const totalMonths = line.duration_months || 0;
+    const { multiplier } = periodInfo;
+    return Math.ceil(totalMonths / multiplier);
+  };
+
+  const billingPeriods = calculateBillingPeriods();
+
+  // Auto-default per-period rate from price list when vehicle class is selected
   useEffect(() => {
     if (line.vehicle_class_id && (!line.monthly_rate || line.monthly_rate === 0)) {
-      const defaultRate = getDefaultMonthlyRate();
+      const defaultRate = getDefaultPerPeriodRate();
       onUpdate('monthly_rate', defaultRate);
     }
-  }, [line.vehicle_class_id, headerDefaults?.default_price_list_id]);
+  }, [line.vehicle_class_id, headerDefaults?.default_price_list_id, headerDefaults?.billing_plan]);
 
   // Auto-calculate lease term from dates
   useEffect(() => {
@@ -261,7 +293,7 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
 
           <div className="space-y-2">
             <Label htmlFor={`rate_${line.line_no}`} className="flex items-center gap-2">
-              {line.rate_type === 'daily' ? 'Daily' : line.rate_type === 'weekly' ? 'Weekly' : 'Monthly'} Rate (AED) *
+              Per Period Rate (AED/{periodInfo.abbrev}) *
               {isRateCustomized && (
                 <Badge variant="secondary" className="text-xs">Customized</Badge>
               )}
@@ -274,7 +306,7 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
                 step="100"
                 value={line.monthly_rate || ""}
                 onChange={(e) => onUpdate('monthly_rate', parseFloat(e.target.value) || 0)}
-                placeholder="Auto-defaulted from price list"
+                placeholder={`Auto-defaulted from price list (${periodInfo.label})`}
               />
               {isRateCustomized && (
                 <Button
@@ -290,7 +322,7 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
             </div>
             {errors[`${linePrefix}_rate`] && <FormError message={errors[`${linePrefix}_rate`]} />}
             <p className="text-xs text-muted-foreground">
-              Default from price list: {defaultRate.toFixed(2)} AED/month
+              Default from price list: {defaultRate.toFixed(2)} AED/{periodInfo.abbrev}
             </p>
           </div>
           
@@ -299,12 +331,15 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
             <Input
               id={`line_subtotal_${line.line_no}`}
               type="text"
-              value={`${((line.monthly_rate || 0) * (line.lease_term_months || 0)).toFixed(2)} AED`}
+              value={`${((line.monthly_rate || 0) * billingPeriods).toFixed(2)} AED`}
               disabled
               className="bg-muted font-semibold"
             />
             <p className="text-xs text-muted-foreground">
-              {line.monthly_rate || 0} AED/month × {line.lease_term_months || 0} months
+              {line.monthly_rate || 0} AED/{periodInfo.abbrev} × {billingPeriods} billing {billingPeriods === 1 ? 'period' : 'periods'}
+            </p>
+            <p className="text-xs text-blue-600 font-medium">
+              Contract: {line.duration_months || 0} months = {billingPeriods} × {periodInfo.label} billing cycles
             </p>
           </div>
         </div>
@@ -606,13 +641,29 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
                 </span>
               </div>
               <div className="flex justify-between text-sm border-t pt-2 mt-2">
-                <span className="font-semibold">Line Subtotal:</span>
-                <span className="font-bold text-primary">
-                  {((line.monthly_rate || 0) * (line.lease_term_months || 0)).toFixed(2)} AED
+                <span className="font-semibold">Rate:</span>
+                <span className="font-medium">
+                  {line.monthly_rate || 0} AED/{periodInfo.abbrev}
+                </span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="font-semibold">Billing Periods:</span>
+                <span className="font-medium">
+                  {billingPeriods} × {periodInfo.label}
+                </span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="font-semibold">Lease Term:</span>
+                <span className="font-medium">{line.lease_term_months || 0} months</span>
+              </div>
+              <div className="flex justify-between text-sm border-t pt-2 mt-2">
+                <span className="font-bold text-lg">Line Total:</span>
+                <span className="font-bold text-lg text-primary">
+                  {((line.monthly_rate || 0) * billingPeriods).toFixed(2)} AED
                 </span>
               </div>
               <p className="text-xs text-muted-foreground text-right">
-                {line.monthly_rate || 0} × {line.lease_term_months || 0} months
+                {line.monthly_rate || 0} AED/{periodInfo.abbrev} × {billingPeriods} billing {billingPeriods === 1 ? 'period' : 'periods'}
               </p>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Duration:</span>

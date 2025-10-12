@@ -27,6 +27,7 @@ interface VehicleLineTableProps {
     default_pickup_location_id?: string;
     default_return_location_id?: string;
     default_price_list_id?: string;
+    billing_plan?: string;
   };
 }
 

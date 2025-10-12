@@ -204,6 +204,7 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
                     default_pickup_location_id: data.default_pickup_location_id,
                     default_return_location_id: data.default_return_location_id,
                     default_price_list_id: data.default_price_list_id,
+                    billing_plan: data.billing_plan || 'monthly',
                   }}
         />
 
