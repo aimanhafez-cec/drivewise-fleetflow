@@ -54,8 +54,8 @@ export const TrainStopStepper: React.FC<TrainStopStepperProps> = ({
                   className={cn(
                     "rounded-full transition-all duration-300 flex items-center justify-center font-semibold",
                     "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
-                    isCompleted && "w-12 h-12 bg-green-600 hover:bg-green-700 hover:scale-110 cursor-pointer shadow-md",
-                    isCurrent && "w-14 h-14 bg-primary hover:bg-primary/90 animate-pulse cursor-pointer shadow-lg",
+                    isCompleted && "w-12 h-12 bg-green-600 hover:bg-green-700 cursor-pointer shadow-sm",
+                    isCurrent && "w-12 h-12 bg-primary hover:bg-primary/90 cursor-pointer shadow-sm",
                     isUpcoming && "w-12 h-12 border-2 border-muted-foreground/30 bg-background cursor-not-allowed"
                   )}
                   aria-label={`${step.title} - ${isCompleted ? 'Completed' : isCurrent ? 'Current' : 'Upcoming'}`}
@@ -118,8 +118,8 @@ export const TrainStopStepper: React.FC<TrainStopStepperProps> = ({
                 <div
                   className={cn(
                     "rounded-full flex items-center justify-center font-semibold flex-shrink-0 transition-all duration-300",
-                    isCompleted && "w-10 h-10 bg-green-600 shadow-md",
-                    isCurrent && "w-12 h-12 bg-primary animate-pulse shadow-lg",
+                    isCompleted && "w-10 h-10 bg-green-600 shadow-sm",
+                    isCurrent && "w-10 h-10 bg-primary shadow-sm",
                     isUpcoming && "w-10 h-10 border-2 border-muted-foreground/30 bg-background"
                   )}
                 >
