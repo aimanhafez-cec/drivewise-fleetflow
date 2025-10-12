@@ -257,8 +257,8 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-6xl max-h-[90vh] p-0">
-        <DialogHeader className="p-6 pb-4">
+      <DialogContent className="max-w-5xl max-h-[90vh] p-0 overflow-hidden">
+        <DialogHeader className="p-4 pb-3">
           <DialogTitle className="flex items-center gap-2">
             <Car className="h-5 w-5" />
             Select Vehicle
@@ -268,25 +268,25 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="px-6 space-y-4">
+        <div className="px-4 space-y-3">
           {/* Search Bar */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-3.5 w-3.5" />
             <Input
               placeholder="Search by vehicle class, make, model, or year..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
+              className="pl-10 h-9"
             />
           </div>
 
           {/* Filters Row */}
-          <div className="grid grid-cols-2 md:grid-cols-7 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
             {/* Vehicle Class */}
             <div className="space-y-1">
-              <Label className="text-xs">Vehicle Class</Label>
+              <Label className="text-[10px]">Vehicle Class</Label>
               <Select value={selectedClass} onValueChange={setSelectedClass}>
-                <SelectTrigger>
+                <SelectTrigger className="h-9">
                   <SelectValue placeholder="All Classes" />
                 </SelectTrigger>
                 <SelectContent>
@@ -302,9 +302,9 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
 
             {/* Make */}
             <div className="space-y-1">
-              <Label className="text-xs">Make</Label>
+              <Label className="text-[10px]">Make</Label>
               <Select value={selectedMake} onValueChange={setSelectedMake}>
-                <SelectTrigger>
+                <SelectTrigger className="h-9">
                   <SelectValue placeholder="All Makes" />
                 </SelectTrigger>
                 <SelectContent>
@@ -320,13 +320,13 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
 
             {/* Model */}
             <div className="space-y-1">
-              <Label className="text-xs">Model</Label>
+              <Label className="text-[10px]">Model</Label>
               <Select
                 value={selectedModel}
                 onValueChange={setSelectedModel}
                 disabled={selectedMake === 'all'}
               >
-                <SelectTrigger>
+                <SelectTrigger className="h-9">
                   <SelectValue placeholder="All Models" />
                 </SelectTrigger>
                 <SelectContent>
@@ -342,9 +342,9 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
 
             {/* Year */}
             <div className="space-y-1">
-              <Label className="text-xs">Year</Label>
+              <Label className="text-[10px]">Year</Label>
               <Select value={selectedYear} onValueChange={setSelectedYear}>
-                <SelectTrigger>
+                <SelectTrigger className="h-9">
                   <SelectValue placeholder="All Years" />
                 </SelectTrigger>
                 <SelectContent>
@@ -360,9 +360,9 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
 
             {/* Location */}
             <div className="space-y-1">
-              <Label className="text-xs">Location</Label>
+              <Label className="text-[10px]">Location</Label>
               <Select value={selectedLocation} onValueChange={setSelectedLocation}>
-                <SelectTrigger>
+                <SelectTrigger className="h-9">
                   <SelectValue placeholder="All Locations" />
                 </SelectTrigger>
                 <SelectContent>
@@ -378,12 +378,12 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
 
             {/* Show Available Only Toggle */}
             <div className="space-y-1">
-              <Label className="text-xs">&nbsp;</Label>
+              <Label className="text-[10px]">&nbsp;</Label>
               <Button
                 type="button"
                 variant={showAvailableOnly ? "default" : "outline"}
                 onClick={() => setShowAvailableOnly(!showAvailableOnly)}
-                className="w-full"
+                className="w-full h-9"
               >
                 {showAvailableOnly ? (
                   <>
@@ -398,12 +398,12 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
 
             {/* Reset Button */}
             <div className="space-y-1">
-              <Label className="text-xs">&nbsp;</Label>
+              <Label className="text-[10px]">&nbsp;</Label>
               <Button
                 type="button"
                 variant="outline"
                 onClick={resetFilters}
-                className="w-full"
+                className="w-full h-9"
               >
                 <X className="h-4 w-4 mr-1" />
                 Reset
@@ -424,7 +424,7 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
         </div>
 
         {/* Vehicle Table */}
-        <ScrollArea className="h-96 px-6">
+        <ScrollArea className="h-80 px-4">
           {isLoading ? (
             <div className="space-y-2">
               {[1, 2, 3, 4, 5].map((i) => (
@@ -444,7 +444,7 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
       <table className="w-full">
         <thead className="bg-muted">
           <tr>
-            <th className="text-center p-3 text-sm font-semibold w-12">
+            <th className="text-center p-2 text-xs font-semibold w-12">
               <input
                 type="checkbox"
                 checked={selectAll}
@@ -452,12 +452,12 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
                 className="h-4 w-4 rounded border-gray-300"
               />
             </th>
-            <th className="text-left p-3 text-sm font-semibold">Vehicle Class</th>
-                    <th className="text-left p-3 text-sm font-semibold">Make</th>
-                    <th className="text-left p-3 text-sm font-semibold">Model</th>
-                    <th className="text-center p-3 text-sm font-semibold">Year</th>
-                    <th className="text-center p-3 text-sm font-semibold">Available Qty</th>
-                    <th className="text-center p-3 text-sm font-semibold w-32">Action</th>
+            <th className="text-left p-2 text-xs font-semibold">Vehicle Class</th>
+                    <th className="text-left p-2 text-xs font-semibold">Make</th>
+                    <th className="text-left p-2 text-xs font-semibold">Model</th>
+                    <th className="text-center p-2 text-xs font-semibold">Year</th>
+                    <th className="text-center p-2 text-xs font-semibold">Available Qty</th>
+                    <th className="text-center p-2 text-xs font-semibold w-32">Action</th>
                   </tr>
                 </thead>
         <tbody>
@@ -472,7 +472,7 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
                 }`}
                 onClick={() => handleToggleItemCode(itemCode)}
               >
-                <td className="p-3 text-center">
+                <td className="p-2 text-center">
                   <input
                     type="checkbox"
                     checked={isSelected}
@@ -481,21 +481,21 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
                     className="h-4 w-4 rounded border-gray-300"
                   />
                 </td>
-                <td className="p-3">
-                  <Badge variant="outline">{itemCode.category_name}</Badge>
+                <td className="p-2 text-xs">
+                  <Badge variant="outline" className="text-xs">{itemCode.category_name}</Badge>
                 </td>
-                        <td className="p-3 font-medium">{itemCode.make}</td>
-                        <td className="p-3">{itemCode.model}</td>
-                        <td className="p-3 text-center">{itemCode.year}</td>
-                        <td className="p-3 text-center">
+                        <td className="p-2 text-xs font-medium">{itemCode.make}</td>
+                        <td className="p-2 text-xs">{itemCode.model}</td>
+                        <td className="p-2 text-xs text-center">{itemCode.year}</td>
+                        <td className="p-2 text-xs text-center">
                           <Badge
                             variant={itemCode.available_qty > 0 ? "default" : "secondary"}
-                            className={itemCode.available_qty > 0 ? "bg-green-600" : ""}
+                            className={itemCode.available_qty > 0 ? "bg-green-600 text-xs" : "text-xs"}
                           >
                             {itemCode.available_qty} / {itemCode.total_qty}
                           </Badge>
                         </td>
-                <td className="p-3 text-center">
+                <td className="p-2 text-center">
                   {isSelected && (
                     <Badge variant="default">
                       <Check className="h-3 w-3 mr-1" />
@@ -512,7 +512,7 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
           )}
         </ScrollArea>
 
-<DialogFooter className="p-6 pt-4 border-t">
+<DialogFooter className="p-4 pt-3 border-t">
   <div className="flex items-center justify-between w-full">
     <div className="text-sm text-muted-foreground">
       {selectedItemCodes.length > 0 ? (
