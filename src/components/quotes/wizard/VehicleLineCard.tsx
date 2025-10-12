@@ -1,13 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Trash2, Car } from "lucide-react";
+import { Trash2, Car, Edit, X } from "lucide-react";
 import { useVehicles, useVehicleCategories } from "@/hooks/useVehicles";
 import { useLocations } from "@/hooks/useBusinessLOVs";
 import { FormError } from "@/components/ui/form-error";
+import { VehicleSelectionModal } from '../VehicleSelectionModal';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 interface VehicleLineCardProps {
   line: {
@@ -51,9 +54,32 @@ export const VehicleLineCard: React.FC<VehicleLineCardProps> = ({
   errors,
   depositType,
 }) => {
+  const [vehicleModalOpen, setVehicleModalOpen] = useState(false);
+  
   const { data: vehicles = [], isLoading: vehiclesLoading } = useVehicles();
   const { data: categories = [], isLoading: categoriesLoading } = useVehicleCategories();
   const { items: locations = [], isLoading: locationsLoading } = useLocations();
+
+  // Fetch selected vehicle details
+  const { data: selectedVehicle } = useQuery({
+    queryKey: ['vehicle', line.vehicle_id],
+    queryFn: async () => {
+      if (!line.vehicle_id) return null;
+      const { data, error } = await supabase
+        .from('vehicles')
+        .select(`
+          id, make, model, year, license_plate, vin, odometer,
+          status, daily_rate, monthly_rate, category_id,
+          categories!inner (id, name, icon)
+        `)
+        .eq('id', line.vehicle_id)
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!line.vehicle_id,
+  });
 
   // Auto-populate VIN and odometer when vehicle is selected
   React.useEffect(() => {
@@ -109,103 +135,113 @@ export const VehicleLineCard: React.FC<VehicleLineCardProps> = ({
           </Button>
         </div>
 
-        {/* SECTION 1: Vehicle Identification */}
+        {/* SECTION 1: Vehicle Selection */}
         <div className="mb-6">
-          <h4 className="text-sm font-semibold mb-3 text-muted-foreground">Vehicle Identification</h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            
-            {/* VIN Input */}
-            <div className="space-y-2">
-              <Label htmlFor={`vin_${line.line_no}`}>VIN Number</Label>
-              <Input
-                id={`vin_${line.line_no}`}
-                type="text"
-                value={line.vin || ""}
-                onChange={(e) => onUpdate('vin', e.target.value)}
-                placeholder="1HGBH41JXMN109186"
-                maxLength={17}
-              />
-              <p className="text-xs text-muted-foreground">17 characters - auto-fills when vehicle selected</p>
-              {errors[`${linePrefix}_vin`] && <FormError message={errors[`${linePrefix}_vin`]} />}
-            </div>
-
-            {/* Vehicle Category */}
-            <div className="space-y-2">
-              <Label htmlFor={`vehicle_class_${line.line_no}`}>Vehicle Category *</Label>
-              <Select
-                value={line.vehicle_class_id || ""}
-                onValueChange={(value) => {
-                  onUpdate('vehicle_class_id', value);
-                  onUpdate('vehicle_id', undefined);
-                  onUpdate('vin', '');
-                  onUpdate('odometer', 0);
-                }}
-              >
-                <SelectTrigger id={`vehicle_class_${line.line_no}`}>
-                  <SelectValue placeholder="Select category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categoriesLoading ? (
-                    <SelectItem value="__loading__" disabled>Loading...</SelectItem>
-                  ) : categories.length === 0 ? (
-                    <SelectItem value="__none__" disabled>No categories</SelectItem>
-                  ) : (
-                    categories.map((cat) => (
-                      <SelectItem key={cat.id} value={cat.id}>
-                        {cat.name}
-                      </SelectItem>
-                    ))
-                  )}
-                </SelectContent>
-              </Select>
-              {errors[`${linePrefix}_vehicle`] && <FormError message={errors[`${linePrefix}_vehicle`]} />}
-            </div>
-
-            {/* Specific Vehicle */}
-            <div className="space-y-2">
-              <Label htmlFor={`vehicle_${line.line_no}`}>Specific Vehicle (Optional)</Label>
-              <Select
-                value={line.vehicle_id || ""}
-                onValueChange={(value) => onUpdate('vehicle_id', value === "__none__" ? undefined : value)}
-                disabled={!line.vehicle_class_id}
-              >
-                <SelectTrigger id={`vehicle_${line.line_no}`}>
-                  <SelectValue placeholder="Any from category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {vehiclesLoading ? (
-                    <SelectItem value="__loading__" disabled>Loading...</SelectItem>
-                  ) : (
-                    <>
-                      <SelectItem value="__none__">Any from category</SelectItem>
-                      {vehicles
-                        .filter(v => !line.vehicle_class_id || v.category_id === line.vehicle_class_id)
-                        .map(v => (
-                          <SelectItem key={v.id} value={v.id}>
-                            {v.year} {v.make} {v.model} - {v.license_plate}
-                          </SelectItem>
-                        ))
-                      }
-                    </>
-                  )}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Odometer (read-only) */}
-            <div className="space-y-2">
-              <Label htmlFor={`odometer_${line.line_no}`}>Current Odometer (km)</Label>
-              <Input
-                id={`odometer_${line.line_no}`}
-                type="number"
-                value={line.odometer || 0}
-                disabled
-                className="bg-muted"
-              />
-              <p className="text-xs text-muted-foreground">Auto-filled from vehicle record</p>
-            </div>
-          </div>
+          <h4 className="text-sm font-semibold mb-3 text-muted-foreground">
+            Vehicle Selection
+          </h4>
+          
+          {!line.vehicle_id ? (
+            // No vehicle selected - show selection button
+            <Button
+              type="button"
+              variant="outline"
+              size="lg"
+              onClick={() => setVehicleModalOpen(true)}
+              className="w-full h-24 border-dashed border-2"
+            >
+              <div className="flex flex-col items-center gap-2">
+                <Car className="h-8 w-8 text-muted-foreground" />
+                <span className="text-lg">Select Vehicle</span>
+                <span className="text-xs text-muted-foreground">
+                  Click to browse and select a vehicle
+                </span>
+              </div>
+            </Button>
+          ) : (
+            // Vehicle selected - show summary card with edit button
+            <Card className="border-2 border-primary bg-primary/5">
+              <CardContent className="p-4">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Car className="h-5 w-5 text-primary" />
+                      <span className="font-semibold text-lg">
+                        {selectedVehicle?.year} {selectedVehicle?.make} {selectedVehicle?.model}
+                      </span>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-2 text-sm">
+                      <div>
+                        <span className="text-muted-foreground">License:</span>
+                        <span className="ml-2 font-medium">{selectedVehicle?.license_plate}</span>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">Category:</span>
+                        <span className="ml-2 font-medium">{selectedVehicle?.categories?.name || 'N/A'}</span>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">VIN:</span>
+                        <span className="ml-2 font-mono text-xs">{line.vin || 'N/A'}</span>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">Odometer:</span>
+                        <span className="ml-2">{line.odometer?.toLocaleString() || 0} km</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex flex-col gap-2">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setVehicleModalOpen(true)}
+                    >
+                      <Edit className="h-4 w-4 mr-1" />
+                      Change
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        onUpdate('vehicle_id', undefined);
+                        onUpdate('vehicle_class_id', undefined);
+                        onUpdate('vin', '');
+                        onUpdate('odometer', 0);
+                      }}
+                      className="text-destructive hover:text-destructive"
+                    >
+                      <X className="h-4 w-4 mr-1" />
+                      Clear
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+          
+          {errors[`${linePrefix}_vehicle`] && (
+            <FormError message={errors[`${linePrefix}_vehicle`]} />
+          )}
         </div>
+
+        {/* Vehicle Selection Modal */}
+        <VehicleSelectionModal
+          open={vehicleModalOpen}
+          onOpenChange={setVehicleModalOpen}
+          selectedVehicleId={line.vehicle_id}
+          onVehicleSelect={(vehicle) => {
+            onUpdate('vehicle_id', vehicle.id);
+            onUpdate('vehicle_class_id', vehicle.category_id);
+            onUpdate('vin', vehicle.vin);
+            onUpdate('odometer', vehicle.odometer);
+            setVehicleModalOpen(false);
+          }}
+          quoteStartDate={line.pickup_at}
+          quoteEndDate={line.return_at}
+        />
 
         {/* SECTION 2: Location & Branch */}
         <div className="mb-6">
