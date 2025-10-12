@@ -108,7 +108,37 @@ export const QuoteWizardStep1: React.FC<QuoteWizardStep1Props> = ({
             </div>
           </div>
 
-          {/* Row 2: Opportunity & Quote Details */}
+          {/* Row 2: Sales Office & Sales Rep */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="sales_office_id">Sales Office *</Label>
+              <SalesOfficeSelect
+                value={data.sales_office_id || ""}
+                onChange={(value) => {
+                  onChange({ sales_office_id: value, sales_rep_id: null });
+                }}
+                placeholder="Select sales office"
+              />
+              {errors.sales_office_id && (
+                <p className="text-sm text-destructive">{errors.sales_office_id}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="sales_rep_id">Sales Rep. *</Label>
+              <SalesRepSelect
+                salesOfficeId={data.sales_office_id}
+                value={data.sales_rep_id || ""}
+                onChange={(value) => onChange({ sales_rep_id: value })}
+                placeholder="Select sales representative"
+              />
+              {errors.sales_rep_id && (
+                <p className="text-sm text-destructive">{errors.sales_rep_id}</p>
+              )}
+            </div>
+          </div>
+
+          {/* Row 3: Opportunity & Quote Details */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="opportunity_id">Opportunity ID (Optional)</Label>
@@ -157,7 +187,7 @@ export const QuoteWizardStep1: React.FC<QuoteWizardStep1Props> = ({
             />
           </div>
 
-          {/* Row 3: Customer Type & Customer Details */}
+          {/* Row 4: Customer Type & Customer Details */}
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="customer_type">Customer Type *</Label>
@@ -288,36 +318,6 @@ export const QuoteWizardStep1: React.FC<QuoteWizardStep1Props> = ({
                 </div>
               </div>
             )}
-          </div>
-
-          {/* Row 4: Sales Office & Sales Rep */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="sales_office_id">Sales Office *</Label>
-              <SalesOfficeSelect
-                value={data.sales_office_id || ""}
-                onChange={(value) => {
-                  onChange({ sales_office_id: value, sales_rep_id: null });
-                }}
-                placeholder="Select sales office"
-              />
-              {errors.sales_office_id && (
-                <p className="text-sm text-destructive">{errors.sales_office_id}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="sales_rep_id">Sales Rep. *</Label>
-              <SalesRepSelect
-                salesOfficeId={data.sales_office_id}
-                value={data.sales_rep_id || ""}
-                onChange={(value) => onChange({ sales_rep_id: value })}
-                placeholder="Select sales representative"
-              />
-              {errors.sales_rep_id && (
-                <p className="text-sm text-destructive">{errors.sales_rep_id}</p>
-              )}
-            </div>
           </div>
 
           {/* Row 5: Quote Entry Date, Status & Win/Loss Reason */}
