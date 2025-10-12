@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Trash2, Car, Edit, X } from "lucide-react";
 import { useVehicles, useVehicleCategories } from "@/hooks/useVehicles";
@@ -81,16 +82,7 @@ export const VehicleLineCard: React.FC<VehicleLineCardProps> = ({
     enabled: !!line.vehicle_id,
   });
 
-  // Auto-populate VIN and odometer when vehicle is selected
-  React.useEffect(() => {
-    if (line.vehicle_id && vehicles.length > 0) {
-      const selectedVehicle = vehicles.find(v => v.id === line.vehicle_id);
-      if (selectedVehicle) {
-        onUpdate('vin', (selectedVehicle as any).vin || '');
-        onUpdate('odometer', selectedVehicle.odometer || 0);
-      }
-    }
-  }, [line.vehicle_id, vehicles]);
+  // Note: VIN and odometer auto-population removed - not needed at quotation stage
 
   // Calculate duration in months
   React.useEffect(() => {
@@ -173,18 +165,22 @@ export const VehicleLineCard: React.FC<VehicleLineCardProps> = ({
                     
                     <div className="grid grid-cols-2 gap-2 text-sm">
                       <div>
-                        <span className="text-muted-foreground">License:</span>
-                        <span className="ml-2 font-medium">{selectedVehicle?.license_plate}</span>
-                      </div>
-                      <div>
                         <span className="text-muted-foreground">Category:</span>
-                        <span className="ml-2 font-medium">{selectedVehicle?.categories?.name || 'N/A'}</span>
+                        <span className="ml-2 font-medium">
+                          {selectedVehicle?.categories?.name || 'N/A'}
+                        </span>
                       </div>
                       <div>
-                        <span className="text-muted-foreground">Odometer:</span>
-                        <span className="ml-2">{line.odometer?.toLocaleString() || 0} km</span>
+                        <span className="text-muted-foreground">Available:</span>
+                        <Badge variant="outline" className="ml-2">
+                          {(selectedVehicle as any)?._itemCodeMeta?.available_qty || 0} vehicles
+                        </Badge>
                       </div>
                     </div>
+                    
+                    <p className="text-xs text-muted-foreground">
+                      Note: Specific VIN will be assigned when converting to agreement
+                    </p>
                   </div>
                   
                   <div className="flex flex-col gap-2">
@@ -204,8 +200,6 @@ export const VehicleLineCard: React.FC<VehicleLineCardProps> = ({
                       onClick={() => {
                         onUpdate('vehicle_id', undefined);
                         onUpdate('vehicle_class_id', undefined);
-                        onUpdate('vin', '');
-                        onUpdate('odometer', 0);
                       }}
                       className="text-destructive hover:text-destructive"
                     >
@@ -231,8 +225,6 @@ export const VehicleLineCard: React.FC<VehicleLineCardProps> = ({
           onVehicleSelect={(vehicle) => {
             onUpdate('vehicle_id', vehicle.id);
             onUpdate('vehicle_class_id', vehicle.category_id);
-            onUpdate('vin', vehicle.vin);
-            onUpdate('odometer', vehicle.odometer);
             setVehicleModalOpen(false);
           }}
           quoteStartDate={line.pickup_at}
