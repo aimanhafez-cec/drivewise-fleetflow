@@ -26,8 +26,18 @@ export const TrainStopStepper: React.FC<TrainStopStepperProps> = ({
       {/* Desktop: Horizontal Layout */}
       <div className="hidden md:block">
         <div className="relative flex items-center justify-between">
-          {/* Background connecting line */}
+          {/* Gray background line */}
           <div className="absolute top-6 left-0 right-0 h-0.5 bg-border z-0" />
+          
+          {/* Green progress overlay */}
+          {completedSteps.length > 0 && (
+            <div 
+              className="absolute top-6 left-0 h-0.5 bg-green-600 z-[1] transition-all duration-500"
+              style={{ 
+                width: `${(completedSteps.length / (steps.length - 1)) * 100}%` 
+              }}
+            />
+          )}
           
           {steps.map((step, index) => {
             const isCompleted = completedSteps.includes(step.id);
@@ -36,7 +46,7 @@ export const TrainStopStepper: React.FC<TrainStopStepperProps> = ({
             const isClickable = step.id <= currentStep;
 
             return (
-              <div key={step.id} className="flex flex-col items-center relative z-10 flex-1">
+              <div key={step.id} className="flex flex-col items-center relative z-20 flex-1">
                 {/* Circle */}
                 <button
                   onClick={() => isClickable && onStepClick(step.id)}
@@ -62,18 +72,6 @@ export const TrainStopStepper: React.FC<TrainStopStepperProps> = ({
                     </span>
                   )}
                 </button>
-                
-                {/* Connecting line segment */}
-                {index < steps.length - 1 && (
-                  <div 
-                    className={cn(
-                      "absolute top-6 left-1/2 h-0.5 z-0",
-                      "transition-all duration-300",
-                      isCompleted ? "bg-green-600 w-full" : "bg-border w-full"
-                    )}
-                    style={{ width: 'calc(100% + 1rem)' }}
-                  />
-                )}
                 
                 {/* Label */}
                 <span className={cn(
@@ -155,12 +153,12 @@ export const TrainStopStepper: React.FC<TrainStopStepperProps> = ({
 
               {/* Vertical connecting line */}
               {index < steps.length - 1 && (
-                <div 
-                  className={cn(
-                    "absolute left-[29px] top-[52px] w-0.5 h-8 transition-all duration-300",
-                    isCompleted ? "bg-green-600" : "bg-border"
+                <div className="absolute left-[29px] top-[52px] w-0.5 h-8">
+                  <div className="w-full h-full bg-border" />
+                  {isCompleted && (
+                    <div className="absolute top-0 left-0 w-full h-full bg-green-600 transition-all duration-500" />
                   )}
-                />
+                </div>
               )}
             </div>
           );
