@@ -263,12 +263,12 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
             <Car className="h-5 w-5" />
             Select Vehicle
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-xs text-muted-foreground">
             Search and filter to find the perfect vehicle for this quote line.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="px-4 space-y-3">
+        <div className="px-4 space-y-2">
           {/* Search Bar */}
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-3.5 w-3.5" />
@@ -283,7 +283,7 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
           {/* Filters Row */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
             {/* Vehicle Class */}
-            <div className="space-y-1">
+            <div className="space-y-0.5">
               <Label className="text-[10px]">Vehicle Class</Label>
               <Select value={selectedClass} onValueChange={setSelectedClass}>
                 <SelectTrigger className="h-9">
@@ -301,7 +301,7 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
             </div>
 
             {/* Make */}
-            <div className="space-y-1">
+            <div className="space-y-0.5">
               <Label className="text-[10px]">Make</Label>
               <Select value={selectedMake} onValueChange={setSelectedMake}>
                 <SelectTrigger className="h-9">
@@ -319,7 +319,7 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
             </div>
 
             {/* Model */}
-            <div className="space-y-1">
+            <div className="space-y-0.5">
               <Label className="text-[10px]">Model</Label>
               <Select
                 value={selectedModel}
@@ -341,7 +341,7 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
             </div>
 
             {/* Year */}
-            <div className="space-y-1">
+            <div className="space-y-0.5">
               <Label className="text-[10px]">Year</Label>
               <Select value={selectedYear} onValueChange={setSelectedYear}>
                 <SelectTrigger className="h-9">
@@ -359,7 +359,7 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
             </div>
 
             {/* Location */}
-            <div className="space-y-1">
+            <div className="space-y-0.5">
               <Label className="text-[10px]">Location</Label>
               <Select value={selectedLocation} onValueChange={setSelectedLocation}>
                 <SelectTrigger className="h-9">
@@ -377,7 +377,7 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
             </div>
 
             {/* Show Available Only Toggle */}
-            <div className="space-y-1">
+            <div className="space-y-0.5">
               <Label className="text-[10px]">&nbsp;</Label>
               <Button
                 type="button"
@@ -397,7 +397,7 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
             </div>
 
             {/* Reset Button */}
-            <div className="space-y-1">
+            <div className="space-y-0.5">
               <Label className="text-[10px]">&nbsp;</Label>
               <Button
                 type="button"
@@ -412,7 +412,7 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
           </div>
 
           {/* Results Count */}
-          <div className="text-sm text-muted-foreground">
+          <div className="text-xs text-muted-foreground bg-muted/30 px-3 py-1.5 rounded-md inline-block">
             {isLoading ? (
               'Loading vehicles...'
             ) : (
@@ -424,7 +424,7 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
         </div>
 
         {/* Vehicle Table */}
-        <ScrollArea className="h-80 px-4">
+        <ScrollArea className="h-80 px-4 pt-2">
           {isLoading ? (
             <div className="space-y-2">
               {[1, 2, 3, 4, 5].map((i) => (
@@ -442,7 +442,7 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
           ) : (
             <div className="border rounded-lg overflow-hidden">
       <table className="w-full">
-        <thead className="bg-muted">
+        <thead className="bg-muted sticky top-0 z-10">
           <tr>
             <th className="text-center p-2 text-xs font-semibold w-12">
               <input
@@ -457,7 +457,6 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
                     <th className="text-left p-2 text-xs font-semibold">Model</th>
                     <th className="text-center p-2 text-xs font-semibold">Year</th>
                     <th className="text-center p-2 text-xs font-semibold">Available Qty</th>
-                    <th className="text-center p-2 text-xs font-semibold w-32">Action</th>
                   </tr>
                 </thead>
         <tbody>
@@ -495,14 +494,6 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
                             {itemCode.available_qty} / {itemCode.total_qty}
                           </Badge>
                         </td>
-                <td className="p-2 text-center">
-                  {isSelected && (
-                    <Badge variant="default">
-                      <Check className="h-3 w-3 mr-1" />
-                      Selected
-                    </Badge>
-                  )}
-                </td>
                       </tr>
                     );
                   })}
