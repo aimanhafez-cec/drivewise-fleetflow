@@ -429,6 +429,7 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
 
             {/* Show Available Only Toggle */}
             <div>
+              <Label className="text-[10px] opacity-0">Filter</Label>
               <Button
                 type="button"
                 variant={showAvailableOnly ? "default" : "outline"}
@@ -448,6 +449,7 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
 
             {/* Reset Button */}
             <div>
+              <Label className="text-[10px] opacity-0">Actions</Label>
               <Button
                 type="button"
                 variant="outline"
