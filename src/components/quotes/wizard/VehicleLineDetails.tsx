@@ -24,22 +24,45 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
 
   return (
     <div className="space-y-6 max-w-6xl">
-      {/* Vehicle Info Summary */}
-      <Card className="bg-background">
-        <CardContent className="pt-4">
-          <h4 className="font-semibold mb-2">Vehicle Line {line.line_no}</h4>
-          <p className="text-sm text-muted-foreground">
-            {line._vehicleMeta 
-              ? `${line._vehicleMeta.year} ${line._vehicleMeta.make} ${line._vehicleMeta.model} (${line._vehicleMeta.category_name})`
-              : 'Vehicle not selected'}
-          </p>
-          {line._vehicleMeta?._itemCodeMeta && (
-            <p className="text-xs text-muted-foreground mt-1">
-              {line._vehicleMeta._itemCodeMeta.available_qty} vehicles available
-            </p>
-          )}
-        </CardContent>
-      </Card>
+      {/* Item Master Information */}
+      {line._vehicleMeta && (
+        <Card className="bg-blue-50 border-blue-200">
+          <CardContent className="pt-4">
+            <h4 className="font-semibold text-sm mb-3">Vehicle Specification - Line {line.line_no}</h4>
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-3 text-sm">
+              <div>
+                <span className="text-muted-foreground text-xs">Item Code:</span>
+                <div className="font-mono font-semibold text-primary">
+                  {line._vehicleMeta.item_code || 'N/A'}
+                </div>
+              </div>
+              <div>
+                <span className="text-muted-foreground text-xs">Make:</span>
+                <div className="font-medium">{line._vehicleMeta.make}</div>
+              </div>
+              <div>
+                <span className="text-muted-foreground text-xs">Model:</span>
+                <div className="font-medium">{line._vehicleMeta.model}</div>
+              </div>
+              <div>
+                <span className="text-muted-foreground text-xs">Year:</span>
+                <div className="font-medium">{line._vehicleMeta.year}</div>
+              </div>
+              {line._vehicleMeta.color && (
+                <div>
+                  <span className="text-muted-foreground text-xs">Color:</span>
+                  <div className="font-medium">{line._vehicleMeta.color}</div>
+                </div>
+              )}
+            </div>
+            <div className="mt-2 text-xs text-muted-foreground">
+              {line._vehicleMeta._itemCodeMeta && (
+                <span>{line._vehicleMeta._itemCodeMeta.available_qty} vehicles available</span>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {/* SECTION 1: Location & Branch */}

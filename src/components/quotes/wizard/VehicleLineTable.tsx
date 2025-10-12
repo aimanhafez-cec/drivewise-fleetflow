@@ -65,7 +65,8 @@ export const VehicleLineTable: React.FC<VehicleLineTableProps> = ({
               />
             </TableHead>
             <TableHead className="w-12">#</TableHead>
-            <TableHead>Vehicle</TableHead>
+            <TableHead className="min-w-[140px]">Item Code</TableHead>
+            <TableHead className="min-w-[250px]">Item Description</TableHead>
             <TableHead>Category</TableHead>
             <TableHead>Start Date</TableHead>
             <TableHead className="text-right">Duration</TableHead>
@@ -77,9 +78,9 @@ export const VehicleLineTable: React.FC<VehicleLineTableProps> = ({
         <TableBody>
           {lines.map((line, index) => {
             const isExpanded = expandedLines.includes(line.line_no);
-            const vehicleDisplay = line._vehicleMeta 
-              ? `${line._vehicleMeta.year} ${line._vehicleMeta.make} ${line._vehicleMeta.model}`
-              : 'Not selected';
+            const itemCode = line._vehicleMeta?.item_code || 'N/A';
+            const itemDescription = line._vehicleMeta?.item_description || 
+              (line._vehicleMeta ? `${line._vehicleMeta.year} ${line._vehicleMeta.make} ${line._vehicleMeta.model}` : 'Not selected');
             const category = line._vehicleMeta?.category_name || 'N/A';
             
             return (
@@ -92,7 +93,17 @@ export const VehicleLineTable: React.FC<VehicleLineTableProps> = ({
                     />
                   </TableCell>
                   <TableCell className="font-medium">{line.line_no}</TableCell>
-                  <TableCell className="font-medium">{vehicleDisplay}</TableCell>
+                  <TableCell className="font-mono text-xs font-semibold text-primary">
+                    {itemCode}
+                  </TableCell>
+                  <TableCell className="font-medium">
+                    {itemDescription}
+                    {line._vehicleMeta?.color && (
+                      <div className="text-xs text-muted-foreground mt-1">
+                        Color: {line._vehicleMeta.color}
+                      </div>
+                    )}
+                  </TableCell>
                   <TableCell>
                     <Badge variant="outline">{category}</Badge>
                   </TableCell>
@@ -131,7 +142,7 @@ export const VehicleLineTable: React.FC<VehicleLineTableProps> = ({
                 
                 {isExpanded && (
                   <TableRow>
-                    <TableCell colSpan={9} className="bg-muted/30 p-6">
+                    <TableCell colSpan={10} className="bg-muted/30 p-6">
                       <VehicleLineDetails
                         line={line}
                         onUpdate={(field, value) => onUpdate(index, field, value)}

@@ -62,7 +62,11 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
         make: vehicle.make,
         model: vehicle.model,
         year: vehicle.year,
+        color: vehicle.color,
+        item_code: vehicle.item_code,
+        item_description: vehicle.item_description,
         category_name: vehicle._itemCodeMeta?.category_name || vehicle.categories?.name,
+        colors: vehicle._itemCodeMeta?.colors || [],
         _itemCodeMeta: vehicle._itemCodeMeta,
       },
     }));
