@@ -433,14 +433,14 @@ export const VehicleLineCard: React.FC<VehicleLineCardProps> = ({
             <div className="space-y-2">
               <Label htmlFor={`ins_pkg_${line.line_no}`}>Coverage Package</Label>
               <Select
-                value={line.insurance_coverage_package || ""}
-                onValueChange={(value) => onUpdate('insurance_coverage_package', value)}
+                value={line.insurance_coverage_package || "inherit"}
+                onValueChange={(value) => onUpdate('insurance_coverage_package', value === 'inherit' ? undefined : value)}
               >
                 <SelectTrigger id={`ins_pkg_${line.line_no}`}>
                   <SelectValue placeholder="Use header default" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Use header default</SelectItem>
+                  <SelectItem value="inherit">Use header default</SelectItem>
                   <SelectItem value="cdw">CDW</SelectItem>
                   <SelectItem value="comprehensive">Comprehensive</SelectItem>
                   <SelectItem value="full-zero-excess">Full / Zero Excess</SelectItem>
@@ -466,14 +466,14 @@ export const VehicleLineCard: React.FC<VehicleLineCardProps> = ({
             <div className="space-y-2">
               <Label htmlFor={`ins_terr_${line.line_no}`}>Territorial Coverage</Label>
               <Select
-                value={line.insurance_territorial_coverage || ""}
-                onValueChange={(value) => onUpdate('insurance_territorial_coverage', value)}
+                value={line.insurance_territorial_coverage || "inherit"}
+                onValueChange={(value) => onUpdate('insurance_territorial_coverage', value === 'inherit' ? undefined : value)}
               >
                 <SelectTrigger id={`ins_terr_${line.line_no}`}>
                   <SelectValue placeholder="Use header default" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Use header default</SelectItem>
+                  <SelectItem value="inherit">Use header default</SelectItem>
                   <SelectItem value="uae-only">UAE Only</SelectItem>
                   <SelectItem value="gcc">GCC Coverage</SelectItem>
                 </SelectContent>
