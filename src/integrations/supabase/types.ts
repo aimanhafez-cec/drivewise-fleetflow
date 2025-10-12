@@ -768,15 +768,22 @@ export type Database = {
           actual_return_date: string | null
           additional_services: Json | null
           agreement_id: string
+          category_name: string | null
           cost_center_id: string | null
           created_at: string
           excess_km_rate_aed: number | null
+          exterior_color: string | null
           id: string
           included_services: Json | null
+          item_code: string | null
+          item_description: string | null
           lease_end_date: string | null
           lease_start_date: string
           line_number: number
           line_status: string
+          make: string | null
+          model: string | null
+          model_year: number | null
           monthly_km_allowance: number | null
           monthly_rate_aed: number
           pickup_location_id: string | null
@@ -794,15 +801,22 @@ export type Database = {
           actual_return_date?: string | null
           additional_services?: Json | null
           agreement_id: string
+          category_name?: string | null
           cost_center_id?: string | null
           created_at?: string
           excess_km_rate_aed?: number | null
+          exterior_color?: string | null
           id?: string
           included_services?: Json | null
+          item_code?: string | null
+          item_description?: string | null
           lease_end_date?: string | null
           lease_start_date: string
           line_number: number
           line_status?: string
+          make?: string | null
+          model?: string | null
+          model_year?: number | null
           monthly_km_allowance?: number | null
           monthly_rate_aed: number
           pickup_location_id?: string | null
@@ -820,15 +834,22 @@ export type Database = {
           actual_return_date?: string | null
           additional_services?: Json | null
           agreement_id?: string
+          category_name?: string | null
           cost_center_id?: string | null
           created_at?: string
           excess_km_rate_aed?: number | null
+          exterior_color?: string | null
           id?: string
           included_services?: Json | null
+          item_code?: string | null
+          item_description?: string | null
           lease_end_date?: string | null
           lease_start_date?: string
           line_number?: number
           line_status?: string
+          make?: string | null
+          model?: string | null
+          model_year?: number | null
           monthly_km_allowance?: number | null
           monthly_rate_aed?: number
           pickup_location_id?: string | null
@@ -1563,6 +1584,96 @@ export type Database = {
         }
         Relationships: []
       }
+      location_lov: {
+        Row: {
+          address: Json | null
+          business_hours: Json | null
+          city: string
+          code: string
+          contact_email: string | null
+          contact_phone: string | null
+          coordinates: Json | null
+          created_at: string
+          display_order: number | null
+          id: string
+          is_active: boolean | null
+          name: string
+          terminal: string | null
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          address?: Json | null
+          business_hours?: Json | null
+          city: string
+          code: string
+          contact_email?: string | null
+          contact_phone?: string | null
+          coordinates?: Json | null
+          created_at?: string
+          display_order?: number | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          terminal?: string | null
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          address?: Json | null
+          business_hours?: Json | null
+          city?: string
+          code?: string
+          contact_email?: string | null
+          contact_phone?: string | null
+          coordinates?: Json | null
+          created_at?: string
+          display_order?: number | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          terminal?: string | null
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          created_at: string
+          id: string
+          link: string | null
+          message: string
+          read: boolean
+          title: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          link?: string | null
+          message: string
+          read?: boolean
+          title: string
+          type?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          link?: string | null
+          message?: string
+          read?: boolean
+          title?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       opportunities: {
         Row: {
           created_at: string
@@ -1766,6 +1877,54 @@ export type Database = {
           total_spent?: number | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      promo_codes: {
+        Row: {
+          applicable_vehicle_categories: string[] | null
+          code: string
+          created_at: string | null
+          discount_type: string
+          discount_value: number
+          id: string
+          is_active: boolean | null
+          min_booking_amount: number | null
+          updated_at: string | null
+          usage_limit: number | null
+          used_count: number | null
+          valid_from: string
+          valid_to: string
+        }
+        Insert: {
+          applicable_vehicle_categories?: string[] | null
+          code: string
+          created_at?: string | null
+          discount_type: string
+          discount_value: number
+          id?: string
+          is_active?: boolean | null
+          min_booking_amount?: number | null
+          updated_at?: string | null
+          usage_limit?: number | null
+          used_count?: number | null
+          valid_from: string
+          valid_to: string
+        }
+        Update: {
+          applicable_vehicle_categories?: string[] | null
+          code?: string
+          created_at?: string | null
+          discount_type?: string
+          discount_value?: number
+          id?: string
+          is_active?: boolean | null
+          min_booking_amount?: number | null
+          updated_at?: string | null
+          usage_limit?: number | null
+          used_count?: number | null
+          valid_from?: string
+          valid_to?: string
         }
         Relationships: []
       }
@@ -1998,22 +2157,30 @@ export type Database = {
         Row: {
           add_ons: Json | null
           airport_info: Json | null
+          airport_surcharge: number | null
           auto_approved: boolean | null
           billing_address: Json | null
           booking_type: Database["public"]["Enums"]["booking_type"] | null
           converted_agreement_id: string | null
           created_at: string
           created_by: string | null
+          cross_border_permits: Json | null
           customer_id: string
+          darb_package: Json | null
           end_datetime: string
+          estimated_tolls: number | null
+          fuel_option: string | null
           id: string
           instant_booking_score: number | null
+          mileage_package: Json | null
+          one_way_surcharge: number | null
           pickup_location: string
           po_number: string | null
           rate_plan: Json | null
           referral_code: string | null
           return_location: string
           ro_number: string | null
+          salik_package: Json | null
           special_requests: string | null
           start_datetime: string
           status: Database["public"]["Enums"]["reservation_status"]
@@ -2025,22 +2192,30 @@ export type Database = {
         Insert: {
           add_ons?: Json | null
           airport_info?: Json | null
+          airport_surcharge?: number | null
           auto_approved?: boolean | null
           billing_address?: Json | null
           booking_type?: Database["public"]["Enums"]["booking_type"] | null
           converted_agreement_id?: string | null
           created_at?: string
           created_by?: string | null
+          cross_border_permits?: Json | null
           customer_id: string
+          darb_package?: Json | null
           end_datetime: string
+          estimated_tolls?: number | null
+          fuel_option?: string | null
           id?: string
           instant_booking_score?: number | null
+          mileage_package?: Json | null
+          one_way_surcharge?: number | null
           pickup_location: string
           po_number?: string | null
           rate_plan?: Json | null
           referral_code?: string | null
           return_location: string
           ro_number?: string | null
+          salik_package?: Json | null
           special_requests?: string | null
           start_datetime: string
           status?: Database["public"]["Enums"]["reservation_status"]
@@ -2052,22 +2227,30 @@ export type Database = {
         Update: {
           add_ons?: Json | null
           airport_info?: Json | null
+          airport_surcharge?: number | null
           auto_approved?: boolean | null
           billing_address?: Json | null
           booking_type?: Database["public"]["Enums"]["booking_type"] | null
           converted_agreement_id?: string | null
           created_at?: string
           created_by?: string | null
+          cross_border_permits?: Json | null
           customer_id?: string
+          darb_package?: Json | null
           end_datetime?: string
+          estimated_tolls?: number | null
+          fuel_option?: string | null
           id?: string
           instant_booking_score?: number | null
+          mileage_package?: Json | null
+          one_way_surcharge?: number | null
           pickup_location?: string
           po_number?: string | null
           rate_plan?: Json | null
           referral_code?: string | null
           return_location?: string
           ro_number?: string | null
+          salik_package?: Json | null
           special_requests?: string | null
           start_datetime?: string
           status?: Database["public"]["Enums"]["reservation_status"]
@@ -2696,6 +2879,8 @@ export type Database = {
           fuel_level: number | null
           id: string
           insurance_expiry: string | null
+          item_code: string | null
+          item_description: string | null
           license_expiry: string | null
           license_plate: string
           location: string | null
@@ -2723,6 +2908,8 @@ export type Database = {
           fuel_level?: number | null
           id?: string
           insurance_expiry?: string | null
+          item_code?: string | null
+          item_description?: string | null
           license_expiry?: string | null
           license_plate: string
           location?: string | null
@@ -2750,6 +2937,8 @@ export type Database = {
           fuel_level?: number | null
           id?: string
           insurance_expiry?: string | null
+          item_code?: string | null
+          item_description?: string | null
           license_expiry?: string | null
           license_plate?: string
           location?: string | null
@@ -2812,6 +3001,26 @@ export type Database = {
       }
       generate_ticket_no: {
         Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      generate_vehicle_item_code: {
+        Args: {
+          p_category: string
+          p_color: string
+          p_make: string
+          p_model: string
+          p_year: number
+        }
+        Returns: string
+      }
+      generate_vehicle_item_description: {
+        Args: {
+          p_category: string
+          p_color: string
+          p_make: string
+          p_model: string
+          p_year: number
+        }
         Returns: string
       }
     }

@@ -33,6 +33,9 @@ interface Vehicle {
   status: string;
   category_id: string;
   location: string | null;
+  color: string | null;
+  item_code: string;
+  item_description: string;
   categories?: {
     id: string;
     name: string;
@@ -41,16 +44,22 @@ interface Vehicle {
   _itemCodeMeta?: {
     available_qty: number;
     category_name: string;
+    colors: string[];
+    item_code: string;
+    item_description: string;
   };
 }
 
 interface ItemCode {
   key: string;
+  item_code: string;
+  item_description: string;
   category_id: string;
   category_name: string;
   make: string;
   model: string;
   year: number;
+  colors: string[];
   available_qty: number;
   total_qty: number;
   representative_vehicle_id: string;
@@ -77,6 +86,7 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
   const [selectedModel, setSelectedModel] = useState<string>('all');
   const [selectedYear, setSelectedYear] = useState<string>('all');
   const [selectedLocation, setSelectedLocation] = useState<string>('all');
+  const [selectedColor, setSelectedColor] = useState<string>('all');
   const [showAvailableOnly, setShowAvailableOnly] = useState(false);
   const [selectedItemCodes, setSelectedItemCodes] = useState<ItemCode[]>([]);
   const [selectAll, setSelectAll] = useState(false);
@@ -88,10 +98,11 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
       const { data, error } = await supabase
         .from('vehicles')
         .select(`
-          id, make, model, year, status, category_id, location,
+          id, make, model, year, status, category_id, location, color,
+          item_code, item_description,
           categories!inner (id, name, icon)
         `)
-        .order('make, model, year');
+        .order('item_code');
 
       if (error) throw error;
       return (data || []) as Vehicle[];
@@ -99,11 +110,12 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
   });
 
   // Dynamic filter options
-  const { classes, makes, models, years } = useMemo(() => {
+  const { classes, makes, models, years, colors } = useMemo(() => {
     const classSet = new Set<string>();
     const makeSet = new Set<string>();
     const modelSet = new Set<string>();
     const yearSet = new Set<number>();
+    const colorSet = new Set<string>();
 
     vehicles.forEach((v) => {
       if (v.categories?.name) classSet.add(v.categories.name);
@@ -114,6 +126,7 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
       }
       
       yearSet.add(v.year);
+      if (v.color) colorSet.add(v.color);
     });
 
     return {
@@ -121,6 +134,7 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
       makes: Array.from(makeSet).sort(),
       models: Array.from(modelSet).sort(),
       years: Array.from(yearSet).sort((a, b) => b - a),
+      colors: Array.from(colorSet).sort(),
     };
   }, [vehicles, selectedMake]);
 
@@ -142,16 +156,20 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
         return;
       }
 
-      const key = `${v.category_id}|${v.make}|${v.model}|${v.year}`;
+      // Use item_code as the key (identical specs = same item_code)
+      const key = v.item_code;
       
       if (!itemCodeMap.has(key)) {
         itemCodeMap.set(key, {
           key,
+          item_code: v.item_code,
+          item_description: v.item_description,
           category_id: v.category_id,
           category_name: v.categories?.name || 'Unknown',
           make: v.make,
           model: v.model,
           year: v.year,
+          colors: [],
           available_qty: 0,
           total_qty: 0,
           representative_vehicle_id: v.id,
@@ -160,6 +178,11 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
       
       const itemCode = itemCodeMap.get(key)!;
       itemCode.total_qty++;
+      
+      // Track unique colors
+      if (v.color && !itemCode.colors.includes(v.color)) {
+        itemCode.colors.push(v.color);
+      }
       
       if (v.status === 'available') {
         itemCode.available_qty++;
@@ -173,22 +196,25 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
   const filteredItemCodes = useMemo(() => {
     return itemCodes.filter((item) => {
       const searchLower = searchTerm.toLowerCase();
-      const matchesSearch =
-        !searchTerm ||
+      const matchesSearch = 
         item.make.toLowerCase().includes(searchLower) ||
         item.model.toLowerCase().includes(searchLower) ||
         item.year.toString().includes(searchLower) ||
-        item.category_name.toLowerCase().includes(searchLower);
+        item.category_name.toLowerCase().includes(searchLower) ||
+        item.item_code.toLowerCase().includes(searchLower) ||
+        item.item_description.toLowerCase().includes(searchLower);
 
       const matchesClass = selectedClass === 'all' || item.category_name === selectedClass;
       const matchesMake = selectedMake === 'all' || item.make === selectedMake;
       const matchesModel = selectedModel === 'all' || item.model === selectedModel;
       const matchesYear = selectedYear === 'all' || item.year.toString() === selectedYear;
+      const matchesColor = selectedColor === 'all' || item.colors.includes(selectedColor);
       const matchesAvailability = !showAvailableOnly || item.available_qty > 0;
 
-      return matchesSearch && matchesClass && matchesMake && matchesModel && matchesYear && matchesAvailability;
+      return matchesSearch && matchesClass && matchesMake && matchesModel && 
+             matchesYear && matchesColor && matchesAvailability;
     });
-  }, [itemCodes, searchTerm, selectedClass, selectedMake, selectedModel, selectedYear, showAvailableOnly]);
+  }, [itemCodes, searchTerm, selectedClass, selectedMake, selectedModel, selectedYear, selectedColor, showAvailableOnly]);
 
   // Reset filters
   const resetFilters = () => {
@@ -198,6 +224,7 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
     setSelectedModel('all');
     setSelectedYear('all');
     setSelectedLocation('all');
+    setSelectedColor('all');
     setShowAvailableOnly(false);
   };
 
@@ -232,9 +259,15 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
         if (representativeVehicle) {
           return {
             ...representativeVehicle,
+            item_code: itemCode.item_code,
+            item_description: itemCode.item_description,
+            color: itemCode.colors[0] || null,
             _itemCodeMeta: {
               available_qty: itemCode.available_qty,
               category_name: itemCode.category_name,
+              colors: itemCode.colors,
+              item_code: itemCode.item_code,
+              item_description: itemCode.item_description,
             }
           };
         }
@@ -358,6 +391,24 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
               </Select>
             </div>
 
+            {/* Color */}
+            <div>
+              <Label className="text-[10px]">Color</Label>
+              <Select value={selectedColor} onValueChange={setSelectedColor}>
+                <SelectTrigger className="h-9">
+                  <SelectValue placeholder="All Colors" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Colors</SelectItem>
+                  {colors.map((color) => (
+                    <SelectItem key={color} value={color}>
+                      {color}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
             {/* Location */}
             <div>
               <Label className="text-[10px]">Location</Label>
@@ -449,13 +500,16 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
                 className="h-4 w-4 rounded border-gray-300"
               />
             </th>
-            <th className="text-left p-2 text-xs font-semibold">Vehicle Class</th>
-                    <th className="text-left p-2 text-xs font-semibold">Make</th>
-                    <th className="text-left p-2 text-xs font-semibold">Model</th>
-                    <th className="text-center p-2 text-xs font-semibold">Year</th>
-                    <th className="text-center p-2 text-xs font-semibold">Available Qty</th>
-                  </tr>
-                </thead>
+            <th className="text-left p-2 text-xs font-semibold">Item Code</th>
+            <th className="text-left p-2 text-xs font-semibold">Item Description</th>
+            <th className="text-left p-2 text-xs font-semibold">Make</th>
+            <th className="text-left p-2 text-xs font-semibold">Model</th>
+            <th className="text-center p-2 text-xs font-semibold">Year</th>
+            <th className="text-center p-2 text-xs font-semibold">Color(s)</th>
+            <th className="text-center p-2 text-xs font-semibold">Category</th>
+            <th className="text-center p-2 text-xs font-semibold">Available</th>
+          </tr>
+        </thead>
         <tbody>
           {filteredItemCodes.map((itemCode) => {
             const isSelected = selectedItemCodes.some(ic => ic.key === itemCode.key);
@@ -477,20 +531,41 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
                     className="h-4 w-4 rounded border-gray-300"
                   />
                 </td>
-                <td className="p-2 text-xs">
-                  <Badge variant="outline" className="text-xs">{itemCode.category_name}</Badge>
+                <td className="p-2 text-xs font-mono font-semibold text-primary">
+                  {itemCode.item_code}
                 </td>
-                        <td className="p-2 text-xs font-medium">{itemCode.make}</td>
-                        <td className="p-2 text-xs">{itemCode.model}</td>
-                        <td className="p-2 text-xs text-center">{itemCode.year}</td>
-                        <td className="p-2 text-xs text-center">
-                          <Badge
-                            variant={itemCode.available_qty > 0 ? "default" : "secondary"}
-                            className={itemCode.available_qty > 0 ? "bg-green-600 text-xs" : "text-xs"}
-                          >
-                            {itemCode.available_qty} / {itemCode.total_qty}
-                          </Badge>
-                        </td>
+                <td className="p-2 text-xs font-medium">
+                  {itemCode.item_description}
+                </td>
+                <td className="p-2 text-xs">{itemCode.make}</td>
+                <td className="p-2 text-xs">{itemCode.model}</td>
+                <td className="p-2 text-xs text-center">{itemCode.year}</td>
+                <td className="p-2 text-xs text-center">
+                  <div className="flex flex-wrap gap-1 justify-center">
+                    {itemCode.colors.length > 0 ? (
+                      itemCode.colors.map(color => (
+                        <Badge key={color} variant="outline" className="text-[10px]">
+                          {color}
+                        </Badge>
+                      ))
+                    ) : (
+                      <span className="text-muted-foreground">Any</span>
+                    )}
+                  </div>
+                </td>
+                <td className="p-2 text-xs text-center">
+                  <Badge variant="secondary" className="text-[10px]">
+                    {itemCode.category_name}
+                  </Badge>
+                </td>
+                <td className="p-2 text-xs text-center">
+                  <Badge
+                    variant={itemCode.available_qty > 0 ? "default" : "secondary"}
+                    className={itemCode.available_qty > 0 ? "bg-green-600 text-xs" : "text-xs"}
+                  >
+                    {itemCode.available_qty} / {itemCode.total_qty}
+                  </Badge>
+                </td>
                       </tr>
                     );
                   })}
