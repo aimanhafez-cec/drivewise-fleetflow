@@ -108,6 +108,8 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
       if (error) throw error;
       return (data || []) as Vehicle[];
     },
+    refetchOnMount: true,
+    staleTime: 0, // Always fetch fresh data
   });
 
   // Dynamic filter options
