@@ -516,57 +516,8 @@ export const QuoteWizard: React.FC = () => {
       </Card>
 
       {/* Step Content */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <div className="lg:col-span-3">
-          {renderStep()}
-        </div>
-
-        {/* Summary Sidebar */}
-        <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Quote Summary</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {quoteData.items && quoteData.items.length > 0 ? (
-                <>
-                  <div className="space-y-2">
-                    {quoteData.items.map((item, index) => (
-                      <div key={index} className="text-sm">
-                        <div className="flex justify-between">
-                          <span>{item.description}</span>
-                          <span>AED {(item.qty * item.rate).toFixed(2)}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="border-t pt-2 space-y-1">
-                    <div className="flex justify-between text-sm">
-                      <span>Subtotal</span>
-                      <span>
-                        ${quoteData.items.reduce((sum, item) => sum + (item.qty * item.rate), 0).toFixed(2)}
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span>Tax ({((quoteData.tax_rate || 0) * 100).toFixed(0)}%)</span>
-                      <span>
-                        ${(quoteData.items.reduce((sum, item) => sum + (item.qty * item.rate), 0) * (quoteData.tax_rate || 0)).toFixed(2)}
-                      </span>
-                    </div>
-                    <div className="flex justify-between font-semibold border-t pt-1">
-                      <span>Total</span>
-                      <span>
-                        ${(quoteData.items.reduce((sum, item) => sum + (item.qty * item.rate), 0) * (1 + (quoteData.tax_rate || 0))).toFixed(2)}
-                      </span>
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <p className="text-sm text-muted-foreground">No items added yet</p>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+      <div>
+        {renderStep()}
       </div>
 
       {/* Navigation */}
