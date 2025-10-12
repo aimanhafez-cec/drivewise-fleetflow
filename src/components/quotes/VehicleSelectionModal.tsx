@@ -122,8 +122,7 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
         v.make.toLowerCase().includes(searchLower) ||
         v.model.toLowerCase().includes(searchLower) ||
         v.year.toString().includes(searchLower) ||
-        v.license_plate.toLowerCase().includes(searchLower) ||
-        v.vin?.toLowerCase().includes(searchLower);
+        v.license_plate.toLowerCase().includes(searchLower);
 
       // Class filter
       const matchesClass =
@@ -192,7 +191,7 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
             <Input
-              placeholder="Search by make, model, year, license plate, or VIN..."
+              placeholder="Search by make, model, year, or license plate..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
@@ -372,12 +371,6 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
                             <span className="text-muted-foreground">Category:</span>
                             <div className="font-medium">
                               {vehicle.categories?.name || 'N/A'}
-                            </div>
-                          </div>
-                          <div>
-                            <span className="text-muted-foreground">VIN:</span>
-                            <div className="font-mono text-[10px]">
-                              {vehicle.vin || 'N/A'}
                             </div>
                           </div>
                           <div>

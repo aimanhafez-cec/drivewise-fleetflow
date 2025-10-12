@@ -181,10 +181,6 @@ export const VehicleLineCard: React.FC<VehicleLineCardProps> = ({
                         <span className="ml-2 font-medium">{selectedVehicle?.categories?.name || 'N/A'}</span>
                       </div>
                       <div>
-                        <span className="text-muted-foreground">VIN:</span>
-                        <span className="ml-2 font-mono text-xs">{line.vin || 'N/A'}</span>
-                      </div>
-                      <div>
                         <span className="text-muted-foreground">Odometer:</span>
                         <span className="ml-2">{line.odometer?.toLocaleString() || 0} km</span>
                       </div>
