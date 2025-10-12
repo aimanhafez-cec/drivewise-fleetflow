@@ -161,23 +161,27 @@ export interface Location {
 }
 
 export const useLocations = (type?: string) => {
-  // Return static locations since the table doesn't exist in the database
-  const staticLocations: Location[] = [
-    { id: 'main', name: 'Main Location', code: 'MAIN', type: 'branch', label: 'Main Location' },
-    { id: 'airport', name: 'Airport Location', code: 'AIRPORT', type: 'airport', label: 'Airport Location' },
-    { id: 'downtown', name: 'Downtown Branch', code: 'DOWN', type: 'branch', label: 'Downtown Branch' }
-  ];
-
+  const dependencies: Record<string, any> = { is_active: true };
+  if (type) {
+    dependencies.type = type;
+  }
+  
+  const result = useLOV<Location>(
+    'location_lov', 
+    'id, name, code, type, city, terminal, contact_phone, contact_email',
+    {
+      dependencies,
+      searchFields: ['name', 'code', 'city'],
+      orderBy: 'name'
+    }
+  );
+  
   return {
-    items: staticLocations,
-    isLoading: false,
-    error: null,
-    updateSearch: () => {},
-    searchQuery: '',
-    fetchNextPage: () => Promise.resolve(),
-    hasNextPage: false,
-    isFetchingNextPage: false,
-    refetch: () => Promise.resolve()
+    ...result,
+    items: result.items.map(item => ({
+      ...item,
+      label: item.code ? `${item.name} (${item.code})` : item.name
+    }))
   };
 };
 

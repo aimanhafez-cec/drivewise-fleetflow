@@ -61,6 +61,16 @@ interface QuoteData {
     advance_rent_months: number;
     monthly_rate: number;
     duration_months: number;
+    // Phase 3B: Enhanced vehicle line fields
+    vin?: string;
+    color?: string;
+    location_id?: string;
+    odometer?: number;
+    mileage_package_km: number;
+    excess_km_rate: number;
+    rate_type: 'monthly' | 'weekly' | 'daily';
+    lease_term_months?: number;
+    end_date?: string;
   }>;
   
   // Financial Section from Step 4 (19 fields)
@@ -329,6 +339,20 @@ export const QuoteWizard: React.FC = () => {
               }
               if (line.advance_rent_months < 0) {
                 newErrors[`line_${index}_advance`] = `Line ${index + 1}: Advance rent months cannot be negative`;
+              }
+              
+              // Phase 3B validations
+              if (!line.location_id) {
+                newErrors[`line_${index}_location`] = `Line ${index + 1}: Location/Branch required`;
+              }
+              if (line.vin && line.vin.length !== 17) {
+                newErrors[`line_${index}_vin`] = `Line ${index + 1}: VIN must be 17 characters`;
+              }
+              if (line.mileage_package_km <= 0) {
+                newErrors[`line_${index}_mileage`] = `Line ${index + 1}: Mileage package must be > 0`;
+              }
+              if (line.excess_km_rate < 0) {
+                newErrors[`line_${index}_excess_km`] = `Line ${index + 1}: Excess KM rate cannot be negative`;
               }
             });
           }

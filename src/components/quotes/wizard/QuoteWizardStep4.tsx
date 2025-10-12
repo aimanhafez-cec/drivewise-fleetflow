@@ -105,6 +105,11 @@ export const QuoteWizardStep4: React.FC<QuoteWizardStep4Props> = ({
                       <p className="text-sm text-muted-foreground">
                         {line.vehicle_class_id ? 'Vehicle Category Selected' : 'Specific Vehicle Selected'}
                       </p>
+                      {line.vin && (
+                        <p className="text-xs text-muted-foreground mt-1">
+                          VIN: {line.vin}
+                        </p>
+                      )}
                     </div>
                     <Badge variant="outline">
                       {line.duration_months} months
@@ -112,34 +117,76 @@ export const QuoteWizardStep4: React.FC<QuoteWizardStep4Props> = ({
                   </div>
                   
                   <div className="grid grid-cols-2 gap-3 text-sm">
+                    {/* Contract Terms */}
                     <div>
-                      <span className="text-muted-foreground">Pickup:</span>
-                      <p className="font-medium">{line.pickup_at}</p>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">Return:</span>
-                      <p className="font-medium">{line.return_at}</p>
+                      <span className="text-muted-foreground">Start Date:</span>
+                      <p className="font-medium">{line.pickup_at || 'N/A'}</p>
                     </div>
                     <div>
-                      <span className="text-muted-foreground">Monthly Rate:</span>
-                      <p className="font-medium">{line.monthly_rate.toFixed(2)} AED</p>
+                      <span className="text-muted-foreground">End Date:</span>
+                      <p className="font-medium">{line.end_date || 'N/A'}</p>
                     </div>
                     <div>
-                      <span className="text-muted-foreground">Deposit:</span>
-                      <p className="font-medium">{line.deposit_amount.toFixed(2)} AED</p>
+                      <span className="text-muted-foreground">Duration:</span>
+                      <p className="font-medium">{line.duration_months} months</p>
                     </div>
-                    <div className="col-span-2">
-                      <span className="text-muted-foreground">Advance Rent:</span>
-                      <p className="font-medium">
-                        {line.advance_rent_months} month(s) × {line.monthly_rate.toFixed(2)} = {' '}
-                        {((line.advance_rent_months || 0) * (line.monthly_rate || 0)).toFixed(2)} AED
-                      </p>
+                    <div>
+                      <span className="text-muted-foreground">Rate Type:</span>
+                      <p className="font-medium capitalize">{line.rate_type || 'monthly'}</p>
                     </div>
+                    
+                    {/* Mileage Terms */}
+                    <div>
+                      <span className="text-muted-foreground">Mileage Package:</span>
+                      <p className="font-medium">{line.mileage_package_km?.toLocaleString() || 'N/A'} km/month</p>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Excess Rate:</span>
+                      <p className="font-medium">{line.excess_km_rate?.toFixed(2) || 'N/A'} AED/km</p>
+                    </div>
+                    
+                    {/* Location */}
+                    {line.location_id && (
+                      <div className="col-span-2">
+                        <span className="text-muted-foreground">Location:</span>
+                        <p className="font-medium">{line.location_id}</p>
+                      </div>
+                    )}
+                    
+                    {/* Odometer */}
+                    {line.odometer && (
+                      <div>
+                        <span className="text-muted-foreground">Current Odometer:</span>
+                        <p className="font-medium">{line.odometer.toLocaleString()} km</p>
+                      </div>
+                    )}
                   </div>
                   
                   <Separator className="my-3" />
                   
-                  <div className="flex justify-between font-semibold">
+                  {/* Financial breakdown */}
+                  <div className="grid grid-cols-2 gap-3 text-sm mb-3">
+                    <div>
+                      <span className="text-muted-foreground">
+                        {line.rate_type === 'daily' ? 'Daily' : line.rate_type === 'weekly' ? 'Weekly' : 'Monthly'} Rate:
+                      </span>
+                      <p className="font-semibold">{line.monthly_rate.toFixed(2)} AED</p>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Deposit:</span>
+                      <p className="font-semibold">{line.deposit_amount.toFixed(2)} AED</p>
+                    </div>
+                    <div className="col-span-2">
+                      <span className="text-muted-foreground">Advance Rent:</span>
+                      <p className="font-semibold">
+                        {line.advance_rent_months} × {line.monthly_rate.toFixed(2)} = {((line.advance_rent_months || 0) * (line.monthly_rate || 0)).toFixed(2)} AED
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <Separator />
+                  
+                  <div className="flex justify-between font-semibold mt-3">
                     <span>Line Upfront Total:</span>
                     <span className="text-primary">
                       {(line.deposit_amount + ((line.advance_rent_months || 0) * (line.monthly_rate || 0))).toFixed(2)} AED

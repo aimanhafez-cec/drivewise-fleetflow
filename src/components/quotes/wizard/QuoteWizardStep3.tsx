@@ -39,6 +39,16 @@ export const QuoteWizardStep3: React.FC<QuoteWizardStep3Props> = ({
       advance_rent_months: data.default_advance_rent_months || 1,
       monthly_rate: 0,
       duration_months: 0,
+      // Phase 3B defaults
+      vin: '',
+      color: '',
+      location_id: undefined,
+      odometer: 0,
+      mileage_package_km: 3000,
+      excess_km_rate: 1.00,
+      rate_type: 'monthly' as const,
+      lease_term_months: undefined,
+      end_date: undefined,
     };
     onChange({ quote_items: [...currentLines, newLine] });
   };

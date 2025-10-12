@@ -9,6 +9,8 @@ export interface Vehicle {
   license_plate: string;
   status: string;
   category_id?: string;
+  vin?: string;
+  odometer?: number;
 }
 
 export interface VehicleCategory {
@@ -23,7 +25,7 @@ export const useVehicles = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('vehicles')
-        .select('id, make, model, year, license_plate, status, category_id')
+        .select('id, make, model, year, license_plate, status, category_id, vin, odometer')
         .eq('status', 'available')
         .order('make, model');
       
