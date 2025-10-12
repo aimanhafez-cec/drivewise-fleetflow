@@ -89,6 +89,7 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
   const [selectedColor, setSelectedColor] = useState<string>('all');
   const [showAvailableOnly, setShowAvailableOnly] = useState(false);
   const [selectedItemCodes, setSelectedItemCodes] = useState<ItemCode[]>([]);
+  const [itemQuantities, setItemQuantities] = useState<Map<string, number>>(new Map());
   const [selectAll, setSelectAll] = useState(false);
 
   // Fetch vehicles with location
@@ -226,56 +227,75 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
     setSelectedLocation('all');
     setSelectedColor('all');
     setShowAvailableOnly(false);
+    setSelectedItemCodes([]);
+    setItemQuantities(new Map());
+    setSelectAll(false);
   };
 
   const handleToggleItemCode = (itemCode: ItemCode) => {
-    setSelectedItemCodes(prev => {
-      const exists = prev.find(ic => ic.key === itemCode.key);
-      if (exists) {
-        return prev.filter(ic => ic.key !== itemCode.key);
-      } else {
-        return [...prev, itemCode];
-      }
-    });
+    const isCurrentlySelected = selectedItemCodes.some(ic => ic.key === itemCode.key);
+    
+    if (isCurrentlySelected) {
+      // Deselect: remove from selection and clear quantity
+      setSelectedItemCodes(selectedItemCodes.filter(ic => ic.key !== itemCode.key));
+      const newQuantities = new Map(itemQuantities);
+      newQuantities.delete(itemCode.key);
+      setItemQuantities(newQuantities);
+    } else {
+      // Select: add to selection and set default quantity to 1
+      setSelectedItemCodes([...selectedItemCodes, itemCode]);
+      setItemQuantities(new Map(itemQuantities.set(itemCode.key, 1)));
+    }
   };
 
   const handleSelectAll = () => {
     if (selectAll) {
       setSelectedItemCodes([]);
+      setItemQuantities(new Map());
       setSelectAll(false);
     } else {
+      const newQuantities = new Map(itemQuantities);
+      filteredItemCodes.forEach(ic => newQuantities.set(ic.key, 1));
       setSelectedItemCodes([...filteredItemCodes]);
+      setItemQuantities(newQuantities);
       setSelectAll(true);
     }
   };
 
   const handleConfirmSelection = () => {
     if (selectedItemCodes.length > 0) {
-      const selectedVehicles = selectedItemCodes.map(itemCode => {
+      const selectedVehicles: any[] = [];
+      
+      selectedItemCodes.forEach(itemCode => {
         const representativeVehicle = vehicles.find(
           v => v.id === itemCode.representative_vehicle_id
         );
         
         if (representativeVehicle) {
-          return {
-            ...representativeVehicle,
-            item_code: itemCode.item_code,
-            item_description: itemCode.item_description,
-            color: itemCode.colors[0] || null,
-            _itemCodeMeta: {
-              available_qty: itemCode.available_qty,
-              category_name: itemCode.category_name,
-              colors: itemCode.colors,
+          const qty = itemQuantities.get(itemCode.key) || 1;
+          
+          // Create 'qty' number of vehicle entries
+          for (let i = 0; i < qty; i++) {
+            selectedVehicles.push({
+              ...representativeVehicle,
               item_code: itemCode.item_code,
               item_description: itemCode.item_description,
-            }
-          };
+              color: itemCode.colors[0] || null,
+              _itemCodeMeta: {
+                available_qty: itemCode.available_qty,
+                category_name: itemCode.category_name,
+                colors: itemCode.colors,
+                item_code: itemCode.item_code,
+                item_description: itemCode.item_description,
+              }
+            });
+          }
         }
-        return null;
-      }).filter(Boolean);
+      });
       
       (onVehicleSelect as any)(selectedVehicles);
       setSelectedItemCodes([]);
+      setItemQuantities(new Map());
       setSelectAll(false);
       onOpenChange(false);
     }
@@ -510,6 +530,7 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
             <th className="text-center p-2 text-xs font-semibold">Color(s)</th>
             <th className="text-center p-2 text-xs font-semibold">Category</th>
             <th className="text-center p-2 text-xs font-semibold">Available</th>
+            <th className="text-center p-2 text-xs font-semibold">Qty</th>
           </tr>
         </thead>
         <tbody>
@@ -568,6 +589,27 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
                     {itemCode.available_qty} / {itemCode.total_qty}
                   </Badge>
                 </td>
+                <td className="p-2 text-center" onClick={(e) => e.stopPropagation()}>
+                  {isSelected ? (
+                    <Input
+                      type="number"
+                      min="1"
+                      max={itemCode.available_qty}
+                      value={itemQuantities.get(itemCode.key) || 1}
+                      onChange={(e) => {
+                        const qty = Math.min(
+                          Math.max(1, parseInt(e.target.value) || 1),
+                          itemCode.available_qty
+                        );
+                        setItemQuantities(new Map(itemQuantities.set(itemCode.key, qty)));
+                      }}
+                      className="w-16 h-8 text-center text-xs"
+                      disabled={itemCode.available_qty === 0}
+                    />
+                  ) : (
+                    <span className="text-muted-foreground text-xs">-</span>
+                  )}
+                </td>
                       </tr>
                     );
                   })}
@@ -583,6 +625,11 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
         <span className="flex items-center gap-2">
           <Check className="h-4 w-4 text-primary" />
           <strong>{selectedItemCodes.length}</strong> vehicle type{selectedItemCodes.length !== 1 ? 's' : ''} selected
+          <span className="ml-2 text-xs bg-primary/10 px-2 py-1 rounded">
+            Total units: <strong>
+              {Array.from(itemQuantities.values()).reduce((sum, qty) => sum + qty, 0)}
+            </strong>
+          </span>
         </span>
       ) : (
         'Check rows to select vehicle types'
@@ -606,7 +653,7 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
         disabled={selectedItemCodes.length === 0}
       >
         <Check className="h-4 w-4 mr-2" />
-        Add Selected Vehicles ({selectedItemCodes.length})
+        Add Selected Vehicles ({Array.from(itemQuantities.values()).reduce((sum, qty) => sum + qty, 0)} units)
       </Button>
     </div>
   </div>
