@@ -25,7 +25,7 @@ export const TrainStopStepper: React.FC<TrainStopStepperProps> = ({
     <div className="w-full">
       {/* Desktop: Horizontal Layout */}
       <div className="hidden md:block">
-        <div className="relative flex items-center justify-between">
+        <div className="relative flex items-start justify-between">
           {/* Gray background line */}
           <div className="absolute top-5 left-0 right-0 h-0.5 bg-border z-0" />
           
@@ -46,7 +46,7 @@ export const TrainStopStepper: React.FC<TrainStopStepperProps> = ({
             const isClickable = step.id <= currentStep;
 
             return (
-              <div key={step.id} className="flex flex-col items-center relative z-20 flex-1">
+              <div key={step.id} className="flex flex-col items-center relative z-20 w-28">
                 {/* Circle */}
                 <button
                   onClick={() => isClickable && onStepClick(step.id)}
@@ -75,20 +75,13 @@ export const TrainStopStepper: React.FC<TrainStopStepperProps> = ({
                 
                 {/* Label */}
                 <span className={cn(
-                  "mt-3 text-sm text-center px-2 transition-all duration-200",
+                  "mt-2 text-xs text-center px-1 transition-all duration-200",
                   isCurrent && "font-bold text-primary",
                   isCompleted && "font-medium text-green-600",
                   isUpcoming && "text-muted-foreground"
                 )}>
                   {step.title}
                 </span>
-                
-                {/* Description (only for current step on desktop) */}
-                {isCurrent && (
-                  <span className="mt-1 text-xs text-muted-foreground text-center px-2">
-                    {step.description}
-                  </span>
-                )}
               </div>
             );
           })}
@@ -166,7 +159,7 @@ export const TrainStopStepper: React.FC<TrainStopStepperProps> = ({
       </div>
 
       {/* Progress percentage indicator */}
-      <div className="text-center text-sm text-muted-foreground mt-4">
+      <div className="text-center text-xs text-muted-foreground mt-2">
         {Math.round((completedSteps.length / steps.length) * 100)}% Complete
       </div>
     </div>
