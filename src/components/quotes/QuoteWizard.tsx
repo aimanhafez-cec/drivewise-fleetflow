@@ -9,6 +9,8 @@ import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, ArrowRight, Send } from "lucide-react";
 import { QuoteWizardStep1 } from "./wizard/QuoteWizardStep1";
 import { QuoteWizardStep2 } from "./wizard/QuoteWizardStep2";
+import { QuoteWizardStep3 } from "./wizard/QuoteWizardStep3";
+import { QuoteWizardStep4 } from "./wizard/QuoteWizardStep4";
 
 interface QuoteData {
   // Header fields from Step 1
@@ -43,9 +45,23 @@ interface QuoteData {
   return_at?: string;
   return_location?: string;
   
-  // Vehicle from Step 3
+  // Vehicle from Step 3 (legacy single-vehicle for non-corporate)
   vehicle_type_id?: string;
   vehicle_id?: string;
+  
+  // Vehicle Lines (for Corporate multi-vehicle quotes)
+  quote_items?: Array<{
+    line_no: number;
+    vehicle_class_id?: string;
+    vehicle_id?: string;
+    pickup_at: string;
+    return_at: string;
+    deposit_amount: number;
+    deposit_type?: string;
+    advance_rent_months: number;
+    monthly_rate: number;
+    duration_months: number;
+  }>;
   
   // Financial Section from Step 4 (19 fields)
   // 1. Billing & Payment Terms
@@ -59,8 +75,8 @@ interface QuoteData {
   default_price_list_id?: string;
   withholding_tax_percentage?: number;
   
-  // 3. Deposits & Advances
-  deposit_type?: string; // refundable, non-refundable, pre-authorization
+  // 3. Deposits & Advances (defaults for vehicle lines)
+  deposit_type?: string; // refundable, non-refundable, bank-guarantee
   default_deposit_amount?: number;
   default_advance_rent_months?: number;
   annual_escalation_percentage?: number;
@@ -102,6 +118,8 @@ interface QuoteData {
 const steps = [
   { id: 1, title: "Header", description: "Quote header information" },
   { id: 2, title: "Financials", description: "Billing, deposits & payment terms" },
+  { id: 3, title: "Vehicles", description: "Vehicle selection & configuration" },
+  { id: 4, title: "Summary", description: "Review & finalize quote" },
 ];
 
 export const QuoteWizard: React.FC = () => {
@@ -114,6 +132,7 @@ export const QuoteWizard: React.FC = () => {
     version: 1,
     currency: "AED",
     quote_entry_date: new Date().toISOString().split("T")[0],
+    quote_items: [], // Initialize empty vehicle lines array
     // Financial defaults
     vat_percentage: 5, // UAE standard 5%
     billing_plan: "monthly",
@@ -282,6 +301,44 @@ export const QuoteWizard: React.FC = () => {
           newErrors.invoice_to_email = "Invoice email is required when consolidation is enabled";
         }
         break;
+      case 3:
+        // Vehicle selection validation
+        if (quoteData.quote_type === 'Corporate lease') {
+          // Multi-vehicle validation
+          if (!quoteData.quote_items || quoteData.quote_items.length === 0) {
+            newErrors.quote_items = "At least one vehicle line is required";
+          } else {
+            quoteData.quote_items.forEach((line, index) => {
+              if (!line.vehicle_class_id && !line.vehicle_id) {
+                newErrors[`line_${index}_vehicle`] = `Line ${index + 1}: Vehicle category or specific vehicle required`;
+              }
+              if (!line.pickup_at) {
+                newErrors[`line_${index}_pickup`] = `Line ${index + 1}: Pickup date required`;
+              }
+              if (!line.return_at) {
+                newErrors[`line_${index}_return`] = `Line ${index + 1}: Return date required`;
+              }
+              if (line.pickup_at && line.return_at && new Date(line.pickup_at) >= new Date(line.return_at)) {
+                newErrors[`line_${index}_dates`] = `Line ${index + 1}: Return date must be after pickup date`;
+              }
+              if (!line.monthly_rate || line.monthly_rate <= 0) {
+                newErrors[`line_${index}_rate`] = `Line ${index + 1}: Monthly rate required`;
+              }
+              if (line.deposit_amount < 0) {
+                newErrors[`line_${index}_deposit`] = `Line ${index + 1}: Deposit cannot be negative`;
+              }
+              if (line.advance_rent_months < 0) {
+                newErrors[`line_${index}_advance`] = `Line ${index + 1}: Advance rent months cannot be negative`;
+              }
+            });
+          }
+        } else {
+          // Single vehicle validation (legacy)
+          if (!quoteData.vehicle_type_id && !quoteData.vehicle_id) {
+            newErrors.vehicle = "Vehicle category or specific vehicle required";
+          }
+        }
+        break;
     }
 
     setErrors(newErrors);
@@ -319,6 +376,22 @@ export const QuoteWizard: React.FC = () => {
           <QuoteWizardStep2
             data={quoteData}
             onChange={(data) => updateQuoteData(2, data)}
+            errors={errors}
+          />
+        );
+      case 3:
+        return (
+          <QuoteWizardStep3
+            data={quoteData}
+            onChange={(data) => updateQuoteData(3, data)}
+            errors={errors}
+          />
+        );
+      case 4:
+        return (
+          <QuoteWizardStep4
+            data={quoteData}
+            onChange={(data) => updateQuoteData(4, data)}
             errors={errors}
           />
         );
@@ -438,7 +511,7 @@ export const QuoteWizard: React.FC = () => {
           Back
         </Button>
 
-        {currentStep < 2 ? (
+        {currentStep < steps.length ? (
           <Button
             id="btn-wiz-next"
             onClick={handleNext}
