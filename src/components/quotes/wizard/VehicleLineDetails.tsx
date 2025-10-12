@@ -3,6 +3,8 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { FormError } from "@/components/ui/form-error";
 import { useLocations } from "@/hooks/useBusinessLOVs";
 
@@ -11,6 +13,15 @@ interface VehicleLineDetailsProps {
   onUpdate: (field: string, value: any) => void;
   errors: Record<string, string>;
   depositType: string;
+  headerDefaults?: {
+    deposit_amount?: number;
+    advance_rent_months?: number;
+    insurance_coverage_package?: string;
+    insurance_excess_aed?: number;
+    insurance_glass_tire_cover?: boolean;
+    insurance_pai_enabled?: boolean;
+    insurance_territorial_coverage?: string;
+  };
 }
 
 export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
@@ -18,9 +29,21 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
   onUpdate,
   errors,
   depositType,
+  headerDefaults = {},
 }) => {
   const { items: locations = [], isLoading: locationsLoading } = useLocations();
   const linePrefix = `line_${line.line_no - 1}`;
+
+  // Helper to check if a field is customized
+  const isCustomized = (field: string, lineValue: any, defaultValue: any) => {
+    if (defaultValue === undefined) return false;
+    return lineValue !== undefined && lineValue !== defaultValue;
+  };
+
+  // Reset field to default
+  const resetToDefault = (field: string, defaultValue: any) => {
+    onUpdate(field, defaultValue);
+  };
 
   return (
     <div className="space-y-6 max-w-6xl">
@@ -220,30 +243,62 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
           </h4>
           
           <div className="space-y-2">
-            <Label htmlFor={`deposit_${line.line_no}`}>
+            <Label htmlFor={`deposit_${line.line_no}`} className="flex items-center gap-2">
               Deposit Amount (AED) - {depositType}
+              {isCustomized("deposit_amount", line.deposit_amount, headerDefaults.deposit_amount) && (
+                <Badge variant="secondary" className="text-xs">Customized</Badge>
+              )}
             </Label>
             <Input
               id={`deposit_${line.line_no}`}
               type="number"
               min="0"
               step="100"
-              value={line.deposit_amount || 0}
+              value={line.deposit_amount ?? headerDefaults.deposit_amount ?? 0}
               onChange={(e) => onUpdate('deposit_amount', parseFloat(e.target.value) || 0)}
+              placeholder={headerDefaults.deposit_amount ? `Default: ${headerDefaults.deposit_amount}` : undefined}
             />
+            {isCustomized("deposit_amount", line.deposit_amount, headerDefaults.deposit_amount) && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-7 text-xs"
+                onClick={() => resetToDefault("deposit_amount", headerDefaults.deposit_amount)}
+              >
+                Reset to default
+              </Button>
+            )}
             {errors[`${linePrefix}_deposit`] && <FormError message={errors[`${linePrefix}_deposit`]} />}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor={`advance_${line.line_no}`}>Advance Rent (Months)</Label>
+            <Label htmlFor={`advance_${line.line_no}`} className="flex items-center gap-2">
+              Advance Rent (Months)
+              {isCustomized("advance_rent_months", line.advance_rent_months, headerDefaults.advance_rent_months) && (
+                <Badge variant="secondary" className="text-xs">Customized</Badge>
+              )}
+            </Label>
             <Input
               id={`advance_${line.line_no}`}
               type="number"
               min="0"
               max="3"
-              value={line.advance_rent_months || 0}
+              value={line.advance_rent_months ?? headerDefaults.advance_rent_months ?? 0}
               onChange={(e) => onUpdate('advance_rent_months', parseInt(e.target.value) || 0)}
+              placeholder={headerDefaults.advance_rent_months !== undefined ? `Default: ${headerDefaults.advance_rent_months}` : undefined}
             />
+            {isCustomized("advance_rent_months", line.advance_rent_months, headerDefaults.advance_rent_months) && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-7 text-xs"
+                onClick={() => resetToDefault("advance_rent_months", headerDefaults.advance_rent_months)}
+              >
+                Reset to default
+              </Button>
+            )}
             <p className="text-xs text-muted-foreground">
               Advance: {line.advance_rent_months || 0} × {line.monthly_rate || 0} = {((line.advance_rent_months || 0) * (line.monthly_rate || 0)).toFixed(2)} AED
             </p>
@@ -258,38 +313,76 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
           </h4>
           
           <div className="space-y-2">
-            <Label htmlFor={`ins_coverage_${line.line_no}`}>Coverage Package</Label>
+            <Label htmlFor={`ins_coverage_${line.line_no}`} className="flex items-center gap-2">
+              Coverage Package
+              {isCustomized("insurance_coverage_package", line.insurance_coverage_package, headerDefaults.insurance_coverage_package) && (
+                <Badge variant="secondary" className="text-xs">Customized</Badge>
+              )}
+            </Label>
             <Select
-              value={line.insurance_coverage_package || 'comprehensive'}
+              value={line.insurance_coverage_package ?? headerDefaults.insurance_coverage_package ?? 'comprehensive'}
               onValueChange={(value) => onUpdate('insurance_coverage_package', value)}
             >
               <SelectTrigger id={`ins_coverage_${line.line_no}`}>
                 <SelectValue placeholder="Select coverage" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="cdw">CDW</SelectItem>
                 <SelectItem value="comprehensive">Comprehensive</SelectItem>
-                <SelectItem value="third-party">Third Party</SelectItem>
-                <SelectItem value="cdw">CDW Only</SelectItem>
+                <SelectItem value="full-zero-excess">Full / Zero Excess</SelectItem>
               </SelectContent>
             </Select>
+            {isCustomized("insurance_coverage_package", line.insurance_coverage_package, headerDefaults.insurance_coverage_package) && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-7 text-xs"
+                onClick={() => resetToDefault("insurance_coverage_package", headerDefaults.insurance_coverage_package)}
+              >
+                Reset to default
+              </Button>
+            )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor={`ins_excess_${line.line_no}`}>Excess (AED)</Label>
+            <Label htmlFor={`ins_excess_${line.line_no}`} className="flex items-center gap-2">
+              Excess (AED)
+              {isCustomized("insurance_excess_aed", line.insurance_excess_aed, headerDefaults.insurance_excess_aed) && (
+                <Badge variant="secondary" className="text-xs">Customized</Badge>
+              )}
+            </Label>
             <Input
               id={`ins_excess_${line.line_no}`}
               type="number"
               min="0"
               step="100"
-              value={line.insurance_excess_aed ?? 1500}
+              value={line.insurance_excess_aed ?? headerDefaults.insurance_excess_aed ?? 1500}
               onChange={(e) => onUpdate('insurance_excess_aed', parseFloat(e.target.value))}
+              placeholder={headerDefaults.insurance_excess_aed !== undefined ? `Default: ${headerDefaults.insurance_excess_aed}` : undefined}
             />
+            {isCustomized("insurance_excess_aed", line.insurance_excess_aed, headerDefaults.insurance_excess_aed) && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-7 text-xs"
+                onClick={() => resetToDefault("insurance_excess_aed", headerDefaults.insurance_excess_aed)}
+              >
+                Reset to default
+              </Button>
+            )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor={`ins_territory_${line.line_no}`}>Territorial Coverage</Label>
+            <Label htmlFor={`ins_territory_${line.line_no}`} className="flex items-center gap-2">
+              Territorial Coverage
+              {isCustomized("insurance_territorial_coverage", line.insurance_territorial_coverage, headerDefaults.insurance_territorial_coverage) && (
+                <Badge variant="secondary" className="text-xs">Customized</Badge>
+              )}
+            </Label>
             <Select
-              value={line.insurance_territorial_coverage || 'uae-only'}
+              value={line.insurance_territorial_coverage ?? headerDefaults.insurance_territorial_coverage ?? 'uae-only'}
               onValueChange={(value) => onUpdate('insurance_territorial_coverage', value)}
             >
               <SelectTrigger id={`ins_territory_${line.line_no}`}>
@@ -298,9 +391,19 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
               <SelectContent>
                 <SelectItem value="uae-only">UAE Only</SelectItem>
                 <SelectItem value="gcc">GCC Countries</SelectItem>
-                <SelectItem value="gcc-plus">GCC + Oman</SelectItem>
               </SelectContent>
             </Select>
+            {isCustomized("insurance_territorial_coverage", line.insurance_territorial_coverage, headerDefaults.insurance_territorial_coverage) && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-7 text-xs"
+                onClick={() => resetToDefault("insurance_territorial_coverage", headerDefaults.insurance_territorial_coverage)}
+              >
+                Reset to default
+              </Button>
+            )}
           </div>
         </div>
 

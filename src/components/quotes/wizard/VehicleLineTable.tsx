@@ -16,6 +16,15 @@ interface VehicleLineTableProps {
   selectedLines: number[];
   onSelectLine: (lineNo: number) => void;
   onSelectAll: () => void;
+  headerDefaults?: {
+    deposit_amount?: number;
+    advance_rent_months?: number;
+    insurance_coverage_package?: string;
+    insurance_excess_aed?: number;
+    insurance_glass_tire_cover?: boolean;
+    insurance_pai_enabled?: boolean;
+    insurance_territorial_coverage?: string;
+  };
 }
 
 export const VehicleLineTable: React.FC<VehicleLineTableProps> = ({
@@ -27,6 +36,7 @@ export const VehicleLineTable: React.FC<VehicleLineTableProps> = ({
   selectedLines,
   onSelectLine,
   onSelectAll,
+  headerDefaults = {},
 }) => {
   const [expandedLines, setExpandedLines] = useState<number[]>([]);
 
@@ -159,6 +169,7 @@ export const VehicleLineTable: React.FC<VehicleLineTableProps> = ({
                         onUpdate={(field, value) => onUpdate(index, field, value)}
                         errors={errors}
                         depositType={depositType}
+                        headerDefaults={headerDefaults}
                       />
                     </TableCell>
                   </TableRow>
