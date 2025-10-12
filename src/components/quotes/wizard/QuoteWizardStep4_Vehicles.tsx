@@ -4,9 +4,11 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Car, AlertCircle, Plus } from "lucide-react";
+import { Car, AlertCircle } from "lucide-react";
 import { useVehicles, useVehicleCategories } from "@/hooks/useVehicles";
 import { VehicleLineCard } from "./VehicleLineCard";
+import { VehicleLineTable } from "./VehicleLineTable";
+import { VehicleSelectionModal } from "../VehicleSelectionModal";
 import { FormError } from "@/components/ui/form-error";
 
 interface QuoteWizardStep3Props {
@@ -22,16 +24,21 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
 }) => {
   const { data: vehicles = [], isLoading: vehiclesLoading } = useVehicles();
   const { data: categories = [], isLoading: categoriesLoading } = useVehicleCategories();
+  
+  const [vehicleModalOpen, setVehicleModalOpen] = React.useState(false);
+  const [selectedLines, setSelectedLines] = React.useState<number[]>([]);
 
   const isCorporate = data.quote_type === 'Corporate lease';
 
-  // Add new vehicle line
-  const addVehicleLine = () => {
+  // Add multiple vehicle lines from modal selection
+  const addMultipleVehicleLines = (selectedVehicles: any[]) => {
     const currentLines = data.quote_items || [];
-    const newLine = {
-      line_no: currentLines.length + 1,
-      vehicle_class_id: undefined,
-      vehicle_id: undefined,
+    const startLineNo = currentLines.length + 1;
+    
+    const newLines = selectedVehicles.map((vehicle, idx) => ({
+      line_no: startLineNo + idx,
+      vehicle_class_id: vehicle.category_id,
+      vehicle_id: vehicle.id,
       pickup_at: data.contract_effective_from || "",
       return_at: data.contract_effective_to || "",
       deposit_amount: data.default_deposit_amount || 2500,
@@ -39,24 +46,28 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
       advance_rent_months: data.default_advance_rent_months || 1,
       monthly_rate: 0,
       duration_months: 0,
-      // Phase 3B defaults
-      vin: '',
-      color: '',
       location_id: undefined,
-      odometer: 0,
       mileage_package_km: 3000,
       excess_km_rate: 1.00,
       rate_type: 'monthly' as const,
       lease_term_months: undefined,
       end_date: undefined,
-      // Phase 3C: Inherit insurance defaults from header
       insurance_coverage_package: data.insurance_coverage_package || 'comprehensive',
       insurance_excess_aed: data.insurance_excess_aed ?? 1500,
       insurance_glass_tire_cover: data.insurance_glass_tire_cover ?? true,
       insurance_pai_enabled: data.insurance_pai_enabled ?? false,
       insurance_territorial_coverage: data.insurance_territorial_coverage || 'uae-only',
-    };
-    onChange({ quote_items: [...currentLines, newLine] });
+      // Store vehicle metadata for display
+      _vehicleMeta: {
+        make: vehicle.make,
+        model: vehicle.model,
+        year: vehicle.year,
+        category_name: vehicle._itemCodeMeta?.category_name || vehicle.categories?.name,
+        _itemCodeMeta: vehicle._itemCodeMeta,
+      },
+    }));
+    
+    onChange({ quote_items: [...currentLines, ...newLines] });
   };
 
   // Remove vehicle line
@@ -98,6 +109,20 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
 
   const totals = calculateTotals();
 
+  const handleSelectLine = (lineNo: number) => {
+    setSelectedLines(prev =>
+      prev.includes(lineNo) ? prev.filter(l => l !== lineNo) : [...prev, lineNo]
+    );
+  };
+
+  const handleSelectAll = () => {
+    if (selectedLines.length === (data.quote_items || []).length) {
+      setSelectedLines([]);
+    } else {
+      setSelectedLines((data.quote_items || []).map((line: any) => line.line_no));
+    }
+  };
+
   // Corporate Multi-Vehicle Interface
   if (isCorporate) {
     return (
@@ -118,11 +143,11 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
               </div>
               <Button
                 type="button"
-                onClick={addVehicleLine}
+                onClick={() => setVehicleModalOpen(true)}
                 variant="default"
               >
-                <Plus className="h-4 w-4 mr-2" />
-                Add Vehicle Line
+                <Car className="h-4 w-4 mr-2" />
+                Select Vehicles
               </Button>
             </div>
           </CardHeader>
@@ -131,44 +156,39 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
             
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
               <p className="text-sm text-blue-800">
-                <strong>Tip:</strong> Each vehicle line inherits deposit and advance rent defaults from Step 2, 
-                but you can customize them per line below.
+                <strong>Tip:</strong> Select multiple vehicles at once, then expand each row to customize details.
+                Each line inherits defaults from previous steps.
               </p>
             </div>
           </CardContent>
         </Card>
 
-        {/* Vehicle Lines */}
-        {data.quote_items && data.quote_items.length > 0 ? (
-          <div className="space-y-4">
-            {data.quote_items.map((line: any, index: number) => (
-              <VehicleLineCard
-                key={line.line_no}
-                line={line}
-                onUpdate={(field, value) => updateVehicleLine(index, field, value)}
-                onRemove={() => removeVehicleLine(index)}
-                errors={errors}
-                depositType={data.deposit_type || 'refundable'}
-              />
-            ))}
-          </div>
-        ) : (
-          <Card className="border-dashed">
-            <CardContent className="py-12">
-              <div className="text-center">
-                <Car className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <h3 className="text-lg font-semibold mb-2">No Vehicle Lines Yet</h3>
-                <p className="text-muted-foreground mb-4">
-                  Start by adding your first vehicle line to the quote
-                </p>
-                <Button onClick={addVehicleLine}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add First Vehicle Line
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+        {/* Vehicle Selection Modal */}
+        <VehicleSelectionModal
+          open={vehicleModalOpen}
+          onOpenChange={setVehicleModalOpen}
+          selectedVehicleId={undefined}
+          onVehicleSelect={(vehicles: any) => {
+            if (Array.isArray(vehicles)) {
+              addMultipleVehicleLines(vehicles);
+            }
+            setVehicleModalOpen(false);
+          }}
+          quoteStartDate={data.contract_effective_from}
+          quoteEndDate={data.contract_effective_to}
+        />
+
+        {/* Vehicle Lines Table */}
+        <VehicleLineTable
+          lines={data.quote_items || []}
+          onUpdate={updateVehicleLine}
+          onRemove={removeVehicleLine}
+          errors={errors}
+          depositType={data.deposit_type || 'refundable'}
+          selectedLines={selectedLines}
+          onSelectLine={handleSelectLine}
+          onSelectAll={handleSelectAll}
+        />
 
         {/* Summary Panel */}
         {data.quote_items && data.quote_items.length > 0 && (

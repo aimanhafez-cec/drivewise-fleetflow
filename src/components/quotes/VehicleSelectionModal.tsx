@@ -78,7 +78,8 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
   const [selectedYear, setSelectedYear] = useState<string>('all');
   const [selectedLocation, setSelectedLocation] = useState<string>('all');
   const [showAvailableOnly, setShowAvailableOnly] = useState(false);
-  const [tempSelectedItemCode, setTempSelectedItemCode] = useState<ItemCode | null>(null);
+  const [selectedItemCodes, setSelectedItemCodes] = useState<ItemCode[]>([]);
+  const [selectAll, setSelectAll] = useState(false);
 
   // Fetch vehicles with location
   const { data: vehicles = [], isLoading } = useQuery({
@@ -200,24 +201,49 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
     setShowAvailableOnly(false);
   };
 
-  // Handle item code selection
-  const handleSelect = () => {
-    if (tempSelectedItemCode) {
-      const representativeVehicle = vehicles.find(
-        v => v.id === tempSelectedItemCode.representative_vehicle_id
-      );
-      
-      if (representativeVehicle) {
-        onVehicleSelect({
-          ...representativeVehicle,
-          _itemCodeMeta: {
-            available_qty: tempSelectedItemCode.available_qty,
-            category_name: tempSelectedItemCode.category_name,
-          }
-        });
+  const handleToggleItemCode = (itemCode: ItemCode) => {
+    setSelectedItemCodes(prev => {
+      const exists = prev.find(ic => ic.key === itemCode.key);
+      if (exists) {
+        return prev.filter(ic => ic.key !== itemCode.key);
+      } else {
+        return [...prev, itemCode];
       }
+    });
+  };
+
+  const handleSelectAll = () => {
+    if (selectAll) {
+      setSelectedItemCodes([]);
+      setSelectAll(false);
+    } else {
+      setSelectedItemCodes([...filteredItemCodes]);
+      setSelectAll(true);
+    }
+  };
+
+  const handleConfirmSelection = () => {
+    if (selectedItemCodes.length > 0) {
+      const selectedVehicles = selectedItemCodes.map(itemCode => {
+        const representativeVehicle = vehicles.find(
+          v => v.id === itemCode.representative_vehicle_id
+        );
+        
+        if (representativeVehicle) {
+          return {
+            ...representativeVehicle,
+            _itemCodeMeta: {
+              available_qty: itemCode.available_qty,
+              category_name: itemCode.category_name,
+            }
+          };
+        }
+        return null;
+      }).filter(Boolean);
       
-      setTempSelectedItemCode(null);
+      (onVehicleSelect as any)(selectedVehicles);
+      setSelectedItemCodes([]);
+      setSelectAll(false);
       onOpenChange(false);
     }
   };
@@ -415,10 +441,18 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
             </div>
           ) : (
             <div className="border rounded-lg overflow-hidden">
-              <table className="w-full">
-                <thead className="bg-muted">
-                  <tr>
-                    <th className="text-left p-3 text-sm font-semibold">Vehicle Class</th>
+      <table className="w-full">
+        <thead className="bg-muted">
+          <tr>
+            <th className="text-center p-3 text-sm font-semibold w-12">
+              <input
+                type="checkbox"
+                checked={selectAll}
+                onChange={handleSelectAll}
+                className="h-4 w-4 rounded border-gray-300"
+              />
+            </th>
+            <th className="text-left p-3 text-sm font-semibold">Vehicle Class</th>
                     <th className="text-left p-3 text-sm font-semibold">Make</th>
                     <th className="text-left p-3 text-sm font-semibold">Model</th>
                     <th className="text-center p-3 text-sm font-semibold">Year</th>
@@ -426,21 +460,30 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
                     <th className="text-center p-3 text-sm font-semibold w-32">Action</th>
                   </tr>
                 </thead>
-                <tbody>
-                  {filteredItemCodes.map((itemCode) => {
-                    const isSelected = tempSelectedItemCode?.key === itemCode.key;
-                    
-                    return (
-                      <tr
-                        key={itemCode.key}
-                        className={`border-t cursor-pointer transition-colors hover:bg-muted/50 ${
-                          isSelected ? 'bg-primary/10' : ''
-                        }`}
-                        onClick={() => setTempSelectedItemCode(itemCode)}
-                      >
-                        <td className="p-3">
-                          <Badge variant="outline">{itemCode.category_name}</Badge>
-                        </td>
+        <tbody>
+          {filteredItemCodes.map((itemCode) => {
+            const isSelected = selectedItemCodes.some(ic => ic.key === itemCode.key);
+            
+            return (
+              <tr
+                key={itemCode.key}
+                className={`border-t cursor-pointer transition-colors hover:bg-muted/50 ${
+                  isSelected ? 'bg-primary/10' : ''
+                }`}
+                onClick={() => handleToggleItemCode(itemCode)}
+              >
+                <td className="p-3 text-center">
+                  <input
+                    type="checkbox"
+                    checked={isSelected}
+                    onChange={() => handleToggleItemCode(itemCode)}
+                    onClick={(e) => e.stopPropagation()}
+                    className="h-4 w-4 rounded border-gray-300"
+                  />
+                </td>
+                <td className="p-3">
+                  <Badge variant="outline">{itemCode.category_name}</Badge>
+                </td>
                         <td className="p-3 font-medium">{itemCode.make}</td>
                         <td className="p-3">{itemCode.model}</td>
                         <td className="p-3 text-center">{itemCode.year}</td>
@@ -452,26 +495,14 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
                             {itemCode.available_qty} / {itemCode.total_qty}
                           </Badge>
                         </td>
-                        <td className="p-3 text-center">
-                          <Button
-                            type="button"
-                            size="sm"
-                            variant={isSelected ? "default" : "outline"}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setTempSelectedItemCode(itemCode);
-                            }}
-                          >
-                            {isSelected ? (
-                              <>
-                                <Check className="h-3 w-3 mr-1" />
-                                Selected
-                              </>
-                            ) : (
-                              'Select'
-                            )}
-                          </Button>
-                        </td>
+                <td className="p-3 text-center">
+                  {isSelected && (
+                    <Badge variant="default">
+                      <Check className="h-3 w-3 mr-1" />
+                      Selected
+                    </Badge>
+                  )}
+                </td>
                       </tr>
                     );
                   })}
@@ -481,43 +512,41 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
           )}
         </ScrollArea>
 
-        <DialogFooter className="p-6 pt-4 border-t">
-          <div className="flex items-center justify-between w-full">
-            <div className="text-sm text-muted-foreground">
-              {tempSelectedItemCode ? (
-                <span className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-primary" />
-                  Selected: {tempSelectedItemCode.make} {tempSelectedItemCode.model} {tempSelectedItemCode.year}
-                  <Badge variant="outline" className="ml-2">
-                    {tempSelectedItemCode.available_qty} available
-                  </Badge>
-                </span>
-              ) : (
-                'Click a row to select a vehicle type'
-              )}
-            </div>
-            <div className="flex gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => {
-                  setTempSelectedItemCode(null);
-                  onOpenChange(false);
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="button"
-                onClick={handleSelect}
-                disabled={!tempSelectedItemCode}
-              >
-                <Check className="h-4 w-4 mr-2" />
-                Select Vehicle Type
-              </Button>
-            </div>
-          </div>
-        </DialogFooter>
+<DialogFooter className="p-6 pt-4 border-t">
+  <div className="flex items-center justify-between w-full">
+    <div className="text-sm text-muted-foreground">
+      {selectedItemCodes.length > 0 ? (
+        <span className="flex items-center gap-2">
+          <Check className="h-4 w-4 text-primary" />
+          <strong>{selectedItemCodes.length}</strong> vehicle type{selectedItemCodes.length !== 1 ? 's' : ''} selected
+        </span>
+      ) : (
+        'Check rows to select vehicle types'
+      )}
+    </div>
+    <div className="flex gap-2">
+      <Button
+        type="button"
+        variant="outline"
+        onClick={() => {
+          setSelectedItemCodes([]);
+          setSelectAll(false);
+          onOpenChange(false);
+        }}
+      >
+        Cancel
+      </Button>
+      <Button
+        type="button"
+        onClick={handleConfirmSelection}
+        disabled={selectedItemCodes.length === 0}
+      >
+        <Check className="h-4 w-4 mr-2" />
+        Add Selected Vehicles ({selectedItemCodes.length})
+      </Button>
+    </div>
+  </div>
+</DialogFooter>
       </DialogContent>
     </Dialog>
   );
