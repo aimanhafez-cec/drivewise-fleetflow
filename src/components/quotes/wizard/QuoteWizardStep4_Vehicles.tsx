@@ -46,7 +46,8 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
       advance_rent_months: data.default_advance_rent_months || 1,
       monthly_rate: 0,
       duration_months: 0,
-      location_id: undefined,
+      pickup_location_id: data.default_pickup_location_id,
+      return_location_id: data.default_return_location_id,
       mileage_package_km: 3000,
       excess_km_rate: 1.00,
       rate_type: 'monthly' as const,
@@ -200,6 +201,8 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
             insurance_glass_tire_cover: data.insurance_glass_tire_cover,
             insurance_pai_enabled: data.insurance_pai_enabled,
             insurance_territorial_coverage: data.insurance_territorial_coverage,
+            default_pickup_location_id: data.default_pickup_location_id,
+            default_return_location_id: data.default_return_location_id,
           }}
         />
 

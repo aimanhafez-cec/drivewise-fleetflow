@@ -16,6 +16,7 @@ import {
   SalesOfficeSelect,
   SalesRepSelect,
   CustomerSiteSelect,
+  LocationSelect,
 } from "@/components/ui/select-components";
 import { CustomerSelect } from "@/components/ui/select-components";
 import { OpportunityViewDialog } from "@/components/quotes/OpportunityViewDialog";
@@ -432,7 +433,28 @@ export const QuoteWizardStep1: React.FC<QuoteWizardStep1Props> = ({
             </div>
           </div>
 
-          {/* Row 7: Contract Dates & Duration */}
+          {/* Row 7: Default Locations */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="default_pickup_location_id">Default Pickup Location</Label>
+              <LocationSelect
+                value={data.default_pickup_location_id || ""}
+                onChange={(value) => onChange({ default_pickup_location_id: value })}
+                placeholder="Select default pickup location"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="default_return_location_id">Default Return Location</Label>
+              <LocationSelect
+                value={data.default_return_location_id || ""}
+                onChange={(value) => onChange({ default_return_location_id: value })}
+                placeholder="Select default return location"
+              />
+            </div>
+          </div>
+
+          {/* Row 8: Contract Dates & Duration */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="space-y-2">
               <Label htmlFor="validity_date_to">Validity Date To</Label>

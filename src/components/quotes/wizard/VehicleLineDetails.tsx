@@ -21,6 +21,8 @@ interface VehicleLineDetailsProps {
     insurance_glass_tire_cover?: boolean;
     insurance_pai_enabled?: boolean;
     insurance_territorial_coverage?: string;
+    default_pickup_location_id?: string;
+    default_return_location_id?: string;
   };
 }
 
@@ -88,20 +90,25 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {/* SECTION 1: Location & Branch */}
+        {/* SECTION 1: Delivery & Collection */}
         <div className="space-y-4">
           <h4 className="text-sm font-semibold text-muted-foreground border-b pb-2">
-            Location & Branch
+            Delivery & Collection
           </h4>
           
           <div className="space-y-2">
-            <Label htmlFor={`location_${line.line_no}`}>Branch / Location *</Label>
+            <Label htmlFor={`pickup_location_${line.line_no}`} className="flex items-center gap-2">
+              Pickup Location *
+              {isCustomized("pickup_location_id", line.pickup_location_id, headerDefaults.default_pickup_location_id) && (
+                <Badge variant="secondary" className="text-xs">Customized</Badge>
+              )}
+            </Label>
             <Select
-              value={line.location_id || ""}
-              onValueChange={(value) => onUpdate('location_id', value)}
+              value={line.pickup_location_id ?? headerDefaults.default_pickup_location_id ?? ""}
+              onValueChange={(value) => onUpdate('pickup_location_id', value)}
             >
-              <SelectTrigger id={`location_${line.line_no}`}>
-                <SelectValue placeholder="Select location" />
+              <SelectTrigger id={`pickup_location_${line.line_no}`}>
+                <SelectValue placeholder={headerDefaults.default_pickup_location_id ? "Select location" : "Select pickup location"} />
               </SelectTrigger>
               <SelectContent>
                 {locationsLoading ? (
@@ -117,7 +124,60 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
                 )}
               </SelectContent>
             </Select>
-            {errors[`${linePrefix}_location`] && <FormError message={errors[`${linePrefix}_location`]} />}
+            {isCustomized("pickup_location_id", line.pickup_location_id, headerDefaults.default_pickup_location_id) && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-7 text-xs"
+                onClick={() => resetToDefault("pickup_location_id", headerDefaults.default_pickup_location_id)}
+              >
+                Reset to default
+              </Button>
+            )}
+            {errors[`${linePrefix}_pickup_location`] && <FormError message={errors[`${linePrefix}_pickup_location`]} />}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor={`return_location_${line.line_no}`} className="flex items-center gap-2">
+              Return Location
+              {isCustomized("return_location_id", line.return_location_id, headerDefaults.default_return_location_id) && (
+                <Badge variant="secondary" className="text-xs">Customized</Badge>
+              )}
+            </Label>
+            <Select
+              value={line.return_location_id ?? headerDefaults.default_return_location_id ?? line.pickup_location_id ?? headerDefaults.default_pickup_location_id ?? ""}
+              onValueChange={(value) => onUpdate('return_location_id', value)}
+            >
+              <SelectTrigger id={`return_location_${line.line_no}`}>
+                <SelectValue placeholder="Same as pickup" />
+              </SelectTrigger>
+              <SelectContent>
+                {locationsLoading ? (
+                  <SelectItem value="__loading__" disabled>Loading...</SelectItem>
+                ) : locations.length === 0 ? (
+                  <SelectItem value="__none__" disabled>No locations</SelectItem>
+                ) : (
+                  locations.map((loc: any) => (
+                    <SelectItem key={loc.id} value={loc.id}>
+                      {loc.label}
+                    </SelectItem>
+                  ))
+                )}
+              </SelectContent>
+            </Select>
+            {isCustomized("return_location_id", line.return_location_id, headerDefaults.default_return_location_id) && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-7 text-xs"
+                onClick={() => resetToDefault("return_location_id", headerDefaults.default_return_location_id)}
+              >
+                Reset to default
+              </Button>
+            )}
+            <p className="text-xs text-muted-foreground">Leave blank to use pickup location</p>
           </div>
         </div>
 
@@ -400,6 +460,70 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
                 size="sm"
                 className="h-7 text-xs"
                 onClick={() => resetToDefault("insurance_territorial_coverage", headerDefaults.insurance_territorial_coverage)}
+              >
+                Reset to default
+              </Button>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor={`ins_glass_tire_${line.line_no}`} className="flex items-center gap-2">
+              Glass & Tire Cover
+              {isCustomized("insurance_glass_tire_cover", line.insurance_glass_tire_cover, headerDefaults.insurance_glass_tire_cover) && (
+                <Badge variant="secondary" className="text-xs">Customized</Badge>
+              )}
+            </Label>
+            <Select
+              value={(line.insurance_glass_tire_cover ?? headerDefaults.insurance_glass_tire_cover) ? "yes" : "no"}
+              onValueChange={(value) => onUpdate('insurance_glass_tire_cover', value === "yes")}
+            >
+              <SelectTrigger id={`ins_glass_tire_${line.line_no}`}>
+                <SelectValue placeholder="Select option" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="yes">Yes - Included</SelectItem>
+                <SelectItem value="no">No - Not Included</SelectItem>
+              </SelectContent>
+            </Select>
+            {isCustomized("insurance_glass_tire_cover", line.insurance_glass_tire_cover, headerDefaults.insurance_glass_tire_cover) && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-7 text-xs"
+                onClick={() => resetToDefault("insurance_glass_tire_cover", headerDefaults.insurance_glass_tire_cover)}
+              >
+                Reset to default
+              </Button>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor={`ins_pai_${line.line_no}`} className="flex items-center gap-2">
+              Personal Accident Insurance (PAI)
+              {isCustomized("insurance_pai_enabled", line.insurance_pai_enabled, headerDefaults.insurance_pai_enabled) && (
+                <Badge variant="secondary" className="text-xs">Customized</Badge>
+              )}
+            </Label>
+            <Select
+              value={(line.insurance_pai_enabled ?? headerDefaults.insurance_pai_enabled) ? "yes" : "no"}
+              onValueChange={(value) => onUpdate('insurance_pai_enabled', value === "yes")}
+            >
+              <SelectTrigger id={`ins_pai_${line.line_no}`}>
+                <SelectValue placeholder="Select option" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="yes">Yes - Enabled</SelectItem>
+                <SelectItem value="no">No - Not Included</SelectItem>
+              </SelectContent>
+            </Select>
+            {isCustomized("insurance_pai_enabled", line.insurance_pai_enabled, headerDefaults.insurance_pai_enabled) && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-7 text-xs"
+                onClick={() => resetToDefault("insurance_pai_enabled", headerDefaults.insurance_pai_enabled)}
               >
                 Reset to default
               </Button>
