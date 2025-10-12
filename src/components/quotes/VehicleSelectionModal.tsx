@@ -257,7 +257,7 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-5xl max-h-[90vh] p-0 overflow-hidden">
+      <DialogContent className="max-w-5xl max-h-[90vh] p-0 flex flex-col">
         <DialogHeader className="p-4 pb-2">
           <DialogTitle className="flex items-center gap-2">
             <Car className="h-5 w-5" />
@@ -268,7 +268,7 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="px-4 space-y-1">
+        <div className="px-4 space-y-1 flex-shrink-0">
           {/* Search Bar */}
           <div className="relative mb-0">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-3.5 w-3.5" />
@@ -422,7 +422,7 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
         </div>
 
         {/* Vehicle Table */}
-        <div className="h-80 px-4 pt-1 overflow-auto border-t">
+        <div className="flex-1 px-4 pt-1 overflow-auto border-t min-h-0">
           {isLoading ? (
             <div className="space-y-2">
               {[1, 2, 3, 4, 5].map((i) => (
@@ -499,7 +499,7 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
           )}
         </div>
 
-<DialogFooter className="p-4 pt-3 border-t">
+<DialogFooter className="p-4 pt-3 border-t flex-shrink-0">
   <div className="flex items-center justify-between w-full">
     <div className="text-sm text-muted-foreground">
       {selectedItemCodes.length > 0 ? (
