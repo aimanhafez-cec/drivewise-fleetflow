@@ -438,7 +438,7 @@ export const VehicleSelectionModal: React.FC<VehicleSelectionModalProps> = ({
               </p>
             </div>
           ) : (
-      <table className="w-full border border-border rounded-lg overflow-hidden">
+      <table className="w-full border border-border rounded-lg">
         <thead className="bg-background sticky top-0 z-10 shadow-sm border-b">
           <tr>
             <th className="text-center p-2 text-xs font-semibold w-12">
