@@ -193,6 +193,7 @@ export const InspectionWizard: React.FC<InspectionWizardProps> = ({
       const nextStep = STEPS[currentIndex + 1].key;
       console.log('Moving to next step:', nextStep);
       setCurrentStep(nextStep);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
@@ -200,6 +201,7 @@ export const InspectionWizard: React.FC<InspectionWizardProps> = ({
     const currentIndex = getCurrentStepIndex();
     if (currentIndex > 0) {
       setCurrentStep(STEPS[currentIndex - 1].key);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 

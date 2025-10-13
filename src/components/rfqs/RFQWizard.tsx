@@ -107,11 +107,13 @@ export const RFQWizard: React.FC = () => {
   const handleNext = () => {
     if (validateStep(currentStep)) {
       setCurrentStep(prev => Math.min(prev + 1, steps.length));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
   const handleBack = () => {
     setCurrentStep(prev => Math.max(prev - 1, 1));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleSubmit = () => {

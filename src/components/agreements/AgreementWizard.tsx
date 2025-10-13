@@ -196,6 +196,7 @@ export const AgreementWizard: React.FC<AgreementWizardProps> = ({
     if (validateCurrentStep()) {
       if (currentStep < steps.length) {
         setCurrentStep(currentStep + 1);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     } else {
       toast({
@@ -209,6 +210,7 @@ export const AgreementWizard: React.FC<AgreementWizardProps> = ({
   const handlePrevious = () => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 

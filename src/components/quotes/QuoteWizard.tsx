@@ -417,17 +417,20 @@ export const QuoteWizard: React.FC = () => {
         setCompletedSteps(prev => [...prev, currentStep]);
       }
       setCurrentStep(prev => Math.min(prev + 1, steps.length));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
   const handleBack = () => {
     setCurrentStep(prev => Math.max(prev - 1, 1));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleStepClick = (stepId: number) => {
     // Only allow clicking on current or completed steps
     if (stepId <= currentStep) {
       setCurrentStep(stepId);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
       toast({
         title: "Complete current step first",

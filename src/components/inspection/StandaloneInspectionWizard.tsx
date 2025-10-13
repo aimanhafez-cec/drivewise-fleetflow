@@ -165,6 +165,7 @@ export const StandaloneInspectionWizard: React.FC<StandaloneInspectionWizardProp
     if (currentIndex < STEPS.length - 1) {
       const nextStep = STEPS[currentIndex + 1].key;
       setCurrentStep(nextStep);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
@@ -172,6 +173,7 @@ export const StandaloneInspectionWizard: React.FC<StandaloneInspectionWizardProp
     const currentIndex = getCurrentStepIndex();
     if (currentIndex > 0) {
       setCurrentStep(STEPS[currentIndex - 1].key);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
