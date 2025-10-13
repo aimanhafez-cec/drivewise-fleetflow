@@ -5,7 +5,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { FormError } from "@/components/ui/form-error";
+import { AlertCircle, Info } from "lucide-react";
 import { useLocations, useCustomerSites } from "@/hooks/useBusinessLOVs";
 import { formatDurationInMonthsAndDays } from "@/lib/utils/dateUtils";
 
@@ -50,6 +52,17 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
   const { items: locations = [], isLoading: locationsLoading } = useLocations();
   const { items: customerSites = [], isLoading: sitesLoading } = useCustomerSites(headerDefaults?.customer_id);
   const linePrefix = `line_${line.line_no - 1}`;
+
+  // Debug logging for vehicle line customer data
+  useEffect(() => {
+    console.log('🔍 VehicleLineDetails - Line', line.line_no, {
+      headerDefaults_customer_id: headerDefaults?.customer_id,
+      customerSites_count: customerSites.length,
+      sitesLoading,
+      pickup_type: line.pickup_type ?? headerDefaults?.pickup_type,
+      pickup_customer_site_id: line.pickup_customer_site_id ?? headerDefaults?.pickup_customer_site_id
+    });
+  }, [headerDefaults?.customer_id, customerSites.length, sitesLoading, line.line_no, line.pickup_type, line.pickup_customer_site_id, headerDefaults?.pickup_type, headerDefaults?.pickup_customer_site_id]);
 
   // Get billing period information based on billing plan
   const getBillingPeriodInfo = () => {
@@ -243,6 +256,22 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
                     <Badge variant="secondary" className="text-xs">Customized</Badge>
                   )}
                 </Label>
+                {!headerDefaults?.customer_id && (
+                  <Alert variant="destructive" className="mb-2">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>
+                      No customer selected. Customer sites cannot be loaded.
+                    </AlertDescription>
+                  </Alert>
+                )}
+                {headerDefaults?.customer_id && customerSites.length === 0 && !sitesLoading && (
+                  <Alert className="mb-2">
+                    <Info className="h-4 w-4" />
+                    <AlertDescription>
+                      No customer sites found for customer ID: {headerDefaults.customer_id}
+                    </AlertDescription>
+                  </Alert>
+                )}
                 <Select
                   value={line.pickup_customer_site_id ?? headerDefaults.pickup_customer_site_id ?? ""}
                   onValueChange={(value) => onUpdate('pickup_customer_site_id', value)}

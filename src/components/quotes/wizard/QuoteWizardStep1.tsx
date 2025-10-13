@@ -5,7 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Eye, User, Building2 } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Eye, User, Building2, Info } from "lucide-react";
 import { format } from "date-fns";
 import { formatDurationInMonthsAndDays } from "@/lib/utils/dateUtils";
 import {
@@ -64,6 +65,18 @@ export const QuoteWizardStep1: React.FC<QuoteWizardStep1Props> = ({
     }
   }, [data.customer_type, selectedCustomer?.full_name, onChange]);
 
+  // Debug logging for customer data
+  useEffect(() => {
+    console.log('🔍 QuoteWizardStep1 - Customer Data:', {
+      customer_id: data.customer_id,
+      customer_bill_to: data.customer_bill_to,
+      pickup_type: data.pickup_type,
+      pickup_customer_site_id: data.pickup_customer_site_id,
+      return_type: data.return_type,
+      return_customer_site_id: data.return_customer_site_id
+    });
+  }, [data.customer_id, data.customer_bill_to, data.pickup_type, data.pickup_customer_site_id, data.return_type, data.return_customer_site_id]);
+
   // Auto-calculate duration when dates change
   useEffect(() => {
     if (data.contract_effective_from && data.contract_effective_to) {
@@ -77,15 +90,22 @@ export const QuoteWizardStep1: React.FC<QuoteWizardStep1Props> = ({
 
   // Default pickup/return customer site to Bill To when applicable
   useEffect(() => {
-    if (data.customer_bill_to) {
-      if (data.pickup_type === 'customer_site' && !data.pickup_customer_site_id) {
+    // Default pickup site when conditions are met
+    if (data.pickup_type === 'customer_site' && !data.pickup_customer_site_id) {
+      if (data.customer_bill_to) {
+        console.log('✅ Defaulting pickup_customer_site_id to Bill To:', data.customer_bill_to);
         onChange({ pickup_customer_site_id: data.customer_bill_to });
       }
-      if (data.return_type === 'customer_site' && !data.return_customer_site_id) {
+    }
+    
+    // Default return site when conditions are met
+    if (data.return_type === 'customer_site' && !data.return_customer_site_id) {
+      if (data.customer_bill_to) {
+        console.log('✅ Defaulting return_customer_site_id to Bill To:', data.customer_bill_to);
         onChange({ return_customer_site_id: data.customer_bill_to });
       }
     }
-  }, [data.customer_bill_to, data.pickup_type, data.return_type]);
+  }, [data.customer_bill_to, data.pickup_type, data.return_type, data.pickup_customer_site_id, data.return_customer_site_id]);
 
   return (
     <div className="space-y-6">
@@ -565,6 +585,14 @@ export const QuoteWizardStep1: React.FC<QuoteWizardStep1Props> = ({
                         <p className="text-xs text-muted-foreground">
                           Select a customer first
                         </p>
+                      )}
+                      {data.customer_id && !data.customer_bill_to && (
+                        <Alert className="mt-2">
+                          <Info className="h-4 w-4" />
+                          <AlertDescription>
+                            💡 Tip: Select a "Customer Bill To" site first. It will be used as the default pickup site.
+                          </AlertDescription>
+                        </Alert>
                       )}
                       {errors.pickup_customer_site_id && (
                         <p className="text-sm text-destructive">{errors.pickup_customer_site_id}</p>

@@ -330,6 +330,12 @@ export const QuoteWizard: React.FC = () => {
         if (!quoteData.quote_date) newErrors.quote_date = "Quote date is required";
         if (!quoteData.quote_type) newErrors.quote_type = "Quote type is required";
         
+        console.log('🔍 Step 1 Validation - Customer Data:', {
+          customer_id: quoteData.customer_id,
+          pickup_type: quoteData.pickup_type,
+          pickup_customer_site_id: quoteData.pickup_customer_site_id
+        });
+        
         // Win/Loss reason required if status is won or lost
         if ((quoteData.status === "won" || quoteData.status === "lost") && !quoteData.win_loss_reason) {
           newErrors.win_loss_reason = "Win/Loss reason is required for this status";
