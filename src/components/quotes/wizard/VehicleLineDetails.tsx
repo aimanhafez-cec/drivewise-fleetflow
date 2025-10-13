@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { FormError } from "@/components/ui/form-error";
-import { useLocations } from "@/hooks/useBusinessLOVs";
+import { useLocations, useCustomerSites } from "@/hooks/useBusinessLOVs";
 import { formatDurationInMonthsAndDays } from "@/lib/utils/dateUtils";
 
 interface VehicleLineDetailsProps {
@@ -22,8 +22,14 @@ interface VehicleLineDetailsProps {
     insurance_glass_tire_cover?: boolean;
     insurance_pai_enabled?: boolean;
     insurance_territorial_coverage?: string;
-    default_pickup_location_id?: string;
-    default_return_location_id?: string;
+    pickup_type?: string;
+    pickup_location_id?: string;
+    pickup_customer_site_id?: string;
+    return_type?: string;
+    return_location_id?: string;
+    return_customer_site_id?: string;
+    delivery_fee?: number;
+    collection_fee?: number;
     default_price_list_id?: string;
     billing_plan?: string;
   };
@@ -37,6 +43,7 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
   headerDefaults = {},
 }) => {
   const { items: locations = [], isLoading: locationsLoading } = useLocations();
+  const { items: customerSites = [], isLoading: sitesLoading } = useCustomerSites();
   const linePrefix = `line_${line.line_no - 1}`;
 
   // Get billing period information based on billing plan
@@ -139,88 +146,261 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
             Delivery & Collection
           </h4>
           
+          {/* Pickup Configuration */}
           <div className="space-y-2">
-            <Label htmlFor={`pickup_location_${line.line_no}`} className="flex items-center gap-2">
-              Pickup Location *
-              {isCustomized("pickup_location_id", line.pickup_location_id, headerDefaults.default_pickup_location_id) && (
+            <Label htmlFor={`pickup_type_${line.line_no}`} className="flex items-center gap-2">
+              Pickup From *
+              {isCustomized("pickup_type", line.pickup_type, headerDefaults.pickup_type) && (
                 <Badge variant="secondary" className="text-xs">Customized</Badge>
               )}
             </Label>
             <Select
-              value={line.pickup_location_id ?? headerDefaults.default_pickup_location_id ?? ""}
-              onValueChange={(value) => onUpdate('pickup_location_id', value)}
+              value={line.pickup_type ?? headerDefaults.pickup_type ?? "company_location"}
+              onValueChange={(value) => {
+                onUpdate('pickup_type', value);
+                // Clear location/site when type changes
+                if (value === 'company_location') {
+                  onUpdate('pickup_customer_site_id', null);
+                } else {
+                  onUpdate('pickup_location_id', null);
+                }
+              }}
             >
-              <SelectTrigger id={`pickup_location_${line.line_no}`}>
-                <SelectValue placeholder={headerDefaults.default_pickup_location_id ? "Select location" : "Select pickup location"} />
+              <SelectTrigger id={`pickup_type_${line.line_no}`}>
+                <SelectValue placeholder="Select pickup type" />
               </SelectTrigger>
               <SelectContent>
-                {locationsLoading ? (
-                  <SelectItem value="__loading__" disabled>Loading...</SelectItem>
-                ) : locations.length === 0 ? (
-                  <SelectItem value="__none__" disabled>No locations</SelectItem>
-                ) : (
-                  locations.map((loc: any) => (
-                    <SelectItem key={loc.id} value={loc.id}>
-                      {loc.label}
-                    </SelectItem>
-                  ))
-                )}
+                <SelectItem value="company_location">Our Location</SelectItem>
+                <SelectItem value="customer_site">Customer Location (Delivery)</SelectItem>
               </SelectContent>
             </Select>
-            {isCustomized("pickup_location_id", line.pickup_location_id, headerDefaults.default_pickup_location_id) && (
+            {isCustomized("pickup_type", line.pickup_type, headerDefaults.pickup_type) && (
               <Button
                 type="button"
                 variant="ghost"
                 size="sm"
                 className="h-7 text-xs"
-                onClick={() => resetToDefault("pickup_location_id", headerDefaults.default_pickup_location_id)}
+                onClick={() => resetToDefault("pickup_type", headerDefaults.pickup_type)}
               >
                 Reset to default
               </Button>
+            )}
+          </div>
+
+          {/* Pickup Location/Site Selector */}
+          <div className="space-y-2">
+            {(line.pickup_type ?? headerDefaults.pickup_type ?? "company_location") === "company_location" ? (
+              <>
+                <Label htmlFor={`pickup_location_${line.line_no}`} className="flex items-center gap-2">
+                  Pickup Location *
+                  {isCustomized("pickup_location_id", line.pickup_location_id, headerDefaults.pickup_location_id) && (
+                    <Badge variant="secondary" className="text-xs">Customized</Badge>
+                  )}
+                </Label>
+                <Select
+                  value={line.pickup_location_id ?? headerDefaults.pickup_location_id ?? ""}
+                  onValueChange={(value) => onUpdate('pickup_location_id', value)}
+                >
+                  <SelectTrigger id={`pickup_location_${line.line_no}`}>
+                    <SelectValue placeholder="Select pickup location" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {locationsLoading ? (
+                      <SelectItem value="__loading__" disabled>Loading...</SelectItem>
+                    ) : locations.length === 0 ? (
+                      <SelectItem value="__none__" disabled>No locations</SelectItem>
+                    ) : (
+                      locations.map((loc: any) => (
+                        <SelectItem key={loc.id} value={loc.id}>
+                          {loc.label}
+                        </SelectItem>
+                      ))
+                    )}
+                  </SelectContent>
+                </Select>
+                {isCustomized("pickup_location_id", line.pickup_location_id, headerDefaults.pickup_location_id) && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 text-xs"
+                    onClick={() => resetToDefault("pickup_location_id", headerDefaults.pickup_location_id)}
+                  >
+                    Reset to default
+                  </Button>
+                )}
+              </>
+            ) : (
+              <>
+                <Label htmlFor={`pickup_customer_site_${line.line_no}`} className="flex items-center gap-2">
+                  Customer Site *
+                  {isCustomized("pickup_customer_site_id", line.pickup_customer_site_id, headerDefaults.pickup_customer_site_id) && (
+                    <Badge variant="secondary" className="text-xs">Customized</Badge>
+                  )}
+                </Label>
+                <Select
+                  value={line.pickup_customer_site_id ?? headerDefaults.pickup_customer_site_id ?? ""}
+                  onValueChange={(value) => onUpdate('pickup_customer_site_id', value)}
+                >
+                  <SelectTrigger id={`pickup_customer_site_${line.line_no}`}>
+                    <SelectValue placeholder="Select customer site" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {sitesLoading ? (
+                      <SelectItem value="__loading__" disabled>Loading...</SelectItem>
+                    ) : customerSites.length === 0 ? (
+                      <SelectItem value="__none__" disabled>No sites available</SelectItem>
+                    ) : (
+                      customerSites.map((site: any) => (
+                        <SelectItem key={site.id} value={site.id}>
+                          {site.label}
+                        </SelectItem>
+                      ))
+                    )}
+                  </SelectContent>
+                </Select>
+                {isCustomized("pickup_customer_site_id", line.pickup_customer_site_id, headerDefaults.pickup_customer_site_id) && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 text-xs"
+                    onClick={() => resetToDefault("pickup_customer_site_id", headerDefaults.pickup_customer_site_id)}
+                  >
+                    Reset to default
+                  </Button>
+                )}
+              </>
             )}
             {errors[`${linePrefix}_pickup_location`] && <FormError message={errors[`${linePrefix}_pickup_location`]} />}
           </div>
 
+          {/* Return Configuration */}
           <div className="space-y-2">
-            <Label htmlFor={`return_location_${line.line_no}`} className="flex items-center gap-2">
-              Return Location
-              {isCustomized("return_location_id", line.return_location_id, headerDefaults.default_return_location_id) && (
+            <Label htmlFor={`return_type_${line.line_no}`} className="flex items-center gap-2">
+              Return To *
+              {isCustomized("return_type", line.return_type, headerDefaults.return_type) && (
                 <Badge variant="secondary" className="text-xs">Customized</Badge>
               )}
             </Label>
             <Select
-              value={line.return_location_id ?? headerDefaults.default_return_location_id ?? line.pickup_location_id ?? headerDefaults.default_pickup_location_id ?? ""}
-              onValueChange={(value) => onUpdate('return_location_id', value)}
+              value={line.return_type ?? headerDefaults.return_type ?? "company_location"}
+              onValueChange={(value) => {
+                onUpdate('return_type', value);
+                // Clear location/site when type changes
+                if (value === 'company_location') {
+                  onUpdate('return_customer_site_id', null);
+                } else {
+                  onUpdate('return_location_id', null);
+                }
+              }}
             >
-              <SelectTrigger id={`return_location_${line.line_no}`}>
-                <SelectValue placeholder="Same as pickup" />
+              <SelectTrigger id={`return_type_${line.line_no}`}>
+                <SelectValue placeholder="Select return type" />
               </SelectTrigger>
               <SelectContent>
-                {locationsLoading ? (
-                  <SelectItem value="__loading__" disabled>Loading...</SelectItem>
-                ) : locations.length === 0 ? (
-                  <SelectItem value="__none__" disabled>No locations</SelectItem>
-                ) : (
-                  locations.map((loc: any) => (
-                    <SelectItem key={loc.id} value={loc.id}>
-                      {loc.label}
-                    </SelectItem>
-                  ))
-                )}
+                <SelectItem value="company_location">Our Location</SelectItem>
+                <SelectItem value="customer_site">Customer Location (Collection)</SelectItem>
               </SelectContent>
             </Select>
-            {isCustomized("return_location_id", line.return_location_id, headerDefaults.default_return_location_id) && (
+            {isCustomized("return_type", line.return_type, headerDefaults.return_type) && (
               <Button
                 type="button"
                 variant="ghost"
                 size="sm"
                 className="h-7 text-xs"
-                onClick={() => resetToDefault("return_location_id", headerDefaults.default_return_location_id)}
+                onClick={() => resetToDefault("return_type", headerDefaults.return_type)}
               >
                 Reset to default
               </Button>
             )}
-            <p className="text-xs text-muted-foreground">Leave blank to use pickup location</p>
+          </div>
+
+          {/* Return Location/Site Selector */}
+          <div className="space-y-2">
+            {(line.return_type ?? headerDefaults.return_type ?? "company_location") === "company_location" ? (
+              <>
+                <Label htmlFor={`return_location_${line.line_no}`} className="flex items-center gap-2">
+                  Return Location *
+                  {isCustomized("return_location_id", line.return_location_id, headerDefaults.return_location_id) && (
+                    <Badge variant="secondary" className="text-xs">Customized</Badge>
+                  )}
+                </Label>
+                <Select
+                  value={line.return_location_id ?? headerDefaults.return_location_id ?? ""}
+                  onValueChange={(value) => onUpdate('return_location_id', value)}
+                >
+                  <SelectTrigger id={`return_location_${line.line_no}`}>
+                    <SelectValue placeholder="Select return location" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {locationsLoading ? (
+                      <SelectItem value="__loading__" disabled>Loading...</SelectItem>
+                    ) : locations.length === 0 ? (
+                      <SelectItem value="__none__" disabled>No locations</SelectItem>
+                    ) : (
+                      locations.map((loc: any) => (
+                        <SelectItem key={loc.id} value={loc.id}>
+                          {loc.label}
+                        </SelectItem>
+                      ))
+                    )}
+                  </SelectContent>
+                </Select>
+                {isCustomized("return_location_id", line.return_location_id, headerDefaults.return_location_id) && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 text-xs"
+                    onClick={() => resetToDefault("return_location_id", headerDefaults.return_location_id)}
+                  >
+                    Reset to default
+                  </Button>
+                )}
+              </>
+            ) : (
+              <>
+                <Label htmlFor={`return_customer_site_${line.line_no}`} className="flex items-center gap-2">
+                  Customer Site *
+                  {isCustomized("return_customer_site_id", line.return_customer_site_id, headerDefaults.return_customer_site_id) && (
+                    <Badge variant="secondary" className="text-xs">Customized</Badge>
+                  )}
+                </Label>
+                <Select
+                  value={line.return_customer_site_id ?? headerDefaults.return_customer_site_id ?? ""}
+                  onValueChange={(value) => onUpdate('return_customer_site_id', value)}
+                >
+                  <SelectTrigger id={`return_customer_site_${line.line_no}`}>
+                    <SelectValue placeholder="Select customer site" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {sitesLoading ? (
+                      <SelectItem value="__loading__" disabled>Loading...</SelectItem>
+                    ) : customerSites.length === 0 ? (
+                      <SelectItem value="__none__" disabled>No sites available</SelectItem>
+                    ) : (
+                      customerSites.map((site: any) => (
+                        <SelectItem key={site.id} value={site.id}>
+                          {site.label}
+                        </SelectItem>
+                      ))
+                    )}
+                  </SelectContent>
+                </Select>
+                {isCustomized("return_customer_site_id", line.return_customer_site_id, headerDefaults.return_customer_site_id) && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 text-xs"
+                    onClick={() => resetToDefault("return_customer_site_id", headerDefaults.return_customer_site_id)}
+                  >
+                    Reset to default
+                  </Button>
+                )}
+              </>
+            )}
           </div>
         </div>
 

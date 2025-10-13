@@ -24,8 +24,14 @@ interface VehicleLineTableProps {
     insurance_glass_tire_cover?: boolean;
     insurance_pai_enabled?: boolean;
     insurance_territorial_coverage?: string;
-    default_pickup_location_id?: string;
-    default_return_location_id?: string;
+    pickup_type?: string;
+    pickup_location_id?: string;
+    pickup_customer_site_id?: string;
+    return_type?: string;
+    return_location_id?: string;
+    return_customer_site_id?: string;
+    delivery_fee?: number;
+    collection_fee?: number;
     default_price_list_id?: string;
     billing_plan?: string;
   };
