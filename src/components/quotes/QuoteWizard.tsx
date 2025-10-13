@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams, useParams } from "react-router-dom";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrainStopStepper } from "@/components/ui/train-stop-stepper";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, ArrowRight, Send } from "lucide-react";
+import { ArrowLeft, ArrowRight, Send, Save } from "lucide-react";
 import { QuoteWizardStep1 } from "./wizard/QuoteWizardStep1";
 import { QuoteWizardStep2 } from "./wizard/QuoteWizardStep2";
 import { QuoteWizardStep3_Insurance } from "./wizard/QuoteWizardStep3_Insurance";
@@ -203,24 +203,27 @@ export const QuoteWizard: React.FC = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [searchParams] = useSearchParams();
+  const { id: quoteIdParam } = useParams<{ id: string }>();
 
-  // Check if we're duplicating, revising a quote, or creating from RFQ
+  // Check if we're duplicating, revising a quote, creating from RFQ, or editing existing
   const duplicateId = searchParams.get("duplicate");
   const reviseId = searchParams.get("revise");
   const fromRfqId = searchParams.get("fromRfq");
+  const editMode = searchParams.get("edit") === "true";
+  const quoteId = quoteIdParam;
 
   const { data: existingQuote } = useQuery({
-    queryKey: ["quote", duplicateId || reviseId],
+    queryKey: ["quote", duplicateId || reviseId || quoteId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("quotes")
         .select("*")
-        .eq("id", duplicateId || reviseId)
+        .eq("id", duplicateId || reviseId || quoteId)
         .maybeSingle();
       if (error) throw error;
       return data;
     },
-    enabled: !!(duplicateId || reviseId),
+    enabled: !!(duplicateId || reviseId || (editMode && quoteId)),
   });
 
   const { data: sourceRfq } = useQuery({
@@ -239,13 +242,23 @@ export const QuoteWizard: React.FC = () => {
 
   useEffect(() => {
     if (existingQuote) {
-      setQuoteData({
-        customer_id: existingQuote.customer_id,
-        vehicle_id: existingQuote.vehicle_id,
-        items: Array.isArray(existingQuote.items) ? existingQuote.items as Array<{description: string; qty: number; rate: number}> : [],
-        tax_rate: 0.08,
-        notes: existingQuote.notes || "",
-      });
+      // Load full quote data for editing
+      if (editMode && quoteId) {
+        const loadedData: any = { ...existingQuote };
+        if (Array.isArray(existingQuote.items)) {
+          loadedData.items = existingQuote.items;
+        }
+        setQuoteData(loadedData);
+      } else {
+        // For duplicate/revise, load minimal data
+        setQuoteData({
+          customer_id: existingQuote.customer_id,
+          vehicle_id: existingQuote.vehicle_id,
+          items: Array.isArray(existingQuote.items) ? existingQuote.items as Array<{description: string; qty: number; rate: number}> : [],
+          tax_rate: 0.08,
+          notes: existingQuote.notes || "",
+        });
+      }
     } else if (sourceRfq) {
       setQuoteData({
         customer_id: sourceRfq.customer_id,
@@ -259,7 +272,92 @@ export const QuoteWizard: React.FC = () => {
         notes: sourceRfq.notes || "",
       });
     }
-  }, [existingQuote, sourceRfq]);
+  }, [existingQuote, sourceRfq, editMode, quoteId]);
+
+  const saveDraftMutation = useMutation({
+    mutationFn: async (data: Partial<QuoteData>) => {
+      const quotePayload: any = {
+        legal_entity_id: data.legal_entity_id,
+        business_unit_id: data.business_unit_id,
+        opportunity_id: data.opportunity_id,
+        customer_type: data.customer_type,
+        customer_id: data.customer_id,
+        account_name: data.account_name,
+        customer_bill_to: data.customer_bill_to,
+        contact_person_id: data.contact_person_id,
+        project: data.project,
+        sales_office_id: data.sales_office_id,
+        sales_rep_id: data.sales_rep_id,
+        quote_entry_date: data.quote_entry_date,
+        status: data.status || "draft",
+        quote_date: data.quote_date,
+        quote_type: data.quote_type,
+        quote_description: data.quote_description,
+        currency: data.currency,
+        validity_date_to: data.validity_date_to,
+        contract_effective_from: data.contract_effective_from,
+        contract_effective_to: data.contract_effective_to,
+        duration_days: data.duration_days,
+        vehicle_id: data.vehicle_id,
+        items: data.items || [],
+        notes: data.notes,
+      };
+
+      // If no ID exists, INSERT new quote
+      if (!quoteId) {
+        quotePayload.quote_number = `Q-${new Date().getFullYear()}-${String(Date.now()).slice(-4)}`;
+        quotePayload.rfq_id = fromRfqId || null;
+
+        const { data: quote, error } = await supabase
+          .from("quotes")
+          .insert(quotePayload)
+          .select()
+          .single();
+
+        if (error) throw error;
+        return { quote, isNew: true };
+      }
+      
+      // If has ID, UPDATE existing quote
+      const { data: quote, error } = await supabase
+        .from("quotes")
+        .update(quotePayload)
+        .eq("id", quoteId)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return { quote, isNew: false };
+    },
+    onSuccess: async ({ quote, isNew }) => {
+      queryClient.invalidateQueries({ queryKey: ["quotes"] });
+      queryClient.invalidateQueries({ queryKey: ["quote", quote.id] });
+      
+      // Update RFQ status if creating from RFQ
+      if (fromRfqId && isNew) {
+        await supabase
+          .from("rfqs")
+          .update({ status: "quoted" })
+          .eq("id", fromRfqId);
+        queryClient.invalidateQueries({ queryKey: ["rfq", fromRfqId] });
+        queryClient.invalidateQueries({ queryKey: ["rfqs"] });
+      }
+      
+      toast({ 
+        title: "Saved", 
+        description: isNew ? "Quote saved as draft" : "Changes saved" 
+      });
+      
+      // Update URL if new quote
+      if (isNew) {
+        navigate(`/quotes/${quote.id}?edit=true`, { replace: true });
+      }
+    },
+    onError: (error) => {
+      console.error("Failed to save quote:", error);
+      toast({ title: "Error", description: "Failed to save quote", variant: "destructive" });
+    },
+  });
 
   const createQuoteMutation = useMutation({
     mutationFn: async (data: QuoteData) => {
@@ -479,6 +577,10 @@ export const QuoteWizard: React.FC = () => {
     }
   };
 
+  const handleSaveDraft = () => {
+    saveDraftMutation.mutate(quoteData);
+  };
+
   const handleSubmit = () => {
     if (validateStep(currentStep) && quoteData.customer_id) {
       createQuoteMutation.mutate(quoteData as QuoteData);
@@ -537,15 +639,26 @@ export const QuoteWizard: React.FC = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">
-            {reviseId ? "Revise Quote" : duplicateId ? "Duplicate Quote" : fromRfqId ? "Prepare Quote from RFQ" : "New Quote"}
+            {editMode ? "Edit Quote" : reviseId ? "Revise Quote" : duplicateId ? "Duplicate Quote" : fromRfqId ? "Prepare Quote from RFQ" : "New Quote"}
+            {quoteData.quote_number && ` - ${quoteData.quote_number}`}
           </h1>
           <p className="text-muted-foreground">
             Step {currentStep} of {steps.length}: {steps[currentStep - 1].description}
           </p>
         </div>
-        <Button variant="outline" onClick={() => navigate("/quotes")}>
-          Cancel
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            onClick={handleSaveDraft}
+            disabled={saveDraftMutation.isPending}
+          >
+            <Save className="h-4 w-4 mr-2" />
+            {quoteId ? "Save Changes" : "Save Draft"}
+          </Button>
+          <Button variant="outline" onClick={() => navigate("/quotes")}>
+            Cancel
+          </Button>
+        </div>
       </div>
 
       {/* Train Stop Progress Indicator */}

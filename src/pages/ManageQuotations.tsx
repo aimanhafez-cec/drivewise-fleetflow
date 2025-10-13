@@ -378,9 +378,16 @@ const ManageQuotations: React.FC = () => {
                       {formatCurrency(Number(quote.total_amount) || 0)}
                     </TableCell>
                     <TableCell onClick={() => navigate(`/quotes/${quote.id}`)}>
-                      <Badge className={statusColor(quote.status)}>
-                        {quote.status.charAt(0).toUpperCase() + quote.status.slice(1)}
-                      </Badge>
+                      <div className="flex items-center gap-2">
+                        <Badge className={statusColor(quote.status)}>
+                          {quote.status.charAt(0).toUpperCase() + quote.status.slice(1)}
+                        </Badge>
+                        {quote.status === 'draft' && (
+                          <Badge variant="outline" className="text-orange-600">
+                            Incomplete
+                          </Badge>
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>
@@ -394,9 +401,9 @@ const ManageQuotations: React.FC = () => {
                             <Eye className="mr-2 h-4 w-4" />
                             View Details
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => navigate(`/quotes/${quote.id}`)}>
+                          <DropdownMenuItem onClick={() => navigate(`/quotes/${quote.id}?edit=true`)}>
                             <Edit className="mr-2 h-4 w-4" />
-                            Edit Quote
+                            {quote.status === 'draft' ? 'Continue Editing' : 'Edit Quote'}
                           </DropdownMenuItem>
                           <DropdownMenuItem>
                             <Copy className="mr-2 h-4 w-4" />
