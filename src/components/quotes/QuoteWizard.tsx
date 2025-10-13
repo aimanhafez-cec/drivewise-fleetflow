@@ -40,6 +40,20 @@ interface QuoteData {
   contract_effective_to?: string;
   duration_days?: number;
   
+  // Pickup configuration
+  pickup_type?: 'company_location' | 'customer_site';
+  pickup_location_id?: string;
+  pickup_customer_site_id?: string;
+  
+  // Return configuration
+  return_type?: 'company_location' | 'customer_site';
+  return_location_id?: string;
+  return_customer_site_id?: string;
+  
+  // Optional delivery/collection fees
+  delivery_fee?: number;
+  collection_fee?: number;
+  
   // Trip details from Step 2
   pickup_at?: string;
   pickup_location?: string;
@@ -161,6 +175,10 @@ export const QuoteWizard: React.FC = () => {
     currency: "AED",
     quote_entry_date: new Date().toISOString().split("T")[0],
     quote_items: [], // Initialize empty vehicle lines array
+    pickup_type: "company_location",
+    return_type: "company_location",
+    delivery_fee: 0,
+    collection_fee: 0,
     // Financial defaults
     vat_percentage: 5, // UAE standard 5%
     billing_plan: "monthly",
@@ -321,6 +339,27 @@ export const QuoteWizard: React.FC = () => {
         // Win/Loss reason required if status is won or lost
         if ((quoteData.status === "won" || quoteData.status === "lost") && !quoteData.win_loss_reason) {
           newErrors.win_loss_reason = "Win/Loss reason is required for this status";
+        }
+        
+        // Pickup/Return validation
+        if (!quoteData.pickup_type) {
+          newErrors.pickup_type = "Pickup type is required";
+        }
+        if (quoteData.pickup_type === "company_location" && !quoteData.pickup_location_id) {
+          newErrors.pickup_location_id = "Pickup location is required";
+        }
+        if (quoteData.pickup_type === "customer_site" && !quoteData.pickup_customer_site_id) {
+          newErrors.pickup_customer_site_id = "Customer site is required for pickup";
+        }
+        
+        if (!quoteData.return_type) {
+          newErrors.return_type = "Return type is required";
+        }
+        if (quoteData.return_type === "company_location" && !quoteData.return_location_id) {
+          newErrors.return_location_id = "Return location is required";
+        }
+        if (quoteData.return_type === "customer_site" && !quoteData.return_customer_site_id) {
+          newErrors.return_customer_site_id = "Customer site is required for return";
         }
         break;
       case 2:

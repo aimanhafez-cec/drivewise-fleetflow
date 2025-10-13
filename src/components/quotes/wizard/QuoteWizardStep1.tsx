@@ -452,24 +452,216 @@ export const QuoteWizardStep1: React.FC<QuoteWizardStep1Props> = ({
             </div>
           )}
 
-          {/* Row 7: Default Locations */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="default_pickup_location_id">Default Pickup Location</Label>
-              <LocationSelect
-                value={data.default_pickup_location_id || ""}
-                onChange={(value) => onChange({ default_pickup_location_id: value })}
-                placeholder="Select default pickup location"
-              />
+          {/* Row 7: Pickup & Return Configuration */}
+          <div className="space-y-6">
+            {/* Pickup Configuration */}
+            <div className="space-y-4 p-4 border rounded-lg bg-muted/30">
+              <h4 className="font-medium text-sm">Pickup Configuration</h4>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Pickup Type Selector */}
+                <div className="space-y-2">
+                  <Label htmlFor="pickup_type">
+                    <span className="text-destructive">*</span> Pickup From
+                  </Label>
+                  <Select
+                    value={data.pickup_type || "company_location"}
+                    onValueChange={(value: 'company_location' | 'customer_site') => {
+                      onChange({ 
+                        pickup_type: value,
+                        pickup_location_id: undefined,
+                        pickup_customer_site_id: undefined,
+                      });
+                    }}
+                  >
+                    <SelectTrigger id="pickup_type" className={errors.pickup_type ? "border-destructive" : ""}>
+                      <SelectValue placeholder="Select pickup type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="company_location">
+                        <div className="flex flex-col py-1">
+                          <span className="font-medium">Our Location</span>
+                          <span className="text-xs text-muted-foreground">
+                            Customer picks up from our branch/airport
+                          </span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="customer_site">
+                        <div className="flex flex-col py-1">
+                          <span className="font-medium">Customer Location (Delivery)</span>
+                          <span className="text-xs text-muted-foreground">
+                            We deliver vehicle to customer site
+                          </span>
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {errors.pickup_type && (
+                    <p className="text-sm text-destructive">{errors.pickup_type}</p>
+                  )}
+                </div>
+
+                {/* Conditional Pickup Location/Site Selector */}
+                <div className="space-y-2">
+                  {data.pickup_type === "company_location" ? (
+                    <>
+                      <Label htmlFor="pickup_location_id">
+                        <span className="text-destructive">*</span> Pickup Location
+                      </Label>
+                      <LocationSelect
+                        value={data.pickup_location_id || ""}
+                        onChange={(value) => onChange({ pickup_location_id: value })}
+                        placeholder="Select pickup location"
+                      />
+                      {errors.pickup_location_id && (
+                        <p className="text-sm text-destructive">{errors.pickup_location_id}</p>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <Label htmlFor="pickup_customer_site_id">
+                        <span className="text-destructive">*</span> Customer Site
+                      </Label>
+                      <CustomerSiteSelect
+                        customerId={data.customer_id}
+                        value={data.pickup_customer_site_id || ""}
+                        onChange={(value) => onChange({ pickup_customer_site_id: value })}
+                        placeholder="Select customer site"
+                        disabled={!data.customer_id}
+                      />
+                      {!data.customer_id && (
+                        <p className="text-xs text-muted-foreground">
+                          Select a customer first
+                        </p>
+                      )}
+                      {errors.pickup_customer_site_id && (
+                        <p className="text-sm text-destructive">{errors.pickup_customer_site_id}</p>
+                      )}
+                    </>
+                  )}
+                </div>
+              </div>
+              
+              {/* Optional: Delivery Fee */}
+              {data.pickup_type === "customer_site" && (
+                <div className="space-y-2">
+                  <Label htmlFor="delivery_fee">Delivery Fee (Optional)</Label>
+                  <Input
+                    id="delivery_fee"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={data.delivery_fee || ""}
+                    onChange={(e) => onChange({ delivery_fee: parseFloat(e.target.value) || 0 })}
+                    placeholder="Enter delivery fee (if applicable)"
+                  />
+                </div>
+              )}
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="default_return_location_id">Default Return Location</Label>
-              <LocationSelect
-                value={data.default_return_location_id || ""}
-                onChange={(value) => onChange({ default_return_location_id: value })}
-                placeholder="Select default return location"
-              />
+            {/* Return Configuration */}
+            <div className="space-y-4 p-4 border rounded-lg bg-muted/30">
+              <h4 className="font-medium text-sm">Return Configuration</h4>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Return Type Selector */}
+                <div className="space-y-2">
+                  <Label htmlFor="return_type">
+                    <span className="text-destructive">*</span> Return To
+                  </Label>
+                  <Select
+                    value={data.return_type || "company_location"}
+                    onValueChange={(value: 'company_location' | 'customer_site') => {
+                      onChange({ 
+                        return_type: value,
+                        return_location_id: undefined,
+                        return_customer_site_id: undefined,
+                      });
+                    }}
+                  >
+                    <SelectTrigger id="return_type" className={errors.return_type ? "border-destructive" : ""}>
+                      <SelectValue placeholder="Select return type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="company_location">
+                        <div className="flex flex-col py-1">
+                          <span className="font-medium">Our Location</span>
+                          <span className="text-xs text-muted-foreground">
+                            Customer returns to our branch/airport
+                          </span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="customer_site">
+                        <div className="flex flex-col py-1">
+                          <span className="font-medium">Customer Location (Collection)</span>
+                          <span className="text-xs text-muted-foreground">
+                            We collect vehicle from customer site
+                          </span>
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {errors.return_type && (
+                    <p className="text-sm text-destructive">{errors.return_type}</p>
+                  )}
+                </div>
+
+                {/* Conditional Return Location/Site Selector */}
+                <div className="space-y-2">
+                  {data.return_type === "company_location" ? (
+                    <>
+                      <Label htmlFor="return_location_id">
+                        <span className="text-destructive">*</span> Return Location
+                      </Label>
+                      <LocationSelect
+                        value={data.return_location_id || ""}
+                        onChange={(value) => onChange({ return_location_id: value })}
+                        placeholder="Select return location"
+                      />
+                      {errors.return_location_id && (
+                        <p className="text-sm text-destructive">{errors.return_location_id}</p>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <Label htmlFor="return_customer_site_id">
+                        <span className="text-destructive">*</span> Customer Site
+                      </Label>
+                      <CustomerSiteSelect
+                        customerId={data.customer_id}
+                        value={data.return_customer_site_id || ""}
+                        onChange={(value) => onChange({ return_customer_site_id: value })}
+                        placeholder="Select customer site"
+                        disabled={!data.customer_id}
+                      />
+                      {!data.customer_id && (
+                        <p className="text-xs text-muted-foreground">
+                          Select a customer first
+                        </p>
+                      )}
+                      {errors.return_customer_site_id && (
+                        <p className="text-sm text-destructive">{errors.return_customer_site_id}</p>
+                      )}
+                    </>
+                  )}
+                </div>
+              </div>
+              
+              {/* Optional: Collection Fee */}
+              {data.return_type === "customer_site" && (
+                <div className="space-y-2">
+                  <Label htmlFor="collection_fee">Collection Fee (Optional)</Label>
+                  <Input
+                    id="collection_fee"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={data.collection_fee || ""}
+                    onChange={(e) => onChange({ collection_fee: parseFloat(e.target.value) || 0 })}
+                    placeholder="Enter collection fee (if applicable)"
+                  />
+                </div>
+              )}
             </div>
           </div>
 
