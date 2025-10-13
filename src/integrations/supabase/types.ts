@@ -918,6 +918,83 @@ export type Database = {
         }
         Relationships: []
       }
+      cost_sheet_approvals: {
+        Row: {
+          action: Database["public"]["Enums"]["cost_sheet_approval_action"]
+          approver_user_id: string
+          comments: string | null
+          cost_sheet_id: string
+          created_at: string
+          id: string
+        }
+        Insert: {
+          action: Database["public"]["Enums"]["cost_sheet_approval_action"]
+          approver_user_id: string
+          comments?: string | null
+          cost_sheet_id: string
+          created_at?: string
+          id?: string
+        }
+        Update: {
+          action?: Database["public"]["Enums"]["cost_sheet_approval_action"]
+          approver_user_id?: string
+          comments?: string | null
+          cost_sheet_id?: string
+          created_at?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cost_sheet_approvals_cost_sheet_id_fkey"
+            columns: ["cost_sheet_id"]
+            isOneToOne: false
+            referencedRelation: "quote_cost_sheets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cost_sheet_configurations: {
+        Row: {
+          created_at: string
+          financing_rate_percent: number
+          id: string
+          insurance_per_month_aed: number
+          is_active: boolean
+          maintenance_per_month_aed: number
+          name: string
+          other_costs_per_month_aed: number
+          overhead_percent: number
+          registration_admin_per_month_aed: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          financing_rate_percent?: number
+          id?: string
+          insurance_per_month_aed?: number
+          is_active?: boolean
+          maintenance_per_month_aed?: number
+          name: string
+          other_costs_per_month_aed?: number
+          overhead_percent?: number
+          registration_admin_per_month_aed?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          financing_rate_percent?: number
+          id?: string
+          insurance_per_month_aed?: number
+          is_active?: boolean
+          maintenance_per_month_aed?: number
+          name?: string
+          other_costs_per_month_aed?: number
+          overhead_percent?: number
+          registration_admin_per_month_aed?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       customer_sites: {
         Row: {
           address: Json | null
@@ -1927,6 +2004,153 @@ export type Database = {
           valid_to?: string
         }
         Relationships: []
+      }
+      quote_cost_sheet_lines: {
+        Row: {
+          acquisition_cost_aed: number
+          actual_margin_percent: number
+          cost_sheet_id: string
+          created_at: string
+          id: string
+          insurance_per_month_aed: number
+          lease_term_months: number
+          line_no: number
+          maintenance_per_month_aed: number
+          other_costs_per_month_aed: number
+          quoted_rate_per_month_aed: number
+          registration_admin_per_month_aed: number
+          residual_value_percent: number
+          suggested_rate_per_month_aed: number
+          total_cost_per_month_aed: number
+          updated_at: string
+          vehicle_class_id: string | null
+          vehicle_id: string | null
+        }
+        Insert: {
+          acquisition_cost_aed?: number
+          actual_margin_percent?: number
+          cost_sheet_id: string
+          created_at?: string
+          id?: string
+          insurance_per_month_aed?: number
+          lease_term_months: number
+          line_no: number
+          maintenance_per_month_aed?: number
+          other_costs_per_month_aed?: number
+          quoted_rate_per_month_aed?: number
+          registration_admin_per_month_aed?: number
+          residual_value_percent?: number
+          suggested_rate_per_month_aed?: number
+          total_cost_per_month_aed?: number
+          updated_at?: string
+          vehicle_class_id?: string | null
+          vehicle_id?: string | null
+        }
+        Update: {
+          acquisition_cost_aed?: number
+          actual_margin_percent?: number
+          cost_sheet_id?: string
+          created_at?: string
+          id?: string
+          insurance_per_month_aed?: number
+          lease_term_months?: number
+          line_no?: number
+          maintenance_per_month_aed?: number
+          other_costs_per_month_aed?: number
+          quoted_rate_per_month_aed?: number
+          registration_admin_per_month_aed?: number
+          residual_value_percent?: number
+          suggested_rate_per_month_aed?: number
+          total_cost_per_month_aed?: number
+          updated_at?: string
+          vehicle_class_id?: string | null
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quote_cost_sheet_lines_cost_sheet_id_fkey"
+            columns: ["cost_sheet_id"]
+            isOneToOne: false
+            referencedRelation: "quote_cost_sheets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quote_cost_sheet_lines_vehicle_class_id_fkey"
+            columns: ["vehicle_class_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quote_cost_sheet_lines_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quote_cost_sheets: {
+        Row: {
+          approval_notes: string | null
+          approved_at: string | null
+          approved_by: string | null
+          created_at: string
+          financing_rate_percent: number
+          id: string
+          notes_assumptions: string | null
+          overhead_percent: number
+          quote_id: string
+          residual_value_percent: number
+          status: Database["public"]["Enums"]["cost_sheet_status"]
+          submitted_at: string | null
+          submitted_by: string | null
+          target_margin_percent: number
+          updated_at: string
+        }
+        Insert: {
+          approval_notes?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          financing_rate_percent?: number
+          id?: string
+          notes_assumptions?: string | null
+          overhead_percent?: number
+          quote_id: string
+          residual_value_percent?: number
+          status?: Database["public"]["Enums"]["cost_sheet_status"]
+          submitted_at?: string | null
+          submitted_by?: string | null
+          target_margin_percent?: number
+          updated_at?: string
+        }
+        Update: {
+          approval_notes?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          financing_rate_percent?: number
+          id?: string
+          notes_assumptions?: string | null
+          overhead_percent?: number
+          quote_id?: string
+          residual_value_percent?: number
+          status?: Database["public"]["Enums"]["cost_sheet_status"]
+          submitted_at?: string | null
+          submitted_by?: string | null
+          target_margin_percent?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quote_cost_sheets_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: true
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       quotes: {
         Row: {
@@ -3056,6 +3280,8 @@ export type Database = {
         | "terminated"
         | "expired"
       cost_allocation_mode: "Per Vehicle" | "Per Cost Center" | "Project"
+      cost_sheet_approval_action: "approved" | "rejected" | "requested_changes"
+      cost_sheet_status: "draft" | "pending_approval" | "approved" | "rejected"
       credit_terms: "Net 15" | "Net 30" | "Net 45" | "Custom"
       customer_segment: "SME" | "Enterprise" | "Government"
       customer_type: "Company" | "Person"
@@ -3286,6 +3512,8 @@ export const Constants = {
         "expired",
       ],
       cost_allocation_mode: ["Per Vehicle", "Per Cost Center", "Project"],
+      cost_sheet_approval_action: ["approved", "rejected", "requested_changes"],
+      cost_sheet_status: ["draft", "pending_approval", "approved", "rejected"],
       credit_terms: ["Net 15", "Net 30", "Net 45", "Custom"],
       customer_segment: ["SME", "Enterprise", "Government"],
       customer_type: ["Company", "Person"],
