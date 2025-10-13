@@ -3058,7 +3058,7 @@ export type Database = {
       cost_allocation_mode: "Per Vehicle" | "Per Cost Center" | "Project"
       credit_terms: "Net 15" | "Net 30" | "Net 45" | "Custom"
       customer_segment: "SME" | "Enterprise" | "Government"
-      customer_type: "B2B" | "B2C" | "CORPORATE"
+      customer_type: "Company" | "Person"
       damage_type:
         | "scratch"
         | "dent"
@@ -3288,7 +3288,7 @@ export const Constants = {
       cost_allocation_mode: ["Per Vehicle", "Per Cost Center", "Project"],
       credit_terms: ["Net 15", "Net 30", "Net 45", "Custom"],
       customer_segment: ["SME", "Enterprise", "Government"],
-      customer_type: ["B2B", "B2C", "CORPORATE"],
+      customer_type: ["Company", "Person"],
       damage_type: [
         "scratch",
         "dent",

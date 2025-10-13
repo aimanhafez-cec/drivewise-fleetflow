@@ -24,7 +24,7 @@ import { CarSubscriptionStep10 } from './wizard/CarSubscriptionStep10';
 
 const carSubscriptionSchema = z.object({
   // Agreement & Parties
-  customer_type: z.enum(['B2C', 'B2B']),
+  customer_type: z.enum(['Person', 'Company']),
   customer_id: z.string().min(1, "Customer is required"),
   bill_to_contact: z.string().optional(),
   
@@ -133,7 +133,7 @@ export const CarSubscriptionWizard: React.FC = () => {
   const form = useForm<CarSubscriptionFormData>({
     resolver: zodResolver(carSubscriptionSchema),
     defaultValues: {
-      customer_type: 'B2C',
+      customer_type: 'Person',
       customer_id: '',
       subscription_model: 'By Class',
       start_date: '',
@@ -227,11 +227,10 @@ export const CarSubscriptionWizard: React.FC = () => {
       
       const { error } = await supabase
         .from('car_subscriptions')
-        .insert({
+        .insert([{
           ...formData,
-          subscription_id: subscriptionId,
           status: 'draft'
-        });
+        }]);
 
       if (error) throw error;
 

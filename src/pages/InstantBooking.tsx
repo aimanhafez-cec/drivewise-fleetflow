@@ -25,7 +25,7 @@ const InstantBooking = () => {
     returnLocation: '',
     vehicleId: '',
     customerId: '',
-    customerType: 'B2C' as 'B2B' | 'B2C' | 'CORPORATE',
+    customerType: 'Person' as 'Company' | 'Person',
     selectedAddOns: [] as string[],
     addOnCharges: {} as Record<string, number>,
     pricing: null as any,

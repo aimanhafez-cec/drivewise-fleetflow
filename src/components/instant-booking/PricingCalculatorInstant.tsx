@@ -11,7 +11,7 @@ interface PricingCalculatorInstantProps {
     returnDate: string;
     vehicleId: string;
     customerId: string;
-    customerType: 'B2B' | 'B2C' | 'CORPORATE';
+    customerType: 'Company' | 'Person';
     selectedAddOns?: string[];
     addOnCharges?: Record<string, number>;
   };
@@ -120,10 +120,8 @@ const PricingCalculatorInstant: React.FC<PricingCalculatorInstantProps> = ({
 
     // Apply customer type discounts (only on base amount, not add-ons)
     let customerDiscount = 0;
-    if (bookingData.customerType === 'B2B') {
-      customerDiscount = baseAmount * 0.1; // 10% B2B discount
-    } else if (bookingData.customerType === 'CORPORATE') {
-      customerDiscount = baseAmount * 0.15; // 15% corporate discount
+    if (bookingData.customerType === 'Company') {
+      customerDiscount = baseAmount * 0.1; // 10% Company discount
     }
     
     const discountedAmount = baseAmount - customerDiscount;
@@ -235,7 +233,7 @@ const PricingCalculatorInstant: React.FC<PricingCalculatorInstantProps> = ({
               <span className="flex items-center gap-1">
                 {bookingData.customerType} Discount
                 <Badge variant="outline" className="text-green-600 border-green-600">
-                  {bookingData.customerType === 'B2B' ? '10%' : '15%'}
+                  10%
                 </Badge>
               </span>
               <span>-AED {pricingCalculation.customerDiscount.toFixed(2)}</span>

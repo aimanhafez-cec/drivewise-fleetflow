@@ -28,8 +28,8 @@ export const CarSubscriptionStep1: React.FC<CarSubscriptionStep1Props> = ({ form
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="B2C">Individual</SelectItem>
-                  <SelectItem value="B2B">Corporate</SelectItem>
+                  <SelectItem value="Person">Person</SelectItem>
+                  <SelectItem value="Company">Company</SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />

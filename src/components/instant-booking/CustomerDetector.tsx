@@ -13,7 +13,7 @@ interface Customer {
   full_name: string;
   email: string;
   phone?: string;
-  customer_type: 'B2B' | 'B2C' | 'CORPORATE';
+  customer_type: 'Company' | 'Person';
   credit_limit?: number;
   total_rentals?: number;
 }
@@ -30,7 +30,7 @@ const CustomerDetector: React.FC<CustomerDetectorProps> = ({
     full_name: string;
     email: string;
     phone: string;
-    customer_type: 'B2B' | 'B2C' | 'CORPORATE';
+    customer_type: 'Company' | 'Person';
     national_id?: string;
     license_number?: string;
     license_expiry?: string;
@@ -43,7 +43,7 @@ const CustomerDetector: React.FC<CustomerDetectorProps> = ({
     full_name: '',
     email: '',
     phone: '',
-    customer_type: 'B2C' as const,
+    customer_type: 'Person' as const,
     national_id: '',
     license_number: '',
     license_expiry: '',
@@ -135,7 +135,7 @@ const CustomerDetector: React.FC<CustomerDetectorProps> = ({
         full_name: '',
         email: '',
         phone: '',
-        customer_type: 'B2C' as const,
+        customer_type: 'Person' as const,
         national_id: '',
         license_number: '',
         license_expiry: '',
@@ -151,32 +151,31 @@ const CustomerDetector: React.FC<CustomerDetectorProps> = ({
   };
   const getCustomerTypeColor = (type: string) => {
     switch (type) {
-      case 'B2B':
+      case 'Company':
         return 'bg-blue-100 text-blue-800';
-      case 'CORPORATE':
-        return 'bg-purple-100 text-purple-800';
-      default:
+      case 'Person':
         return 'bg-green-100 text-green-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
   const getCustomerTypeDisplay = (type: string) => {
     switch (type) {
-      case 'B2C':
-        return 'Individual';
-      case 'B2B':
-        return 'B2B';
-      case 'CORPORATE':
-        return 'Corporate';
+      case 'Company':
+        return 'Company';
+      case 'Person':
+        return 'Person';
       default:
-        return 'Individual';
+        return 'Unknown';
     }
   };
   const getCustomerTypeIcon = (type: string) => {
     switch (type) {
-      case 'B2B':
-      case 'CORPORATE':
+      case 'Company':
         return <Building2 className="h-4 w-4" />;
+      case 'Person':
+        return <User className="h-4 w-4" />;
       default:
         return <User className="h-4 w-4" />;
     }
@@ -299,11 +298,10 @@ const CustomerDetector: React.FC<CustomerDetectorProps> = ({
                     <Label htmlFor="customer-type">Customer Type</Label>
                     <select id="customer-type" value={newCustomer.customer_type} onChange={e => setNewCustomer(prev => ({
                       ...prev,
-                      customer_type: e.target.value as 'B2B' | 'B2C' | 'CORPORATE'
+                      customer_type: e.target.value as 'Company' | 'Person'
                     }))} className="mt-1 text-foreground w-full px-3 py-2 border rounded-md bg-background">
-                      <option value="B2C">Individual</option>
-                      <option value="B2B">B2B - Business</option>
-                      <option value="CORPORATE">Corporate Account</option>
+                      <option value="Person">Person</option>
+                      <option value="Company">Company</option>
                     </select>
                   </div>
                   <div>

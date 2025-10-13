@@ -10,7 +10,7 @@ export interface InstantBookingData {
   returnLocation: string;
   vehicleId: string;
   customerId: string;
-  customerType: 'B2B' | 'B2C' | 'CORPORATE';
+  customerType: 'Company' | 'Person';
   selectedAddOns?: string[];
   addOnCharges?: Record<string, number>;
   pricing?: any;
