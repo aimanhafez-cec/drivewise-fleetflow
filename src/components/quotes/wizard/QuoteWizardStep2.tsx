@@ -520,7 +520,7 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Row 1: Payment Method and Email Invoice Toggle */}
             <div className="space-y-2">
-              <Label htmlFor="payment_method">Payment Method *</Label>
+              <Label htmlFor="payment_method">Default Payment Method *</Label>
               <Select
                 value={data.payment_method || "bank-transfer"}
                 onValueChange={(value) => onChange({ payment_method: value })}
@@ -556,7 +556,7 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
             {/* Row 2: Contact Person Select (conditional) */}
             {data.invoice_consolidation && (
               <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="invoice_contact_person_id">Invoice To Contact *</Label>
+                <Label htmlFor="invoice_contact_person_id">Invoice to Contact *</Label>
                 <ContactPersonSelect
                   customerId={data.customer_id}
                   value={data.invoice_contact_person_id || data.contact_person_id || ""}
