@@ -2,7 +2,11 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { FileText, DollarSign, Car, Calendar } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { FileText, DollarSign, Car, Calendar, Calculator, AlertCircle } from "lucide-react";
+import { useCostSheet } from "@/hooks/useCostSheet";
+import { CostSheetStatusBadge } from "../costsheet/CostSheetStatusBadge";
+import { formatCurrency } from "@/lib/utils/currency";
 
 interface QuoteWizardStep4Props {
   data: any;
@@ -16,6 +20,7 @@ export const QuoteWizardStep5_Summary: React.FC<QuoteWizardStep4Props> = ({
   errors,
 }) => {
   const isCorporate = data.quote_type === 'Corporate lease';
+  const { data: costSheet } = useCostSheet(data.id);
   
   // Calculate totals
   const calculateTotals = () => {
@@ -85,6 +90,127 @@ export const QuoteWizardStep5_Summary: React.FC<QuoteWizardStep4Props> = ({
           </div>
         </CardContent>
       </Card>
+
+      {/* Cost Sheet Status (Corporate only) */}
+      {isCorporate && data.id && (
+        <Card className={costSheet?.status === 'approved' ? 'border-green-500' : costSheet?.status === 'pending_approval' ? 'border-yellow-500' : ''}>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2">
+                <Calculator className="h-5 w-5" />
+                Cost Sheet & Profitability
+              </CardTitle>
+              {costSheet && <CostSheetStatusBadge status={costSheet.status} />}
+            </div>
+          </CardHeader>
+          <CardContent>
+            {!costSheet ? (
+              <Alert>
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  No cost sheet has been prepared yet. Return to Step 4 (Vehicles) to calculate profitability.
+                </AlertDescription>
+              </Alert>
+            ) : (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                  <div>
+                    <span className="text-muted-foreground">Target Margin:</span>
+                    <p className="font-semibold">{costSheet.target_margin_percent}%</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Financing Rate:</span>
+                    <p className="font-semibold">{costSheet.financing_rate_percent}%</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Overhead:</span>
+                    <p className="font-semibold">{costSheet.overhead_percent}%</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Vehicle Lines:</span>
+                    <p className="font-semibold">{costSheet.lines?.length || 0}</p>
+                  </div>
+                </div>
+
+                {costSheet.lines && costSheet.lines.length > 0 && (
+                  <>
+                    <Separator />
+                    <div className="space-y-2">
+                      <h4 className="font-semibold text-sm">Line Margins</h4>
+                      {costSheet.lines.map((line) => (
+                        <div key={line.id} className="flex justify-between items-center text-sm">
+                          <span className="text-muted-foreground">Line {line.line_no}:</span>
+                          <div className="flex items-center gap-3">
+                            <span className="font-mono">
+                              Cost: {formatCurrency(line.total_cost_per_month_aed, 'AED')}
+                            </span>
+                            <span className="font-mono">
+                              Rate: {formatCurrency(line.quoted_rate_per_month_aed, 'AED')}
+                            </span>
+                            <Badge 
+                              variant={
+                                line.actual_margin_percent >= costSheet.target_margin_percent 
+                                  ? 'default' 
+                                  : line.actual_margin_percent >= 10 
+                                  ? 'outline' 
+                                  : 'destructive'
+                              }
+                              className={
+                                line.actual_margin_percent >= costSheet.target_margin_percent
+                                  ? 'bg-green-500 text-white hover:bg-green-600'
+                                  : line.actual_margin_percent >= 10
+                                  ? 'border-yellow-500 text-yellow-700 dark:text-yellow-400'
+                                  : ''
+                              }
+                            >
+                              {line.actual_margin_percent.toFixed(1)}%
+                            </Badge>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+
+                {costSheet.status === 'draft' && (
+                  <Alert>
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>
+                      Cost sheet is still in draft. Submit for approval before finalizing the quote.
+                    </AlertDescription>
+                  </Alert>
+                )}
+
+                {costSheet.status === 'pending_approval' && (
+                  <Alert className="border-yellow-500">
+                    <AlertCircle className="h-4 w-4 text-yellow-600" />
+                    <AlertDescription className="text-yellow-800 dark:text-yellow-200">
+                      Cost sheet is pending approval. Quote cannot be finalized until approved.
+                    </AlertDescription>
+                  </Alert>
+                )}
+
+                {costSheet.status === 'approved' && (
+                  <Alert className="border-green-500 bg-green-50 dark:bg-green-950">
+                    <AlertCircle className="h-4 w-4 text-green-600" />
+                    <AlertDescription className="text-green-800 dark:text-green-200">
+                      ✓ Cost sheet approved by {costSheet.approved_by} on {new Date(costSheet.approved_at!).toLocaleDateString()}
+                      {costSheet.approval_notes && ` — ${costSheet.approval_notes}`}
+                    </AlertDescription>
+                  </Alert>
+                )}
+
+                {costSheet.notes_assumptions && (
+                  <div className="mt-3">
+                    <span className="text-sm text-muted-foreground">Notes: </span>
+                    <p className="text-sm mt-1">{costSheet.notes_assumptions}</p>
+                  </div>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       {/* Vehicle Lines Summary (Corporate) */}
       {isCorporate && data.quote_items && data.quote_items.length > 0 && (
