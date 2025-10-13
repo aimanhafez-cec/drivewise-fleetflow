@@ -1,5 +1,7 @@
 import React, { useEffect } from "react";
 import { addMonths, format as formatDate } from "date-fns";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -12,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { PaymentTermsSelect, PriceListSelect } from "@/components/ui/select-components";
+import { PaymentTermsSelect, PriceListSelect, ContactPersonSelect } from "@/components/ui/select-components";
 import {
   BILLING_PLANS,
   PRORATION_RULES,
@@ -58,6 +60,25 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
   };
 
   const upfrontDue = calculateUpfrontDue();
+
+  // Fetch selected contact person's email for display
+  const { data: selectedContact } = useQuery({
+    queryKey: ["contact_person", data.invoice_contact_person_id || data.contact_person_id],
+    queryFn: async () => {
+      const contactId = data.invoice_contact_person_id || data.contact_person_id;
+      if (!contactId) return null;
+      const { data: contact, error } = await supabase
+        .from("contact_persons")
+        .select("email, full_name")
+        .eq("id", contactId)
+        .single();
+      if (error) throw error;
+      return contact;
+    },
+    enabled: !!(data.invoice_contact_person_id || data.contact_person_id) && data.invoice_consolidation,
+  });
+
+  const selectedContactEmail = selectedContact?.email;
 
   // Auto-calculate billing start date based on contract effective from + billing plan offset
   useEffect(() => {
@@ -497,34 +518,7 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="invoice_consolidation">Invoice Consolidation</Label>
-                <Switch
-                  id="invoice_consolidation"
-                  checked={data.invoice_consolidation || false}
-                  onCheckedChange={(checked) => onChange({ invoice_consolidation: checked })}
-                />
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Consolidate multiple line items into single invoice
-              </p>
-            </div>
-
-            {data.invoice_consolidation && (
-              <div className="space-y-2">
-                <Label htmlFor="invoice_to_email">Invoice To Email *</Label>
-                <Input
-                  id="invoice_to_email"
-                  type="email"
-                  value={data.invoice_to_email || ""}
-                  onChange={(e) => onChange({ invoice_to_email: e.target.value })}
-                  placeholder="billing@company.com"
-                />
-                {errors.invoice_to_email && <FormError message={errors.invoice_to_email} />}
-              </div>
-            )}
-
+            {/* Row 1: Payment Method and Email Invoice Toggle */}
             <div className="space-y-2">
               <Label htmlFor="payment_method">Payment Method *</Label>
               <Select
@@ -545,6 +539,41 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
               {errors.payment_method && <FormError message={errors.payment_method} />}
             </div>
 
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="invoice_consolidation">Email Invoice to Contact</Label>
+                <Switch
+                  id="invoice_consolidation"
+                  checked={data.invoice_consolidation || false}
+                  onCheckedChange={(checked) => onChange({ invoice_consolidation: checked })}
+                />
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Send invoice to specific contact person via email
+              </p>
+            </div>
+
+            {/* Row 2: Contact Person Select (conditional) */}
+            {data.invoice_consolidation && (
+              <div className="space-y-2 md:col-span-2">
+                <Label htmlFor="invoice_contact_person_id">Invoice To Contact *</Label>
+                <ContactPersonSelect
+                  customerId={data.customer_id}
+                  value={data.invoice_contact_person_id || data.contact_person_id || ""}
+                  onChange={(value) => onChange({ invoice_contact_person_id: value })}
+                  placeholder="Select contact person"
+                />
+                {errors.invoice_contact_person_id && <FormError message={errors.invoice_contact_person_id} />}
+                
+                {selectedContactEmail && (
+                  <p className="text-xs text-muted-foreground">
+                    Invoice will be sent to: <span className="font-medium">{selectedContactEmail}</span>
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* Row 3: Customer PO Number */}
             <div className="space-y-2">
               <Label htmlFor="customer_po_number">Customer PO Number</Label>
               <Input

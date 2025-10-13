@@ -111,7 +111,7 @@ interface QuoteData {
   
   // 6. Invoice & Payment Settings
   invoice_consolidation?: boolean;
-  invoice_to_email?: string;
+  invoice_contact_person_id?: string;
   payment_method?: string; // bank-transfer, credit-card, cheque, direct-debit
   customer_po_number?: string;
   
@@ -331,8 +331,8 @@ export const QuoteWizard: React.FC = () => {
         if (!quoteData.deposit_type) newErrors.deposit_type = "Deposit type is required";
         if (!quoteData.default_deposit_amount) newErrors.default_deposit_amount = "Deposit amount per vehicle is required";
         if (!quoteData.payment_method) newErrors.payment_method = "Payment method is required";
-        if (quoteData.invoice_consolidation && !quoteData.invoice_to_email) {
-          newErrors.invoice_to_email = "Invoice email is required when consolidation is enabled";
+        if (quoteData.invoice_consolidation && !quoteData.invoice_contact_person_id) {
+          newErrors.invoice_contact_person_id = "Invoice contact person is required when emailing invoice is enabled";
         }
         break;
       case 3:
