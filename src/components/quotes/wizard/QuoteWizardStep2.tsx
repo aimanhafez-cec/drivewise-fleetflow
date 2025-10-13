@@ -75,7 +75,7 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
       if (error) throw error;
       return contact;
     },
-    enabled: !!(data.invoice_contact_person_id || data.contact_person_id) && data.invoice_consolidation,
+    enabled: !!(data.invoice_contact_person_id || data.contact_person_id) && data.email_invoice_to_contact,
   });
 
   const selectedContactEmail = selectedContact?.email;
@@ -518,7 +518,7 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Row 1: Payment Method and Email Invoice Toggle */}
+            {/* Row 1: Payment Method and Invoice Format */}
             <div className="space-y-2">
               <Label htmlFor="payment_method">Default Payment Method *</Label>
               <Select
@@ -540,12 +540,38 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
             </div>
 
             <div className="space-y-2">
+              <Label htmlFor="invoice_format">Invoice Format *</Label>
+              <Select
+                value={data.invoice_format || "consolidated"}
+                onValueChange={(value) => onChange({ invoice_format: value })}
+              >
+                <SelectTrigger id="invoice_format">
+                  <SelectValue placeholder="Select invoice format" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="consolidated">
+                    Consolidated Invoice - One invoice for all lines
+                  </SelectItem>
+                  <SelectItem value="per_line">
+                    Separate Invoices - One invoice per vehicle line
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                {data.invoice_format === 'per_line' 
+                  ? 'Each vehicle line will have its own invoice'
+                  : 'All vehicle lines will be combined into one invoice'}
+              </p>
+            </div>
+
+            {/* Row 2: Email Invoice Toggle */}
+            <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="invoice_consolidation">Email Invoice to Contact</Label>
+                <Label htmlFor="email_invoice_to_contact">Email Invoice to Contact</Label>
                 <Switch
-                  id="invoice_consolidation"
-                  checked={data.invoice_consolidation || false}
-                  onCheckedChange={(checked) => onChange({ invoice_consolidation: checked })}
+                  id="email_invoice_to_contact"
+                  checked={data.email_invoice_to_contact || false}
+                  onCheckedChange={(checked) => onChange({ email_invoice_to_contact: checked })}
                 />
               </div>
               <p className="text-xs text-muted-foreground">
@@ -553,8 +579,8 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
               </p>
             </div>
 
-            {/* Row 2: Contact Person Select (conditional) */}
-            {data.invoice_consolidation && (
+            {/* Row 3: Contact Person Select (conditional) */}
+            {data.email_invoice_to_contact && (
               <div className="space-y-2 md:col-span-2">
                 <Label htmlFor="invoice_contact_person_id">Invoice to Contact *</Label>
                 <ContactPersonSelect
@@ -573,7 +599,7 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
               </div>
             )}
 
-            {/* Row 3: Customer PO Number */}
+            {/* Row 4: Customer PO Number */}
             <div className="space-y-2">
               <Label htmlFor="customer_po_number">Customer PO Number</Label>
               <Input

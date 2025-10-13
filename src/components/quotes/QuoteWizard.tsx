@@ -110,7 +110,8 @@ interface QuoteData {
   late_fee_percentage?: number;
   
   // 6. Invoice & Payment Settings
-  invoice_consolidation?: boolean;
+  invoice_format?: 'consolidated' | 'per_line';
+  email_invoice_to_contact?: boolean;
   invoice_contact_person_id?: string;
   payment_method?: string; // bank-transfer, credit-card, cheque, direct-debit
   customer_po_number?: string;
@@ -170,7 +171,8 @@ export const QuoteWizard: React.FC = () => {
     annual_escalation_percentage: 5,
     grace_period_days: 5,
     late_fee_percentage: 2,
-    invoice_consolidation: false,
+    invoice_format: "consolidated",
+    email_invoice_to_contact: false,
     payment_method: "bank-transfer",
     fx_rate_type: "corporate",
     withholding_tax_percentage: 0,
@@ -331,7 +333,7 @@ export const QuoteWizard: React.FC = () => {
         if (!quoteData.deposit_type) newErrors.deposit_type = "Deposit type is required";
         if (!quoteData.default_deposit_amount) newErrors.default_deposit_amount = "Deposit amount per vehicle is required";
         if (!quoteData.payment_method) newErrors.payment_method = "Payment method is required";
-        if (quoteData.invoice_consolidation && !quoteData.invoice_contact_person_id) {
+        if (quoteData.email_invoice_to_contact && !quoteData.invoice_contact_person_id) {
           newErrors.invoice_contact_person_id = "Invoice contact person is required when emailing invoice is enabled";
         }
         break;
