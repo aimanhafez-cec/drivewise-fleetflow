@@ -566,9 +566,9 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
             Financial Summary
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="border-t pt-4">
-            <h4 className="font-semibold mb-3">Upfront Due per Vehicle</h4>
+        <CardContent className="space-y-2">
+          <div className="border-t pt-2">
+            <h4 className="font-semibold mb-2">Upfront Due per Vehicle</h4>
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span>Deposit (per vehicle):</span>
@@ -582,11 +582,11 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
                 <span>Initial Fees Total:</span>
                 <span className="font-medium">{upfrontDue.initialFees.toFixed(2)} AED</span>
               </div>
-              <div className="flex justify-between text-lg font-bold border-t pt-2 mt-2">
+              <div className="flex justify-between text-lg font-bold border-t pt-1.5 mt-1.5">
                 <span>Total Upfront Due (per vehicle):</span>
                 <span className="text-primary">{upfrontDue.total.toFixed(2)} AED</span>
               </div>
-              <p className="text-xs text-muted-foreground mt-2">
+              <p className="text-xs text-muted-foreground mt-1">
                 * Multiply by number of vehicles for total upfront amount
               </p>
             </div>
