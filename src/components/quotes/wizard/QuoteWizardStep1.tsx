@@ -75,6 +75,18 @@ export const QuoteWizardStep1: React.FC<QuoteWizardStep1Props> = ({
     }
   }, [data.contract_effective_from, data.contract_effective_to]);
 
+  // Default pickup/return customer site to Bill To when applicable
+  useEffect(() => {
+    if (data.customer_bill_to) {
+      if (data.pickup_type === 'customer_site' && !data.pickup_customer_site_id) {
+        onChange({ pickup_customer_site_id: data.customer_bill_to });
+      }
+      if (data.return_type === 'customer_site' && !data.return_customer_site_id) {
+        onChange({ return_customer_site_id: data.customer_bill_to });
+      }
+    }
+  }, [data.customer_bill_to, data.pickup_type, data.return_type]);
+
   return (
     <div className="space-y-6">
       <Card>
@@ -235,7 +247,15 @@ export const QuoteWizardStep1: React.FC<QuoteWizardStep1Props> = ({
                   <Label htmlFor="customer_id">Customer Organization Name *</Label>
                   <CustomerSelect
                     value={data.customer_id || ""}
-                    onChange={(value) => onChange({ customer_id: value })}
+                    onChange={(value) =>
+                      onChange({
+                        customer_id: value,
+                        customer_bill_to: null,
+                        contact_person_id: null,
+                        pickup_customer_site_id: undefined,
+                        return_customer_site_id: undefined,
+                      })
+                    }
                     customerType={data.customer_type}
                     placeholder="Search and select organization"
                   />
@@ -293,7 +313,15 @@ export const QuoteWizardStep1: React.FC<QuoteWizardStep1Props> = ({
                   <Label htmlFor="customer_id">Customer Name *</Label>
                   <CustomerSelect
                     value={data.customer_id || ""}
-                    onChange={(value) => onChange({ customer_id: value })}
+                    onChange={(value) =>
+                      onChange({
+                        customer_id: value,
+                        customer_bill_to: null,
+                        contact_person_id: null,
+                        pickup_customer_site_id: undefined,
+                        return_customer_site_id: undefined,
+                      })
+                    }
                     customerType="Person"
                     placeholder="Search and select person"
                   />
@@ -467,11 +495,15 @@ export const QuoteWizardStep1: React.FC<QuoteWizardStep1Props> = ({
                   <Select
                     value={data.pickup_type || "company_location"}
                     onValueChange={(value: 'company_location' | 'customer_site') => {
-                      onChange({ 
+                      const patch: any = {
                         pickup_type: value,
                         pickup_location_id: undefined,
                         pickup_customer_site_id: undefined,
-                      });
+                      };
+                      if (value === 'customer_site' && !data.pickup_customer_site_id && data.customer_bill_to) {
+                        patch.pickup_customer_site_id = data.customer_bill_to;
+                      }
+                      onChange(patch);
                     }}
                   >
                     <SelectTrigger id="pickup_type" className={errors.pickup_type ? "border-destructive" : ""}>
@@ -556,11 +588,15 @@ export const QuoteWizardStep1: React.FC<QuoteWizardStep1Props> = ({
                   <Select
                     value={data.return_type || "company_location"}
                     onValueChange={(value: 'company_location' | 'customer_site') => {
-                      onChange({ 
+                      const patch: any = {
                         return_type: value,
                         return_location_id: undefined,
                         return_customer_site_id: undefined,
-                      });
+                      };
+                      if (value === 'customer_site' && !data.return_customer_site_id && data.customer_bill_to) {
+                        patch.return_customer_site_id = data.customer_bill_to;
+                      }
+                      onChange(patch);
                     }}
                   >
                     <SelectTrigger id="return_type" className={errors.return_type ? "border-destructive" : ""}>

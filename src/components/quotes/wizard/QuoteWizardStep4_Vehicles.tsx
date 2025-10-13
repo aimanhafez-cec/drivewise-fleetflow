@@ -198,7 +198,7 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
           selectedLines={selectedLines}
           onSelectLine={handleSelectLine}
           onSelectAll={handleSelectAll}
-                  headerDefaults={{
+          headerDefaults={{
                     deposit_amount: data.default_deposit_amount,
                     advance_rent_months: data.default_advance_rent_months,
                     insurance_coverage_package: data.insurance_coverage_package,
@@ -213,8 +213,9 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
                     return_location_id: data.return_location_id,
                     return_customer_site_id: data.return_customer_site_id,
                     default_price_list_id: data.default_price_list_id,
-                    initial_fees: data.initial_fees || [],
                     billing_plan: data.billing_plan || 'monthly',
+                    initial_fees: data.initial_fees || [],
+                    customer_id: data.customer_id,
                   }}
         />
 

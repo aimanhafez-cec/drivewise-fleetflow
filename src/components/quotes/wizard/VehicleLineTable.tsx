@@ -38,6 +38,7 @@ interface VehicleLineTableProps {
       description: string;
       amount: number;
     }>;
+    customer_id?: string;
   };
 }
 

@@ -30,6 +30,7 @@ interface VehicleLineDetailsProps {
     return_customer_site_id?: string;
     default_price_list_id?: string;
     billing_plan?: string;
+    customer_id?: string;
     initial_fees?: Array<{
       fee_type: string;
       fee_type_label?: string;
@@ -47,7 +48,7 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
   headerDefaults = {},
 }) => {
   const { items: locations = [], isLoading: locationsLoading } = useLocations();
-  const { items: customerSites = [], isLoading: sitesLoading } = useCustomerSites();
+  const { items: customerSites = [], isLoading: sitesLoading } = useCustomerSites(headerDefaults?.customer_id);
   const linePrefix = `line_${line.line_no - 1}`;
 
   // Get billing period information based on billing plan
