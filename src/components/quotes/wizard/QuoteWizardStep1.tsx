@@ -56,9 +56,9 @@ export const QuoteWizardStep1: React.FC<QuoteWizardStep1Props> = ({
     enabled: !!data.customer_id,
   });
 
-  // Auto-fill account name when customer is selected (for organizations)
+  // Auto-fill account name when customer is selected (for companies)
   useEffect(() => {
-    if ((data.customer_type === "B2B" || data.customer_type === "CORPORATE") && selectedCustomer?.full_name) {
+    if (data.customer_type === "Company" && selectedCustomer?.full_name) {
       onChange({ account_name: selectedCustomer.full_name });
     }
   }, [data.customer_type, selectedCustomer?.full_name, onChange]);
@@ -208,19 +208,13 @@ export const QuoteWizardStep1: React.FC<QuoteWizardStep1Props> = ({
                   <SelectValue placeholder="Select customer type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="B2B">
+                  <SelectItem value="Company">
                     <div className="flex items-center gap-2">
                       <Building2 className="h-4 w-4" />
-                      Organization
+                      Company
                     </div>
                   </SelectItem>
-                  <SelectItem value="CORPORATE">
-                    <div className="flex items-center gap-2">
-                      <Building2 className="h-4 w-4" />
-                      Corporate
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="B2C">
+                  <SelectItem value="Person">
                     <div className="flex items-center gap-2">
                       <User className="h-4 w-4" />
                       Person
@@ -233,8 +227,8 @@ export const QuoteWizardStep1: React.FC<QuoteWizardStep1Props> = ({
               )}
             </div>
 
-            {/* Organization Fields */}
-            {(data.customer_type === "B2B" || data.customer_type === "CORPORATE") && (
+            {/* Company Fields */}
+            {data.customer_type === "Company" && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border rounded-lg bg-muted/50">
                 <div className="space-y-2 md:col-span-2">
                   <Label htmlFor="customer_id">Customer Organization Name *</Label>
@@ -292,14 +286,14 @@ export const QuoteWizardStep1: React.FC<QuoteWizardStep1Props> = ({
             )}
 
             {/* Person Fields */}
-            {data.customer_type === "B2C" && (
+            {data.customer_type === "Person" && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border rounded-lg bg-muted/50">
                 <div className="space-y-2 md:col-span-2">
                   <Label htmlFor="customer_id">Customer Name *</Label>
                   <CustomerSelect
                     value={data.customer_id || ""}
                     onChange={(value) => onChange({ customer_id: value })}
-                    customerType="B2C"
+                    customerType="Person"
                     placeholder="Search and select person"
                   />
                   {errors.customer_id && (
