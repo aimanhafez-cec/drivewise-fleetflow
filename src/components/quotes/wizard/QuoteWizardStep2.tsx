@@ -19,7 +19,6 @@ import {
   VAT_RATES,
   DEPOSIT_TYPES,
   PAYMENT_METHODS,
-  FX_RATE_TYPES,
   INITIAL_FEE_TYPES,
 } from "@/lib/constants/financialOptions";
 import { Calendar, DollarSign, Receipt, CreditCard, AlertCircle, TrendingUp, Plus, Trash2 } from "lucide-react";
@@ -568,28 +567,7 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="fx_rate_type">FX Rate Type</Label>
-              <Select
-                value={data.fx_rate_type || "corporate"}
-                onValueChange={(value) => onChange({ fx_rate_type: value })}
-              >
-                <SelectTrigger id="fx_rate_type">
-                  <SelectValue placeholder="Select FX rate type" />
-                </SelectTrigger>
-                <SelectContent>
-                  {FX_RATE_TYPES.map((type) => (
-                    <SelectItem key={type.id} value={type.value}>
-                      {type.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="border-t pt-4 mt-4">
+          <div className="border-t pt-4">
             <h4 className="font-semibold mb-3">Upfront Due per Vehicle</h4>
             <div className="space-y-2">
               <div className="flex justify-between text-sm">

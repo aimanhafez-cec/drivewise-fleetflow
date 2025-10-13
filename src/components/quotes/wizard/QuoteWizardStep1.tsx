@@ -18,6 +18,7 @@ import {
   CustomerSiteSelect,
   LocationSelect,
 } from "@/components/ui/select-components";
+import { FX_RATE_TYPES } from "@/lib/constants/financialOptions";
 import { CustomerSelect } from "@/components/ui/select-components";
 import { OpportunityViewDialog } from "@/components/quotes/OpportunityViewDialog";
 import { useOpportunityById } from "@/hooks/useQuoteLOVs";
@@ -426,6 +427,30 @@ export const QuoteWizardStep1: React.FC<QuoteWizardStep1Props> = ({
               </Select>
             </div>
           </div>
+
+          {/* Conditionally show FX Rate Type for non-AED currencies */}
+          {data.currency && data.currency !== "AED" && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="fx_rate_type">FX Rate Type</Label>
+                <Select
+                  value={data.fx_rate_type || "corporate"}
+                  onValueChange={(value) => onChange({ fx_rate_type: value })}
+                >
+                  <SelectTrigger id="fx_rate_type">
+                    <SelectValue placeholder="Select FX rate type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {FX_RATE_TYPES.map((type) => (
+                      <SelectItem key={type.id} value={type.value}>
+                        {type.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          )}
 
           {/* Row 7: Default Locations */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
