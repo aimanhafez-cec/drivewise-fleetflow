@@ -541,22 +541,6 @@ export const QuoteWizardStep1: React.FC<QuoteWizardStep1Props> = ({
                   )}
                 </div>
               </div>
-              
-              {/* Optional: Delivery Fee */}
-              {data.pickup_type === "customer_site" && (
-                <div className="space-y-2">
-                  <Label htmlFor="delivery_fee">Delivery Fee (Optional)</Label>
-                  <Input
-                    id="delivery_fee"
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={data.delivery_fee || ""}
-                    onChange={(e) => onChange({ delivery_fee: parseFloat(e.target.value) || 0 })}
-                    placeholder="Enter delivery fee (if applicable)"
-                  />
-                </div>
-              )}
             </div>
 
             {/* Return Configuration */}
@@ -646,22 +630,6 @@ export const QuoteWizardStep1: React.FC<QuoteWizardStep1Props> = ({
                   )}
                 </div>
               </div>
-              
-              {/* Optional: Collection Fee */}
-              {data.return_type === "customer_site" && (
-                <div className="space-y-2">
-                  <Label htmlFor="collection_fee">Collection Fee (Optional)</Label>
-                  <Input
-                    id="collection_fee"
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={data.collection_fee || ""}
-                    onChange={(e) => onChange({ collection_fee: parseFloat(e.target.value) || 0 })}
-                    placeholder="Enter collection fee (if applicable)"
-                  />
-                </div>
-              )}
             </div>
           </div>
 

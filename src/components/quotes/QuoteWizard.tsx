@@ -50,10 +50,6 @@ interface QuoteData {
   return_location_id?: string;
   return_customer_site_id?: string;
   
-  // Optional delivery/collection fees
-  delivery_fee?: number;
-  collection_fee?: number;
-  
   // Trip details from Step 2
   pickup_at?: string;
   pickup_location?: string;
@@ -177,8 +173,6 @@ export const QuoteWizard: React.FC = () => {
     quote_items: [], // Initialize empty vehicle lines array
     pickup_type: "company_location",
     return_type: "company_location",
-    delivery_fee: 0,
-    collection_fee: 0,
     // Financial defaults
     vat_percentage: 5, // UAE standard 5%
     billing_plan: "monthly",

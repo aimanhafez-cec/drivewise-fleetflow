@@ -53,8 +53,6 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
       return_type: data.return_type || 'company_location',
       return_location_id: data.return_location_id,
       return_customer_site_id: data.return_customer_site_id,
-      delivery_fee: data.delivery_fee || 0,
-      collection_fee: data.collection_fee || 0,
       mileage_package_km: 3000,
       excess_km_rate: 1.00,
       rate_type: 'monthly' as const,
@@ -214,9 +212,8 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
                     return_type: data.return_type,
                     return_location_id: data.return_location_id,
                     return_customer_site_id: data.return_customer_site_id,
-                    delivery_fee: data.delivery_fee,
-                    collection_fee: data.collection_fee,
                     default_price_list_id: data.default_price_list_id,
+                    initial_fees: data.initial_fees || [],
                     billing_plan: data.billing_plan || 'monthly',
                   }}
         />

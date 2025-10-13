@@ -28,10 +28,14 @@ interface VehicleLineDetailsProps {
     return_type?: string;
     return_location_id?: string;
     return_customer_site_id?: string;
-    delivery_fee?: number;
-    collection_fee?: number;
     default_price_list_id?: string;
     billing_plan?: string;
+    initial_fees?: Array<{
+      fee_type: string;
+      fee_type_label?: string;
+      description: string;
+      amount: number;
+    }>;
   };
 }
 

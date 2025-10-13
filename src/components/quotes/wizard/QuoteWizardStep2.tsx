@@ -25,6 +25,7 @@ import {
 } from "@/lib/constants/financialOptions";
 import { Calendar, DollarSign, Receipt, CreditCard, AlertCircle, TrendingUp, Plus, Trash2 } from "lucide-react";
 import { FormError } from "@/components/ui/form-error";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 interface QuoteWizardStep2Props {
   data: any;
@@ -384,9 +385,25 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
           <CardDescription className="mt-2">
             One-time, non-refundable setup and administrative charges collected before vehicle delivery. 
             These cover preparation, documentation, delivery, and system setup costs and appear in the upfront due total.
+            <br /><br />
+            <strong>Delivery/Logistics Fees:</strong> If the customer requires vehicle delivery to their site 
+            or collection from their site, add a "Delivery / Logistics Fee" here. This will apply to the entire quote 
+            but can be customized per vehicle line if needed.
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {/* Show contextual alert when delivery/collection is needed */}
+          {(data.pickup_type === 'customer_site' || data.return_type === 'customer_site') && (
+            <Alert className="mb-4">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Delivery/Collection Required</AlertTitle>
+              <AlertDescription>
+                {data.pickup_type === 'customer_site' && "Vehicle delivery to customer site selected. "}
+                {data.return_type === 'customer_site' && "Vehicle collection from customer site selected. "}
+                Consider adding a "Delivery / Logistics Fee" below to cover transportation costs.
+              </AlertDescription>
+            </Alert>
+          )}
           {data.initial_fees && data.initial_fees.length > 0 ? (
             <div className="space-y-4">
               <div className="border rounded-lg overflow-hidden">
