@@ -560,7 +560,7 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
 
       {/* Card 7: Financial Summary */}
       <Card className="bg-primary/5 border-primary">
-        <CardHeader className="pb-3">
+        <CardHeader className="pb-2">
           <CardTitle className="flex items-center gap-2 text-base">
             <TrendingUp className="h-4 w-4" />
             Financial Summary
