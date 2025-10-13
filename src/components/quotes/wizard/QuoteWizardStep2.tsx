@@ -560,16 +560,16 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
 
       {/* Card 7: Financial Summary */}
       <Card className="bg-primary/5 border-primary">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <TrendingUp className="h-5 w-5" />
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <TrendingUp className="h-4 w-4" />
             Financial Summary
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-2">
-          <div className="border-t pt-2">
-            <h4 className="font-semibold mb-2">Upfront Due per Vehicle</h4>
-            <div className="space-y-2">
+        <CardContent className="pt-0 pb-4">
+          <div className="space-y-1">
+            <h4 className="font-semibold text-sm mb-1.5">Upfront Due per Vehicle</h4>
+            <div className="space-y-1">
               <div className="flex justify-between text-sm">
                 <span>Deposit (per vehicle):</span>
                 <span className="font-medium">{upfrontDue.deposit.toFixed(2)} AED</span>
@@ -582,11 +582,11 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
                 <span>Initial Fees Total:</span>
                 <span className="font-medium">{upfrontDue.initialFees.toFixed(2)} AED</span>
               </div>
-              <div className="flex justify-between text-lg font-bold border-t pt-1.5 mt-1.5">
+              <div className="flex justify-between text-base font-bold border-t pt-1.5 mt-1.5">
                 <span>Total Upfront Due (per vehicle):</span>
                 <span className="text-primary">{upfrontDue.total.toFixed(2)} AED</span>
               </div>
-              <p className="text-xs text-muted-foreground mt-1">
+              <p className="text-xs text-muted-foreground mt-0.5">
                 * Multiply by number of vehicles for total upfront amount
               </p>
             </div>
