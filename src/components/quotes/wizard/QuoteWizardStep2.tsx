@@ -564,7 +564,7 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
               </p>
             </div>
 
-            {/* Row 2: Email Invoice Toggle */}
+            {/* Row 2: Email Invoice Toggle and Contact Person (same row) */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="email_invoice_to_contact">Email Invoice to Contact</Label>
@@ -579,9 +579,9 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
               </p>
             </div>
 
-            {/* Row 3: Contact Person Select (conditional) */}
+            {/* Contact Person Select beside toggle when enabled */}
             {data.email_invoice_to_contact && (
-              <div className="space-y-2 md:col-span-2">
+              <div className="space-y-2">
                 <Label htmlFor="invoice_contact_person_id">Invoice to Contact *</Label>
                 <ContactPersonSelect
                   customerId={data.customer_id}
