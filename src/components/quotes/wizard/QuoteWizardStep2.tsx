@@ -333,9 +333,7 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
             Deposits & Advances
           </CardTitle>
           <CardDescription className="mt-2">
-            Define the customer's refundable security deposit and any advance rental months to be collected 
-            before contract activation. These protect the company's financial exposure and must be settled 
-            before vehicle handover.
+            Security deposit and advance rent collected upfront per vehicle.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
