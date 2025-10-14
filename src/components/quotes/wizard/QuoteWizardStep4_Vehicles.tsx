@@ -31,6 +31,31 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
 
   const isCorporate = data.quote_type === 'Corporate lease';
 
+  // Helper function to calculate default per-period rate based on price list and vehicle category
+  const calculateDefaultRate = (priceListId: string, categoryName: string, billingPlan: string): number => {
+    // Hardcoded monthly rates by price list and vehicle category
+    const monthlyRatesByClass: Record<string, Record<string, number>> = {
+      'standard': { 'economy': 1200, 'compact': 1500, 'midsize': 2000, 'suv': 3500, 'luxury': 5000, 'premium': 5000 },
+      'premium': { 'economy': 1400, 'compact': 1800, 'midsize': 2400, 'suv': 4200, 'luxury': 6000, 'premium': 6000 },
+      'government': { 'economy': 1000, 'compact': 1300, 'midsize': 1800, 'suv': 3000, 'luxury': 4500, 'premium': 4500 },
+    };
+
+    // Get billing multiplier
+    const billingMultipliers: Record<string, number> = {
+      'monthly': 1,
+      'quarterly': 3,
+      'semi-annual': 6,
+      'annual': 12,
+    };
+
+    const priceList = priceListId || 'standard';
+    const category = categoryName?.toLowerCase() || 'midsize';
+    const monthlyRate = monthlyRatesByClass[priceList]?.[category] || 2000;
+    const multiplier = billingMultipliers[billingPlan || 'monthly'] || 1;
+    
+    return monthlyRate * multiplier;
+  };
+
   // Add multiple vehicle lines from modal selection
   const addMultipleVehicleLines = (selectedVehicles: any[]) => {
     const currentLines = data.quote_items || [];
@@ -45,7 +70,11 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
       deposit_amount: data.default_deposit_amount || 2500,
       deposit_type: data.deposit_type || 'refundable',
       advance_rent_months: data.default_advance_rent_months || 1,
-      monthly_rate: 0,
+      monthly_rate: calculateDefaultRate(
+        data.default_price_list_id || 'standard',
+        vehicle._itemCodeMeta?.category_name || vehicle.categories?.name || 'midsize',
+        data.billing_plan || 'monthly'
+      ),
       duration_months: 0,
       // Inherit pickup/return configuration from header
       pickup_type: data.pickup_type || 'company_location',
