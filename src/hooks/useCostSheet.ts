@@ -254,3 +254,37 @@ export const useUpdateCostSheetStatus = () => {
     },
   });
 };
+
+export const useApplyCostSheetRates = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async (params: { cost_sheet_id: string }) => {
+      const { data, error } = await supabase.functions.invoke('apply-cost-sheet-rates', {
+        body: { cost_sheet_id: params.cost_sheet_id },
+      });
+
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      return data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['cost-sheets'] });
+      queryClient.invalidateQueries({ queryKey: ['cost-sheet'] });
+      queryClient.invalidateQueries({ queryKey: ['quotes'] });
+      
+      toast({
+        title: 'Rates Applied Successfully',
+        description: `Updated ${data.updated_lines} vehicle line(s) with approved rates.`,
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Failed to Apply Rates',
+        description: error.message || 'Could not apply rates to vehicle lines',
+        variant: 'destructive',
+      });
+    },
+  });
+};

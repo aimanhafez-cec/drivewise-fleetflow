@@ -16,6 +16,7 @@ import {
   useSubmitCostSheet,
   useApproveCostSheet,
   useUpdateCostSheetStatus,
+  useApplyCostSheetRates,
 } from '@/hooks/useCostSheet';
 import {
   Select,
@@ -47,6 +48,7 @@ export const CostSheetDrawer: React.FC<CostSheetDrawerProps> = ({
   const submitMutation = useSubmitCostSheet();
   const approveMutation = useApproveCostSheet();
   const updateStatusMutation = useUpdateCostSheetStatus();
+  const applyRatesMutation = useApplyCostSheetRates();
   const { toast } = useToast();
 
   const [headerData, setHeaderData] = useState({
@@ -95,6 +97,14 @@ export const CostSheetDrawer: React.FC<CostSheetDrawerProps> = ({
     submitMutation.mutate({
       cost_sheet_id: costSheet.id,
       notes: headerData.notes_assumptions,
+    });
+  };
+
+  const handleApplyRates = () => {
+    if (!costSheet) return;
+    
+    applyRatesMutation.mutate({
+      cost_sheet_id: costSheet.id,
     });
   };
 
@@ -201,6 +211,16 @@ export const CostSheetDrawer: React.FC<CostSheetDrawerProps> = ({
                   {submitMutation.isPending ? 'Submitting...' : 'Submit'}
                 </Button>
               </>
+            )}
+
+            {costSheet?.status === 'approved' && (
+              <Button
+                onClick={handleApplyRates}
+                disabled={applyRatesMutation.isPending}
+                className="bg-green-600 hover:bg-green-700"
+              >
+                {applyRatesMutation.isPending ? 'Applying...' : 'Apply Rates to Vehicle Lines'}
+              </Button>
             )}
             </div>
           </div>

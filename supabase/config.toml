@@ -8,3 +8,6 @@ verify_jwt = true
 
 [functions.approve-cost-sheet]
 verify_jwt = true
+
+[functions.apply-cost-sheet-rates]
+verify_jwt = true
