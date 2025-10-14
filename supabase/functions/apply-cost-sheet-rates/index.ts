@@ -95,7 +95,8 @@ Deno.serve(async (req) => {
       JSON.stringify({ 
         success: true, 
         message: 'Rates applied to vehicle lines successfully',
-        updated_lines: updatedLines.length
+        updated_lines: updatedLines.length,
+        quote_id: costSheet.quote_id
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )

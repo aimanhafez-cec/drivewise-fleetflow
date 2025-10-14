@@ -274,6 +274,11 @@ export const useApplyCostSheetRates = () => {
       queryClient.invalidateQueries({ queryKey: ['cost-sheet'] });
       queryClient.invalidateQueries({ queryKey: ['quotes'] });
       
+      // Invalidate the specific quote being edited
+      if (data.quote_id) {
+        queryClient.invalidateQueries({ queryKey: ['quote', data.quote_id] });
+      }
+      
       toast({
         title: 'Rates Applied Successfully',
         description: `Updated ${data.updated_lines} vehicle line(s) with approved rates.`,
