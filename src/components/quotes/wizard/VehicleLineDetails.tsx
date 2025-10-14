@@ -606,12 +606,6 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
           </AccordionTrigger>
           <AccordionContent className="px-4 pb-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        
-        {/* SECTION 2: Contract Terms */}
-        <div className="space-y-4">
-          <h4 className="text-sm font-semibold text-muted-foreground border-b pb-2">
-            Contract Terms
-          </h4>
           
           <div className="space-y-2">
             <Label htmlFor={`pickup_${line.line_no}`}>Start Date *</Label>
@@ -725,13 +719,23 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
               Contract: {line.duration_months || 0} months = {billingPeriods} × {periodInfo.label} billing cycles
             </p>
           </div>
-        </div>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
 
         {/* SECTION 3: Mileage Package */}
-        <div className="space-y-4">
-          <h4 className="text-sm font-semibold text-muted-foreground border-b pb-2">
-            Mileage Package
-          </h4>
+        <AccordionItem value="mileage">
+          <AccordionTrigger className="hover:bg-muted/50 px-4 py-3">
+            <div className="flex items-center gap-2">
+              <Gauge className="h-4 w-4 text-primary" />
+              <span className="font-semibold">Mileage Package</span>
+              <span className="text-sm text-muted-foreground ml-2">
+                {line.mileage_package_km || 3000} km/month
+              </span>
+            </div>
+          </AccordionTrigger>
+          <AccordionContent className="px-4 pb-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           
           <div className="space-y-2">
             <Label htmlFor={`mileage_${line.line_no}`}>Included KM / Month *</Label>
@@ -762,13 +766,23 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
             <p className="text-xs text-muted-foreground">Charge per km over allowance</p>
             {errors[`${linePrefix}_excess_km`] && <FormError message={errors[`${linePrefix}_excess_km`]} />}
           </div>
-        </div>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
 
-        {/* SECTION 4: Deposit & Advance */}
-        <div className="space-y-4">
-          <h4 className="text-sm font-semibold text-muted-foreground border-b pb-2">
-            Deposit & Advance Rent
-          </h4>
+        {/* SECTION 4: Deposit & Advance Rent */}
+        <AccordionItem value="deposit">
+          <AccordionTrigger className="hover:bg-muted/50 px-4 py-3">
+            <div className="flex items-center gap-2">
+              <Coins className="h-4 w-4 text-primary" />
+              <span className="font-semibold">Deposit & Advance Rent</span>
+              {hasCustomizations("deposit") && (
+                <Badge variant="secondary" className="ml-2">Customized</Badge>
+              )}
+            </div>
+          </AccordionTrigger>
+          <AccordionContent className="px-4 pb-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           
           <div className="space-y-2">
             <Label htmlFor={`deposit_${line.line_no}`} className="flex items-center gap-2">
@@ -832,13 +846,23 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
             </p>
             {errors[`${linePrefix}_advance`] && <FormError message={errors[`${linePrefix}_advance`]} />}
           </div>
-        </div>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
 
         {/* SECTION 5: Insurance Overrides */}
-        <div className="space-y-4">
-          <h4 className="text-sm font-semibold text-muted-foreground border-b pb-2">
-            Insurance Overrides
-          </h4>
+        <AccordionItem value="insurance">
+          <AccordionTrigger className="hover:bg-muted/50 px-4 py-3">
+            <div className="flex items-center gap-2">
+              <Shield className="h-4 w-4 text-primary" />
+              <span className="font-semibold">Insurance Overrides</span>
+              {hasCustomizations("insurance") && (
+                <Badge variant="secondary" className="ml-2">Customized</Badge>
+              )}
+            </div>
+          </AccordionTrigger>
+          <AccordionContent className="px-4 pb-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           
           <div className="space-y-2">
             <Label htmlFor={`ins_coverage_${line.line_no}`} className="flex items-center gap-2">
@@ -997,7 +1021,9 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
               </Button>
             )}
           </div>
-        </div>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
 
         {/* SECTION 6: Maintenance Override */}
         <AccordionItem value="maintenance">
@@ -1192,6 +1218,25 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
                     {((line.deposit_amount || 0) + (line.advance_rent_months || 0) * (line.monthly_rate || 0) + (line.delivery_fee || 0) + (line.collection_fee || 0)).toFixed(2)} AED
                   </span>
                 </div>
+                
+                {/* Maintenance section */}
+                {(line.maintenance_enabled ?? headerDefaults.maintenance_enabled) && (
+                  <>
+                    <div className="flex justify-between text-sm border-t pt-2 mt-2">
+                      <span className="text-muted-foreground">Maintenance (Monthly):</span>
+                      <span className="font-medium">
+                        {line.maintenance_monthly_cost || 0} AED
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Total Maintenance:</span>
+                      <span className="font-medium">
+                        {calculateMaintenanceCost().toFixed(2)} AED
+                      </span>
+                    </div>
+                  </>
+                )}
+                
                 <div className="flex justify-between text-sm border-t pt-2 mt-2">
                   <span className="font-semibold">Rate:</span>
                   <span className="font-medium">
