@@ -148,7 +148,15 @@ export const CostSheetVehicleTable: React.FC<CostSheetVehicleTableProps> = ({
                 {formatCurrency(line.total_cost_per_month_aed, 'AED')}
               </TableCell>
               <TableCell className="text-right text-green-600 dark:text-green-400 font-semibold">
-                {formatCurrency(line.suggested_rate_per_month_aed, 'AED')}
+                {disabled ? (
+                  formatCurrency(line.suggested_rate_per_month_aed, 'AED')
+                ) : (
+                  <FormattedNumberInput
+                    value={line.suggested_rate_per_month_aed}
+                    onChange={(value) => onLineUpdate?.(line.id, 'suggested_rate_per_month_aed', value)}
+                    className="w-40 text-right font-semibold"
+                  />
+                )}
               </TableCell>
               <TableCell className="text-right">
                 {formatCurrency(line.quoted_rate_per_month_aed, 'AED')}

@@ -17,6 +17,8 @@ import {
   useApproveCostSheet,
   useUpdateCostSheetStatus,
   useApplyCostSheetRates,
+  useDeleteCostSheet,
+  CostSheetLine,
 } from '@/hooks/useCostSheet';
 import {
   Select,
@@ -49,6 +51,7 @@ export const CostSheetDrawer: React.FC<CostSheetDrawerProps> = ({
   const approveMutation = useApproveCostSheet();
   const updateStatusMutation = useUpdateCostSheetStatus();
   const applyRatesMutation = useApplyCostSheetRates();
+  const deleteMutation = useDeleteCostSheet();
   const { toast } = useToast();
 
   const [headerData, setHeaderData] = useState({
@@ -58,6 +61,8 @@ export const CostSheetDrawer: React.FC<CostSheetDrawerProps> = ({
     residual_value_percent: 40.0,
     notes_assumptions: '',
   });
+
+  const [lineUpdates, setLineUpdates] = useState<Record<string, Partial<CostSheetLine>>>({});
 
   useEffect(() => {
     if (costSheet) {
@@ -83,21 +88,33 @@ export const CostSheetDrawer: React.FC<CostSheetDrawerProps> = ({
 
   const handleSubmit = () => {
     if (!costSheet) return;
-    
-    const lowMarginLines = costSheet.lines?.filter(l => l.actual_margin_percent < 5) || [];
-    if (lowMarginLines.length > 0) {
-      toast({
-        title: 'Cannot Submit',
-        description: `${lowMarginLines.length} line(s) have margins below 5%. Please adjust costs or rates.`,
-        variant: 'destructive',
-      });
-      return;
-    }
 
     submitMutation.mutate({
       cost_sheet_id: costSheet.id,
       notes: headerData.notes_assumptions,
     });
+  };
+
+  const handleDelete = () => {
+    if (!costSheet) return;
+    
+    if (window.confirm('Are you sure you want to delete this draft cost sheet? This action cannot be undone.')) {
+      deleteMutation.mutate(
+        { cost_sheet_id: costSheet.id },
+        {
+          onSuccess: () => {
+            onClose();
+          },
+        }
+      );
+    }
+  };
+
+  const handleLineUpdate = (lineId: string, field: string, value: number) => {
+    setLineUpdates(prev => ({
+      ...prev,
+      [lineId]: { ...prev[lineId], [field]: value }
+    }));
   };
 
   const handleApplyRates = () => {
@@ -177,7 +194,11 @@ export const CostSheetDrawer: React.FC<CostSheetDrawerProps> = ({
 
           {costSheet?.lines && costSheet.lines.length > 0 && (
             <>
-              <CostSheetVehicleTable lines={costSheet.lines} />
+              <CostSheetVehicleTable 
+                lines={costSheet.lines} 
+                disabled={costSheet.status !== 'draft'}
+                onLineUpdate={handleLineUpdate}
+              />
               <CostSheetSummary 
                 lines={costSheet.lines} 
                 targetMargin={headerData.target_margin_percent}
@@ -198,17 +219,24 @@ export const CostSheetDrawer: React.FC<CostSheetDrawerProps> = ({
             {costSheet?.status === 'draft' && (
               <>
                 <Button
-                  variant="outline"
+                  variant="destructive"
+                  onClick={handleDelete}
+                  disabled={deleteMutation.isPending}
+                >
+                  {deleteMutation.isPending ? 'Deleting...' : 'Delete Draft'}
+                </Button>
+                <Button
                   onClick={handleCalculate}
                   disabled={calculateMutation.isPending}
+                  title="Recalculate with current vehicle lines and updated parameters"
                 >
-                  {calculateMutation.isPending ? 'Recalculating...' : 'Recalculate'}
+                  {calculateMutation.isPending ? 'Recalculating...' : 'Refresh from Vehicle Lines'}
                 </Button>
                 <Button
                   onClick={handleSubmit}
                   disabled={submitMutation.isPending}
                 >
-                  {submitMutation.isPending ? 'Submitting...' : 'Submit'}
+                  {submitMutation.isPending ? 'Submitting...' : 'Submit for Approval'}
                 </Button>
               </>
             )}

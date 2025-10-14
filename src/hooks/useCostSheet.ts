@@ -288,3 +288,34 @@ export const useApplyCostSheetRates = () => {
     },
   });
 };
+
+export const useDeleteCostSheet = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async (params: { cost_sheet_id: string }) => {
+      const { error } = await supabase
+        .from('quote_cost_sheets')
+        .delete()
+        .eq('id', params.cost_sheet_id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cost-sheets'] });
+      queryClient.invalidateQueries({ queryKey: ['cost-sheet'] });
+      toast({
+        title: 'Draft Deleted',
+        description: 'Cost sheet draft has been deleted successfully.',
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Delete Failed',
+        description: error.message || 'Failed to delete cost sheet',
+        variant: 'destructive',
+      });
+    },
+  });
+};

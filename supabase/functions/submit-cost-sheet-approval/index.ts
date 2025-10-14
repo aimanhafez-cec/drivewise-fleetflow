@@ -51,19 +51,6 @@ Deno.serve(async (req) => {
       throw new Error(`Cannot submit cost sheet with status: ${costSheet.status}`)
     }
 
-    // Validate that all lines have valid margins (at least 5%)
-    const { data: lines } = await supabaseClient
-      .from('quote_cost_sheet_lines')
-      .select('*')
-      .eq('cost_sheet_id', cost_sheet_id)
-
-    const lowMarginLines = lines?.filter(l => l.actual_margin_percent < 5) ?? []
-    if (lowMarginLines.length > 0) {
-      throw new Error(
-        `Cannot submit: ${lowMarginLines.length} line(s) have margins below 5%`
-      )
-    }
-
     // Auto-approve for demo: Update to approved status directly
     const { error: updateError } = await supabaseClient
       .from('quote_cost_sheets')
