@@ -78,6 +78,8 @@ Deno.serve(async (req) => {
         target_margin_percent: targetMargin,
         residual_value_percent: residualValue,
         status: 'draft',
+      }, {
+        onConflict: 'quote_id'
       })
       .select()
       .single()

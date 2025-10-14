@@ -22,6 +22,7 @@ import {
   useApproveCostSheet 
 } from '@/hooks/useCostSheet';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface CostSheetDrawerProps {
   open: boolean;
@@ -61,6 +62,35 @@ export const CostSheetDrawer: React.FC<CostSheetDrawerProps> = ({
       });
     }
   }, [costSheet]);
+
+  // Check if quote has changed (vehicles added/removed)
+  useEffect(() => {
+    if (costSheet && quoteId) {
+      const checkForChanges = async () => {
+        const { data: quote } = await supabase
+          .from('quotes')
+          .select('quote_items')
+          .eq('id', quoteId)
+          .single();
+        
+        if (quote) {
+          const currentVehicleCount = Array.isArray(quote.quote_items) ? quote.quote_items.length : 0;
+          const costSheetVehicleCount = costSheet.lines?.length || 0;
+          
+          if (currentVehicleCount !== costSheetVehicleCount) {
+            toast({
+              title: 'Quote has changed',
+              description: `Quote has ${currentVehicleCount} vehicle(s) but cost sheet has ${costSheetVehicleCount}. Click "Recalculate" to update.`,
+              variant: 'destructive',
+              duration: 10000,
+            });
+          }
+        }
+      };
+      
+      checkForChanges();
+    }
+  }, [costSheet, quoteId, toast]);
 
   const handleCalculate = () => {
     calculateMutation.mutate({

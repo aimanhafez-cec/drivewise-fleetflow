@@ -97,7 +97,7 @@ export const CostSheetVehicleTable: React.FC<CostSheetVehicleTableProps> = ({
                     type="number"
                     value={line.acquisition_cost_aed}
                     onChange={(e) => onLineUpdate?.(line.id, 'acquisition_cost_aed', parseFloat(e.target.value))}
-                    className="w-28 text-right"
+                    className="w-32 text-right"
                   />
                 )}
               </TableCell>
@@ -109,7 +109,7 @@ export const CostSheetVehicleTable: React.FC<CostSheetVehicleTableProps> = ({
                     type="number"
                     value={line.maintenance_per_month_aed}
                     onChange={(e) => onLineUpdate?.(line.id, 'maintenance_per_month_aed', parseFloat(e.target.value))}
-                    className="w-24 text-right"
+                    className="w-28 text-right"
                   />
                 )}
               </TableCell>
@@ -121,7 +121,7 @@ export const CostSheetVehicleTable: React.FC<CostSheetVehicleTableProps> = ({
                     type="number"
                     value={line.insurance_per_month_aed}
                     onChange={(e) => onLineUpdate?.(line.id, 'insurance_per_month_aed', parseFloat(e.target.value))}
-                    className="w-24 text-right"
+                    className="w-28 text-right"
                   />
                 )}
               </TableCell>
@@ -133,7 +133,7 @@ export const CostSheetVehicleTable: React.FC<CostSheetVehicleTableProps> = ({
                     type="number"
                     value={line.registration_admin_per_month_aed}
                     onChange={(e) => onLineUpdate?.(line.id, 'registration_admin_per_month_aed', parseFloat(e.target.value))}
-                    className="w-24 text-right"
+                    className="w-28 text-right"
                   />
                 )}
               </TableCell>
@@ -145,7 +145,7 @@ export const CostSheetVehicleTable: React.FC<CostSheetVehicleTableProps> = ({
                     type="number"
                     value={line.other_costs_per_month_aed}
                     onChange={(e) => onLineUpdate?.(line.id, 'other_costs_per_month_aed', parseFloat(e.target.value))}
-                    className="w-24 text-right"
+                    className="w-28 text-right"
                   />
                 )}
               </TableCell>
