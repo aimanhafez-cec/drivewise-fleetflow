@@ -11,6 +11,7 @@ import { VehicleLineTable } from "./VehicleLineTable";
 import { VehicleSelectionModal } from "../VehicleSelectionModal";
 import { FormError } from "@/components/ui/form-error";
 import { CostSheetSection } from "../costsheet/CostSheetSection";
+import { formatCurrency } from "@/lib/utils/currency";
 
 interface QuoteWizardStep3Props {
   data: any;
@@ -134,6 +135,8 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
   // Calculate totals
   const calculateTotals = () => {
     const lines = data.quote_items || [];
+    
+    // Existing calculations
     const totalDeposits = lines.reduce((sum: number, line: any) => sum + (line.deposit_amount || 0), 0);
     const totalAdvance = lines.reduce((sum: number, line: any) => 
       sum + ((line.advance_rent_months || 0) * (line.monthly_rate || 0)), 0);
@@ -144,6 +147,20 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
     const initialFees = (data.initial_fees || []).reduce((sum: number, fee: any) => 
       sum + (parseFloat(fee.amount) || 0), 0);
     
+    // Calculate monthly recurring rental
+    const monthlyRecurringRental = lines.reduce((sum: number, line: any) => 
+      sum + (line.monthly_rate || 0), 0);
+    
+    // Calculate subtotal (before VAT)
+    const subtotal = totalDeposits + totalAdvance + totalDeliveryFees + totalCollectionFees + initialFees;
+    
+    // Calculate VAT (use vat_percentage from data, default to 5%)
+    const vatPercentage = data.vat_percentage || 5;
+    const vatAmount = subtotal * (vatPercentage / 100);
+    
+    // Total including VAT
+    const totalIncludingVat = subtotal + vatAmount;
+    
     return {
       vehicles: lines.length,
       deposits: totalDeposits,
@@ -151,7 +168,12 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
       deliveryFees: totalDeliveryFees,
       collectionFees: totalCollectionFees,
       initialFees,
-      grandTotal: totalDeposits + totalAdvance + totalDeliveryFees + totalCollectionFees + initialFees,
+      monthlyRecurringRental,
+      subtotal,
+      vatPercentage,
+      vatAmount,
+      totalIncludingVat,
+      grandTotal: subtotal,
     };
   };
 
@@ -281,27 +303,45 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Total Deposits:</span>
-                  <span className="font-semibold">{totals.deposits.toFixed(2)} AED</span>
+                  <span className="font-semibold">{formatCurrency(totals.deposits)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Total Advance Rent:</span>
-                  <span className="font-semibold">{totals.advance.toFixed(2)} AED</span>
+                  <span className="font-semibold">{formatCurrency(totals.advance)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Total Delivery Fees:</span>
-                  <span className="font-semibold">{totals.deliveryFees.toFixed(2)} AED</span>
+                  <span className="font-semibold">{formatCurrency(totals.deliveryFees)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Total Collection Fees:</span>
-                  <span className="font-semibold">{totals.collectionFees.toFixed(2)} AED</span>
+                  <span className="font-semibold">{formatCurrency(totals.collectionFees)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Initial Fees (One-time):</span>
-                  <span className="font-semibold">{totals.initialFees.toFixed(2)} AED</span>
+                  <span className="font-semibold">{formatCurrency(totals.initialFees)}</span>
                 </div>
+                
+                {/* Monthly Recurring Section */}
                 <div className="border-t pt-3 flex justify-between">
-                  <span className="font-bold text-lg">Total Upfront Due:</span>
-                  <span className="font-bold text-lg text-primary">{totals.grandTotal.toFixed(2)} AED</span>
+                  <span className="font-semibold">Monthly Recurring Rental:</span>
+                  <span className="font-semibold text-blue-600">{formatCurrency(totals.monthlyRecurringRental)}</span>
+                </div>
+                
+                {/* Subtotal and VAT */}
+                <div className="border-t pt-3 flex justify-between">
+                  <span className="text-muted-foreground">Subtotal (Upfront):</span>
+                  <span>{formatCurrency(totals.subtotal)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">VAT ({totals.vatPercentage}%):</span>
+                  <span>{formatCurrency(totals.vatAmount)}</span>
+                </div>
+                
+                {/* Grand Total */}
+                <div className="border-t pt-3 flex justify-between">
+                  <span className="font-bold text-lg">Total Upfront Due (incl. VAT):</span>
+                  <span className="font-bold text-lg text-primary">{formatCurrency(totals.totalIncludingVat)}</span>
                 </div>
               </div>
             </CardContent>
