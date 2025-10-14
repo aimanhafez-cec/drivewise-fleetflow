@@ -537,7 +537,7 @@ export const QuoteWizard: React.FC = () => {
         if (quoteData.vat_percentage === undefined) newErrors.vat_percentage = "VAT % is required";
         if (!quoteData.default_price_list_id) newErrors.default_price_list_id = "Price list is required";
         if (!quoteData.deposit_type) newErrors.deposit_type = "Deposit type is required";
-        if (!quoteData.default_deposit_amount) newErrors.default_deposit_amount = "Deposit amount per vehicle is required";
+        if (quoteData.default_deposit_amount === undefined || quoteData.default_deposit_amount === null) newErrors.default_deposit_amount = "Deposit amount per vehicle is required";
         if (!quoteData.payment_method) newErrors.payment_method = "Payment method is required";
         if (quoteData.email_invoice_to_contact && !quoteData.invoice_contact_person_id) {
           newErrors.invoice_contact_person_id = "Invoice contact person is required when emailing invoice is enabled";
