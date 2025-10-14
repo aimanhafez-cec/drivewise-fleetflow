@@ -201,13 +201,6 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
           </CardHeader>
           <CardContent>
             {errors.quote_items && <FormError message={errors.quote_items} />}
-            
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-              <p className="text-sm text-blue-800">
-                <strong>Tip:</strong> Select multiple vehicles at once, then expand each row to customize details.
-                Each line inherits defaults from previous steps.
-              </p>
-            </div>
           </CardContent>
         </Card>
 
