@@ -37,11 +37,11 @@ interface VehicleLineDetailsProps {
     customer_id?: string;
     default_delivery_fee?: number;
     default_collection_fee?: number;
-    maintenance_enabled?: boolean;
+    maintenance_included?: boolean;
     maintenance_package_type?: string;
-    maintenance_monthly_cost?: number;
+    monthly_maintenance_cost_per_vehicle?: number;
     maintenance_plan_source?: string;
-    maintenance_show_as_separate_line?: boolean;
+    show_maintenance_separate_line?: boolean;
     initial_fees?: Array<{
       fee_type: string;
       fee_type_label?: string;
@@ -179,11 +179,11 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
                isCustomized("insurance_glass_tire_cover", line.insurance_glass_tire_cover, headerDefaults.insurance_glass_tire_cover) ||
                isCustomized("insurance_pai_enabled", line.insurance_pai_enabled, headerDefaults.insurance_pai_enabled);
       case "maintenance":
-        return isCustomized("maintenance_enabled", line.maintenance_enabled, headerDefaults.maintenance_enabled) ||
+        return isCustomized("maintenance_included", line.maintenance_included, headerDefaults.maintenance_included) ||
                isCustomized("maintenance_package_type", line.maintenance_package_type, headerDefaults.maintenance_package_type) ||
-               isCustomized("maintenance_monthly_cost", line.maintenance_monthly_cost, headerDefaults.maintenance_monthly_cost) ||
+               isCustomized("monthly_maintenance_cost_per_vehicle", line.monthly_maintenance_cost_per_vehicle, headerDefaults.monthly_maintenance_cost_per_vehicle) ||
                isCustomized("maintenance_plan_source", line.maintenance_plan_source, headerDefaults.maintenance_plan_source) ||
-               isCustomized("maintenance_show_as_separate_line", line.maintenance_show_as_separate_line, headerDefaults.maintenance_show_as_separate_line);
+               isCustomized("show_maintenance_separate_line", line.show_maintenance_separate_line, headerDefaults.show_maintenance_separate_line);
       default:
         return false;
     }
@@ -200,18 +200,18 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
   };
 
   const getMaintenancePreview = () => {
-    const enabled = line.maintenance_enabled ?? headerDefaults.maintenance_enabled ?? false;
+    const enabled = line.maintenance_included ?? headerDefaults.maintenance_included ?? false;
     if (!enabled) return "Disabled";
     const type = line.maintenance_package_type ?? headerDefaults.maintenance_package_type ?? "basic";
-    const cost = line.maintenance_monthly_cost ?? headerDefaults.maintenance_monthly_cost ?? 0;
+    const cost = line.monthly_maintenance_cost_per_vehicle ?? headerDefaults.monthly_maintenance_cost_per_vehicle ?? 0;
     return `${type.charAt(0).toUpperCase() + type.slice(1)} | ${cost} AED/month`;
   };
 
   // Calculate total maintenance cost
   const calculateMaintenanceCost = () => {
-    const enabled = line.maintenance_enabled ?? headerDefaults.maintenance_enabled ?? false;
+    const enabled = line.maintenance_included ?? headerDefaults.maintenance_included ?? false;
     if (!enabled) return 0;
-    const monthlyCost = line.maintenance_monthly_cost ?? headerDefaults.maintenance_monthly_cost ?? 0;
+    const monthlyCost = line.monthly_maintenance_cost_per_vehicle ?? headerDefaults.monthly_maintenance_cost_per_vehicle ?? 0;
     const months = line.duration_months || 0;
     return monthlyCost * months;
   };
@@ -1049,10 +1049,10 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
                   </div>
                   <div className="flex items-center gap-2">
                     <Checkbox 
-                      checked={line.maintenance_enabled ?? headerDefaults.maintenance_enabled ?? false}
-                      onCheckedChange={(checked) => onUpdate('maintenance_enabled', checked)}
+                      checked={line.maintenance_included ?? headerDefaults.maintenance_included ?? false}
+                      onCheckedChange={(checked) => onUpdate('maintenance_included', checked)}
                     />
-                    {isCustomized("maintenance_enabled", line.maintenance_enabled, headerDefaults.maintenance_enabled) && (
+                    {isCustomized("maintenance_included", line.maintenance_included, headerDefaults.maintenance_included) && (
                       <Badge variant="secondary" className="text-xs">Customized</Badge>
                     )}
                   </div>
@@ -1060,7 +1060,7 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
               </div>
 
               {/* Conditional fields when maintenance is enabled */}
-              {(line.maintenance_enabled ?? headerDefaults.maintenance_enabled) && (
+              {(line.maintenance_included ?? headerDefaults.maintenance_included) && (
                 <>
                   <div className="space-y-2">
                     <Label htmlFor={`maint_package_${line.line_no}`} className="flex items-center gap-2">
@@ -1077,9 +1077,9 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
                         <SelectValue placeholder="Select package type" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="basic">Basic Service</SelectItem>
-                        <SelectItem value="comprehensive">Comprehensive</SelectItem>
-                        <SelectItem value="premium">Premium</SelectItem>
+                        <SelectItem value="basic">Basic - Scheduled services</SelectItem>
+                        <SelectItem value="full">Full - Parts, labor, tires, battery</SelectItem>
+                        <SelectItem value="comprehensive">Comprehensive - All-inclusive</SelectItem>
                       </SelectContent>
                     </Select>
                     {isCustomized("maintenance_package_type", line.maintenance_package_type, headerDefaults.maintenance_package_type) && (
@@ -1098,7 +1098,7 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
                   <div className="space-y-2">
                     <Label htmlFor={`maint_cost_${line.line_no}`} className="flex items-center gap-2">
                       Monthly Cost/Vehicle (AED)
-                      {isCustomized("maintenance_monthly_cost", line.maintenance_monthly_cost, headerDefaults.maintenance_monthly_cost) && (
+                      {isCustomized("monthly_maintenance_cost_per_vehicle", line.monthly_maintenance_cost_per_vehicle, headerDefaults.monthly_maintenance_cost_per_vehicle) && (
                         <Badge variant="secondary" className="text-xs">Customized</Badge>
                       )}
                     </Label>
@@ -1107,17 +1107,17 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
                       type="number"
                       min="0"
                       step="50"
-                      value={line.maintenance_monthly_cost ?? headerDefaults.maintenance_monthly_cost ?? 0}
-                      onChange={(e) => onUpdate('maintenance_monthly_cost', parseFloat(e.target.value) || 0)}
+                      value={line.monthly_maintenance_cost_per_vehicle ?? headerDefaults.monthly_maintenance_cost_per_vehicle ?? 0}
+                      onChange={(e) => onUpdate('monthly_maintenance_cost_per_vehicle', parseFloat(e.target.value) || 0)}
                       placeholder="0.00"
                     />
-                    {isCustomized("maintenance_monthly_cost", line.maintenance_monthly_cost, headerDefaults.maintenance_monthly_cost) && (
+                    {isCustomized("monthly_maintenance_cost_per_vehicle", line.monthly_maintenance_cost_per_vehicle, headerDefaults.monthly_maintenance_cost_per_vehicle) && (
                       <Button
                         type="button"
                         variant="ghost"
                         size="sm"
                         className="h-7 text-xs"
-                        onClick={() => resetToDefault("maintenance_monthly_cost", headerDefaults.maintenance_monthly_cost)}
+                        onClick={() => resetToDefault("monthly_maintenance_cost_per_vehicle", headerDefaults.monthly_maintenance_cost_per_vehicle)}
                       >
                         Reset to default
                       </Button>
@@ -1132,16 +1132,15 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
                       )}
                     </Label>
                     <Select
-                      value={line.maintenance_plan_source ?? headerDefaults.maintenance_plan_source ?? 'in-house'}
+                      value={line.maintenance_plan_source ?? headerDefaults.maintenance_plan_source ?? 'internal'}
                       onValueChange={(value) => onUpdate('maintenance_plan_source', value)}
                     >
                       <SelectTrigger id={`maint_source_${line.line_no}`}>
                         <SelectValue placeholder="Select plan source" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="in-house">In-House</SelectItem>
-                        <SelectItem value="oem-dealer">OEM / Dealer</SelectItem>
-                        <SelectItem value="third-party">Third-Party Provider</SelectItem>
+                        <SelectItem value="internal">Internal Workshop</SelectItem>
+                        <SelectItem value="third_party">Third Party Provider</SelectItem>
                       </SelectContent>
                     </Select>
                     {isCustomized("maintenance_plan_source", line.maintenance_plan_source, headerDefaults.maintenance_plan_source) && (
@@ -1160,14 +1159,14 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
                   <div className="space-y-2 col-span-full">
                     <div className="flex items-center space-x-2 p-3 bg-muted/50 rounded-lg">
                       <Checkbox 
-                        checked={line.maintenance_show_as_separate_line ?? headerDefaults.maintenance_show_as_separate_line ?? false}
-                        onCheckedChange={(checked) => onUpdate('maintenance_show_as_separate_line', checked)}
+                        checked={line.show_maintenance_separate_line ?? headerDefaults.show_maintenance_separate_line ?? false}
+                        onCheckedChange={(checked) => onUpdate('show_maintenance_separate_line', checked)}
                       />
                       <div>
                         <Label className="font-medium">Show as separate line item in quote</Label>
                         <p className="text-xs text-muted-foreground">Display maintenance as a distinct line in the quotation</p>
                       </div>
-                      {isCustomized("maintenance_show_as_separate_line", line.maintenance_show_as_separate_line, headerDefaults.maintenance_show_as_separate_line) && (
+                      {isCustomized("show_maintenance_separate_line", line.show_maintenance_separate_line, headerDefaults.show_maintenance_separate_line) && (
                         <Badge variant="secondary" className="text-xs ml-auto">Customized</Badge>
                       )}
                     </div>
@@ -1220,12 +1219,12 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
                 </div>
                 
                 {/* Maintenance section */}
-                {(line.maintenance_enabled ?? headerDefaults.maintenance_enabled) && (
+                {(line.maintenance_included ?? headerDefaults.maintenance_included) && (
                   <>
                     <div className="flex justify-between text-sm border-t pt-2 mt-2">
                       <span className="text-muted-foreground">Maintenance (Monthly):</span>
                       <span className="font-medium">
-                        {line.maintenance_monthly_cost || 0} AED
+                        {line.monthly_maintenance_cost_per_vehicle || headerDefaults.monthly_maintenance_cost_per_vehicle || 0} AED
                       </span>
                     </div>
                     <div className="flex justify-between text-sm">

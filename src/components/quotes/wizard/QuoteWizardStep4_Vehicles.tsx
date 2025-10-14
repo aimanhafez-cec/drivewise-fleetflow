@@ -227,6 +227,11 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
                     default_collection_fee: data.default_collection_fee,
                     initial_fees: data.initial_fees || [],
                     customer_id: data.customer_id,
+                    maintenance_included: data.maintenance_included,
+                    maintenance_package_type: data.maintenance_package_type,
+                    monthly_maintenance_cost_per_vehicle: data.monthly_maintenance_cost_per_vehicle,
+                    maintenance_plan_source: data.maintenance_plan_source,
+                    show_maintenance_separate_line: data.show_maintenance_separate_line,
                   }}
         />
 

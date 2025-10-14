@@ -34,11 +34,11 @@ interface VehicleLineTableProps {
     billing_plan?: string;
     default_delivery_fee?: number;
     default_collection_fee?: number;
-    maintenance_enabled?: boolean;
+    maintenance_included?: boolean;
     maintenance_package_type?: string;
-    maintenance_monthly_cost?: number;
+    monthly_maintenance_cost_per_vehicle?: number;
     maintenance_plan_source?: string;
-    maintenance_show_as_separate_line?: boolean;
+    show_maintenance_separate_line?: boolean;
     initial_fees?: Array<{
       fee_type: string;
       fee_type_label?: string;
