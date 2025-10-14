@@ -119,7 +119,7 @@ export const CostSheetDrawer: React.FC<CostSheetDrawerProps> = ({
             {costSheet && (
               <div className="bg-muted/30 p-3 rounded-md border">
                 <div className="flex items-center gap-4 flex-wrap">
-                  <Label className="text-sm font-medium min-w-fit">Status (Demo Mode):</Label>
+                  <Label className="text-sm font-medium min-w-fit">Status:</Label>
                   <Select
                     value={costSheet.status}
                     onValueChange={(value) => {
@@ -141,9 +141,6 @@ export const CostSheetDrawer: React.FC<CostSheetDrawerProps> = ({
                       <SelectItem value="rejected">Rejected</SelectItem>
                     </SelectContent>
                   </Select>
-                  <p className="text-xs text-muted-foreground">
-                    Manually change for testing
-                  </p>
                 </div>
               </div>
             )}
@@ -201,7 +198,7 @@ export const CostSheetDrawer: React.FC<CostSheetDrawerProps> = ({
                   onClick={handleSubmit}
                   disabled={submitMutation.isPending}
                 >
-                  {submitMutation.isPending ? 'Submitting...' : 'Submit & Auto-Approve'}
+                  {submitMutation.isPending ? 'Submitting...' : 'Submit'}
                 </Button>
               </>
             )}
