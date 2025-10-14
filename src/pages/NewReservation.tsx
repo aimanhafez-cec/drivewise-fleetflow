@@ -443,7 +443,7 @@ const NewReservation = () => {
         formData.selectedMiscCharges.forEach(addOnId => {
           const addOn = availableAddOns.find(a => a.id === addOnId);
           if (addOn) {
-            newCharges[addOnId] = calculateAddOnCost(addOn, totalDays);
+            newCharges[addOnId] = calculateAddOnCost(addOnId, totalDays);
           }
         });
         updateFormData('addOnCharges', newCharges);
@@ -1738,18 +1738,17 @@ const NewReservation = () => {
               <div className="space-y-6">
                 {/* Add-ons Selection */}
                 <div className="space-y-8">
-                  {addOnCategories.map(category => {
-                  const categoryAddOns = categorizeAddOns(category);
-                  if (categoryAddOns.length === 0) return null;
-                  return <div key={category} className="space-y-4">
+                  {categorizeAddOns().map(category => {
+                  if (category.items.length === 0) return null;
+                  return <div key={category.category} className="space-y-4">
                         <h3 className="font-semibold text-lg text-card-foreground border-b border-card-foreground/20 pb-2">
-                          {category}
+                          {category.name}
                         </h3>
                         <div className="grid gap-4">
-                          {categoryAddOns.map(addOn => {
+                          {category.items.map(addOn => {
                         const isSelected = (formData.selectedMiscCharges || []).includes(addOn.id);
                         const rentalDays = formData.totalDays || 1;
-                        const cost = calculateAddOnCost(addOn, rentalDays);
+                        const cost = calculateAddOnCost(addOn.id, rentalDays);
                         const IconComponent = addOn.icon;
                         return <div key={addOn.id} className={`
                                   relative p-4 border rounded-lg cursor-pointer transition-all hover:shadow-md
@@ -1781,7 +1780,7 @@ const NewReservation = () => {
                                     <div className="flex items-center gap-2 mb-2">
                                       <IconComponent className="h-5 w-5 text-white" />
                                       <h4 className="font-medium text-card-foreground">{addOn.name}</h4>
-                                      {addOn.popular && <Badge variant="secondary" className="text-xs">
+                                      {addOn.isPopular && <Badge variant="secondary" className="text-xs">
                                           Popular
                                         </Badge>}
                                     </div>
@@ -1817,7 +1816,7 @@ const NewReservation = () => {
                       const addOn = availableAddOns.find(a => a.id === addOnId);
                       if (!addOn) return null;
                       const rentalDays = formData.totalDays || 1;
-                      const cost = calculateAddOnCost(addOn, rentalDays);
+                      const cost = calculateAddOnCost(addOnId, rentalDays);
                       const IconComponent = addOn.icon;
                       return <div key={addOnId} className="flex items-center justify-between p-3 bg-card-foreground/5 rounded-lg border border-card-foreground/10">
                               <div className="flex items-center gap-2 flex-1">

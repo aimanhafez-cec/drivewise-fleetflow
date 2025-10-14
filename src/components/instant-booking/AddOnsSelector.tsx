@@ -41,14 +41,14 @@ const AddOnsSelector: React.FC<AddOnsSelectorProps> = ({
             if (category.items.length === 0) return null;
 
             return (
-              <div key={category} className="space-y-4">
+              <div key={category.category} className="space-y-4">
                 <h3 className="font-semibold text-lg text-card-foreground border-b border-card-foreground/20 pb-2">
-                  {category}
+                  {category.name}
                 </h3>
                 <div className="grid gap-4">
-                  {categoryAddOns.map((addOn) => {
+                  {category.items.map((addOn) => {
                     const isSelected = selectedAddOns.includes(addOn.id);
-                    const cost = calculateAddOnCost(addOn, rentalDays);
+                    const cost = calculateAddOnCost(addOn.id, rentalDays);
                     const IconComponent = addOn.icon;
 
                     return (
@@ -74,7 +74,7 @@ const AddOnsSelector: React.FC<AddOnsSelectorProps> = ({
                             <div className="flex items-center gap-2 mb-2">
                               <IconComponent className="h-5 w-5 text-primary" />
                               <h4 className="font-medium text-card-foreground">{addOn.name}</h4>
-                              {addOn.popular && (
+                              {addOn.isPopular && (
                                 <Badge variant="secondary" className="text-xs">
                                   Popular
                                 </Badge>
@@ -120,7 +120,7 @@ const AddOnsSelector: React.FC<AddOnsSelectorProps> = ({
                 const addOn = availableAddOns.find(a => a.id === addOnId);
                 if (!addOn) return null;
                 
-                const cost = calculateAddOnCost(addOn, rentalDays);
+                const cost = calculateAddOnCost(addOnId, rentalDays);
                 const IconComponent = addOn.icon;
                 
                 return (
