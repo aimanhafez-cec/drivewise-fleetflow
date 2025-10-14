@@ -7,7 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { FormError } from "@/components/ui/form-error";
-import { AlertCircle, Info } from "lucide-react";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Checkbox } from "@/components/ui/checkbox";
+import { AlertCircle, Info, MapPin, FileText, Gauge, Coins, Shield, Wrench, Calculator } from "lucide-react";
 import { useLocations, useCustomerSites } from "@/hooks/useBusinessLOVs";
 import { formatDurationInMonthsAndDays } from "@/lib/utils/dateUtils";
 
@@ -35,6 +37,11 @@ interface VehicleLineDetailsProps {
     customer_id?: string;
     default_delivery_fee?: number;
     default_collection_fee?: number;
+    maintenance_enabled?: boolean;
+    maintenance_package_type?: string;
+    maintenance_monthly_cost?: number;
+    maintenance_plan_source?: string;
+    maintenance_show_as_separate_line?: boolean;
     initial_fees?: Array<{
       fee_type: string;
       fee_type_label?: string;
@@ -87,8 +94,6 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
 
   // Get default per-period rate from price list based on vehicle class
   const getDefaultPerPeriodRate = (): number => {
-    // Mock MONTHLY base rates by vehicle class and price list
-    // These will be multiplied by billing cycle to get per-period rate
     const monthlyRatesByClass: Record<string, Record<string, number>> = {
       'standard': { 'economy': 1200, 'compact': 1500, 'midsize': 2000, 'suv': 3500, 'luxury': 5000 },
       'premium': { 'economy': 1400, 'compact': 1800, 'midsize': 2400, 'suv': 4200, 'luxury': 6000 },
@@ -99,16 +104,13 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
     const vehicleClassName = line._vehicleMeta?.category_name?.toLowerCase() || 'midsize';
     const monthlyRate = monthlyRatesByClass[priceListId]?.[vehicleClassName] || 2000;
     
-    // Multiply by billing cycle to get per-period rate
     const { multiplier } = periodInfo;
     return monthlyRate * multiplier;
   };
 
-  // Track if per-period rate has been customized
   const defaultRate = getDefaultPerPeriodRate();
   const isRateCustomized = line.monthly_rate !== undefined && line.monthly_rate !== defaultRate;
 
-  // Calculate number of billing periods in the lease term
   const calculateBillingPeriods = (): number => {
     const totalMonths = line.duration_months || 0;
     const { multiplier } = periodInfo;
@@ -131,12 +133,10 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
       const from = new Date(line.pickup_at);
       const to = new Date(line.return_at);
       
-      // Calculate months (rounded to nearest month)
       const diffTime = Math.abs(to.getTime() - from.getTime());
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      const months = Math.round(diffDays / 30.44); // Average days per month
+      const months = Math.round(diffDays / 30.44);
       
-      // Update both duration_months and lease_term_months
       if (line.duration_months !== months) {
         onUpdate('duration_months', months);
       }
@@ -157,14 +157,83 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
     onUpdate(field, defaultValue);
   };
 
+  // Helper to check if a section has customizations
+  const hasCustomizations = (section: string): boolean => {
+    switch (section) {
+      case "delivery":
+        return isCustomized("pickup_type", line.pickup_type, headerDefaults.pickup_type) ||
+               isCustomized("pickup_location_id", line.pickup_location_id, headerDefaults.pickup_location_id) ||
+               isCustomized("pickup_customer_site_id", line.pickup_customer_site_id, headerDefaults.pickup_customer_site_id) ||
+               isCustomized("return_type", line.return_type, headerDefaults.return_type) ||
+               isCustomized("return_location_id", line.return_location_id, headerDefaults.return_location_id) ||
+               isCustomized("return_customer_site_id", line.return_customer_site_id, headerDefaults.return_customer_site_id) ||
+               isCustomized("delivery_fee", line.delivery_fee, headerDefaults.default_delivery_fee ?? 0) ||
+               isCustomized("collection_fee", line.collection_fee, headerDefaults.default_collection_fee ?? 0);
+      case "deposit":
+        return isCustomized("deposit_amount", line.deposit_amount, headerDefaults.deposit_amount) ||
+               isCustomized("advance_rent_months", line.advance_rent_months, headerDefaults.advance_rent_months);
+      case "insurance":
+        return isCustomized("insurance_coverage_package", line.insurance_coverage_package, headerDefaults.insurance_coverage_package) ||
+               isCustomized("insurance_excess_aed", line.insurance_excess_aed, headerDefaults.insurance_excess_aed) ||
+               isCustomized("insurance_territorial_coverage", line.insurance_territorial_coverage, headerDefaults.insurance_territorial_coverage) ||
+               isCustomized("insurance_glass_tire_cover", line.insurance_glass_tire_cover, headerDefaults.insurance_glass_tire_cover) ||
+               isCustomized("insurance_pai_enabled", line.insurance_pai_enabled, headerDefaults.insurance_pai_enabled);
+      case "maintenance":
+        return isCustomized("maintenance_enabled", line.maintenance_enabled, headerDefaults.maintenance_enabled) ||
+               isCustomized("maintenance_package_type", line.maintenance_package_type, headerDefaults.maintenance_package_type) ||
+               isCustomized("maintenance_monthly_cost", line.maintenance_monthly_cost, headerDefaults.maintenance_monthly_cost) ||
+               isCustomized("maintenance_plan_source", line.maintenance_plan_source, headerDefaults.maintenance_plan_source) ||
+               isCustomized("maintenance_show_as_separate_line", line.maintenance_show_as_separate_line, headerDefaults.maintenance_show_as_separate_line);
+      default:
+        return false;
+    }
+  };
+
+  // Generate preview text for accordion headers
+  const getDeliveryPreview = () => {
+    const pickupType = line.pickup_type ?? headerDefaults.pickup_type ?? "company_location";
+    const returnType = line.return_type ?? headerDefaults.return_type ?? "company_location";
+    if (pickupType === "customer_site" && returnType === "customer_site") return "Delivery & Collection";
+    if (pickupType === "customer_site") return "Delivery only";
+    if (returnType === "customer_site") return "Collection only";
+    return "Self-pickup";
+  };
+
+  const getMaintenancePreview = () => {
+    const enabled = line.maintenance_enabled ?? headerDefaults.maintenance_enabled ?? false;
+    if (!enabled) return "Disabled";
+    const type = line.maintenance_package_type ?? headerDefaults.maintenance_package_type ?? "basic";
+    const cost = line.maintenance_monthly_cost ?? headerDefaults.maintenance_monthly_cost ?? 0;
+    return `${type.charAt(0).toUpperCase() + type.slice(1)} | ${cost} AED/month`;
+  };
+
+  // Calculate total maintenance cost
+  const calculateMaintenanceCost = () => {
+    const enabled = line.maintenance_enabled ?? headerDefaults.maintenance_enabled ?? false;
+    if (!enabled) return 0;
+    const monthlyCost = line.maintenance_monthly_cost ?? headerDefaults.maintenance_monthly_cost ?? 0;
+    const months = line.duration_months || 0;
+    return monthlyCost * months;
+  };
+
   return (
-    <div className="space-y-6 max-w-6xl">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="space-y-2 max-w-5xl">
+      <Accordion type="multiple" defaultValue={["delivery", "contract", "summary"]} className="w-full">
+        
         {/* SECTION 1: Delivery & Collection */}
-        <div className="space-y-4">
-          <h4 className="text-sm font-semibold text-muted-foreground border-b pb-2">
-            Delivery & Collection
-          </h4>
+        <AccordionItem value="delivery">
+          <AccordionTrigger className="hover:bg-muted/50 px-4 py-3">
+            <div className="flex items-center gap-2">
+              <MapPin className="h-4 w-4 text-primary" />
+              <span className="font-semibold">Delivery & Collection</span>
+              <span className="text-sm text-muted-foreground ml-2">{getDeliveryPreview()}</span>
+              {hasCustomizations("delivery") && (
+                <Badge variant="secondary" className="ml-2">Customized</Badge>
+              )}
+            </div>
+          </AccordionTrigger>
+          <AccordionContent className="px-4 pb-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           
           {/* Pickup Configuration */}
           <div className="space-y-2">
@@ -520,8 +589,24 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
               </p>
             </div>
           )}
-        </div>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
 
+        {/* SECTION 2: Contract Terms */}
+        <AccordionItem value="contract">
+          <AccordionTrigger className="hover:bg-muted/50 px-4 py-3">
+            <div className="flex items-center gap-2">
+              <FileText className="h-4 w-4 text-primary" />
+              <span className="font-semibold">Contract Terms</span>
+              <span className="text-sm text-muted-foreground ml-2">
+                {line.duration_months || 0} months | {line.monthly_rate || 0} AED/{periodInfo.abbrev}
+              </span>
+            </div>
+          </AccordionTrigger>
+          <AccordionContent className="px-4 pb-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        
         {/* SECTION 2: Contract Terms */}
         <div className="space-y-4">
           <h4 className="text-sm font-semibold text-muted-foreground border-b pb-2">
@@ -914,77 +999,240 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
           </div>
         </div>
 
-        {/* SECTION 6: Line Summary */}
-        <div className="space-y-4">
-          <h4 className="text-sm font-semibold text-muted-foreground border-b pb-2">
-            Line Summary
-          </h4>
-          
-          <Card className="bg-muted">
-            <CardContent className="pt-4 space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Deposit:</span>
-                <span className="font-medium">{line.deposit_amount || 0} AED</span>
+        {/* SECTION 6: Maintenance Override */}
+        <AccordionItem value="maintenance">
+          <AccordionTrigger className="hover:bg-muted/50 px-4 py-3">
+            <div className="flex items-center gap-2">
+              <Wrench className="h-4 w-4 text-primary" />
+              <span className="font-semibold">Maintenance Override</span>
+              <span className="text-sm text-muted-foreground ml-2">{getMaintenancePreview()}</span>
+              {hasCustomizations("maintenance") && (
+                <Badge variant="secondary" className="ml-2">Customized</Badge>
+              )}
+            </div>
+          </AccordionTrigger>
+          <AccordionContent className="px-4 pb-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              
+              {/* Enable/Disable Maintenance */}
+              <div className="space-y-2 col-span-full">
+                <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                  <div>
+                    <Label className="font-medium">Include Maintenance Plan</Label>
+                    <p className="text-xs text-muted-foreground">Add maintenance coverage to this vehicle</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Checkbox 
+                      checked={line.maintenance_enabled ?? headerDefaults.maintenance_enabled ?? false}
+                      onCheckedChange={(checked) => onUpdate('maintenance_enabled', checked)}
+                    />
+                    {isCustomized("maintenance_enabled", line.maintenance_enabled, headerDefaults.maintenance_enabled) && (
+                      <Badge variant="secondary" className="text-xs">Customized</Badge>
+                    )}
+                  </div>
+                </div>
               </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Advance Rent:</span>
-                <span className="font-medium">
-                  {((line.advance_rent_months || 0) * (line.monthly_rate || 0)).toFixed(2)} AED
-                </span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Delivery Fee:</span>
-                <span className="font-medium">{(line.delivery_fee || 0).toFixed(2)} AED</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Collection Fee:</span>
-                <span className="font-medium">{(line.collection_fee || 0).toFixed(2)} AED</span>
-              </div>
-              <div className="flex justify-between text-sm border-t pt-2">
-                <span className="font-semibold">Upfront Total:</span>
-                <span className="font-bold text-primary">
-                  {((line.deposit_amount || 0) + (line.advance_rent_months || 0) * (line.monthly_rate || 0) + (line.delivery_fee || 0) + (line.collection_fee || 0)).toFixed(2)} AED
-                </span>
-              </div>
-              <div className="flex justify-between text-sm border-t pt-2 mt-2">
-                <span className="font-semibold">Rate:</span>
-                <span className="font-medium">
-                  {line.monthly_rate || 0} AED/{periodInfo.abbrev}
-                </span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="font-semibold">Billing Periods:</span>
-                <span className="font-medium">
-                  {billingPeriods} × {periodInfo.label}
-                </span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="font-semibold">Lease Term:</span>
-                <span className="font-medium">{line.lease_term_months || 0} months</span>
-              </div>
-              <div className="flex justify-between text-sm border-t pt-2 mt-2">
-                <span className="font-bold text-lg">Line Total:</span>
-                <span className="font-bold text-lg text-primary">
-                  {((line.monthly_rate || 0) * billingPeriods).toFixed(2)} AED
-                </span>
-              </div>
-              <p className="text-xs text-muted-foreground text-right">
-                {line.monthly_rate || 0} AED/{periodInfo.abbrev} × {billingPeriods} billing {billingPeriods === 1 ? 'period' : 'periods'}
-              </p>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Duration:</span>
-                <span className="font-medium">{line.duration_months || 0} months</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Total Mileage:</span>
-                <span className="font-medium">
-                  {((line.mileage_package_km || 0) * (line.duration_months || 0)).toLocaleString()} km
-                </span>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+
+              {/* Conditional fields when maintenance is enabled */}
+              {(line.maintenance_enabled ?? headerDefaults.maintenance_enabled) && (
+                <>
+                  <div className="space-y-2">
+                    <Label htmlFor={`maint_package_${line.line_no}`} className="flex items-center gap-2">
+                      Package Type
+                      {isCustomized("maintenance_package_type", line.maintenance_package_type, headerDefaults.maintenance_package_type) && (
+                        <Badge variant="secondary" className="text-xs">Customized</Badge>
+                      )}
+                    </Label>
+                    <Select
+                      value={line.maintenance_package_type ?? headerDefaults.maintenance_package_type ?? 'basic'}
+                      onValueChange={(value) => onUpdate('maintenance_package_type', value)}
+                    >
+                      <SelectTrigger id={`maint_package_${line.line_no}`}>
+                        <SelectValue placeholder="Select package type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="basic">Basic Service</SelectItem>
+                        <SelectItem value="comprehensive">Comprehensive</SelectItem>
+                        <SelectItem value="premium">Premium</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    {isCustomized("maintenance_package_type", line.maintenance_package_type, headerDefaults.maintenance_package_type) && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 text-xs"
+                        onClick={() => resetToDefault("maintenance_package_type", headerDefaults.maintenance_package_type)}
+                      >
+                        Reset to default
+                      </Button>
+                    )}
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor={`maint_cost_${line.line_no}`} className="flex items-center gap-2">
+                      Monthly Cost/Vehicle (AED)
+                      {isCustomized("maintenance_monthly_cost", line.maintenance_monthly_cost, headerDefaults.maintenance_monthly_cost) && (
+                        <Badge variant="secondary" className="text-xs">Customized</Badge>
+                      )}
+                    </Label>
+                    <Input
+                      id={`maint_cost_${line.line_no}`}
+                      type="number"
+                      min="0"
+                      step="50"
+                      value={line.maintenance_monthly_cost ?? headerDefaults.maintenance_monthly_cost ?? 0}
+                      onChange={(e) => onUpdate('maintenance_monthly_cost', parseFloat(e.target.value) || 0)}
+                      placeholder="0.00"
+                    />
+                    {isCustomized("maintenance_monthly_cost", line.maintenance_monthly_cost, headerDefaults.maintenance_monthly_cost) && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 text-xs"
+                        onClick={() => resetToDefault("maintenance_monthly_cost", headerDefaults.maintenance_monthly_cost)}
+                      >
+                        Reset to default
+                      </Button>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor={`maint_source_${line.line_no}`} className="flex items-center gap-2">
+                      Plan Source
+                      {isCustomized("maintenance_plan_source", line.maintenance_plan_source, headerDefaults.maintenance_plan_source) && (
+                        <Badge variant="secondary" className="text-xs">Customized</Badge>
+                      )}
+                    </Label>
+                    <Select
+                      value={line.maintenance_plan_source ?? headerDefaults.maintenance_plan_source ?? 'in-house'}
+                      onValueChange={(value) => onUpdate('maintenance_plan_source', value)}
+                    >
+                      <SelectTrigger id={`maint_source_${line.line_no}`}>
+                        <SelectValue placeholder="Select plan source" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="in-house">In-House</SelectItem>
+                        <SelectItem value="oem-dealer">OEM / Dealer</SelectItem>
+                        <SelectItem value="third-party">Third-Party Provider</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    {isCustomized("maintenance_plan_source", line.maintenance_plan_source, headerDefaults.maintenance_plan_source) && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 text-xs"
+                        onClick={() => resetToDefault("maintenance_plan_source", headerDefaults.maintenance_plan_source)}
+                      >
+                        Reset to default
+                      </Button>
+                    )}
+                  </div>
+
+                  <div className="space-y-2 col-span-full">
+                    <div className="flex items-center space-x-2 p-3 bg-muted/50 rounded-lg">
+                      <Checkbox 
+                        checked={line.maintenance_show_as_separate_line ?? headerDefaults.maintenance_show_as_separate_line ?? false}
+                        onCheckedChange={(checked) => onUpdate('maintenance_show_as_separate_line', checked)}
+                      />
+                      <div>
+                        <Label className="font-medium">Show as separate line item in quote</Label>
+                        <p className="text-xs text-muted-foreground">Display maintenance as a distinct line in the quotation</p>
+                      </div>
+                      {isCustomized("maintenance_show_as_separate_line", line.maintenance_show_as_separate_line, headerDefaults.maintenance_show_as_separate_line) && (
+                        <Badge variant="secondary" className="text-xs ml-auto">Customized</Badge>
+                      )}
+                    </div>
+                  </div>
+                </>
+              )}
+              
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+
+        {/* SECTION 7: Line Summary */}
+        <AccordionItem value="summary" className="border-t-2 border-primary/20">
+          <AccordionTrigger className="hover:bg-muted/50 px-4 py-3 bg-muted/30">
+            <div className="flex items-center gap-2">
+              <Calculator className="h-4 w-4 text-primary" />
+              <span className="font-semibold text-primary">Line Summary</span>
+              <span className="text-sm font-bold text-primary ml-2">
+                {((line.monthly_rate || 0) * billingPeriods).toFixed(2)} AED
+              </span>
+            </div>
+          </AccordionTrigger>
+          <AccordionContent className="px-4 pb-4">
+            
+            <Card className="bg-muted">
+              <CardContent className="pt-4 space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Deposit:</span>
+                  <span className="font-medium">{line.deposit_amount || 0} AED</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Advance Rent:</span>
+                  <span className="font-medium">
+                    {((line.advance_rent_months || 0) * (line.monthly_rate || 0)).toFixed(2)} AED
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Delivery Fee:</span>
+                  <span className="font-medium">{(line.delivery_fee || 0).toFixed(2)} AED</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Collection Fee:</span>
+                  <span className="font-medium">{(line.collection_fee || 0).toFixed(2)} AED</span>
+                </div>
+                <div className="flex justify-between text-sm border-t pt-2">
+                  <span className="font-semibold">Upfront Total:</span>
+                  <span className="font-bold text-primary">
+                    {((line.deposit_amount || 0) + (line.advance_rent_months || 0) * (line.monthly_rate || 0) + (line.delivery_fee || 0) + (line.collection_fee || 0)).toFixed(2)} AED
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm border-t pt-2 mt-2">
+                  <span className="font-semibold">Rate:</span>
+                  <span className="font-medium">
+                    {line.monthly_rate || 0} AED/{periodInfo.abbrev}
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="font-semibold">Billing Periods:</span>
+                  <span className="font-medium">
+                    {billingPeriods} × {periodInfo.label}
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="font-semibold">Lease Term:</span>
+                  <span className="font-medium">{line.lease_term_months || 0} months</span>
+                </div>
+                <div className="flex justify-between text-sm border-t pt-2 mt-2">
+                  <span className="font-bold text-lg">Line Total:</span>
+                  <span className="font-bold text-lg text-primary">
+                    {((line.monthly_rate || 0) * billingPeriods).toFixed(2)} AED
+                  </span>
+                </div>
+                <p className="text-xs text-muted-foreground text-right">
+                  {line.monthly_rate || 0} AED/{periodInfo.abbrev} × {billingPeriods} billing {billingPeriods === 1 ? 'period' : 'periods'}
+                </p>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Duration:</span>
+                  <span className="font-medium">{line.duration_months || 0} months</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Total Mileage:</span>
+                  <span className="font-medium">
+                    {((line.mileage_package_km || 0) * (line.duration_months || 0)).toLocaleString()} km
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
+          </AccordionContent>
+        </AccordionItem>
+
+      </Accordion>
     </div>
   );
 };
