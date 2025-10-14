@@ -4,19 +4,21 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Shield, Info, Wrench, Check, X, ChevronDown, HelpCircle } from "lucide-react";
+import { Shield, Info, Wrench, Check, X, ChevronDown, HelpCircle, Package } from "lucide-react";
 import { FormError } from "@/components/ui/form-error";
 import { Switch } from "@/components/ui/switch";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { DefaultAddOnsSelector } from "./DefaultAddOnsSelector";
+import { formatCurrency } from "@/lib/utils/currency";
 
-interface QuoteWizardStep3InsuranceProps {
+interface QuoteWizardStep3CoverageServicesProps {
   data: any;
   onChange: (data: any) => void;
   errors: Record<string, string>;
 }
 
-export const QuoteWizardStep3_Insurance: React.FC<QuoteWizardStep3InsuranceProps> = ({
+export const QuoteWizardStep3_CoverageServices: React.FC<QuoteWizardStep3CoverageServicesProps> = ({
   data,
   onChange,
   errors,
@@ -111,6 +113,30 @@ export const QuoteWizardStep3_Insurance: React.FC<QuoteWizardStep3InsuranceProps
     data.maintenance_package_type,
     data.monthly_maintenance_cost_per_vehicle,
   ]);
+
+  // Auto-generate add-ons summary
+  React.useEffect(() => {
+    const enabled = (data.default_addons || []).filter((a: any) => a.enabled);
+    if (enabled.length === 0) {
+      onChange({ default_addons_summary: 'No add-ons selected' });
+      return;
+    }
+    
+    const monthly = enabled.filter((a: any) => a.type === 'monthly');
+    const oneTime = enabled.filter((a: any) => a.type === 'one-time');
+    
+    const parts = [];
+    if (monthly.length > 0) {
+      const total = monthly.reduce((sum: number, a: any) => sum + a.amount, 0);
+      parts.push(`${monthly.length} monthly (+${total} AED/month)`);
+    }
+    if (oneTime.length > 0) {
+      const total = oneTime.reduce((sum: number, a: any) => sum + a.amount, 0);
+      parts.push(`${oneTime.length} one-time (+${total} AED)`);
+    }
+    
+    onChange({ default_addons_summary: parts.join(' • ') });
+  }, [data.default_addons]);
 
   const TooltipLabel = ({ label, tooltip }: { label: string; tooltip: string }) => (
     <TooltipProvider>
@@ -371,6 +397,58 @@ export const QuoteWizardStep3_Insurance: React.FC<QuoteWizardStep3InsuranceProps
             </>
           )}
 
+        </CardContent>
+      </Card>
+
+      {/* Default Add-Ons & Extras Card */}
+      <Card>
+        <CardHeader className="p-4 border-b">
+          <div className="flex items-center gap-2">
+            <Package className="h-4 w-4 text-primary" />
+            <CardTitle className="text-base font-semibold">Default Add-Ons & Extras</CardTitle>
+            <Badge variant="secondary" className="text-xs ml-auto">
+              Applied to All Vehicles
+            </Badge>
+          </div>
+        </CardHeader>
+        <CardContent className="p-4 space-y-4">
+          <DefaultAddOnsSelector
+            selectedAddOns={data.default_addons || []}
+            onChange={(addons) => onChange({ default_addons: addons })}
+          />
+          
+          {/* Summary of selected add-ons */}
+          {data.default_addons && data.default_addons.filter((a: any) => a.enabled).length > 0 && (
+            <div className="mt-4 p-3 bg-muted/50 rounded-lg">
+              <div className="text-sm font-medium mb-2">Selected Add-Ons Summary</div>
+              <div className="text-xs text-muted-foreground space-y-1">
+                {(() => {
+                  const enabled = data.default_addons.filter((a: any) => a.enabled);
+                  const monthlyAddOns = enabled.filter((a: any) => a.type === 'monthly');
+                  const oneTimeAddOns = enabled.filter((a: any) => a.type === 'one-time');
+                  const monthlyTotal = monthlyAddOns.reduce((sum: number, a: any) => sum + a.amount, 0);
+                  const oneTimeTotal = oneTimeAddOns.reduce((sum: number, a: any) => sum + a.amount, 0);
+                  
+                  return (
+                    <>
+                      {monthlyAddOns.length > 0 && (
+                        <div>
+                          {monthlyAddOns.length} monthly add-on{monthlyAddOns.length > 1 ? 's' : ''} 
+                          (+{formatCurrency(monthlyTotal)} /month per vehicle)
+                        </div>
+                      )}
+                      {oneTimeAddOns.length > 0 && (
+                        <div>
+                          {oneTimeAddOns.length} one-time add-on{oneTimeAddOns.length > 1 ? 's' : ''} 
+                          (+{formatCurrency(oneTimeTotal)} per vehicle)
+                        </div>
+                      )}
+                    </>
+                  );
+                })()}
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 

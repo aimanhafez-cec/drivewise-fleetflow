@@ -96,6 +96,17 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
       insurance_glass_tire_cover: data.insurance_glass_tire_cover ?? true,
       insurance_pai_enabled: data.insurance_pai_enabled ?? false,
       insurance_territorial_coverage: data.insurance_territorial_coverage || 'uae-only',
+      // Auto-populate add-ons from header defaults
+      addons: (data.default_addons || [])
+        .filter((a: any) => a.enabled)
+        .map((a: any) => ({
+          id: a.id,
+          name: a.name,
+          type: a.type,
+          amount: a.amount,
+          enabled: true,
+          customized: false, // Not customized yet
+        })),
       // Store vehicle metadata for display
       _vehicleMeta: {
         make: vehicle.make,
@@ -147,12 +158,32 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
     const initialFees = (data.initial_fees || []).reduce((sum: number, fee: any) => 
       sum + (parseFloat(fee.amount) || 0), 0);
     
-    // Calculate monthly recurring rental
-    const monthlyRecurringRental = lines.reduce((sum: number, line: any) => 
-      sum + (line.monthly_rate || 0), 0);
+    // Calculate add-ons costs
+    const monthlyAddOns = lines.reduce((sum: number, line: any) => {
+      const lineMonthlyAddOns = (line.addons || [])
+        .filter((a: any) => a.enabled && a.type === 'monthly')
+        .reduce((s: number, a: any) => s + a.amount, 0);
+      return sum + lineMonthlyAddOns;
+    }, 0);
+
+    const oneTimeAddOns = lines.reduce((sum: number, line: any) => {
+      const lineOneTimeAddOns = (line.addons || [])
+        .filter((a: any) => a.enabled && a.type === 'one-time')
+        .reduce((s: number, a: any) => s + a.amount, 0);
+      return sum + lineOneTimeAddOns;
+    }, 0);
     
-    // Calculate subtotal (before VAT)
-    const subtotal = totalDeposits + totalAdvance + totalDeliveryFees + totalCollectionFees + initialFees;
+    // Calculate monthly recurring rental including monthly add-ons
+    const monthlyRecurringRental = lines.reduce((sum: number, line: any) => {
+      const baseRate = line.monthly_rate || 0;
+      const monthlyAddOnsCost = (line.addons || [])
+        .filter((a: any) => a.enabled && a.type === 'monthly')
+        .reduce((s: number, a: any) => s + a.amount, 0);
+      return sum + baseRate + monthlyAddOnsCost;
+    }, 0);
+    
+    // Calculate subtotal (before VAT) including one-time add-ons
+    const subtotal = totalDeposits + totalAdvance + totalDeliveryFees + totalCollectionFees + initialFees + oneTimeAddOns;
     
     // Calculate VAT (use vat_percentage from data, default to 5%)
     const vatPercentage = data.vat_percentage || 5;
@@ -168,6 +199,8 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
       deliveryFees: totalDeliveryFees,
       collectionFees: totalCollectionFees,
       initialFees,
+      monthlyAddOns,
+      oneTimeAddOns,
       monthlyRecurringRental,
       subtotal,
       vatPercentage,
@@ -253,7 +286,7 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
           selectedLines={selectedLines}
           onSelectLine={handleSelectLine}
           onSelectAll={handleSelectAll}
-          headerDefaults={{
+                  headerDefaults={{
                     deposit_amount: data.default_deposit_amount,
                     advance_rent_months: data.default_advance_rent_months,
                     insurance_coverage_package: data.insurance_coverage_package,
@@ -278,6 +311,7 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
                     monthly_maintenance_cost_per_vehicle: data.monthly_maintenance_cost_per_vehicle,
                     maintenance_plan_source: data.maintenance_plan_source,
                     show_maintenance_separate_line: data.show_maintenance_separate_line,
+                    default_addons: data.default_addons,
                   }}
         />
 
@@ -321,6 +355,20 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
                   <span className="text-muted-foreground">Initial Fees (One-time):</span>
                   <span className="font-semibold">{formatCurrency(totals.initialFees)}</span>
                 </div>
+                
+                {/* Add-Ons Section */}
+                {(totals.monthlyAddOns > 0 || totals.oneTimeAddOns > 0) && (
+                  <>
+                    <div className="border-t pt-3 flex justify-between">
+                      <span className="text-muted-foreground">Monthly Add-Ons (Total):</span>
+                      <span className="font-semibold text-blue-600">{formatCurrency(totals.monthlyAddOns)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">One-Time Add-Ons:</span>
+                      <span className="font-semibold">{formatCurrency(totals.oneTimeAddOns)}</span>
+                    </div>
+                  </>
+                )}
                 
                 {/* Monthly Recurring Section */}
                 <div className="border-t pt-3 flex justify-between">

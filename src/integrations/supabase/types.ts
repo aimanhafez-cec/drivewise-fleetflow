@@ -2175,6 +2175,7 @@ export type Database = {
           customer_id: string
           customer_po_number: string | null
           customer_type: string | null
+          default_addons: Json | null
           default_advance_rent_months: number | null
           default_deposit_amount: number | null
           default_price_list_id: string | null
@@ -2260,6 +2261,7 @@ export type Database = {
           customer_id: string
           customer_po_number?: string | null
           customer_type?: string | null
+          default_addons?: Json | null
           default_advance_rent_months?: number | null
           default_deposit_amount?: number | null
           default_price_list_id?: string | null
@@ -2345,6 +2347,7 @@ export type Database = {
           customer_id?: string
           customer_po_number?: string | null
           customer_type?: string | null
+          default_addons?: Json | null
           default_advance_rent_months?: number | null
           default_deposit_amount?: number | null
           default_price_list_id?: string | null

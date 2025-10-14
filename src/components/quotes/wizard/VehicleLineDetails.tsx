@@ -9,9 +9,10 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { FormError } from "@/components/ui/form-error";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Checkbox } from "@/components/ui/checkbox";
-import { AlertCircle, Info, MapPin, FileText, Gauge, Coins, Shield, Wrench, Calculator } from "lucide-react";
+import { AlertCircle, Info, MapPin, FileText, Gauge, Coins, Shield, Wrench, Calculator, Package } from "lucide-react";
 import { useLocations, useCustomerSites } from "@/hooks/useBusinessLOVs";
 import { formatDurationInMonthsAndDays } from "@/lib/utils/dateUtils";
+import { VehicleAddOnsOverride } from "./VehicleAddOnsOverride";
 
 interface VehicleLineDetailsProps {
   line: any;
@@ -42,6 +43,13 @@ interface VehicleLineDetailsProps {
     monthly_maintenance_cost_per_vehicle?: number;
     maintenance_plan_source?: string;
     show_maintenance_separate_line?: boolean;
+    default_addons?: Array<{
+      id: string;
+      name: string;
+      type: 'monthly' | 'one-time';
+      amount: number;
+      enabled: boolean;
+    }>;
     initial_fees?: Array<{
       fee_type: string;
       fee_type_label?: string;
@@ -184,6 +192,18 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
                isCustomized("monthly_maintenance_cost_per_vehicle", line.monthly_maintenance_cost_per_vehicle, headerDefaults.monthly_maintenance_cost_per_vehicle) ||
                isCustomized("maintenance_plan_source", line.maintenance_plan_source, headerDefaults.maintenance_plan_source) ||
                isCustomized("show_maintenance_separate_line", line.show_maintenance_separate_line, headerDefaults.show_maintenance_separate_line);
+      case "addons":
+        const headerAddOns = headerDefaults.default_addons || [];
+        const lineAddOns = line.addons || [];
+        
+        // Check if any add-on differs from header
+        if (lineAddOns.length !== headerAddOns.filter((a: any) => a.enabled).length) return true;
+        
+        return lineAddOns.some((lineAddon: any) => {
+          const headerAddon = headerAddOns.find((h: any) => h.id === lineAddon.id);
+          if (!headerAddon) return lineAddon.enabled; // New add-on not in header
+          return lineAddon.enabled !== headerAddon.enabled; // Different enabled state
+        });
       default:
         return false;
     }
@@ -205,6 +225,15 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
     const type = line.maintenance_package_type ?? headerDefaults.maintenance_package_type ?? "basic";
     const cost = line.monthly_maintenance_cost_per_vehicle ?? headerDefaults.monthly_maintenance_cost_per_vehicle ?? 0;
     return `${type.charAt(0).toUpperCase() + type.slice(1)} | ${cost} AED/month`;
+  };
+
+  const getAddOnsPreview = () => {
+    const addons = line.addons || [];
+    const enabledCount = addons.filter((a: any) => a.enabled).length;
+    if (enabledCount === 0) return "None selected";
+    const monthlyCount = addons.filter((a: any) => a.enabled && a.type === 'monthly').length;
+    const oneTimeCount = addons.filter((a: any) => a.enabled && a.type === 'one-time').length;
+    return `${enabledCount} selected (${monthlyCount} monthly, ${oneTimeCount} one-time)`;
   };
 
   // Calculate total maintenance cost
@@ -1273,6 +1302,29 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
                 </div>
               </CardContent>
             </Card>
+          </AccordionContent>
+        </AccordionItem>
+
+        {/* SECTION 7: Add-Ons & Extras Override */}
+        <AccordionItem value="addons">
+          <AccordionTrigger className="hover:bg-muted/50 px-4 py-3">
+            <div className="flex items-center gap-2">
+              <Package className="h-4 w-4 text-primary" />
+              <span className="font-semibold">Add-Ons & Extras</span>
+              <span className="text-sm text-muted-foreground ml-2">
+                {getAddOnsPreview()}
+              </span>
+              {hasCustomizations("addons") && (
+                <Badge variant="secondary" className="ml-2">Customized</Badge>
+              )}
+            </div>
+          </AccordionTrigger>
+          <AccordionContent className="px-4 pb-4">
+            <VehicleAddOnsOverride
+              line={line}
+              onUpdate={onUpdate}
+              headerDefaults={headerDefaults}
+            />
           </AccordionContent>
         </AccordionItem>
 

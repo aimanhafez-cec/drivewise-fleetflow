@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, ArrowRight, Send, Save } from "lucide-react";
 import { QuoteWizardStep1 } from "./wizard/QuoteWizardStep1";
 import { QuoteWizardStep2 } from "./wizard/QuoteWizardStep2";
-import { QuoteWizardStep3_Insurance } from "./wizard/QuoteWizardStep3_Insurance";
+import { QuoteWizardStep3_CoverageServices } from "./wizard/QuoteWizardStep3_CoverageServices";
 import { QuoteWizardStep4_Vehicles } from "./wizard/QuoteWizardStep4_Vehicles";
 import { QuoteWizardStep5_Summary } from "./wizard/QuoteWizardStep5_Summary";
 
@@ -89,6 +89,15 @@ interface QuoteData {
     insurance_glass_tire_cover?: boolean;
     insurance_pai_enabled?: boolean;
     insurance_territorial_coverage?: string;
+    // Phase 3D: Add-Ons per line
+    addons?: Array<{
+      id: string;
+      name: string;
+      type: 'monthly' | 'one-time';
+      amount: number;
+      enabled: boolean;
+      customized?: boolean;
+    }>;
   }>;
   
   // Financial Section from Step 4 (19 fields)
@@ -155,6 +164,16 @@ interface QuoteData {
   show_maintenance_separate_line?: boolean;
   maintenance_coverage_summary?: string;
 
+  // Phase 3D: Default Add-Ons
+  default_addons?: Array<{
+    id: string;
+    name: string;
+    type: 'monthly' | 'one-time';
+    amount: number;
+    enabled: boolean;
+  }>;
+  default_addons_summary?: string;
+
   // Legacy pricing fields (keep for backward compatibility)
   items?: Array<{
     description: string;
@@ -171,7 +190,7 @@ interface QuoteData {
 const steps = [
   { id: 1, title: "Header", description: "Quote header information" },
   { id: 2, title: "Financials", description: "Billing, deposits & payment terms" },
-  { id: 3, title: "Insurance & Maintenance", description: "Insurance & maintenance coverage" },
+  { id: 3, title: "Coverage & Services", description: "Insurance, maintenance & add-ons" },
   { id: 4, title: "Vehicles", description: "Vehicle selection & configuration" },
   { id: 5, title: "Summary", description: "Review & finalize quote" },
 ];
@@ -213,6 +232,9 @@ export const QuoteWizard: React.FC = () => {
     insurance_pai_enabled: false,
     insurance_territorial_coverage: 'uae-only',
     insurance_coverage_summary: '',
+    // Add-ons defaults
+    default_addons: [],
+    default_addons_summary: '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   
@@ -374,6 +396,10 @@ export const QuoteWizard: React.FC = () => {
         maintenance_plan_source: data.maintenance_plan_source,
         show_maintenance_separate_line: data.show_maintenance_separate_line,
         maintenance_coverage_summary: data.maintenance_coverage_summary,
+        
+        // Step 3 - Add-Ons
+        default_addons: data.default_addons,
+        default_addons_summary: data.default_addons_summary,
         
         // Step 4 - Vehicles
         quote_items: data.quote_items,
@@ -692,7 +718,7 @@ export const QuoteWizard: React.FC = () => {
         );
       case 3:
         return (
-          <QuoteWizardStep3_Insurance
+          <QuoteWizardStep3_CoverageServices
             data={quoteData}
             onChange={(data) => updateQuoteData(3, data)}
             errors={errors}
