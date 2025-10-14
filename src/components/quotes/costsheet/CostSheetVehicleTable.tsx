@@ -34,16 +34,32 @@ export const CostSheetVehicleTable: React.FC<CostSheetVehicleTableProps> = ({
         <TableHeader>
           <TableRow>
             <TableHead className="w-[60px]">Line</TableHead>
-            <TableHead>Vehicle</TableHead>
-            <TableHead className="text-right">Acquisition Cost</TableHead>
-            <TableHead className="text-right">Maintenance/mo</TableHead>
-            <TableHead className="text-right">Insurance/mo</TableHead>
-            <TableHead className="text-right">Reg/Admin/mo</TableHead>
-            <TableHead className="text-right">Other/mo</TableHead>
-            <TableHead className="text-right">Total Cost/mo</TableHead>
-            <TableHead className="text-right">Suggested Rate</TableHead>
-            <TableHead className="text-right">Quoted Rate</TableHead>
-            <TableHead className="text-right">Margin</TableHead>
+            <TableHead className="min-w-[180px]">Vehicle</TableHead>
+            <TableHead className="text-right min-w-[120px] whitespace-nowrap">
+              Acquisition<br/>Cost
+            </TableHead>
+            <TableHead className="text-right min-w-[110px] whitespace-nowrap">
+              Maint.<br/>/mo
+            </TableHead>
+            <TableHead className="text-right min-w-[110px] whitespace-nowrap">
+              Ins.<br/>/mo
+            </TableHead>
+            <TableHead className="text-right min-w-[110px] whitespace-nowrap">
+              Reg/Admin<br/>/mo
+            </TableHead>
+            <TableHead className="text-right min-w-[100px] whitespace-nowrap">
+              Other<br/>/mo
+            </TableHead>
+            <TableHead className="text-right min-w-[120px] whitespace-nowrap">
+              Total Cost<br/>/mo
+            </TableHead>
+            <TableHead className="text-right min-w-[120px] whitespace-nowrap">
+              Suggested<br/>Rate
+            </TableHead>
+            <TableHead className="text-right min-w-[120px] whitespace-nowrap">
+              Quoted<br/>Rate
+            </TableHead>
+            <TableHead className="text-right min-w-[100px]">Margin</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -51,8 +67,26 @@ export const CostSheetVehicleTable: React.FC<CostSheetVehicleTableProps> = ({
             <TableRow key={line.id}>
               <TableCell className="font-medium">{line.line_no}</TableCell>
               <TableCell>
-                <div className="text-sm">
-                  {line.vehicle_id ? 'Specific Vehicle' : 'Vehicle Class'}
+                <div className="text-sm font-medium">
+                  {line.vehicle ? (
+                    <div>
+                      <div className="font-semibold">
+                        {line.vehicle.make} {line.vehicle.model} {line.vehicle.year}
+                      </div>
+                      {line.vehicle.license_plate && (
+                        <div className="text-xs text-muted-foreground">
+                          {line.vehicle.license_plate}
+                        </div>
+                      )}
+                    </div>
+                  ) : line.vehicle_class ? (
+                    <div>
+                      <div className="font-semibold">{line.vehicle_class.name}</div>
+                      <div className="text-xs text-muted-foreground">Vehicle Class</div>
+                    </div>
+                  ) : (
+                    <div className="text-muted-foreground">Not specified</div>
+                  )}
                 </div>
               </TableCell>
               <TableCell className="text-right">

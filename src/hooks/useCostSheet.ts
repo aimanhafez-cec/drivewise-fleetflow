@@ -7,6 +7,15 @@ export interface CostSheetLine {
   line_no: number;
   vehicle_class_id?: string;
   vehicle_id?: string;
+  vehicle?: {
+    make: string;
+    model: string;
+    year: number;
+    license_plate?: string;
+  };
+  vehicle_class?: {
+    name: string;
+  };
   lease_term_months: number;
   acquisition_cost_aed: number;
   residual_value_percent: number;
@@ -45,7 +54,14 @@ export const useCostSheet = (quoteId?: string) => {
       
       const { data, error } = await supabase
         .from('quote_cost_sheets')
-        .select('*, lines:quote_cost_sheet_lines(*)')
+        .select(`
+          *,
+          lines:quote_cost_sheet_lines(
+            *,
+            vehicle:vehicles(make, model, year, license_plate),
+            vehicle_class:categories(name)
+          )
+        `)
         .eq('quote_id', quoteId)
         .single();
       
