@@ -371,8 +371,11 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
                 type="number"
                 min="0"
                 step="100"
-                value={data.default_deposit_amount || 2500}
-                onChange={(e) => onChange({ default_deposit_amount: parseFloat(e.target.value) })}
+                value={data.default_deposit_amount ?? 2500}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  onChange({ default_deposit_amount: val === "" ? 0 : parseFloat(val) || 0 });
+                }}
               />
               <p className="text-xs text-muted-foreground">This amount will be applied to each vehicle line added in the quote.</p>
               {errors.default_deposit_amount && <FormError message={errors.default_deposit_amount} />}
