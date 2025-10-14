@@ -21,7 +21,8 @@ import {
   User,
   Car,
   Clock,
-  DollarSign
+  DollarSign,
+  Edit
 } from "lucide-react";
 
 interface Quote {
@@ -31,6 +32,7 @@ interface Quote {
   customer_id: string;
   vehicle_id?: string;
   items: any[];
+  quote_items?: any[];
   subtotal: number;
   tax_amount: number;
   total_amount: number;
@@ -38,12 +40,12 @@ interface Quote {
   notes?: string;
   created_at: string;
   updated_at: string;
-  profiles?: {
+  customer?: {
     full_name: string;
     email: string;
     phone?: string;
   };
-  vehicles?: {
+  vehicle?: {
     make: string;
     model: string;
     year: number;
@@ -214,6 +216,15 @@ const QuoteDetails: React.FC = () => {
           <Button variant="outline" size="sm" onClick={() => navigate("/quotes")}>
             Back to Quotes
           </Button>
+          {quote.status === "draft" && (
+            <Button 
+              size="sm"
+              onClick={() => navigate(`/quotes/new?edit=true&id=${quote.id}`)}
+            >
+              <Edit className="h-4 w-4 mr-1" />
+              Continue Editing
+            </Button>
+          )}
           <Button 
             variant="outline" 
             size="sm"
@@ -235,6 +246,7 @@ const QuoteDetails: React.FC = () => {
           </Button>
           {quote.status === "draft" && (
             <Button 
+              variant="outline"
               size="sm"
               onClick={() => sendQuoteMutation.mutate(quote.id)}
               disabled={sendQuoteMutation.isPending}
@@ -276,17 +288,39 @@ const QuoteDetails: React.FC = () => {
                 <CardContent className="space-y-4">
                   {/* Line Items */}
                   <div className="space-y-3">
-                    {quote.items.map((item: any, index: number) => (
-                      <div key={index} className="flex justify-between items-center p-3 border rounded-lg">
-                        <div>
-                          <p className="font-medium">{item.description}</p>
-                          <p className="text-sm text-muted-foreground">
-                            Qty: {item.qty} × AED {Number(item.rate).toFixed(2)}
-                          </p>
-                        </div>
-                        <p className="font-semibold">AED {Number(item.qty * item.rate).toFixed(2)}</p>
-                      </div>
-                    ))}
+                    {(() => {
+                      const displayItems = quote.quote_items && quote.quote_items.length > 0 
+                        ? quote.quote_items 
+                        : quote.items;
+                      
+                      if (!displayItems || displayItems.length === 0) {
+                        return <p className="text-muted-foreground">No line items available</p>;
+                      }
+
+                      return displayItems.map((item: any, index: number) => {
+                        const lineTotal = item.monthly_rate 
+                          ? item.monthly_rate * (item.duration_months || 1)
+                          : item.qty * item.rate;
+                        
+                        const description = item._vehicleMeta 
+                          ? `${item._vehicleMeta.year || ''} ${item._vehicleMeta.make || ''} ${item._vehicleMeta.model || ''} - ${item.duration_months || 0} months`
+                          : item.description || 'Line item';
+
+                        const rateDisplay = item.monthly_rate
+                          ? `${item.duration_months || 0} months × AED ${Number(item.monthly_rate).toFixed(2)}/mo`
+                          : `Qty: ${item.qty || 0} × AED ${Number(item.rate || 0).toFixed(2)}`;
+
+                        return (
+                          <div key={index} className="flex justify-between items-center p-3 border rounded-lg">
+                            <div>
+                              <p className="font-medium">{description}</p>
+                              <p className="text-sm text-muted-foreground">{rateDisplay}</p>
+                            </div>
+                            <p className="font-semibold">AED {Number(lineTotal).toFixed(2)}</p>
+                          </div>
+                        );
+                      });
+                    })()}
                   </div>
 
                   <Separator />
@@ -295,16 +329,16 @@ const QuoteDetails: React.FC = () => {
                   <div className="space-y-2">
                     <div className="flex justify-between">
                       <span>Subtotal</span>
-                      <span>AED {Number(quote.subtotal).toFixed(2)}</span>
+                      <span>AED {Number(quote.subtotal || 0).toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Tax</span>
-                      <span>AED {Number(quote.tax_amount).toFixed(2)}</span>
+                      <span>AED {Number(quote.tax_amount || 0).toFixed(2)}</span>
                     </div>
                     <Separator />
                     <div className="flex justify-between font-semibold text-lg">
                       <span>Total</span>
-                      <span>AED {Number(quote.total_amount).toFixed(2)}</span>
+                      <span>AED {Number(quote.total_amount || 0).toFixed(2)}</span>
                     </div>
                   </div>
                 </CardContent>
