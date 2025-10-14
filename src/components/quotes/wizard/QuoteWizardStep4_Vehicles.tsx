@@ -199,9 +199,11 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
               </Button>
             </div>
           </CardHeader>
-          <CardContent>
-            {errors.quote_items && <FormError message={errors.quote_items} />}
-          </CardContent>
+          {errors.quote_items && (
+            <CardContent>
+              <FormError message={errors.quote_items} />
+            </CardContent>
+          )}
         </Card>
 
         {/* Vehicle Selection Modal */}
