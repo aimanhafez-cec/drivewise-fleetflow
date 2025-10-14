@@ -392,6 +392,22 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
               />
               <p className="text-xs text-muted-foreground">Number of months to collect upfront for each vehicle. Can be adjusted per line if needed.</p>
             </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="default_delivery_fee">Default Delivery Fee (per vehicle)</Label>
+              <Input
+                id="default_delivery_fee"
+                type="number"
+                min="0"
+                step="50"
+                value={data.default_delivery_fee || 0}
+                onChange={(e) => onChange({ default_delivery_fee: parseFloat(e.target.value) || 0 })}
+                placeholder="0.00"
+              />
+              <p className="text-xs text-muted-foreground">
+                Default delivery/collection fee applied to each vehicle. Can be customized per vehicle.
+              </p>
+            </div>
           </div>
         </CardContent>
       </Card>

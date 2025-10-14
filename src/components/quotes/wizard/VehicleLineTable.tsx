@@ -32,6 +32,7 @@ interface VehicleLineTableProps {
     return_customer_site_id?: string;
     default_price_list_id?: string;
     billing_plan?: string;
+    default_delivery_fee?: number;
     initial_fees?: Array<{
       fee_type: string;
       fee_type_label?: string;
@@ -66,7 +67,8 @@ export const VehicleLineTable: React.FC<VehicleLineTableProps> = ({
   const calculateUpfront = (line: any) => {
     const deposit = line.deposit_amount || 0;
     const advance = (line.advance_rent_months || 0) * (line.monthly_rate || 0);
-    return deposit + advance;
+    const delivery = line.delivery_fee || 0;
+    return deposit + advance + delivery;
   };
 
   const formatDate = (dateStr: string) => {
@@ -96,6 +98,7 @@ export const VehicleLineTable: React.FC<VehicleLineTableProps> = ({
             <TableHead>Start Date</TableHead>
             <TableHead className="text-right">Duration</TableHead>
             <TableHead className="text-right">Monthly Rate</TableHead>
+            <TableHead className="text-right">Delivery Fee</TableHead>
             <TableHead className="text-right">Upfront Total</TableHead>
             <TableHead className="w-32 text-center">Actions</TableHead>
           </TableRow>
@@ -146,6 +149,12 @@ export const VehicleLineTable: React.FC<VehicleLineTableProps> = ({
                   <TableCell>{formatDate(line.pickup_at)}</TableCell>
                   <TableCell className="text-right">{line.duration_months || 0} mo</TableCell>
                   <TableCell className="text-right">{line.monthly_rate || 0} AED</TableCell>
+                  <TableCell className="text-right">
+                    {line.delivery_fee !== undefined && line.delivery_fee !== (headerDefaults.default_delivery_fee ?? 0) && (
+                      <Badge variant="secondary" className="text-xs mr-1">Custom</Badge>
+                    )}
+                    {(line.delivery_fee ?? headerDefaults.default_delivery_fee ?? 0).toFixed(2)} AED
+                  </TableCell>
                   <TableCell className="text-right font-bold">
                     {calculateUpfront(line).toFixed(2)} AED
                   </TableCell>
@@ -178,7 +187,7 @@ export const VehicleLineTable: React.FC<VehicleLineTableProps> = ({
                 
                 {isExpanded && (
                   <TableRow>
-                    <TableCell colSpan={10} className="bg-muted/30 p-6">
+                    <TableCell colSpan={11} className="bg-muted/30 p-6">
                       <VehicleLineDetails
                         line={line}
                         onUpdate={(field, value) => onUpdate(index, field, value)}

@@ -33,6 +33,7 @@ interface VehicleLineDetailsProps {
     default_price_list_id?: string;
     billing_plan?: string;
     customer_id?: string;
+    default_delivery_fee?: number;
     initial_fees?: Array<{
       fee_type: string;
       fee_type_label?: string;
@@ -435,6 +436,39 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
                 )}
               </>
             )}
+          </div>
+
+          {/* Delivery Fee */}
+          <div className="space-y-2">
+            <Label htmlFor={`delivery_fee_${line.line_no}`} className="flex items-center gap-2">
+              Delivery Fee (AED)
+              {isCustomized("delivery_fee", line.delivery_fee, headerDefaults.default_delivery_fee ?? 0) && (
+                <Badge variant="secondary" className="text-xs">Customized</Badge>
+              )}
+            </Label>
+            <Input
+              id={`delivery_fee_${line.line_no}`}
+              type="number"
+              min="0"
+              step="50"
+              value={line.delivery_fee ?? headerDefaults.default_delivery_fee ?? 0}
+              onChange={(e) => onUpdate('delivery_fee', parseFloat(e.target.value) || 0)}
+              placeholder="0.00"
+            />
+            {isCustomized("delivery_fee", line.delivery_fee, headerDefaults.default_delivery_fee ?? 0) && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-7 text-xs"
+                onClick={() => resetToDefault("delivery_fee", headerDefaults.default_delivery_fee ?? 0)}
+              >
+                Reset to default
+              </Button>
+            )}
+            <p className="text-xs text-muted-foreground">
+              One-time fee for this vehicle's delivery/collection
+            </p>
           </div>
         </div>
 
@@ -848,10 +882,14 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
                   {((line.advance_rent_months || 0) * (line.monthly_rate || 0)).toFixed(2)} AED
                 </span>
               </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Delivery Fee:</span>
+                <span className="font-medium">{(line.delivery_fee || 0).toFixed(2)} AED</span>
+              </div>
               <div className="flex justify-between text-sm border-t pt-2">
                 <span className="font-semibold">Upfront Total:</span>
                 <span className="font-bold text-primary">
-                  {((line.deposit_amount || 0) + (line.advance_rent_months || 0) * (line.monthly_rate || 0)).toFixed(2)} AED
+                  {((line.deposit_amount || 0) + (line.advance_rent_months || 0) * (line.monthly_rate || 0) + (line.delivery_fee || 0)).toFixed(2)} AED
                 </span>
               </div>
               <div className="flex justify-between text-sm border-t pt-2 mt-2">

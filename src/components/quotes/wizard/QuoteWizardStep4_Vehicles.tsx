@@ -54,6 +54,7 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
       return_type: data.return_type || 'company_location',
       return_location_id: data.return_location_id,
       return_customer_site_id: data.return_customer_site_id,
+      delivery_fee: data.default_delivery_fee || 0,
       mileage_package_km: 3000,
       excess_km_rate: 1.00,
       rate_type: 'monthly' as const,
@@ -106,6 +107,8 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
     const totalDeposits = lines.reduce((sum: number, line: any) => sum + (line.deposit_amount || 0), 0);
     const totalAdvance = lines.reduce((sum: number, line: any) => 
       sum + ((line.advance_rent_months || 0) * (line.monthly_rate || 0)), 0);
+    const totalDeliveryFees = lines.reduce((sum: number, line: any) => 
+      sum + (line.delivery_fee || 0), 0);
     const initialFees = (data.initial_fees || []).reduce((sum: number, fee: any) => 
       sum + (parseFloat(fee.amount) || 0), 0);
     
@@ -113,8 +116,9 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
       vehicles: lines.length,
       deposits: totalDeposits,
       advance: totalAdvance,
+      deliveryFees: totalDeliveryFees,
       initialFees,
-      grandTotal: totalDeposits + totalAdvance + initialFees,
+      grandTotal: totalDeposits + totalAdvance + totalDeliveryFees + initialFees,
     };
   };
 
@@ -215,6 +219,7 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
                     return_customer_site_id: data.return_customer_site_id,
                     default_price_list_id: data.default_price_list_id,
                     billing_plan: data.billing_plan || 'monthly',
+                    default_delivery_fee: data.default_delivery_fee,
                     initial_fees: data.initial_fees || [],
                     customer_id: data.customer_id,
                   }}
@@ -247,6 +252,10 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Total Advance Rent:</span>
                   <span className="font-semibold">{totals.advance.toFixed(2)} AED</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Total Delivery Fees:</span>
+                  <span className="font-semibold">{totals.deliveryFees.toFixed(2)} AED</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Initial Fees (One-time):</span>
