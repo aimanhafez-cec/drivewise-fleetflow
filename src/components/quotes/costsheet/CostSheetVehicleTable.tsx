@@ -1,9 +1,9 @@
 import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { CostSheetLine } from '@/hooks/useCostSheet';
 import { formatCurrency } from '@/lib/utils/currency';
+import { FormattedNumberInput } from '@/components/ui/formatted-number-input';
 
 interface CostSheetVehicleTableProps {
   lines: CostSheetLine[];
@@ -30,7 +30,7 @@ export const CostSheetVehicleTable: React.FC<CostSheetVehicleTableProps> = ({
 
   return (
     <div className="border rounded-lg overflow-x-auto">
-      <Table>
+      <Table className="min-w-[1400px]">
         <TableHeader>
           <TableRow>
             <TableHead className="w-[60px]">Line</TableHead>
@@ -93,11 +93,10 @@ export const CostSheetVehicleTable: React.FC<CostSheetVehicleTableProps> = ({
                 {disabled ? (
                   formatCurrency(line.acquisition_cost_aed, 'AED')
                 ) : (
-                  <Input
-                    type="number"
+                  <FormattedNumberInput
                     value={line.acquisition_cost_aed}
-                    onChange={(e) => onLineUpdate?.(line.id, 'acquisition_cost_aed', parseFloat(e.target.value))}
-                    className="w-32 text-right"
+                    onChange={(value) => onLineUpdate?.(line.id, 'acquisition_cost_aed', value)}
+                    className="w-40 text-right"
                   />
                 )}
               </TableCell>
@@ -105,11 +104,10 @@ export const CostSheetVehicleTable: React.FC<CostSheetVehicleTableProps> = ({
                 {disabled ? (
                   formatCurrency(line.maintenance_per_month_aed, 'AED')
                 ) : (
-                  <Input
-                    type="number"
+                  <FormattedNumberInput
                     value={line.maintenance_per_month_aed}
-                    onChange={(e) => onLineUpdate?.(line.id, 'maintenance_per_month_aed', parseFloat(e.target.value))}
-                    className="w-28 text-right"
+                    onChange={(value) => onLineUpdate?.(line.id, 'maintenance_per_month_aed', value)}
+                    className="w-32 text-right"
                   />
                 )}
               </TableCell>
@@ -117,11 +115,10 @@ export const CostSheetVehicleTable: React.FC<CostSheetVehicleTableProps> = ({
                 {disabled ? (
                   formatCurrency(line.insurance_per_month_aed, 'AED')
                 ) : (
-                  <Input
-                    type="number"
+                  <FormattedNumberInput
                     value={line.insurance_per_month_aed}
-                    onChange={(e) => onLineUpdate?.(line.id, 'insurance_per_month_aed', parseFloat(e.target.value))}
-                    className="w-28 text-right"
+                    onChange={(value) => onLineUpdate?.(line.id, 'insurance_per_month_aed', value)}
+                    className="w-32 text-right"
                   />
                 )}
               </TableCell>
@@ -129,11 +126,10 @@ export const CostSheetVehicleTable: React.FC<CostSheetVehicleTableProps> = ({
                 {disabled ? (
                   formatCurrency(line.registration_admin_per_month_aed, 'AED')
                 ) : (
-                  <Input
-                    type="number"
+                  <FormattedNumberInput
                     value={line.registration_admin_per_month_aed}
-                    onChange={(e) => onLineUpdate?.(line.id, 'registration_admin_per_month_aed', parseFloat(e.target.value))}
-                    className="w-28 text-right"
+                    onChange={(value) => onLineUpdate?.(line.id, 'registration_admin_per_month_aed', value)}
+                    className="w-32 text-right"
                   />
                 )}
               </TableCell>
@@ -141,11 +137,10 @@ export const CostSheetVehicleTable: React.FC<CostSheetVehicleTableProps> = ({
                 {disabled ? (
                   formatCurrency(line.other_costs_per_month_aed, 'AED')
                 ) : (
-                  <Input
-                    type="number"
+                  <FormattedNumberInput
                     value={line.other_costs_per_month_aed}
-                    onChange={(e) => onLineUpdate?.(line.id, 'other_costs_per_month_aed', parseFloat(e.target.value))}
-                    className="w-28 text-right"
+                    onChange={(value) => onLineUpdate?.(line.id, 'other_costs_per_month_aed', value)}
+                    className="w-32 text-right"
                   />
                 )}
               </TableCell>
