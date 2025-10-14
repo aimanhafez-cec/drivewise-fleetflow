@@ -64,13 +64,15 @@ Deno.serve(async (req) => {
       )
     }
 
-    // Update cost sheet status
+    // Auto-approve for demo: Update to approved status directly
     const { error: updateError } = await supabaseClient
       .from('quote_cost_sheets')
       .update({
-        status: 'pending_approval',
+        status: 'approved',
         submitted_by: user.id,
         submitted_at: new Date().toISOString(),
+        approved_by: user.id,
+        approved_at: new Date().toISOString(),
         notes_assumptions: notes ?? costSheet.notes_assumptions,
       })
       .eq('id', cost_sheet_id)
@@ -79,21 +81,21 @@ Deno.serve(async (req) => {
       throw new Error(`Failed to update cost sheet: ${updateError.message}`)
     }
 
-    // Log submission in approvals table
+    // Log the auto-approval in the approvals table
     const { error: approvalError } = await supabaseClient
       .from('cost_sheet_approvals')
       .insert({
         cost_sheet_id,
         approver_user_id: user.id,
-        action: 'requested_changes',
-        comments: `Submitted for approval${notes ? `: ${notes}` : ''}`,
+        action: 'approved',
+        comments: notes ? `Auto-approved (Demo). ${notes}` : 'Auto-approved (Demo)',
       })
 
     if (approvalError) {
       console.warn('Failed to log approval:', approvalError.message)
     }
 
-    console.log('✅ Cost sheet submitted for approval')
+    console.log('✅ Cost sheet auto-approved (demo mode)')
 
     return new Response(
       JSON.stringify({ 

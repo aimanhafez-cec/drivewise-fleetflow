@@ -68,24 +68,65 @@ Deno.serve(async (req) => {
     const targetMargin = target_margin ?? 15.0
     const residualValue = residual_value_percent ?? 40.0
 
-    // Create or update cost sheet header
-    const { data: costSheet, error: costSheetError } = await supabaseClient
+    // Check for existing draft cost sheet
+    const { data: existingDraft } = await supabaseClient
       .from('quote_cost_sheets')
-      .upsert({
-        quote_id,
-        financing_rate_percent: finRate,
-        overhead_percent: overheadPct,
-        target_margin_percent: targetMargin,
-        residual_value_percent: residualValue,
-        status: 'draft',
-      }, {
-        onConflict: 'quote_id'
-      })
-      .select()
+      .select('id, version')
+      .eq('quote_id', quote_id)
+      .eq('status', 'draft')
       .single()
 
-    if (costSheetError || !costSheet) {
-      throw new Error(`Failed to create cost sheet: ${costSheetError?.message}`)
+    let costSheet
+    
+    if (existingDraft) {
+      // Update existing draft
+      const { data, error: updateError } = await supabaseClient
+        .from('quote_cost_sheets')
+        .update({
+          financing_rate_percent: finRate,
+          overhead_percent: overheadPct,
+          target_margin_percent: targetMargin,
+          residual_value_percent: residualValue,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', existingDraft.id)
+        .select()
+        .single()
+      
+      if (updateError) throw updateError
+      costSheet = data
+    } else {
+      // Create new version
+      const { data: maxVersionData } = await supabaseClient
+        .from('quote_cost_sheets')
+        .select('version')
+        .eq('quote_id', quote_id)
+        .order('version', { ascending: false })
+        .limit(1)
+        .single()
+      
+      const nextVersion = (maxVersionData?.version || 0) + 1
+      
+      const { data, error: insertError } = await supabaseClient
+        .from('quote_cost_sheets')
+        .insert({
+          quote_id,
+          version: nextVersion,
+          financing_rate_percent: finRate,
+          overhead_percent: overheadPct,
+          target_margin_percent: targetMargin,
+          residual_value_percent: residualValue,
+          status: 'draft',
+        })
+        .select()
+        .single()
+      
+      if (insertError) throw insertError
+      costSheet = data
+    }
+
+    if (!costSheet) {
+      throw new Error('Failed to create/update cost sheet')
     }
 
     console.log('✅ Cost sheet created/updated:', costSheet.id)

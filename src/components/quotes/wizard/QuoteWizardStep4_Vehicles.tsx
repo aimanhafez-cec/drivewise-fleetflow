@@ -10,8 +10,7 @@ import { VehicleLineCard } from "./VehicleLineCard";
 import { VehicleLineTable } from "./VehicleLineTable";
 import { VehicleSelectionModal } from "../VehicleSelectionModal";
 import { FormError } from "@/components/ui/form-error";
-import { CostSheetButton } from "../costsheet/CostSheetButton";
-import { CostSheetDrawer } from "../costsheet/CostSheetDrawer";
+import { CostSheetSection } from "../costsheet/CostSheetSection";
 
 interface QuoteWizardStep3Props {
   data: any;
@@ -29,7 +28,6 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
   
   const [vehicleModalOpen, setVehicleModalOpen] = React.useState(false);
   const [selectedLines, setSelectedLines] = React.useState<number[]>([]);
-  const [costSheetOpen, setCostSheetOpen] = React.useState(false);
 
   const isCorporate = data.quote_type === 'Corporate lease';
 
@@ -222,20 +220,12 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
                   }}
         />
 
-        {/* Cost Sheet Button */}
+        {/* Cost Sheet Section */}
         {data.quote_items && data.quote_items.length > 0 && data.id && (
-          <>
-            <CostSheetButton 
-              quoteId={data.id} 
-              onOpen={() => setCostSheetOpen(true)} 
-            />
-            <CostSheetDrawer
-              open={costSheetOpen}
-              onClose={() => setCostSheetOpen(false)}
-              quoteId={data.id}
-              quoteDurationMonths={data.duration_days ? Math.round(data.duration_days / 30) : 36}
-            />
-          </>
+          <CostSheetSection 
+            quoteId={data.id} 
+            quoteDurationMonths={data.duration_days ? Math.round(data.duration_days / 30) : 36}
+          />
         )}
 
         {/* Summary Panel */}

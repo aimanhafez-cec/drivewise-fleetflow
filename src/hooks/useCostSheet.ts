@@ -29,9 +29,22 @@ export interface CostSheetLine {
   actual_margin_percent: number;
 }
 
+export interface CostSheetListItem {
+  id: string;
+  cost_sheet_no: string;
+  version: number;
+  status: 'draft' | 'pending_approval' | 'approved' | 'rejected';
+  created_at: string;
+  submitted_at?: string;
+  approved_at?: string;
+  approved_by?: string;
+}
+
 export interface CostSheet {
   id: string;
   quote_id: string;
+  version: number;
+  cost_sheet_no: string;
   financing_rate_percent: number;
   overhead_percent: number;
   target_margin_percent: number;
@@ -46,11 +59,32 @@ export interface CostSheet {
   lines?: CostSheetLine[];
 }
 
-export const useCostSheet = (quoteId?: string) => {
+// Fetch all cost sheets for a quote
+export const useCostSheets = (quoteId?: string) => {
   return useQuery({
-    queryKey: ['cost-sheet', quoteId],
+    queryKey: ['cost-sheets', quoteId],
     queryFn: async () => {
-      if (!quoteId) return null;
+      if (!quoteId) return [];
+      
+      const { data, error } = await supabase
+        .from('quote_cost_sheets')
+        .select('id, cost_sheet_no, version, status, created_at, submitted_at, approved_at, approved_by')
+        .eq('quote_id', quoteId)
+        .order('version', { ascending: false });
+      
+      if (error) throw error;
+      return data as CostSheetListItem[];
+    },
+    enabled: !!quoteId,
+  });
+};
+
+// Fetch a single cost sheet by ID
+export const useCostSheet = (costSheetId?: string) => {
+  return useQuery({
+    queryKey: ['cost-sheet', costSheetId],
+    queryFn: async () => {
+      if (!costSheetId) return null;
       
       const { data, error } = await supabase
         .from('quote_cost_sheets')
@@ -62,13 +96,13 @@ export const useCostSheet = (quoteId?: string) => {
             vehicle_class:categories(name)
           )
         `)
-        .eq('quote_id', quoteId)
+        .eq('id', costSheetId)
         .single();
       
       if (error && error.code !== 'PGRST116') throw error;
       return data as CostSheet | null;
     },
-    enabled: !!quoteId,
+    enabled: !!costSheetId,
   });
 };
 
@@ -92,7 +126,8 @@ export const useCalculateCostSheet = () => {
       return data;
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['cost-sheet', variables.quote_id] });
+      queryClient.invalidateQueries({ queryKey: ['cost-sheets', variables.quote_id] });
+      queryClient.invalidateQueries({ queryKey: ['cost-sheet'] });
       toast({
         title: 'Cost Sheet Calculated',
         description: 'Cost sheet has been calculated successfully.',
@@ -125,10 +160,11 @@ export const useSubmitCostSheet = () => {
       return data;
     },
     onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['cost-sheets'] });
       queryClient.invalidateQueries({ queryKey: ['cost-sheet'] });
       toast({
-        title: 'Submitted for Approval',
-        description: 'Cost sheet has been submitted for approval.',
+        title: 'Cost Sheet Approved',
+        description: 'Cost sheet has been auto-approved successfully.',
       });
     },
     onError: (error: any) => {
@@ -160,6 +196,7 @@ export const useApproveCostSheet = () => {
       return data;
     },
     onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['cost-sheets'] });
       queryClient.invalidateQueries({ queryKey: ['cost-sheet'] });
       queryClient.invalidateQueries({ queryKey: ['quotes'] });
       
@@ -175,6 +212,43 @@ export const useApproveCostSheet = () => {
       toast({
         title: 'Action Failed',
         description: error.message || 'Failed to process cost sheet approval',
+        variant: 'destructive',
+      });
+    },
+  });
+};
+
+export const useUpdateCostSheetStatus = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async (params: {
+      cost_sheet_id: string;
+      status: 'draft' | 'pending_approval' | 'approved' | 'rejected';
+    }) => {
+      const { data, error } = await supabase
+        .from('quote_cost_sheets')
+        .update({ status: params.status })
+        .eq('id', params.cost_sheet_id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cost-sheets'] });
+      queryClient.invalidateQueries({ queryKey: ['cost-sheet'] });
+      toast({
+        title: 'Status Updated',
+        description: 'Cost sheet status has been updated.',
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Update Failed',
+        description: error.message || 'Failed to update cost sheet status',
         variant: 'destructive',
       });
     },

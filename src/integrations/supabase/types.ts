@@ -2095,6 +2095,7 @@ export type Database = {
           approval_notes: string | null
           approved_at: string | null
           approved_by: string | null
+          cost_sheet_no: string | null
           created_at: string
           financing_rate_percent: number
           id: string
@@ -2107,11 +2108,13 @@ export type Database = {
           submitted_by: string | null
           target_margin_percent: number
           updated_at: string
+          version: number
         }
         Insert: {
           approval_notes?: string | null
           approved_at?: string | null
           approved_by?: string | null
+          cost_sheet_no?: string | null
           created_at?: string
           financing_rate_percent?: number
           id?: string
@@ -2124,11 +2127,13 @@ export type Database = {
           submitted_by?: string | null
           target_margin_percent?: number
           updated_at?: string
+          version?: number
         }
         Update: {
           approval_notes?: string | null
           approved_at?: string | null
           approved_by?: string | null
+          cost_sheet_no?: string | null
           created_at?: string
           financing_rate_percent?: number
           id?: string
@@ -2141,12 +2146,13 @@ export type Database = {
           submitted_by?: string | null
           target_margin_percent?: number
           updated_at?: string
+          version?: number
         }
         Relationships: [
           {
             foreignKeyName: "quote_cost_sheets_quote_id_fkey"
             columns: ["quote_id"]
-            isOneToOne: true
+            isOneToOne: false
             referencedRelation: "quotes"
             referencedColumns: ["id"]
           },
@@ -3332,6 +3338,10 @@ export type Database = {
       }
       generate_corporate_lease_no: {
         Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      generate_cost_sheet_no: {
+        Args: { p_quote_id: string; p_version: number }
         Returns: string
       }
       generate_reservation_no: {

@@ -7,6 +7,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { FileText, Calendar, User, Car, DollarSign } from "lucide-react";
+import { CostSheetSection } from "../costsheet/CostSheetSection";
+import { DatePicker } from "@/components/ui/date-picker";
+import { format } from "date-fns";
 
 interface QuoteWizardStep5Props {
   data: any;
@@ -213,6 +216,14 @@ export const QuoteWizardStep5: React.FC<QuoteWizardStep5Props> = ({
           </div>
         </CardContent>
       </Card>
+
+      {/* Cost Sheet Section */}
+      {data.id && (
+        <CostSheetSection 
+          quoteId={data.id} 
+          quoteDurationMonths={data.duration_days ? Math.ceil(data.duration_days / 30) : 12}
+        />
+      )}
     </div>
   );
 };
