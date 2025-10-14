@@ -42,7 +42,7 @@ Deno.serve(async (req) => {
     // Fetch quote and its items
     const { data: quote, error: quoteError } = await supabaseClient
       .from('quotes')
-      .select('*, quote_items:items')
+      .select('*')
       .eq('id', quote_id)
       .single()
 
