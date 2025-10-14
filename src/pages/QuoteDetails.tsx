@@ -85,7 +85,7 @@ const QuoteDetails: React.FC = () => {
       
       // Fetch related data
       const [customerResult, vehicleResult] = await Promise.all([
-        supabase.from("profiles").select("full_name, email, phone").eq("id", data.customer_id).single(),
+        supabase.from("customers").select("full_name, email, phone").eq("id", data.customer_id).single(),
         data.vehicle_id ? supabase.from("vehicles").select("make, model, year, license_plate").eq("id", data.vehicle_id).single() : Promise.resolve({ data: null })
       ]);
       
