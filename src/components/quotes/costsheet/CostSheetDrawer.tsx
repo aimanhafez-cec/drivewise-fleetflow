@@ -100,7 +100,7 @@ export const CostSheetDrawer: React.FC<CostSheetDrawerProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-[95vw] max-h-[95vh] overflow-y-auto">
+      <DialogContent className="max-w-[95vw] max-h-[95vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 flex-wrap">
             {costSheet ? (
@@ -114,36 +114,39 @@ export const CostSheetDrawer: React.FC<CostSheetDrawerProps> = ({
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6 py-6">
-          {costSheet && (
-            <div className="bg-muted/50 p-4 rounded-lg">
-              <Label>Status (Demo Mode)</Label>
-              <Select
-                value={costSheet.status}
-                onValueChange={(value) => {
-                  if (costSheet.id) {
-                    updateStatusMutation.mutate({
-                      cost_sheet_id: costSheet.id,
-                      status: value as any,
-                    });
-                  }
-                }}
-              >
-                <SelectTrigger className="mt-2">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="draft">Draft</SelectItem>
-                  <SelectItem value="pending_approval">Pending Approval</SelectItem>
-                  <SelectItem value="approved">Approved</SelectItem>
-                  <SelectItem value="rejected">Rejected</SelectItem>
-                </SelectContent>
-              </Select>
-              <p className="text-xs text-muted-foreground mt-2">
-                Demo mode: Manually change status for testing purposes
-              </p>
-            </div>
-          )}
+        <div className="flex-1 overflow-y-auto overflow-x-hidden">
+          <div className="space-y-4 p-1">
+            {costSheet && (
+              <div className="bg-muted/30 p-3 rounded-md border">
+                <div className="flex items-center gap-4 flex-wrap">
+                  <Label className="text-sm font-medium min-w-fit">Status (Demo Mode):</Label>
+                  <Select
+                    value={costSheet.status}
+                    onValueChange={(value) => {
+                      if (costSheet.id) {
+                        updateStatusMutation.mutate({
+                          cost_sheet_id: costSheet.id,
+                          status: value as any,
+                        });
+                      }
+                    }}
+                  >
+                    <SelectTrigger className="w-[200px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="draft">Draft</SelectItem>
+                      <SelectItem value="pending_approval">Pending Approval</SelectItem>
+                      <SelectItem value="approved">Approved</SelectItem>
+                      <SelectItem value="rejected">Rejected</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground">
+                    Manually change for testing
+                  </p>
+                </div>
+              </div>
+            )}
           
           <CostSheetHeader
             financingRate={headerData.financing_rate_percent}
@@ -175,7 +178,7 @@ export const CostSheetDrawer: React.FC<CostSheetDrawerProps> = ({
             </>
           )}
 
-          <div className="flex gap-3 justify-end pt-4 border-t">
+            <div className="flex gap-3 justify-end pt-4 border-t">
             {!costSheet && (
               <Button
                 onClick={handleCalculate}
@@ -202,6 +205,7 @@ export const CostSheetDrawer: React.FC<CostSheetDrawerProps> = ({
                 </Button>
               </>
             )}
+            </div>
           </div>
         </div>
       </DialogContent>

@@ -29,10 +29,8 @@ export const CostSheetVehicleTable: React.FC<CostSheetVehicleTableProps> = ({
   };
 
   return (
-    <div className="overflow-x-auto">
-      <div className="px-6">
-        <div className="border rounded-lg">
-          <Table className="min-w-[1400px]">
+    <div className="border rounded-lg overflow-x-auto">
+      <Table className="min-w-[1400px]">
             <TableHeader>
               <TableRow>
                 <TableHead className="w-[60px]">Line</TableHead>
@@ -168,9 +166,7 @@ export const CostSheetVehicleTable: React.FC<CostSheetVehicleTableProps> = ({
             </TableRow>
           ))}
         </TableBody>
-          </Table>
-        </div>
-      </div>
+      </Table>
     </div>
   );
 };
