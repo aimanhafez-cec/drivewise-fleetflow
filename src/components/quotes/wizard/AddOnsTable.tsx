@@ -7,6 +7,7 @@ import { Plus, Trash2, Package } from "lucide-react";
 import { useAddonItems } from "@/hooks/useAddonItems";
 import { formatCurrency } from "@/lib/utils/currency";
 import { Badge } from "@/components/ui/badge";
+import { LOVSelect } from "@/components/ui/lov-select";
 
 export interface AddOnLine {
   id: string; // UUID from addon_items table or temp ID for custom
@@ -86,30 +87,29 @@ export const AddOnsTable: React.FC<AddOnsTableProps> = ({ addons, onChange }) =>
     .filter(a => a.pricing_model === 'one-time')
     .reduce((sum, a) => sum + a.total, 0);
 
+  // Transform catalog items to LOV format for searchable dropdown
+  const catalogLOVItems = catalogItems.map(item => ({
+    id: item.id,
+    label: `${item.item_name} - ${item.pricing_model === 'monthly' ? 'Monthly' : 'One-time'} - ${formatCurrency(item.default_unit_price)}`,
+  }));
+
   return (
     <div className="space-y-4">
       {/* Add Controls */}
       <div className="flex flex-wrap gap-2">
-        <Select onValueChange={addLineFromCatalog} disabled={isLoading}>
-          <SelectTrigger className="w-[300px]">
-            <SelectValue placeholder="Select from catalog..." />
-          </SelectTrigger>
-          <SelectContent>
-            {catalogItems.map((item) => (
-              <SelectItem key={item.id} value={item.id}>
-                <div className="flex items-center gap-2">
-                  <span>{item.item_name}</span>
-                  <Badge variant="outline" className="text-xs">
-                    {item.pricing_model === 'monthly' ? 'Monthly' : 'One-time'}
-                  </Badge>
-                  <span className="text-xs text-muted-foreground">
-                    {formatCurrency(item.default_unit_price)}
-                  </span>
-                </div>
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <LOVSelect
+          value=""
+          items={catalogLOVItems}
+          onChange={(value) => {
+            if (value) addLineFromCatalog(value as string);
+          }}
+          placeholder="Select from catalog..."
+          searchPlaceholder="Search add-ons..."
+          emptyMessage="No add-ons found"
+          isLoading={isLoading}
+          allowClear={false}
+          className="w-[300px]"
+        />
 
         <Button type="button" variant="outline" size="sm" onClick={addCustomLine}>
           <Plus className="h-4 w-4 mr-1" />
