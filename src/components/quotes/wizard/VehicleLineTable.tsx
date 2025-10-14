@@ -33,6 +33,7 @@ interface VehicleLineTableProps {
     default_price_list_id?: string;
     billing_plan?: string;
     default_delivery_fee?: number;
+    default_collection_fee?: number;
     initial_fees?: Array<{
       fee_type: string;
       fee_type_label?: string;
@@ -68,7 +69,8 @@ export const VehicleLineTable: React.FC<VehicleLineTableProps> = ({
     const deposit = line.deposit_amount || 0;
     const advance = (line.advance_rent_months || 0) * (line.monthly_rate || 0);
     const delivery = line.delivery_fee || 0;
-    return deposit + advance + delivery;
+    const collection = line.collection_fee || 0;
+    return deposit + advance + delivery + collection;
   };
 
   const formatDate = (dateStr: string) => {
@@ -98,7 +100,7 @@ export const VehicleLineTable: React.FC<VehicleLineTableProps> = ({
             <TableHead>Start Date</TableHead>
             <TableHead className="text-right">Duration</TableHead>
             <TableHead className="text-right">Monthly Rate</TableHead>
-            <TableHead className="text-right">Delivery Fee</TableHead>
+            <TableHead className="text-right">Delivery & Collection</TableHead>
             <TableHead className="text-right">Upfront Total</TableHead>
             <TableHead className="w-32 text-center">Actions</TableHead>
           </TableRow>
@@ -150,10 +152,33 @@ export const VehicleLineTable: React.FC<VehicleLineTableProps> = ({
                   <TableCell className="text-right">{line.duration_months || 0} mo</TableCell>
                   <TableCell className="text-right">{line.monthly_rate || 0} AED</TableCell>
                   <TableCell className="text-right">
-                    {line.delivery_fee !== undefined && line.delivery_fee !== (headerDefaults.default_delivery_fee ?? 0) && (
-                      <Badge variant="secondary" className="text-xs mr-1">Custom</Badge>
-                    )}
-                    {(line.delivery_fee ?? headerDefaults.default_delivery_fee ?? 0).toFixed(2)} AED
+                    <div className="space-y-1">
+                      {/* Delivery Fee */}
+                      {((line.pickup_type ?? headerDefaults.pickup_type ?? "company_location") === "customer_site") ? (
+                        <div className="text-xs">
+                          <span className="text-muted-foreground">Delivery: </span>
+                          {line.delivery_fee !== undefined && line.delivery_fee !== (headerDefaults.default_delivery_fee ?? 0) && (
+                            <Badge variant="secondary" className="text-[10px] mr-1 px-1 py-0">Custom</Badge>
+                          )}
+                          <span className="font-medium">{(line.delivery_fee ?? headerDefaults.default_delivery_fee ?? 0).toFixed(2)} AED</span>
+                        </div>
+                      ) : (
+                        <div className="text-xs text-muted-foreground">Delivery: N/A</div>
+                      )}
+                      
+                      {/* Collection Fee */}
+                      {((line.return_type ?? headerDefaults.return_type ?? "company_location") === "customer_site") ? (
+                        <div className="text-xs">
+                          <span className="text-muted-foreground">Collection: </span>
+                          {line.collection_fee !== undefined && line.collection_fee !== (headerDefaults.default_collection_fee ?? 0) && (
+                            <Badge variant="secondary" className="text-[10px] mr-1 px-1 py-0">Custom</Badge>
+                          )}
+                          <span className="font-medium">{(line.collection_fee ?? headerDefaults.default_collection_fee ?? 0).toFixed(2)} AED</span>
+                        </div>
+                      ) : (
+                        <div className="text-xs text-muted-foreground">Collection: N/A</div>
+                      )}
+                    </div>
                   </TableCell>
                   <TableCell className="text-right font-bold">
                     {calculateUpfront(line).toFixed(2)} AED

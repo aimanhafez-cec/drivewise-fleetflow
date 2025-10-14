@@ -405,7 +405,23 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
                 placeholder="0.00"
               />
               <p className="text-xs text-muted-foreground">
-                Default delivery/collection fee applied to each vehicle. Can be customized per vehicle.
+                Fee charged when vehicle is <strong>delivered to customer location</strong>. Applied when "Pickup From" is set to "Customer Location".
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="default_collection_fee">Default Collection Fee (per vehicle)</Label>
+              <Input
+                id="default_collection_fee"
+                type="number"
+                min="0"
+                step="50"
+                value={data.default_collection_fee || 0}
+                onChange={(e) => onChange({ default_collection_fee: parseFloat(e.target.value) || 0 })}
+                placeholder="0.00"
+              />
+              <p className="text-xs text-muted-foreground">
+                Fee charged when vehicle is <strong>collected from customer location</strong>. Applied when "Return To" is set to "Customer Location".
               </p>
             </div>
           </div>

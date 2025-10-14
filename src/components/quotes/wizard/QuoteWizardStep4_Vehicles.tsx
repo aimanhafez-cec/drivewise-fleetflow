@@ -55,6 +55,7 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
       return_location_id: data.return_location_id,
       return_customer_site_id: data.return_customer_site_id,
       delivery_fee: data.default_delivery_fee || 0,
+      collection_fee: data.default_collection_fee || 0,
       mileage_package_km: 3000,
       excess_km_rate: 1.00,
       rate_type: 'monthly' as const,
@@ -109,6 +110,8 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
       sum + ((line.advance_rent_months || 0) * (line.monthly_rate || 0)), 0);
     const totalDeliveryFees = lines.reduce((sum: number, line: any) => 
       sum + (line.delivery_fee || 0), 0);
+    const totalCollectionFees = lines.reduce((sum: number, line: any) => 
+      sum + (line.collection_fee || 0), 0);
     const initialFees = (data.initial_fees || []).reduce((sum: number, fee: any) => 
       sum + (parseFloat(fee.amount) || 0), 0);
     
@@ -117,8 +120,9 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
       deposits: totalDeposits,
       advance: totalAdvance,
       deliveryFees: totalDeliveryFees,
+      collectionFees: totalCollectionFees,
       initialFees,
-      grandTotal: totalDeposits + totalAdvance + totalDeliveryFees + initialFees,
+      grandTotal: totalDeposits + totalAdvance + totalDeliveryFees + totalCollectionFees + initialFees,
     };
   };
 
@@ -220,6 +224,7 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
                     default_price_list_id: data.default_price_list_id,
                     billing_plan: data.billing_plan || 'monthly',
                     default_delivery_fee: data.default_delivery_fee,
+                    default_collection_fee: data.default_collection_fee,
                     initial_fees: data.initial_fees || [],
                     customer_id: data.customer_id,
                   }}
@@ -256,6 +261,10 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Total Delivery Fees:</span>
                   <span className="font-semibold">{totals.deliveryFees.toFixed(2)} AED</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Total Collection Fees:</span>
+                  <span className="font-semibold">{totals.collectionFees.toFixed(2)} AED</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Initial Fees (One-time):</span>
