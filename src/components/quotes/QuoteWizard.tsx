@@ -633,8 +633,8 @@ export const QuoteWizard: React.FC = () => {
   };
 
   const handleStepClick = (stepId: number) => {
-    // Only allow clicking on current or completed steps
-    if (stepId <= currentStep) {
+    // Allow clicking on current, previous, or completed steps
+    if (stepId <= currentStep || completedSteps.includes(stepId)) {
       setCurrentStep(stepId);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
