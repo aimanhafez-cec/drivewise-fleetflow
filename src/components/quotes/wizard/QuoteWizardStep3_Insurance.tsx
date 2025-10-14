@@ -141,108 +141,116 @@ export const QuoteWizardStep3_Insurance: React.FC<QuoteWizardStep3InsuranceProps
         </CardHeader>
         <CardContent className="p-4 space-y-3">
           
-          {/* Row 1: Coverage Package + Excess */}
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
-            <div className="md:col-span-3 space-y-1.5">
-              <TooltipLabel 
-                label="Coverage Package *" 
-                tooltip="Baseline coverage level for all vehicles. CDW covers collision/damage, Comprehensive adds theft/fire, Full includes zero excess."
-              />
-              <Select
-                value={data.insurance_coverage_package || ""}
-                onValueChange={(value) => onChange({ insurance_coverage_package: value })}
-              >
-                <SelectTrigger className="h-9">
-                  <SelectValue placeholder="Select package" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="cdw">CDW (Collision Damage Waiver)</SelectItem>
-                  <SelectItem value="comprehensive">Comprehensive</SelectItem>
-                  <SelectItem value="full-zero-excess">Full / Zero Excess</SelectItem>
-                </SelectContent>
-              </Select>
-              {errors.insurance_coverage_package && <FormError message={errors.insurance_coverage_package} />}
+          {/* Primary Selection: Coverage Package - Highlighted */}
+          <div className="space-y-3">
+            <div className="p-3 bg-muted/50 rounded-lg border border-border/50">
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
+                <div className="md:col-span-3 space-y-1.5">
+                  <TooltipLabel 
+                    label="Coverage Package *" 
+                    tooltip="Baseline coverage level for all vehicles. CDW covers collision/damage, Comprehensive adds theft/fire, Full includes zero excess."
+                  />
+                  <Select
+                    value={data.insurance_coverage_package || ""}
+                    onValueChange={(value) => onChange({ insurance_coverage_package: value })}
+                  >
+                    <SelectTrigger className="h-9">
+                      <SelectValue placeholder="Select package" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="cdw">CDW (Collision Damage Waiver)</SelectItem>
+                      <SelectItem value="comprehensive">Comprehensive</SelectItem>
+                      <SelectItem value="full-zero-excess">Full / Zero Excess</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {errors.insurance_coverage_package && <FormError message={errors.insurance_coverage_package} />}
+                </div>
+
+                <div className="md:col-span-2 space-y-1.5">
+                  <TooltipLabel 
+                    label="Excess / Deductible (AED) *" 
+                    tooltip="Amount customer pays per incident. Automatically 0 for Full/Zero-Excess package."
+                  />
+                  <Input
+                    type="number"
+                    min="0"
+                    step="100"
+                    className="h-9"
+                    value={data.insurance_excess_aed ?? 1500}
+                    onChange={(e) => onChange({ insurance_excess_aed: parseFloat(e.target.value) || 0 })}
+                    disabled={data.insurance_coverage_package === 'full-zero-excess'}
+                    placeholder="1500"
+                  />
+                  {errors.insurance_excess_aed && <FormError message={errors.insurance_excess_aed} />}
+                </div>
+              </div>
             </div>
 
-            <div className="md:col-span-2 space-y-1.5">
-              <TooltipLabel 
-                label="Excess / Deductible (AED) *" 
-                tooltip="Amount customer pays per incident. Automatically 0 for Full/Zero-Excess package."
-              />
-              <Input
-                type="number"
-                min="0"
-                step="100"
-                className="h-9"
-                value={data.insurance_excess_aed ?? 1500}
-                onChange={(e) => onChange({ insurance_excess_aed: parseFloat(e.target.value) || 0 })}
-                disabled={data.insurance_coverage_package === 'full-zero-excess'}
-                placeholder="1500"
-              />
-              {errors.insurance_excess_aed && <FormError message={errors.insurance_excess_aed} />}
-            </div>
-          </div>
+            {/* Visual Separator + Row 2: Glass & Tire + PAI */}
+            <div className="border-t pt-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <TooltipLabel 
+                    label="Glass & Tire Cover" 
+                    tooltip="Coverage for windscreen, glass, and tire damage. Typically included in Comprehensive packages."
+                  />
+                  <Select
+                    value={data.insurance_glass_tire_cover ? "yes" : "no"}
+                    onValueChange={(value) => onChange({ insurance_glass_tire_cover: value === "yes" })}
+                  >
+                    <SelectTrigger className="h-9">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="yes">Yes - Included</SelectItem>
+                      <SelectItem value="no">No - Not Included</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-          {/* Row 2: Glass & Tire + PAI */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <TooltipLabel 
-                label="Glass & Tire Cover" 
-                tooltip="Coverage for windscreen, glass, and tire damage. Typically included in Comprehensive packages."
-              />
-              <Select
-                value={data.insurance_glass_tire_cover ? "yes" : "no"}
-                onValueChange={(value) => onChange({ insurance_glass_tire_cover: value === "yes" })}
-              >
-                <SelectTrigger className="h-9">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="yes">Yes - Included</SelectItem>
-                  <SelectItem value="no">No - Not Included</SelectItem>
-                </SelectContent>
-              </Select>
+                <div className="space-y-1.5">
+                  <TooltipLabel 
+                    label="Personal Accident Insurance (PAI)" 
+                    tooltip="Optional coverage for medical expenses of driver and passengers in case of accident."
+                  />
+                  <Select
+                    value={data.insurance_pai_enabled ? "yes" : "no"}
+                    onValueChange={(value) => onChange({ insurance_pai_enabled: value === "yes" })}
+                  >
+                    <SelectTrigger className="h-9">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="yes">Yes - Enabled</SelectItem>
+                      <SelectItem value="no">No - Not Included</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
             </div>
 
-            <div className="space-y-1.5">
-              <TooltipLabel 
-                label="Personal Accident Insurance (PAI)" 
-                tooltip="Optional coverage for medical expenses of driver and passengers in case of accident."
-              />
-              <Select
-                value={data.insurance_pai_enabled ? "yes" : "no"}
-                onValueChange={(value) => onChange({ insurance_pai_enabled: value === "yes" })}
-              >
-                <SelectTrigger className="h-9">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="yes">Yes - Enabled</SelectItem>
-                  <SelectItem value="no">No - Not Included</SelectItem>
-                </SelectContent>
-              </Select>
+            {/* Visual Separator + Row 3: Territorial Coverage */}
+            <div className="border-t pt-3">
+              <div className="space-y-1.5">
+                <TooltipLabel 
+                  label="Territorial Coverage *" 
+                  tooltip="Geographic area where insurance is valid. GCC includes UAE, Saudi Arabia, Kuwait, Bahrain, Oman, Qatar (surcharge applies)."
+                />
+                <Select
+                  value={data.insurance_territorial_coverage || "uae-only"}
+                  onValueChange={(value) => onChange({ insurance_territorial_coverage: value })}
+                >
+                  <SelectTrigger className="h-9">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="uae-only">UAE Only (Default)</SelectItem>
+                    <SelectItem value="gcc">GCC Coverage (surcharge applies)</SelectItem>
+                  </SelectContent>
+                </Select>
+                {errors.insurance_territorial_coverage && <FormError message={errors.insurance_territorial_coverage} />}
+              </div>
             </div>
-          </div>
-
-          {/* Row 3: Territorial Coverage */}
-          <div className="space-y-1.5">
-            <TooltipLabel 
-              label="Territorial Coverage *" 
-              tooltip="Geographic area where insurance is valid. GCC includes UAE, Saudi Arabia, Kuwait, Bahrain, Oman, Qatar (surcharge applies)."
-            />
-            <Select
-              value={data.insurance_territorial_coverage || "uae-only"}
-              onValueChange={(value) => onChange({ insurance_territorial_coverage: value })}
-            >
-              <SelectTrigger className="h-9">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="uae-only">UAE Only (Default)</SelectItem>
-                <SelectItem value="gcc">GCC Coverage (surcharge applies)</SelectItem>
-              </SelectContent>
-            </Select>
-            {errors.insurance_territorial_coverage && <FormError message={errors.insurance_territorial_coverage} />}
           </div>
 
         </CardContent>
