@@ -25,6 +25,25 @@ export const QuoteWizardStep3_Insurance: React.FC<QuoteWizardStep3InsuranceProps
     }
   }, [data.insurance_coverage_package]);
 
+  // Initialize defaults for required fields if not set
+  React.useEffect(() => {
+    const updates: any = {};
+    
+    if (!data.insurance_coverage_package) {
+      updates.insurance_coverage_package = 'comprehensive';
+    }
+    if (data.insurance_excess_aed === undefined) {
+      updates.insurance_excess_aed = 1500;
+    }
+    if (!data.insurance_territorial_coverage) {
+      updates.insurance_territorial_coverage = 'uae-only';
+    }
+    
+    if (Object.keys(updates).length > 0) {
+      onChange(updates);
+    }
+  }, []);
+
   // Auto-generate coverage summary
   React.useEffect(() => {
     const parts = [];

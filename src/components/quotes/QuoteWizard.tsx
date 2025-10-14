@@ -279,6 +279,7 @@ export const QuoteWizard: React.FC = () => {
   const saveDraftMutation = useMutation({
     mutationFn: async (data: Partial<QuoteData>) => {
       const quotePayload: any = {
+        // Step 1 fields
         legal_entity_id: data.legal_entity_id,
         business_unit_id: data.business_unit_id,
         opportunity_id: data.opportunity_id,
@@ -303,6 +304,46 @@ export const QuoteWizard: React.FC = () => {
         vehicle_id: data.vehicle_id,
         items: data.items || [],
         notes: data.notes,
+        pickup_type: data.pickup_type,
+        pickup_location_id: data.pickup_location_id,
+        pickup_customer_site_id: data.pickup_customer_site_id,
+        return_type: data.return_type,
+        return_location_id: data.return_location_id,
+        return_customer_site_id: data.return_customer_site_id,
+        win_loss_reason: data.win_loss_reason,
+        
+        // Step 2 fields - Financial Terms
+        payment_terms_id: data.payment_terms_id,
+        billing_plan: data.billing_plan,
+        billing_start_date: data.billing_start_date,
+        proration_rule: data.proration_rule,
+        default_price_list_id: data.default_price_list_id,
+        annual_escalation_percentage: data.annual_escalation_percentage,
+        vat_percentage: data.vat_percentage,
+        withholding_tax_percentage: data.withholding_tax_percentage,
+        deposit_type: data.deposit_type,
+        default_deposit_amount: data.default_deposit_amount,
+        default_advance_rent_months: data.default_advance_rent_months,
+        initial_fees: data.initial_fees,
+        grace_period_days: data.grace_period_days,
+        late_fee_percentage: data.late_fee_percentage,
+        payment_method: data.payment_method,
+        invoice_format: data.invoice_format,
+        email_invoice_to_contact: data.email_invoice_to_contact,
+        invoice_contact_person_id: data.invoice_contact_person_id,
+        customer_po_number: data.customer_po_number,
+        
+        // Step 3 fields - Insurance
+        insurance_coverage_package: data.insurance_coverage_package,
+        insurance_excess_aed: data.insurance_excess_aed,
+        insurance_territorial_coverage: data.insurance_territorial_coverage,
+        insurance_glass_tire_cover: data.insurance_glass_tire_cover,
+        insurance_pai_enabled: data.insurance_pai_enabled,
+        insurance_coverage_summary: data.insurance_coverage_summary,
+        
+        // Step 4 fields - Vehicles
+        quote_items: data.quote_items,
+        vehicle_type_id: data.vehicle_type_id,
       };
 
       // If no ID exists, INSERT new quote

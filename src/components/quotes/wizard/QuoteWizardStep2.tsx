@@ -111,6 +111,38 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
     }
   }, [data.contract_effective_from, data.billing_plan]);
 
+  // Initialize defaults for required fields if not set
+  React.useEffect(() => {
+    const updates: any = {};
+    
+    if (data.vat_percentage === undefined || data.vat_percentage === null) {
+      updates.vat_percentage = 5;
+    }
+    if (!data.deposit_type) {
+      updates.deposit_type = 'refundable';
+    }
+    if (data.default_deposit_amount === undefined || data.default_deposit_amount === null) {
+      updates.default_deposit_amount = 2500;
+    }
+    if (!data.payment_method) {
+      updates.payment_method = 'bank-transfer';
+    }
+    if (!data.billing_plan) {
+      updates.billing_plan = 'monthly';
+    }
+    if (!data.proration_rule) {
+      updates.proration_rule = 'first-last';
+    }
+    if (!data.currency) {
+      updates.currency = 'AED';
+    }
+    
+    // Only call onChange if there are updates to avoid infinite loop
+    if (Object.keys(updates).length > 0) {
+      onChange(updates);
+    }
+  }, []); // Empty dependency array - run only once on mount
+
   // Add initial fee row
   const addInitialFee = () => {
     const currentFees = data.initial_fees || [];
