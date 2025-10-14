@@ -14,6 +14,7 @@ import { QuoteWizardStep4_Vehicles } from "./wizard/QuoteWizardStep4_Vehicles";
 import { QuoteWizardStep5_Summary } from "./wizard/QuoteWizardStep5_Summary";
 
 interface QuoteData {
+  id?: string;
   // Header fields from Step 1
   legal_entity_id?: string;
   business_unit_id?: string;
@@ -208,9 +209,10 @@ export const QuoteWizard: React.FC = () => {
   // Check if we're duplicating, revising a quote, creating from RFQ, or editing existing
   const duplicateId = searchParams.get("duplicate");
   const reviseId = searchParams.get("revise");
-  const fromRfqId = searchParams.get("fromRfq");
+  const fromRfqId = searchParams.get("fromRfqId");
   const editMode = searchParams.get("edit") === "true";
-  const quoteId = quoteIdParam;
+  const quoteIdFromSearch = searchParams.get("id");
+  const quoteId = quoteIdParam || quoteIdFromSearch;
 
   const { data: existingQuote } = useQuery({
     queryKey: ["quote", duplicateId || reviseId || quoteId],
@@ -348,9 +350,17 @@ export const QuoteWizard: React.FC = () => {
         description: isNew ? "Quote saved as draft" : "Changes saved" 
       });
       
-      // Update URL if new quote
+      // If new quote, silently update URL without navigation
       if (isNew) {
-        navigate(`/quotes/${quote.id}?edit=true`, { replace: true });
+        const newUrl = `/quotes/new?edit=true&id=${quote.id}`;
+        window.history.replaceState(null, "", newUrl);
+        
+        // Update local state with new ID and quote number
+        setQuoteData(prev => ({ 
+          ...prev, 
+          id: quote.id, 
+          quote_number: quote.quote_number 
+        }));
       }
     },
     onError: (error) => {
@@ -639,7 +649,7 @@ export const QuoteWizard: React.FC = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">
-            {editMode ? "Edit Quote" : reviseId ? "Revise Quote" : duplicateId ? "Duplicate Quote" : fromRfqId ? "Prepare Quote from RFQ" : "New Quote"}
+            {quoteData.id ? "Edit Quote" : reviseId ? "Revise Quote" : duplicateId ? "Duplicate Quote" : fromRfqId ? "Prepare Quote from RFQ" : "New Quote"}
             {quoteData.quote_number && ` - ${quoteData.quote_number}`}
           </h1>
           <p className="text-muted-foreground">
@@ -653,7 +663,7 @@ export const QuoteWizard: React.FC = () => {
             disabled={saveDraftMutation.isPending}
           >
             <Save className="h-4 w-4 mr-2" />
-            {quoteId ? "Save Changes" : "Save Draft"}
+            {quoteData.id ? "Save Changes" : "Save Draft"}
           </Button>
           <Button variant="outline" onClick={() => navigate("/quotes")}>
             Cancel
