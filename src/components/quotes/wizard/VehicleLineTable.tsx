@@ -6,6 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { ChevronDown, ChevronUp, Trash2 } from "lucide-react";
 import { VehicleLineDetails } from "./VehicleLineDetails";
 import { format } from "date-fns";
+import { AddOnLine } from "./AddOnsTable";
 
 interface VehicleLineTableProps {
   lines: any[];
@@ -39,13 +40,7 @@ interface VehicleLineTableProps {
     monthly_maintenance_cost_per_vehicle?: number;
     maintenance_plan_source?: string;
     show_maintenance_separate_line?: boolean;
-    default_addons?: Array<{
-      id: string;
-      name: string;
-      type: 'monthly' | 'one-time';
-      amount: number;
-      enabled: boolean;
-    }>;
+    default_addons?: AddOnLine[];
     initial_fees?: Array<{
       fee_type: string;
       fee_type_label?: string;

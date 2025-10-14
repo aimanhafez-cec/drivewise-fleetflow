@@ -37,9 +37,8 @@ const AddOnsSelector: React.FC<AddOnsSelectorProps> = ({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-8">
-          {addOnCategories.map((category) => {
-            const categoryAddOns = categorizeAddOns(category);
-            if (categoryAddOns.length === 0) return null;
+          {categorizeAddOns().map((category) => {
+            if (category.items.length === 0) return null;
 
             return (
               <div key={category} className="space-y-4">

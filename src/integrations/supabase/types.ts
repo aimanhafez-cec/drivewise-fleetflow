@@ -14,6 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
+      addon_items: {
+        Row: {
+          category: string
+          created_at: string
+          currency: string
+          default_unit_price: number
+          description: string | null
+          display_order: number | null
+          id: string
+          is_active: boolean
+          item_code: string
+          item_name: string
+          notes: string | null
+          pricing_model: string
+          uom: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          currency?: string
+          default_unit_price?: number
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          is_active?: boolean
+          item_code: string
+          item_name: string
+          notes?: string | null
+          pricing_model: string
+          uom?: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          currency?: string
+          default_unit_price?: number
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          is_active?: boolean
+          item_code?: string
+          item_name?: string
+          notes?: string | null
+          pricing_model?: string
+          uom?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       agreement_lines: {
         Row: {
           additions: Json | null

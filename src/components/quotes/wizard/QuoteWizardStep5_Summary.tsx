@@ -389,6 +389,48 @@ export const QuoteWizardStep5_Summary: React.FC<QuoteWizardStep4Props> = ({
         </Card>
       )}
 
+      {/* Add-Ons & Extras Summary */}
+      {data.default_addons && data.default_addons.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Add-Ons & Extras</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {data.default_addons.map((addon: any, index: number) => (
+                <div key={index} className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">
+                    {addon.item_name} ({addon.pricing_model}) × {addon.quantity}
+                  </span>
+                  <span className="font-medium">{formatCurrency(addon.total)}</span>
+                </div>
+              ))}
+              <Separator />
+              <div className="flex justify-between font-semibold">
+                <span>Monthly Add-Ons:</span>
+                <span>
+                  {formatCurrency(
+                    data.default_addons
+                      .filter((a: any) => a.pricing_model === 'monthly')
+                      .reduce((sum: number, a: any) => sum + a.total, 0)
+                  )}
+                </span>
+              </div>
+              <div className="flex justify-between font-semibold">
+                <span>One-Time Add-Ons:</span>
+                <span>
+                  {formatCurrency(
+                    data.default_addons
+                      .filter((a: any) => a.pricing_model === 'one-time')
+                      .reduce((sum: number, a: any) => sum + a.total, 0)
+                  )}
+                </span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Grand Total Summary */}
       <Card className="border-primary">
         <CardHeader>

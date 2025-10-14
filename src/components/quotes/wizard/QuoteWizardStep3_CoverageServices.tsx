@@ -9,7 +9,7 @@ import { FormError } from "@/components/ui/form-error";
 import { Switch } from "@/components/ui/switch";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { DefaultAddOnsSelector } from "./DefaultAddOnsSelector";
+import { AddOnsTable, AddOnLine } from "./AddOnsTable";
 import { formatCurrency } from "@/lib/utils/currency";
 
 interface QuoteWizardStep3CoverageServicesProps {
@@ -116,23 +116,23 @@ export const QuoteWizardStep3_CoverageServices: React.FC<QuoteWizardStep3Coverag
 
   // Auto-generate add-ons summary
   React.useEffect(() => {
-    const enabled = (data.default_addons || []).filter((a: any) => a.enabled);
-    if (enabled.length === 0) {
+    const addons: AddOnLine[] = data.default_addons || [];
+    if (addons.length === 0) {
       onChange({ default_addons_summary: 'No add-ons selected' });
       return;
     }
     
-    const monthly = enabled.filter((a: any) => a.type === 'monthly');
-    const oneTime = enabled.filter((a: any) => a.type === 'one-time');
+    const monthly = addons.filter(a => a.pricing_model === 'monthly');
+    const oneTime = addons.filter(a => a.pricing_model === 'one-time');
     
     const parts = [];
     if (monthly.length > 0) {
-      const total = monthly.reduce((sum: number, a: any) => sum + a.amount, 0);
-      parts.push(`${monthly.length} monthly (+${total} AED/month)`);
+      const total = monthly.reduce((sum, a) => sum + a.total, 0);
+      parts.push(`${monthly.length} monthly (+${formatCurrency(total)}/month)`);
     }
     if (oneTime.length > 0) {
-      const total = oneTime.reduce((sum: number, a: any) => sum + a.amount, 0);
-      parts.push(`${oneTime.length} one-time (+${total} AED)`);
+      const total = oneTime.reduce((sum, a) => sum + a.total, 0);
+      parts.push(`${oneTime.length} one-time (+${formatCurrency(total)})`);
     }
     
     onChange({ default_addons_summary: parts.join(' • ') });
@@ -412,40 +412,24 @@ export const QuoteWizardStep3_CoverageServices: React.FC<QuoteWizardStep3Coverag
           </div>
         </CardHeader>
         <CardContent className="p-4 space-y-4">
-          <DefaultAddOnsSelector
-            selectedAddOns={data.default_addons || []}
+          <AddOnsTable
+            addons={data.default_addons || []}
             onChange={(addons) => onChange({ default_addons: addons })}
           />
           
           {/* Summary of selected add-ons */}
-          {data.default_addons && data.default_addons.filter((a: any) => a.enabled).length > 0 && (
-            <div className="mt-4 p-3 bg-muted/50 rounded-lg">
-              <div className="text-sm font-medium mb-2">Selected Add-Ons Summary</div>
-              <div className="text-xs text-muted-foreground space-y-1">
-                {(() => {
-                  const enabled = data.default_addons.filter((a: any) => a.enabled);
-                  const monthlyAddOns = enabled.filter((a: any) => a.type === 'monthly');
-                  const oneTimeAddOns = enabled.filter((a: any) => a.type === 'one-time');
-                  const monthlyTotal = monthlyAddOns.reduce((sum: number, a: any) => sum + a.amount, 0);
-                  const oneTimeTotal = oneTimeAddOns.reduce((sum: number, a: any) => sum + a.amount, 0);
-                  
-                  return (
-                    <>
-                      {monthlyAddOns.length > 0 && (
-                        <div>
-                          {monthlyAddOns.length} monthly add-on{monthlyAddOns.length > 1 ? 's' : ''} 
-                          (+{formatCurrency(monthlyTotal)} /month per vehicle)
-                        </div>
-                      )}
-                      {oneTimeAddOns.length > 0 && (
-                        <div>
-                          {oneTimeAddOns.length} one-time add-on{oneTimeAddOns.length > 1 ? 's' : ''} 
-                          (+{formatCurrency(oneTimeTotal)} per vehicle)
-                        </div>
-                      )}
-                    </>
-                  );
-                })()}
+          {data.default_addons && data.default_addons.length > 0 && (
+            <div className="mt-4 p-3 bg-primary/5 rounded-lg">
+              <p className="text-sm font-medium mb-2">Selected Add-Ons Summary:</p>
+              <div className="space-y-1">
+                {data.default_addons.map((addon: AddOnLine) => (
+                  <div key={addon.id} className="flex justify-between text-xs">
+                    <span className="text-muted-foreground">{addon.item_name}</span>
+                    <span className="font-medium">
+                      {formatCurrency(addon.total)} {addon.pricing_model === 'monthly' ? '/ month' : 'one-time'}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
           )}

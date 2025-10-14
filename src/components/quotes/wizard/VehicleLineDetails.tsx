@@ -13,6 +13,7 @@ import { AlertCircle, Info, MapPin, FileText, Gauge, Coins, Shield, Wrench, Calc
 import { useLocations, useCustomerSites } from "@/hooks/useBusinessLOVs";
 import { formatDurationInMonthsAndDays } from "@/lib/utils/dateUtils";
 import { VehicleAddOnsOverride } from "./VehicleAddOnsOverride";
+import { AddOnLine } from "./AddOnsTable";
 
 interface VehicleLineDetailsProps {
   line: any;
@@ -43,13 +44,7 @@ interface VehicleLineDetailsProps {
     monthly_maintenance_cost_per_vehicle?: number;
     maintenance_plan_source?: string;
     show_maintenance_separate_line?: boolean;
-    default_addons?: Array<{
-      id: string;
-      name: string;
-      type: 'monthly' | 'one-time';
-      amount: number;
-      enabled: boolean;
-    }>;
+    default_addons?: AddOnLine[];
     initial_fees?: Array<{
       fee_type: string;
       fee_type_label?: string;
@@ -197,12 +192,13 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
         const lineAddOns = line.addons || [];
         
         // Check if any add-on differs from header
-        if (lineAddOns.length !== headerAddOns.filter((a: any) => a.enabled).length) return true;
+        if (lineAddOns.length !== headerAddOns.length) return true;
         
-        return lineAddOns.some((lineAddon: any) => {
-          const headerAddon = headerAddOns.find((h: any) => h.id === lineAddon.id);
-          if (!headerAddon) return lineAddon.enabled; // New add-on not in header
-          return lineAddon.enabled !== headerAddon.enabled; // Different enabled state
+        return lineAddOns.some((lineAddon: AddOnLine) => {
+          const headerAddon = headerAddOns.find((h: AddOnLine) => h.id === lineAddon.id);
+          if (!headerAddon) return true;
+          return lineAddon.quantity !== headerAddon.quantity || 
+                 lineAddon.unit_price !== headerAddon.unit_price;
         });
       default:
         return false;

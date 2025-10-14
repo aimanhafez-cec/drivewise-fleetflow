@@ -96,17 +96,8 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
       insurance_glass_tire_cover: data.insurance_glass_tire_cover ?? true,
       insurance_pai_enabled: data.insurance_pai_enabled ?? false,
       insurance_territorial_coverage: data.insurance_territorial_coverage || 'uae-only',
-      // Auto-populate add-ons from header defaults
-      addons: (data.default_addons || [])
-        .filter((a: any) => a.enabled)
-        .map((a: any) => ({
-          id: a.id,
-          name: a.name,
-          type: a.type,
-          amount: a.amount,
-          enabled: true,
-          customized: false, // Not customized yet
-        })),
+      // Auto-populate add-ons from header defaults (deep clone)
+      addons: (data.default_addons || []).map((a: any) => ({ ...a })),
       // Store vehicle metadata for display
       _vehicleMeta: {
         make: vehicle.make,
@@ -158,18 +149,18 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
     const initialFees = (data.initial_fees || []).reduce((sum: number, fee: any) => 
       sum + (parseFloat(fee.amount) || 0), 0);
     
-    // Calculate add-ons costs
+    // Calculate add-ons costs using new format
     const monthlyAddOns = lines.reduce((sum: number, line: any) => {
       const lineMonthlyAddOns = (line.addons || [])
-        .filter((a: any) => a.enabled && a.type === 'monthly')
-        .reduce((s: number, a: any) => s + a.amount, 0);
+        .filter((a: any) => a.pricing_model === 'monthly')
+        .reduce((s: number, a: any) => s + a.total, 0);
       return sum + lineMonthlyAddOns;
     }, 0);
 
     const oneTimeAddOns = lines.reduce((sum: number, line: any) => {
       const lineOneTimeAddOns = (line.addons || [])
-        .filter((a: any) => a.enabled && a.type === 'one-time')
-        .reduce((s: number, a: any) => s + a.amount, 0);
+        .filter((a: any) => a.pricing_model === 'one-time')
+        .reduce((s: number, a: any) => s + a.total, 0);
       return sum + lineOneTimeAddOns;
     }, 0);
     
@@ -177,8 +168,8 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
     const monthlyRecurringRental = lines.reduce((sum: number, line: any) => {
       const baseRate = line.monthly_rate || 0;
       const monthlyAddOnsCost = (line.addons || [])
-        .filter((a: any) => a.enabled && a.type === 'monthly')
-        .reduce((s: number, a: any) => s + a.amount, 0);
+        .filter((a: any) => a.pricing_model === 'monthly')
+        .reduce((s: number, a: any) => s + a.total, 0);
       return sum + baseRate + monthlyAddOnsCost;
     }, 0);
     
