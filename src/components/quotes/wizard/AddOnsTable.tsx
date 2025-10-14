@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -27,6 +27,7 @@ interface AddOnsTableProps {
 
 export const AddOnsTable: React.FC<AddOnsTableProps> = ({ addons, onChange }) => {
   const { data: catalogItems = [], isLoading } = useAddonItems();
+  const [searchQuery, setSearchQuery] = useState('');
 
   const addLineFromCatalog = (catalogItemId: string) => {
     const catalogItem = catalogItems.find(item => item.id === catalogItemId);
@@ -93,16 +94,22 @@ export const AddOnsTable: React.FC<AddOnsTableProps> = ({ addons, onChange }) =>
     label: `${item.item_name} - ${item.pricing_model === 'monthly' ? 'Monthly' : 'One-time'} - ${formatCurrency(item.default_unit_price)}`,
   }));
 
+  // Filter items based on search query
+  const filteredCatalogItems = catalogLOVItems.filter(item =>
+    item.label.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <div className="space-y-4">
       {/* Add Controls */}
       <div className="flex flex-wrap gap-2">
         <LOVSelect
           value=""
-          items={catalogLOVItems}
+          items={filteredCatalogItems}
           onChange={(value) => {
             if (value) addLineFromCatalog(value as string);
           }}
+          onSearch={setSearchQuery}
           placeholder="Select from catalog..."
           searchPlaceholder="Search add-ons..."
           emptyMessage="No add-ons found"
