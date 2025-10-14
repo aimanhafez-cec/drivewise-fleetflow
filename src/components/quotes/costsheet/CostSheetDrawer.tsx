@@ -153,27 +153,29 @@ export const CostSheetDrawer: React.FC<CostSheetDrawerProps> = ({
             </div>
           </SheetHeader>
 
-          <ScrollArea className="flex-1 px-6">
-            <div className="py-6 space-y-6">
-              {!costSheet && (
-                <Alert>
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>
-                    No cost sheet exists yet. Click "Calculate Cost Sheet" to generate one based on default values.
-                  </AlertDescription>
-                </Alert>
-              )}
+          <ScrollArea className="flex-1">
+            <div className="space-y-6">
+              <div className="px-6 pt-6">
+                {!costSheet && (
+                  <Alert>
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>
+                      No cost sheet exists yet. Click "Calculate Cost Sheet" to generate one based on default values.
+                    </AlertDescription>
+                  </Alert>
+                )}
 
-              <CostSheetHeader
-                financingRate={headerData.financing_rate_percent}
-                overheadPercent={headerData.overhead_percent}
-                targetMargin={headerData.target_margin_percent}
-                residualValue={headerData.residual_value_percent}
-                leaseTerm={quoteDurationMonths}
-                notes={headerData.notes_assumptions}
-                disabled={isDisabled}
-                onChange={(field, value) => setHeaderData(prev => ({ ...prev, [field]: value }))}
-              />
+                <CostSheetHeader
+                  financingRate={headerData.financing_rate_percent}
+                  overheadPercent={headerData.overhead_percent}
+                  targetMargin={headerData.target_margin_percent}
+                  residualValue={headerData.residual_value_percent}
+                  leaseTerm={quoteDurationMonths}
+                  notes={headerData.notes_assumptions}
+                  disabled={isDisabled}
+                  onChange={(field, value) => setHeaderData(prev => ({ ...prev, [field]: value }))}
+                />
+              </div>
 
               {costSheet?.lines && costSheet.lines.length > 0 && (
                 <>
@@ -182,10 +184,12 @@ export const CostSheetDrawer: React.FC<CostSheetDrawerProps> = ({
                     disabled={isDisabled}
                   />
 
-                  <CostSheetSummary
-                    lines={costSheet.lines}
-                    targetMargin={headerData.target_margin_percent}
-                  />
+                  <div className="px-6 pb-6">
+                    <CostSheetSummary
+                      lines={costSheet.lines}
+                      targetMargin={headerData.target_margin_percent}
+                    />
+                  </div>
                 </>
               )}
             </div>

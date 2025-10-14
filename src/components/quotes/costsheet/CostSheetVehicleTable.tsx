@@ -29,39 +29,41 @@ export const CostSheetVehicleTable: React.FC<CostSheetVehicleTableProps> = ({
   };
 
   return (
-    <div className="border rounded-lg overflow-x-auto">
-      <Table className="min-w-[1400px]">
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-[60px]">Line</TableHead>
-            <TableHead className="min-w-[180px]">Vehicle</TableHead>
-            <TableHead className="text-right min-w-[120px] whitespace-nowrap">
-              Acquisition<br/>Cost
-            </TableHead>
-            <TableHead className="text-right min-w-[110px] whitespace-nowrap">
-              Maint.<br/>/mo
-            </TableHead>
-            <TableHead className="text-right min-w-[110px] whitespace-nowrap">
-              Ins.<br/>/mo
-            </TableHead>
-            <TableHead className="text-right min-w-[110px] whitespace-nowrap">
-              Reg/Admin<br/>/mo
-            </TableHead>
-            <TableHead className="text-right min-w-[100px] whitespace-nowrap">
-              Other<br/>/mo
-            </TableHead>
-            <TableHead className="text-right min-w-[120px] whitespace-nowrap">
-              Total Cost<br/>/mo
-            </TableHead>
-            <TableHead className="text-right min-w-[120px] whitespace-nowrap">
-              Suggested<br/>Rate
-            </TableHead>
-            <TableHead className="text-right min-w-[120px] whitespace-nowrap">
-              Quoted<br/>Rate
-            </TableHead>
-            <TableHead className="text-right min-w-[100px]">Margin</TableHead>
-          </TableRow>
-        </TableHeader>
+    <div className="overflow-x-auto">
+      <div className="px-6">
+        <div className="border rounded-lg">
+          <Table className="min-w-[1400px]">
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[60px]">Line</TableHead>
+                <TableHead className="min-w-[180px]">Vehicle</TableHead>
+                <TableHead className="text-right min-w-[120px] whitespace-nowrap">
+                  Acquisition<br/>Cost
+                </TableHead>
+                <TableHead className="text-right min-w-[110px] whitespace-nowrap">
+                  Maint.<br/>/mo
+                </TableHead>
+                <TableHead className="text-right min-w-[110px] whitespace-nowrap">
+                  Ins.<br/>/mo
+                </TableHead>
+                <TableHead className="text-right min-w-[110px] whitespace-nowrap">
+                  Reg/Admin<br/>/mo
+                </TableHead>
+                <TableHead className="text-right min-w-[100px] whitespace-nowrap">
+                  Other<br/>/mo
+                </TableHead>
+                <TableHead className="text-right min-w-[120px] whitespace-nowrap">
+                  Total Cost<br/>/mo
+                </TableHead>
+                <TableHead className="text-right min-w-[120px] whitespace-nowrap">
+                  Suggested<br/>Rate
+                </TableHead>
+                <TableHead className="text-right min-w-[120px] whitespace-nowrap">
+                  Quoted<br/>Rate
+                </TableHead>
+                <TableHead className="text-right min-w-[100px]">Margin</TableHead>
+              </TableRow>
+            </TableHeader>
         <TableBody>
           {lines.map((line) => (
             <TableRow key={line.id}>
@@ -166,7 +168,9 @@ export const CostSheetVehicleTable: React.FC<CostSheetVehicleTableProps> = ({
             </TableRow>
           ))}
         </TableBody>
-      </Table>
+          </Table>
+        </div>
+      </div>
     </div>
   );
 };
