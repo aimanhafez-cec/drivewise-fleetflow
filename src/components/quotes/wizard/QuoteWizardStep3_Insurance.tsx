@@ -4,8 +4,9 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Shield, Info } from "lucide-react";
+import { Shield, Info, Wrench } from "lucide-react";
 import { FormError } from "@/components/ui/form-error";
+import { Switch } from "@/components/ui/switch";
 
 interface QuoteWizardStep3InsuranceProps {
   data: any;
@@ -44,7 +45,7 @@ export const QuoteWizardStep3_Insurance: React.FC<QuoteWizardStep3InsuranceProps
     }
   }, []);
 
-  // Auto-generate coverage summary
+  // Auto-generate insurance coverage summary
   React.useEffect(() => {
     const parts = [];
     if (data.insurance_coverage_package) {
@@ -81,6 +82,41 @@ export const QuoteWizardStep3_Insurance: React.FC<QuoteWizardStep3InsuranceProps
     data.insurance_glass_tire_cover,
     data.insurance_pai_enabled,
     data.insurance_territorial_coverage,
+  ]);
+
+  // Auto-generate maintenance coverage summary
+  React.useEffect(() => {
+    if (!data.maintenance_included) {
+      onChange({ maintenance_coverage_summary: 'Maintenance: Customer Responsibility (not included)' });
+      return;
+    }
+
+    const parts = [];
+    const packageLabels = {
+      'none': 'No Package',
+      'basic': 'Basic Plan - Scheduled services only',
+      'full': 'Full Plan - Parts, labor, tires, battery',
+      'comprehensive': 'Comprehensive Plan - All-inclusive coverage'
+    };
+    
+    if (data.maintenance_package_type) {
+      parts.push(packageLabels[data.maintenance_package_type as keyof typeof packageLabels] || data.maintenance_package_type);
+    }
+    
+    if (data.monthly_maintenance_cost_per_vehicle) {
+      parts.push(`AED ${data.monthly_maintenance_cost_per_vehicle}/vehicle/month`);
+    }
+    
+    if (data.maintenance_plan_source) {
+      parts.push(data.maintenance_plan_source === 'internal' ? 'Internal Workshop' : 'Third Party Provider');
+    }
+    
+    onChange({ maintenance_coverage_summary: parts.join(' • ') || 'Maintenance included' });
+  }, [
+    data.maintenance_included,
+    data.maintenance_package_type,
+    data.monthly_maintenance_cost_per_vehicle,
+    data.maintenance_plan_source,
   ]);
 
   const calculateMonthlyTotal = () => {
@@ -253,6 +289,170 @@ export const QuoteWizardStep3_Insurance: React.FC<QuoteWizardStep3InsuranceProps
             <div className="text-sm text-blue-800">
               <strong>Note:</strong> These are default settings. Each vehicle line in the next step 
               will inherit these values, but you can customize insurance per vehicle if needed.
+            </div>
+          </div>
+
+        </CardContent>
+      </Card>
+
+      {/* Maintenance Package Card */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Wrench className="h-5 w-5" />
+            Maintenance Coverage - Default Settings
+          </CardTitle>
+          <CardDescription>
+            Configure default maintenance coverage for all vehicles. Toggle to include maintenance as part of the lease package, 
+            or leave disabled for customer responsibility. These settings will be inherited by each vehicle line.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          
+          {/* Include Maintenance Toggle */}
+          <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
+            <div className="flex-1 pr-4">
+              <Label htmlFor="maintenance_included" className="text-base font-semibold cursor-pointer">
+                Include Maintenance Plan in Lease?
+              </Label>
+              <p className="text-sm text-muted-foreground mt-1">
+                When enabled, maintenance costs are included in monthly rate. When disabled, customer is responsible for maintenance.
+              </p>
+            </div>
+            <Switch
+              id="maintenance_included"
+              checked={data.maintenance_included || false}
+              onCheckedChange={(checked) => {
+                onChange({ 
+                  maintenance_included: checked,
+                  maintenance_package_type: checked ? (data.maintenance_package_type || 'basic') : 'none'
+                });
+              }}
+            />
+          </div>
+
+          {/* Maintenance Package Details (conditional) */}
+          {data.maintenance_included && (
+            <>
+              {/* Package Type */}
+              <div className="space-y-2">
+                <Label htmlFor="maintenance_package_type">
+                  Maintenance Package Type *
+                </Label>
+                <Select
+                  value={data.maintenance_package_type || "basic"}
+                  onValueChange={(value) => onChange({ maintenance_package_type: value })}
+                >
+                  <SelectTrigger id="maintenance_package_type">
+                    <SelectValue placeholder="Select package type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="basic">Basic - Scheduled services only</SelectItem>
+                    <SelectItem value="full">Full - Parts, labor, tires, battery</SelectItem>
+                    <SelectItem value="comprehensive">Comprehensive - All-inclusive</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">
+                  Select the level of maintenance coverage to include
+                </p>
+              </div>
+
+              {/* Monthly Cost per Vehicle */}
+              <div className="space-y-2">
+                <Label htmlFor="maintenance_cost">
+                  Monthly Maintenance Cost per Vehicle (AED) *
+                </Label>
+                <Input
+                  id="maintenance_cost"
+                  type="number"
+                  min="0"
+                  step="50"
+                  value={data.monthly_maintenance_cost_per_vehicle ?? 250}
+                  onChange={(e) => onChange({ monthly_maintenance_cost_per_vehicle: parseFloat(e.target.value) || 0 })}
+                  placeholder="250"
+                />
+                <p className="text-xs text-muted-foreground">
+                  This amount will be added to each vehicle's monthly rate
+                </p>
+              </div>
+
+              {/* Plan Source */}
+              <div className="space-y-2">
+                <Label htmlFor="maintenance_source">Plan Source</Label>
+                <Select
+                  value={data.maintenance_plan_source || "internal"}
+                  onValueChange={(value) => onChange({ maintenance_plan_source: value })}
+                >
+                  <SelectTrigger id="maintenance_source">
+                    <SelectValue placeholder="Select source" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="internal">Internal Workshop</SelectItem>
+                    <SelectItem value="third_party">Third Party Provider</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">
+                  Where maintenance services will be performed
+                </p>
+              </div>
+
+              {/* Show as Separate Line */}
+              <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
+                <div className="flex-1 pr-4">
+                  <Label htmlFor="show_separate" className="text-sm font-medium cursor-pointer">
+                    Show Maintenance as Separate Line Item?
+                  </Label>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Display maintenance cost separately in quote, or bundle with base rate
+                  </p>
+                </div>
+                <Switch
+                  id="show_separate"
+                  checked={data.show_maintenance_separate_line ?? true}
+                  onCheckedChange={(checked) => onChange({ show_maintenance_separate_line: checked })}
+                />
+              </div>
+            </>
+          )}
+
+        </CardContent>
+      </Card>
+
+      {/* Combined Summary Card */}
+      <Card className="border-primary">
+        <CardHeader>
+          <CardTitle className="text-base">Coverage Summary (Default)</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          
+          {/* Insurance Summary */}
+          <div className="p-3 bg-muted rounded-lg">
+            <p className="text-sm font-medium mb-2 flex items-center gap-2">
+              <Shield className="h-4 w-4" />
+              Insurance Coverage:
+            </p>
+            <p className="text-sm text-muted-foreground">
+              {data.insurance_coverage_summary || 'Configure coverage settings above'}
+            </p>
+          </div>
+
+          {/* Maintenance Summary */}
+          <div className="p-3 bg-muted rounded-lg">
+            <p className="text-sm font-medium mb-2 flex items-center gap-2">
+              <Wrench className="h-4 w-4" />
+              Maintenance Coverage:
+            </p>
+            <p className="text-sm text-muted-foreground">
+              {data.maintenance_coverage_summary || 'Configure maintenance settings above'}
+            </p>
+          </div>
+
+          {/* Info Banner */}
+          <div className="flex gap-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <Info className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+            <div className="text-sm text-blue-800">
+              <strong>Note:</strong> These are default settings for all vehicles. Each vehicle line in the next step 
+              will inherit these values, but you can customize insurance and maintenance per vehicle if needed.
             </div>
           </div>
 

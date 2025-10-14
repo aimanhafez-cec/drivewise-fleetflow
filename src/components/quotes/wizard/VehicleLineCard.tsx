@@ -41,6 +41,11 @@ interface VehicleLineCardProps {
     insurance_glass_tire_cover?: boolean;
     insurance_pai_enabled?: boolean;
     insurance_territorial_coverage?: string;
+    // Maintenance overrides
+    maintenance_included?: boolean;
+    maintenance_package_type?: string;
+    monthly_maintenance_cost?: number;
+    maintenance_plan_source?: string;
   };
   onUpdate: (field: string, value: any) => void;
   onRemove: () => void;
@@ -503,6 +508,97 @@ export const VehicleLineCard: React.FC<VehicleLineCardProps> = ({
                 </SelectContent>
               </Select>
             </div>
+          </div>
+        </div>
+
+        {/* SECTION 7: Maintenance (Optional Override) */}
+        <div className="mb-6">
+          <h4 className="text-sm font-semibold mb-3 text-muted-foreground">
+            Maintenance Coverage (Optional Override)
+          </h4>
+          <div className="p-3 bg-green-50 border border-green-200 rounded-lg mb-4">
+            <p className="text-xs text-green-800">
+              <strong>Inherited from header:</strong> {line.maintenance_included ? 
+                `Included - ${line.maintenance_package_type || 'basic'} package - ${line.monthly_maintenance_cost ?? 250} AED/month` : 
+                'Not Included (Customer Responsibility)'}
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            
+            {/* Include Maintenance Override */}
+            <div className="space-y-2">
+              <Label htmlFor={`maint_include_${line.line_no}`}>Include Maintenance?</Label>
+              <Select
+                value={line.maintenance_included === undefined ? "inherit" : line.maintenance_included ? "yes" : "no"}
+                onValueChange={(value) => onUpdate('maintenance_included', value === 'inherit' ? undefined : value === 'yes')}
+              >
+                <SelectTrigger id={`maint_include_${line.line_no}`}>
+                  <SelectValue placeholder="Use header default" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="inherit">Use header default</SelectItem>
+                  <SelectItem value="yes">Yes - Include Maintenance</SelectItem>
+                  <SelectItem value="no">No - Customer Responsibility</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Package Type Override (only if maintenance included) */}
+            {(line.maintenance_included !== false) && (
+              <div className="space-y-2">
+                <Label htmlFor={`maint_pkg_${line.line_no}`}>Package Type</Label>
+                <Select
+                  value={line.maintenance_package_type || "inherit"}
+                  onValueChange={(value) => onUpdate('maintenance_package_type', value === 'inherit' ? undefined : value)}
+                >
+                  <SelectTrigger id={`maint_pkg_${line.line_no}`}>
+                    <SelectValue placeholder="Use header default" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="inherit">Use header default</SelectItem>
+                    <SelectItem value="basic">Basic</SelectItem>
+                    <SelectItem value="full">Full</SelectItem>
+                    <SelectItem value="comprehensive">Comprehensive</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            {/* Monthly Cost Override (only if maintenance included) */}
+            {(line.maintenance_included !== false) && (
+              <div className="space-y-2">
+                <Label htmlFor={`maint_cost_${line.line_no}`}>Monthly Cost (AED)</Label>
+                <Input
+                  id={`maint_cost_${line.line_no}`}
+                  type="number"
+                  min="0"
+                  step="50"
+                  value={line.monthly_maintenance_cost ?? ""}
+                  onChange={(e) => onUpdate('monthly_maintenance_cost', parseFloat(e.target.value) || 0)}
+                  placeholder="Use header default"
+                />
+              </div>
+            )}
+
+            {/* Plan Source Override (only if maintenance included) */}
+            {(line.maintenance_included !== false) && (
+              <div className="space-y-2">
+                <Label htmlFor={`maint_source_${line.line_no}`}>Plan Source</Label>
+                <Select
+                  value={line.maintenance_plan_source || "inherit"}
+                  onValueChange={(value) => onUpdate('maintenance_plan_source', value === 'inherit' ? undefined : value)}
+                >
+                  <SelectTrigger id={`maint_source_${line.line_no}`}>
+                    <SelectValue placeholder="Use header default" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="inherit">Use header default</SelectItem>
+                    <SelectItem value="internal">Internal Workshop</SelectItem>
+                    <SelectItem value="third_party">Third Party Provider</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
           </div>
         </div>
 

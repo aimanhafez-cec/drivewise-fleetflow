@@ -2202,6 +2202,11 @@ export type Database = {
           items: Json
           late_fee_percentage: number | null
           legal_entity_id: string | null
+          maintenance_coverage_summary: string | null
+          maintenance_included: boolean | null
+          maintenance_package_type: string | null
+          maintenance_plan_source: string | null
+          monthly_maintenance_cost_per_vehicle: number | null
           notes: string | null
           opportunity_id: string | null
           payment_instructions: string | null
@@ -2224,6 +2229,7 @@ export type Database = {
           rfq_id: string | null
           sales_office_id: string | null
           sales_rep_id: string | null
+          show_maintenance_separate_line: boolean | null
           status: string
           subtotal: number
           tax_amount: number
@@ -2281,6 +2287,11 @@ export type Database = {
           items?: Json
           late_fee_percentage?: number | null
           legal_entity_id?: string | null
+          maintenance_coverage_summary?: string | null
+          maintenance_included?: boolean | null
+          maintenance_package_type?: string | null
+          maintenance_plan_source?: string | null
+          monthly_maintenance_cost_per_vehicle?: number | null
           notes?: string | null
           opportunity_id?: string | null
           payment_instructions?: string | null
@@ -2303,6 +2314,7 @@ export type Database = {
           rfq_id?: string | null
           sales_office_id?: string | null
           sales_rep_id?: string | null
+          show_maintenance_separate_line?: boolean | null
           status?: string
           subtotal?: number
           tax_amount?: number
@@ -2360,6 +2372,11 @@ export type Database = {
           items?: Json
           late_fee_percentage?: number | null
           legal_entity_id?: string | null
+          maintenance_coverage_summary?: string | null
+          maintenance_included?: boolean | null
+          maintenance_package_type?: string | null
+          maintenance_plan_source?: string | null
+          monthly_maintenance_cost_per_vehicle?: number | null
           notes?: string | null
           opportunity_id?: string | null
           payment_instructions?: string | null
@@ -2382,6 +2399,7 @@ export type Database = {
           rfq_id?: string | null
           sales_office_id?: string | null
           sales_rep_id?: string | null
+          show_maintenance_separate_line?: boolean | null
           status?: string
           subtotal?: number
           tax_amount?: number

@@ -154,11 +154,19 @@ Deno.serve(async (req) => {
       // Get lease term from item or calculate from dates
       const leaseTerm = item.lease_term_months ?? 36
 
+      // Determine if maintenance is included
+      // Check per-vehicle override first, then fall back to quote-level setting
+      const maintenanceIncluded = item.maintenance_included ?? quote.maintenance_included ?? false
+      
       // Use config defaults or provided values
-      const maintenanceCost = config?.maintenance_per_month_aed ?? 250
+      const maintenanceCost = maintenanceIncluded 
+        ? (item.monthly_maintenance_cost ?? quote.monthly_maintenance_cost_per_vehicle ?? config?.maintenance_per_month_aed ?? 250)
+        : 0
       const insuranceCost = config?.insurance_per_month_aed ?? 300
       const registrationCost = config?.registration_admin_per_month_aed ?? 100
       const otherCosts = config?.other_costs_per_month_aed ?? 50
+
+      console.log(`Line ${lineNo}: Maintenance ${maintenanceIncluded ? 'INCLUDED' : 'EXCLUDED'} - ${maintenanceCost} AED/month`)
 
       // Calculate total monthly cost
       const depreciation = (acquisitionCost * (1 - residualValue / 100)) / leaseTerm
