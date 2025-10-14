@@ -2155,6 +2155,9 @@ export type Database = {
       quotes: {
         Row: {
           account_name: string | null
+          annual_escalation_percentage: number | null
+          billing_plan: string | null
+          billing_start_date: string | null
           business_unit_id: string | null
           contact_person_id: string | null
           contract_effective_from: string | null
@@ -2164,19 +2167,54 @@ export type Database = {
           currency: string | null
           customer_bill_to: string | null
           customer_id: string
+          customer_po_number: string | null
           customer_type: string | null
+          default_advance_rent_months: number | null
+          default_deposit_amount: number | null
+          default_price_list_id: string | null
+          deposit_type: string | null
           duration_days: number | null
+          email_invoice_to_contact: boolean | null
+          grace_period_days: number | null
           id: string
+          initial_fees: Json | null
+          insurance_additional_driver: boolean | null
+          insurance_coverage_package: string | null
+          insurance_coverage_summary: string | null
+          insurance_cross_border: boolean | null
+          insurance_damage_waiver: boolean | null
+          insurance_excess_aed: number | null
+          insurance_glass_tire_cover: boolean | null
+          insurance_notes: string | null
+          insurance_pai_enabled: boolean | null
+          insurance_personal_accident: boolean | null
+          insurance_territorial_coverage: string | null
+          insurance_theft_protection: boolean | null
+          insurance_third_party_liability: boolean | null
+          invoice_contact_person_id: string | null
+          invoice_format: string | null
           items: Json
+          late_fee_percentage: number | null
           legal_entity_id: string | null
           notes: string | null
           opportunity_id: string | null
+          payment_instructions: string | null
+          payment_method: string | null
+          payment_terms_id: string | null
+          pickup_customer_site_id: string | null
+          pickup_location_id: string | null
+          pickup_type: string | null
           project: string | null
+          proration_rule: string | null
           quote_date: string | null
           quote_description: string | null
           quote_entry_date: string | null
+          quote_items: Json | null
           quote_number: string
           quote_type: string | null
+          return_customer_site_id: string | null
+          return_location_id: string | null
+          return_type: string | null
           rfq_id: string | null
           sales_office_id: string | null
           sales_rep_id: string | null
@@ -2187,12 +2225,18 @@ export type Database = {
           updated_at: string
           valid_until: string | null
           validity_date_to: string | null
+          vat_percentage: number | null
           vehicle_id: string | null
+          vehicle_type_id: string | null
           version: number | null
           win_loss_reason: string | null
+          withholding_tax_percentage: number | null
         }
         Insert: {
           account_name?: string | null
+          annual_escalation_percentage?: number | null
+          billing_plan?: string | null
+          billing_start_date?: string | null
           business_unit_id?: string | null
           contact_person_id?: string | null
           contract_effective_from?: string | null
@@ -2202,19 +2246,54 @@ export type Database = {
           currency?: string | null
           customer_bill_to?: string | null
           customer_id: string
+          customer_po_number?: string | null
           customer_type?: string | null
+          default_advance_rent_months?: number | null
+          default_deposit_amount?: number | null
+          default_price_list_id?: string | null
+          deposit_type?: string | null
           duration_days?: number | null
+          email_invoice_to_contact?: boolean | null
+          grace_period_days?: number | null
           id?: string
+          initial_fees?: Json | null
+          insurance_additional_driver?: boolean | null
+          insurance_coverage_package?: string | null
+          insurance_coverage_summary?: string | null
+          insurance_cross_border?: boolean | null
+          insurance_damage_waiver?: boolean | null
+          insurance_excess_aed?: number | null
+          insurance_glass_tire_cover?: boolean | null
+          insurance_notes?: string | null
+          insurance_pai_enabled?: boolean | null
+          insurance_personal_accident?: boolean | null
+          insurance_territorial_coverage?: string | null
+          insurance_theft_protection?: boolean | null
+          insurance_third_party_liability?: boolean | null
+          invoice_contact_person_id?: string | null
+          invoice_format?: string | null
           items?: Json
+          late_fee_percentage?: number | null
           legal_entity_id?: string | null
           notes?: string | null
           opportunity_id?: string | null
+          payment_instructions?: string | null
+          payment_method?: string | null
+          payment_terms_id?: string | null
+          pickup_customer_site_id?: string | null
+          pickup_location_id?: string | null
+          pickup_type?: string | null
           project?: string | null
+          proration_rule?: string | null
           quote_date?: string | null
           quote_description?: string | null
           quote_entry_date?: string | null
+          quote_items?: Json | null
           quote_number: string
           quote_type?: string | null
+          return_customer_site_id?: string | null
+          return_location_id?: string | null
+          return_type?: string | null
           rfq_id?: string | null
           sales_office_id?: string | null
           sales_rep_id?: string | null
@@ -2225,12 +2304,18 @@ export type Database = {
           updated_at?: string
           valid_until?: string | null
           validity_date_to?: string | null
+          vat_percentage?: number | null
           vehicle_id?: string | null
+          vehicle_type_id?: string | null
           version?: number | null
           win_loss_reason?: string | null
+          withholding_tax_percentage?: number | null
         }
         Update: {
           account_name?: string | null
+          annual_escalation_percentage?: number | null
+          billing_plan?: string | null
+          billing_start_date?: string | null
           business_unit_id?: string | null
           contact_person_id?: string | null
           contract_effective_from?: string | null
@@ -2240,19 +2325,54 @@ export type Database = {
           currency?: string | null
           customer_bill_to?: string | null
           customer_id?: string
+          customer_po_number?: string | null
           customer_type?: string | null
+          default_advance_rent_months?: number | null
+          default_deposit_amount?: number | null
+          default_price_list_id?: string | null
+          deposit_type?: string | null
           duration_days?: number | null
+          email_invoice_to_contact?: boolean | null
+          grace_period_days?: number | null
           id?: string
+          initial_fees?: Json | null
+          insurance_additional_driver?: boolean | null
+          insurance_coverage_package?: string | null
+          insurance_coverage_summary?: string | null
+          insurance_cross_border?: boolean | null
+          insurance_damage_waiver?: boolean | null
+          insurance_excess_aed?: number | null
+          insurance_glass_tire_cover?: boolean | null
+          insurance_notes?: string | null
+          insurance_pai_enabled?: boolean | null
+          insurance_personal_accident?: boolean | null
+          insurance_territorial_coverage?: string | null
+          insurance_theft_protection?: boolean | null
+          insurance_third_party_liability?: boolean | null
+          invoice_contact_person_id?: string | null
+          invoice_format?: string | null
           items?: Json
+          late_fee_percentage?: number | null
           legal_entity_id?: string | null
           notes?: string | null
           opportunity_id?: string | null
+          payment_instructions?: string | null
+          payment_method?: string | null
+          payment_terms_id?: string | null
+          pickup_customer_site_id?: string | null
+          pickup_location_id?: string | null
+          pickup_type?: string | null
           project?: string | null
+          proration_rule?: string | null
           quote_date?: string | null
           quote_description?: string | null
           quote_entry_date?: string | null
+          quote_items?: Json | null
           quote_number?: string
           quote_type?: string | null
+          return_customer_site_id?: string | null
+          return_location_id?: string | null
+          return_type?: string | null
           rfq_id?: string | null
           sales_office_id?: string | null
           sales_rep_id?: string | null
@@ -2263,9 +2383,12 @@ export type Database = {
           updated_at?: string
           valid_until?: string | null
           validity_date_to?: string | null
+          vat_percentage?: number | null
           vehicle_id?: string | null
+          vehicle_type_id?: string | null
           version?: number | null
           win_loss_reason?: string | null
+          withholding_tax_percentage?: number | null
         }
         Relationships: [
           {

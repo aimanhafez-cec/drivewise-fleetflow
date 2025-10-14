@@ -126,6 +126,7 @@ interface QuoteData {
   invoice_contact_person_id?: string;
   payment_method?: string; // bank-transfer, credit-card, cheque, direct-debit
   customer_po_number?: string;
+  payment_instructions?: string;
   
   // 7. Financial Summary (calculated + FX rate)
   fx_rate_type?: string; // corporate, spot, fixed, market
@@ -138,6 +139,13 @@ interface QuoteData {
   insurance_pai_enabled?: boolean;
   insurance_territorial_coverage?: 'uae-only' | 'gcc';
   insurance_coverage_summary?: string;
+  insurance_damage_waiver?: boolean;
+  insurance_theft_protection?: boolean;
+  insurance_third_party_liability?: boolean;
+  insurance_personal_accident?: boolean;
+  insurance_additional_driver?: boolean;
+  insurance_cross_border?: boolean;
+  insurance_notes?: string;
 
   // Legacy pricing fields (keep for backward compatibility)
   items?: Array<{
@@ -278,8 +286,8 @@ export const QuoteWizard: React.FC = () => {
 
   const saveDraftMutation = useMutation({
     mutationFn: async (data: Partial<QuoteData>) => {
-      // Only include fields that actually exist in the quotes table
       const quotePayload: any = {
+        // Step 1 - Header Information
         legal_entity_id: data.legal_entity_id,
         business_unit_id: data.business_unit_id,
         opportunity_id: data.opportunity_id,
@@ -305,6 +313,55 @@ export const QuoteWizard: React.FC = () => {
         items: data.items || [],
         notes: data.notes,
         win_loss_reason: data.win_loss_reason,
+        
+        // Pickup/Return Configuration
+        pickup_type: data.pickup_type,
+        pickup_location_id: data.pickup_location_id,
+        pickup_customer_site_id: data.pickup_customer_site_id,
+        return_type: data.return_type,
+        return_location_id: data.return_location_id,
+        return_customer_site_id: data.return_customer_site_id,
+        
+        // Step 2 - Financial Terms
+        payment_terms_id: data.payment_terms_id,
+        billing_plan: data.billing_plan,
+        billing_start_date: data.billing_start_date,
+        proration_rule: data.proration_rule,
+        default_price_list_id: data.default_price_list_id,
+        annual_escalation_percentage: data.annual_escalation_percentage,
+        vat_percentage: data.vat_percentage,
+        withholding_tax_percentage: data.withholding_tax_percentage,
+        deposit_type: data.deposit_type,
+        default_deposit_amount: data.default_deposit_amount,
+        default_advance_rent_months: data.default_advance_rent_months,
+        initial_fees: data.initial_fees,
+        grace_period_days: data.grace_period_days,
+        late_fee_percentage: data.late_fee_percentage,
+        payment_method: data.payment_method,
+        invoice_format: data.invoice_format,
+        email_invoice_to_contact: data.email_invoice_to_contact,
+        invoice_contact_person_id: data.invoice_contact_person_id,
+        customer_po_number: data.customer_po_number,
+        payment_instructions: data.payment_instructions,
+        
+        // Step 3 - Insurance
+        insurance_coverage_package: data.insurance_coverage_package,
+        insurance_excess_aed: data.insurance_excess_aed,
+        insurance_territorial_coverage: data.insurance_territorial_coverage,
+        insurance_glass_tire_cover: data.insurance_glass_tire_cover,
+        insurance_pai_enabled: data.insurance_pai_enabled,
+        insurance_damage_waiver: data.insurance_damage_waiver,
+        insurance_theft_protection: data.insurance_theft_protection,
+        insurance_third_party_liability: data.insurance_third_party_liability,
+        insurance_personal_accident: data.insurance_personal_accident,
+        insurance_additional_driver: data.insurance_additional_driver,
+        insurance_cross_border: data.insurance_cross_border,
+        insurance_coverage_summary: data.insurance_coverage_summary,
+        insurance_notes: data.insurance_notes,
+        
+        // Step 4 - Vehicles
+        quote_items: data.quote_items,
+        vehicle_type_id: data.vehicle_type_id,
       };
 
       // If no ID exists, INSERT new quote
