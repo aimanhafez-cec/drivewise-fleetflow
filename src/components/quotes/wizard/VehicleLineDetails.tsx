@@ -218,7 +218,7 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
 
   return (
     <div className="space-y-2 max-w-5xl">
-      <Accordion type="multiple" defaultValue={["delivery", "contract", "summary"]} className="w-full">
+      <Accordion type="multiple" defaultValue={[]} className="w-full">
         
         {/* SECTION 1: Delivery & Collection */}
         <AccordionItem value="delivery">
