@@ -4,9 +4,12 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Shield, Info, Wrench } from "lucide-react";
+import { Shield, Info, Wrench, Check, X, Globe, DollarSign, MapPin, User, ChevronDown, ChevronUp, HelpCircle } from "lucide-react";
 import { FormError } from "@/components/ui/form-error";
 import { Switch } from "@/components/ui/switch";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Separator } from "@/components/ui/separator";
 
 interface QuoteWizardStep3InsuranceProps {
   data: any;
@@ -253,42 +256,359 @@ export const QuoteWizardStep3_Insurance: React.FC<QuoteWizardStep3InsuranceProps
         </CardContent>
       </Card>
 
-      {/* Coverage Summary Card */}
-      <Card className="border-primary">
-        <CardHeader>
-          <CardTitle className="text-base">Coverage Summary (Default)</CardTitle>
+      {/* Enhanced Coverage Summary Card */}
+      <Card className="border-primary/50 shadow-lg">
+        <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10">
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Shield className="h-5 w-5 text-primary" />
+            Coverage Summary (Default)
+          </CardTitle>
+          <CardDescription>
+            Comprehensive overview of insurance and protection defaults for all vehicles
+          </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-6 pt-6">
           
-          {/* Auto-generated summary */}
-          <div className="p-3 bg-muted rounded-lg">
-            <p className="text-sm font-medium mb-2">Coverage Description:</p>
-            <p className="text-sm text-muted-foreground">
-              {data.insurance_coverage_summary || 'Configure coverage settings above'}
+          {/* Quick Reference Cards Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Protection Level Card */}
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="p-4 rounded-lg border bg-gradient-to-br from-green-50 to-green-100/50 dark:from-green-950/20 dark:to-green-900/10 border-green-200 dark:border-green-800 hover:shadow-md transition-shadow cursor-help">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Shield className="h-5 w-5 text-green-600 dark:text-green-400" />
+                      <HelpCircle className="h-3 w-3 text-muted-foreground ml-auto" />
+                    </div>
+                    <p className="text-xs text-muted-foreground mb-1">Protection Level</p>
+                    <p className="font-semibold text-sm text-foreground">
+                      {data.insurance_coverage_package === 'cdw' && 'CDW'}
+                      {data.insurance_coverage_package === 'comprehensive' && 'Comprehensive'}
+                      {data.insurance_coverage_package === 'full-zero-excess' && 'Full / Zero Excess'}
+                      {!data.insurance_coverage_package && 'Not Set'}
+                    </p>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="max-w-xs">The level of insurance coverage protecting against damage, theft, and liability</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+
+            {/* Customer Liability Card */}
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="p-4 rounded-lg border bg-gradient-to-br from-amber-50 to-amber-100/50 dark:from-amber-950/20 dark:to-amber-900/10 border-amber-200 dark:border-amber-800 hover:shadow-md transition-shadow cursor-help">
+                    <div className="flex items-center gap-2 mb-2">
+                      <DollarSign className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+                      <HelpCircle className="h-3 w-3 text-muted-foreground ml-auto" />
+                    </div>
+                    <p className="text-xs text-muted-foreground mb-1">Customer Liability</p>
+                    <p className="font-semibold text-sm text-foreground">
+                      {data.insurance_coverage_package === 'full-zero-excess' 
+                        ? 'AED 0' 
+                        : `AED ${data.insurance_excess_aed || 1500}`}
+                    </p>
+                    <p className="text-xs text-muted-foreground">per incident</p>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="max-w-xs">The excess/deductible amount customer pays in case of damage or loss</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+
+            {/* Coverage Area Card */}
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="p-4 rounded-lg border bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-950/20 dark:to-blue-900/10 border-blue-200 dark:border-blue-800 hover:shadow-md transition-shadow cursor-help">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Globe className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                      <HelpCircle className="h-3 w-3 text-muted-foreground ml-auto" />
+                    </div>
+                    <p className="text-xs text-muted-foreground mb-1">Coverage Area</p>
+                    <p className="font-semibold text-sm text-foreground">
+                      {data.insurance_territorial_coverage === 'gcc' ? 'GCC Countries' : 'UAE Only'}
+                    </p>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="max-w-xs">
+                    {data.insurance_territorial_coverage === 'gcc' 
+                      ? 'Coverage extends to Saudi Arabia, Kuwait, Bahrain, Oman, Qatar, and UAE'
+                      : 'Coverage limited to United Arab Emirates only'}
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+
+            {/* Driver Protection Card */}
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="p-4 rounded-lg border bg-gradient-to-br from-purple-50 to-purple-100/50 dark:from-purple-950/20 dark:to-purple-900/10 border-purple-200 dark:border-purple-800 hover:shadow-md transition-shadow cursor-help">
+                    <div className="flex items-center gap-2 mb-2">
+                      <User className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                      <HelpCircle className="h-3 w-3 text-muted-foreground ml-auto" />
+                    </div>
+                    <p className="text-xs text-muted-foreground mb-1">Driver Protection</p>
+                    <p className="font-semibold text-sm text-foreground">
+                      {data.insurance_pai_enabled ? 'PAI Included' : 'Not Included'}
+                    </p>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="max-w-xs">Personal Accident Insurance covers medical expenses for driver and passengers</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+
+          <Separator />
+
+          {/* Coverage Description */}
+          <div className="p-4 bg-gradient-to-r from-muted/50 to-muted rounded-lg border">
+            <p className="text-sm font-semibold mb-3 flex items-center gap-2">
+              <Info className="h-4 w-4 text-primary" />
+              Coverage Description:
+            </p>
+            <p className="text-sm text-foreground leading-relaxed">
+              {data.insurance_coverage_summary || 'Configure coverage settings above to see summary'}
             </p>
           </div>
 
-          {/* Monthly Total (Read-only) */}
-          <div className="flex items-center justify-between p-3 bg-primary/5 rounded-lg border border-primary/20">
-            <div>
-              <p className="text-sm font-semibold">Monthly Insurance Total (All Vehicles)</p>
-              <p className="text-xs text-muted-foreground mt-1">
-                Sum of all vehicle line insurance charges
+          {/* What's Included / Not Included */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* What's Included */}
+            <div className="p-4 rounded-lg border bg-green-50/50 dark:bg-green-950/10 border-green-200 dark:border-green-800">
+              <p className="text-sm font-semibold mb-3 text-green-900 dark:text-green-100 flex items-center gap-2">
+                <Check className="h-4 w-4" />
+                What's Included
               </p>
+              <ul className="space-y-2">
+                <li className="flex items-start gap-2 text-sm">
+                  <Check className="h-4 w-4 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
+                  <span>Collision & Comprehensive Damage</span>
+                </li>
+                <li className="flex items-start gap-2 text-sm">
+                  <Check className="h-4 w-4 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
+                  <span>Third Party Liability (Unlimited)</span>
+                </li>
+                {data.insurance_glass_tire_cover && (
+                  <>
+                    <li className="flex items-start gap-2 text-sm">
+                      <Check className="h-4 w-4 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
+                      <span>Glass & Windscreen Coverage</span>
+                    </li>
+                    <li className="flex items-start gap-2 text-sm">
+                      <Check className="h-4 w-4 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
+                      <span>Tire Damage Coverage</span>
+                    </li>
+                  </>
+                )}
+                {data.insurance_pai_enabled && (
+                  <li className="flex items-start gap-2 text-sm">
+                    <Check className="h-4 w-4 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
+                    <span>Personal Accident Insurance</span>
+                  </li>
+                )}
+                {data.insurance_territorial_coverage === 'gcc' && (
+                  <li className="flex items-start gap-2 text-sm">
+                    <Check className="h-4 w-4 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
+                    <span>GCC Cross-border Coverage</span>
+                  </li>
+                )}
+                <li className="flex items-start gap-2 text-sm">
+                  <Check className="h-4 w-4 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
+                  <span>24/7 Roadside Assistance</span>
+                </li>
+              </ul>
             </div>
-            <div className="text-right">
-              <Badge variant="outline" className="text-base px-3 py-1">
-                {calculateMonthlyTotal().toFixed(2)} AED
-              </Badge>
+
+            {/* What's Not Included */}
+            <div className="p-4 rounded-lg border bg-red-50/50 dark:bg-red-950/10 border-red-200 dark:border-red-800">
+              <p className="text-sm font-semibold mb-3 text-red-900 dark:text-red-100 flex items-center gap-2">
+                <X className="h-4 w-4" />
+                What's Not Included
+              </p>
+              <ul className="space-y-2">
+                {!data.insurance_pai_enabled && (
+                  <li className="flex items-start gap-2 text-sm">
+                    <X className="h-4 w-4 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+                    <span>Personal Accident Insurance <span className="text-xs text-muted-foreground">(Add +AED 50/month)</span></span>
+                  </li>
+                )}
+                {data.insurance_territorial_coverage !== 'gcc' && (
+                  <li className="flex items-start gap-2 text-sm">
+                    <X className="h-4 w-4 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+                    <span>Cross-border GCC Travel <span className="text-xs text-muted-foreground">(Add +AED 150/month)</span></span>
+                  </li>
+                )}
+                {!data.insurance_glass_tire_cover && (
+                  <>
+                    <li className="flex items-start gap-2 text-sm">
+                      <X className="h-4 w-4 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+                      <span>Glass & Windscreen Damage</span>
+                    </li>
+                    <li className="flex items-start gap-2 text-sm">
+                      <X className="h-4 w-4 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+                      <span>Tire Damage or Punctures</span>
+                    </li>
+                  </>
+                )}
+                <li className="flex items-start gap-2 text-sm">
+                  <X className="h-4 w-4 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+                  <span>Mechanical Breakdown <span className="text-xs text-muted-foreground">(See Maintenance section)</span></span>
+                </li>
+                <li className="flex items-start gap-2 text-sm">
+                  <X className="h-4 w-4 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+                  <span>Off-road or Competition Use</span>
+                </li>
+                <li className="flex items-start gap-2 text-sm">
+                  <X className="h-4 w-4 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+                  <span>Intentional Damage or Negligence</span>
+                </li>
+              </ul>
             </div>
           </div>
 
-          {/* Info Banner */}
-          <div className="flex gap-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-            <Info className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
-            <div className="text-sm text-blue-800">
-              <strong>Note:</strong> These are default settings. Each vehicle line in the next step 
-              will inherit these values, but you can customize insurance per vehicle if needed.
+          <Separator />
+
+          {/* Coverage Comparison Table - Collapsible */}
+          <Collapsible>
+            <CollapsibleTrigger className="flex items-center justify-between w-full p-3 hover:bg-muted/50 rounded-lg transition-colors">
+              <span className="text-sm font-semibold flex items-center gap-2">
+                <Info className="h-4 w-4 text-primary" />
+                View Detailed Coverage Comparison
+              </span>
+              <ChevronDown className="h-4 w-4 text-muted-foreground" />
+            </CollapsibleTrigger>
+            <CollapsibleContent className="pt-4">
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left py-2 px-3 font-semibold">Feature</th>
+                      <th className="text-center py-2 px-3 font-semibold">Included</th>
+                      <th className="text-left py-2 px-3 font-semibold">Details</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y">
+                    <tr className="hover:bg-muted/30">
+                      <td className="py-3 px-3">Collision Damage</td>
+                      <td className="text-center py-3 px-3">
+                        <Check className="h-5 w-5 text-green-600 inline-block" />
+                      </td>
+                      <td className="py-3 px-3 text-muted-foreground">Up to vehicle value</td>
+                    </tr>
+                    <tr className="hover:bg-muted/30">
+                      <td className="py-3 px-3">Third Party Liability</td>
+                      <td className="text-center py-3 px-3">
+                        <Check className="h-5 w-5 text-green-600 inline-block" />
+                      </td>
+                      <td className="py-3 px-3 text-muted-foreground">Unlimited coverage</td>
+                    </tr>
+                    <tr className="hover:bg-muted/30">
+                      <td className="py-3 px-3">Glass & Windscreen</td>
+                      <td className="text-center py-3 px-3">
+                        {data.insurance_glass_tire_cover ? (
+                          <Check className="h-5 w-5 text-green-600 inline-block" />
+                        ) : (
+                          <X className="h-5 w-5 text-red-600 inline-block" />
+                        )}
+                      </td>
+                      <td className="py-3 px-3 text-muted-foreground">
+                        {data.insurance_glass_tire_cover ? 'Full coverage' : 'Not included'}
+                      </td>
+                    </tr>
+                    <tr className="hover:bg-muted/30">
+                      <td className="py-3 px-3">Tires</td>
+                      <td className="text-center py-3 px-3">
+                        {data.insurance_glass_tire_cover ? (
+                          <Check className="h-5 w-5 text-green-600 inline-block" />
+                        ) : (
+                          <X className="h-5 w-5 text-red-600 inline-block" />
+                        )}
+                      </td>
+                      <td className="py-3 px-3 text-muted-foreground">
+                        {data.insurance_glass_tire_cover ? 'Full coverage' : 'Not included'}
+                      </td>
+                    </tr>
+                    <tr className="hover:bg-muted/30">
+                      <td className="py-3 px-3">Personal Accident</td>
+                      <td className="text-center py-3 px-3">
+                        {data.insurance_pai_enabled ? (
+                          <Check className="h-5 w-5 text-green-600 inline-block" />
+                        ) : (
+                          <X className="h-5 w-5 text-red-600 inline-block" />
+                        )}
+                      </td>
+                      <td className="py-3 px-3 text-muted-foreground">
+                        {data.insurance_pai_enabled ? 'Driver & passengers' : 'Available as add-on (+AED 50/mo)'}
+                      </td>
+                    </tr>
+                    <tr className="hover:bg-muted/30">
+                      <td className="py-3 px-3">Cross-border Travel</td>
+                      <td className="text-center py-3 px-3">
+                        {data.insurance_territorial_coverage === 'gcc' ? (
+                          <Check className="h-5 w-5 text-green-600 inline-block" />
+                        ) : (
+                          <X className="h-5 w-5 text-red-600 inline-block" />
+                        )}
+                      </td>
+                      <td className="py-3 px-3 text-muted-foreground">
+                        {data.insurance_territorial_coverage === 'gcc' 
+                          ? 'GCC countries included' 
+                          : 'Available as add-on (+AED 150/mo)'}
+                      </td>
+                    </tr>
+                    <tr className="hover:bg-muted/30">
+                      <td className="py-3 px-3">Roadside Assistance</td>
+                      <td className="text-center py-3 px-3">
+                        <Check className="h-5 w-5 text-green-600 inline-block" />
+                      </td>
+                      <td className="py-3 px-3 text-muted-foreground">24/7 emergency support</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
+
+          <Separator />
+
+          {/* Enhanced Monthly Total with Gradient */}
+          <div className="relative overflow-hidden rounded-xl border border-primary/30 bg-gradient-to-br from-primary/10 via-primary/5 to-background p-6">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -z-10" />
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-muted-foreground">Monthly Insurance Total</p>
+                <p className="text-xs text-muted-foreground">
+                  All vehicles • Sum of line insurance charges
+                </p>
+              </div>
+              <div className="text-right">
+                <div className="text-3xl font-bold text-foreground mb-1">
+                  {calculateMonthlyTotal().toFixed(2)} <span className="text-lg font-normal text-muted-foreground">AED</span>
+                </div>
+                <Badge variant="secondary" className="text-xs">
+                  Per vehicle: — <span className="text-muted-foreground ml-1">(add vehicles in step 4)</span>
+                </Badge>
+              </div>
+            </div>
+          </div>
+
+          {/* Smart Info Banner */}
+          <div className="flex gap-3 p-4 bg-gradient-to-r from-blue-50 to-blue-100/50 dark:from-blue-950/20 dark:to-blue-900/10 border border-blue-200 dark:border-blue-800 rounded-lg">
+            <Info className="h-5 w-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+            <div className="text-sm text-blue-900 dark:text-blue-100 space-y-1">
+              <p className="font-semibold">Default Coverage Settings</p>
+              <p className="text-blue-800 dark:text-blue-200">
+                These settings will be inherited by each vehicle line in the next step. 
+                You can customize insurance coverage per vehicle if needed for specific requirements.
+              </p>
             </div>
           </div>
 
@@ -418,41 +738,108 @@ export const QuoteWizardStep3_Insurance: React.FC<QuoteWizardStep3InsuranceProps
         </CardContent>
       </Card>
 
-      {/* Combined Summary Card */}
-      <Card className="border-primary">
-        <CardHeader>
-          <CardTitle className="text-base">Coverage Summary (Default)</CardTitle>
+      {/* Enhanced Combined Summary Card */}
+      <Card className="border-primary/50 shadow-lg bg-gradient-to-br from-background to-muted/20">
+        <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10">
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Shield className="h-5 w-5 text-primary" />
+            Complete Coverage Summary
+          </CardTitle>
+          <CardDescription>
+            Combined overview of insurance and maintenance defaults
+          </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-6 pt-6">
           
-          {/* Insurance Summary */}
-          <div className="p-3 bg-muted rounded-lg">
-            <p className="text-sm font-medium mb-2 flex items-center gap-2">
-              <Shield className="h-4 w-4" />
-              Insurance Coverage:
-            </p>
-            <p className="text-sm text-muted-foreground">
-              {data.insurance_coverage_summary || 'Configure coverage settings above'}
-            </p>
+          {/* Insurance Summary - Enhanced */}
+          <div className="p-4 rounded-xl border bg-gradient-to-br from-green-50/50 to-emerald-50/30 dark:from-green-950/10 dark:to-emerald-950/5 border-green-200 dark:border-green-800">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="p-2 rounded-lg bg-green-100 dark:bg-green-900/30">
+                <Shield className="h-5 w-5 text-green-600 dark:text-green-400" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-green-900 dark:text-green-100">Insurance Coverage</p>
+                <p className="text-xs text-green-700 dark:text-green-300">Default protection settings</p>
+              </div>
+            </div>
+            <div className="pl-11">
+              <p className="text-sm text-foreground leading-relaxed">
+                {data.insurance_coverage_summary || 'Configure insurance coverage above to see summary'}
+              </p>
+            </div>
           </div>
 
-          {/* Maintenance Summary */}
-          <div className="p-3 bg-muted rounded-lg">
-            <p className="text-sm font-medium mb-2 flex items-center gap-2">
-              <Wrench className="h-4 w-4" />
-              Maintenance Coverage:
-            </p>
-            <p className="text-sm text-muted-foreground">
-              {data.maintenance_coverage_summary || 'Configure maintenance settings above'}
-            </p>
+          {/* Maintenance Summary - Enhanced */}
+          <div className="p-4 rounded-xl border bg-gradient-to-br from-amber-50/50 to-orange-50/30 dark:from-amber-950/10 dark:to-orange-950/5 border-amber-200 dark:border-amber-800">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="p-2 rounded-lg bg-amber-100 dark:bg-amber-900/30">
+                <Wrench className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-amber-900 dark:text-amber-100">Maintenance Coverage</p>
+                <p className="text-xs text-amber-700 dark:text-amber-300">Default service settings</p>
+              </div>
+            </div>
+            <div className="pl-11">
+              <p className="text-sm text-foreground leading-relaxed">
+                {data.maintenance_coverage_summary || 'Configure maintenance settings above to see summary'}
+              </p>
+              {data.maintenance_included && data.show_maintenance_separate_line && (
+                <Badge variant="outline" className="mt-2 text-xs">
+                  Shown as separate line item
+                </Badge>
+              )}
+            </div>
           </div>
 
-          {/* Info Banner */}
-          <div className="flex gap-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-            <Info className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
-            <div className="text-sm text-blue-800">
-              <strong>Note:</strong> These are default settings for all vehicles. Each vehicle line in the next step 
-              will inherit these values, but you can customize insurance and maintenance per vehicle if needed.
+          <Separator className="my-4" />
+
+          {/* Summary Stats Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="text-center p-3 rounded-lg bg-muted/50 border">
+              <p className="text-xs text-muted-foreground mb-1">Excess</p>
+              <p className="text-lg font-bold text-foreground">
+                {data.insurance_coverage_package === 'full-zero-excess' ? '0' : (data.insurance_excess_aed || '—')}
+              </p>
+              <p className="text-xs text-muted-foreground">AED</p>
+            </div>
+            <div className="text-center p-3 rounded-lg bg-muted/50 border">
+              <p className="text-xs text-muted-foreground mb-1">Territory</p>
+              <p className="text-sm font-semibold text-foreground">
+                {data.insurance_territorial_coverage === 'gcc' ? 'GCC' : 'UAE'}
+              </p>
+            </div>
+            <div className="text-center p-3 rounded-lg bg-muted/50 border">
+              <p className="text-xs text-muted-foreground mb-1">Glass/Tire</p>
+              <p className="text-sm font-semibold text-foreground">
+                {data.insurance_glass_tire_cover ? (
+                  <Check className="h-5 w-5 text-green-600 inline-block" />
+                ) : (
+                  <X className="h-5 w-5 text-red-600 inline-block" />
+                )}
+              </p>
+            </div>
+            <div className="text-center p-3 rounded-lg bg-muted/50 border">
+              <p className="text-xs text-muted-foreground mb-1">Maintenance</p>
+              <p className="text-sm font-semibold text-foreground">
+                {data.maintenance_included ? (
+                  <Check className="h-5 w-5 text-green-600 inline-block" />
+                ) : (
+                  <X className="h-5 w-5 text-red-600 inline-block" />
+                )}
+              </p>
+            </div>
+          </div>
+
+          {/* Key Info Banner */}
+          <div className="flex gap-3 p-4 bg-gradient-to-r from-blue-50 to-indigo-50/50 dark:from-blue-950/20 dark:to-indigo-950/10 border border-blue-200 dark:border-blue-800 rounded-lg">
+            <Info className="h-5 w-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+            <div className="text-sm text-blue-900 dark:text-blue-100 space-y-1">
+              <p className="font-semibold">Applied to All Vehicles</p>
+              <p className="text-blue-800 dark:text-blue-200">
+                These default settings will be inherited by each vehicle line in Step 4. 
+                You can customize insurance and maintenance per vehicle for specific requirements.
+              </p>
             </div>
           </div>
 
