@@ -157,7 +157,7 @@ const QuickSearch: React.FC = () => {
       >
         <Search className="mr-2 h-4 w-4" />
         Quick Search
-        <span className="ml-2 text-xs text-muted-foreground">Ctrl/⌘+K</span>
+        <span className="ml-2 text-xs text-muted-foreground">Ctrl/Cmd+K</span>
       </Button>
       <Button
         variant="ghost"
