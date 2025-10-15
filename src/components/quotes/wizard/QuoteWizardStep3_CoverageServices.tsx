@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Shield, Info, Wrench, Check, X, ChevronDown, HelpCircle, Package, Gauge } from "lucide-react";
+import { Shield, Info, Wrench, Check, X, ChevronDown, HelpCircle, Package, Gauge, DollarSign } from "lucide-react";
 import { FormError } from "@/components/ui/form-error";
 import { Switch } from "@/components/ui/switch";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -499,6 +499,145 @@ export const QuoteWizardStep3_CoverageServices: React.FC<QuoteWizardStep3Coverag
         </CardContent>
       </Card>
 
+      {/* Toll & Fines Handling Card */}
+      <Card>
+        <CardHeader className="p-4 border-b">
+          <div className="flex items-center gap-2">
+            <DollarSign className="h-4 w-4 text-primary" />
+            <CardTitle className="text-base font-semibold">Toll & Fines Handling</CardTitle>
+            <Badge variant="secondary" className="text-xs ml-auto">Default Settings</Badge>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs">
+                  <p>Configure how Salik/Darb tolls and traffic fines are billed to customers.</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+        </CardHeader>
+        <CardContent className="p-4 space-y-3">
+          
+          {/* UAE Toll Systems Info */}
+          <div className="p-3 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg">
+            <div className="flex gap-2">
+              <Info className="h-4 w-4 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+              <div className="text-xs text-blue-900 dark:text-blue-100">
+                <p className="font-medium mb-1">UAE Toll Systems</p>
+                <p><strong>Salik:</strong> Dubai toll gates (AED 4-8 per crossing)</p>
+                <p><strong>Darb:</strong> Abu Dhabi toll gates (varies by vehicle type)</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Row 1: Toll Handling Type */}
+          <div className="space-y-1.5">
+            <TooltipLabel 
+              label="Toll Handling Type *" 
+              tooltip="Choose how Salik/Darb toll charges are billed. Rebill Actuals: pass through actual toll costs monthly. Fixed Package: charge a flat monthly fee per vehicle. Included: tolls are part of the lease rate."
+            />
+            <Select
+              value={data.salik_darb_handling || "Rebill Actual (monthly)"}
+              onValueChange={(value) => onChange({ 
+                salik_darb_handling: value,
+                // Clear allowance cap if not Fixed Package
+                salik_darb_allowance_cap: value === "Fixed Package per Vehicle" ? data.salik_darb_allowance_cap : undefined
+              })}
+            >
+              <SelectTrigger className="h-9">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Rebill Actual (monthly)">Rebill Actuals (monthly)</SelectItem>
+                <SelectItem value="Fixed Package per Vehicle">Fixed Package per Vehicle</SelectItem>
+                <SelectItem value="Included in Lease Rate">Included in Lease Rate</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Row 2: Fixed Package Amount - Conditional */}
+          {data.salik_darb_handling === "Fixed Package per Vehicle" && (
+            <div className="space-y-1.5 p-3 bg-muted/50 rounded-lg">
+              <TooltipLabel 
+                label="Monthly Toll Package Amount (AED) *" 
+                tooltip="Fixed monthly fee per vehicle covering all toll usage. Typical range: AED 50-150/month depending on usage."
+              />
+              <Input
+                type="number"
+                min="0"
+                step="10"
+                className="h-9"
+                value={data.salik_darb_allowance_cap ?? 100}
+                onChange={(e) => onChange({ salik_darb_allowance_cap: parseFloat(e.target.value) || 0 })}
+                placeholder="100"
+              />
+            </div>
+          )}
+
+          {/* Row 3: Admin Fee Model + Traffic Fines */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <TooltipLabel 
+                label="Admin Fee Model" 
+                tooltip="How administrative fees are charged for toll processing. Per-invoice: one admin fee per monthly invoice. Per-event: fee charged per toll transaction."
+              />
+              <Select
+                value={data.tolls_admin_fee_model || "Per-invoice"}
+                onValueChange={(value) => onChange({ tolls_admin_fee_model: value })}
+              >
+                <SelectTrigger className="h-9">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="None">None - No Admin Fee</SelectItem>
+                  <SelectItem value="Per-event">Per-event (per transaction)</SelectItem>
+                  <SelectItem value="Per-invoice">Per-invoice (monthly)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-1.5">
+              <TooltipLabel 
+                label="Traffic Fines Handling *" 
+                tooltip="How traffic violations are processed and billed to customers. Auto Rebill: automatic billing with admin fee. Customer Direct: customer pays fines directly to RTA."
+              />
+              <Select
+                value={data.traffic_fines_handling || "Auto Rebill + Admin Fee"}
+                onValueChange={(value) => onChange({ traffic_fines_handling: value })}
+              >
+                <SelectTrigger className="h-9">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Auto Rebill + Admin Fee">Auto Rebill + Admin Fee</SelectItem>
+                  <SelectItem value="Customer Pays Direct">Customer Pays Direct</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          {/* Row 4: Admin Fee per Fine */}
+          <div className="space-y-1.5">
+            <TooltipLabel 
+              label="Admin Fee per Fine (AED)" 
+              tooltip="Processing fee charged per traffic violation for administrative handling. Typical: AED 25-50 per fine."
+            />
+            <Input
+              type="number"
+              min="0"
+              step="5"
+              className="h-9"
+              value={data.admin_fee_per_fine_aed ?? 25}
+              onChange={(e) => onChange({ admin_fee_per_fine_aed: parseFloat(e.target.value) || 0 })}
+              placeholder="25"
+            />
+          </div>
+
+        </CardContent>
+      </Card>
+
       {/* Default Add-Ons & Extras Card */}
       <Card>
         <CardHeader className="p-4 border-b">
@@ -706,6 +845,38 @@ export const QuoteWizardStep3_CoverageServices: React.FC<QuoteWizardStep3Coverag
                     ))}
                   </div>
                 )}
+              </div>
+
+              {/* Toll & Fines Details */}
+              <div className="p-3 rounded-lg border bg-muted/30">
+                <p className="text-xs font-semibold mb-2 flex items-center gap-1.5">
+                  <DollarSign className="h-3 w-3" />
+                  Toll & Fines Handling
+                </p>
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Toll Policy:</span>
+                    <span className="font-medium">{data.salik_darb_handling || 'Rebill Actual (monthly)'}</span>
+                  </div>
+                  {data.salik_darb_handling === "Fixed Package per Vehicle" && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-muted-foreground">Fixed Package:</span>
+                      <span className="font-medium">{formatCurrency(data.salik_darb_allowance_cap || 100)}/vehicle/month</span>
+                    </div>
+                  )}
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Admin Fee Model:</span>
+                    <span className="font-medium">{data.tolls_admin_fee_model || 'Per-invoice'}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Traffic Fines:</span>
+                    <span className="font-medium">{data.traffic_fines_handling || 'Auto Rebill + Admin Fee'}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Fine Admin Fee:</span>
+                    <span className="font-medium">{formatCurrency(data.admin_fee_per_fine_aed || 25)}</span>
+                  </div>
+                </div>
               </div>
 
             </CollapsibleContent>

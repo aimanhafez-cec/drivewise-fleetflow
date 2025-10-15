@@ -325,6 +325,42 @@ export const QuoteWizardStep5_Summary: React.FC<QuoteWizardStep4Props> = ({
         </Card>
       )}
 
+      {/* Toll & Fines Policy Summary */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <DollarSign className="h-5 w-5" />
+            Toll & Fines Policy
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <span className="text-muted-foreground">Toll Handling:</span>
+              <p className="font-medium">{data.salik_darb_handling || 'Rebill Actual (monthly)'}</p>
+            </div>
+            {data.salik_darb_handling === "Fixed Package per Vehicle" && (
+              <div>
+                <span className="text-muted-foreground">Fixed Package Amount:</span>
+                <p className="font-medium">{formatCurrency(data.salik_darb_allowance_cap || 100)}/vehicle/month</p>
+              </div>
+            )}
+            <div>
+              <span className="text-muted-foreground">Admin Fee Model:</span>
+              <p className="font-medium">{data.tolls_admin_fee_model || 'Per-invoice'}</p>
+            </div>
+            <div>
+              <span className="text-muted-foreground">Traffic Fines:</span>
+              <p className="font-medium">{data.traffic_fines_handling || 'Auto Rebill + Admin Fee'}</p>
+            </div>
+            <div>
+              <span className="text-muted-foreground">Fine Admin Fee:</span>
+              <p className="font-medium">{formatCurrency(data.admin_fee_per_fine_aed || 25)} per fine</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Financial Terms Summary */}
       <Card>
         <CardHeader>

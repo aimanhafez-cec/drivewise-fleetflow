@@ -179,6 +179,13 @@ interface QuoteData {
   pooled_mileage_allowance_km?: number;
   pooled_excess_km_rate?: number;
 
+  // Toll & Fines Configuration
+  salik_darb_handling?: string;
+  salik_darb_allowance_cap?: number;
+  tolls_admin_fee_model?: string;
+  traffic_fines_handling?: string;
+  admin_fee_per_fine_aed?: number;
+
   // Legacy pricing fields (keep for backward compatibility)
   items?: Array<{
     description: string;
@@ -409,6 +416,13 @@ export const QuoteWizard: React.FC = () => {
         mileage_pooling_enabled: data.mileage_pooling_enabled,
         pooled_mileage_allowance_km: data.pooled_mileage_allowance_km,
         pooled_excess_km_rate: data.pooled_excess_km_rate,
+        
+        // Step 3 - Toll & Fines
+        salik_darb_handling: data.salik_darb_handling,
+        salik_darb_allowance_cap: data.salik_darb_allowance_cap,
+        tolls_admin_fee_model: data.tolls_admin_fee_model,
+        traffic_fines_handling: data.traffic_fines_handling,
+        admin_fee_per_fine_aed: data.admin_fee_per_fine_aed,
         
         // Step 4 - Vehicles
         quote_items: data.quote_items,
