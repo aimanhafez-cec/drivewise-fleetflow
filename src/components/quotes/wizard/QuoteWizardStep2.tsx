@@ -3,6 +3,7 @@ import { addMonths, format as formatDate } from "date-fns";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -171,14 +172,15 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
   return (
     <div className="space-y-6">
       {/* Card 1: Billing & Payment Terms */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Calendar className="h-5 w-5" />
-            Billing & Payment Terms
-          </CardTitle>
+      <Card className="border-l-4 border-l-blue-500 shadow-md">
+        <CardHeader className="p-4 border-b">
+          <div className="flex items-center gap-2">
+            <Calendar className="h-4 w-4 text-primary" />
+            <CardTitle className="text-base font-semibold">Billing & Payment Terms</CardTitle>
+            <Badge variant="secondary" className="text-xs ml-auto">Default Settings</Badge>
+          </div>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="p-4 space-y-3">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="payment_terms_id">Payment Terms *</Label>
@@ -247,14 +249,15 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
       </Card>
 
       {/* Card 2: Tax & Pricing */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Receipt className="h-5 w-5" />
-            Tax & Pricing
-          </CardTitle>
+      <Card className="border-l-4 border-l-green-500 shadow-md">
+        <CardHeader className="p-4 border-b">
+          <div className="flex items-center gap-2">
+            <Receipt className="h-4 w-4 text-primary" />
+            <CardTitle className="text-base font-semibold">Tax & Pricing</CardTitle>
+            <Badge variant="secondary" className="text-xs ml-auto">Default Settings</Badge>
+          </div>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="p-4 space-y-3">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="currency">Currency</Label>
@@ -326,17 +329,18 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
       </Card>
 
       {/* Card 3: Deposits & Advances */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <DollarSign className="h-5 w-5" />
-            Deposits & Advances
-          </CardTitle>
-          <CardDescription className="mt-2">
+      <Card className="border-l-4 border-l-purple-500 shadow-md">
+        <CardHeader className="p-4 border-b">
+          <div className="flex items-center gap-2">
+            <DollarSign className="h-4 w-4 text-primary" />
+            <CardTitle className="text-base font-semibold">Deposits & Advances</CardTitle>
+            <Badge variant="secondary" className="text-xs ml-auto">Default Settings</Badge>
+          </div>
+          <CardDescription className="mt-2 text-sm">
             Security deposit and advance rent collected upfront per vehicle.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="p-4 space-y-3">
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
             <p className="text-sm text-blue-800">
               <strong>Note:</strong> Deposit and advance rent amounts are set per vehicle. 
@@ -430,13 +434,14 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
       </Card>
 
       {/* Card 4: Initial Fees (Editable Grid) */}
-      <Card>
-        <CardHeader>
+      <Card className="border-l-4 border-l-orange-500 shadow-md">
+        <CardHeader className="p-4 border-b">
           <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2">
-              <CreditCard className="h-5 w-5" />
-              Initial Fees
-            </CardTitle>
+            <div className="flex items-center gap-2">
+              <CreditCard className="h-4 w-4 text-primary" />
+              <CardTitle className="text-base font-semibold">Initial Fees</CardTitle>
+              <Badge variant="secondary" className="text-xs">Default Settings</Badge>
+            </div>
             <Button
               type="button"
               variant="outline"
@@ -447,11 +452,11 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
               Add Fee
             </Button>
           </div>
-          <CardDescription className="mt-2">
+          <CardDescription className="mt-2 text-sm">
             One-time setup and administrative charges collected upfront (registration, documentation, processing fees, etc.)
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-4">
           {data.initial_fees && data.initial_fees.length > 0 ? (
             <div className="space-y-4">
               <div className="border rounded-lg overflow-hidden">
@@ -536,14 +541,15 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
       </Card>
 
       {/* Card 5: Late Fee Policy */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <AlertCircle className="h-5 w-5" />
-            Late Fee Policy
-          </CardTitle>
+      <Card className="border-l-4 border-l-red-500 shadow-md">
+        <CardHeader className="p-4 border-b">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="h-4 w-4 text-primary" />
+            <CardTitle className="text-base font-semibold">Late Fee Policy</CardTitle>
+            <Badge variant="secondary" className="text-xs ml-auto">Default Settings</Badge>
+          </div>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="p-4 space-y-3">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="grace_period_days">Grace Period (Days)</Label>
@@ -574,14 +580,15 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
       </Card>
 
       {/* Card 6: Invoice & Payment Settings */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Receipt className="h-5 w-5" />
-            Invoice & Payment Settings
-          </CardTitle>
+      <Card className="border-l-4 border-l-indigo-500 shadow-md">
+        <CardHeader className="p-4 border-b">
+          <div className="flex items-center gap-2">
+            <Receipt className="h-4 w-4 text-primary" />
+            <CardTitle className="text-base font-semibold">Invoice & Payment Settings</CardTitle>
+            <Badge variant="secondary" className="text-xs ml-auto">Default Settings</Badge>
+          </div>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="p-4 space-y-3">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Row 1: Payment Method and Invoice Format */}
             <div className="space-y-2">
@@ -679,14 +686,15 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
       </Card>
 
       {/* Card 7: Financial Summary - Defaults */}
-      <Card className="bg-primary/5 border-primary">
-        <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-2 text-base">
-            <TrendingUp className="h-4 w-4" />
-            Financial Summary - Defaults
-          </CardTitle>
+      <Card className="border-l-4 border-l-primary shadow-md bg-primary/5">
+        <CardHeader className="p-4 border-b border-primary/20">
+          <div className="flex items-center gap-2">
+            <TrendingUp className="h-4 w-4 text-primary" />
+            <CardTitle className="text-base font-semibold">Financial Summary - Defaults</CardTitle>
+            <Badge variant="default" className="text-xs ml-auto">Summary</Badge>
+          </div>
         </CardHeader>
-        <CardContent className="pt-0 pb-4">
+        <CardContent className="p-4">
           <div className="space-y-2">
             <div className="space-y-1">
               <div className="flex justify-between text-sm">
