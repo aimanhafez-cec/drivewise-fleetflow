@@ -366,12 +366,13 @@ export const QuoteWizardStep1: React.FC<QuoteWizardStep1Props> = ({
 
           {/* Row 5: Quote Entry Date, Status & Win/Loss Reason */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="quote_entry_date">Quote Entry Date</Label>
-              <Input
+            <div>
+              <DatePicker
                 id="quote_entry_date"
-                type="date"
+                label="Quote Entry Date"
                 value={data.quote_entry_date || format(new Date(), "yyyy-MM-dd")}
+                onChange={(date) => onChange({ quote_entry_date: date ? format(date, "yyyy-MM-dd") : null })}
+                placeholder="Auto-filled with today's date"
                 disabled
               />
             </div>
