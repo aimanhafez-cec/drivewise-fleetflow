@@ -56,7 +56,7 @@ export const TrainStopStepper: React.FC<TrainStopStepperProps> = ({
                     "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
                     isCompleted && "w-10 h-10 bg-green-600 hover:bg-green-700 cursor-pointer",
                     isCurrent && "w-10 h-10 bg-primary hover:bg-primary/90 cursor-pointer",
-                    isUpcoming && "w-10 h-10 border-2 border-muted-foreground/30 bg-background cursor-not-allowed"
+                    isUpcoming && "w-10 h-10 border-2 border-border bg-muted/30 cursor-not-allowed"
                   )}
                   aria-label={`${step.title} - ${isCompleted ? 'Completed' : isCurrent ? 'Current' : 'Upcoming'}`}
                   aria-current={isCurrent ? 'step' : undefined}
@@ -65,8 +65,8 @@ export const TrainStopStepper: React.FC<TrainStopStepperProps> = ({
                     <Check className="h-5 w-5 text-white" />
                   ) : (
                     <span className={cn(
-                      "text-sm",
-                      isCurrent ? "text-white" : "text-muted-foreground"
+                      "text-sm font-semibold",
+                      isCurrent ? "text-white" : isUpcoming ? "text-foreground" : "text-foreground"
                     )}>
                       {step.id}
                     </span>
@@ -113,15 +113,15 @@ export const TrainStopStepper: React.FC<TrainStopStepperProps> = ({
                     "rounded-full flex items-center justify-center font-semibold flex-shrink-0 transition-all duration-300",
                     isCompleted && "w-8 h-8 bg-green-600",
                     isCurrent && "w-8 h-8 bg-primary",
-                    isUpcoming && "w-8 h-8 border-2 border-muted-foreground/30 bg-background"
+                    isUpcoming && "w-8 h-8 border-2 border-border bg-muted/30"
                   )}
                 >
                   {isCompleted ? (
                     <Check className="h-5 w-5 text-white" />
                   ) : (
                     <span className={cn(
-                      "text-sm",
-                      isCurrent ? "text-white" : "text-muted-foreground"
+                      "text-sm font-semibold",
+                      isCurrent ? "text-white" : "text-foreground"
                     )}>
                       {step.id}
                     </span>
