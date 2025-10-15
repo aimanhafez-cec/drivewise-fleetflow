@@ -9,6 +9,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Eye, User, Building2, Info } from "lucide-react";
 import { format } from "date-fns";
 import { formatDurationInMonthsAndDays } from "@/lib/utils/dateUtils";
+import { DatePicker } from "@/components/ui/date-picker";
 import {
   LegalEntitySelect,
   BusinessUnitSelect,
@@ -424,17 +425,16 @@ export const QuoteWizardStep1: React.FC<QuoteWizardStep1Props> = ({
 
           {/* Row 6: Quote Date, Quote Type & Currency */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="quote_date">Quote Date *</Label>
-              <Input
+            <div>
+              <DatePicker
                 id="quote_date"
-                type="date"
-                value={data.quote_date || ""}
-                onChange={(e) => onChange({ quote_date: e.target.value })}
+                label="Quote Date"
+                required
+                value={data.quote_date}
+                onChange={(date) => onChange({ quote_date: date ? format(date, "yyyy-MM-dd") : null })}
+                placeholder="Select quote date"
+                error={errors.quote_date}
               />
-              {errors.quote_date && (
-                <p className="text-sm text-destructive">{errors.quote_date}</p>
-              )}
             </div>
 
             <div className="space-y-2">
@@ -699,41 +699,37 @@ export const QuoteWizardStep1: React.FC<QuoteWizardStep1Props> = ({
 
           {/* Row 8: Contract Dates & Duration */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="validity_date_to">Validity Date To</Label>
-              <Input
+            <div>
+              <DatePicker
                 id="validity_date_to"
-                type="date"
-                value={data.validity_date_to || ""}
-                onChange={(e) => onChange({ validity_date_to: e.target.value })}
+                label="Validity Date To"
+                value={data.validity_date_to}
+                onChange={(date) => onChange({ validity_date_to: date ? format(date, "yyyy-MM-dd") : null })}
+                placeholder="Select validity date"
+                error={errors.validity_date_to}
               />
-              {errors.validity_date_to && (
-                <p className="text-sm text-destructive">{errors.validity_date_to}</p>
-              )}
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="contract_effective_from">Contract Effective From</Label>
-              <Input
+            <div>
+              <DatePicker
                 id="contract_effective_from"
-                type="date"
-                value={data.contract_effective_from || ""}
-                onChange={(e) => onChange({ contract_effective_from: e.target.value })}
+                label="Contract Effective From"
+                value={data.contract_effective_from}
+                onChange={(date) => onChange({ contract_effective_from: date ? format(date, "yyyy-MM-dd") : null })}
+                placeholder="Select start date"
+                error={errors.contract_effective_from}
+                minDate={data.quote_date ? new Date(data.quote_date) : undefined}
               />
-              {errors.contract_effective_from && (
-                <p className="text-sm text-destructive">{errors.contract_effective_from}</p>
-              )}
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="contract_effective_to">Contract Effective To</Label>
-              <Input
+            <div>
+              <DatePicker
                 id="contract_effective_to"
-                type="date"
-                value={data.contract_effective_to || ""}
-                onChange={(e) => onChange({ contract_effective_to: e.target.value })}
+                label="Contract Effective To"
+                value={data.contract_effective_to}
+                onChange={(date) => onChange({ contract_effective_to: date ? format(date, "yyyy-MM-dd") : null })}
+                placeholder="Select end date"
+                error={errors.contract_effective_to}
+                minDate={data.contract_effective_from ? new Date(data.contract_effective_from) : undefined}
               />
-              {errors.contract_effective_to && (
-                <p className="text-sm text-destructive">{errors.contract_effective_to}</p>
-              )}
             </div>
 
             <div className="space-y-2">
