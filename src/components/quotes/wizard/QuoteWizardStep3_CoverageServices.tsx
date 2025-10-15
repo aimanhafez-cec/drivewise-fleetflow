@@ -155,9 +155,9 @@ export const QuoteWizardStep3_CoverageServices: React.FC<QuoteWizardStep3Coverag
   );
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Insurance Coverage Card - Compact */}
-      <Card>
+      <Card className="border-l-4 border-l-blue-500 shadow-md">
         <CardHeader className="p-4 border-b">
           <div className="flex items-center gap-2">
             <Shield className="h-4 w-4 text-primary" />
@@ -283,7 +283,7 @@ export const QuoteWizardStep3_CoverageServices: React.FC<QuoteWizardStep3Coverag
       </Card>
 
       {/* Maintenance Coverage Card - Compact */}
-      <Card>
+      <Card className="border-l-4 border-l-orange-500 shadow-md">
         <CardHeader className="p-4 border-b">
           <div className="flex items-center gap-2">
             <Wrench className="h-4 w-4 text-primary" />
@@ -401,7 +401,7 @@ export const QuoteWizardStep3_CoverageServices: React.FC<QuoteWizardStep3Coverag
       </Card>
 
       {/* Mileage Configuration Card */}
-      <Card>
+      <Card className="border-l-4 border-l-purple-500 shadow-md">
         <CardHeader className="p-4 border-b">
           <div className="flex items-center gap-2">
             <Gauge className="h-4 w-4 text-primary" />
@@ -500,7 +500,7 @@ export const QuoteWizardStep3_CoverageServices: React.FC<QuoteWizardStep3Coverag
       </Card>
 
       {/* Toll & Fines Handling Card */}
-      <Card>
+      <Card className="border-l-4 border-l-green-500 shadow-md">
         <CardHeader className="p-4 border-b">
           <div className="flex items-center gap-2">
             <DollarSign className="h-4 w-4 text-primary" />
@@ -646,7 +646,7 @@ export const QuoteWizardStep3_CoverageServices: React.FC<QuoteWizardStep3Coverag
       </Card>
 
       {/* Default Add-Ons & Extras Card */}
-      <Card>
+      <Card className="border-l-4 border-l-indigo-500 shadow-md">
         <CardHeader className="p-4 border-b">
           <div className="flex items-center gap-2">
             <Package className="h-4 w-4 text-primary" />
