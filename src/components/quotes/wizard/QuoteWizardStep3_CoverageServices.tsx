@@ -543,7 +543,9 @@ export const QuoteWizardStep3_CoverageServices: React.FC<QuoteWizardStep3Coverag
               onValueChange={(value) => onChange({ 
                 salik_darb_handling: value,
                 // Clear allowance cap if not Fixed Package
-                salik_darb_allowance_cap: value === "Fixed Package per Vehicle" ? data.salik_darb_allowance_cap : undefined
+                salik_darb_allowance_cap: value === "Fixed Package per Vehicle" ? data.salik_darb_allowance_cap : undefined,
+                // Auto-set admin fee to None if Fixed Package or Included
+                tolls_admin_fee_model: (value === "Fixed Package per Vehicle" || value === "Included in Lease Rate") ? "None" : data.tolls_admin_fee_model
               })}
             >
               <SelectTrigger className="h-9">
@@ -578,25 +580,28 @@ export const QuoteWizardStep3_CoverageServices: React.FC<QuoteWizardStep3Coverag
 
           {/* Row 3: Admin Fee Model + Traffic Fines */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <TooltipLabel 
-                label="Admin Fee Model" 
-                tooltip="How administrative fees are charged for toll processing. Per-invoice: one admin fee per monthly invoice. Per-event: fee charged per toll transaction."
-              />
-              <Select
-                value={data.tolls_admin_fee_model || "Per-invoice"}
-                onValueChange={(value) => onChange({ tolls_admin_fee_model: value })}
-              >
-                <SelectTrigger className="h-9">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="None">None - No Admin Fee</SelectItem>
-                  <SelectItem value="Per-event">Per-event (per transaction)</SelectItem>
-                  <SelectItem value="Per-invoice">Per-invoice (monthly)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            {/* Admin Fee Model - Only for Rebill Actuals */}
+            {data.salik_darb_handling === "Rebill Actual (monthly)" && (
+              <div className="space-y-1.5">
+                <TooltipLabel 
+                  label="Admin Fee Model" 
+                  tooltip="How administrative fees are charged for toll processing. Per-invoice: one admin fee per monthly invoice. Per-event: fee charged per toll transaction."
+                />
+                <Select
+                  value={data.tolls_admin_fee_model || "Per-invoice"}
+                  onValueChange={(value) => onChange({ tolls_admin_fee_model: value })}
+                >
+                  <SelectTrigger className="h-9">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="None">None - No Admin Fee</SelectItem>
+                    <SelectItem value="Per-event">Per-event (per transaction)</SelectItem>
+                    <SelectItem value="Per-invoice">Per-invoice (monthly)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
 
             <div className="space-y-1.5">
               <TooltipLabel 
@@ -618,22 +623,24 @@ export const QuoteWizardStep3_CoverageServices: React.FC<QuoteWizardStep3Coverag
             </div>
           </div>
 
-          {/* Row 4: Admin Fee per Fine */}
-          <div className="space-y-1.5">
-            <TooltipLabel 
-              label="Admin Fee per Fine (AED)" 
-              tooltip="Processing fee charged per traffic violation for administrative handling. Typical: AED 25-50 per fine."
-            />
-            <Input
-              type="number"
-              min="0"
-              step="5"
-              className="h-9"
-              value={data.admin_fee_per_fine_aed ?? 25}
-              onChange={(e) => onChange({ admin_fee_per_fine_aed: parseFloat(e.target.value) || 0 })}
-              placeholder="25"
-            />
-          </div>
+          {/* Row 4: Admin Fee per Fine - Only for Auto Rebill */}
+          {data.traffic_fines_handling === "Auto Rebill + Admin Fee" && (
+            <div className="space-y-1.5">
+              <TooltipLabel 
+                label="Admin Fee per Fine (AED)" 
+                tooltip="Processing fee charged per traffic violation for administrative handling. Typical: AED 25-50 per fine."
+              />
+              <Input
+                type="number"
+                min="0"
+                step="5"
+                className="h-9"
+                value={data.admin_fee_per_fine_aed ?? 25}
+                onChange={(e) => onChange({ admin_fee_per_fine_aed: parseFloat(e.target.value) || 0 })}
+                placeholder="25"
+              />
+            </div>
+          )}
 
         </CardContent>
       </Card>
