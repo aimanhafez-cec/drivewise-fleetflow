@@ -2258,6 +2258,7 @@ export type Database = {
           maintenance_included: boolean | null
           maintenance_package_type: string | null
           maintenance_plan_source: string | null
+          mileage_pooling_enabled: boolean | null
           monthly_maintenance_cost_per_vehicle: number | null
           notes: string | null
           opportunity_id: string | null
@@ -2267,6 +2268,8 @@ export type Database = {
           pickup_customer_site_id: string | null
           pickup_location_id: string | null
           pickup_type: string | null
+          pooled_excess_km_rate: number | null
+          pooled_mileage_allowance_km: number | null
           project: string | null
           proration_rule: string | null
           quote_date: string | null
@@ -2344,6 +2347,7 @@ export type Database = {
           maintenance_included?: boolean | null
           maintenance_package_type?: string | null
           maintenance_plan_source?: string | null
+          mileage_pooling_enabled?: boolean | null
           monthly_maintenance_cost_per_vehicle?: number | null
           notes?: string | null
           opportunity_id?: string | null
@@ -2353,6 +2357,8 @@ export type Database = {
           pickup_customer_site_id?: string | null
           pickup_location_id?: string | null
           pickup_type?: string | null
+          pooled_excess_km_rate?: number | null
+          pooled_mileage_allowance_km?: number | null
           project?: string | null
           proration_rule?: string | null
           quote_date?: string | null
@@ -2430,6 +2436,7 @@ export type Database = {
           maintenance_included?: boolean | null
           maintenance_package_type?: string | null
           maintenance_plan_source?: string | null
+          mileage_pooling_enabled?: boolean | null
           monthly_maintenance_cost_per_vehicle?: number | null
           notes?: string | null
           opportunity_id?: string | null
@@ -2439,6 +2446,8 @@ export type Database = {
           pickup_customer_site_id?: string | null
           pickup_location_id?: string | null
           pickup_type?: string | null
+          pooled_excess_km_rate?: number | null
+          pooled_mileage_allowance_km?: number | null
           project?: string | null
           proration_rule?: string | null
           quote_date?: string | null

@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Shield, Info, Wrench, Check, X, ChevronDown, HelpCircle, Package } from "lucide-react";
+import { Shield, Info, Wrench, Check, X, ChevronDown, HelpCircle, Package, Gauge } from "lucide-react";
 import { FormError } from "@/components/ui/form-error";
 import { Switch } from "@/components/ui/switch";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -395,6 +395,105 @@ export const QuoteWizardStep3_CoverageServices: React.FC<QuoteWizardStep3Coverag
                 </div>
               </div>
             </>
+          )}
+
+        </CardContent>
+      </Card>
+
+      {/* Mileage Configuration Card */}
+      <Card>
+        <CardHeader className="p-4 border-b">
+          <div className="flex items-center gap-2">
+            <Gauge className="h-4 w-4 text-primary" />
+            <CardTitle className="text-base font-semibold">Mileage Configuration</CardTitle>
+            <Badge variant="secondary" className="text-xs ml-auto">Default Settings</Badge>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs">
+                  <p>Choose between pooled mileage (shared across all vehicles) or individual mileage per vehicle.</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+        </CardHeader>
+        <CardContent className="p-4 space-y-3">
+          
+          {/* Enable Mileage Pooling Toggle */}
+          <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+            <div className="flex-1">
+              <Label htmlFor="mileage_pooling" className="text-sm font-medium cursor-pointer">
+                Enable Mileage Pooling
+              </Label>
+              <p className="text-xs text-muted-foreground mt-1">
+                Share total mileage allowance across all vehicles instead of per-vehicle limits
+              </p>
+            </div>
+            <Switch
+              id="mileage_pooling"
+              checked={data.mileage_pooling_enabled || false}
+              onCheckedChange={(checked) => {
+                onChange({ 
+                  mileage_pooling_enabled: checked,
+                  pooled_mileage_allowance_km: checked ? (data.pooled_mileage_allowance_km || 30000) : undefined,
+                  pooled_excess_km_rate: checked ? (data.pooled_excess_km_rate || 1.00) : undefined,
+                });
+              }}
+            />
+          </div>
+
+          {/* Pooled Mileage Details - Conditional */}
+          {data.mileage_pooling_enabled && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+              <div className="space-y-1.5">
+                <TooltipLabel 
+                  label="Total Fleet Mileage Allowance (km/month) *" 
+                  tooltip="Total kilometers shared across all vehicles per month. Example: 10 vehicles × 3,000 km = 30,000 km pool."
+                />
+                <Input
+                  type="number"
+                  min="0"
+                  step="1000"
+                  className="h-9"
+                  value={data.pooled_mileage_allowance_km ?? 30000}
+                  onChange={(e) => onChange({ pooled_mileage_allowance_km: parseInt(e.target.value) || 0 })}
+                  placeholder="30000"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Shared across all {(data.quote_items || []).length || 0} vehicle(s)
+                </p>
+              </div>
+
+              <div className="space-y-1.5">
+                <TooltipLabel 
+                  label="Excess Rate (AED/km) *" 
+                  tooltip="Charge per kilometer when the total pooled allowance is exceeded."
+                />
+                <Input
+                  type="number"
+                  min="0"
+                  step="0.10"
+                  className="h-9"
+                  value={data.pooled_excess_km_rate ?? 1.00}
+                  onChange={(e) => onChange({ pooled_excess_km_rate: parseFloat(e.target.value) || 0 })}
+                  placeholder="1.00"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Info Banner */}
+          {!data.mileage_pooling_enabled && (
+            <div className="p-3 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg">
+              <div className="flex gap-2">
+                <Info className="h-4 w-4 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+                <p className="text-xs text-blue-900 dark:text-blue-100">
+                  When disabled, each vehicle will have its own mileage allowance configured in Step 4.
+                </p>
+              </div>
+            </div>
           )}
 
         </CardContent>

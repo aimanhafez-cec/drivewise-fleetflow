@@ -174,6 +174,11 @@ interface QuoteData {
   }>;
   default_addons_summary?: string;
 
+  // Mileage Pooling Configuration
+  mileage_pooling_enabled?: boolean;
+  pooled_mileage_allowance_km?: number;
+  pooled_excess_km_rate?: number;
+
   // Legacy pricing fields (keep for backward compatibility)
   items?: Array<{
     description: string;
@@ -399,6 +404,11 @@ export const QuoteWizard: React.FC = () => {
         
         // Step 3 - Add-Ons
         default_addons: data.default_addons,
+        
+        // Step 3 - Mileage Pooling
+        mileage_pooling_enabled: data.mileage_pooling_enabled,
+        pooled_mileage_allowance_km: data.pooled_mileage_allowance_km,
+        pooled_excess_km_rate: data.pooled_excess_km_rate,
         
         // Step 4 - Vehicles
         quote_items: data.quote_items,

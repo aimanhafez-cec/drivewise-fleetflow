@@ -86,8 +86,9 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
       return_customer_site_id: data.return_customer_site_id,
       delivery_fee: data.default_delivery_fee || 0,
       collection_fee: data.default_collection_fee || 0,
-      mileage_package_km: 3000,
-      excess_km_rate: 1.00,
+      // Only set mileage fields if pooling is disabled
+      mileage_package_km: data.mileage_pooling_enabled ? undefined : 3000,
+      excess_km_rate: data.mileage_pooling_enabled ? undefined : 1.00,
       rate_type: 'monthly' as const,
       lease_term_months: undefined,
       end_date: undefined,
@@ -303,6 +304,9 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
                     maintenance_plan_source: data.maintenance_plan_source,
                     show_maintenance_separate_line: data.show_maintenance_separate_line,
                     default_addons: data.default_addons,
+                    mileage_pooling_enabled: data.mileage_pooling_enabled,
+                    pooled_mileage_allowance_km: data.pooled_mileage_allowance_km,
+                    pooled_excess_km_rate: data.pooled_excess_km_rate,
                   }}
         />
 

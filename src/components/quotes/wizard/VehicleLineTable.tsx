@@ -48,6 +48,9 @@ interface VehicleLineTableProps {
       amount: number;
     }>;
     customer_id?: string;
+    mileage_pooling_enabled?: boolean;
+    pooled_mileage_allowance_km?: number;
+    pooled_excess_km_rate?: number;
   };
 }
 

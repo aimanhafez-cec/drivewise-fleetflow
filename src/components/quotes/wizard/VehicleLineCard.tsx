@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Trash2, Car, Edit, X } from "lucide-react";
+import { Trash2, Car, Edit, X, Info } from "lucide-react";
 import { useVehicles, useVehicleCategories } from "@/hooks/useVehicles";
 import { useLocations } from "@/hooks/useBusinessLOVs";
 import { FormError } from "@/components/ui/form-error";
@@ -51,6 +51,11 @@ interface VehicleLineCardProps {
   onRemove: () => void;
   errors: Record<string, string>;
   depositType: string;
+  headerDefaults?: {
+    mileage_pooling_enabled?: boolean;
+    pooled_mileage_allowance_km?: number;
+    pooled_excess_km_rate?: number;
+  };
 }
 
 export const VehicleLineCard: React.FC<VehicleLineCardProps> = ({
@@ -59,6 +64,7 @@ export const VehicleLineCard: React.FC<VehicleLineCardProps> = ({
   onRemove,
   errors,
   depositType,
+  headerDefaults = {},
 }) => {
   const [vehicleModalOpen, setVehicleModalOpen] = useState(false);
   
@@ -366,43 +372,62 @@ export const VehicleLineCard: React.FC<VehicleLineCardProps> = ({
         </div>
 
         {/* SECTION 4: Mileage & Usage */}
-        <div className="mb-6">
-          <h4 className="text-sm font-semibold mb-3 text-muted-foreground">Mileage Package</h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            
-            {/* Mileage Package */}
-            <div className="space-y-2">
-              <Label htmlFor={`mileage_${line.line_no}`}>Included KM / Month *</Label>
-              <Input
-                id={`mileage_${line.line_no}`}
-                type="number"
-                min="0"
-                step="500"
-                value={line.mileage_package_km || 3000}
-                onChange={(e) => onUpdate('mileage_package_km', parseInt(e.target.value) || 0)}
-                placeholder="3000"
-              />
-              <p className="text-xs text-muted-foreground">Standard package: 3,000 km/month</p>
-              {errors[`${linePrefix}_mileage`] && <FormError message={errors[`${linePrefix}_mileage`]} />}
-            </div>
+        {!headerDefaults?.mileage_pooling_enabled && (
+          <div className="mb-6">
+            <h4 className="text-sm font-semibold mb-3 text-muted-foreground">Mileage Package</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              
+              {/* Mileage Package */}
+              <div className="space-y-2">
+                <Label htmlFor={`mileage_${line.line_no}`}>Included KM / Month *</Label>
+                <Input
+                  id={`mileage_${line.line_no}`}
+                  type="number"
+                  min="0"
+                  step="500"
+                  value={line.mileage_package_km || 3000}
+                  onChange={(e) => onUpdate('mileage_package_km', parseInt(e.target.value) || 0)}
+                  placeholder="3000"
+                />
+                <p className="text-xs text-muted-foreground">Standard package: 3,000 km/month</p>
+                {errors[`${linePrefix}_mileage`] && <FormError message={errors[`${linePrefix}_mileage`]} />}
+              </div>
 
-            {/* Excess KM Rate */}
-            <div className="space-y-2">
-              <Label htmlFor={`excess_${line.line_no}`}>Excess KM Rate (AED/km) *</Label>
-              <Input
-                id={`excess_${line.line_no}`}
-                type="number"
-                min="0"
-                step="0.10"
-                value={line.excess_km_rate || 1.00}
-                onChange={(e) => onUpdate('excess_km_rate', parseFloat(e.target.value) || 0)}
-                placeholder="1.00"
-              />
-              <p className="text-xs text-muted-foreground">Charge per km over allowance</p>
-              {errors[`${linePrefix}_excess_km`] && <FormError message={errors[`${linePrefix}_excess_km`]} />}
+              {/* Excess KM Rate */}
+              <div className="space-y-2">
+                <Label htmlFor={`excess_${line.line_no}`}>Excess KM Rate (AED/km) *</Label>
+                <Input
+                  id={`excess_${line.line_no}`}
+                  type="number"
+                  min="0"
+                  step="0.10"
+                  value={line.excess_km_rate || 1.00}
+                  onChange={(e) => onUpdate('excess_km_rate', parseFloat(e.target.value) || 0)}
+                  placeholder="1.00"
+                />
+                <p className="text-xs text-muted-foreground">Charge per km over allowance</p>
+                {errors[`${linePrefix}_excess_km`] && <FormError message={errors[`${linePrefix}_excess_km`]} />}
+              </div>
             </div>
           </div>
-        </div>
+        )}
+
+        {/* Pooled Mileage Info Banner */}
+        {headerDefaults?.mileage_pooling_enabled && (
+          <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg">
+            <div className="flex items-center gap-2">
+              <Info className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+              <div>
+                <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                  Mileage Pooling Enabled
+                </p>
+                <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
+                  Using shared fleet allowance: <strong>{headerDefaults.pooled_mileage_allowance_km?.toLocaleString() || 0} km/month</strong> @ <strong>{headerDefaults.pooled_excess_km_rate || 0} AED/km</strong> excess rate
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* SECTION 5: Financials (Deposit & Advance) */}
         <div className="mb-6">

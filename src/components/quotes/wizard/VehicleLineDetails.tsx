@@ -51,6 +51,9 @@ interface VehicleLineDetailsProps {
       description: string;
       amount: number;
     }>;
+    mileage_pooling_enabled?: boolean;
+    pooled_mileage_allowance_km?: number;
+    pooled_excess_km_rate?: number;
   };
 }
 
@@ -749,51 +752,70 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
         </AccordionItem>
 
         {/* SECTION 3: Mileage Package */}
-        <AccordionItem value="mileage">
-          <AccordionTrigger className="hover:bg-muted/50 px-4 py-3">
-            <div className="flex items-center gap-2">
-              <Gauge className="h-4 w-4 text-primary" />
-              <span className="font-semibold">Mileage Package</span>
-              <span className="text-sm text-muted-foreground ml-2">
-                {line.mileage_package_km || 3000} km/month
-              </span>
+        {!headerDefaults?.mileage_pooling_enabled && (
+          <AccordionItem value="mileage">
+            <AccordionTrigger className="hover:bg-muted/50 px-4 py-3">
+              <div className="flex items-center gap-2">
+                <Gauge className="h-4 w-4 text-primary" />
+                <span className="font-semibold">Mileage Package</span>
+                <span className="text-sm text-muted-foreground ml-2">
+                  {line.mileage_package_km || 3000} km/month
+                </span>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="px-4 pb-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            
+            <div className="space-y-2">
+              <Label htmlFor={`mileage_${line.line_no}`}>Included KM / Month *</Label>
+              <Input
+                id={`mileage_${line.line_no}`}
+                type="number"
+                min="0"
+                step="500"
+                value={line.mileage_package_km || 3000}
+                onChange={(e) => onUpdate('mileage_package_km', parseInt(e.target.value) || 0)}
+                placeholder="3000"
+              />
+              <p className="text-xs text-muted-foreground">Standard: 3,000 km/month</p>
+              {errors[`${linePrefix}_mileage`] && <FormError message={errors[`${linePrefix}_mileage`]} />}
             </div>
-          </AccordionTrigger>
-          <AccordionContent className="px-4 pb-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          
-          <div className="space-y-2">
-            <Label htmlFor={`mileage_${line.line_no}`}>Included KM / Month *</Label>
-            <Input
-              id={`mileage_${line.line_no}`}
-              type="number"
-              min="0"
-              step="500"
-              value={line.mileage_package_km || 3000}
-              onChange={(e) => onUpdate('mileage_package_km', parseInt(e.target.value) || 0)}
-              placeholder="3000"
-            />
-            <p className="text-xs text-muted-foreground">Standard: 3,000 km/month</p>
-            {errors[`${linePrefix}_mileage`] && <FormError message={errors[`${linePrefix}_mileage`]} />}
-          </div>
 
-          <div className="space-y-2">
-            <Label htmlFor={`excess_${line.line_no}`}>Excess KM Rate (AED/km) *</Label>
-            <Input
-              id={`excess_${line.line_no}`}
-              type="number"
-              min="0"
-              step="0.10"
-              value={line.excess_km_rate || 1.00}
-              onChange={(e) => onUpdate('excess_km_rate', parseFloat(e.target.value) || 0)}
-              placeholder="1.00"
-            />
-            <p className="text-xs text-muted-foreground">Charge per km over allowance</p>
-            {errors[`${linePrefix}_excess_km`] && <FormError message={errors[`${linePrefix}_excess_km`]} />}
-          </div>
+            <div className="space-y-2">
+              <Label htmlFor={`excess_${line.line_no}`}>Excess KM Rate (AED/km) *</Label>
+              <Input
+                id={`excess_${line.line_no}`}
+                type="number"
+                min="0"
+                step="0.10"
+                value={line.excess_km_rate || 1.00}
+                onChange={(e) => onUpdate('excess_km_rate', parseFloat(e.target.value) || 0)}
+                placeholder="1.00"
+              />
+              <p className="text-xs text-muted-foreground">Charge per km over allowance</p>
+              {errors[`${linePrefix}_excess_km`] && <FormError message={errors[`${linePrefix}_excess_km`]} />}
             </div>
-          </AccordionContent>
-        </AccordionItem>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        )}
+
+        {/* Pooled Mileage Info Badge */}
+        {headerDefaults?.mileage_pooling_enabled && (
+          <div className="px-4 py-3 bg-blue-50 dark:bg-blue-950/30 border-y">
+            <div className="flex items-center gap-2">
+              <Gauge className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+              <div className="flex-1">
+                <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                  Mileage Pooling Enabled
+                </p>
+                <p className="text-xs text-blue-700 dark:text-blue-300 mt-0.5">
+                  Using shared fleet allowance: {headerDefaults.pooled_mileage_allowance_km?.toLocaleString()} km/month @ {headerDefaults.pooled_excess_km_rate} AED/km excess
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* SECTION 4: Deposit & Advance Rent */}
         <AccordionItem value="deposit">
