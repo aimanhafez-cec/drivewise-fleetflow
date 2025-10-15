@@ -43,7 +43,7 @@ export const TrainStopStepper: React.FC<TrainStopStepperProps> = ({
             const isCompleted = completedSteps.includes(step.id);
             const isCurrent = step.id === currentStep;
             const isUpcoming = step.id > currentStep;
-            const isClickable = step.id <= currentStep || completedSteps.includes(step.id);
+            const isClickable = step.id === currentStep || (step.id < currentStep && completedSteps.includes(step.id));
 
             return (
               <div key={step.id} className="flex flex-col items-center relative z-20 w-28">
@@ -94,7 +94,7 @@ export const TrainStopStepper: React.FC<TrainStopStepperProps> = ({
           const isCompleted = completedSteps.includes(step.id);
           const isCurrent = step.id === currentStep;
           const isUpcoming = step.id > currentStep;
-          const isClickable = step.id <= currentStep || completedSteps.includes(step.id);
+          const isClickable = step.id === currentStep || (step.id < currentStep && completedSteps.includes(step.id));
 
           return (
             <div key={step.id} className="relative">
