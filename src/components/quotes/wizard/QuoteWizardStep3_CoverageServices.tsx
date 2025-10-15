@@ -524,10 +524,12 @@ export const QuoteWizardStep3_CoverageServices: React.FC<QuoteWizardStep3Coverag
           <div className="p-3 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg">
             <div className="flex gap-2">
               <Info className="h-4 w-4 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
-              <div className="text-xs text-blue-900 dark:text-blue-100">
-                <p className="font-medium mb-1">UAE Toll Systems</p>
-                <p><strong>Salik:</strong> Dubai toll gates (AED 4-8 per crossing)</p>
-                <p><strong>Darb:</strong> Abu Dhabi toll gates (varies by vehicle type)</p>
+              <div className="text-xs text-blue-900 dark:text-blue-100 space-y-2">
+                <p className="font-medium">UAE Toll Systems & Handling Options</p>
+                <p><strong>Salik (Dubai):</strong> AED 4-8 per gate crossing | <strong>Darb (Abu Dhabi):</strong> Variable by location</p>
+                <p><strong>Rebill Actuals:</strong> Most common - customer pays exact charges + optional admin fee</p>
+                <p><strong>Included Allowance:</strong> Corporate leases - include up to cap/month, excess rebilled</p>
+                <p><strong>Included in Lease Rate:</strong> Estimated toll cost built into monthly rate (long-term only)</p>
               </div>
             </div>
           </div>
@@ -536,16 +538,16 @@ export const QuoteWizardStep3_CoverageServices: React.FC<QuoteWizardStep3Coverag
           <div className="space-y-1.5">
             <TooltipLabel 
               label="Toll Handling Type *" 
-              tooltip="Choose how Salik/Darb toll charges are billed. Rebill Actuals: pass through actual toll costs monthly. Fixed Package: charge a flat monthly fee per vehicle. Included: tolls are part of the lease rate."
+              tooltip="Choose how Salik/Darb toll charges are billed. Rebill Actuals: pass through actual toll costs monthly. Included Allowance: cap included per vehicle, excess rebilled. Included: tolls are part of the lease rate."
             />
             <Select
               value={data.salik_darb_handling || "Rebill Actual (monthly)"}
               onValueChange={(value) => onChange({ 
                 salik_darb_handling: value,
-                // Clear allowance cap if not Fixed Package
-                salik_darb_allowance_cap: value === "Fixed Package per Vehicle" ? data.salik_darb_allowance_cap : undefined,
-                // Auto-set admin fee to None if Fixed Package or Included
-                tolls_admin_fee_model: (value === "Fixed Package per Vehicle" || value === "Included in Lease Rate") ? "None" : data.tolls_admin_fee_model
+                // Clear allowance cap if not Included Allowance
+                salik_darb_allowance_cap: value === "Included Allowance" ? data.salik_darb_allowance_cap : undefined,
+                // Auto-set admin fee to None if Included Allowance or Included in Lease Rate
+                tolls_admin_fee_model: (value === "Included Allowance" || value === "Included in Lease Rate") ? "None" : data.tolls_admin_fee_model
               })}
             >
               <SelectTrigger className="h-9">
@@ -553,27 +555,27 @@ export const QuoteWizardStep3_CoverageServices: React.FC<QuoteWizardStep3Coverag
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="Rebill Actual (monthly)">Rebill Actuals (monthly)</SelectItem>
-                <SelectItem value="Fixed Package per Vehicle">Fixed Package per Vehicle</SelectItem>
+                <SelectItem value="Included Allowance">Included Allowance (cap/month)</SelectItem>
                 <SelectItem value="Included in Lease Rate">Included in Lease Rate</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          {/* Row 2: Fixed Package Amount - Conditional */}
-          {data.salik_darb_handling === "Fixed Package per Vehicle" && (
+          {/* Row 2: Allowance Cap - Conditional */}
+          {data.salik_darb_handling === "Included Allowance" && (
             <div className="space-y-1.5 p-3 bg-muted/50 rounded-lg">
               <TooltipLabel 
-                label="Monthly Toll Package Amount (AED) *" 
-                tooltip="Fixed monthly fee per vehicle covering all toll usage. Typical range: AED 50-150/month depending on usage."
+                label="Monthly Allowance Cap (AED) *" 
+                tooltip="Maximum toll charges included per vehicle per month. Any usage above this cap will be rebilled to customer. Typical range: AED 100-300/month for corporate leases."
               />
               <Input
                 type="number"
                 min="0"
                 step="10"
                 className="h-9"
-                value={data.salik_darb_allowance_cap ?? 100}
+                value={data.salik_darb_allowance_cap ?? 150}
                 onChange={(e) => onChange({ salik_darb_allowance_cap: parseFloat(e.target.value) || 0 })}
-                placeholder="100"
+                placeholder="150"
               />
             </div>
           )}

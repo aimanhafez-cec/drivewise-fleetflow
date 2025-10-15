@@ -196,8 +196,7 @@ export const RENEWAL_OPTIONS = [
 
 export const SALIK_DARB_HANDLING = [
   { id: 'Rebill Actual (monthly)', label: 'Rebill Actual (monthly)' },
-  { id: 'Included Allowance', label: 'Included Allowance (cap/month)' },
-  { id: 'Customer Direct', label: 'Customer Direct Payment' }
+  { id: 'Included Allowance', label: 'Included Allowance (cap/month)' }
 ];
 
 export const TOLLS_ADMIN_FEE_MODELS = [
