@@ -452,7 +452,7 @@ export const QuoteWizardStep3_CoverageServices: React.FC<QuoteWizardStep3Coverag
         <CardContent className="p-4 space-y-3">
           
           {/* Quick Stats Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
             <div className="p-3 rounded-lg border bg-gradient-to-br from-green-50 to-green-100/50 dark:from-green-950/20 dark:to-green-900/10 border-green-200 dark:border-green-800">
               <p className="text-xs text-muted-foreground mb-1">Excess</p>
               <p className="text-lg font-bold text-foreground">
@@ -479,6 +479,13 @@ export const QuoteWizardStep3_CoverageServices: React.FC<QuoteWizardStep3Coverag
               <p className="text-xs text-muted-foreground mb-1">Maintenance</p>
               <p className="text-lg font-bold text-foreground">
                 {data.maintenance_included ? <Check className="h-5 w-5 inline" /> : <X className="h-5 w-5 inline" />}
+              </p>
+            </div>
+
+            <div className="p-3 rounded-lg border bg-gradient-to-br from-indigo-50 to-indigo-100/50 dark:from-indigo-950/20 dark:to-indigo-900/10 border-indigo-200 dark:border-indigo-800">
+              <p className="text-xs text-muted-foreground mb-1">Add-Ons</p>
+              <p className="text-lg font-bold text-foreground">
+                {(data.default_addons || []).length}
               </p>
             </div>
           </div>
@@ -574,6 +581,31 @@ export const QuoteWizardStep3_CoverageServices: React.FC<QuoteWizardStep3Coverag
                   <p className="text-xs text-muted-foreground mt-1">
                     Cost: AED {data.monthly_maintenance_cost_per_vehicle}/vehicle/month
                   </p>
+                )}
+              </div>
+
+              {/* Add-Ons Details */}
+              <div className="p-3 rounded-lg border bg-muted/30">
+                <p className="text-xs font-semibold mb-2 flex items-center gap-1.5">
+                  <Package className="h-3 w-3" />
+                  Default Add-Ons & Extras
+                </p>
+                <p className="text-sm text-foreground">
+                  {data.default_addons_summary || 'No add-ons selected'}
+                </p>
+                {data.default_addons && data.default_addons.length > 0 && (
+                  <div className="mt-2 space-y-1">
+                    {data.default_addons.map((addon: AddOnLine, idx: number) => (
+                      <div key={idx} className="flex items-center justify-between text-xs">
+                        <span className="text-muted-foreground">
+                          {addon.item_name} ({addon.pricing_model})
+                        </span>
+                        <span className="font-medium">
+                          {formatCurrency(addon.total)}{addon.pricing_model === 'monthly' ? '/mo' : ''}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
                 )}
               </div>
 
