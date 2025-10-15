@@ -107,7 +107,6 @@ export const CarSubscriptionStep6: React.FC<CarSubscriptionStep6Props> = ({ form
                 </FormControl>
                 <SelectContent>
                   <SelectItem value="Auto Rebill + Admin Fee">Auto Rebill + Admin Fee</SelectItem>
-                  <SelectItem value="Customer Pays Direct">Customer Pays Direct (not advised)</SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />

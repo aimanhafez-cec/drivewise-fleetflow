@@ -606,7 +606,7 @@ export const QuoteWizardStep3_CoverageServices: React.FC<QuoteWizardStep3Coverag
             <div className="space-y-1.5">
               <TooltipLabel 
                 label="Traffic Fines Handling *" 
-                tooltip="How traffic violations are processed and billed to customers. Auto Rebill: automatic billing with admin fee. Customer Direct: customer pays fines directly to RTA."
+                tooltip="How traffic violations are processed and billed to customers. Company handles all fines and bills customer with processing admin fee."
               />
               <Select
                 value={data.traffic_fines_handling || "Auto Rebill + Admin Fee"}
@@ -615,32 +615,29 @@ export const QuoteWizardStep3_CoverageServices: React.FC<QuoteWizardStep3Coverag
                 <SelectTrigger className="h-9">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Auto Rebill + Admin Fee">Auto Rebill + Admin Fee</SelectItem>
-                  <SelectItem value="Customer Pays Direct">Customer Pays Direct</SelectItem>
-                </SelectContent>
+                  <SelectContent>
+                    <SelectItem value="Auto Rebill + Admin Fee">Auto Rebill + Admin Fee</SelectItem>
+                  </SelectContent>
               </Select>
             </div>
           </div>
 
-          {/* Row 4: Admin Fee per Fine - Only for Auto Rebill */}
-          {data.traffic_fines_handling === "Auto Rebill + Admin Fee" && (
-            <div className="space-y-1.5">
-              <TooltipLabel 
-                label="Admin Fee per Fine (AED)" 
-                tooltip="Processing fee charged per traffic violation for administrative handling. Typical: AED 25-50 per fine."
-              />
-              <Input
-                type="number"
-                min="0"
-                step="5"
-                className="h-9"
-                value={data.admin_fee_per_fine_aed ?? 25}
-                onChange={(e) => onChange({ admin_fee_per_fine_aed: parseFloat(e.target.value) || 0 })}
-                placeholder="25"
-              />
-            </div>
-          )}
+          {/* Row 4: Admin Fee per Fine - Always visible since Auto Rebill is the only option */}
+          <div className="space-y-1.5">
+            <TooltipLabel 
+              label="Admin Fee per Fine (AED)" 
+              tooltip="Processing fee charged per traffic violation for administrative handling. Typical: AED 25-50 per fine."
+            />
+            <Input
+              type="number"
+              min="0"
+              step="5"
+              className="h-9"
+              value={data.admin_fee_per_fine_aed ?? 25}
+              onChange={(e) => onChange({ admin_fee_per_fine_aed: parseFloat(e.target.value) || 0 })}
+              placeholder="25"
+            />
+          </div>
 
         </CardContent>
       </Card>

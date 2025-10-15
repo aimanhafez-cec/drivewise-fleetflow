@@ -207,8 +207,7 @@ export const TOLLS_ADMIN_FEE_MODELS = [
 ];
 
 export const TRAFFIC_FINES_HANDLING = [
-  { id: 'Auto Rebill + Admin Fee', label: 'Auto Rebill + Admin Fee' },
-  { id: 'Customer Direct', label: 'Customer Direct Payment' }
+  { id: 'Auto Rebill + Admin Fee', label: 'Auto Rebill + Admin Fee' }
 ];
 
 export const FUEL_HANDLING = [

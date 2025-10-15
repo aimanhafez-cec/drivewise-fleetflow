@@ -77,26 +77,24 @@ export const CorporateLeasingStep5: React.FC<CorporateLeasingStep5Props> = ({ fo
           )}
         />
 
-        {trafficFinesHandling === 'Auto Rebill + Admin Fee' && (
-          <FormField
-            control={form.control}
-            name="admin_fee_per_fine_aed"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Admin Fee per Fine (AED)</FormLabel>
-                <FormControl>
-                  <Input 
-                    type="number" 
-                    {...field} 
-                    onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
-                    placeholder="Enter admin fee amount..." 
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        )}
+        <FormField
+          control={form.control}
+          name="admin_fee_per_fine_aed"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Admin Fee per Fine (AED)</FormLabel>
+              <FormControl>
+                <Input 
+                  type="number" 
+                  {...field} 
+                  onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
+                  placeholder="Enter admin fee amount..." 
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         <FormField
           control={form.control}
@@ -130,9 +128,8 @@ export const CorporateLeasingStep5: React.FC<CorporateLeasingStep5Props> = ({ fo
       <div className="bg-red-50 dark:bg-red-950/20 p-4 rounded-lg border border-red-200 dark:border-red-800">
         <h4 className="font-medium text-red-900 dark:text-red-100 mb-2">Traffic Fines Management</h4>
         <div className="text-sm text-red-800 dark:text-red-200 space-y-2">
-          <p><strong>Auto Rebill:</strong> Lessor pays fines and charges customer with admin fee</p>
-          <p><strong>Customer Direct:</strong> Customer receives fines directly and handles payment</p>
-          <p><strong>Note:</strong> Auto rebill ensures faster resolution but includes admin processing fee</p>
+          <p><strong>Auto Rebill + Admin Fee:</strong> Company pays all fines and charges customer with admin fee for processing</p>
+          <p><strong>Note:</strong> Admin fee covers verification, processing, and customer notification costs. This ensures faster resolution and maintains proper tracking of violations.</p>
         </div>
       </div>
     </div>
