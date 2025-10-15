@@ -29,17 +29,49 @@ export const QuoteWizardStep5_Summary: React.FC<QuoteWizardStep4Props> = ({
         sum + (line.deposit_amount || 0), 0);
       const totalAdvance = data.quote_items.reduce((sum: number, line: any) => 
         sum + ((line.advance_rent_months || 0) * (line.monthly_rate || 0)), 0);
+      
+      // Add delivery/collection fees
+      const totalDeliveryFees = data.quote_items.reduce((sum: number, line: any) => 
+        sum + (line.delivery_fee || 0), 0);
+      const totalCollectionFees = data.quote_items.reduce((sum: number, line: any) => 
+        sum + (line.collection_fee || 0), 0);
+      
+      // Add one-time add-ons
+      const oneTimeAddOns = data.quote_items.reduce((sum: number, line: any) => {
+        const lineOneTimeAddOns = (line.addons || [])
+          .filter((a: any) => a.pricing_model === 'one-time')
+          .reduce((s: number, a: any) => s + a.total, 0);
+        return sum + lineOneTimeAddOns;
+      }, 0);
+      
+      // Calculate monthly recurring rental
+      const monthlyRecurringRental = data.quote_items.reduce((sum: number, line: any) => {
+        const baseRate = line.monthly_rate || 0;
+        const monthlyAddOnsCost = (line.addons || [])
+          .filter((a: any) => a.pricing_model === 'monthly')
+          .reduce((s: number, a: any) => s + a.total, 0);
+        return sum + baseRate + monthlyAddOnsCost;
+      }, 0);
+      
       const initialFees = (data.initial_fees || []).reduce((sum: number, fee: any) => 
         sum + (parseFloat(fee.amount) || 0), 0);
-      const vat = (totalAdvance + initialFees) * ((data.vat_percentage || 0) / 100);
+      
+      // Deposits are NOT taxable in UAE
+      const taxableSubtotal = totalAdvance + totalDeliveryFees + totalCollectionFees + initialFees + oneTimeAddOns;
+      const vat = taxableSubtotal * ((data.vat_percentage || 0) / 100);
       
       return {
         deposits: totalDeposits,
         advance: totalAdvance,
+        deliveryFees: totalDeliveryFees,
+        collectionFees: totalCollectionFees,
         initialFees,
-        subtotal: totalDeposits + totalAdvance + initialFees,
+        oneTimeAddOns,
+        monthlyRecurringRental,
+        taxableSubtotal,
+        subtotal: totalDeposits + taxableSubtotal,
         vat,
-        grandTotal: totalDeposits + totalAdvance + initialFees + vat,
+        grandTotal: totalDeposits + taxableSubtotal + vat,
       };
     }
     
@@ -47,7 +79,12 @@ export const QuoteWizardStep5_Summary: React.FC<QuoteWizardStep4Props> = ({
     return {
       deposits: data.default_deposit_amount || 0,
       advance: 0,
+      deliveryFees: 0,
+      collectionFees: 0,
       initialFees: 0,
+      oneTimeAddOns: 0,
+      monthlyRecurringRental: 0,
+      taxableSubtotal: 0,
       subtotal: 0,
       vat: 0,
       grandTotal: 0,
@@ -472,36 +509,64 @@ export const QuoteWizardStep5_Summary: React.FC<QuoteWizardStep4Props> = ({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <DollarSign className="h-5 w-5" />
-            Total Upfront Due
+            Grand Total Summary
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Total Deposits:</span>
-              <span className="font-semibold">{totals.deposits.toFixed(2)} AED</span>
+              <span className="text-muted-foreground">Total Deposits (Non-taxable):</span>
+              <span className="font-semibold">{formatCurrency(totals.deposits)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Total Advance Rent:</span>
-              <span className="font-semibold">{totals.advance.toFixed(2)} AED</span>
+              <span className="font-semibold">{formatCurrency(totals.advance)}</span>
+            </div>
+            {totals.deliveryFees > 0 && (
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Delivery Fees:</span>
+                <span className="font-semibold">{formatCurrency(totals.deliveryFees)}</span>
+              </div>
+            )}
+            {totals.collectionFees > 0 && (
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Collection Fees:</span>
+                <span className="font-semibold">{formatCurrency(totals.collectionFees)}</span>
+              </div>
+            )}
+            {totals.initialFees > 0 && (
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Initial Fees (One-time):</span>
+                <span className="font-semibold">{formatCurrency(totals.initialFees)}</span>
+              </div>
+            )}
+            {totals.oneTimeAddOns > 0 && (
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">One-Time Add-Ons:</span>
+                <span className="font-semibold">{formatCurrency(totals.oneTimeAddOns)}</span>
+              </div>
+            )}
+            
+            {totals.monthlyRecurringRental > 0 && (
+              <div className="border-t pt-3 flex justify-between">
+                <span className="font-semibold">Monthly Recurring Rental:</span>
+                <span className="font-semibold text-blue-600">{formatCurrency(totals.monthlyRecurringRental)}</span>
+              </div>
+            )}
+            
+            <div className="border-t pt-3 flex justify-between">
+              <span className="text-muted-foreground">Subtotal (Taxable):</span>
+              <span>{formatCurrency(totals.taxableSubtotal)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Initial Fees:</span>
-              <span className="font-semibold">{totals.initialFees.toFixed(2)} AED</span>
+              <span className="text-muted-foreground">VAT ({data.vat_percentage || 5}%):</span>
+              <span>{formatCurrency(totals.vat)}</span>
             </div>
-            <Separator />
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Subtotal:</span>
-              <span className="font-semibold">{totals.subtotal.toFixed(2)} AED</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">VAT ({data.vat_percentage || 0}%):</span>
-              <span className="font-semibold">{totals.vat.toFixed(2)} AED</span>
-            </div>
+            
             <Separator className="border-primary" />
             <div className="flex justify-between font-bold text-xl">
-              <span className="text-primary">Grand Total Due:</span>
-              <span className="text-primary">{totals.grandTotal.toFixed(2)} AED</span>
+              <span className="text-primary">Total Upfront Due (incl. VAT):</span>
+              <span className="text-primary">{formatCurrency(totals.grandTotal)}</span>
             </div>
           </div>
         </CardContent>

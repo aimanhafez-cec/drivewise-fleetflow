@@ -4,9 +4,10 @@ import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { TrainStopStepper } from "@/components/ui/train-stop-stepper";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, ArrowRight, Send, Save } from "lucide-react";
+import { ArrowLeft, ArrowRight, Send, Save, AlertCircle } from "lucide-react";
 import { QuoteWizardStep1 } from "./wizard/QuoteWizardStep1";
 import { QuoteWizardStep2 } from "./wizard/QuoteWizardStep2";
 import { QuoteWizardStep3_CoverageServices } from "./wizard/QuoteWizardStep3_CoverageServices";
@@ -806,6 +807,24 @@ export const QuoteWizard: React.FC = () => {
           />
         </CardContent>
       </Card>
+
+      {/* Validation Errors Display */}
+      {Object.keys(errors).length > 0 && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            <strong>Please fix the following errors to proceed:</strong>
+            <ul className="list-disc list-inside mt-2 text-sm">
+              {Object.entries(errors).slice(0, 5).map(([key, message]) => (
+                <li key={key}>{message}</li>
+              ))}
+            </ul>
+            {Object.keys(errors).length > 5 && (
+              <p className="text-xs mt-2">...and {Object.keys(errors).length - 5} more errors</p>
+            )}
+          </AlertDescription>
+        </Alert>
+      )}
 
       {/* Step Content */}
       <div>

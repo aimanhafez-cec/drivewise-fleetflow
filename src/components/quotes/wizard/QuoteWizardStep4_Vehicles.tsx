@@ -1,5 +1,6 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
@@ -174,12 +175,14 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
       return sum + baseRate + monthlyAddOnsCost;
     }, 0);
     
-    // Calculate subtotal (before VAT) including one-time add-ons
-    const subtotal = totalDeposits + totalAdvance + totalDeliveryFees + totalCollectionFees + initialFees + oneTimeAddOns;
+    // Deposits are NOT taxable in UAE (refundable security)
+    const taxableSubtotal = totalAdvance + totalDeliveryFees + totalCollectionFees + initialFees + oneTimeAddOns;
+    const nonTaxableSubtotal = totalDeposits;
+    const subtotal = taxableSubtotal + nonTaxableSubtotal;
     
-    // Calculate VAT (use vat_percentage from data, default to 5%)
+    // Calculate VAT only on taxable items (exclude deposits)
     const vatPercentage = data.vat_percentage || 5;
-    const vatAmount = subtotal * (vatPercentage / 100);
+    const vatAmount = taxableSubtotal * (vatPercentage / 100);
     
     // Total including VAT
     const totalIncludingVat = subtotal + vatAmount;
@@ -194,11 +197,12 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
       monthlyAddOns,
       oneTimeAddOns,
       monthlyRecurringRental,
+      taxableSubtotal,
+      nonTaxableSubtotal,
       subtotal,
       vatPercentage,
       vatAmount,
       totalIncludingVat,
-      grandTotal: subtotal,
     };
   };
 
@@ -222,6 +226,23 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
   if (isCorporate) {
     return (
       <div className="space-y-6">
+        {/* Validation Errors Display */}
+        {Object.keys(errors).some(key => key.startsWith('line_') || key === 'quote_items') && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              <strong>Please fix the following errors before proceeding:</strong>
+              <ul className="list-disc list-inside mt-2">
+                {Object.entries(errors)
+                  .filter(([key]) => key.startsWith('line_') || key === 'quote_items')
+                  .map(([key, message]) => (
+                    <li key={key}>{message}</li>
+                  ))}
+              </ul>
+            </AlertDescription>
+          </Alert>
+        )}
+
         {/* Header */}
         <Card>
           <CardHeader>
@@ -373,8 +394,12 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
                 
                 {/* Subtotal and VAT */}
                 <div className="border-t pt-3 flex justify-between">
-                  <span className="text-muted-foreground">Subtotal (Upfront):</span>
-                  <span>{formatCurrency(totals.subtotal)}</span>
+                  <span className="text-muted-foreground">Subtotal (Taxable):</span>
+                  <span>{formatCurrency(totals.taxableSubtotal)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Deposits (Non-taxable):</span>
+                  <span>{formatCurrency(totals.nonTaxableSubtotal)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">VAT ({totals.vatPercentage}%):</span>
