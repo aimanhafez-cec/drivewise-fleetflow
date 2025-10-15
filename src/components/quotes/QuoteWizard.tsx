@@ -399,7 +399,6 @@ export const QuoteWizard: React.FC = () => {
         
         // Step 3 - Add-Ons
         default_addons: data.default_addons,
-        default_addons_summary: data.default_addons_summary,
         
         // Step 4 - Vehicles
         quote_items: data.quote_items,
