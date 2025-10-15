@@ -864,10 +864,10 @@ export const QuoteWizardStep3_CoverageServices: React.FC<QuoteWizardStep3Coverag
                     <span className="text-muted-foreground">Toll Policy:</span>
                     <span className="font-medium">{data.salik_darb_handling || 'Rebill Actual (monthly)'}</span>
                   </div>
-                  {data.salik_darb_handling === "Fixed Package per Vehicle" && (
+                  {data.salik_darb_handling === "Included Allowance" && (
                     <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground">Fixed Package:</span>
-                      <span className="font-medium">{formatCurrency(data.salik_darb_allowance_cap || 100)}/vehicle/month</span>
+                      <span className="text-muted-foreground">Monthly Allowance Cap:</span>
+                      <span className="font-medium">{formatCurrency(data.salik_darb_allowance_cap || 150)}/vehicle/month</span>
                     </div>
                   )}
                   <div className="flex items-center justify-between">

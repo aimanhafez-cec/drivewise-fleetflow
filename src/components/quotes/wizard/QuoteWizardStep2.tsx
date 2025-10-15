@@ -678,36 +678,41 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
         </CardContent>
       </Card>
 
-      {/* Card 7: Financial Summary */}
+      {/* Card 7: Financial Summary - Defaults */}
       <Card className="bg-primary/5 border-primary">
         <CardHeader className="pb-2">
           <CardTitle className="flex items-center gap-2 text-base">
             <TrendingUp className="h-4 w-4" />
-            Financial Summary
+            Financial Summary - Defaults
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-0 pb-4">
-          <div className="space-y-1">
-            <h4 className="font-semibold text-sm mb-1.5">Upfront Due per Vehicle</h4>
+          <div className="space-y-2">
             <div className="space-y-1">
               <div className="flex justify-between text-sm">
                 <span>Deposit (per vehicle):</span>
                 <span className="font-medium">{upfrontDue.deposit.toFixed(2)} AED</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span>Advance Rent ({upfrontDue.advanceMonths} months per vehicle):</span>
-                <span className="font-medium">{upfrontDue.advanceRent.toFixed(2)} AED</span>
+                <span>Advance Rent:</span>
+                <span className="font-medium">{upfrontDue.advanceMonths} month(s) per vehicle</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span>Initial Fees Total:</span>
+                <span>Initial Fees (One-time Total):</span>
                 <span className="font-medium">{upfrontDue.initialFees.toFixed(2)} AED</span>
               </div>
-              <div className="flex justify-between text-base font-bold border-t pt-1.5 mt-1.5">
-                <span>Total Upfront Due (per vehicle):</span>
-                <span className="text-primary">{upfrontDue.total.toFixed(2)} AED</span>
+              <div className="flex justify-between text-sm">
+                <span>Delivery Fee (per vehicle):</span>
+                <span className="font-medium">{(data.default_delivery_fee || 0).toFixed(2)} AED</span>
               </div>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                * Multiply by number of vehicles for total upfront amount
+              <div className="flex justify-between text-sm">
+                <span>Collection Fee (per vehicle):</span>
+                <span className="font-medium">{(data.default_collection_fee || 0).toFixed(2)} AED</span>
+              </div>
+            </div>
+            <div className="mt-3 p-2 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg">
+              <p className="text-xs text-blue-900 dark:text-blue-100">
+                <strong>Note:</strong> Final upfront amounts will be calculated in Step 4 after adding vehicle lines with rental rates.
               </p>
             </div>
           </div>
