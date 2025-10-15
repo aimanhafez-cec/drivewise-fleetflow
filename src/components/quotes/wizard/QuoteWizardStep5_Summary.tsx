@@ -3,10 +3,13 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { FileText, DollarSign, Car, Calendar, Calculator, AlertCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { FileText, DollarSign, Car, Calendar, Calculator, AlertCircle, CheckCircle, Send, Printer, Mail } from "lucide-react";
 import { useCostSheet } from "@/hooks/useCostSheet";
 import { CostSheetStatusBadge } from "../costsheet/CostSheetStatusBadge";
 import { formatCurrency } from "@/lib/utils/currency";
+import { useSubmitQuote, useGenerateQuotePDF, useSendQuoteToCustomer } from "@/hooks/useQuote";
+import { useToast } from "@/hooks/use-toast";
 
 interface QuoteWizardStep4Props {
   data: any;
@@ -21,6 +24,47 @@ export const QuoteWizardStep5_Summary: React.FC<QuoteWizardStep4Props> = ({
 }) => {
   const isCorporate = data.quote_type === 'Corporate lease';
   const { data: costSheet } = useCostSheet(data.id);
+  const { toast } = useToast();
+  
+  const submitQuoteMutation = useSubmitQuote();
+  const generatePDFMutation = useGenerateQuotePDF();
+  const sendQuoteMutation = useSendQuoteToCustomer();
+
+  const handleSubmitForApproval = () => {
+    if (!data.id) {
+      toast({
+        title: 'Error',
+        description: 'Please save the quote as draft first',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
+    submitQuoteMutation.mutate({
+      quote_id: data.id,
+      notes: 'Submitted from Quote Wizard Summary',
+    });
+  };
+
+  const handlePrintPDF = () => {
+    generatePDFMutation.mutate(data.id);
+  };
+
+  const handleSendToCustomer = () => {
+    if (!data.account_name) {
+      toast({
+        title: 'Error',
+        description: 'Customer information is missing',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
+    toast({
+      title: 'Coming Soon',
+      description: 'Email sending will be implemented in the next phase',
+    });
+  };
   
   // Calculate totals
   const calculateTotals = () => {
@@ -127,6 +171,79 @@ export const QuoteWizardStep5_Summary: React.FC<QuoteWizardStep4Props> = ({
           </div>
         </CardContent>
       </Card>
+
+      {/* Quote Actions */}
+      {data.id && data.status === 'draft' && (
+        <Card className="border-primary">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Send className="h-5 w-5" />
+              Finalize & Submit Quote
+            </CardTitle>
+            <CardDescription>
+              Review complete. Submit for approval to proceed with the quote.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col gap-3">
+              {isCorporate && costSheet?.status !== 'approved' && (
+                <Alert>
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>
+                    Cost sheet must be approved before submitting the quote.
+                  </AlertDescription>
+                </Alert>
+              )}
+              
+              <div className="flex gap-2">
+                <Button
+                  onClick={handleSubmitForApproval}
+                  disabled={submitQuoteMutation.isPending || (isCorporate && costSheet?.status !== 'approved')}
+                  className="flex-1"
+                >
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                  {submitQuoteMutation.isPending ? 'Submitting...' : 'Submit for Approval'}
+                </Button>
+              </div>
+              
+              <Separator />
+              
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  onClick={handlePrintPDF}
+                  disabled={generatePDFMutation.isPending}
+                  className="flex-1"
+                >
+                  <Printer className="h-4 w-4 mr-2" />
+                  Print PDF
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  onClick={handleSendToCustomer}
+                  disabled={sendQuoteMutation.isPending}
+                  className="flex-1"
+                >
+                  <Mail className="h-4 w-4 mr-2" />
+                  Send to Customer
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Approved Status Banner */}
+      {data.status === 'approved' && (
+        <Alert className="border-green-500 bg-green-50 dark:bg-green-950">
+          <CheckCircle className="h-4 w-4 text-green-600" />
+          <AlertDescription className="text-green-800 dark:text-green-200">
+            ✓ Quote approved and ready to send to customer
+            {data.approved_at && ` on ${new Date(data.approved_at).toLocaleDateString()}`}
+          </AlertDescription>
+        </Alert>
+      )}
 
       {/* Cost Sheet Status (Corporate only) */}
       {isCorporate && data.id && (

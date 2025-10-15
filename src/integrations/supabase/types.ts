@@ -2056,6 +2056,41 @@ export type Database = {
         }
         Relationships: []
       }
+      quote_approvals: {
+        Row: {
+          action: string
+          approver_user_id: string
+          comments: string | null
+          created_at: string | null
+          id: string
+          quote_id: string
+        }
+        Insert: {
+          action: string
+          approver_user_id: string
+          comments?: string | null
+          created_at?: string | null
+          id?: string
+          quote_id: string
+        }
+        Update: {
+          action?: string
+          approver_user_id?: string
+          comments?: string | null
+          created_at?: string | null
+          id?: string
+          quote_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quote_approvals_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       quote_cost_sheet_lines: {
         Row: {
           acquisition_cost_aed: number
@@ -2213,6 +2248,9 @@ export type Database = {
         Row: {
           account_name: string | null
           annual_escalation_percentage: number | null
+          approval_notes: string | null
+          approved_at: string | null
+          approved_by: string | null
           billing_plan: string | null
           billing_start_date: string | null
           business_unit_id: string | null
@@ -2286,6 +2324,8 @@ export type Database = {
           sales_rep_id: string | null
           show_maintenance_separate_line: boolean | null
           status: string
+          submitted_at: string | null
+          submitted_by: string | null
           subtotal: number
           tax_amount: number
           total_amount: number
@@ -2302,6 +2342,9 @@ export type Database = {
         Insert: {
           account_name?: string | null
           annual_escalation_percentage?: number | null
+          approval_notes?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
           billing_plan?: string | null
           billing_start_date?: string | null
           business_unit_id?: string | null
@@ -2375,6 +2418,8 @@ export type Database = {
           sales_rep_id?: string | null
           show_maintenance_separate_line?: boolean | null
           status?: string
+          submitted_at?: string | null
+          submitted_by?: string | null
           subtotal?: number
           tax_amount?: number
           total_amount?: number
@@ -2391,6 +2436,9 @@ export type Database = {
         Update: {
           account_name?: string | null
           annual_escalation_percentage?: number | null
+          approval_notes?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
           billing_plan?: string | null
           billing_start_date?: string | null
           business_unit_id?: string | null
@@ -2464,6 +2512,8 @@ export type Database = {
           sales_rep_id?: string | null
           show_maintenance_separate_line?: boolean | null
           status?: string
+          submitted_at?: string | null
+          submitted_by?: string | null
           subtotal?: number
           tax_amount?: number
           total_amount?: number

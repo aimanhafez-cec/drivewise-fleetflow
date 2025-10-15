@@ -853,14 +853,22 @@ export const QuoteWizard: React.FC = () => {
             <ArrowRight className="h-4 w-4 ml-2" />
           </Button>
         ) : (
-          <Button
-            id="btn-send"
-            onClick={handleSubmit}
-            disabled={createQuoteMutation.isPending || Object.keys(errors).length > 0}
-          >
-            <Send className="h-4 w-4 mr-2" />
-            Create Quote
-          </Button>
+          <div className="flex gap-2">
+            {quoteData.status === 'approved' ? (
+              <Button
+                id="btn-finalize"
+                onClick={handleSubmit}
+                disabled={createQuoteMutation.isPending}
+              >
+                <Send className="h-4 w-4 mr-2" />
+                Finalize Quote
+              </Button>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                Submit quote for approval in the summary section above
+              </p>
+            )}
+          </div>
         )}
       </div>
     </div>

@@ -11,3 +11,6 @@ verify_jwt = true
 
 [functions.apply-cost-sheet-rates]
 verify_jwt = true
+
+[functions.submit-quote-approval]
+verify_jwt = true
