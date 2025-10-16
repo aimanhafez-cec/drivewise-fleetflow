@@ -84,6 +84,10 @@ export const QuotationSearch: React.FC<QuotationSearchProps> = ({
               className="pl-10"
             />
           </div>
+          <Button onClick={handleSearch} disabled={isLoading}>
+            <Search className="mr-2 h-4 w-4" />
+            Search
+          </Button>
           <Button
             variant="outline"
             onClick={() => setShowFilters(!showFilters)}
@@ -96,10 +100,6 @@ export const QuotationSearch: React.FC<QuotationSearchProps> = ({
                 {activeFilterCount}
               </Badge>
             )}
-          </Button>
-          <Button onClick={handleSearch} disabled={isLoading}>
-            <Search className="mr-2 h-4 w-4" />
-            Search
           </Button>
           {(filters.query || activeFilterCount > 0) && (
             <Button variant="ghost" onClick={handleClear}>
