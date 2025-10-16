@@ -29,7 +29,13 @@ import {
   User,
   Copy,
   ArrowRight,
+  XCircle,
+  AlertCircle,
 } from "lucide-react";
+import { CustomerAcceptanceDialog } from "@/components/quotes/CustomerAcceptanceDialog";
+import { CustomerRejectionDialog } from "@/components/quotes/CustomerRejectionDialog";
+import { ConvertToMasterAgreementDialog } from "@/components/quotes/ConvertToMasterAgreementDialog";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { formatCurrency } from "@/lib/utils/currency";
 import { format } from "date-fns";
 import { formatDurationInMonthsAndDays } from "@/lib/utils/dateUtils";
@@ -86,6 +92,11 @@ interface Quote {
   opportunity_id?: string;
   customer_id: string;
   vehicle_id?: string;
+  version?: number;
+  customer_acceptance_status?: string;
+  customer_rejection_reason?: string;
+  win_loss_reason?: string;
+  profiles?: any;
 }
 
 const statusConfig = {
@@ -103,6 +114,10 @@ const QuoteDetails: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  
+  const [acceptDialogOpen, setAcceptDialogOpen] = React.useState(false);
+  const [rejectDialogOpen, setRejectDialogOpen] = React.useState(false);
+  const [convertDialogOpen, setConvertDialogOpen] = React.useState(false);
 
   useEffect(() => {
     document.title = "Quote Details | Core Car Rental";
@@ -297,6 +312,74 @@ const QuoteDetails: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Customer Response Actions - Show for sent/viewed/approved quotes */}
+      {['sent', 'viewed', 'approved'].includes(quote.status) && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Customer Response</CardTitle>
+            <CardDescription>
+              Record customer acceptance or rejection of this quote
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-3">
+              <Button
+                onClick={() => setAcceptDialogOpen(true)}
+                className="bg-green-600 hover:bg-green-700"
+              >
+                <CheckCircle className="mr-2 h-4 w-4" />
+                Customer Accepted
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => setRejectDialogOpen(true)}
+              >
+                <XCircle className="mr-2 h-4 w-4" />
+                Customer Rejected
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Show acceptance status if accepted */}
+      {quote.status === 'accepted' && (
+        <Card className="border-green-200 bg-green-50 dark:bg-green-950">
+          <CardHeader>
+            <CardTitle className="text-green-700 dark:text-green-300">Quote Accepted</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-green-600 dark:text-green-400 mb-4">
+              Customer has accepted this quote. You can now convert it to a Master Agreement.
+            </p>
+            {quote.win_loss_reason && (
+              <p className="text-sm text-muted-foreground mb-4">
+                <strong>Win Reason:</strong> {quote.win_loss_reason}
+              </p>
+            )}
+            <Button
+              onClick={() => setConvertDialogOpen(true)}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              <FileText className="mr-2 h-4 w-4" />
+              Convert to Master Agreement
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Show rejection info if declined */}
+      {quote.status === 'declined' && quote.customer_rejection_reason && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Quote Rejected</AlertTitle>
+          <AlertDescription>
+            <p className="mb-2">{quote.customer_rejection_reason}</p>
+            <p className="text-xs">You can create a new version to revise terms.</p>
+          </AlertDescription>
+        </Alert>
+      )}
 
       {/* Main Content */}
       <Tabs defaultValue="summary" className="w-full">
@@ -947,6 +1030,27 @@ const QuoteDetails: React.FC = () => {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Dialogs */}
+      <CustomerAcceptanceDialog
+        open={acceptDialogOpen}
+        onOpenChange={setAcceptDialogOpen}
+        quoteId={id!}
+        quoteNumber={quote.quote_number}
+      />
+
+      <CustomerRejectionDialog
+        open={rejectDialogOpen}
+        onOpenChange={setRejectDialogOpen}
+        quoteId={id!}
+        quoteNumber={quote.quote_number}
+      />
+
+      <ConvertToMasterAgreementDialog
+        open={convertDialogOpen}
+        onOpenChange={setConvertDialogOpen}
+        quote={quote}
+      />
     </div>
   );
 };

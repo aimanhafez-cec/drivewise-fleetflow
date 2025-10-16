@@ -1,0 +1,142 @@
+import React from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useConvertQuoteToMasterAgreement } from "@/hooks/useConvertQuoteToMasterAgreement";
+import { FileText, AlertCircle, CheckCircle2 } from "lucide-react";
+import { formatCurrency } from "@/lib/utils/currency";
+
+interface ConvertToMasterAgreementDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  quote: any;
+}
+
+export const ConvertToMasterAgreementDialog: React.FC<ConvertToMasterAgreementDialogProps> = ({
+  open,
+  onOpenChange,
+  quote,
+}) => {
+  const convertMutation = useConvertQuoteToMasterAgreement();
+
+  // Validation checks
+  const hasCustomer = !!quote?.customer_id;
+  const hasVehicles = quote?.quote_items && quote.quote_items.length > 0;
+  const isAccepted = quote?.status === "accepted";
+
+  const canConvert = hasCustomer && hasVehicles && isAccepted;
+
+  const handleConvert = async () => {
+    if (!canConvert) return;
+
+    try {
+      await convertMutation.mutateAsync(quote.id);
+      onOpenChange(false);
+    } catch (error) {
+      console.error("Failed to convert:", error);
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <FileText className="h-5 w-5" />
+            Convert to Master Agreement
+          </DialogTitle>
+          <DialogDescription>
+            This will create a Corporate Leasing Agreement from quote {quote?.quote_number}
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-4 py-4">
+          {/* Pre-check validations */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              {hasCustomer ? (
+                <CheckCircle2 className="h-4 w-4 text-green-600" />
+              ) : (
+                <AlertCircle className="h-4 w-4 text-destructive" />
+              )}
+              <span className="text-sm">Customer information available</span>
+            </div>
+            <div className="flex items-center gap-2">
+              {hasVehicles ? (
+                <CheckCircle2 className="h-4 w-4 text-green-600" />
+              ) : (
+                <AlertCircle className="h-4 w-4 text-destructive" />
+              )}
+              <span className="text-sm">At least one vehicle in quote</span>
+            </div>
+            <div className="flex items-center gap-2">
+              {isAccepted ? (
+                <CheckCircle2 className="h-4 w-4 text-green-600" />
+              ) : (
+                <AlertCircle className="h-4 w-4 text-destructive" />
+              )}
+              <span className="text-sm">Quote status is accepted</span>
+            </div>
+          </div>
+
+          {!canConvert && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                Cannot convert: Please ensure quote is accepted and has all required information.
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {/* Quote Summary */}
+          {canConvert && (
+            <div className="border rounded-lg p-4 space-y-3">
+              <h4 className="font-semibold">Quote Summary</h4>
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <div>
+                  <span className="text-muted-foreground">Quote Number:</span>
+                  <p className="font-medium">{quote.quote_number}</p>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Customer:</span>
+                  <p className="font-medium">{quote.profiles?.full_name || "N/A"}</p>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Duration:</span>
+                  <p className="font-medium">{quote.duration_days || "N/A"} days</p>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Total Vehicles:</span>
+                  <p className="font-medium">{quote.quote_items?.length || 0}</p>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Total Amount:</span>
+                  <p className="font-medium">{formatCurrency(quote.total_amount || 0)}</p>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleConvert}
+            disabled={!canConvert || convertMutation.isPending}
+          >
+            {convertMutation.isPending ? "Converting..." : "Convert to Master Agreement"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
