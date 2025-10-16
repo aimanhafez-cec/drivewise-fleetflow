@@ -760,53 +760,6 @@ const QuoteDetails: React.FC = () => {
             </CardContent>
           </Card>
 
-          {/* Insurance Coverage */}
-          {(quote.insurance_coverage_package || quote.insurance_coverage_summary) && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Shield className="h-5 w-5" />
-                  Insurance Coverage
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {quote.insurance_coverage_package && (
-                  <div>
-                    <p className="text-sm text-muted-foreground">Package</p>
-                    <p className="font-medium capitalize">{quote.insurance_coverage_package}</p>
-                  </div>
-                )}
-                {quote.insurance_coverage_summary && (
-                  <div>
-                    <p className="text-sm text-muted-foreground">Coverage Summary</p>
-                    <p className="font-medium">{quote.insurance_coverage_summary}</p>
-                  </div>
-                )}
-                <div className="grid md:grid-cols-3 gap-4 pt-2">
-                  {quote.insurance_excess_aed !== undefined && (
-                    <div>
-                      <p className="text-sm text-muted-foreground">Excess</p>
-                      <p className="font-medium">{formatCurrency(quote.insurance_excess_aed)}</p>
-                    </div>
-                  )}
-                  {quote.insurance_glass_tire_cover !== undefined && (
-                    <div>
-                      <p className="text-sm text-muted-foreground">Glass & Tire</p>
-                      <Badge variant={quote.insurance_glass_tire_cover ? "default" : "secondary"}>
-                        {quote.insurance_glass_tire_cover ? "Included" : "Not Included"}
-                      </Badge>
-                    </div>
-                  )}
-                  {quote.insurance_territorial_coverage && (
-                    <div>
-                      <p className="text-sm text-muted-foreground">Territory</p>
-                      <p className="font-medium capitalize">{quote.insurance_territorial_coverage}</p>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          )}
 
           {/* Notes */}
           {quote.notes && (
