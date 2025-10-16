@@ -10,6 +10,19 @@ interface QuotePrintLayoutProps {
 }
 
 export const QuotePrintLayout: React.FC<QuotePrintLayoutProps> = ({ data, totals, costSheet }) => {
+  const getQuoteTypeDisplay = (quoteType: string | null | undefined) => {
+    switch (quoteType) {
+      case 'Corporate lease':
+        return 'Corporate Leasing';
+      case 'Personal Lease':
+        return 'Personal Leasing';
+      case 'Rental-Short Term':
+        return 'Short Term Rental';
+      default:
+        return 'Standard Rental';
+    }
+  };
+
   const quoteDate = data.created_at ? new Date(data.created_at) : new Date();
   const validUntil = new Date(quoteDate);
   validUntil.setDate(validUntil.getDate() + 30);
@@ -123,7 +136,7 @@ export const QuotePrintLayout: React.FC<QuotePrintLayoutProps> = ({ data, totals
           )}
           <div className="flex justify-between">
             <span className="font-semibold">Quote Type:</span>
-            <span>{data.quote_type === 'corporate_leasing' ? 'Corporate Leasing' : 'Standard Rental'}</span>
+            <span>{getQuoteTypeDisplay(data.quote_type)}</span>
           </div>
           <div className="flex justify-between">
             <span className="font-semibold">Currency:</span>
