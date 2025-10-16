@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { TrainStopStepper } from "@/components/ui/train-stop-stepper";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, ArrowRight, Send, Save, AlertCircle } from "lucide-react";
+import { ArrowLeft, ArrowRight, Send, Save, AlertCircle, Edit } from "lucide-react";
 import { QuoteWizardStep1 } from "./wizard/QuoteWizardStep1";
 import { QuoteWizardStep2 } from "./wizard/QuoteWizardStep2";
 import { QuoteWizardStep3_CoverageServices } from "./wizard/QuoteWizardStep3_CoverageServices";
@@ -210,7 +210,12 @@ const steps = [
   { id: 6, title: "Summary", description: "Review & finalize quote" },
 ];
 
-export const QuoteWizard: React.FC = () => {
+interface QuoteWizardProps {
+  viewMode?: boolean;
+  quoteId?: string;
+}
+
+export const QuoteWizard: React.FC<QuoteWizardProps> = ({ viewMode = false, quoteId: propQuoteId }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [quoteData, setQuoteData] = useState<Partial<QuoteData>>({
@@ -263,9 +268,9 @@ export const QuoteWizard: React.FC = () => {
   const duplicateId = searchParams.get("duplicate");
   const reviseId = searchParams.get("revise");
   const fromRfqId = searchParams.get("fromRfqId");
-  const editMode = searchParams.get("edit") === "true";
+  const editMode = searchParams.get("edit") === "true" || viewMode;
   const quoteIdFromSearch = searchParams.get("id");
-  const quoteId = quoteIdParam || quoteIdFromSearch;
+  const quoteId = propQuoteId || quoteIdParam || quoteIdFromSearch;
 
   const { data: existingQuote } = useQuery({
     queryKey: ["quote", duplicateId || reviseId || quoteId],
@@ -278,7 +283,7 @@ export const QuoteWizard: React.FC = () => {
       if (error) throw error;
       return data;
     },
-    enabled: !!(duplicateId || reviseId || (editMode && quoteId)),
+    enabled: !!(duplicateId || reviseId || (editMode && quoteId) || viewMode),
   });
 
   const { data: sourceRfq } = useQuery({
@@ -297,8 +302,8 @@ export const QuoteWizard: React.FC = () => {
 
   useEffect(() => {
     if (existingQuote) {
-      // Load full quote data for editing
-      if (editMode && quoteId) {
+      // Load full quote data for editing or viewing
+      if ((editMode && quoteId) || viewMode) {
         const loadedData: any = { ...existingQuote };
         if (Array.isArray(existingQuote.items)) {
           loadedData.items = existingQuote.items;
@@ -899,7 +904,7 @@ export const QuoteWizard: React.FC = () => {
         return (
           <QuoteWizardStep1
             data={quoteData}
-            onChange={(data) => updateQuoteData(1, data)}
+            onChange={(data) => !viewMode && updateQuoteData(1, data)}
             errors={errors}
           />
         );
@@ -907,7 +912,7 @@ export const QuoteWizard: React.FC = () => {
         return (
           <QuoteWizardStep2
             data={quoteData}
-            onChange={(data) => updateQuoteData(2, data)}
+            onChange={(data) => !viewMode && updateQuoteData(2, data)}
             errors={errors}
           />
         );
@@ -915,7 +920,7 @@ export const QuoteWizard: React.FC = () => {
         return (
           <QuoteWizardStep3_CoverageServices
             data={quoteData}
-            onChange={(data) => updateQuoteData(3, data)}
+            onChange={(data) => !viewMode && updateQuoteData(3, data)}
             errors={errors}
           />
         );
@@ -923,7 +928,7 @@ export const QuoteWizard: React.FC = () => {
         return (
           <QuoteWizardStep4_Vehicles
             data={quoteData}
-            onChange={(data) => updateQuoteData(4, data)}
+            onChange={(data) => !viewMode && updateQuoteData(4, data)}
             errors={errors}
           />
         );
@@ -937,7 +942,7 @@ export const QuoteWizard: React.FC = () => {
         return (
           <QuoteWizardStep5_Summary
             data={quoteData}
-            onChange={(data) => updateQuoteData(6, data)}
+            onChange={(data) => !viewMode && updateQuoteData(6, data)}
             errors={errors}
           />
         );
@@ -948,7 +953,8 @@ export const QuoteWizard: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Wizard Header - Hide during print */}
+      {/* Wizard Header - Hide during print and in view mode */}
+      {!viewMode && (
       <div className="no-print">
         <div className="flex items-center justify-between">
           <div>
@@ -975,6 +981,31 @@ export const QuoteWizard: React.FC = () => {
           </div>
         </div>
       </div>
+      )}
+
+      {/* View Mode Header */}
+      {viewMode && (
+        <div className="no-print">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight">
+                View Quote {quoteData.quote_number && `- ${quoteData.quote_number}`}
+              </h1>
+              <p className="text-muted-foreground">Read-only view of quote details</p>
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => navigate("/quotes")}>
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back
+              </Button>
+              <Button onClick={() => navigate(`/quotes/new?edit=true&id=${quoteData.id}`)}>
+                <Edit className="h-4 w-4 mr-2" />
+                Edit Quote
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Train Stop Progress Indicator */}
       <Card className="no-print">
@@ -1011,7 +1042,8 @@ export const QuoteWizard: React.FC = () => {
         {renderStep()}
       </div>
 
-      {/* Navigation - Hide during print */}
+      {/* Navigation - Hide during print and in view mode */}
+      {!viewMode && (
       <div className="no-print">
         <div className="flex justify-between">
           <Button
@@ -1053,6 +1085,7 @@ export const QuoteWizard: React.FC = () => {
           )}
         </div>
       </div>
+      )}
     </div>
   );
 };

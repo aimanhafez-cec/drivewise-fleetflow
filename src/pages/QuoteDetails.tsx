@@ -53,6 +53,8 @@ import { QuoteMileagePooling } from "@/components/quotes/details/QuoteMileagePoo
 import { QuoteTollsPolicy } from "@/components/quotes/details/QuoteTollsPolicy";
 import { QuotePaymentPolicy } from "@/components/quotes/details/QuotePaymentPolicy";
 import { QuoteFinancialBreakdown } from "@/components/quotes/details/QuoteFinancialBreakdown";
+import { QuotePaymentSummary } from "@/components/quotes/details/QuotePaymentSummary";
+import { QuoteInitialFees } from "@/components/quotes/details/QuoteInitialFees";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -358,6 +360,10 @@ const QuoteDetails: React.FC = () => {
               <ArrowLeft className="h-4 w-4 mr-1" />
               Back
             </Button>
+            <Button size="sm" onClick={() => navigate(`/quotes/view/${quote.id}`)}>
+              <FileText className="h-4 w-4 mr-1" />
+              View Quote
+            </Button>
             <Button size="sm" onClick={() => navigate(`/quotes/new?edit=true&id=${quote.id}`)}>
               <Edit className="h-4 w-4 mr-1" />
               Edit Quote
@@ -599,6 +605,15 @@ const QuoteDetails: React.FC = () => {
               </div>
             </CardContent>
           </Card>
+
+          {/* Payment Summary */}
+          <QuotePaymentSummary quote={quote} />
+
+          {/* Initial Fees */}
+          <QuoteInitialFees quote={quote} />
+
+          {/* Financial Breakdown */}
+          <QuoteFinancialBreakdown quote={quote} />
 
           {/* Pickup & Return Configuration */}
           <QuotePickupReturnInfo
