@@ -17,7 +17,8 @@ import {
   Zap,
   BarChart3,
   Building2,
-  FileCheck
+  FileCheck,
+  FileSpreadsheet
 } from 'lucide-react';
 import {
   Sidebar,
@@ -77,7 +78,7 @@ const navigation = [
   {
     title: 'Manage Quotations',
     url: '/manage-quotations',
-    icon: FileCheck,
+    icon: FileSpreadsheet,
   },
   {
     title: 'Inspections',
