@@ -735,23 +735,16 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
             <CardTitle className="text-base font-semibold">Additional Notes & Terms</CardTitle>
             <Badge variant="secondary" className="text-xs ml-auto">Optional</Badge>
           </div>
-          <CardDescription className="mt-2 text-sm">
-            Add any special terms, conditions, or notes for this quote
-          </CardDescription>
         </CardHeader>
-        <CardContent className="p-4 space-y-2">
-          <Label htmlFor="notes">Additional Notes</Label>
+        <CardContent className="p-4">
           <Textarea
             id="notes"
             value={data.notes || ""}
             onChange={(e) => onChange({ notes: e.target.value })}
-            placeholder="Enter any additional notes, special terms, or conditions for this quote..."
+            placeholder="Add any special terms or conditions..."
             rows={4}
             className="resize-none"
           />
-          <p className="text-xs text-muted-foreground">
-            These notes will appear in the quote summary and can be used to communicate special terms or conditions.
-          </p>
         </CardContent>
       </Card>
     </div>
