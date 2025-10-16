@@ -31,7 +31,16 @@ export const QuoteWizardStep5_Summary: React.FC<QuoteWizardStep4Props> = ({
   const sendQuoteMutation = useSendQuoteToCustomer();
 
   const handleSubmitForApproval = () => {
+    console.log('🔘 Submit button clicked!', {
+      hasId: !!data.id,
+      quoteId: data.id,
+      isCorporate,
+      costSheetStatus: costSheet?.status,
+      quoteStatus: data.status
+    });
+
     if (!data.id) {
+      console.warn('⚠️ No quote ID found!');
       toast({
         title: 'Error',
         description: 'Please save the quote as draft first',
@@ -39,7 +48,8 @@ export const QuoteWizardStep5_Summary: React.FC<QuoteWizardStep4Props> = ({
       });
       return;
     }
-    
+
+    console.log('📤 Submitting quote:', data.id);
     submitQuoteMutation.mutate({
       quote_id: data.id,
       notes: 'Submitted from Quote Wizard Summary',
@@ -139,111 +149,114 @@ export const QuoteWizardStep5_Summary: React.FC<QuoteWizardStep4Props> = ({
 
   return (
     <div className="space-y-6">
-      {/* Quote Header Summary */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <FileText className="h-5 w-5" />
-            Quote Summary & Review
-          </CardTitle>
-          <CardDescription>
-            Review all quote details before submission
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <span className="text-muted-foreground">Quote Type:</span>
-              <p className="font-medium">{data.quote_type || 'N/A'}</p>
+      {/* Sticky Action Bar */}
+      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b p-4 -m-6 mb-6 print:hidden">
+        <div className="flex items-center justify-between max-w-7xl mx-auto">
+          <div>
+            <h2 className="text-2xl font-bold">{data.quote_number || 'New Quote'}</h2>
+            <p className="text-sm text-muted-foreground">
+              {data.account_name} • {data.quote_date || 'Draft'}
+            </p>
+          </div>
+          <div className="flex gap-2">
+            {data.status === 'draft' && (
+              <Button 
+                size="lg" 
+                onClick={handleSubmitForApproval}
+                disabled={submitQuoteMutation.isPending || (isCorporate && costSheet?.status !== 'approved')}
+              >
+                <CheckCircle className="mr-2 h-5 w-5" />
+                Submit for Approval
+              </Button>
+            )}
+            {data.status === 'approved' && (
+              <>
+                <Button size="lg" variant="outline" onClick={handlePrintPDF}>
+                  <Printer className="mr-2 h-5 w-5" />
+                  Print PDF
+                </Button>
+                <Button size="lg" onClick={handleSendToCustomer}>
+                  <Mail className="mr-2 h-5 w-5" />
+                  Send to Customer
+                </Button>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Status Banners */}
+      {data.status === 'approved' && (
+        <Alert className="border-green-500 bg-green-50 dark:bg-green-950">
+          <CheckCircle className="h-4 w-4 text-green-600" />
+          <AlertDescription className="text-green-800 dark:text-green-200">
+            <strong>Quote Approved</strong> - This quote has been approved and is ready to be sent to the customer.
+            {data.approved_at && ` Approved on ${new Date(data.approved_at).toLocaleDateString()}`}
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {isCorporate && costSheet?.status !== 'approved' && data.status === 'draft' && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            <strong>Cost Sheet Required:</strong> Corporate leasing quotes require an approved cost sheet before submission.
+            Current status: <CostSheetStatusBadge status={costSheet?.status || 'draft'} />
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {/* Executive Summary Card */}
+      <Card className="bg-gradient-to-br from-primary/5 to-primary/10">
+        <CardContent className="pt-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            <div className="text-center">
+              <p className="text-sm text-muted-foreground mb-1">Grand Total</p>
+              <p className="text-3xl font-bold text-primary">
+                {formatCurrency(totals.grandTotal, data.currency || 'AED')}
+              </p>
             </div>
-            <div>
-              <span className="text-muted-foreground">Customer:</span>
-              <p className="font-medium">{data.account_name || 'N/A'}</p>
+            <div className="text-center">
+              <p className="text-sm text-muted-foreground mb-1">Monthly Recurring</p>
+              <p className="text-3xl font-bold">
+                {formatCurrency(totals.monthlyRecurringRental, data.currency || 'AED')}
+              </p>
+              <p className="text-xs text-muted-foreground">/month</p>
             </div>
-            <div>
-              <span className="text-muted-foreground">Quote Date:</span>
-              <p className="font-medium">{data.quote_date || 'N/A'}</p>
+            <div className="text-center">
+              <p className="text-sm text-muted-foreground mb-1">Vehicle Lines</p>
+              <p className="text-3xl font-bold">{data.quote_items?.length || 1}</p>
             </div>
+            <div className="text-center">
+              <p className="text-sm text-muted-foreground mb-1">Contract Term</p>
+              <p className="text-3xl font-bold">
+                {data.duration_days ? Math.floor(data.duration_days / 30) : 'N/A'}
+                <span className="text-lg font-normal ml-1">months</span>
+              </p>
+            </div>
+          </div>
+
+          <Separator className="my-6" />
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
             <div>
-              <span className="text-muted-foreground">Valid Until:</span>
+              <span className="text-muted-foreground text-xs">Quote Valid Until</span>
               <p className="font-medium">{data.validity_date_to || 'N/A'}</p>
+            </div>
+            <div>
+              <span className="text-muted-foreground text-xs">Contract Start</span>
+              <p className="font-medium">{data.contract_effective_from || 'N/A'}</p>
+            </div>
+            <div>
+              <span className="text-muted-foreground text-xs">Contract End</span>
+              <p className="font-medium">{data.contract_effective_to || 'N/A'}</p>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Quote Actions */}
-      {data.id && data.status === 'draft' && (
-        <Card className="border-primary">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Send className="h-5 w-5" />
-              Finalize & Submit Quote
-            </CardTitle>
-            <CardDescription>
-              Review complete. Submit for approval to proceed with the quote.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col gap-3">
-              {isCorporate && costSheet?.status !== 'approved' && (
-                <Alert>
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>
-                    Cost sheet must be approved before submitting the quote.
-                  </AlertDescription>
-                </Alert>
-              )}
-              
-              <div className="flex gap-2">
-                <Button
-                  onClick={handleSubmitForApproval}
-                  disabled={submitQuoteMutation.isPending || (isCorporate && costSheet?.status !== 'approved')}
-                  className="flex-1"
-                >
-                  <CheckCircle className="h-4 w-4 mr-2" />
-                  {submitQuoteMutation.isPending ? 'Submitting...' : 'Submit for Approval'}
-                </Button>
-              </div>
-              
-              <Separator />
-              
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  onClick={handlePrintPDF}
-                  disabled={generatePDFMutation.isPending}
-                  className="flex-1"
-                >
-                  <Printer className="h-4 w-4 mr-2" />
-                  Print PDF
-                </Button>
-                
-                <Button
-                  variant="outline"
-                  onClick={handleSendToCustomer}
-                  disabled={sendQuoteMutation.isPending}
-                  className="flex-1"
-                >
-                  <Mail className="h-4 w-4 mr-2" />
-                  Send to Customer
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Approved Status Banner */}
-      {data.status === 'approved' && (
-        <Alert className="border-green-500 bg-green-50 dark:bg-green-950">
-          <CheckCircle className="h-4 w-4 text-green-600" />
-          <AlertDescription className="text-green-800 dark:text-green-200">
-            ✓ Quote approved and ready to send to customer
-            {data.approved_at && ` on ${new Date(data.approved_at).toLocaleDateString()}`}
-          </AlertDescription>
-        </Alert>
-      )}
+      {/* Two Column Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
       {/* Cost Sheet Status (Corporate only) */}
       {isCorporate && data.id && (

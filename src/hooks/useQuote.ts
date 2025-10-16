@@ -11,14 +11,22 @@ export const useSubmitQuote = () => {
       quote_id: string;
       notes?: string;
     }) => {
+      console.log('🚀 Invoking submit-quote-approval with:', params);
+      
       const { data, error } = await supabase.functions.invoke('submit-quote-approval', {
         body: params,
       });
 
-      if (error) throw error;
+      console.log('📥 Response:', { data, error });
+
+      if (error) {
+        console.error('❌ Edge function error:', error);
+        throw error;
+      }
       return data;
     },
     onSuccess: (data) => {
+      console.log('✅ Quote approved successfully:', data);
       queryClient.invalidateQueries({ queryKey: ['quote', data.quote_id] });
       queryClient.invalidateQueries({ queryKey: ['quotes'] });
       toast({
@@ -27,9 +35,11 @@ export const useSubmitQuote = () => {
       });
     },
     onError: (error: any) => {
+      console.error('❌ Full error object:', error);
+      const errorMessage = error?.message || error?.error?.message || 'Failed to submit quote';
       toast({
         title: 'Submission Failed',
-        description: error.message || 'Failed to submit quote',
+        description: errorMessage,
         variant: 'destructive',
       });
     },
