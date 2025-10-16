@@ -2091,6 +2091,66 @@ export type Database = {
           },
         ]
       }
+      quote_attachments: {
+        Row: {
+          attachment_type: string
+          created_at: string | null
+          description: string | null
+          entered_by: string | null
+          file_name: string | null
+          file_path: string | null
+          file_size: number | null
+          file_url: string | null
+          id: string
+          mime_type: string | null
+          quote_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          attachment_type: string
+          created_at?: string | null
+          description?: string | null
+          entered_by?: string | null
+          file_name?: string | null
+          file_path?: string | null
+          file_size?: number | null
+          file_url?: string | null
+          id?: string
+          mime_type?: string | null
+          quote_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          attachment_type?: string
+          created_at?: string | null
+          description?: string | null
+          entered_by?: string | null
+          file_name?: string | null
+          file_path?: string | null
+          file_size?: number | null
+          file_url?: string | null
+          id?: string
+          mime_type?: string | null
+          quote_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quote_attachments_entered_by_fkey"
+            columns: ["entered_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quote_attachments_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       quote_cost_sheet_lines: {
         Row: {
           acquisition_cost_aed: number

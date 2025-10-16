@@ -13,6 +13,7 @@ import { QuoteWizardStep2 } from "./wizard/QuoteWizardStep2";
 import { QuoteWizardStep3_CoverageServices } from "./wizard/QuoteWizardStep3_CoverageServices";
 import { QuoteWizardStep4_Vehicles } from "./wizard/QuoteWizardStep4_Vehicles";
 import { QuoteWizardStep5_Summary } from "./wizard/QuoteWizardStep5_Summary";
+import { QuoteWizardStep6 } from "./wizard/QuoteWizardStep6_Attachments";
 
 interface QuoteData {
   id?: string;
@@ -206,6 +207,7 @@ const steps = [
   { id: 3, title: "Coverage & Services", description: "Insurance, maintenance & add-ons" },
   { id: 4, title: "Vehicles", description: "Vehicle selection & configuration" },
   { id: 5, title: "Summary", description: "Review & finalize quote" },
+  { id: 6, title: "Attachments", description: "Upload supporting documents" },
 ];
 
 export const QuoteWizard: React.FC = () => {
@@ -759,6 +761,12 @@ export const QuoteWizard: React.FC = () => {
             data={quoteData}
             onChange={(data) => updateQuoteData(5, data)}
             errors={errors}
+          />
+        );
+      case 6:
+        return (
+          <QuoteWizardStep6
+            data={quoteData}
           />
         );
       default:
