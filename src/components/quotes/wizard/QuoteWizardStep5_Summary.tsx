@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { FileText, DollarSign, Car, Calendar, Calculator, AlertCircle, CheckCircle, Send, Printer, Mail } from "lucide-react";
-import { useCostSheet } from "@/hooks/useCostSheet";
+import { useCostSheets, useCostSheet } from "@/hooks/useCostSheet";
 import { CostSheetStatusBadge } from "../costsheet/CostSheetStatusBadge";
 import { formatCurrency } from "@/lib/utils/currency";
 import { useSubmitQuote, useGenerateQuotePDF, useSendQuoteToCustomer } from "@/hooks/useQuote";
@@ -23,7 +23,9 @@ export const QuoteWizardStep5_Summary: React.FC<QuoteWizardStep4Props> = ({
   errors,
 }) => {
   const isCorporate = data.quote_type === 'Corporate lease';
-  const { data: costSheet } = useCostSheet(data.id);
+  const { data: costSheets } = useCostSheets(data.id);
+  const latestCostSheetId = costSheets?.[0]?.id; // Get latest cost sheet ID
+  const { data: costSheet } = useCostSheet(latestCostSheetId); // Fetch full details
   const { toast } = useToast();
   
   const submitQuoteMutation = useSubmitQuote();
