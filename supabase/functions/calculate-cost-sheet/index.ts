@@ -68,10 +68,10 @@ Deno.serve(async (req) => {
       .eq('is_active', true)
       .single()
 
-    const finRate = financing_rate ?? config?.financing_rate_percent ?? 6.0
-    const overheadPct = overhead_percent ?? config?.overhead_percent ?? 5.0
+    const finRate = financing_rate ?? config?.financing_rate_percent ?? 5.5
+    const overheadPct = overhead_percent ?? config?.overhead_percent ?? 8.0
     const targetMargin = target_margin ?? 15.0
-    const residualValue = residual_value_percent ?? 40.0
+    // Residual value will be dynamically set based on lease term for each line
 
     // Check for existing draft cost sheet
     const { data: existingDraft } = await supabaseClient
@@ -196,29 +196,55 @@ Deno.serve(async (req) => {
       // Get lease term from item or calculate from dates
       const leaseTerm = item.lease_term_months ?? 36
 
+      // Dynamic residual value based on lease term (shorter leases = higher residual)
+      let dynamicResidualValue = residual_value_percent ?? 40.0
+      if (leaseTerm <= 12) {
+        dynamicResidualValue = 85.0  // 12-month: vehicle retains 85% value
+      } else if (leaseTerm <= 18) {
+        dynamicResidualValue = 75.0  // 18-month: vehicle retains 75% value
+      } else if (leaseTerm <= 24) {
+        dynamicResidualValue = 65.0  // 24-month: vehicle retains 65% value
+      } else if (leaseTerm <= 30) {
+        dynamicResidualValue = 55.0  // 30-month: vehicle retains 55% value
+      } else {
+        dynamicResidualValue = 45.0  // 36+ month: vehicle retains 45% value
+      }
+
       // Determine if maintenance is included
       // Check per-vehicle override first, then fall back to quote-level setting
       const maintenanceIncluded = item.maintenance_included ?? quote.maintenance_included ?? false
       
       // Use config defaults or provided values
       const maintenanceCost = maintenanceIncluded 
-        ? (item.monthly_maintenance_cost ?? quote.monthly_maintenance_cost_per_vehicle ?? config?.maintenance_per_month_aed ?? 250)
+        ? (item.monthly_maintenance_cost ?? quote.monthly_maintenance_cost_per_vehicle ?? config?.maintenance_per_month_aed ?? 350)
         : 0
-      const insuranceCost = config?.insurance_per_month_aed ?? 300
-      const registrationCost = config?.registration_admin_per_month_aed ?? 100
-      const otherCosts = config?.other_costs_per_month_aed ?? 50
+      const insuranceCost = config?.insurance_per_month_aed ?? 450
+      const registrationCost = config?.registration_admin_per_month_aed ?? 125
+      const otherCosts = config?.other_costs_per_month_aed ?? 75
 
       console.log(`Line ${lineNo}: Maintenance ${maintenanceIncluded ? 'INCLUDED' : 'EXCLUDED'} - ${maintenanceCost} AED/month`)
 
       // Calculate total monthly cost
-      const depreciation = (acquisitionCost * (1 - residualValue / 100)) / leaseTerm
+      const depreciation = (acquisitionCost * (1 - dynamicResidualValue / 100)) / leaseTerm
       const financing = (acquisitionCost * finRate / 100) / 12
       const overhead = (maintenanceCost + insuranceCost + registrationCost + otherCosts) * (overheadPct / 100)
       
       const totalCost = depreciation + financing + maintenanceCost + insuranceCost + registrationCost + otherCosts + overhead
 
-      // Calculate suggested rate based on target margin
-      const suggestedRate = roundCurrency(totalCost / (1 - targetMargin / 100))
+      // Calculate base suggested rate based on target margin
+      let suggestedRate = roundCurrency(totalCost / (1 - targetMargin / 100))
+
+      // Apply short-term lease premium
+      let leasePremiumMultiplier = 1.0
+      if (leaseTerm <= 12) {
+        leasePremiumMultiplier = 1.25  // 25% premium for 12-month
+      } else if (leaseTerm <= 18) {
+        leasePremiumMultiplier = 1.15  // 15% premium for 18-month
+      } else if (leaseTerm <= 24) {
+        leasePremiumMultiplier = 1.10  // 10% premium for 24-month
+      }
+
+      suggestedRate = roundCurrency(suggestedRate * leasePremiumMultiplier)
 
       // Get current quoted rate
       const quotedRate = roundCurrency(item.monthly_rate ?? suggestedRate)
@@ -233,7 +259,7 @@ Deno.serve(async (req) => {
         vehicle_id: item.vehicle_id,
         lease_term_months: leaseTerm,
         acquisition_cost_aed: roundCurrency(acquisitionCost),
-        residual_value_percent: residualValue,
+        residual_value_percent: dynamicResidualValue,
         maintenance_per_month_aed: roundCurrency(maintenanceCost),
         insurance_per_month_aed: roundCurrency(insuranceCost),
         registration_admin_per_month_aed: roundCurrency(registrationCost),
