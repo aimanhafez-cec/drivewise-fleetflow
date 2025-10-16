@@ -496,6 +496,13 @@ export const QuoteWizard: React.FC = () => {
     },
   });
 
+  // Helper to remove undefined values from payload
+  const cleanPayload = (obj: any) => {
+    return Object.fromEntries(
+      Object.entries(obj).filter(([_, value]) => value !== undefined)
+    );
+  };
+
   const createQuoteMutation = useMutation({
     mutationFn: async (data: QuoteData) => {
       const subtotal = data.items.reduce((sum, item) => sum + (item.qty * item.rate), 0);
@@ -503,26 +510,131 @@ export const QuoteWizard: React.FC = () => {
       const total = subtotal + taxAmount;
 
       const quotePayload = {
+        // Header fields (Step 1)
+        legal_entity_id: data.legal_entity_id,
+        business_unit_id: data.business_unit_id,
+        opportunity_id: data.opportunity_id,
+        quote_description: data.quote_description,
+        customer_type: data.customer_type,
         customer_id: data.customer_id,
+        account_name: data.account_name,
+        customer_bill_to: data.customer_bill_to,
+        contact_person_id: data.contact_person_id,
+        project: data.project,
+        sales_office_id: data.sales_office_id,
+        sales_rep_id: data.sales_rep_id,
+        quote_entry_date: data.quote_entry_date,
+        status: data.status || "draft",
+        win_loss_reason: data.win_loss_reason,
+        version: data.version || 1,
+        quote_date: data.quote_date,
+        quote_type: data.quote_type,
+        currency: data.currency || 'AED',
+        validity_date_to: data.validity_date_to,
+        contract_effective_from: data.contract_effective_from,
+        contract_effective_to: data.contract_effective_to,
+        duration_days: data.duration_days,
+        
+        // Pickup/Return configuration
+        pickup_type: data.pickup_type,
+        pickup_location_id: data.pickup_location_id,
+        pickup_customer_site_id: data.pickup_customer_site_id,
+        return_type: data.return_type,
+        return_location_id: data.return_location_id,
+        return_customer_site_id: data.return_customer_site_id,
+        
+        // Vehicle (legacy single-vehicle field)
+        vehicle_type_id: data.vehicle_type_id,
         vehicle_id: data.vehicle_id,
-        items: data.items,
-        subtotal,
-        tax_amount: taxAmount,
-        total_amount: total,
+        
+        // Vehicle Lines (Corporate multi-vehicle quotes)
+        quote_items: data.quote_items || [],
+        
+        // Financial fields (Step 2)
+        payment_terms_id: data.payment_terms_id,
+        billing_plan: data.billing_plan,
+        billing_start_date: data.billing_start_date,
+        proration_rule: data.proration_rule,
+        vat_percentage: data.vat_percentage,
+        default_price_list_id: data.default_price_list_id,
+        withholding_tax_percentage: data.withholding_tax_percentage,
+        deposit_type: data.deposit_type,
+        default_deposit_amount: data.default_deposit_amount,
+        default_advance_rent_months: data.default_advance_rent_months,
+        annual_escalation_percentage: data.annual_escalation_percentage,
+        initial_fees: data.initial_fees || [],
+        grace_period_days: data.grace_period_days,
+        late_fee_percentage: data.late_fee_percentage,
+        invoice_format: data.invoice_format,
+        email_invoice_to_contact: data.email_invoice_to_contact,
+        invoice_contact_person_id: data.invoice_contact_person_id,
+        payment_method: data.payment_method,
+        customer_po_number: data.customer_po_number,
+        payment_instructions: data.payment_instructions,
+        
+        // Insurance fields (Step 3)
+        insurance_coverage_package: data.insurance_coverage_package,
+        insurance_excess_aed: data.insurance_excess_aed,
+        insurance_glass_tire_cover: data.insurance_glass_tire_cover,
+        insurance_pai_enabled: data.insurance_pai_enabled,
+        insurance_territorial_coverage: data.insurance_territorial_coverage,
+        insurance_coverage_summary: data.insurance_coverage_summary,
+        insurance_damage_waiver: data.insurance_damage_waiver,
+        insurance_theft_protection: data.insurance_theft_protection,
+        insurance_third_party_liability: data.insurance_third_party_liability,
+        insurance_personal_accident: data.insurance_personal_accident,
+        insurance_additional_driver: data.insurance_additional_driver,
+        insurance_cross_border: data.insurance_cross_border,
+        insurance_notes: data.insurance_notes,
+        
+        // Maintenance fields (Step 3)
+        maintenance_included: data.maintenance_included,
+        maintenance_package_type: data.maintenance_package_type,
+        monthly_maintenance_cost_per_vehicle: data.monthly_maintenance_cost_per_vehicle,
+        maintenance_plan_source: data.maintenance_plan_source,
+        show_maintenance_separate_line: data.show_maintenance_separate_line,
+        maintenance_coverage_summary: data.maintenance_coverage_summary,
+        
+        // Default Add-Ons (Step 3)
+        default_addons: data.default_addons || [],
+        
+        // Mileage Pooling
+        mileage_pooling_enabled: data.mileage_pooling_enabled,
+        pooled_mileage_allowance_km: data.pooled_mileage_allowance_km,
+        pooled_excess_km_rate: data.pooled_excess_km_rate,
+        
+        // Toll & Fines
+        salik_darb_handling: data.salik_darb_handling,
+        salik_darb_allowance_cap: data.salik_darb_allowance_cap,
+        tolls_admin_fee_model: data.tolls_admin_fee_model,
+        traffic_fines_handling: data.traffic_fines_handling,
+        admin_fee_per_fine_aed: data.admin_fee_per_fine_aed,
+        
+        // Legacy fields (for backward compatibility)
+        items: data.items || [],
         valid_until: data.expires_at,
         notes: data.notes,
-        status: data.status || "draft",
+        
+        // Calculated fields
+        subtotal: subtotal,
+        tax_amount: taxAmount,
+        total_amount: total,
+        
+        // Other
         rfq_id: fromRfqId || null,
       };
 
       // If no quoteId, INSERT new quote
       if (!quoteId) {
+        const insertPayload = {
+          ...quotePayload,
+          quote_number: `Q-${new Date().getFullYear()}-${String(Date.now()).slice(-4)}`,
+        };
+        const cleanedInsertPayload = cleanPayload(insertPayload);
+        
         const { data: quote, error } = await supabase
           .from("quotes")
-          .insert({
-            ...quotePayload,
-            quote_number: `Q-${new Date().getFullYear()}-${String(Date.now()).slice(-4)}`,
-          })
+          .insert(cleanedInsertPayload as any)
           .select()
           .single();
 
@@ -531,9 +643,10 @@ export const QuoteWizard: React.FC = () => {
       }
 
       // If has ID, UPDATE existing quote
+      const cleanedPayload = cleanPayload(quotePayload);
       const { data: quote, error } = await supabase
         .from("quotes")
-        .update(quotePayload)
+        .update(cleanedPayload as any)
         .eq("id", quoteId)
         .select()
         .single();
