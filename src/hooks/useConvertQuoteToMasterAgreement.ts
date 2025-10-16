@@ -17,7 +17,7 @@ export const useConvertQuoteToMasterAgreement = () => {
         title: "Success",
         description: "Quote converted to Corporate Leasing Agreement",
       });
-      navigate(`/corporate-leasing/${agreementId}`);
+      navigate(`/master-agreements/${agreementId}`);
     },
     onError: (error: any) => {
       console.error("Failed to convert quote:", error);

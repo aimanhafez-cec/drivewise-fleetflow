@@ -91,15 +91,21 @@ const navigation = [
     icon: FileText,
   },
   {
-    title: 'Corporate Leasing',
-    url: '/corporate-leasing',
+    title: 'Master Agreements',
+    url: '/master-agreements',
     icon: Building2,
   },
-  {
-    title: 'Car Subscriptions',
-    url: '/car-subscriptions',
-    icon: Car,
-  },
+  // Hidden incomplete screens
+  // {
+  //   title: 'Corporate Leasing',
+  //   url: '/corporate-leasing',
+  //   icon: Building2,
+  // },
+  // {
+  //   title: 'Car Subscriptions',
+  //   url: '/car-subscriptions',
+  //   icon: Car,
+  // },
   {
     title: 'Reports',
     url: '/reports',

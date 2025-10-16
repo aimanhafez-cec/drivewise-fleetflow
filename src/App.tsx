@@ -43,8 +43,11 @@ import CorporateLeasing from "./pages/CorporateLeasing";
 import NewCorporateLeasing from "./pages/NewCorporateLeasing";
 import CorporateLeasingDetails from "./pages/CorporateLeasingDetails";
 import CorporateLeasingEdit from "./pages/CorporateLeasingEdit";
-import { CarSubscriptions } from "./pages/CarSubscriptions";
-import { NewCarSubscription } from "./pages/NewCarSubscription";
+import MasterAgreements from "./pages/MasterAgreements";
+import MasterAgreementDetails from "./pages/MasterAgreementDetails";
+// Hidden - commented out imports
+// import { CarSubscriptions } from "./pages/CarSubscriptions";
+// import { NewCarSubscription } from "./pages/NewCarSubscription";
 
 const queryClient = new QueryClient();
 
@@ -181,24 +184,35 @@ const App = () => {
               }>
                 <Route index element={<Reports />} />
               </Route>
+              <Route path="/master-agreements" element={
+                <ProtectedRoute>
+                  <AppLayout />
+                </ProtectedRoute>
+              }>
+                <Route index element={<MasterAgreements />} />
+                <Route path="new" element={<NewCorporateLeasing />} />
+                <Route path=":id" element={<MasterAgreementDetails />} />
+              </Route>
               <Route path="/corporate-leasing" element={
                 <ProtectedRoute>
                   <AppLayout />
                 </ProtectedRoute>
               }>
-                <Route index element={<CorporateLeasing />} />
-                <Route path="new" element={<NewCorporateLeasing />} />
-                <Route path=":id" element={<CorporateLeasingDetails />} />
+                {/* Hidden - Corporate Leasing list */}
+                {/* <Route index element={<CorporateLeasing />} /> */}
+                {/* <Route path="new" element={<NewCorporateLeasing />} /> */}
+                {/* <Route path=":id" element={<CorporateLeasingDetails />} /> */}
                 <Route path=":id/edit" element={<CorporateLeasingEdit />} />
               </Route>
-              <Route path="/car-subscriptions" element={
+              {/* Hidden - Car Subscriptions */}
+              {/* <Route path="/car-subscriptions" element={
                 <ProtectedRoute>
                   <AppLayout />
                 </ProtectedRoute>
               }>
                 <Route index element={<CarSubscriptions />} />
                 <Route path="new" element={<NewCarSubscription />} />
-              </Route>
+              </Route> */}
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
