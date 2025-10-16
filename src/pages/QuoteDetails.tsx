@@ -546,7 +546,7 @@ const QuoteDetails: React.FC = () => {
           <TabsTrigger value="summary">Summary</TabsTrigger>
           <TabsTrigger value="vehicles">Vehicles</TabsTrigger>
           <TabsTrigger value="attachments">Attachments</TabsTrigger>
-          <TabsTrigger value="customer">Customer</TabsTrigger>
+          <TabsTrigger value="customer">Customer & Sales</TabsTrigger>
           <TabsTrigger value="activity">Activity</TabsTrigger>
         </TabsList>
 
