@@ -55,14 +55,14 @@ interface QuoteWithRelations {
   id: string;
   quote_number: string;
   customer_id: string;
-  vehicle_id: string | null;
   rfq_id: string | null;
   status: string;
+  quote_type: string | null;
   total_amount: number;
   created_at: string;
-  valid_until: string | null;
+  validity_date_to: string | null;
+  quote_items: any[];
   customer?: Customer | null;
-  vehicle?: Vehicle | null;
 }
 
 const ManageQuotations: React.FC = () => {
@@ -80,7 +80,7 @@ const ManageQuotations: React.FC = () => {
     queryFn: async () => {
       let query = supabase
         .from("quotes")
-        .select("*")
+        .select("id, quote_number, customer_id, rfq_id, status, quote_type, total_amount, created_at, validity_date_to, quote_items")
         .order("created_at", { ascending: false });
 
       // Apply quick filter
@@ -104,10 +104,10 @@ const ManageQuotations: React.FC = () => {
         query = query.lte("created_at", filters.dateTo);
       }
       if (filters.validFrom) {
-        query = query.gte("valid_until", filters.validFrom);
+        query = query.gte("validity_date_to", filters.validFrom);
       }
       if (filters.validTo) {
-        query = query.lte("valid_until", filters.validTo);
+        query = query.lte("validity_date_to", filters.validTo);
       }
       if (filters.amountMin) {
         query = query.gte("total_amount", filters.amountMin);
@@ -121,9 +121,6 @@ const ManageQuotations: React.FC = () => {
       if (filters.rfq) {
         query = query.eq("rfq_id", filters.rfq);
       }
-      if (filters.vehicle) {
-        query = query.eq("vehicle_id", filters.vehicle);
-      }
 
       const { data, error } = await query;
       if (error) throw error;
@@ -131,27 +128,17 @@ const ManageQuotations: React.FC = () => {
       // Fetch related data for each quote
       if (data && data.length > 0) {
         const customerIds = [...new Set(data.map(q => q.customer_id).filter(Boolean))] as string[];
-        const vehicleIds = [...new Set(data.map(q => q.vehicle_id).filter(Boolean))] as string[];
         
-        const [customersData, vehiclesData] = await Promise.all([
-          customerIds.length > 0 
-            ? supabase.from("customers").select("id, full_name, email").in("id", customerIds)
-            : Promise.resolve({ data: [] as Customer[] }),
-          vehicleIds.length > 0
-            ? supabase.from("vehicles").select("id, make, model, license_plate").in("id", vehicleIds)
-            : Promise.resolve({ data: [] as Vehicle[] }),
-        ]);
+        const customersData = customerIds.length > 0 
+          ? await supabase.from("profiles").select("id, full_name, email").in("id", customerIds)
+          : { data: [] as Customer[] };
 
         const customersMap = new Map<string, Customer>();
         customersData.data?.forEach(c => customersMap.set(c.id, c));
-        
-        const vehiclesMap = new Map<string, Vehicle>();
-        vehiclesData.data?.forEach(v => vehiclesMap.set(v.id, v));
 
         return data.map(quote => ({
           ...quote,
           customer: quote.customer_id ? customersMap.get(quote.customer_id) : null,
-          vehicle: quote.vehicle_id ? vehiclesMap.get(quote.vehicle_id) : null,
         })) as QuoteWithRelations[];
       }
 
@@ -182,12 +169,29 @@ const ManageQuotations: React.FC = () => {
     }
   };
 
-  const isExpiringSoon = (validUntil: string | null) => {
-    if (!validUntil) return false;
+  const isExpiringSoon = (validityDateTo: string | null) => {
+    if (!validityDateTo) return false;
     const daysUntilExpiry = Math.floor(
-      (new Date(validUntil).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)
+      (new Date(validityDateTo).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)
     );
     return daysUntilExpiry >= 0 && daysUntilExpiry <= 7;
+  };
+
+  const getVehicleDisplay = (quoteItems: any[]) => {
+    if (!quoteItems || quoteItems.length === 0) {
+      return { display: "To be assigned", count: 0 };
+    }
+    if (quoteItems.length === 1) {
+      const item = quoteItems[0];
+      return { 
+        display: item.vehicle_class_name || item.item_description || "Vehicle",
+        count: 1
+      };
+    }
+    return { 
+      display: `${quoteItems.length} vehicles`,
+      count: quoteItems.length
+    };
   };
 
   const handleSearch = (newFilters: SearchFilters) => {
@@ -294,8 +298,9 @@ const ManageQuotations: React.FC = () => {
             <TableHeader>
               <TableRow>
                 <TableHead>Quote #</TableHead>
+                <TableHead>Type</TableHead>
                 <TableHead>Customer</TableHead>
-                <TableHead>Vehicle</TableHead>
+                <TableHead>Vehicles</TableHead>
                 <TableHead>Created Date</TableHead>
                 <TableHead>Valid Until</TableHead>
                 <TableHead className="text-right">Amount</TableHead>
@@ -306,13 +311,13 @@ const ManageQuotations: React.FC = () => {
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center py-12">
+                  <TableCell colSpan={9} className="text-center py-12">
                     Loading quotations...
                   </TableCell>
                 </TableRow>
               ) : quotes.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center py-12">
+                  <TableCell colSpan={9} className="text-center py-12">
                     <div className="flex flex-col items-center gap-2">
                       <FileText className="h-12 w-12 text-muted-foreground" />
                       <p className="text-lg font-medium">No quotations found</p>
@@ -327,13 +332,20 @@ const ManageQuotations: React.FC = () => {
                   </TableCell>
                 </TableRow>
               ) : (
-                quotes.map((quote) => (
+                quotes.map((quote) => {
+                  const vehicleInfo = getVehicleDisplay(quote.quote_items || []);
+                  return (
                   <TableRow key={quote.id} className="cursor-pointer hover:bg-muted/50">
                     <TableCell
                       onClick={() => navigate(`/quotes/${quote.id}`)}
                       className="font-medium"
                     >
                       {quote.quote_number}
+                    </TableCell>
+                    <TableCell onClick={() => navigate(`/quotes/${quote.id}`)}>
+                      <Badge variant="outline" className="capitalize">
+                        {quote.quote_type || "Standard"}
+                      </Badge>
                     </TableCell>
                     <TableCell onClick={() => navigate(`/quotes/${quote.id}`)}>
                       <div>
@@ -344,34 +356,30 @@ const ManageQuotations: React.FC = () => {
                       </div>
                     </TableCell>
                     <TableCell onClick={() => navigate(`/quotes/${quote.id}`)}>
-                      {quote.vehicle ? (
-                        <div>
-                          <p className="font-medium">
-                            {quote.vehicle.make} {quote.vehicle.model}
-                          </p>
+                      <div>
+                        <p className="font-medium">{vehicleInfo.display}</p>
+                        {vehicleInfo.count > 1 && (
                           <p className="text-sm text-muted-foreground">
-                            {quote.vehicle.license_plate}
+                            Multiple vehicles
                           </p>
-                        </div>
-                      ) : (
-                        <span className="text-muted-foreground">-</span>
-                      )}
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell onClick={() => navigate(`/quotes/${quote.id}`)}>
                       {format(new Date(quote.created_at), "MMM dd, yyyy")}
                     </TableCell>
                     <TableCell onClick={() => navigate(`/quotes/${quote.id}`)}>
-                      {quote.valid_until ? (
+                      {quote.validity_date_to ? (
                         <div className="flex items-center gap-2">
-                          {format(new Date(quote.valid_until), "MMM dd, yyyy")}
-                          {isExpiringSoon(quote.valid_until) && (
+                          {format(new Date(quote.validity_date_to), "MMM dd, yyyy")}
+                          {isExpiringSoon(quote.validity_date_to) && (
                             <Badge variant="outline" className="text-orange-600">
                               Expiring Soon
                             </Badge>
                           )}
                         </div>
                       ) : (
-                        <span className="text-muted-foreground">-</span>
+                        <span className="text-muted-foreground">Not set</span>
                       )}
                     </TableCell>
                     <TableCell onClick={() => navigate(`/quotes/${quote.id}`)} className="text-right">
@@ -433,7 +441,8 @@ const ManageQuotations: React.FC = () => {
                       </DropdownMenu>
                     </TableCell>
                   </TableRow>
-                ))
+                  );
+                })
               )}
             </TableBody>
           </Table>
