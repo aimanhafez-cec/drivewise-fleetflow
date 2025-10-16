@@ -973,7 +973,7 @@ const QuoteDetails: React.FC = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Building className="h-5 w-5" />
-                Quote Metadata
+                Company & Sales Information
               </CardTitle>
             </CardHeader>
             <CardContent>
