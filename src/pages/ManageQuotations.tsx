@@ -233,6 +233,11 @@ const ManageQuotations: React.FC = () => {
     return daysUntilExpiry >= 0 && daysUntilExpiry <= 3;
   };
 
+  const formatQuoteType = (type?: string | null) => {
+    if (!type) return "Standard";
+    return type.replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+  };
+
   const getVehicleDisplay = (quoteItems: any) => {
     const items = Array.isArray(quoteItems) ? quoteItems : [];
     if (items.length === 0) {
@@ -416,8 +421,8 @@ const ManageQuotations: React.FC = () => {
                       {quote.quote_number}
                     </TableCell>
                     <TableCell onClick={() => navigate(`/quotes/${quote.id}`)} className="align-middle">
-                      <Badge variant="outline" className="capitalize">
-                        {quote.quote_type || "Standard"}
+                      <Badge variant="outline" className="whitespace-nowrap leading-tight">
+                        {formatQuoteType(quote.quote_type)}
                       </Badge>
                     </TableCell>
                     <TableCell onClick={() => navigate(`/quotes/${quote.id}`)} className="align-middle">
