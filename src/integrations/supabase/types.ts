@@ -2320,9 +2320,13 @@ export type Database = {
           created_at: string
           created_by: string | null
           currency: string | null
+          customer_acceptance_status: string | null
           customer_bill_to: string | null
           customer_id: string
           customer_po_number: string | null
+          customer_rejection_reason: string | null
+          customer_signature: Json | null
+          customer_signed_at: string | null
           customer_type: string | null
           default_addons: Json | null
           default_advance_rent_months: number | null
@@ -2370,6 +2374,8 @@ export type Database = {
           pooled_mileage_allowance_km: number | null
           project: string | null
           proration_rule: string | null
+          public_token: string | null
+          public_token_expires_at: string | null
           quote_date: string | null
           quote_description: string | null
           quote_entry_date: string | null
@@ -2382,6 +2388,8 @@ export type Database = {
           rfq_id: string | null
           sales_office_id: string | null
           sales_rep_id: string | null
+          sent_to_customer_at: string | null
+          sent_to_customer_by: string | null
           show_maintenance_separate_line: boolean | null
           status: string
           submitted_at: string | null
@@ -2414,9 +2422,13 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           currency?: string | null
+          customer_acceptance_status?: string | null
           customer_bill_to?: string | null
           customer_id: string
           customer_po_number?: string | null
+          customer_rejection_reason?: string | null
+          customer_signature?: Json | null
+          customer_signed_at?: string | null
           customer_type?: string | null
           default_addons?: Json | null
           default_advance_rent_months?: number | null
@@ -2464,6 +2476,8 @@ export type Database = {
           pooled_mileage_allowance_km?: number | null
           project?: string | null
           proration_rule?: string | null
+          public_token?: string | null
+          public_token_expires_at?: string | null
           quote_date?: string | null
           quote_description?: string | null
           quote_entry_date?: string | null
@@ -2476,6 +2490,8 @@ export type Database = {
           rfq_id?: string | null
           sales_office_id?: string | null
           sales_rep_id?: string | null
+          sent_to_customer_at?: string | null
+          sent_to_customer_by?: string | null
           show_maintenance_separate_line?: boolean | null
           status?: string
           submitted_at?: string | null
@@ -2508,9 +2524,13 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           currency?: string | null
+          customer_acceptance_status?: string | null
           customer_bill_to?: string | null
           customer_id?: string
           customer_po_number?: string | null
+          customer_rejection_reason?: string | null
+          customer_signature?: Json | null
+          customer_signed_at?: string | null
           customer_type?: string | null
           default_addons?: Json | null
           default_advance_rent_months?: number | null
@@ -2558,6 +2578,8 @@ export type Database = {
           pooled_mileage_allowance_km?: number | null
           project?: string | null
           proration_rule?: string | null
+          public_token?: string | null
+          public_token_expires_at?: string | null
           quote_date?: string | null
           quote_description?: string | null
           quote_entry_date?: string | null
@@ -2570,6 +2592,8 @@ export type Database = {
           rfq_id?: string | null
           sales_office_id?: string | null
           sales_rep_id?: string | null
+          sent_to_customer_at?: string | null
+          sent_to_customer_by?: string | null
           show_maintenance_separate_line?: boolean | null
           status?: string
           submitted_at?: string | null

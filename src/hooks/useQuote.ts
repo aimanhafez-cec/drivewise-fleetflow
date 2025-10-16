@@ -79,29 +79,45 @@ export const useGenerateQuotePDF = () => {
 };
 
 export const useSendQuoteToCustomer = () => {
+  const queryClient = useQueryClient();
   const { toast } = useToast();
 
   return useMutation({
     mutationFn: async (params: {
       quote_id: string;
-      customer_email: string;
-      message?: string;
+      recipient_email: string;
+      custom_message?: string;
+      expiration_days?: number;
     }) => {
-      // TODO: Implement email sending via edge function
-      // For now, show placeholder
-      console.log('Sending quote to:', params);
-      return { success: true };
+      console.log('📧 Sending quote to customer via edge function:', params);
+      
+      const { data, error } = await supabase.functions.invoke('send-quote-to-customer', {
+        body: params,
+      });
+
+      if (error) {
+        console.error('❌ Edge function error:', error);
+        throw error;
+      }
+      
+      console.log('✅ Quote sent successfully:', data);
+      return data;
     },
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
+      console.log('✅ Success response:', data);
+      queryClient.invalidateQueries({ queryKey: ['quote', variables.quote_id] });
+      queryClient.invalidateQueries({ queryKey: ['quotes'] });
       toast({
-        title: 'Coming Soon',
-        description: 'Email sending will be implemented in the next phase.',
+        title: 'Quote Sent Successfully',
+        description: `Quote has been sent to ${variables.recipient_email}`,
       });
     },
     onError: (error: any) => {
+      console.error('❌ Send quote error:', error);
+      const errorMessage = error?.message || error?.error?.message || 'Failed to send quote to customer';
       toast({
-        title: 'Failed to Send',
-        description: error.message || 'Failed to send quote to customer',
+        title: 'Failed to Send Quote',
+        description: errorMessage,
         variant: 'destructive',
       });
     },

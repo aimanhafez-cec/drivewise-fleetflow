@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { QuotePrintLayout } from "../QuotePrintLayout";
 import { Separator } from "@/components/ui/separator";
@@ -13,6 +13,9 @@ import { formatCurrency } from "@/lib/utils/currency";
 import { useSubmitQuote, useGenerateQuotePDF, useSendQuoteToCustomer } from "@/hooks/useQuote";
 import { useToast } from "@/hooks/use-toast";
 import { addMonths, format } from "date-fns";
+import { SendQuoteToCustomerDialog } from "../SendQuoteToCustomerDialog";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface QuoteWizardStep4Props {
   data: any;
@@ -31,9 +34,40 @@ export const QuoteWizardStep5_Summary: React.FC<QuoteWizardStep4Props> = ({
   const { data: costSheet } = useCostSheet(latestCostSheetId); // Fetch full details
   const { toast } = useToast();
   
+  const [sendDialogOpen, setSendDialogOpen] = useState(false);
+  
   const submitQuoteMutation = useSubmitQuote();
   const generatePDFMutation = useGenerateQuotePDF();
   const sendQuoteMutation = useSendQuoteToCustomer();
+
+  // Fetch customer and contact person details
+  const { data: customerData } = useQuery({
+    queryKey: ['customer', data.customer_id],
+    queryFn: async () => {
+      if (!data.customer_id) return null;
+      const { data: customer } = await supabase
+        .from('profiles')
+        .select('full_name, email')
+        .eq('id', data.customer_id)
+        .single();
+      return customer;
+    },
+    enabled: !!data.customer_id,
+  });
+
+  const { data: contactPersonData } = useQuery({
+    queryKey: ['contact_person', data.contact_person_id],
+    queryFn: async () => {
+      if (!data.contact_person_id) return null;
+      const { data: contact } = await supabase
+        .from('profiles')
+        .select('full_name, email')
+        .eq('id', data.contact_person_id)
+        .single();
+      return contact;
+    },
+    enabled: !!data.contact_person_id,
+  });
 
   const handleSubmitForApproval = () => {
     console.log('🔘 Submit button clicked!', {
@@ -66,19 +100,25 @@ export const QuoteWizardStep5_Summary: React.FC<QuoteWizardStep4Props> = ({
   };
 
   const handleSendToCustomer = () => {
-    if (!data.account_name) {
+    if (!data.id) {
       toast({
         title: 'Error',
-        description: 'Customer information is missing',
+        description: 'Please save the quote as draft first',
         variant: 'destructive',
       });
       return;
     }
     
-    toast({
-      title: 'Coming Soon',
-      description: 'Email sending will be implemented in the next phase',
-    });
+    if (!contactPersonData?.email && !customerData?.email) {
+      toast({
+        title: 'Error',
+        description: 'Customer email is missing',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
+    setSendDialogOpen(true);
   };
   
   // Helper to calculate end date from start date + duration
@@ -914,6 +954,16 @@ export const QuoteWizardStep5_Summary: React.FC<QuoteWizardStep4Props> = ({
         </Card>
       </Collapsible>
       </div>
+
+      {/* Send to Customer Dialog */}
+      <SendQuoteToCustomerDialog
+        open={sendDialogOpen}
+        onOpenChange={setSendDialogOpen}
+        quoteId={data.id}
+        quoteNumber={data.quote_number}
+        customerName={customerData?.full_name || data.account_name || 'Customer'}
+        customerEmail={contactPersonData?.email || customerData?.email || ''}
+      />
     </div>
   );
 };
