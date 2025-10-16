@@ -206,8 +206,8 @@ const steps = [
   { id: 2, title: "Financials", description: "Billing, deposits & payment terms" },
   { id: 3, title: "Coverage & Services", description: "Insurance, maintenance & add-ons" },
   { id: 4, title: "Vehicles", description: "Vehicle selection & configuration" },
-  { id: 5, title: "Summary", description: "Review & finalize quote" },
-  { id: 6, title: "Attachments", description: "Upload supporting documents" },
+  { id: 5, title: "Attachments", description: "Upload supporting documents" },
+  { id: 6, title: "Summary", description: "Review & finalize quote" },
 ];
 
 export const QuoteWizard: React.FC = () => {
@@ -757,16 +757,16 @@ export const QuoteWizard: React.FC = () => {
         );
       case 5:
         return (
-          <QuoteWizardStep5_Summary
+          <QuoteWizardStep6
             data={quoteData}
-            onChange={(data) => updateQuoteData(5, data)}
-            errors={errors}
           />
         );
       case 6:
         return (
-          <QuoteWizardStep6
+          <QuoteWizardStep5_Summary
             data={quoteData}
+            onChange={(data) => updateQuoteData(6, data)}
+            errors={errors}
           />
         );
       default:
