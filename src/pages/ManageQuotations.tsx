@@ -403,20 +403,10 @@ const ManageQuotations: React.FC = () => {
                     <TableCell onClick={() => navigate(`/quotes/${quote.id}`)}>
                       <div>
                         <p className="font-medium">{quote.customer?.full_name || "N/A"}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {quote.customer?.email || ""}
-                        </p>
                       </div>
                     </TableCell>
                     <TableCell onClick={() => navigate(`/quotes/${quote.id}`)}>
-                      <div>
-                        <p className="font-medium">{vehicleInfo.display}</p>
-                        {vehicleInfo.count > 1 && (
-                          <p className="text-sm text-muted-foreground">
-                            Multiple vehicles
-                          </p>
-                        )}
-                      </div>
+                      <p className="font-medium">{vehicleInfo.display}</p>
                     </TableCell>
                     <TableCell onClick={() => navigate(`/quotes/${quote.id}`)}>
                       {format(new Date(quote.created_at), "MMM dd, yyyy")}
