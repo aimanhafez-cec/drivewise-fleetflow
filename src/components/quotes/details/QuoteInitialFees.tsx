@@ -7,10 +7,11 @@ interface QuoteInitialFeesProps {
 }
 
 const formatFeeType = (feeType: string): string => {
-  if (!feeType) return 'Fee';
+  if (!feeType || typeof feeType !== 'string') return 'Fee';
   
   // Convert to title case and add "Fee" suffix if not present
   const formatted = feeType
+    .trim()
     .split('_')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
     .join(' ');
@@ -39,17 +40,20 @@ export const QuoteInitialFees: React.FC<QuoteInitialFeesProps> = ({ quote }) => 
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
-          {initialFees.map((fee: any, index: number) => (
-            <div key={index} className="flex justify-between items-start pb-3 border-b last:border-0 last:pb-0">
-              <div>
-                <p className="font-medium">{formatFeeType(fee.fee_type)}</p>
-                {fee.description && (
-                  <p className="text-sm text-muted-foreground">{fee.description}</p>
-                )}
+          {initialFees.map((fee: any, index: number) => {
+            console.log('Fee data:', fee);
+            return (
+              <div key={index} className="flex justify-between items-start pb-3 border-b last:border-0 last:pb-0">
+                <div>
+                  <p className="font-medium">{fee.fee_type ? formatFeeType(fee.fee_type) : 'Unknown Fee'}</p>
+                  {fee.description && (
+                    <p className="text-sm text-muted-foreground">{fee.description}</p>
+                  )}
+                </div>
+                <p className="font-semibold">{formatCurrency(fee.amount, quote.currency || 'AED')}</p>
               </div>
-              <p className="font-semibold">{formatCurrency(fee.amount, quote.currency || 'AED')}</p>
-            </div>
-          ))}
+            );
+          })}
           
           {initialFees.length > 1 && (
             <>
