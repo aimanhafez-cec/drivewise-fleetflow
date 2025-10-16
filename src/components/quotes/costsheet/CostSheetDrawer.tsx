@@ -30,6 +30,8 @@ import {
 } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertTriangle } from 'lucide-react';
 
 interface CostSheetDrawerProps {
   open: boolean;
@@ -236,6 +238,15 @@ export const CostSheetDrawer: React.FC<CostSheetDrawerProps> = ({
 
           {mergedLines.length > 0 && (
             <>
+              {mergedLines.some(l => l.lease_term_months < 24) && (
+                <Alert variant="default" className="border-amber-500 bg-amber-50 dark:bg-amber-950/20">
+                  <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-500" />
+                  <AlertDescription className="text-amber-900 dark:text-amber-200">
+                    <strong>Short-term lease detected:</strong> Vehicles with lease terms under 24 months have higher depreciation costs. 
+                    The system automatically applies dynamic residual values (12m: 85%, 18m: 75%, 24m: 65%) and lease premiums (12m: +25%, 18m: +15%, 24m: +10%) to maintain target margins.
+                  </AlertDescription>
+                </Alert>
+              )}
               <CostSheetVehicleTable 
                 lines={mergedLines} 
                 disabled={costSheet?.status !== 'draft'}
