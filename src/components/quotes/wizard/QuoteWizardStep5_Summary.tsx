@@ -46,7 +46,7 @@ export const QuoteWizardStep5_Summary: React.FC<QuoteWizardStep4Props> = ({
     queryFn: async () => {
       if (!data.customer_id) return null;
       const { data: customer } = await supabase
-        .from('profiles')
+        .from('customers')
         .select('full_name, email')
         .eq('id', data.customer_id)
         .single();
@@ -60,7 +60,7 @@ export const QuoteWizardStep5_Summary: React.FC<QuoteWizardStep4Props> = ({
     queryFn: async () => {
       if (!data.contact_person_id) return null;
       const { data: contact } = await supabase
-        .from('profiles')
+        .from('contact_persons')
         .select('full_name, email')
         .eq('id', data.contact_person_id)
         .single();
