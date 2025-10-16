@@ -215,6 +215,9 @@ interface QuoteWizardProps {
   quoteId?: string;
 }
 
+// Helper to normalize type strings for robust comparison
+const normalizeType = (t?: string) => (t || '').trim().toLowerCase();
+
 export const QuoteWizard: React.FC<QuoteWizardProps> = ({ viewMode = false, quoteId: propQuoteId }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
@@ -268,10 +271,14 @@ export const QuoteWizard: React.FC<QuoteWizardProps> = ({ viewMode = false, quot
     let subtotal = 0;
     let taxAmount = 0;
 
-    if (data.quote_items && data.quote_items.length > 0) {
+    const isCorporateQuote = normalizeType(data.quote_type) === 'corporate lease';
+
+    if (isCorporateQuote && data.quote_items && data.quote_items.length > 0) {
       // Corporate lease: calculate from quote_items
+      const headerMonths = data.duration_days ? Math.round((data.duration_days || 0) / 30) : 0;
+      
       subtotal = data.quote_items.reduce((sum, item) => {
-        const months = item.duration_months || 0;
+        const months = (item.duration_months && item.duration_months > 0) ? item.duration_months : headerMonths;
         const monthlyRate = item.monthly_rate || 0;
         return sum + (months * monthlyRate);
       }, 0);
@@ -822,7 +829,7 @@ export const QuoteWizard: React.FC<QuoteWizardProps> = ({ viewMode = false, quot
         break;
       case 4:
         // Vehicle selection validation
-        if (quoteData.quote_type === 'Corporate lease') {
+        if (normalizeType(quoteData.quote_type) === 'corporate lease') {
           // Multi-vehicle validation
           if (!quoteData.quote_items || quoteData.quote_items.length === 0) {
             newErrors.quote_items = "At least one vehicle line is required";
@@ -1063,30 +1070,30 @@ export const QuoteWizard: React.FC<QuoteWizardProps> = ({ viewMode = false, quot
         {renderStep()}
       </div>
 
-      {/* Navigation - Hide during print only */}
-      <div className="no-print">
-        <div className="flex justify-between">
-          <Button
-            id="btn-wiz-back"
-            variant="outline"
-            onClick={handleBack}
-            disabled={currentStep === 1}
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
-          </Button>
-
-          {currentStep < steps.length ? (
+      {/* Navigation - Hidden in view mode and during print */}
+      {!viewMode && (
+        <div className="no-print">
+          <div className="flex justify-between">
             <Button
-              id="btn-wiz-next"
-              onClick={handleNext}
-              disabled={viewMode || Object.keys(errors).length > 0}
+              id="btn-wiz-back"
+              variant="outline"
+              onClick={handleBack}
+              disabled={currentStep === 1}
             >
-              Next
-              <ArrowRight className="h-4 w-4 ml-2" />
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back
             </Button>
-          ) : (
-            !viewMode && (
+
+            {currentStep < steps.length ? (
+              <Button
+                id="btn-wiz-next"
+                onClick={handleNext}
+                disabled={Object.keys(errors).length > 0}
+              >
+                Next
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </Button>
+            ) : (
               <div className="flex gap-2">
                 {quoteData.status === 'approved' ? (
                   <Button
@@ -1103,10 +1110,10 @@ export const QuoteWizard: React.FC<QuoteWizardProps> = ({ viewMode = false, quot
                   </p>
                 )}
               </div>
-            )
-          )}
+            )}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

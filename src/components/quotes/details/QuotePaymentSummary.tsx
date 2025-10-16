@@ -27,11 +27,63 @@ const getInvoiceFormatLabel = (format?: string) => {
 };
 
 export const QuotePaymentSummary: React.FC<QuotePaymentSummaryProps> = ({ quote }) => {
-  const subtotal = quote.subtotal || 0;
-  const taxAmount = quote.tax_amount || 0;
-  const totalAmount = quote.total_amount || 0;
   const vatPercentage = quote.vat_percentage || 5;
   const currency = quote.currency || 'AED';
+  
+  // Helper to normalize type strings
+  const normalizeType = (t?: string) => (t || '').trim().toLowerCase();
+  const isCorporate = normalizeType(quote.quote_type) === 'corporate lease';
+  
+  // Compute totals on the fly if stored values are 0
+  const computeTotals = () => {
+    let subtotal = quote.subtotal || 0;
+    let taxAmount = quote.tax_amount || 0;
+    let totalAmount = quote.total_amount || 0;
+    
+    // If all stored totals are 0, calculate from items
+    if (subtotal === 0 && taxAmount === 0 && totalAmount === 0) {
+      if (isCorporate && quote.quote_items && quote.quote_items.length > 0) {
+        // Corporate quote calculation
+        const headerMonths = quote.duration_days ? Math.round(quote.duration_days / 30) : 0;
+        const getAddonType = (a: any) => a.pricing_model || a.type;
+        const getAddonTotal = (a: any) => (a.total ?? a.amount ?? 0);
+        
+        const totalDeposits = quote.quote_items.reduce((sum: number, line: any) => 
+          sum + (line.deposit_amount || 0), 0);
+        const totalAdvance = quote.quote_items.reduce((sum: number, line: any) => 
+          sum + ((line.advance_rent_months || 0) * (line.monthly_rate || 0)), 0);
+        const totalDeliveryFees = quote.quote_items.reduce((sum: number, line: any) => 
+          sum + (line.delivery_fee || 0), 0);
+        const totalCollectionFees = quote.quote_items.reduce((sum: number, line: any) => 
+          sum + (line.collection_fee || 0), 0);
+        const oneTimeAddOns = quote.quote_items.reduce((sum: number, line: any) => {
+          const lineOneTimeAddOns = (line.addons || [])
+            .filter((a: any) => getAddonType(a) === 'one-time')
+            .reduce((s: number, a: any) => s + getAddonTotal(a), 0);
+          return sum + lineOneTimeAddOns;
+        }, 0);
+        const initialFees = (quote.initial_fees || []).reduce((sum: number, fee: any) => 
+          sum + (parseFloat(fee.amount) || 0), 0);
+        
+        const taxableSubtotal = totalAdvance + totalDeliveryFees + totalCollectionFees + initialFees + oneTimeAddOns;
+        subtotal = totalDeposits + taxableSubtotal;
+        taxAmount = taxableSubtotal * (vatPercentage / 100);
+        totalAmount = subtotal + taxAmount;
+        
+      } else if (quote.items && quote.items.length > 0) {
+        // Legacy quote calculation
+        subtotal = quote.items.reduce((sum: number, item: any) => 
+          sum + (item.qty * item.rate), 0);
+        const taxRate = quote.tax_rate || (vatPercentage / 100);
+        taxAmount = subtotal * taxRate;
+        totalAmount = subtotal + taxAmount;
+      }
+    }
+    
+    return { subtotal, taxAmount, totalAmount };
+  };
+  
+  const { subtotal, taxAmount, totalAmount } = computeTotals();
 
   return (
     <Card className="border-primary/20">

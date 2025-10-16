@@ -43,7 +43,7 @@ export const TrainStopStepper: React.FC<TrainStopStepperProps> = ({
             const isCompleted = completedSteps.includes(step.id);
             const isCurrent = step.id === currentStep;
             const isUpcoming = step.id > currentStep;
-            const isClickable = step.id === currentStep || (step.id < currentStep && completedSteps.includes(step.id));
+            const isClickable = step.id === currentStep || completedSteps.includes(step.id);
 
             return (
               <div key={step.id} className="flex flex-col items-center relative z-20 w-28">
@@ -56,7 +56,8 @@ export const TrainStopStepper: React.FC<TrainStopStepperProps> = ({
                     "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
                     isCompleted && "w-10 h-10 bg-green-600 hover:bg-green-700 cursor-pointer",
                     isCurrent && "w-10 h-10 bg-primary hover:bg-primary/90 cursor-pointer",
-                    isUpcoming && "w-10 h-10 border-2 border-border bg-muted/30 cursor-not-allowed"
+                    isUpcoming && "w-10 h-10 border-2 border-border bg-muted/30 cursor-not-allowed",
+                    isClickable ? "cursor-pointer" : "cursor-not-allowed"
                   )}
                   aria-label={`${step.title} - ${isCompleted ? 'Completed' : isCurrent ? 'Current' : 'Upcoming'}`}
                   aria-current={isCurrent ? 'step' : undefined}
@@ -94,7 +95,7 @@ export const TrainStopStepper: React.FC<TrainStopStepperProps> = ({
           const isCompleted = completedSteps.includes(step.id);
           const isCurrent = step.id === currentStep;
           const isUpcoming = step.id > currentStep;
-          const isClickable = step.id === currentStep || (step.id < currentStep && completedSteps.includes(step.id));
+          const isClickable = step.id === currentStep || completedSteps.includes(step.id);
 
           return (
             <div key={step.id} className="relative">

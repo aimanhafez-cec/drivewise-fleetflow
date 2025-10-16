@@ -31,7 +31,7 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
   const [vehicleModalOpen, setVehicleModalOpen] = React.useState(false);
   const [selectedLines, setSelectedLines] = React.useState<number[]>([]);
 
-  const isCorporate = data.quote_type === 'Corporate lease';
+  const isCorporate = (data.quote_type || '').toLowerCase() === 'corporate lease';
 
   // Helper function to calculate default per-period rate based on price list and vehicle category
   const calculateDefaultRate = (priceListId: string, categoryName: string, billingPlan: string): number => {
@@ -151,18 +151,22 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
     const initialFees = (data.initial_fees || []).reduce((sum: number, fee: any) => 
       sum + (parseFloat(fee.amount) || 0), 0);
     
-    // Calculate add-ons costs using new format
+    // Helper functions for flexible add-on schema
+    const getAddonType = (a: any) => a.pricing_model || a.type;
+    const getAddonTotal = (a: any) => (a.total ?? a.amount ?? 0);
+    
+    // Calculate add-ons costs using flexible format
     const monthlyAddOns = lines.reduce((sum: number, line: any) => {
       const lineMonthlyAddOns = (line.addons || [])
-        .filter((a: any) => a.pricing_model === 'monthly')
-        .reduce((s: number, a: any) => s + a.total, 0);
+        .filter((a: any) => getAddonType(a) === 'monthly')
+        .reduce((s: number, a: any) => s + getAddonTotal(a), 0);
       return sum + lineMonthlyAddOns;
     }, 0);
 
     const oneTimeAddOns = lines.reduce((sum: number, line: any) => {
       const lineOneTimeAddOns = (line.addons || [])
-        .filter((a: any) => a.pricing_model === 'one-time')
-        .reduce((s: number, a: any) => s + a.total, 0);
+        .filter((a: any) => getAddonType(a) === 'one-time')
+        .reduce((s: number, a: any) => s + getAddonTotal(a), 0);
       return sum + lineOneTimeAddOns;
     }, 0);
     
@@ -170,8 +174,8 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
     const monthlyRecurringRental = lines.reduce((sum: number, line: any) => {
       const baseRate = line.monthly_rate || 0;
       const monthlyAddOnsCost = (line.addons || [])
-        .filter((a: any) => a.pricing_model === 'monthly')
-        .reduce((s: number, a: any) => s + a.total, 0);
+        .filter((a: any) => getAddonType(a) === 'monthly')
+        .reduce((s: number, a: any) => s + getAddonTotal(a), 0);
       return sum + baseRate + monthlyAddOnsCost;
     }, 0);
     

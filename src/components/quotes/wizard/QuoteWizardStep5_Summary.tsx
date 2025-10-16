@@ -28,7 +28,7 @@ export const QuoteWizardStep5_Summary: React.FC<QuoteWizardStep4Props> = ({
   onChange,
   errors,
 }) => {
-  const isCorporate = data.quote_type === 'Corporate lease';
+  const isCorporate = (data.quote_type || '').toLowerCase() === 'corporate lease';
   const { data: costSheets } = useCostSheets(data.id);
   const latestCostSheetId = costSheets?.[0]?.id; // Get latest cost sheet ID
   const { data: costSheet } = useCostSheet(latestCostSheetId); // Fetch full details
@@ -160,6 +160,10 @@ export const QuoteWizardStep5_Summary: React.FC<QuoteWizardStep4Props> = ({
   // Calculate totals
   const calculateTotals = () => {
     if (isCorporate && data.quote_items) {
+      // Helper functions for flexible add-on schema
+      const getAddonType = (a: any) => a.pricing_model || a.type;
+      const getAddonTotal = (a: any) => (a.total ?? a.amount ?? 0);
+      
       const totalDeposits = data.quote_items.reduce((sum: number, line: any) => 
         sum + (line.deposit_amount || 0), 0);
       const totalAdvance = data.quote_items.reduce((sum: number, line: any) => 
@@ -174,8 +178,8 @@ export const QuoteWizardStep5_Summary: React.FC<QuoteWizardStep4Props> = ({
       // Add one-time add-ons
       const oneTimeAddOns = data.quote_items.reduce((sum: number, line: any) => {
         const lineOneTimeAddOns = (line.addons || [])
-          .filter((a: any) => a.pricing_model === 'one-time')
-          .reduce((s: number, a: any) => s + a.total, 0);
+          .filter((a: any) => getAddonType(a) === 'one-time')
+          .reduce((s: number, a: any) => s + getAddonTotal(a), 0);
         return sum + lineOneTimeAddOns;
       }, 0);
       
@@ -183,8 +187,8 @@ export const QuoteWizardStep5_Summary: React.FC<QuoteWizardStep4Props> = ({
       const monthlyRecurringRental = data.quote_items.reduce((sum: number, line: any) => {
         const baseRate = line.monthly_rate || 0;
         const monthlyAddOnsCost = (line.addons || [])
-          .filter((a: any) => a.pricing_model === 'monthly')
-          .reduce((s: number, a: any) => s + a.total, 0);
+          .filter((a: any) => getAddonType(a) === 'monthly')
+          .reduce((s: number, a: any) => s + getAddonTotal(a), 0);
         return sum + baseRate + monthlyAddOnsCost;
       }, 0);
       
