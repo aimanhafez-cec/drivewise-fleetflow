@@ -11,8 +11,10 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { LOVSelect } from "@/components/ui/lov-select";
 import { useMarkQuoteAccepted } from "@/hooks/useQuoteActions";
 import { useConvertQuoteToMasterAgreement } from "@/hooks/useConvertQuoteToMasterAgreement";
+import { useWinReasons } from "@/hooks/useWinLossReasons";
 import { CheckCircle } from "lucide-react";
 
 interface CustomerAcceptanceDialogProps {
@@ -28,9 +30,11 @@ export const CustomerAcceptanceDialog: React.FC<CustomerAcceptanceDialogProps> =
   quoteId,
   quoteNumber,
 }) => {
-  const [winReason, setWinReason] = useState("");
+  const [winReasonId, setWinReasonId] = useState<string>("");
+  const [additionalNotes, setAdditionalNotes] = useState("");
   const [convertNow, setConvertNow] = useState(false);
 
+  const { data: winReasons, isLoading: isLoadingReasons } = useWinReasons();
   const markAcceptedMutation = useMarkQuoteAccepted();
   const convertMutation = useConvertQuoteToMasterAgreement();
 
@@ -39,7 +43,8 @@ export const CustomerAcceptanceDialog: React.FC<CustomerAcceptanceDialogProps> =
       // First mark as accepted
       await markAcceptedMutation.mutateAsync({
         quoteId,
-        winReason,
+        winReasonId,
+        winLossNotes: additionalNotes.trim() || undefined,
       });
 
       // If user wants to convert now, trigger conversion
@@ -48,7 +53,8 @@ export const CustomerAcceptanceDialog: React.FC<CustomerAcceptanceDialogProps> =
       }
 
       onOpenChange(false);
-      setWinReason("");
+      setWinReasonId("");
+      setAdditionalNotes("");
       setConvertNow(false);
     } catch (error) {
       console.error("Failed to process acceptance:", error);
@@ -71,12 +77,24 @@ export const CustomerAcceptanceDialog: React.FC<CustomerAcceptanceDialogProps> =
         <div className="space-y-4 py-4">
           <div>
             <Label htmlFor="win-reason">Win Reason *</Label>
+            <LOVSelect
+              value={winReasonId}
+              onChange={(value) => setWinReasonId(value as string)}
+              items={winReasons?.map(r => ({ id: r.id, label: r.reason_label })) || []}
+              placeholder="Select a win reason..."
+              isLoading={isLoadingReasons}
+              className="mt-2"
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="additional-notes">Additional Notes (Optional)</Label>
             <Textarea
-              id="win-reason"
-              placeholder="Why did the customer accept this quote?"
-              value={winReason}
-              onChange={(e) => setWinReason(e.target.value)}
-              rows={4}
+              id="additional-notes"
+              placeholder="Add any additional context about why the customer accepted..."
+              value={additionalNotes}
+              onChange={(e) => setAdditionalNotes(e.target.value)}
+              rows={3}
               className="mt-2"
             />
           </div>
@@ -99,7 +117,7 @@ export const CustomerAcceptanceDialog: React.FC<CustomerAcceptanceDialogProps> =
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={!winReason.trim() || markAcceptedMutation.isPending || convertMutation.isPending}
+            disabled={!winReasonId || markAcceptedMutation.isPending || convertMutation.isPending}
             className="bg-green-600 hover:bg-green-700"
           >
             {convertMutation.isPending

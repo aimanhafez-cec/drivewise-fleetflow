@@ -9,17 +9,20 @@ export const useMarkQuoteAccepted = () => {
   return useMutation({
     mutationFn: async ({
       quoteId,
-      winReason,
+      winReasonId,
+      winLossNotes,
     }: {
       quoteId: string;
-      winReason: string;
+      winReasonId: string;
+      winLossNotes?: string;
     }) => {
       const { data, error } = await supabase
         .from("quotes")
         .update({
           customer_acceptance_status: "accepted",
           status: "accepted",
-          win_loss_reason: winReason,
+          win_reason_id: winReasonId,
+          win_loss_notes: winLossNotes,
           approved_at: new Date().toISOString(),
         })
         .eq("id", quoteId)
@@ -55,17 +58,20 @@ export const useMarkQuoteRejected = () => {
   return useMutation({
     mutationFn: async ({
       quoteId,
-      rejectionReason,
+      lossReasonId,
+      winLossNotes,
     }: {
       quoteId: string;
-      rejectionReason: string;
+      lossReasonId: string;
+      winLossNotes?: string;
     }) => {
       const { data, error } = await supabase
         .from("quotes")
         .update({
           customer_acceptance_status: "rejected",
           status: "declined",
-          customer_rejection_reason: rejectionReason,
+          loss_reason_id: lossReasonId,
+          win_loss_notes: winLossNotes,
         })
         .eq("id", quoteId)
         .select()
@@ -100,16 +106,19 @@ export const useMarkQuoteWon = () => {
   return useMutation({
     mutationFn: async ({
       quoteId,
-      winReason,
+      winReasonId,
+      winLossNotes,
     }: {
       quoteId: string;
-      winReason: string;
+      winReasonId: string;
+      winLossNotes?: string;
     }) => {
       const { data, error } = await supabase
         .from("quotes")
         .update({
           status: "won",
-          win_loss_reason: winReason,
+          win_reason_id: winReasonId,
+          win_loss_notes: winLossNotes,
         })
         .eq("id", quoteId)
         .select()
@@ -144,16 +153,19 @@ export const useMarkQuoteLost = () => {
   return useMutation({
     mutationFn: async ({
       quoteId,
-      lossReason,
+      lossReasonId,
+      winLossNotes,
     }: {
       quoteId: string;
-      lossReason: string;
+      lossReasonId: string;
+      winLossNotes?: string;
     }) => {
       const { data, error } = await supabase
         .from("quotes")
         .update({
           status: "lost",
-          win_loss_reason: lossReason,
+          loss_reason_id: lossReasonId,
+          win_loss_notes: winLossNotes,
         })
         .eq("id", quoteId)
         .select()

@@ -2386,6 +2386,7 @@ export type Database = {
           items: Json
           late_fee_percentage: number | null
           legal_entity_id: string | null
+          loss_reason_id: string | null
           maintenance_coverage_summary: string | null
           maintenance_included: boolean | null
           maintenance_package_type: string | null
@@ -2434,7 +2435,9 @@ export type Database = {
           vehicle_id: string | null
           vehicle_type_id: string | null
           version: number | null
+          win_loss_notes: string | null
           win_loss_reason: string | null
+          win_reason_id: string | null
           withholding_tax_percentage: number | null
         }
         Insert: {
@@ -2493,6 +2496,7 @@ export type Database = {
           items?: Json
           late_fee_percentage?: number | null
           legal_entity_id?: string | null
+          loss_reason_id?: string | null
           maintenance_coverage_summary?: string | null
           maintenance_included?: boolean | null
           maintenance_package_type?: string | null
@@ -2541,7 +2545,9 @@ export type Database = {
           vehicle_id?: string | null
           vehicle_type_id?: string | null
           version?: number | null
+          win_loss_notes?: string | null
           win_loss_reason?: string | null
+          win_reason_id?: string | null
           withholding_tax_percentage?: number | null
         }
         Update: {
@@ -2600,6 +2606,7 @@ export type Database = {
           items?: Json
           late_fee_percentage?: number | null
           legal_entity_id?: string | null
+          loss_reason_id?: string | null
           maintenance_coverage_summary?: string | null
           maintenance_included?: boolean | null
           maintenance_package_type?: string | null
@@ -2648,7 +2655,9 @@ export type Database = {
           vehicle_id?: string | null
           vehicle_type_id?: string | null
           version?: number | null
+          win_loss_notes?: string | null
           win_loss_reason?: string | null
+          win_reason_id?: string | null
           withholding_tax_percentage?: number | null
         }
         Relationships: [
@@ -2678,6 +2687,13 @@ export type Database = {
             columns: ["legal_entity_id"]
             isOneToOne: false
             referencedRelation: "legal_entities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quotes_loss_reason_id_fkey"
+            columns: ["loss_reason_id"]
+            isOneToOne: false
+            referencedRelation: "win_loss_reasons"
             referencedColumns: ["id"]
           },
           {
@@ -2713,6 +2729,13 @@ export type Database = {
             columns: ["vehicle_id"]
             isOneToOne: false
             referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quotes_win_reason_id_fkey"
+            columns: ["win_reason_id"]
+            isOneToOne: false
+            referencedRelation: "win_loss_reasons"
             referencedColumns: ["id"]
           },
         ]
@@ -3583,6 +3606,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      win_loss_reasons: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          is_active: boolean
+          reason_code: string
+          reason_label: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          reason_code: string
+          reason_label: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          reason_code?: string
+          reason_label?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
       }
     }
     Views: {

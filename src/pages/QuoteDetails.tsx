@@ -44,6 +44,7 @@ import { formatCurrency } from "@/lib/utils/currency";
 import { format } from "date-fns";
 import { formatDurationInMonthsAndDays } from "@/lib/utils/dateUtils";
 import { useGenerateQuotePDF } from "@/hooks/useQuote";
+import { useWinLossReasonById } from "@/hooks/useWinLossReasons";
 import { QuoteHeaderInfo } from "@/components/quotes/details/QuoteHeaderInfo";
 import { QuotePickupReturnInfo } from "@/components/quotes/details/QuotePickupReturnInfo";
 import { QuoteInsuranceDetails } from "@/components/quotes/details/QuoteInsuranceDetails";
@@ -119,6 +120,9 @@ interface Quote {
   customer_acceptance_status?: string;
   customer_rejection_reason?: string;
   win_loss_reason?: string;
+  win_reason_id?: string;
+  loss_reason_id?: string;
+  win_loss_notes?: string;
   sent_to_customer_at?: string;
   sent_to_customer_by?: string;
   customer_signed_at?: string;
@@ -270,6 +274,9 @@ const QuoteDetails: React.FC = () => {
     },
     enabled: !!id,
   });
+
+  const { data: winReason } = useWinLossReasonById(quote?.win_reason_id);
+  const { data: lossReason } = useWinLossReasonById(quote?.loss_reason_id);
 
   const sendQuoteMutation = useMutation({
     mutationFn: async (quoteId: string) => {
@@ -514,10 +521,15 @@ const QuoteDetails: React.FC = () => {
                 <p className="text-sm text-green-600 dark:text-green-400">
                   Customer has accepted this quote. You can now convert it to a Master Agreement.
                 </p>
-                {quote.win_loss_reason && (
-                  <p className="text-xs text-muted-foreground mt-1">
-                    <strong>Win Reason:</strong> {quote.win_loss_reason}
-                  </p>
+                {winReason && (
+                  <div className="text-xs text-muted-foreground mt-2">
+                    <strong>Win Reason:</strong> {winReason.reason_label}
+                    {quote.win_loss_notes && (
+                      <p className="mt-1 text-muted-foreground">
+                        <strong>Notes:</strong> {quote.win_loss_notes}
+                      </p>
+                    )}
+                  </div>
                 )}
               </div>
               <Button
@@ -532,16 +544,33 @@ const QuoteDetails: React.FC = () => {
         </Card>
       )}
 
-      {/* Show rejection info if declined */}
-      {quote.status === 'declined' && quote.customer_rejection_reason && (
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Quote Rejected</AlertTitle>
-          <AlertDescription>
-            <p className="mb-2">{quote.customer_rejection_reason}</p>
-            <p className="text-xs">You can create a new version to revise terms.</p>
-          </AlertDescription>
-        </Alert>
+      {/* Show rejection status if declined */}
+      {quote.status === 'declined' && (
+        <Card className="border-red-200 bg-red-50 dark:bg-red-950">
+          <CardContent className="p-4">
+            <div className="flex items-start gap-3">
+              <XCircle className="h-5 w-5 text-red-600 dark:text-red-400 mt-0.5" />
+              <div className="flex-1">
+                <h3 className="font-semibold text-red-700 dark:text-red-300 mb-1">
+                  Quote Declined
+                </h3>
+                <p className="text-sm text-red-600 dark:text-red-400">
+                  Customer has declined this quote.
+                </p>
+                {lossReason && (
+                  <div className="text-xs text-muted-foreground mt-2">
+                    <strong>Loss Reason:</strong> {lossReason.reason_label}
+                    {quote.win_loss_notes && (
+                      <p className="mt-1">
+                        <strong>Notes:</strong> {quote.win_loss_notes}
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       )}
 
       {/* Main Content */}
