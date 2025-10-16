@@ -6,6 +6,18 @@ interface QuoteInitialFeesProps {
   quote: any;
 }
 
+const formatFeeType = (feeType: string): string => {
+  if (!feeType) return 'Fee';
+  
+  // Convert to title case and add "Fee" suffix if not present
+  const formatted = feeType
+    .split('_')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+  
+  return formatted.includes('Fee') ? formatted : `${formatted} Fee`;
+};
+
 export const QuoteInitialFees: React.FC<QuoteInitialFeesProps> = ({ quote }) => {
   const initialFees = quote.initial_fees || [];
   
@@ -30,7 +42,7 @@ export const QuoteInitialFees: React.FC<QuoteInitialFeesProps> = ({ quote }) => 
           {initialFees.map((fee: any, index: number) => (
             <div key={index} className="flex justify-between items-start pb-3 border-b last:border-0 last:pb-0">
               <div>
-                <p className="font-medium">{fee.fee_type}</p>
+                <p className="font-medium">{formatFeeType(fee.fee_type)}</p>
                 {fee.description && (
                   <p className="text-sm text-muted-foreground">{fee.description}</p>
                 )}
