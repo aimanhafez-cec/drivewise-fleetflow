@@ -78,6 +78,12 @@ export const QuoteWizardStep5_Summary: React.FC<QuoteWizardStep4Props> = ({
     });
   };
   
+  // Helper to get current quote rate for a line
+  const getCurrentLineRate = (lineNo: number): number => {
+    const quoteLine = data.quote_items?.find((item: any) => item.line_no === lineNo);
+    return quoteLine?.monthly_rate || 0;
+  };
+  
   // Calculate totals
   const calculateTotals = () => {
     if (isCorporate && data.quote_items) {
@@ -303,37 +309,44 @@ export const QuoteWizardStep5_Summary: React.FC<QuoteWizardStep4Props> = ({
                     <Separator />
                     <div className="space-y-2">
                       <h4 className="font-semibold text-sm">Line Margins</h4>
-                      {costSheet.lines.map((line) => (
-                        <div key={line.id} className="flex justify-between items-center text-sm">
-                          <span className="text-muted-foreground">Line {line.line_no}:</span>
-                          <div className="flex items-center gap-3">
-                            <span className="font-mono">
-                              Cost: {formatCurrency(line.total_cost_per_month_aed, 'AED')}
-                            </span>
-                            <span className="font-mono">
-                              Rate: {formatCurrency(line.quoted_rate_per_month_aed, 'AED')}
-                            </span>
-                            <Badge 
-                              variant={
-                                line.actual_margin_percent >= costSheet.target_margin_percent 
-                                  ? 'default' 
-                                  : line.actual_margin_percent >= 10 
-                                  ? 'outline' 
-                                  : 'destructive'
-                              }
-                              className={
-                                line.actual_margin_percent >= costSheet.target_margin_percent
-                                  ? 'bg-green-500 text-white hover:bg-green-600'
-                                  : line.actual_margin_percent >= 10
-                                  ? 'border-yellow-500 text-yellow-700 dark:text-yellow-400'
-                                  : ''
-                              }
-                            >
-                              {line.actual_margin_percent.toFixed(1)}%
-                            </Badge>
+                      {costSheet.lines.map((line) => {
+                        const currentRate = getCurrentLineRate(line.line_no);
+                        const currentMarginPercent = currentRate > 0 
+                          ? ((currentRate - line.total_cost_per_month_aed) / currentRate) * 100 
+                          : 0;
+                        
+                        return (
+                          <div key={line.id} className="flex justify-between items-center text-sm">
+                            <span className="text-muted-foreground">Line {line.line_no}:</span>
+                            <div className="flex items-center gap-3">
+                              <span className="font-mono">
+                                Cost: {formatCurrency(line.total_cost_per_month_aed, 'AED')}
+                              </span>
+                              <span className="font-mono">
+                                Rate: {formatCurrency(currentRate, 'AED')}
+                              </span>
+                              <Badge 
+                                variant={
+                                  currentMarginPercent >= costSheet.target_margin_percent 
+                                    ? 'default' 
+                                    : currentMarginPercent >= 10 
+                                    ? 'outline' 
+                                    : 'destructive'
+                                }
+                                className={
+                                  currentMarginPercent >= costSheet.target_margin_percent
+                                    ? 'bg-green-500 text-white hover:bg-green-600'
+                                    : currentMarginPercent >= 10
+                                    ? 'border-yellow-500 text-yellow-700 dark:text-yellow-400'
+                                    : ''
+                                }
+                              >
+                                {currentMarginPercent.toFixed(1)}%
+                              </Badge>
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </>
                 )}
