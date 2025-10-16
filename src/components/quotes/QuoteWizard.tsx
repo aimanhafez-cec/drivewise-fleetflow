@@ -502,32 +502,51 @@ export const QuoteWizard: React.FC = () => {
       const taxAmount = subtotal * data.tax_rate;
       const total = subtotal + taxAmount;
 
+      const quotePayload = {
+        customer_id: data.customer_id,
+        vehicle_id: data.vehicle_id,
+        items: data.items,
+        subtotal,
+        tax_amount: taxAmount,
+        total_amount: total,
+        valid_until: data.expires_at,
+        notes: data.notes,
+        status: data.status || "draft",
+        rfq_id: fromRfqId || null,
+      };
+
+      // If no quoteId, INSERT new quote
+      if (!quoteId) {
+        const { data: quote, error } = await supabase
+          .from("quotes")
+          .insert({
+            ...quotePayload,
+            quote_number: `Q-${new Date().getFullYear()}-${String(Date.now()).slice(-4)}`,
+          })
+          .select()
+          .single();
+
+        if (error) throw error;
+        return { quote, isNew: true };
+      }
+
+      // If has ID, UPDATE existing quote
       const { data: quote, error } = await supabase
         .from("quotes")
-        .insert({
-          customer_id: data.customer_id,
-          vehicle_id: data.vehicle_id,
-          items: data.items,
-          subtotal,
-          tax_amount: taxAmount,
-          total_amount: total,
-          valid_until: data.expires_at,
-          notes: data.notes,
-          quote_number: `Q-${new Date().getFullYear()}-${String(Date.now()).slice(-4)}`,
-          status: "draft",
-          rfq_id: fromRfqId || null,
-        })
+        .update(quotePayload)
+        .eq("id", quoteId)
         .select()
         .single();
 
       if (error) throw error;
-      return quote;
+      return { quote, isNew: false };
     },
-    onSuccess: async (quote) => {
+    onSuccess: async ({ quote, isNew }) => {
       queryClient.invalidateQueries({ queryKey: ["quotes"] });
+      queryClient.invalidateQueries({ queryKey: ["quote", quote.id] });
       
       // Update RFQ status to 'quoted' if this quote was created from an RFQ
-      if (fromRfqId) {
+      if (fromRfqId && isNew) {
         await supabase
           .from("rfqs")
           .update({ status: "quoted" })
@@ -536,12 +555,15 @@ export const QuoteWizard: React.FC = () => {
         queryClient.invalidateQueries({ queryKey: ["rfqs"] });
       }
       
-      toast({ title: "Success", description: "Quote created successfully" });
+      toast({ 
+        title: "Success", 
+        description: isNew ? "Quote created successfully" : "Quote updated successfully" 
+      });
       navigate(`/quotes/${quote.id}`);
     },
     onError: (error) => {
-      console.error("Failed to create quote:", error);
-      toast({ title: "Error", description: "Failed to create quote", variant: "destructive" });
+      console.error("Failed to finalize quote:", error);
+      toast({ title: "Error", description: "Failed to finalize quote", variant: "destructive" });
     },
   });
 
