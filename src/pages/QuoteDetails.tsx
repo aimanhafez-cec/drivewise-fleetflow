@@ -213,7 +213,7 @@ const QuoteDetails: React.FC = () => {
         returnSiteResult,
         billToSiteResult,
       ] = await Promise.all([
-        supabase.from("profiles").select("full_name, email, phone").eq("id", data.customer_id).maybeSingle(),
+        supabase.from("customers").select("full_name, email, phone").eq("id", data.customer_id).maybeSingle(),
         data.vehicle_id
           ? supabase.from("vehicles").select("make, model, year, license_plate").eq("id", data.vehicle_id).maybeSingle()
           : Promise.resolve({ data: null }),
@@ -233,7 +233,7 @@ const QuoteDetails: React.FC = () => {
           ? supabase.from("opportunities").select("opportunity_no").eq("id", data.opportunity_id).maybeSingle()
           : Promise.resolve({ data: null }),
         data.contact_person_id
-          ? supabase.from("profiles").select("full_name, email, phone").eq("id", data.contact_person_id).maybeSingle()
+          ? supabase.from("contact_persons").select("full_name, email, phone").eq("id", data.contact_person_id).maybeSingle()
           : Promise.resolve({ data: null }),
         data.pickup_customer_site_id
           ? supabase.from("customer_sites").select("*").eq("id", data.pickup_customer_site_id).maybeSingle()
