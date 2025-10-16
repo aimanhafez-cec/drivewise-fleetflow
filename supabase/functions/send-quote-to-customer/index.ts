@@ -39,12 +39,7 @@ serve(async (req) => {
     // Fetch quote details
     const { data: quote, error: quoteError } = await supabase
       .from("quotes")
-      .select(`
-        *,
-        customer:customers(full_name, email),
-        contact_person:contact_persons(full_name, email),
-        sales_rep:sales_representatives(full_name, email)
-      `)
+      .select("*")
       .eq("id", quote_id)
       .single();
 
@@ -52,6 +47,43 @@ serve(async (req) => {
       console.error("❌ Quote fetch error:", quoteError);
       throw new Error("Quote not found");
     }
+
+    // Fetch related data separately
+    let customer = null;
+    let contact_person = null;
+    let sales_rep = null;
+
+    if (quote.customer_id) {
+      const { data } = await supabase
+        .from("customers")
+        .select("full_name, email")
+        .eq("id", quote.customer_id)
+        .single();
+      customer = data;
+    }
+
+    if (quote.contact_person_id) {
+      const { data } = await supabase
+        .from("contact_persons")
+        .select("full_name, email")
+        .eq("id", quote.contact_person_id)
+        .single();
+      contact_person = data;
+    }
+
+    if (quote.sales_rep_id) {
+      const { data } = await supabase
+        .from("sales_representatives")
+        .select("full_name, email")
+        .eq("id", quote.sales_rep_id)
+        .single();
+      sales_rep = data;
+    }
+
+    // Attach the related data to the quote object
+    quote.customer = customer;
+    quote.contact_person = contact_person;
+    quote.sales_rep = sales_rep;
 
     // Generate unique public token
     const public_token = crypto.randomUUID();
