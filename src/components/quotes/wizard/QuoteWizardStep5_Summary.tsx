@@ -60,7 +60,7 @@ export const QuoteWizardStep5_Summary: React.FC<QuoteWizardStep4Props> = ({
   };
 
   const handlePrintPDF = () => {
-    generatePDFMutation.mutate(data.id);
+    generatePDFMutation.mutate(data);
   };
 
   const handleSendToCustomer = () => {

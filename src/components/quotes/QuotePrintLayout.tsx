@@ -22,6 +22,14 @@ export const QuotePrintLayout: React.FC<QuotePrintLayoutProps> = ({ data, totals
   const totalVehicles = data.quote_items?.reduce((sum: number, item: any) => sum + (item.quantity || 1), 0) || 0;
   const depositPerVehicle = firstLine?.deposit_amount || 0;
   const totalDeposit = data.quote_items?.reduce((sum: number, item: any) => sum + ((item.deposit_amount || 0) * (item.quantity || 1)), 0) || 0;
+  
+  // Calculate rental subtotal from line items
+  const rentalSubtotal = data.quote_items?.reduce((sum: number, item: any) => {
+    const quantity = item.quantity || 1;
+    const monthlyRate = item.monthly_rate || 0;
+    const lineTotal = monthlyRate * quantity * (durationMonths || 1);
+    return sum + lineTotal;
+  }, 0) || 0;
 
   return (
     <div className="print-layout bg-white text-black p-8 max-w-[210mm] mx-auto">
@@ -58,9 +66,18 @@ export const QuotePrintLayout: React.FC<QuotePrintLayoutProps> = ({ data, totals
           </div>
           <div>
             <h3 className="font-bold mb-2 text-gray-700">BILL TO:</h3>
-            <p className="font-semibold">{data.customer_name || 'Customer Name'}</p>
-            {data.customer_contact && <p>{data.customer_contact}</p>}
-            {data.customer_email && <p>{data.customer_email}</p>}
+            <p className="font-semibold">{data.account_name || data.customer_name || 'Customer Name'}</p>
+            {data._customerMeta?.full_name && (
+              <p className="text-sm">{data._customerMeta.full_name}</p>
+            )}
+            {data._customerMeta?.email && (
+              <p className="text-sm">{data._customerMeta.email}</p>
+            )}
+            {data._customerMeta?.phone && (
+              <p className="text-sm">{data._customerMeta.phone}</p>
+            )}
+            {data.customer_contact && !data._customerMeta?.phone && <p>{data.customer_contact}</p>}
+            {data.customer_email && !data._customerMeta?.email && <p>{data.customer_email}</p>}
             {data.billing_address && <p className="mt-1">{data.billing_address}</p>}
           </div>
         </div>
@@ -106,7 +123,7 @@ export const QuotePrintLayout: React.FC<QuotePrintLayoutProps> = ({ data, totals
           )}
           <div className="flex justify-between">
             <span className="font-semibold">Quote Type:</span>
-            <span>{data.quote_type === 'corporate_leasing' ? 'Corporate Leasing' : 'Legacy Quote'}</span>
+            <span>{data.quote_type === 'corporate_leasing' ? 'Corporate Leasing' : 'Standard Rental'}</span>
           </div>
           <div className="flex justify-between">
             <span className="font-semibold">Currency:</span>
@@ -121,13 +138,13 @@ export const QuotePrintLayout: React.FC<QuotePrintLayoutProps> = ({ data, totals
         <table className="print-table w-full border-collapse">
           <thead>
             <tr className="bg-gray-200">
-              <th className="border border-gray-400 p-2 text-left">#</th>
-              <th className="border border-gray-400 p-2 text-left">Vehicle</th>
-              <th className="border border-gray-400 p-2 text-center">Qty</th>
-              <th className="border border-gray-400 p-2 text-right">Mileage/Month</th>
-              <th className="border border-gray-400 p-2 text-right">Deposit</th>
-              <th className="border border-gray-400 p-2 text-right">Rate/Month</th>
-              <th className="border border-gray-400 p-2 text-right">Total</th>
+              <th className="border border-gray-400 p-2 text-left whitespace-nowrap">#</th>
+              <th className="border border-gray-400 p-2 text-left whitespace-nowrap">Vehicle</th>
+              <th className="border border-gray-400 p-2 text-center whitespace-nowrap">Qty</th>
+              <th className="border border-gray-400 p-2 text-right whitespace-nowrap">Monthly KM</th>
+              <th className="border border-gray-400 p-2 text-right whitespace-nowrap">Deposit</th>
+              <th className="border border-gray-400 p-2 text-right whitespace-nowrap">Rate/Month</th>
+              <th className="border border-gray-400 p-2 text-right whitespace-nowrap">Total</th>
             </tr>
           </thead>
           <tbody>
@@ -222,7 +239,7 @@ export const QuotePrintLayout: React.FC<QuotePrintLayoutProps> = ({ data, totals
               <tr>
                 <td className="py-2 text-right pr-4">Subtotal (Rental):</td>
                 <td className="py-2 text-right font-mono">
-                  {formatCurrency(totals.rental, 'AED')}
+                  {formatCurrency(rentalSubtotal, 'AED')}
                 </td>
               </tr>
               {totals.vat > 0 && (

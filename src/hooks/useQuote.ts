@@ -50,10 +50,23 @@ export const useGenerateQuotePDF = () => {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async (quoteId: string) => {
+    mutationFn: async (quote: any) => {
+      // Extract quote number for filename
+      const quoteNumber = quote?.quote_number || 'Quote';
+      
+      // Temporarily change document title for PDF filename
+      const originalTitle = document.title;
+      document.title = `Autostrad_Quote_${quoteNumber}`;
+      
       // Give browser time to render print layout
       await new Promise(resolve => setTimeout(resolve, 150));
+      
+      // Trigger print
       window.print();
+      
+      // Restore original title
+      document.title = originalTitle;
+      
       return { success: true };
     },
     onSuccess: () => {
