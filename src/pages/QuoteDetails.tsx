@@ -66,6 +66,7 @@ interface Quote {
   id: string;
   quote_number: string;
   status: string;
+  customer_type?: string;
   created_at: string;
   valid_until: string;
   subtotal: number;
@@ -166,6 +167,7 @@ const statusConfig = {
   declined: { label: "Declined", color: "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200" },
   expired: { label: "Expired", color: "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200" },
   converted: { label: "Converted", color: "bg-emerald-100 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-200" },
+  approved: { label: "Approved", color: "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200" },
 };
 
 const QuoteDetails: React.FC = () => {
@@ -201,6 +203,7 @@ const QuoteDetails: React.FC = () => {
       const [
         customerResult,
         vehicleResult,
+        legalEntityResult,
         businessUnitResult,
         salesOfficeResult,
         salesRepResult,
@@ -213,6 +216,9 @@ const QuoteDetails: React.FC = () => {
         supabase.from("profiles").select("full_name, email, phone").eq("id", data.customer_id).maybeSingle(),
         data.vehicle_id
           ? supabase.from("vehicles").select("make, model, year, license_plate").eq("id", data.vehicle_id).maybeSingle()
+          : Promise.resolve({ data: null }),
+        data.legal_entity_id
+          ? supabase.from("legal_entities").select("name, code").eq("id", data.legal_entity_id).maybeSingle()
           : Promise.resolve({ data: null }),
         data.business_unit_id
           ? supabase.from("business_units").select("name, code").eq("id", data.business_unit_id).maybeSingle()
@@ -244,6 +250,7 @@ const QuoteDetails: React.FC = () => {
         ...data,
         customer: customerResult.data,
         vehicle: vehicleResult.data,
+        legalEntity: legalEntityResult.data,
         businessUnit: businessUnitResult.data,
         salesOffice: salesOfficeResult.data,
         salesRep: salesRepResult.data,
@@ -341,7 +348,11 @@ const QuoteDetails: React.FC = () => {
             </div>
             <div className="flex items-center gap-4 text-sm text-muted-foreground flex-wrap">
               <div className="flex items-center gap-1">
-                <User className="h-4 w-4" />
+                {quote.customer_type === 'Company' ? (
+                  <Building className="h-4 w-4" />
+                ) : (
+                  <User className="h-4 w-4" />
+                )}
                 {quote.customer?.full_name}
               </div>
               {quote.valid_until && (
@@ -536,6 +547,7 @@ const QuoteDetails: React.FC = () => {
           {/* Quote Header Information */}
           <QuoteHeaderInfo
             quote={quote}
+            legalEntity={quote.legalEntity}
             businessUnit={quote.businessUnit}
             salesOffice={quote.salesOffice}
             salesRep={quote.salesRep}
