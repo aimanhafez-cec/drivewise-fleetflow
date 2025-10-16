@@ -505,8 +505,33 @@ export const QuoteWizard: React.FC = () => {
 
   const createQuoteMutation = useMutation({
     mutationFn: async (data: QuoteData) => {
-      const subtotal = data.items.reduce((sum, item) => sum + (item.qty * item.rate), 0);
-      const taxAmount = subtotal * data.tax_rate;
+      // Calculate totals based on quote type
+      let subtotal = 0;
+      let taxAmount = 0;
+
+      if (data.quote_items && data.quote_items.length > 0) {
+        // Corporate lease: calculate from quote_items
+        subtotal = data.quote_items.reduce((sum, item) => {
+          const months = item.duration_months || 0;
+          const monthlyRate = item.monthly_rate || 0;
+          return sum + (months * monthlyRate);
+        }, 0);
+        
+        // Apply VAT
+        const vatRate = (data.vat_percentage || 0) / 100;
+        taxAmount = subtotal * vatRate;
+        
+      } else if (data.items && data.items.length > 0) {
+        // Legacy quote: calculate from items
+        subtotal = data.items.reduce((sum, item) => {
+          return sum + (item.qty * item.rate);
+        }, 0);
+        
+        // Apply tax_rate
+        const taxRate = data.tax_rate || 0;
+        taxAmount = subtotal * taxRate;
+      }
+
       const total = subtotal + taxAmount;
 
       const quotePayload = {
@@ -674,9 +699,21 @@ export const QuoteWizard: React.FC = () => {
       });
       navigate(`/quotes/${quote.id}`);
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error("Failed to finalize quote:", error);
-      toast({ title: "Error", description: "Failed to finalize quote", variant: "destructive" });
+      console.error("Error details:", {
+        message: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint,
+      });
+      
+      const errorMessage = error.message || "Failed to finalize quote";
+      toast({ 
+        title: "Error Finalizing Quote", 
+        description: errorMessage, 
+        variant: "destructive" 
+      });
     },
   });
 
