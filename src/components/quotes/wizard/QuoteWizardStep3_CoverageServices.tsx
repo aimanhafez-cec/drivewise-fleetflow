@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Shield, Info, Wrench, Check, X, ChevronDown, HelpCircle, Package, Gauge, DollarSign } from "lucide-react";
+import { Shield, Info, Wrench, Check, X, ChevronDown, Package, Gauge, DollarSign } from "lucide-react";
 import { FormError } from "@/components/ui/form-error";
 import { Switch } from "@/components/ui/switch";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -144,7 +144,7 @@ export const QuoteWizardStep3_CoverageServices: React.FC<QuoteWizardStep3Coverag
         <TooltipTrigger asChild>
           <Label className="flex items-center gap-1.5 cursor-help">
             {label}
-            <HelpCircle className="h-3 w-3 text-muted-foreground" />
+            <Info className="h-3 w-3 text-muted-foreground" />
           </Label>
         </TooltipTrigger>
         <TooltipContent className="max-w-xs">
@@ -292,7 +292,7 @@ export const QuoteWizardStep3_CoverageServices: React.FC<QuoteWizardStep3Coverag
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                  <Info className="h-4 w-4 text-muted-foreground cursor-help" />
                 </TooltipTrigger>
                 <TooltipContent className="max-w-xs">
                   <p>Include maintenance in lease or make it customer's responsibility. Settings apply to all vehicles by default.</p>
@@ -410,7 +410,7 @@ export const QuoteWizardStep3_CoverageServices: React.FC<QuoteWizardStep3Coverag
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                  <Info className="h-4 w-4 text-muted-foreground cursor-help" />
                 </TooltipTrigger>
                 <TooltipContent className="max-w-xs">
                   <p>Choose between pooled mileage (shared across all vehicles) or individual mileage per vehicle.</p>
@@ -509,31 +509,25 @@ export const QuoteWizardStep3_CoverageServices: React.FC<QuoteWizardStep3Coverag
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                  <Info className="h-4 w-4 text-muted-foreground cursor-help" />
                 </TooltipTrigger>
-                <TooltipContent className="max-w-xs">
-                  <p>Configure how Salik/Darb tolls and traffic fines are billed to customers.</p>
+                <TooltipContent className="max-w-md p-4" side="right">
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-sm">UAE Toll Systems & Handling Options</h4>
+                    <div className="space-y-2 text-xs">
+                      <p><strong>Salik (Dubai):</strong> AED 4-8 per gate crossing | <strong>Darb (Abu Dhabi):</strong> Variable by location</p>
+                      <p><strong>Rebill Actuals:</strong> Most common - customer pays exact charges + optional admin fee. No disputes over allowances.</p>
+                      <p><strong>Included Allowance:</strong> Corporate leases - include up to cap/month, excess rebilled to customer.</p>
+                      <p><strong>Included in Lease Rate:</strong> Estimated toll cost built into monthly rate (long-term only)</p>
+                      <p className="pt-2 border-t"><strong>Traffic Fines:</strong> Auto-rebill with admin fee is recommended. Customer disputes can be handled while keeping AR aging active.</p>
+                    </div>
+                  </div>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
           </div>
         </CardHeader>
         <CardContent className="p-4 space-y-3">
-          
-          {/* UAE Toll Systems Info */}
-          <div className="p-3 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg">
-            <div className="flex gap-2">
-              <Info className="h-4 w-4 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
-              <div className="text-xs text-blue-900 dark:text-blue-100 space-y-2">
-                <p className="font-medium">UAE Toll Systems & Handling Options</p>
-                <p><strong>Salik (Dubai):</strong> AED 4-8 per gate crossing | <strong>Darb (Abu Dhabi):</strong> Variable by location</p>
-                <p><strong>Rebill Actuals:</strong> Most common - customer pays exact charges + optional admin fee</p>
-                <p><strong>Included Allowance:</strong> Corporate leases - include up to cap/month, excess rebilled</p>
-                <p><strong>Included in Lease Rate:</strong> Estimated toll cost built into monthly rate (long-term only)</p>
-              </div>
-            </div>
-          </div>
-
           {/* Row 1: Toll Handling Type */}
           <div className="space-y-1.5">
             <TooltipLabel 
