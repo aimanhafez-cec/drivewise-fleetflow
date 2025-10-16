@@ -3438,6 +3438,7 @@ export type Database = {
       }
       vehicles: {
         Row: {
+          acquisition_cost: number | null
           category_id: string | null
           color: string | null
           created_at: string
@@ -3467,6 +3468,7 @@ export type Database = {
           year: number
         }
         Insert: {
+          acquisition_cost?: number | null
           category_id?: string | null
           color?: string | null
           created_at?: string
@@ -3496,6 +3498,7 @@ export type Database = {
           year: number
         }
         Update: {
+          acquisition_cost?: number | null
           category_id?: string | null
           color?: string | null
           created_at?: string

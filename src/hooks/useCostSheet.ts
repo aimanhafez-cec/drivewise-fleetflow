@@ -391,15 +391,27 @@ export const useUpdateCostSheetLines = () => {
         // Merge updates with current data
         const updatedLine = { ...currentLine, ...fields };
         
-        // Recalculate total_cost_per_month_aed
+        // Fetch cost sheet for overhead calculation
+        const { data: costSheet } = await supabase
+          .from('quote_cost_sheets')
+          .select('overhead_percent')
+          .eq('id', currentLine.cost_sheet_id)
+          .single();
+        
+        const overheadPercent = costSheet?.overhead_percent ?? 8.0;
+        
+        // Recalculate total_cost_per_month_aed with overhead
         const depreciation = (updatedLine.acquisition_cost_aed * (1 - updatedLine.residual_value_percent / 100)) / updatedLine.lease_term_months;
         const financing = (updatedLine.acquisition_cost_aed * (params.financing_rate_percent / 100)) / 12;
         
-        const total_cost = depreciation + financing +
+        const baseCost = depreciation + financing +
           updatedLine.maintenance_per_month_aed +
           updatedLine.insurance_per_month_aed +
           updatedLine.registration_admin_per_month_aed +
           updatedLine.other_costs_per_month_aed;
+        
+        const overhead = baseCost * (overheadPercent / 100);
+        const total_cost = baseCost + overhead;
         
         // Recalculate actual_margin_percent
         const actual_margin = updatedLine.quoted_rate_per_month_aed > 0

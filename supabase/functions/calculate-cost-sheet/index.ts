@@ -141,18 +141,55 @@ Deno.serve(async (req) => {
     for (const item of quoteItems) {
       const lineNo = item.line_no ?? 0
       
-      // Get acquisition cost from vehicle if available
-      let acquisitionCost = 150000 // Default estimate
+      // Get acquisition cost from vehicle database
+      let acquisitionCost = 135000 // Default for mid-range SUV
+      
       if (item.vehicle_id) {
         const { data: vehicle } = await supabaseClient
           .from('vehicles')
-          .select('daily_rate, monthly_rate')
+          .select('make, model, year, acquisition_cost')
           .eq('id', item.vehicle_id)
           .single()
         
-        if (vehicle?.monthly_rate) {
-          // Estimate acquisition cost from monthly rate (rough 36-month lease assumption)
-          acquisitionCost = vehicle.monthly_rate * 36
+        // Use stored acquisition cost if available
+        if (vehicle?.acquisition_cost && vehicle.acquisition_cost > 0) {
+          acquisitionCost = vehicle.acquisition_cost
+        } else {
+          // Intelligent estimation based on vehicle class
+          const makeModel = `${vehicle?.make || ''} ${vehicle?.model || ''}`.toLowerCase()
+          
+          if (makeModel.includes('civic') || makeModel.includes('corolla') || 
+              makeModel.includes('sentra') || makeModel.includes('altima')) {
+            acquisitionCost = 105000 // Economy/Mid sedans
+          } else if (makeModel.includes('camry') || makeModel.includes('accord') || 
+                     makeModel.includes('maxima')) {
+            acquisitionCost = 120000 // Premium sedans
+          } else if (makeModel.includes('cr-v') || makeModel.includes('rav4') || 
+                     makeModel.includes('rogue') || makeModel.includes('tucson')) {
+            acquisitionCost = 135000 // Compact SUVs
+          } else if (makeModel.includes('highlander') || makeModel.includes('pilot') || 
+                     makeModel.includes('pathfinder')) {
+            acquisitionCost = 170000 // Mid SUVs
+          } else if (makeModel.includes('x5') || makeModel.includes('gle') || 
+                     makeModel.includes('q7')) {
+            acquisitionCost = 280000 // Premium SUVs
+          } else if (makeModel.includes('750') || makeModel.includes('s-class') || 
+                     makeModel.includes('a8')) {
+            acquisitionCost = 420000 // Luxury sedans
+          } else if (makeModel.includes('f-150') || makeModel.includes('hilux') || 
+                     makeModel.includes('silverado')) {
+            acquisitionCost = 150000 // Pickup trucks
+          } else if (makeModel.includes('mustang') || makeModel.includes('camaro') || 
+                     makeModel.includes('convertible')) {
+            acquisitionCost = 220000 // Sports/convertibles
+          }
+          
+          // Age depreciation adjustment
+          const currentYear = new Date().getFullYear()
+          const age = currentYear - (vehicle?.year || currentYear)
+          if (age > 0) {
+            acquisitionCost = acquisitionCost * Math.pow(0.90, age) // 10% per year
+          }
         }
       }
 
