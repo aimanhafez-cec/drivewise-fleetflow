@@ -226,23 +226,6 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
   if (isCorporate) {
     return (
       <div className="space-y-6">
-        {/* Validation Errors Display */}
-        {Object.keys(errors).some(key => key.startsWith('line_') || key === 'quote_items') && (
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              <strong>Please fix the following errors before proceeding:</strong>
-              <ul className="list-disc list-inside mt-2">
-                {Object.entries(errors)
-                  .filter(([key]) => key.startsWith('line_') || key === 'quote_items')
-                  .map(([key, message]) => (
-                    <li key={key}>{message}</li>
-                  ))}
-              </ul>
-            </AlertDescription>
-          </Alert>
-        )}
-
         {/* Header */}
         <Card>
           <CardHeader>

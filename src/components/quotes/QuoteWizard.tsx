@@ -652,9 +652,6 @@ export const QuoteWizard: React.FC = () => {
               }
               
               // Phase 3B validations
-              if (!line.location_id) {
-                newErrors[`line_${index}_location`] = `Line ${index + 1}: Location/Branch required`;
-              }
               if (line.vin && line.vin.length !== 17) {
                 newErrors[`line_${index}_vin`] = `Line ${index + 1}: VIN must be 17 characters`;
               }
