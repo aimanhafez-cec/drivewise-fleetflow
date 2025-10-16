@@ -39,10 +39,6 @@ import RFQDetails from "./pages/RFQDetails";
 import CustomerDetails from "./pages/CustomerDetails";
 import InstantBooking from "./pages/InstantBooking";
 import Reports from "./pages/Reports";
-import CorporateLeasing from "./pages/CorporateLeasing";
-import NewCorporateLeasing from "./pages/NewCorporateLeasing";
-import CorporateLeasingDetails from "./pages/CorporateLeasingDetails";
-import CorporateLeasingEdit from "./pages/CorporateLeasingEdit";
 import MasterAgreements from "./pages/MasterAgreements";
 import MasterAgreementDetails from "./pages/MasterAgreementDetails";
 // Hidden - commented out imports
@@ -184,36 +180,17 @@ const App = () => {
               }>
                 <Route index element={<Reports />} />
               </Route>
-              <Route path="/master-agreements" element={
-                <ProtectedRoute>
-                  <AppLayout />
-                </ProtectedRoute>
-              }>
-                <Route index element={<MasterAgreements />} />
-                <Route path="new" element={<NewCorporateLeasing />} />
-                <Route path=":id" element={<MasterAgreementDetails />} />
-              </Route>
-              <Route path="/corporate-leasing" element={
-                <ProtectedRoute>
-                  <AppLayout />
-                </ProtectedRoute>
-              }>
-                {/* Hidden - Corporate Leasing list */}
-                {/* <Route index element={<CorporateLeasing />} /> */}
-                {/* <Route path="new" element={<NewCorporateLeasing />} /> */}
-                {/* <Route path=":id" element={<CorporateLeasingDetails />} /> */}
-                <Route path=":id/edit" element={<CorporateLeasingEdit />} />
-              </Route>
-              {/* Hidden - Car Subscriptions */}
-              {/* <Route path="/car-subscriptions" element={
-                <ProtectedRoute>
-                  <AppLayout />
-                </ProtectedRoute>
-              }>
-                <Route index element={<CarSubscriptions />} />
-                <Route path="new" element={<NewCarSubscription />} />
-              </Route> */}
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="/master-agreements" element={
+            <ProtectedRoute>
+              <AppLayout />
+            </ProtectedRoute>
+          }>
+            <Route index element={<MasterAgreements />} />
+            <Route path="new" element={<div className="p-8 text-center"><h2 className="text-2xl font-semibold">Master Agreement Creation - Coming Soon</h2></div>} />
+            <Route path=":id" element={<MasterAgreementDetails />} />
+          </Route>
+
+          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

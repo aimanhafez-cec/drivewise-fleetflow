@@ -95,17 +95,6 @@ const navigation = [
     url: '/master-agreements',
     icon: Building2,
   },
-  // Hidden incomplete screens
-  // {
-  //   title: 'Corporate Leasing',
-  //   url: '/corporate-leasing',
-  //   icon: Building2,
-  // },
-  // {
-  //   title: 'Car Subscriptions',
-  //   url: '/car-subscriptions',
-  //   icon: Car,
-  // },
   {
     title: 'Reports',
     url: '/reports',
