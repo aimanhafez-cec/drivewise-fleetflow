@@ -40,20 +40,17 @@ export const QuoteInitialFees: React.FC<QuoteInitialFeesProps> = ({ quote }) => 
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
-          {initialFees.map((fee: any, index: number) => {
-            console.log('Fee data:', fee);
-            return (
-              <div key={index} className="flex justify-between items-start pb-3 border-b last:border-0 last:pb-0">
-                <div>
-                  <p className="font-medium">{fee.fee_type ? formatFeeType(fee.fee_type) : 'Unknown Fee'}</p>
-                  {fee.description && (
-                    <p className="text-sm text-muted-foreground">{fee.description}</p>
-                  )}
-                </div>
-                <p className="font-semibold">{formatCurrency(fee.amount, quote.currency || 'AED')}</p>
+          {initialFees.map((fee: any, index: number) => (
+            <div key={index} className="flex justify-between items-start pb-3 border-b last:border-0 last:pb-0">
+              <div>
+                <p className="font-medium">{fee.fee_type ? formatFeeType(fee.fee_type) : 'Unknown Fee'}</p>
+                {fee.description && (
+                  <p className="text-sm text-muted-foreground">{fee.description}</p>
+                )}
               </div>
-            );
-          })}
+              <p className="font-semibold">{formatCurrency(fee.amount, quote.currency || 'AED')}</p>
+            </div>
+          ))}
           
           {initialFees.length > 1 && (
             <>

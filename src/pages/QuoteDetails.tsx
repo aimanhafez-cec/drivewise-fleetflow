@@ -846,68 +846,6 @@ const QuoteDetails: React.FC = () => {
             </Card>
           )}
 
-          {/* Initial Fees */}
-          {quote.initial_fees && quote.initial_fees.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <DollarSign className="h-5 w-5" />
-                  Initial Fees
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  {quote.initial_fees.map((fee: any, index: number) => (
-                    <div key={index} className="flex justify-between items-center p-2 border rounded">
-                      <span className="font-medium">{fee.name || fee.description}</span>
-                      <span className="font-semibold">{formatCurrency(fee.amount || 0)}</span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Payment Summary */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <DollarSign className="h-5 w-5" />
-                Payment Summary
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex justify-between text-lg">
-                <span className="text-muted-foreground">Subtotal</span>
-                <span className="font-semibold">{formatCurrency(quote.subtotal || 0)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Tax {quote.vat_percentage ? `(${quote.vat_percentage}%)` : ""}</span>
-                <span className="font-medium">{formatCurrency(quote.tax_amount || 0)}</span>
-              </div>
-              <Separator />
-              <div className="flex justify-between text-xl font-bold">
-                <span>Total</span>
-                <span>
-                  {formatCurrency(quote.total_amount || 0)} {quote.currency || "AED"}
-                </span>
-              </div>
-
-              {quote.proration_rule && (
-                <div className="pt-3 border-t text-sm">
-                  <span className="text-muted-foreground">Proration Rule: </span>
-                  <span className="font-medium">{quote.proration_rule}</span>
-                </div>
-              )}
-              {quote.invoice_format && (
-                <div className="text-sm">
-                  <span className="text-muted-foreground">Invoice Format: </span>
-                  <span className="font-medium">{quote.invoice_format}</span>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
           {/* Notes */}
           {quote.notes && (
             <Card>
