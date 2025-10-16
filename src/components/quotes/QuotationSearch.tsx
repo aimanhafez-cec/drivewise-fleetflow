@@ -137,14 +137,14 @@ export const QuotationSearch: React.FC<QuotationSearchProps> = ({
                 <div className="space-y-2">
                   <Label htmlFor="quoteType">Quote Type</Label>
                   <Select
-                    value={filters.quoteType || ""}
-                    onValueChange={(value) => updateFilter("quoteType", value)}
+                    value={filters.quoteType || "all"}
+                    onValueChange={(value) => updateFilter("quoteType", value === "all" ? undefined : value)}
                   >
                     <SelectTrigger id="quoteType">
                       <SelectValue placeholder="All types" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All types</SelectItem>
+                      <SelectItem value="all">All types</SelectItem>
                       <SelectItem value="corporate-leasing">Corporate Leasing</SelectItem>
                       <SelectItem value="car-subscription">Car Subscription</SelectItem>
                       <SelectItem value="rfq">RFQ</SelectItem>
@@ -163,14 +163,14 @@ export const QuotationSearch: React.FC<QuotationSearchProps> = ({
                 <div className="space-y-2">
                   <Label htmlFor="status">Status</Label>
                   <Select
-                    value={filters.status || ""}
-                    onValueChange={(value) => updateFilter("status", value)}
+                    value={filters.status || "all"}
+                    onValueChange={(value) => updateFilter("status", value === "all" ? undefined : value)}
                   >
                     <SelectTrigger id="status">
                       <SelectValue placeholder="All statuses" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All statuses</SelectItem>
+                      <SelectItem value="all">All statuses</SelectItem>
                       <SelectItem value="draft">Draft</SelectItem>
                       <SelectItem value="submitted">Submitted</SelectItem>
                       <SelectItem value="sent">Sent</SelectItem>
