@@ -808,44 +808,6 @@ const QuoteDetails: React.FC = () => {
             </Card>
           )}
 
-          {/* Maintenance Coverage */}
-          {(quote.maintenance_included || quote.maintenance_coverage_summary) && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Wrench className="h-5 w-5" />
-                  Maintenance Coverage
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div>
-                  <p className="text-sm text-muted-foreground">Maintenance Included</p>
-                  <Badge variant={quote.maintenance_included ? "default" : "secondary"}>
-                    {quote.maintenance_included ? "Yes" : "No"}
-                  </Badge>
-                </div>
-                {quote.maintenance_package_type && (
-                  <div>
-                    <p className="text-sm text-muted-foreground">Package Type</p>
-                    <p className="font-medium capitalize">{quote.maintenance_package_type}</p>
-                  </div>
-                )}
-                {quote.monthly_maintenance_cost_per_vehicle && (
-                  <div>
-                    <p className="text-sm text-muted-foreground">Monthly Cost per Vehicle</p>
-                    <p className="font-medium">{formatCurrency(quote.monthly_maintenance_cost_per_vehicle)}</p>
-                  </div>
-                )}
-                {quote.maintenance_coverage_summary && (
-                  <div>
-                    <p className="text-sm text-muted-foreground">Coverage Summary</p>
-                    <p className="font-medium">{quote.maintenance_coverage_summary}</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
-
           {/* Notes */}
           {quote.notes && (
             <Card>
