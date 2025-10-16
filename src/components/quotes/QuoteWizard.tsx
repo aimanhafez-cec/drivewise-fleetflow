@@ -802,7 +802,7 @@ export const QuoteWizard: React.FC = () => {
       </div>
 
       {/* Train Stop Progress Indicator */}
-      <Card>
+      <Card className="no-print">
         <CardContent className="pt-6 pb-4">
           <TrainStopStepper
             steps={steps}
