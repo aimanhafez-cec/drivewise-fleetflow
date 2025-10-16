@@ -267,6 +267,20 @@ export const QuoteWizard: React.FC<QuoteWizardProps> = ({ viewMode = false, quot
   const queryClient = useQueryClient();
   const [searchParams] = useSearchParams();
 
+  // Helper function to calculate duration in months from dates
+  const calculateDurationMonths = (pickupDate: string, returnDate: string): number => {
+    if (!pickupDate || !returnDate) return 0;
+    
+    const from = new Date(pickupDate);
+    const to = new Date(returnDate);
+    
+    if (isNaN(from.getTime()) || isNaN(to.getTime())) return 0;
+    
+    const diffTime = Math.abs(to.getTime() - from.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return Math.round(diffDays / 30.44); // Average days per month
+  };
+
   // Helper function to calculate quote totals
   const calculateQuoteTotals = (data: Partial<QuoteData>) => {
     let subtotal = 0;
@@ -381,6 +395,23 @@ export const QuoteWizard: React.FC<QuoteWizardProps> = ({ viewMode = false, quot
         if (Array.isArray(existingQuote.items)) {
           loadedData.items = existingQuote.items;
         }
+        
+        // Process quote items to ensure duration is calculated
+        if (Array.isArray(existingQuote.quote_items)) {
+          loadedData.quote_items = existingQuote.quote_items.map((item: any) => {
+            const calculatedDuration = calculateDurationMonths(
+              item.pickup_at, 
+              item.return_at
+            );
+            
+            return {
+              ...item,
+              duration_months: calculatedDuration || item.duration_months || 0,
+              lease_term_months: calculatedDuration || item.lease_term_months || 0,
+            };
+          });
+        }
+        
         setQuoteData(loadedData);
         
         // Mark all steps as completed for existing quotes in view or edit mode
@@ -1111,30 +1142,33 @@ export const QuoteWizard: React.FC<QuoteWizardProps> = ({ viewMode = false, quot
         {renderStep()}
       </div>
 
-      {/* Navigation - Hidden in view mode and during print */}
-      {!viewMode && (
-        <div className="no-print">
-          <div className="flex justify-between">
-            <Button
-              id="btn-wiz-back"
-              variant="outline"
-              onClick={handleBack}
-              disabled={currentStep === 1}
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back
-            </Button>
+      {/* Navigation */}
+      <div className="no-print">
+        <div className="flex justify-between">
+          <Button
+            id="btn-wiz-back"
+            variant="outline"
+            onClick={handleBack}
+            disabled={currentStep === 1}
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back
+          </Button>
 
-            {currentStep < steps.length ? (
-              <Button
-                id="btn-wiz-next"
-                onClick={handleNext}
-                disabled={Object.keys(errors).length > 0}
-              >
-                Next
-                <ArrowRight className="h-4 w-4 ml-2" />
-              </Button>
-            ) : (
+          {currentStep < steps.length ? (
+            <Button
+              id="btn-wiz-next"
+              onClick={viewMode ? () => {
+                setCurrentStep(prev => Math.min(prev + 1, steps.length));
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              } : handleNext}
+              disabled={!viewMode && Object.keys(errors).length > 0}
+            >
+              Next
+              <ArrowRight className="h-4 w-4 ml-2" />
+            </Button>
+          ) : (
+            !viewMode && (
               <div className="flex gap-2">
                 {quoteData.status === 'approved' ? (
                   <Button
@@ -1151,10 +1185,10 @@ export const QuoteWizard: React.FC<QuoteWizardProps> = ({ viewMode = false, quot
                   </p>
                 )}
               </div>
-            )}
-          </div>
+            )
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 };

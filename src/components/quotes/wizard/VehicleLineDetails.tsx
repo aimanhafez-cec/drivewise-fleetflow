@@ -143,14 +143,15 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
       const months = Math.round(diffDays / 30.44);
       
-      if (line.duration_months !== months) {
+      // Always update if duration is 0 or different from calculated
+      if (!line.duration_months || line.duration_months === 0 || line.duration_months !== months) {
         onUpdate('duration_months', months);
       }
-      if (line.lease_term_months !== months) {
+      if (!line.lease_term_months || line.lease_term_months === 0 || line.lease_term_months !== months) {
         onUpdate('lease_term_months', months);
       }
     }
-  }, [line.pickup_at, line.return_at, line.duration_months, line.lease_term_months, onUpdate]);
+  }, [line.pickup_at, line.return_at]);
 
   // Helper to check if a field is customized
   const isCustomized = (field: string, lineValue: any, defaultValue: any) => {

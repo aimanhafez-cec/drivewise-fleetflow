@@ -92,6 +92,25 @@ export const VehicleLineTable: React.FC<VehicleLineTableProps> = ({
     }
   };
 
+  const displayDuration = (line: any): string => {
+    // If we have a stored duration, use it
+    if (line.duration_months && line.duration_months > 0) {
+      return `${line.duration_months} mo`;
+    }
+    
+    // Calculate on-the-fly if dates exist
+    if (line.pickup_at && line.return_at) {
+      const from = new Date(line.pickup_at);
+      const to = new Date(line.return_at);
+      const diffTime = Math.abs(to.getTime() - from.getTime());
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      const months = Math.round(diffDays / 30.44);
+      return `${months} mo`;
+    }
+    
+    return "0 mo";
+  };
+
   return (
     <div className="border rounded-lg overflow-hidden">
       <Table>
@@ -159,7 +178,7 @@ export const VehicleLineTable: React.FC<VehicleLineTableProps> = ({
                     </Badge>
                   </TableCell>
                   <TableCell>{formatDate(line.pickup_at)}</TableCell>
-                  <TableCell className="text-right">{line.duration_months || 0} mo</TableCell>
+                  <TableCell className="text-right">{displayDuration(line)}</TableCell>
                   <TableCell className="text-right">{line.monthly_rate || 0} AED</TableCell>
                   <TableCell className="text-right">
                     <div className="space-y-1">
