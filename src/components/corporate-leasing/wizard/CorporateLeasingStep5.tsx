@@ -3,6 +3,8 @@ import { UseFormReturn } from 'react-hook-form';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { LOVSelect } from '@/components/ui/lov-select';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Info } from 'lucide-react';
 import { 
   SALIK_DARB_HANDLING,
   TOLLS_ADMIN_FEE_MODELS,
@@ -19,6 +21,29 @@ export const CorporateLeasingStep5: React.FC<CorporateLeasingStep5Props> = ({ fo
 
   return (
     <div className="space-y-6">
+      <div className="flex items-center gap-2">
+        <h3 className="text-lg font-semibold">Toll & Fines Handling</h3>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+            </TooltipTrigger>
+            <TooltipContent className="max-w-md p-4" side="right">
+              <div className="space-y-3">
+                <h4 className="font-semibold text-sm">UAE Toll Systems & Handling Options</h4>
+                <div className="space-y-2 text-xs">
+                  <p><strong>Salik (Dubai):</strong> AED 4-8 per gate crossing | <strong>Darb (Abu Dhabi):</strong> Variable by location</p>
+                  <p><strong>Rebill Actuals:</strong> Most common - customer pays exact charges + optional admin fee. No disputes over allowances.</p>
+                  <p><strong>Included Allowance:</strong> Corporate leases - include up to cap/month, excess rebilled to customer.</p>
+                  <p><strong>Included in Lease Rate:</strong> Estimated toll cost built into monthly rate (long-term only)</p>
+                  <p className="pt-2 border-t"><strong>Traffic Fines:</strong> Auto-rebill with admin fee is recommended. Customer disputes can be handled while keeping AR aging active.</p>
+                </div>
+              </div>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
+      
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <FormField
           control={form.control}
@@ -114,23 +139,6 @@ export const CorporateLeasingStep5: React.FC<CorporateLeasingStep5Props> = ({ fo
             </FormItem>
           )}
         />
-      </div>
-
-      <div className="bg-amber-50 dark:bg-amber-950/20 p-4 rounded-lg border border-amber-200 dark:border-amber-800">
-        <h4 className="font-medium text-amber-900 dark:text-amber-100 mb-2">UAE Toll System Information</h4>
-        <div className="text-sm text-amber-800 dark:text-amber-200 space-y-2">
-          <p><strong>Salik (Dubai):</strong> Electronic toll collection system for Dubai roads</p>
-          <p><strong>Darb (Abu Dhabi):</strong> Electronic toll collection system for Abu Dhabi roads</p>
-          <p><strong>Recommended:</strong> Rebill Actual (monthly) for corporate accounts to maintain cost transparency</p>
-        </div>
-      </div>
-
-      <div className="bg-red-50 dark:bg-red-950/20 p-4 rounded-lg border border-red-200 dark:border-red-800">
-        <h4 className="font-medium text-red-900 dark:text-red-100 mb-2">Traffic Fines Management</h4>
-        <div className="text-sm text-red-800 dark:text-red-200 space-y-2">
-          <p><strong>Auto Rebill + Admin Fee:</strong> Company pays all fines and charges customer with admin fee for processing</p>
-          <p><strong>Note:</strong> Admin fee covers verification, processing, and customer notification costs. This ensures faster resolution and maintains proper tracking of violations.</p>
-        </div>
       </div>
     </div>
   );

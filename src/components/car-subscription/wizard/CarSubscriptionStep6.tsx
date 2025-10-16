@@ -3,6 +3,8 @@ import { UseFormReturn } from 'react-hook-form';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Info } from "lucide-react";
 import { SALIK_HANDLING_OPTIONS } from "@/hooks/useCarSubscriptionLOVs";
 
 interface CarSubscriptionStep6Props {
@@ -14,7 +16,28 @@ export const CarSubscriptionStep6: React.FC<CarSubscriptionStep6Props> = ({ form
 
   return (
     <div className="space-y-6">
-      <h3 className="text-lg font-semibold">Tolls & Fines</h3>
+      <div className="flex items-center gap-2">
+        <h3 className="text-lg font-semibold">Tolls & Fines</h3>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+            </TooltipTrigger>
+            <TooltipContent className="max-w-md p-4" side="right">
+              <div className="space-y-3">
+                <h4 className="font-semibold text-sm">UAE Toll Systems & Handling Options</h4>
+                <div className="space-y-2 text-xs">
+                  <p><strong>Salik (Dubai):</strong> AED 4-8 per gate crossing | <strong>Darb (Abu Dhabi):</strong> Variable by location</p>
+                  <p><strong>Rebill Actuals:</strong> Most common - customer pays exact charges + optional admin fee. No disputes over allowances.</p>
+                  <p><strong>Included Allowance:</strong> Corporate leases - include up to cap/month, excess rebilled to customer.</p>
+                  <p><strong>Included in Lease Rate:</strong> Estimated toll cost built into monthly rate (long-term only)</p>
+                  <p className="pt-2 border-t"><strong>Traffic Fines:</strong> Auto-rebill with admin fee is recommended. Customer disputes can be handled while keeping AR aging active.</p>
+                </div>
+              </div>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
       
       <div className="space-y-4">
         <h4 className="font-medium">Salik/Darb Handling</h4>
@@ -134,15 +157,6 @@ export const CarSubscriptionStep6: React.FC<CarSubscriptionStep6Props> = ({ form
             </FormItem>
           )}
         />
-      </div>
-
-      <div className="bg-orange-50 p-4 rounded-lg">
-        <h4 className="font-medium mb-2">UAE Subscription Reality</h4>
-        <div className="text-sm text-card-foreground space-y-2">
-          <p><strong>Rebill Actual (Safer):</strong> Customer pays actual Salik/Darb charges plus optional admin fee. No disputes over allowances.</p>
-          <p><strong>Included Allowance:</strong> Monthly cap on tolls included in subscription. Excess charges rebilled to customer.</p>
-          <p><strong>Traffic Fines:</strong> Auto-rebill with admin fee is recommended. Customer disputes can be handled while keeping AR aging active.</p>
-        </div>
       </div>
     </div>
   );
