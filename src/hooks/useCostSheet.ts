@@ -56,6 +56,14 @@ export interface CostSheet {
   approved_by?: string;
   approved_at?: string;
   approval_notes?: string;
+  approver?: {
+    full_name: string;
+    email: string;
+  };
+  submitter?: {
+    full_name: string;
+    email: string;
+  };
   lines?: CostSheetLine[];
 }
 
@@ -100,7 +108,31 @@ export const useCostSheet = (costSheetId?: string) => {
         .single();
       
       if (error && error.code !== 'PGRST116') throw error;
-      return data as CostSheet | null;
+      if (!data) return null;
+      
+      // Fetch approver and submitter profiles separately
+      const profileIds = [data.approved_by, data.submitted_by].filter(Boolean);
+      
+      let profiles: any = {};
+      if (profileIds.length > 0) {
+        const { data: profilesData } = await supabase
+          .from('profiles')
+          .select('id, full_name, email')
+          .in('id', profileIds);
+        
+        if (profilesData) {
+          profiles = profilesData.reduce((acc: any, p: any) => {
+            acc[p.id] = { full_name: p.full_name, email: p.email };
+            return acc;
+          }, {});
+        }
+      }
+      
+      return {
+        ...data,
+        approver: data.approved_by ? profiles[data.approved_by] : undefined,
+        submitter: data.submitted_by ? profiles[data.submitted_by] : undefined,
+      } as CostSheet;
     },
     enabled: !!costSheetId,
   });

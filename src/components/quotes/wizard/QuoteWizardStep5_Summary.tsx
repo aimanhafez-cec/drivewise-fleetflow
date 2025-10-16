@@ -453,16 +453,16 @@ export const QuoteWizardStep5_Summary: React.FC<QuoteWizardStep4Props> = ({
                   <Alert className="border-yellow-500">
                     <AlertCircle className="h-4 w-4 text-yellow-600" />
                     <AlertDescription className="text-yellow-800 dark:text-yellow-200">
-                      Cost sheet is pending approval. Quote cannot be finalized until approved.
+                      Submitted by {costSheet.submitter?.full_name || 'Unknown'} on {costSheet.submitted_at ? format(new Date(costSheet.submitted_at), 'MMM dd, yyyy') : 'N/A'}. Cost sheet is pending approval. Quote cannot be finalized until approved.
                     </AlertDescription>
                   </Alert>
                 )}
 
                 {costSheet.status === 'approved' && (
                   <Alert className="border-green-500 bg-green-50 dark:bg-green-950">
-                    <AlertCircle className="h-4 w-4 text-green-600" />
+                    <CheckCircle className="h-4 w-4 text-green-600" />
                     <AlertDescription className="text-green-800 dark:text-green-200">
-                      ✓ Cost sheet approved by {costSheet.approved_by} on {new Date(costSheet.approved_at!).toLocaleDateString()}
+                      Cost sheet approved by {costSheet.approver?.full_name || 'Unknown'} on {costSheet.approved_at ? format(new Date(costSheet.approved_at), 'MMM dd, yyyy') : 'N/A'}
                       {costSheet.approval_notes && ` — ${costSheet.approval_notes}`}
                     </AlertDescription>
                   </Alert>
