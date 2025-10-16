@@ -51,7 +51,8 @@ export const useGenerateQuotePDF = () => {
 
   return useMutation({
     mutationFn: async (quoteId: string) => {
-      // For now, use browser print - later can be enhanced with PDF library
+      // Give browser time to render print layout
+      await new Promise(resolve => setTimeout(resolve, 150));
       window.print();
       return { success: true };
     },

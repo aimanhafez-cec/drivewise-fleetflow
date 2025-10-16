@@ -65,6 +65,106 @@
   }
 }
 
+/* Print-specific styles */
+@media print {
+  /* Hide all UI elements during print */
+  .print\:hidden,
+  header, nav, footer, button,
+  .sticky, [role="dialog"],
+  .no-print,
+  .sidebar,
+  .navigation {
+    display: none !important;
+  }
+  
+  /* Show only print layout */
+  .print-only {
+    display: block !important;
+  }
+  
+  /* Page setup for A4 */
+  @page {
+    size: A4 portrait;
+    margin: 15mm;
+  }
+  
+  body {
+    background: white !important;
+    color: black !important;
+    font-size: 11pt;
+    line-height: 1.4;
+  }
+  
+  /* Professional table styling */
+  .print-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    page-break-inside: auto;
+  }
+  
+  .print-table thead {
+    display: table-header-group;
+  }
+  
+  .print-table tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+  
+  .print-table th,
+  .print-table td {
+    border: 1px solid #333;
+    padding: 8px;
+    text-align: left;
+  }
+  
+  .print-table th {
+    background-color: #e5e5e5 !important;
+    font-weight: bold;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  
+  /* Prevent page breaks inside important sections */
+  .print-no-break {
+    page-break-inside: avoid;
+  }
+  
+  .print-section {
+    margin-bottom: 20px;
+  }
+  
+  /* Logo sizing for print */
+  .print-logo {
+    max-width: 180px;
+    height: auto;
+  }
+  
+  /* Professional layout */
+  .print-layout {
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Ensure backgrounds print */
+  .bg-gray-100,
+  .bg-gray-200 {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  
+  /* Clean borders */
+  .border-gray-400 {
+    border-color: #666 !important;
+  }
+  
+  .border-gray-800 {
+    border-color: #222 !important;
+  }
+}
+
 @layer components {
   /* Responsive container improvements */
   .container {

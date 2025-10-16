@@ -1,5 +1,6 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { QuotePrintLayout } from "../QuotePrintLayout";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -157,6 +158,13 @@ export const QuoteWizardStep5_Summary: React.FC<QuoteWizardStep4Props> = ({
 
   return (
     <div className="space-y-6">
+      {/* Hidden Print Layout - Only visible when printing */}
+      <div className="print-only hidden">
+        <QuotePrintLayout data={data} totals={totals} costSheet={costSheet} />
+      </div>
+
+      {/* Screen UI - Hidden when printing */}
+      <div className="no-print space-y-6">
       {/* Sticky Action Bar */}
       <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b p-4 -m-6 mb-6 print:hidden">
         <div className="flex items-center justify-between max-w-7xl mx-auto">
@@ -725,6 +733,7 @@ export const QuoteWizardStep5_Summary: React.FC<QuoteWizardStep4Props> = ({
           </p>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 };
