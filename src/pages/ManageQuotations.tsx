@@ -374,7 +374,7 @@ const ManageQuotations: React.FC = () => {
             <TableHeader>
               <TableRow>
                 <TableHead>Quote #</TableHead>
-                <TableHead>Type</TableHead>
+                <TableHead className="w-[160px]">Type</TableHead>
                 <TableHead>Customer</TableHead>
                 <TableHead>Vehicles</TableHead>
                 <TableHead>Created Date</TableHead>
@@ -420,8 +420,8 @@ const ManageQuotations: React.FC = () => {
                     >
                       {quote.quote_number}
                     </TableCell>
-                    <TableCell onClick={() => navigate(`/quotes/${quote.id}`)} className="align-middle">
-                      <Badge variant="outline" className="whitespace-nowrap leading-tight">
+                    <TableCell onClick={() => navigate(`/quotes/${quote.id}`)} className="align-middle min-w-[160px]">
+                      <Badge variant="outline" className="whitespace-nowrap px-3">
                         {formatQuoteType(quote.quote_type)}
                       </Badge>
                     </TableCell>
