@@ -8,7 +8,8 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
-import { ArrowLeft, FileText, Edit } from 'lucide-react';
+import { ArrowLeft, FileText, Edit, ExternalLink } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { formatCurrency } from "@/lib/utils";
 
@@ -181,9 +182,22 @@ const CorporateLeasingDetails = () => {
             <h1 className="text-3xl font-bold tracking-tight text-card-foreground">
               {agreement.agreement_no || `Draft Agreement #${agreement.id.slice(0, 8)}`}
             </h1>
-            <p className="text-card-foreground">
-              Created on {format(new Date(agreement.created_at), 'MMMM dd, yyyy')}
-            </p>
+            <div className="flex items-center gap-4 text-sm text-card-foreground">
+              <span>Created on {format(new Date(agreement.created_at), 'MMMM dd, yyyy')}</span>
+              {agreement.source_quote_no && (
+                <div className="flex items-center gap-1">
+                  <span className="text-muted-foreground">•</span>
+                  <span className="text-muted-foreground">From Quote:</span>
+                  <Link 
+                    to={`/quotes/${agreement.source_quote_id}`}
+                    className="text-primary hover:underline font-mono inline-flex items-center gap-1"
+                  >
+                    {agreement.source_quote_no}
+                    <ExternalLink className="h-3 w-3" />
+                  </Link>
+                </div>
+              )}
+            </div>
           </div>
         </div>
         <div className="flex items-center space-x-2">

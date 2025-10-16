@@ -10,6 +10,11 @@ export const convertQuoteToCorporateLease = async (quoteId: string) => {
 
   if (fetchError) throw fetchError;
 
+  // 1.1 Check if already converted (prevent duplicates)
+  if (quote.converted_to_agreement) {
+    throw new Error(`Quote ${quote.quote_number} has already been converted to agreement ${quote.agreement_no}`);
+  }
+
   // 2. Generate new agreement number
   const { data: agreementNo, error: agreementNoError } = await supabase.rpc(
     "generate_corporate_lease_no"
@@ -17,7 +22,7 @@ export const convertQuoteToCorporateLease = async (quoteId: string) => {
 
   if (agreementNoError) throw agreementNoError;
 
-  // 3. Map quote fields to corporate_leasing_agreements
+  // 3. Map quote fields to corporate_leasing_agreements with source tracking
   const agreementPayload = {
     agreement_no: agreementNo,
     rental_type: "Corporate Leasing" as any,
@@ -46,11 +51,14 @@ export const convertQuoteToCorporateLease = async (quoteId: string) => {
     deposit_amount_aed: quote.default_deposit_amount,
     currency: quote.currency || "AED",
     vat_code: "UAE 5%",
-    status: "active" as any,
-    signed_date: new Date().toISOString().split("T")[0],
+    status: "draft" as any, // Start as draft, will be signed later
+    signed_date: null, // Not signed yet
     notes: quote.notes,
     created_by: quote.created_by,
     customer_po_no: quote.customer_po_number,
+    // Source quote tracking
+    source_quote_id: quoteId,
+    source_quote_no: quote.quote_number,
     // Required fields
     cost_allocation_mode: "Per Vehicle" as any,
     framework_model: "Fleet Replacement" as any,
@@ -66,24 +74,30 @@ export const convertQuoteToCorporateLease = async (quoteId: string) => {
 
   if (insertError) throw insertError;
 
-  // 5. Create lines from quote_items
+  // 5. Create lines from quote_items with contract numbers
   const quoteItems = Array.isArray(quote.quote_items) ? quote.quote_items : [];
   if (quoteItems.length > 0) {
-    const lines = quoteItems.map((item: any, index: number) => ({
-      agreement_id: agreement.id,
-      vehicle_class_id: item.vehicle_class_id,
-      vehicle_id: item.vehicle_id,
-      qty: item.quantity || 1,
-      line_number: index + 1,
-      lease_start_date: quote.contract_effective_from,
-      monthly_rate_aed: item.monthly_rate,
-      contract_months: quote.duration_days
-        ? Math.ceil(quote.duration_days / 30)
-        : 12,
-      mileage_allowance_km_month: item.included_km_per_month,
-      excess_km_rate_aed: item.excess_km_charge,
-      status: "active" as any,
-    }));
+    const lines = quoteItems.map((item: any, index: number) => {
+      const lineNumber = index + 1;
+      const contractNo = `${agreementNo}-${String(lineNumber).padStart(2, '0')}`;
+      
+      return {
+        agreement_id: agreement.id,
+        contract_no: contractNo,
+        line_number: lineNumber,
+        vehicle_class_id: item.vehicle_class_id,
+        vehicle_id: item.vehicle_id,
+        qty: item.quantity || 1,
+        lease_start_date: quote.contract_effective_from,
+        monthly_rate_aed: item.monthly_rate,
+        contract_months: quote.duration_days
+          ? Math.ceil(quote.duration_days / 30)
+          : 12,
+        mileage_allowance_km_month: item.included_km_per_month,
+        excess_km_rate_aed: item.excess_km_charge,
+        line_status: "draft", // Start as draft
+      };
+    });
 
     const { error: linesError } = await supabase
       .from("corporate_leasing_lines")
@@ -92,10 +106,17 @@ export const convertQuoteToCorporateLease = async (quoteId: string) => {
     if (linesError) throw linesError;
   }
 
-  // 6. Update quote status to 'converted'
+  // 6. Update quote with conversion tracking (bi-directional link)
   const { error: updateError } = await supabase
     .from("quotes")
-    .update({ status: "converted" })
+    .update({
+      converted_to_agreement: true,
+      agreement_id: agreement.id,
+      agreement_no: agreementNo,
+      conversion_date: new Date().toISOString(),
+      converted_by: quote.created_by,
+      status: "accepted", // Keep as accepted, not "converted"
+    })
     .eq("id", quoteId);
 
   if (updateError) throw updateError;

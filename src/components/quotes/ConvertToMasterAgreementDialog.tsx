@@ -8,10 +8,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useConvertQuoteToMasterAgreement } from "@/hooks/useConvertQuoteToMasterAgreement";
-import { FileText, AlertCircle, CheckCircle2 } from "lucide-react";
+import { FileText, AlertCircle, CheckCircle2, ExternalLink } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/currency";
+import { Link } from "react-router-dom";
 
 interface ConvertToMasterAgreementDialogProps {
   open: boolean;
@@ -30,8 +32,9 @@ export const ConvertToMasterAgreementDialog: React.FC<ConvertToMasterAgreementDi
   const hasCustomer = !!quote?.customer_id;
   const hasVehicles = quote?.quote_items && quote.quote_items.length > 0;
   const isAccepted = quote?.status === "accepted";
+  const isAlreadyConverted = quote?.converted_to_agreement === true;
 
-  const canConvert = hasCustomer && hasVehicles && isAccepted;
+  const canConvert = hasCustomer && hasVehicles && isAccepted && !isAlreadyConverted;
 
   const handleConvert = async () => {
     if (!canConvert) return;
@@ -58,35 +61,68 @@ export const ConvertToMasterAgreementDialog: React.FC<ConvertToMasterAgreementDi
         </DialogHeader>
 
         <div className="space-y-4 py-4">
+          {/* Already Converted Warning */}
+          {isAlreadyConverted && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription className="flex items-center justify-between">
+                <span>
+                  This quote has already been converted to agreement <strong>{quote.agreement_no}</strong>
+                </span>
+                <Button
+                  variant="link"
+                  size="sm"
+                  asChild
+                  className="h-auto p-0 text-destructive-foreground"
+                >
+                  <Link to={`/corporate-leasing/${quote.agreement_id}`}>
+                    View Agreement <ExternalLink className="ml-1 h-3 w-3" />
+                  </Link>
+                </Button>
+              </AlertDescription>
+            </Alert>
+          )}
+
           {/* Pre-check validations */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              {hasCustomer ? (
-                <CheckCircle2 className="h-4 w-4 text-green-600" />
-              ) : (
-                <AlertCircle className="h-4 w-4 text-destructive" />
-              )}
-              <span className="text-sm">Customer information available</span>
-            </div>
-            <div className="flex items-center gap-2">
-              {hasVehicles ? (
-                <CheckCircle2 className="h-4 w-4 text-green-600" />
-              ) : (
-                <AlertCircle className="h-4 w-4 text-destructive" />
-              )}
-              <span className="text-sm">At least one vehicle in quote</span>
-            </div>
-            <div className="flex items-center gap-2">
-              {isAccepted ? (
-                <CheckCircle2 className="h-4 w-4 text-green-600" />
-              ) : (
-                <AlertCircle className="h-4 w-4 text-destructive" />
-              )}
-              <span className="text-sm">Quote status is accepted</span>
+          <div className="space-y-2 p-4 bg-muted/50 rounded-lg">
+            <h4 className="font-medium text-sm mb-3">Pre-Conversion Checks</h4>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                {hasCustomer ? (
+                  <CheckCircle2 className="h-4 w-4 text-green-600" />
+                ) : (
+                  <AlertCircle className="h-4 w-4 text-destructive" />
+                )}
+                <span className="text-sm">Customer information available</span>
+              </div>
+              <div className="flex items-center gap-2">
+                {hasVehicles ? (
+                  <CheckCircle2 className="h-4 w-4 text-green-600" />
+                ) : (
+                  <AlertCircle className="h-4 w-4 text-destructive" />
+                )}
+                <span className="text-sm">At least one vehicle in quote</span>
+              </div>
+              <div className="flex items-center gap-2">
+                {isAccepted ? (
+                  <CheckCircle2 className="h-4 w-4 text-green-600" />
+                ) : (
+                  <AlertCircle className="h-4 w-4 text-destructive" />
+                )}
+                <span className="text-sm">Quote status is accepted</span>
+              </div>
+              <div className="flex items-center gap-2">
+                {!isAlreadyConverted ? (
+                  <CheckCircle2 className="h-4 w-4 text-green-600" />
+                ) : (
+                  <AlertCircle className="h-4 w-4 text-destructive" />
+                )}
+                <span className="text-sm">Quote not already converted</span>
+              </div>
             </div>
           </div>
 
-          {!canConvert && (
+          {!canConvert && !isAlreadyConverted && (
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>

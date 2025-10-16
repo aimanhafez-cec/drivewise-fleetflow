@@ -656,6 +656,8 @@ export type Database = {
           signed_date: string | null
           sla_credits_enabled: boolean | null
           sla_credits_percentage: number | null
+          source_quote_id: string | null
+          source_quote_no: string | null
           status: Database["public"]["Enums"]["corporate_lease_status"]
           telematics_consent: boolean | null
           tolls_admin_fee_model: string
@@ -721,6 +723,8 @@ export type Database = {
           signed_date?: string | null
           sla_credits_enabled?: boolean | null
           sla_credits_percentage?: number | null
+          source_quote_id?: string | null
+          source_quote_no?: string | null
           status?: Database["public"]["Enums"]["corporate_lease_status"]
           telematics_consent?: boolean | null
           tolls_admin_fee_model?: string
@@ -786,6 +790,8 @@ export type Database = {
           signed_date?: string | null
           sla_credits_enabled?: boolean | null
           sla_credits_percentage?: number | null
+          source_quote_id?: string | null
+          source_quote_no?: string | null
           status?: Database["public"]["Enums"]["corporate_lease_status"]
           telematics_consent?: boolean | null
           tolls_admin_fee_model?: string
@@ -811,6 +817,13 @@ export type Database = {
             referencedRelation: "legal_entities"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "corporate_leasing_agreements_source_quote_id_fkey"
+            columns: ["source_quote_id"]
+            isOneToOne: false
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
         ]
       }
       corporate_leasing_lines: {
@@ -820,6 +833,8 @@ export type Database = {
           additional_services: Json | null
           agreement_id: string
           category_name: string | null
+          contract_months: number | null
+          contract_no: string | null
           cost_center_id: string | null
           created_at: string
           excess_km_rate_aed: number | null
@@ -833,12 +848,14 @@ export type Database = {
           line_number: number
           line_status: string
           make: string | null
+          mileage_allowance_km_month: number | null
           model: string | null
           model_year: number | null
           monthly_km_allowance: number | null
           monthly_rate_aed: number
           pickup_location_id: string | null
           project_code: string | null
+          qty: number | null
           return_location_id: string | null
           security_deposit_aed: number | null
           setup_fee_aed: number | null
@@ -853,6 +870,8 @@ export type Database = {
           additional_services?: Json | null
           agreement_id: string
           category_name?: string | null
+          contract_months?: number | null
+          contract_no?: string | null
           cost_center_id?: string | null
           created_at?: string
           excess_km_rate_aed?: number | null
@@ -866,12 +885,14 @@ export type Database = {
           line_number: number
           line_status?: string
           make?: string | null
+          mileage_allowance_km_month?: number | null
           model?: string | null
           model_year?: number | null
           monthly_km_allowance?: number | null
           monthly_rate_aed: number
           pickup_location_id?: string | null
           project_code?: string | null
+          qty?: number | null
           return_location_id?: string | null
           security_deposit_aed?: number | null
           setup_fee_aed?: number | null
@@ -886,6 +907,8 @@ export type Database = {
           additional_services?: Json | null
           agreement_id?: string
           category_name?: string | null
+          contract_months?: number | null
+          contract_no?: string | null
           cost_center_id?: string | null
           created_at?: string
           excess_km_rate_aed?: number | null
@@ -899,12 +922,14 @@ export type Database = {
           line_number?: number
           line_status?: string
           make?: string | null
+          mileage_allowance_km_month?: number | null
           model?: string | null
           model_year?: number | null
           monthly_km_allowance?: number | null
           monthly_rate_aed?: number
           pickup_location_id?: string | null
           project_code?: string | null
+          qty?: number | null
           return_location_id?: string | null
           security_deposit_aed?: number | null
           setup_fee_aed?: number | null
@@ -2307,6 +2332,8 @@ export type Database = {
       quotes: {
         Row: {
           account_name: string | null
+          agreement_id: string | null
+          agreement_no: string | null
           annual_escalation_percentage: number | null
           approval_notes: string | null
           approved_at: string | null
@@ -2317,6 +2344,9 @@ export type Database = {
           contact_person_id: string | null
           contract_effective_from: string | null
           contract_effective_to: string | null
+          conversion_date: string | null
+          converted_by: string | null
+          converted_to_agreement: boolean | null
           created_at: string
           created_by: string | null
           currency: string | null
@@ -2409,6 +2439,8 @@ export type Database = {
         }
         Insert: {
           account_name?: string | null
+          agreement_id?: string | null
+          agreement_no?: string | null
           annual_escalation_percentage?: number | null
           approval_notes?: string | null
           approved_at?: string | null
@@ -2419,6 +2451,9 @@ export type Database = {
           contact_person_id?: string | null
           contract_effective_from?: string | null
           contract_effective_to?: string | null
+          conversion_date?: string | null
+          converted_by?: string | null
+          converted_to_agreement?: boolean | null
           created_at?: string
           created_by?: string | null
           currency?: string | null
@@ -2511,6 +2546,8 @@ export type Database = {
         }
         Update: {
           account_name?: string | null
+          agreement_id?: string | null
+          agreement_no?: string | null
           annual_escalation_percentage?: number | null
           approval_notes?: string | null
           approved_at?: string | null
@@ -2521,6 +2558,9 @@ export type Database = {
           contact_person_id?: string | null
           contract_effective_from?: string | null
           contract_effective_to?: string | null
+          conversion_date?: string | null
+          converted_by?: string | null
+          converted_to_agreement?: boolean | null
           created_at?: string
           created_by?: string | null
           currency?: string | null
@@ -2612,6 +2652,13 @@ export type Database = {
           withholding_tax_percentage?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "quotes_agreement_id_fkey"
+            columns: ["agreement_id"]
+            isOneToOne: false
+            referencedRelation: "corporate_leasing_agreements"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "quotes_business_unit_id_fkey"
             columns: ["business_unit_id"]
@@ -3552,6 +3599,10 @@ export type Database = {
       }
       generate_agreement_no: {
         Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      generate_contract_no: {
+        Args: { p_agreement_no: string; p_line_number: number }
         Returns: string
       }
       generate_corporate_lease_no: {

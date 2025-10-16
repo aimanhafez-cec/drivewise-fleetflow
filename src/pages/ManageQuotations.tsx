@@ -20,7 +20,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { QuotationSearch } from "@/components/quotes/QuotationSearch";
-import { Plus, MoreVertical, Eye, Edit, Copy, FileText, Send, CheckCircle, XCircle, Trash2 } from "lucide-react";
+import { Plus, MoreVertical, Eye, Edit, Copy, FileText, Send, CheckCircle, XCircle, Trash2, ExternalLink } from "lucide-react";
+import { Link } from "react-router-dom";
 import { formatCurrency } from "@/lib/utils/currency";
 import { format } from "date-fns";
 
@@ -63,6 +64,9 @@ interface QuoteWithRelations {
   validity_date_to: string | null;
   quote_items: any[];
   vat_percentage?: number;
+  converted_to_agreement?: boolean;
+  agreement_id?: string;
+  agreement_no?: string;
   customer?: Customer | null;
   calculated_total?: number;
 }
@@ -101,7 +105,7 @@ const ManageQuotations: React.FC = () => {
     queryFn: async () => {
       let query = supabase
         .from("quotes")
-        .select("id, quote_number, customer_id, rfq_id, status, quote_type, total_amount, created_at, validity_date_to, quote_items, vat_percentage")
+        .select("id, quote_number, customer_id, rfq_id, status, quote_type, total_amount, created_at, validity_date_to, quote_items, vat_percentage, converted_to_agreement, agreement_id, agreement_no")
         .order("created_at", { ascending: false });
 
       // Apply quick filter
@@ -362,19 +366,21 @@ const ManageQuotations: React.FC = () => {
                 <TableHead>Valid Until</TableHead>
                 <TableHead className="text-right">Amount</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Converted</TableHead>
+                <TableHead>Agreement No.</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={9} className="text-center py-12">
+                  <TableCell colSpan={11} className="text-center py-12">
                     Loading quotations...
                   </TableCell>
                 </TableRow>
               ) : quotes.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={9} className="text-center py-12">
+                  <TableCell colSpan={11} className="text-center py-12">
                     <div className="flex flex-col items-center gap-2">
                       <FileText className="h-12 w-12 text-muted-foreground" />
                       <p className="text-lg font-medium">No quotations found</p>
@@ -443,6 +449,29 @@ const ManageQuotations: React.FC = () => {
                           </Badge>
                         )}
                       </div>
+                    </TableCell>
+                    <TableCell onClick={() => navigate(`/quotes/${quote.id}`)}>
+                      {quote.converted_to_agreement ? (
+                        <Badge variant="default" className="bg-green-600">
+                          Yes
+                        </Badge>
+                      ) : (
+                        <Badge variant="secondary">No</Badge>
+                      )}
+                    </TableCell>
+                    <TableCell onClick={() => navigate(`/quotes/${quote.id}`)}>
+                      {quote.agreement_no ? (
+                        <Link 
+                          to={`/corporate-leasing/${quote.agreement_id}`}
+                          className="flex items-center gap-1 text-primary hover:underline font-mono"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {quote.agreement_no}
+                          <ExternalLink className="h-3 w-3" />
+                        </Link>
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
+                      )}
                     </TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>
