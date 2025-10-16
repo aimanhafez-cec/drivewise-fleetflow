@@ -28,12 +28,8 @@ const getInvoiceFormatLabel = (format?: string) => {
 
 export const QuotePaymentSummary: React.FC<QuotePaymentSummaryProps> = ({ quote }) => {
   const vatPercentage = quote.vat_percentage || 5;
-  const currency = quote.currency || 'AED';
-  
-  console.log('🔍 QuotePaymentSummary Debug:');
-  console.log('  quote.currency:', quote.currency);
-  console.log('  currency variable:', currency);
-  console.log('  typeof currency:', typeof currency);
+  // Sanitize currency code - take only first word if multiple words exist
+  const currency = (quote.currency || 'AED').trim().split(' ')[0];
   
   // Helper to normalize type strings
   const normalizeType = (t?: string) => (t || '').trim().toLowerCase();
@@ -116,13 +112,7 @@ export const QuotePaymentSummary: React.FC<QuotePaymentSummaryProps> = ({ quote 
               <div className="flex justify-between items-center">
                 <span className="text-lg font-semibold">Total Amount</span>
                 <span className="text-2xl font-bold text-primary">
-                  {(() => {
-                    const formattedTotal = formatCurrency(totalAmount, currency);
-                    console.log('  totalAmount:', totalAmount);
-                    console.log('  formatCurrency output:', formattedTotal);
-                    console.log('  typeof formattedTotal:', typeof formattedTotal);
-                    return formattedTotal;
-                  })()}
+                  {formatCurrency(totalAmount, currency)}
                 </span>
               </div>
             </div>

@@ -165,15 +165,11 @@ export const QuoteFinancialBreakdown: React.FC<QuoteFinancialBreakdownProps> = (
               </div>
             )}
             
-            {initialFees.length > 0 && (
-              <>
-                {initialFees.map((fee: any, index: number) => (
-                  <div key={index} className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">{fee.description}</span>
-                    <span className="font-medium">{formatCurrency(fee.amount || 0, currency)}</span>
-                  </div>
-                ))}
-              </>
+            {initialFeesTotal > 0 && (
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-muted-foreground">Initial Fees</span>
+                <span className="font-medium">{formatCurrency(initialFeesTotal, currency)}</span>
+              </div>
             )}
 
             <Separator />
