@@ -221,6 +221,7 @@ const normalizeType = (t?: string) => (t || '').trim().toLowerCase();
 export const QuoteWizard: React.FC<QuoteWizardProps> = ({ viewMode = false, quoteId: propQuoteId }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+  const saveToastTimerRef = React.useRef<number | null>(null);
   const [quoteData, setQuoteData] = useState<Partial<QuoteData>>({
     items: [],
     tax_rate: 0.08,
@@ -362,6 +363,15 @@ export const QuoteWizard: React.FC<QuoteWizardProps> = ({ viewMode = false, quot
     },
     enabled: !!fromRfqId,
   });
+
+  // Cleanup toast timer on unmount
+  useEffect(() => {
+    return () => {
+      if (saveToastTimerRef.current) {
+        clearTimeout(saveToastTimerRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (existingQuote) {
@@ -553,10 +563,18 @@ export const QuoteWizard: React.FC<QuoteWizardProps> = ({ viewMode = false, quot
         queryClient.invalidateQueries({ queryKey: ["rfqs"] });
       }
       
-      toast({ 
-        title: "Saved", 
-        description: isNew ? "Quote saved as draft" : "Changes saved" 
-      });
+      // Clear any pending toast timer
+      if (saveToastTimerRef.current) {
+        clearTimeout(saveToastTimerRef.current);
+      }
+      
+      // Show toast after 3 seconds delay
+      saveToastTimerRef.current = window.setTimeout(() => {
+        toast({ 
+          title: "Saved", 
+          description: isNew ? "Quote saved as draft" : "Changes saved" 
+        });
+      }, 3000);
       
       // If new quote, silently update URL without navigation
       if (isNew) {
