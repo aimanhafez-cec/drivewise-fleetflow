@@ -255,9 +255,6 @@ export const QuoteWizardStep5_Summary: React.FC<QuoteWizardStep4Props> = ({
         </CardContent>
       </Card>
 
-      {/* Two Column Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
       {/* Cost Sheet Status (Corporate only) */}
       {isCorporate && data.id && (
         <Card className={costSheet?.status === 'approved' ? 'border-green-500' : costSheet?.status === 'pending_approval' ? 'border-yellow-500' : ''}>
