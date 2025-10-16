@@ -274,18 +274,41 @@ export const QuoteWizard: React.FC<QuoteWizardProps> = ({ viewMode = false, quot
     const isCorporateQuote = normalizeType(data.quote_type) === 'corporate lease';
 
     if (isCorporateQuote && data.quote_items && data.quote_items.length > 0) {
-      // Corporate lease: calculate from quote_items
-      const headerMonths = data.duration_days ? Math.round((data.duration_days || 0) / 30) : 0;
+      // Corporate lease: comprehensive calculation including ALL components
+      const vatPercentage = data.vat_percentage || 5;
       
-      subtotal = data.quote_items.reduce((sum, item) => {
-        const months = (item.duration_months && item.duration_months > 0) ? item.duration_months : headerMonths;
-        const monthlyRate = item.monthly_rate || 0;
-        return sum + (months * monthlyRate);
+      // Helper functions for add-ons
+      const getAddonType = (a: any) => a.pricing_model || a.type;
+      const getAddonTotal = (a: any) => (a.total ?? a.amount ?? 0);
+      
+      // 1. Calculate deposits (NON-TAXABLE)
+      const totalDeposits = data.quote_items.reduce((sum, line) => 
+        sum + (line.deposit_amount || 0), 0);
+      
+      // 2. Calculate advance rent (TAXABLE)
+      const totalAdvance = data.quote_items.reduce((sum, line) => 
+        sum + ((line.advance_rent_months || 0) * (line.monthly_rate || 0)), 0);
+      
+      // 3. Calculate one-time add-ons (TAXABLE)
+      const oneTimeAddOns = data.quote_items.reduce((sum, line) => {
+        const addons = line.addons || [];
+        return sum + addons
+          .filter((a: any) => getAddonType(a) === 'one-time')
+          .reduce((aSum, a: any) => aSum + getAddonTotal(a), 0);
       }, 0);
       
-      // Apply VAT
-      const vatRate = (data.vat_percentage || 0) / 100;
-      taxAmount = subtotal * vatRate;
+      // 4. Calculate initial fees (TAXABLE)
+      const initialFeesTotal = (data.initial_fees || []).reduce((sum, fee: any) => 
+        sum + (parseFloat(fee.amount) || 0), 0);
+      
+      // Calculate taxable subtotal (excludes deposits)
+      const taxableSubtotal = totalAdvance + initialFeesTotal + oneTimeAddOns;
+      
+      // Total subtotal includes deposits
+      subtotal = totalDeposits + taxableSubtotal;
+      
+      // VAT only on taxable items
+      taxAmount = taxableSubtotal * (vatPercentage / 100);
       
     } else if (data.items && data.items.length > 0) {
       // Legacy quote: calculate from items
