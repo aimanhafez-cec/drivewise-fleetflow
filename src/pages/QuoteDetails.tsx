@@ -808,8 +808,15 @@ const QuoteDetails: React.FC = () => {
             <CardContent>
               {displayItems && displayItems.length > 0 ? (
                 <div className="space-y-4">
-                  {displayItems.map((item: any, index: number) => (
-                    <div key={index} className="p-4 border rounded-lg space-y-3 hover:bg-muted/50 transition-colors">
+                  {displayItems.map((item: any, index: number) => {
+                    const itemDurationMonths = item.duration_months && item.duration_months > 0
+                      ? item.duration_months
+                      : item.pickup_at && item.return_at
+                        ? Math.max(1, Math.round((new Date(item.return_at).getTime() - new Date(item.pickup_at).getTime()) / (1000 * 60 * 60 * 24 * 30.44)))
+                        : 0;
+                    
+                    return (
+                      <div key={index} className="p-4 border rounded-lg space-y-3 hover:bg-muted/50 transition-colors">
                       <div className="flex items-start justify-between">
                         <div className="space-y-1">
                           <div className="flex items-center gap-2">
@@ -840,10 +847,10 @@ const QuoteDetails: React.FC = () => {
                         <div>
                           <p className="text-sm font-medium mb-2">Rental Terms</p>
                           <div className="space-y-2 text-sm">
-                            {item.duration_months !== undefined && (
+                            {itemDurationMonths > 0 && (
                               <div className="flex justify-between">
                                 <span className="text-muted-foreground">Duration:</span>
-                                <span className="font-medium">{item.duration_months} months</span>
+                                <span className="font-medium">{itemDurationMonths} months</span>
                               </div>
                             )}
                             {item.monthly_km_allowance && (
@@ -894,7 +901,8 @@ const QuoteDetails: React.FC = () => {
                         </div>
                       )}
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="text-center py-12">
