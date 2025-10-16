@@ -75,11 +75,6 @@ const navigation = [
     icon: MessageCircleQuestion,
   },
   {
-    title: 'Quotes',
-    url: '/quotes',
-    icon: FileText,
-  },
-  {
     title: 'Manage Quotations',
     url: '/manage-quotations',
     icon: FileCheck,
