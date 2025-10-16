@@ -356,3 +356,84 @@ export const useDeleteCostSheet = () => {
     },
   });
 };
+
+export const useUpdateCostSheetLines = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async (params: {
+      cost_sheet_id: string;
+      financing_rate_percent: number;
+      line_updates: Array<{
+        id: string;
+        acquisition_cost_aed?: number;
+        maintenance_per_month_aed?: number;
+        insurance_per_month_aed?: number;
+        registration_admin_per_month_aed?: number;
+        other_costs_per_month_aed?: number;
+        suggested_rate_per_month_aed?: number;
+      }>;
+    }) => {
+      // Update each line
+      for (const update of params.line_updates) {
+        const { id, ...fields } = update;
+        
+        // Fetch current line data to recalculate totals
+        const { data: currentLine, error: fetchError } = await supabase
+          .from('quote_cost_sheet_lines')
+          .select('*')
+          .eq('id', id)
+          .single();
+        
+        if (fetchError) throw fetchError;
+        
+        // Merge updates with current data
+        const updatedLine = { ...currentLine, ...fields };
+        
+        // Recalculate total_cost_per_month_aed
+        const depreciation = (updatedLine.acquisition_cost_aed * (1 - updatedLine.residual_value_percent / 100)) / updatedLine.lease_term_months;
+        const financing = (updatedLine.acquisition_cost_aed * (params.financing_rate_percent / 100)) / 12;
+        
+        const total_cost = depreciation + financing +
+          updatedLine.maintenance_per_month_aed +
+          updatedLine.insurance_per_month_aed +
+          updatedLine.registration_admin_per_month_aed +
+          updatedLine.other_costs_per_month_aed;
+        
+        // Recalculate actual_margin_percent
+        const actual_margin = updatedLine.quoted_rate_per_month_aed > 0
+          ? ((updatedLine.quoted_rate_per_month_aed - total_cost) / updatedLine.quoted_rate_per_month_aed) * 100
+          : 0;
+        
+        // Update the line in database
+        const { error: updateError } = await supabase
+          .from('quote_cost_sheet_lines')
+          .update({
+            ...fields,
+            total_cost_per_month_aed: total_cost,
+            actual_margin_percent: actual_margin,
+          })
+          .eq('id', id);
+        
+        if (updateError) throw updateError;
+      }
+      
+      return { updated_count: params.line_updates.length };
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['cost-sheet'] });
+      toast({
+        title: 'Changes Saved',
+        description: `Updated ${data.updated_count} line(s) successfully.`,
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Save Failed',
+        description: error.message || 'Failed to save changes',
+        variant: 'destructive',
+      });
+    },
+  });
+};

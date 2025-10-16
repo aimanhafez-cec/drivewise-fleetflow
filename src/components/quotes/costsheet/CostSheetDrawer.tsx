@@ -18,6 +18,7 @@ import {
   useUpdateCostSheetStatus,
   useApplyCostSheetRates,
   useDeleteCostSheet,
+  useUpdateCostSheetLines,
   CostSheetLine,
 } from '@/hooks/useCostSheet';
 import {
@@ -52,6 +53,7 @@ export const CostSheetDrawer: React.FC<CostSheetDrawerProps> = ({
   const updateStatusMutation = useUpdateCostSheetStatus();
   const applyRatesMutation = useApplyCostSheetRates();
   const deleteMutation = useDeleteCostSheet();
+  const updateLinesMutation = useUpdateCostSheetLines();
   const { toast } = useToast();
 
   const [headerData, setHeaderData] = useState({
@@ -76,7 +78,18 @@ export const CostSheetDrawer: React.FC<CostSheetDrawerProps> = ({
     }
   }, [costSheet]);
 
+  const pendingChangesCount = Object.keys(lineUpdates).length;
+
   const handleCalculate = () => {
+    // Warn if there are unsaved changes
+    if (pendingChangesCount > 0) {
+      const confirmed = window.confirm(
+        `You have ${pendingChangesCount} unsaved change(s). Recalculating will discard them. Continue?`
+      );
+      if (!confirmed) return;
+    }
+
+    setLineUpdates({}); // Clear pending changes
     calculateMutation.mutate({
       quote_id: quoteId,
       financing_rate: headerData.financing_rate_percent,
@@ -117,6 +130,29 @@ export const CostSheetDrawer: React.FC<CostSheetDrawerProps> = ({
     }));
   };
 
+  const handleSaveChanges = () => {
+    if (!costSheet || pendingChangesCount === 0) return;
+
+    // Convert lineUpdates to array format
+    const updates = Object.entries(lineUpdates).map(([id, fields]) => ({
+      id,
+      ...fields,
+    }));
+
+    updateLinesMutation.mutate(
+      {
+        cost_sheet_id: costSheet.id,
+        financing_rate_percent: headerData.financing_rate_percent,
+        line_updates: updates,
+      },
+      {
+        onSuccess: () => {
+          setLineUpdates({}); // Clear pending changes after successful save
+        },
+      }
+    );
+  };
+
   const handleApplyRates = () => {
     if (!costSheet) return;
     
@@ -124,6 +160,12 @@ export const CostSheetDrawer: React.FC<CostSheetDrawerProps> = ({
       cost_sheet_id: costSheet.id,
     });
   };
+
+  // Merge line updates with current data for display
+  const mergedLines = costSheet?.lines?.map(line => ({
+    ...line,
+    ...(lineUpdates[line.id] || {}),
+  })) || [];
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -192,15 +234,15 @@ export const CostSheetDrawer: React.FC<CostSheetDrawerProps> = ({
             }}
           />
 
-          {costSheet?.lines && costSheet.lines.length > 0 && (
+          {mergedLines.length > 0 && (
             <>
               <CostSheetVehicleTable 
-                lines={costSheet.lines} 
-                disabled={costSheet.status !== 'draft'}
+                lines={mergedLines} 
+                disabled={costSheet?.status !== 'draft'}
                 onLineUpdate={handleLineUpdate}
               />
               <CostSheetSummary 
-                lines={costSheet.lines} 
+                lines={mergedLines} 
                 targetMargin={headerData.target_margin_percent}
               />
             </>
@@ -226,6 +268,7 @@ export const CostSheetDrawer: React.FC<CostSheetDrawerProps> = ({
                   {deleteMutation.isPending ? 'Deleting...' : 'Delete Draft'}
                 </Button>
                 <Button
+                  variant="outline"
                   onClick={handleCalculate}
                   disabled={calculateMutation.isPending}
                   title="Recalculate with current vehicle lines and updated parameters"
@@ -233,8 +276,20 @@ export const CostSheetDrawer: React.FC<CostSheetDrawerProps> = ({
                   {calculateMutation.isPending ? 'Recalculating...' : 'Refresh from Vehicle Lines'}
                 </Button>
                 <Button
+                  onClick={handleSaveChanges}
+                  disabled={pendingChangesCount === 0 || updateLinesMutation.isPending}
+                  variant={pendingChangesCount > 0 ? 'default' : 'outline'}
+                >
+                  {updateLinesMutation.isPending 
+                    ? 'Saving...' 
+                    : pendingChangesCount > 0 
+                      ? `Save Changes (${pendingChangesCount})` 
+                      : 'Save Changes'}
+                </Button>
+                <Button
                   onClick={handleSubmit}
-                  disabled={submitMutation.isPending}
+                  disabled={submitMutation.isPending || pendingChangesCount > 0}
+                  title={pendingChangesCount > 0 ? 'Please save changes before submitting' : ''}
                 >
                   {submitMutation.isPending ? 'Submitting...' : 'Submit for Approval'}
                 </Button>
