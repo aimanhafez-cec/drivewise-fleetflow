@@ -505,25 +505,29 @@ const QuoteDetails: React.FC = () => {
       {/* Show acceptance status if accepted */}
       {quote.status === 'accepted' && (
         <Card className="border-green-200 bg-green-50 dark:bg-green-950">
-          <CardHeader>
-            <CardTitle className="text-green-700 dark:text-green-300">Quote Accepted</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-green-600 dark:text-green-400 mb-4">
-              Customer has accepted this quote. You can now convert it to a Master Agreement.
-            </p>
-            {quote.win_loss_reason && (
-              <p className="text-sm text-muted-foreground mb-4">
-                <strong>Win Reason:</strong> {quote.win_loss_reason}
-              </p>
-            )}
-            <Button
-              onClick={() => setConvertDialogOpen(true)}
-              className="bg-blue-600 hover:bg-blue-700"
-            >
-              <FileText className="mr-2 h-4 w-4" />
-              Convert to Master Agreement
-            </Button>
+          <CardContent className="p-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div className="flex-1">
+                <h3 className="font-semibold text-green-700 dark:text-green-300 mb-1">
+                  Quote Accepted
+                </h3>
+                <p className="text-sm text-green-600 dark:text-green-400">
+                  Customer has accepted this quote. You can now convert it to a Master Agreement.
+                </p>
+                {quote.win_loss_reason && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    <strong>Win Reason:</strong> {quote.win_loss_reason}
+                  </p>
+                )}
+              </div>
+              <Button
+                onClick={() => setConvertDialogOpen(true)}
+                className="bg-blue-600 hover:bg-blue-700 shrink-0"
+              >
+                <FileText className="mr-2 h-4 w-4" />
+                Convert to Master Agreement
+              </Button>
+            </div>
           </CardContent>
         </Card>
       )}
