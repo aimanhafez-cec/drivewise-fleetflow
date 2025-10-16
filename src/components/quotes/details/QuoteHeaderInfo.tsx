@@ -11,6 +11,7 @@ interface QuoteHeaderInfoProps {
   salesRep?: any;
   opportunity?: any;
   contactPerson?: any;
+  billToSite?: any;
 }
 
 export const QuoteHeaderInfo: React.FC<QuoteHeaderInfoProps> = ({
@@ -21,6 +22,7 @@ export const QuoteHeaderInfo: React.FC<QuoteHeaderInfoProps> = ({
   salesRep,
   opportunity,
   contactPerson,
+  billToSite,
 }) => {
   return (
     <Card>
@@ -79,7 +81,7 @@ export const QuoteHeaderInfo: React.FC<QuoteHeaderInfoProps> = ({
           {quote.customer_bill_to && (
             <div>
               <p className="text-sm text-muted-foreground">Bill To</p>
-              <p className="font-medium">{quote.customer_bill_to}</p>
+              <p className="font-medium">{billToSite?.site_name || quote.customer_bill_to}</p>
             </div>
           )}
           {contactPerson && (

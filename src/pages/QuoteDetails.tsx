@@ -128,6 +128,7 @@ interface Quote {
   returnLocation?: any;
   pickupSite?: any;
   returnSite?: any;
+  billToSite?: any;
   paymentTerms?: any;
   priceList?: any;
   pickup_type?: string;
@@ -205,6 +206,7 @@ const QuoteDetails: React.FC = () => {
         contactPersonResult,
         pickupSiteResult,
         returnSiteResult,
+        billToSiteResult,
       ] = await Promise.all([
         supabase.from("profiles").select("full_name, email, phone").eq("id", data.customer_id).maybeSingle(),
         data.vehicle_id
@@ -231,6 +233,9 @@ const QuoteDetails: React.FC = () => {
         data.return_customer_site_id
           ? supabase.from("customer_sites").select("*").eq("id", data.return_customer_site_id).maybeSingle()
           : Promise.resolve({ data: null }),
+        data.customer_bill_to
+          ? supabase.from("customer_sites").select("*").eq("id", data.customer_bill_to).maybeSingle()
+          : Promise.resolve({ data: null }),
       ]);
 
       return {
@@ -244,6 +249,7 @@ const QuoteDetails: React.FC = () => {
         contactPerson: contactPersonResult.data,
         pickupSite: pickupSiteResult.data,
         returnSite: returnSiteResult.data,
+        billToSite: billToSiteResult.data,
       } as Quote;
     },
     enabled: !!id,
@@ -529,6 +535,7 @@ const QuoteDetails: React.FC = () => {
             salesRep={quote.salesRep}
             opportunity={quote.opportunity}
             contactPerson={quote.contactPerson}
+            billToSite={quote.billToSite}
           />
 
           {/* Quote Details */}
