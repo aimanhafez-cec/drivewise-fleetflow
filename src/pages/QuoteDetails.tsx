@@ -325,7 +325,7 @@ const QuoteDetails: React.FC = () => {
       <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
         <FileText className="h-16 w-16 text-muted-foreground" />
         <h3 className="text-lg font-semibold">Quote not found</h3>
-        <Button onClick={() => navigate("/quotes")}>
+        <Button onClick={() => navigate("/manage-quotations")}>
           <ArrowLeft className="h-4 w-4 mr-1" />
           Back to Quotes
         </Button>
@@ -367,7 +367,7 @@ const QuoteDetails: React.FC = () => {
 
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-2 flex-wrap">
-            <Button variant="outline" size="sm" onClick={() => navigate("/quotes")}>
+            <Button variant="outline" size="sm" onClick={() => navigate("/manage-quotations")}>
               <ArrowLeft className="h-4 w-4 mr-1" />
               Back
             </Button>
