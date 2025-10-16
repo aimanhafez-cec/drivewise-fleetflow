@@ -975,7 +975,7 @@ export const QuoteWizard: React.FC<QuoteWizardProps> = ({ viewMode = false, quot
               <Save className="h-4 w-4 mr-2" />
               {quoteData.id ? "Save Changes" : "Save Draft"}
             </Button>
-            <Button variant="outline" onClick={() => navigate("/quotes")}>
+            <Button variant="outline" onClick={() => navigate("/manage-quotations")}>
               Cancel
             </Button>
           </div>
@@ -994,7 +994,7 @@ export const QuoteWizard: React.FC<QuoteWizardProps> = ({ viewMode = false, quot
               <p className="text-muted-foreground">Read-only view of quote details</p>
             </div>
             <div className="flex gap-2">
-              <Button variant="outline" onClick={() => navigate("/quotes")}>
+              <Button variant="outline" onClick={() => navigate("/manage-quotations")}>
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back
               </Button>
