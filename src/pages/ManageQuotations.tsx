@@ -401,32 +401,32 @@ const ManageQuotations: React.FC = () => {
                   <TableRow key={quote.id} className="cursor-pointer hover:bg-muted/50">
                     <TableCell
                       onClick={() => navigate(`/quotes/${quote.id}`)}
-                      className="font-medium"
+                      className="font-medium align-middle"
                     >
                       {quote.quote_number}
                     </TableCell>
-                    <TableCell onClick={() => navigate(`/quotes/${quote.id}`)}>
+                    <TableCell onClick={() => navigate(`/quotes/${quote.id}`)} className="align-middle">
                       <Badge variant="outline" className="capitalize">
                         {quote.quote_type || "Standard"}
                       </Badge>
                     </TableCell>
-                    <TableCell onClick={() => navigate(`/quotes/${quote.id}`)}>
+                    <TableCell onClick={() => navigate(`/quotes/${quote.id}`)} className="align-middle">
                       <div>
                         <p className="font-medium">{quote.customer?.full_name || "N/A"}</p>
                       </div>
                     </TableCell>
-                    <TableCell onClick={() => navigate(`/quotes/${quote.id}`)}>
+                    <TableCell onClick={() => navigate(`/quotes/${quote.id}`)} className="align-middle">
                       <p className="font-medium">{vehicleInfo.display}</p>
                     </TableCell>
-                    <TableCell onClick={() => navigate(`/quotes/${quote.id}`)}>
+                    <TableCell onClick={() => navigate(`/quotes/${quote.id}`)} className="align-middle">
                       {format(new Date(quote.created_at), "MMM dd, yyyy")}
                     </TableCell>
-                    <TableCell onClick={() => navigate(`/quotes/${quote.id}`)}>
+                    <TableCell onClick={() => navigate(`/quotes/${quote.id}`)} className="align-middle">
                       {quote.validity_date_to ? (
-                        <div className="flex items-center gap-2">
-                          {format(new Date(quote.validity_date_to), "MMM dd, yyyy")}
+                        <div>
+                          <div>{format(new Date(quote.validity_date_to), "MMM dd, yyyy")}</div>
                           {isExpiringSoon(quote.validity_date_to) && (
-                            <Badge variant="outline" className="text-orange-600">
+                            <Badge variant="outline" className="text-orange-600 text-xs mt-0.5">
                               Expiring Soon
                             </Badge>
                           )}
@@ -435,22 +435,15 @@ const ManageQuotations: React.FC = () => {
                         <span className="text-muted-foreground">Not set</span>
                       )}
                     </TableCell>
-                    <TableCell onClick={() => navigate(`/quotes/${quote.id}`)} className="text-right">
+                    <TableCell onClick={() => navigate(`/quotes/${quote.id}`)} className="text-right align-middle">
                       {formatCurrency(quote.calculated_total || Number(quote.total_amount) || 0)}
                     </TableCell>
-                    <TableCell onClick={() => navigate(`/quotes/${quote.id}`)}>
-                      <div className="flex items-center gap-2">
-                        <Badge className={statusColor(quote.status)}>
-                          {quote.status.charAt(0).toUpperCase() + quote.status.slice(1)}
-                        </Badge>
-                        {quote.status === 'draft' && (
-                          <Badge variant="outline" className="text-orange-600">
-                            Incomplete
-                          </Badge>
-                        )}
-                      </div>
+                    <TableCell onClick={() => navigate(`/quotes/${quote.id}`)} className="align-middle">
+                      <Badge className={statusColor(quote.status)}>
+                        {quote.status.charAt(0).toUpperCase() + quote.status.slice(1)}
+                      </Badge>
                     </TableCell>
-                    <TableCell onClick={() => navigate(`/quotes/${quote.id}`)}>
+                    <TableCell onClick={() => navigate(`/quotes/${quote.id}`)} className="align-middle">
                       {quote.converted_to_agreement ? (
                         <Badge variant="default" className="bg-green-600">
                           Yes
@@ -459,7 +452,7 @@ const ManageQuotations: React.FC = () => {
                         <Badge variant="secondary">No</Badge>
                       )}
                     </TableCell>
-                    <TableCell onClick={() => navigate(`/quotes/${quote.id}`)}>
+                    <TableCell onClick={() => navigate(`/quotes/${quote.id}`)} className="align-middle">
                       {quote.agreement_no ? (
                         <Link 
                           to={`/corporate-leasing/${quote.agreement_id}`}
