@@ -79,9 +79,13 @@
     display: none !important;
   }
   
-  /* Show only print layout */
+  /* Show only print layout - override hidden class */
   .print-only {
     display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: static !important;
+    left: auto !important;
   }
   
   /* Page setup for A4 */
