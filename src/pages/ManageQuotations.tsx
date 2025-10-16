@@ -62,7 +62,9 @@ interface QuoteWithRelations {
   created_at: string;
   validity_date_to: string | null;
   quote_items: any[];
+  vat_percentage?: number;
   customer?: Customer | null;
+  calculated_total?: number;
 }
 
 const ManageQuotations: React.FC = () => {
@@ -74,13 +76,32 @@ const ManageQuotations: React.FC = () => {
     document.title = "Manage Quotations | Core Car Rental";
   }, []);
 
+  // Calculate quote total from line items
+  const calculateQuoteTotal = (quoteItems: any, vat_percentage?: number) => {
+    const items = Array.isArray(quoteItems) ? quoteItems : [];
+    if (items.length === 0) return 0;
+    
+    let subtotal = 0;
+    items.forEach((item: any) => {
+      const rate = Number(item.monthly_rate) || 0;
+      const months = Number(item.duration_months) || Number(item.lease_term_months) || 1;
+      const qty = Number(item.qty) || 1;
+      subtotal += rate * months * qty;
+    });
+    
+    const vat = Number(vat_percentage) || 5;
+    const total = subtotal * (1 + vat / 100);
+    
+    return total;
+  };
+
   // Fetch quotes with filters
   const { data: quotes = [], isLoading } = useQuery<QuoteWithRelations[]>({
     queryKey: ["quotes", filters, quickFilter],
     queryFn: async () => {
       let query = supabase
         .from("quotes")
-        .select("id, quote_number, customer_id, rfq_id, status, quote_type, total_amount, created_at, validity_date_to, quote_items")
+        .select("id, quote_number, customer_id, rfq_id, status, quote_type, total_amount, created_at, validity_date_to, quote_items, vat_percentage")
         .order("created_at", { ascending: false });
 
       // Apply quick filter
@@ -129,16 +150,25 @@ const ManageQuotations: React.FC = () => {
       if (data && data.length > 0) {
         const customerIds = [...new Set(data.map(q => q.customer_id).filter(Boolean))] as string[];
         
-        const customersData = customerIds.length > 0 
-          ? await supabase.from("profiles").select("id, full_name, email").in("id", customerIds)
-          : { data: [] as Customer[] };
+        // Fetch from BOTH profiles and customers tables
+        const [profilesData, customersData] = await Promise.all([
+          customerIds.length > 0 
+            ? supabase.from("profiles").select("id, full_name, email").in("id", customerIds)
+            : Promise.resolve({ data: [] as Customer[] }),
+          customerIds.length > 0
+            ? supabase.from("customers").select("id, full_name, email").in("id", customerIds)
+            : Promise.resolve({ data: [] as Customer[] })
+        ]);
 
+        // Merge both datasets (customers table takes precedence)
         const customersMap = new Map<string, Customer>();
+        profilesData.data?.forEach(c => customersMap.set(c.id, c));
         customersData.data?.forEach(c => customersMap.set(c.id, c));
 
         return data.map(quote => ({
           ...quote,
           customer: quote.customer_id ? customersMap.get(quote.customer_id) : null,
+          calculated_total: calculateQuoteTotal(quote.quote_items, quote.vat_percentage),
         })) as QuoteWithRelations[];
       }
 
@@ -148,16 +178,24 @@ const ManageQuotations: React.FC = () => {
 
   // Calculate KPIs
   const totalQuotes = quotes.length;
-  const pendingQuotes = quotes.filter((q) => q.status === "draft" || q.status === "sent").length;
-  const acceptedQuotes = quotes.filter((q) => q.status === "accepted").length;
-  const totalValue = quotes.reduce((sum, q) => sum + (Number(q.total_amount) || 0), 0);
+  const pendingQuotes = quotes.filter((q) => 
+    q.status === "draft" || q.status === "submitted" || q.status === "sent"
+  ).length;
+  const acceptedQuotes = quotes.filter((q) => 
+    q.status === "accepted" || q.status === "approved"
+  ).length;
+  const totalValue = quotes.reduce((sum, q) => 
+    sum + (q.calculated_total || Number(q.total_amount) || 0), 0
+  );
 
   const statusColor = (status: string) => {
     switch (status) {
       case "draft":
         return "bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-100";
+      case "submitted":
       case "sent":
         return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100";
+      case "approved":
       case "accepted":
         return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100";
       case "rejected":
@@ -177,20 +215,21 @@ const ManageQuotations: React.FC = () => {
     return daysUntilExpiry >= 0 && daysUntilExpiry <= 7;
   };
 
-  const getVehicleDisplay = (quoteItems: any[]) => {
-    if (!quoteItems || quoteItems.length === 0) {
+  const getVehicleDisplay = (quoteItems: any) => {
+    const items = Array.isArray(quoteItems) ? quoteItems : [];
+    if (items.length === 0) {
       return { display: "To be assigned", count: 0 };
     }
-    if (quoteItems.length === 1) {
-      const item = quoteItems[0];
+    if (items.length === 1) {
+      const item = items[0];
       return { 
         display: item.vehicle_class_name || item.item_description || "Vehicle",
         count: 1
       };
     }
     return { 
-      display: `${quoteItems.length} vehicles`,
-      count: quoteItems.length
+      display: `${items.length} vehicles`,
+      count: items.length
     };
   };
 
@@ -267,6 +306,20 @@ const ManageQuotations: React.FC = () => {
           size="sm"
         >
           Sent
+        </Button>
+        <Button
+          variant={quickFilter === "submitted" ? "default" : "outline"}
+          onClick={() => setQuickFilter("submitted")}
+          size="sm"
+        >
+          Submitted
+        </Button>
+        <Button
+          variant={quickFilter === "approved" ? "default" : "outline"}
+          onClick={() => setQuickFilter("approved")}
+          size="sm"
+        >
+          Approved
         </Button>
         <Button
           variant={quickFilter === "accepted" ? "default" : "outline"}
@@ -383,7 +436,7 @@ const ManageQuotations: React.FC = () => {
                       )}
                     </TableCell>
                     <TableCell onClick={() => navigate(`/quotes/${quote.id}`)} className="text-right">
-                      {formatCurrency(Number(quote.total_amount) || 0)}
+                      {formatCurrency(quote.calculated_total || Number(quote.total_amount) || 0)}
                     </TableCell>
                     <TableCell onClick={() => navigate(`/quotes/${quote.id}`)}>
                       <div className="flex items-center gap-2">
