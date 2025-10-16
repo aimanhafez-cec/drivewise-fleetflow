@@ -937,11 +937,11 @@ const QuoteDetails: React.FC = () => {
                   )}
                   <div>
                     <p className="text-sm text-muted-foreground">Customer Name</p>
-                    <p className="font-medium">{quote.customer?.full_name}</p>
+                    <p className="font-medium">{quote.customer?.full_name || quote.account_name || "N/A"}</p>
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Email</p>
-                    <p className="font-medium">{quote.customer?.email}</p>
+                    <p className="font-medium">{quote.customer?.email || "N/A"}</p>
                   </div>
                   {quote.customer?.phone && (
                     <div>
@@ -955,7 +955,7 @@ const QuoteDetails: React.FC = () => {
                   {quote.customer_bill_to && (
                     <div>
                       <p className="text-sm text-muted-foreground">Bill-To Site</p>
-                      <p className="font-medium">{quote.customer_bill_to}</p>
+                      <p className="font-medium">{quote.billToSite?.site_name || quote.customer_bill_to}</p>
                     </div>
                   )}
                   {quote.project && (
@@ -982,19 +982,19 @@ const QuoteDetails: React.FC = () => {
                   {quote.legal_entity_id && (
                     <div>
                       <p className="text-sm text-muted-foreground">Legal Entity</p>
-                      <p className="font-medium">{quote.legal_entity_id}</p>
+                      <p className="font-medium">{quote.legalEntity?.name || quote.legal_entity_id}</p>
                     </div>
                   )}
                   {quote.business_unit_id && (
                     <div>
                       <p className="text-sm text-muted-foreground">Business Unit</p>
-                      <p className="font-medium">{quote.business_unit_id}</p>
+                      <p className="font-medium">{quote.businessUnit?.name || quote.business_unit_id}</p>
                     </div>
                   )}
                   {quote.sales_office_id && (
                     <div>
                       <p className="text-sm text-muted-foreground">Sales Office</p>
-                      <p className="font-medium">{quote.sales_office_id}</p>
+                      <p className="font-medium">{quote.salesOffice?.name || quote.sales_office_id}</p>
                     </div>
                   )}
                 </div>
@@ -1002,13 +1002,13 @@ const QuoteDetails: React.FC = () => {
                   {quote.sales_rep_id && (
                     <div>
                       <p className="text-sm text-muted-foreground">Sales Representative</p>
-                      <p className="font-medium">{quote.sales_rep_id}</p>
+                      <p className="font-medium">{quote.salesRep?.full_name || quote.sales_rep_id}</p>
                     </div>
                   )}
                   {quote.contact_person_id && (
                     <div>
                       <p className="text-sm text-muted-foreground">Contact Person</p>
-                      <p className="font-medium">{quote.contact_person_id}</p>
+                      <p className="font-medium">{quote.contactPerson?.full_name || quote.contact_person_id}</p>
                     </div>
                   )}
                   {quote.opportunity_id && (
