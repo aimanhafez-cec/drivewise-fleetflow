@@ -32,6 +32,17 @@ Deno.serve(async (req) => {
       throw new Error('Unauthorized')
     }
 
+    // Get user's profile ID
+    const { data: profile, error: profileError } = await supabaseClient
+      .from('profiles')
+      .select('id')
+      .eq('user_id', user.id)
+      .single()
+
+    if (profileError || !profile) {
+      throw new Error('User profile not found')
+    }
+
     const { cost_sheet_id, notes }: SubmitApprovalRequest = await req.json()
 
     console.log('📤 Submitting cost sheet for approval:', cost_sheet_id)
@@ -56,9 +67,9 @@ Deno.serve(async (req) => {
       .from('quote_cost_sheets')
       .update({
         status: 'approved',
-        submitted_by: user.id,
+        submitted_by: profile.id,
         submitted_at: new Date().toISOString(),
-        approved_by: user.id,
+        approved_by: profile.id,
         approved_at: new Date().toISOString(),
         notes_assumptions: notes ?? costSheet.notes_assumptions,
       })
@@ -73,7 +84,7 @@ Deno.serve(async (req) => {
       .from('cost_sheet_approvals')
       .insert({
         cost_sheet_id,
-        approver_user_id: user.id,
+        approver_user_id: profile.id,
         action: 'approved',
         comments: notes ? `Auto-approved (Demo). ${notes}` : 'Auto-approved (Demo)',
       })
