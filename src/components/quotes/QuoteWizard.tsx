@@ -776,28 +776,31 @@ export const QuoteWizard: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            {quoteData.id ? "Edit Quote" : reviseId ? "Revise Quote" : duplicateId ? "Duplicate Quote" : fromRfqId ? "Prepare Quote from RFQ" : "New Quote"}
-            {quoteData.quote_number && ` - ${quoteData.quote_number}`}
-          </h1>
-          <p className="text-muted-foreground">
-            Step {currentStep} of {steps.length}: {steps[currentStep - 1].description}
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Button 
-            variant="outline" 
-            onClick={handleSaveDraft}
-            disabled={saveDraftMutation.isPending}
-          >
-            <Save className="h-4 w-4 mr-2" />
-            {quoteData.id ? "Save Changes" : "Save Draft"}
-          </Button>
-          <Button variant="outline" onClick={() => navigate("/quotes")}>
-            Cancel
-          </Button>
+      {/* Wizard Header - Hide during print */}
+      <div className="no-print">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">
+              {quoteData.id ? "Edit Quote" : reviseId ? "Revise Quote" : duplicateId ? "Duplicate Quote" : fromRfqId ? "Prepare Quote from RFQ" : "New Quote"}
+              {quoteData.quote_number && ` - ${quoteData.quote_number}`}
+            </h1>
+            <p className="text-muted-foreground">
+              Step {currentStep} of {steps.length}: {steps[currentStep - 1].description}
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              onClick={handleSaveDraft}
+              disabled={saveDraftMutation.isPending}
+            >
+              <Save className="h-4 w-4 mr-2" />
+              {quoteData.id ? "Save Changes" : "Save Draft"}
+            </Button>
+            <Button variant="outline" onClick={() => navigate("/quotes")}>
+              Cancel
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -813,9 +816,9 @@ export const QuoteWizard: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Validation Errors Display */}
+      {/* Validation Errors Display - Hide during print */}
       {Object.keys(errors).length > 0 && (
-        <Alert variant="destructive">
+        <Alert variant="destructive" className="no-print">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
             <strong>Please fix the following errors to proceed:</strong>
@@ -836,45 +839,47 @@ export const QuoteWizard: React.FC = () => {
         {renderStep()}
       </div>
 
-      {/* Navigation */}
-      <div className="flex justify-between">
-        <Button
-          id="btn-wiz-back"
-          variant="outline"
-          onClick={handleBack}
-          disabled={currentStep === 1}
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back
-        </Button>
-
-        {currentStep < steps.length ? (
+      {/* Navigation - Hide during print */}
+      <div className="no-print">
+        <div className="flex justify-between">
           <Button
-            id="btn-wiz-next"
-            onClick={handleNext}
-            disabled={Object.keys(errors).length > 0}
+            id="btn-wiz-back"
+            variant="outline"
+            onClick={handleBack}
+            disabled={currentStep === 1}
           >
-            Next
-            <ArrowRight className="h-4 w-4 ml-2" />
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back
           </Button>
-        ) : (
-          <div className="flex gap-2">
-            {quoteData.status === 'approved' ? (
-              <Button
-                id="btn-finalize"
-                onClick={handleSubmit}
-                disabled={createQuoteMutation.isPending}
-              >
-                <Send className="h-4 w-4 mr-2" />
-                Finalize Quote
-              </Button>
-            ) : (
-              <p className="text-sm text-muted-foreground">
-                Submit quote for approval in the summary section above
-              </p>
-            )}
-          </div>
-        )}
+
+          {currentStep < steps.length ? (
+            <Button
+              id="btn-wiz-next"
+              onClick={handleNext}
+              disabled={Object.keys(errors).length > 0}
+            >
+              Next
+              <ArrowRight className="h-4 w-4 ml-2" />
+            </Button>
+          ) : (
+            <div className="flex gap-2">
+              {quoteData.status === 'approved' ? (
+                <Button
+                  id="btn-finalize"
+                  onClick={handleSubmit}
+                  disabled={createQuoteMutation.isPending}
+                >
+                  <Send className="h-4 w-4 mr-2" />
+                  Finalize Quote
+                </Button>
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  Submit quote for approval in the summary section above
+                </p>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
