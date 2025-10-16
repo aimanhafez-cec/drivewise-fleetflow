@@ -240,12 +240,10 @@ const QuoteDetails: React.FC = () => {
               <ArrowLeft className="h-4 w-4 mr-1" />
               Back
             </Button>
-            {quote.status === "draft" && (
-              <Button size="sm" onClick={() => navigate(`/quotes/new?edit=true&id=${quote.id}`)}>
-                <Edit className="h-4 w-4 mr-1" />
-                Continue Editing
-              </Button>
-            )}
+            <Button size="sm" onClick={() => navigate(`/quotes/new?edit=true&id=${quote.id}`)}>
+              <Edit className="h-4 w-4 mr-1" />
+              Edit Quote
+            </Button>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             <Button variant="outline" size="sm">
