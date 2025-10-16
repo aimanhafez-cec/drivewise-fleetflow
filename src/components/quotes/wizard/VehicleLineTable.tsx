@@ -7,6 +7,7 @@ import { ChevronDown, ChevronUp, Trash2 } from "lucide-react";
 import { VehicleLineDetails } from "./VehicleLineDetails";
 import { format } from "date-fns";
 import { AddOnLine } from "./AddOnsTable";
+import { formatCurrency } from "@/lib/utils/currency";
 
 interface VehicleLineTableProps {
   lines: any[];
@@ -179,7 +180,7 @@ export const VehicleLineTable: React.FC<VehicleLineTableProps> = ({
                   </TableCell>
                   <TableCell>{formatDate(line.pickup_at)}</TableCell>
                   <TableCell className="text-right">{displayDuration(line)}</TableCell>
-                  <TableCell className="text-right">{line.monthly_rate || 0} AED</TableCell>
+                  <TableCell className="text-right">{formatCurrency(line.monthly_rate || 0)}</TableCell>
                   <TableCell className="text-right">
                     <div className="space-y-1">
                       {/* Delivery Fee */}
