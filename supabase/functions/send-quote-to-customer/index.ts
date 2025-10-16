@@ -41,8 +41,8 @@ serve(async (req) => {
       .from("quotes")
       .select(`
         *,
-        customer:profiles!quotes_customer_id_fkey(full_name, email),
-        contact_person:profiles!quotes_contact_person_id_fkey(full_name, email),
+        customer:customers(full_name, email),
+        contact_person:contact_persons(full_name, email),
         sales_rep:sales_representatives(full_name, email)
       `)
       .eq("id", quote_id)
