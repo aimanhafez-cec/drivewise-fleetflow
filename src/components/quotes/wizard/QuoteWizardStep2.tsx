@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -724,6 +725,33 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
               </p>
             </div>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Card 8: Additional Notes & Terms */}
+      <Card className="border-l-4 border-l-gray-500 shadow-md">
+        <CardHeader className="p-4 border-b">
+          <div className="flex items-center gap-2">
+            <CardTitle className="text-base font-semibold">Additional Notes & Terms</CardTitle>
+            <Badge variant="secondary" className="text-xs ml-auto">Optional</Badge>
+          </div>
+          <CardDescription className="mt-2 text-sm">
+            Add any special terms, conditions, or notes for this quote
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="p-4 space-y-2">
+          <Label htmlFor="notes">Additional Notes</Label>
+          <Textarea
+            id="notes"
+            value={data.notes || ""}
+            onChange={(e) => onChange({ notes: e.target.value })}
+            placeholder="Enter any additional notes, special terms, or conditions for this quote..."
+            rows={4}
+            className="resize-none"
+          />
+          <p className="text-xs text-muted-foreground">
+            These notes will appear in the quote summary and can be used to communicate special terms or conditions.
+          </p>
         </CardContent>
       </Card>
     </div>
