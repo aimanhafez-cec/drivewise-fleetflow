@@ -119,6 +119,13 @@ interface Quote {
   customer_acceptance_status?: string;
   customer_rejection_reason?: string;
   win_loss_reason?: string;
+  sent_to_customer_at?: string;
+  sent_to_customer_by?: string;
+  customer_signed_at?: string;
+  approved_at?: string;
+  approved_by?: string;
+  submitted_at?: string;
+  submitted_by?: string;
   profiles?: any;
   // Related data
   legalEntity?: any;
@@ -1064,7 +1071,11 @@ const QuoteDetails: React.FC = () => {
                     <div className="flex-1 pb-8">
                       <div className="flex items-center justify-between mb-1">
                         <p className="font-semibold">Quote Sent</p>
-                        <p className="text-sm text-muted-foreground">Status changed to {quote.status}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {quote.sent_to_customer_at 
+                            ? format(new Date(quote.sent_to_customer_at), "MMM d, yyyy 'at' h:mm a")
+                            : "Date not available"}
+                        </p>
                       </div>
                       <p className="text-sm text-muted-foreground">Quote was sent to customer</p>
                     </div>
@@ -1081,6 +1092,13 @@ const QuoteDetails: React.FC = () => {
                     <div className="flex-1">
                       <div className="flex items-center justify-between mb-1">
                         <p className="font-semibold">Quote Accepted</p>
+                        <p className="text-sm text-muted-foreground">
+                          {quote.customer_signed_at 
+                            ? format(new Date(quote.customer_signed_at), "MMM d, yyyy 'at' h:mm a")
+                            : quote.approved_at 
+                              ? format(new Date(quote.approved_at), "MMM d, yyyy 'at' h:mm a")
+                              : "Date not available"}
+                        </p>
                       </div>
                       <p className="text-sm text-muted-foreground">Customer accepted the quote</p>
                     </div>
