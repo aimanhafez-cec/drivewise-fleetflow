@@ -5,7 +5,8 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { FileText, DollarSign, Car, Calendar, Calculator, AlertCircle, CheckCircle, Send, Printer, Mail } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { FileText, DollarSign, Car, Calendar, Calculator, AlertCircle, CheckCircle, Send, Printer, Mail, ChevronDown, ChevronUp } from "lucide-react";
 import { useCostSheets, useCostSheet } from "@/hooks/useCostSheet";
 import { CostSheetStatusBadge } from "../costsheet/CostSheetStatusBadge";
 import { formatCurrency } from "@/lib/utils/currency";
@@ -98,6 +99,22 @@ export const QuoteWizardStep5_Summary: React.FC<QuoteWizardStep4Props> = ({
   const getCurrentLineRate = (lineNo: number): number => {
     const quoteLine = data.quote_items?.find((item: any) => item.line_no === lineNo);
     return quoteLine?.monthly_rate || 0;
+  };
+  
+  // State to track which sections are open
+  const [openSections, setOpenSections] = React.useState({
+    costSheet: true,
+    vehicleLines: true,
+    tollFines: true,
+    financialTerms: true,
+    initialFees: true,
+    addOns: true,
+    grandTotal: true,
+    notes: false,
+  });
+
+  const toggleSection = (section: keyof typeof openSections) => {
+    setOpenSections(prev => ({ ...prev, [section]: !prev[section] }));
   };
   
   // Calculate totals
@@ -288,17 +305,26 @@ export const QuoteWizardStep5_Summary: React.FC<QuoteWizardStep4Props> = ({
 
       {/* Cost Sheet Status (Corporate only) */}
       {isCorporate && data.id && (
-        <Card className={costSheet?.status === 'approved' ? 'border-green-500' : costSheet?.status === 'pending_approval' ? 'border-yellow-500' : ''}>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                <Calculator className="h-5 w-5" />
-                Cost Sheet & Profitability
-              </CardTitle>
-              {costSheet && <CostSheetStatusBadge status={costSheet.status} />}
-            </div>
-          </CardHeader>
-          <CardContent>
+        <Collapsible open={openSections.costSheet} onOpenChange={() => toggleSection('costSheet')}>
+          <Card className={costSheet?.status === 'approved' ? 'border-green-500' : costSheet?.status === 'pending_approval' ? 'border-yellow-500' : ''}>
+            <CollapsibleTrigger className="w-full">
+              <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Calculator className="h-5 w-5" />
+                    <CardTitle className="text-left">Cost Sheet & Profitability</CardTitle>
+                    {costSheet && <CostSheetStatusBadge status={costSheet.status} />}
+                  </div>
+                  {openSections.costSheet ? (
+                    <ChevronUp className="h-5 w-5 text-muted-foreground" />
+                  ) : (
+                    <ChevronDown className="h-5 w-5 text-muted-foreground" />
+                  )}
+                </div>
+              </CardHeader>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <CardContent>
             {!costSheet ? (
               <Alert>
                 <AlertCircle className="h-4 w-4" />
@@ -410,20 +436,33 @@ export const QuoteWizardStep5_Summary: React.FC<QuoteWizardStep4Props> = ({
                 )}
               </div>
             )}
-          </CardContent>
-        </Card>
+              </CardContent>
+            </CollapsibleContent>
+          </Card>
+        </Collapsible>
       )}
 
       {/* Vehicle Lines Summary (Corporate) */}
       {isCorporate && data.quote_items && data.quote_items.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Car className="h-5 w-5" />
-              Vehicle Lines ({data.quote_items.length})
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+        <Collapsible open={openSections.vehicleLines} onOpenChange={() => toggleSection('vehicleLines')}>
+          <Card>
+            <CollapsibleTrigger className="w-full">
+              <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Car className="h-5 w-5" />
+                    <CardTitle>Vehicle Lines ({data.quote_items.length})</CardTitle>
+                  </div>
+                  {openSections.vehicleLines ? (
+                    <ChevronUp className="h-5 w-5 text-muted-foreground" />
+                  ) : (
+                    <ChevronDown className="h-5 w-5 text-muted-foreground" />
+                  )}
+                </div>
+              </CardHeader>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <CardContent>
             <div className="space-y-4">
               {data.quote_items.map((line: any) => (
                 <div key={line.line_no} className="border-2 rounded-lg p-5 hover:border-primary/30 transition-colors">
@@ -569,19 +608,32 @@ export const QuoteWizardStep5_Summary: React.FC<QuoteWizardStep4Props> = ({
                 </div>
               ))}
             </div>
-          </CardContent>
-        </Card>
+              </CardContent>
+            </CollapsibleContent>
+          </Card>
+        </Collapsible>
       )}
 
       {/* Toll & Fines Policy Summary */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <DollarSign className="h-5 w-5" />
-            Toll & Fines Policy
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
+      <Collapsible open={openSections.tollFines} onOpenChange={() => toggleSection('tollFines')}>
+        <Card>
+          <CollapsibleTrigger className="w-full">
+            <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <DollarSign className="h-5 w-5" />
+                  <CardTitle>Toll & Fines Policy</CardTitle>
+                </div>
+                {openSections.tollFines ? (
+                  <ChevronUp className="h-5 w-5 text-muted-foreground" />
+                ) : (
+                  <ChevronDown className="h-5 w-5 text-muted-foreground" />
+                )}
+              </div>
+            </CardHeader>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <CardContent>
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
               <span className="text-muted-foreground">Toll Handling:</span>
@@ -606,18 +658,31 @@ export const QuoteWizardStep5_Summary: React.FC<QuoteWizardStep4Props> = ({
               <p className="font-medium">{formatCurrency(data.admin_fee_per_fine_aed || 25)} per fine</p>
             </div>
           </div>
-        </CardContent>
-      </Card>
+            </CardContent>
+          </CollapsibleContent>
+        </Card>
+      </Collapsible>
 
       {/* Financial Terms Summary */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Calendar className="h-5 w-5" />
-            Financial Terms
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
+      <Collapsible open={openSections.financialTerms} onOpenChange={() => toggleSection('financialTerms')}>
+        <Card>
+          <CollapsibleTrigger className="w-full">
+            <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-5 w-5" />
+                  <CardTitle>Financial Terms</CardTitle>
+                </div>
+                {openSections.financialTerms ? (
+                  <ChevronUp className="h-5 w-5 text-muted-foreground" />
+                ) : (
+                  <ChevronDown className="h-5 w-5 text-muted-foreground" />
+                )}
+              </div>
+            </CardHeader>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <CardContent>
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
               <span className="text-muted-foreground">Billing Plan:</span>
@@ -644,16 +709,29 @@ export const QuoteWizardStep5_Summary: React.FC<QuoteWizardStep4Props> = ({
               <p className="font-medium">{data.annual_escalation_percentage || 0}% annually</p>
             </div>
           </div>
-        </CardContent>
-      </Card>
+            </CardContent>
+          </CollapsibleContent>
+        </Card>
+      </Collapsible>
 
       {/* Initial Fees */}
       {data.initial_fees && data.initial_fees.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Initial Fees (One-time)</CardTitle>
-          </CardHeader>
-          <CardContent>
+        <Collapsible open={openSections.initialFees} onOpenChange={() => toggleSection('initialFees')}>
+          <Card>
+            <CollapsibleTrigger className="w-full">
+              <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+                <div className="flex items-center justify-between">
+                  <CardTitle>Initial Fees (One-time)</CardTitle>
+                  {openSections.initialFees ? (
+                    <ChevronUp className="h-5 w-5 text-muted-foreground" />
+                  ) : (
+                    <ChevronDown className="h-5 w-5 text-muted-foreground" />
+                  )}
+                </div>
+              </CardHeader>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <CardContent>
             <div className="space-y-2">
               {data.initial_fees.map((fee: any, index: number) => (
                 <div key={index} className="flex justify-between text-sm">
@@ -669,17 +747,30 @@ export const QuoteWizardStep5_Summary: React.FC<QuoteWizardStep4Props> = ({
                 <span>{totals.initialFees.toFixed(2)} AED</span>
               </div>
             </div>
-          </CardContent>
-        </Card>
+              </CardContent>
+            </CollapsibleContent>
+          </Card>
+        </Collapsible>
       )}
 
       {/* Add-Ons & Extras Summary */}
       {data.default_addons && data.default_addons.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Add-Ons & Extras</CardTitle>
-          </CardHeader>
-          <CardContent>
+        <Collapsible open={openSections.addOns} onOpenChange={() => toggleSection('addOns')}>
+          <Card>
+            <CollapsibleTrigger className="w-full">
+              <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+                <div className="flex items-center justify-between">
+                  <CardTitle>Add-Ons & Extras</CardTitle>
+                  {openSections.addOns ? (
+                    <ChevronUp className="h-5 w-5 text-muted-foreground" />
+                  ) : (
+                    <ChevronDown className="h-5 w-5 text-muted-foreground" />
+                  )}
+                </div>
+              </CardHeader>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <CardContent>
             <div className="space-y-2">
               {data.default_addons.map((addon: any, index: number) => (
                 <div key={index} className="flex justify-between text-sm">
@@ -711,19 +802,32 @@ export const QuoteWizardStep5_Summary: React.FC<QuoteWizardStep4Props> = ({
                 </span>
               </div>
             </div>
-          </CardContent>
-        </Card>
+              </CardContent>
+            </CollapsibleContent>
+          </Card>
+        </Collapsible>
       )}
 
       {/* Grand Total Summary */}
-      <Card className="border-primary">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <DollarSign className="h-5 w-5" />
-            Grand Total Summary
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
+      <Collapsible open={openSections.grandTotal} onOpenChange={() => toggleSection('grandTotal')}>
+        <Card className="border-primary">
+          <CollapsibleTrigger className="w-full">
+            <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <DollarSign className="h-5 w-5" />
+                  <CardTitle>Grand Total Summary</CardTitle>
+                </div>
+                {openSections.grandTotal ? (
+                  <ChevronUp className="h-5 w-5 text-muted-foreground" />
+                ) : (
+                  <ChevronDown className="h-5 w-5 text-muted-foreground" />
+                )}
+              </div>
+            </CardHeader>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <CardContent>
           <div className="space-y-3">
             <div className="flex justify-between">
               <span className="text-muted-foreground">Total Deposits (Non-taxable):</span>
@@ -780,20 +884,35 @@ export const QuoteWizardStep5_Summary: React.FC<QuoteWizardStep4Props> = ({
               <span className="text-primary">{formatCurrency(totals.grandTotal)}</span>
             </div>
           </div>
-        </CardContent>
-      </Card>
+            </CardContent>
+          </CollapsibleContent>
+        </Card>
+      </Collapsible>
 
       {/* Notes Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Additional Notes</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <Collapsible open={openSections.notes} onOpenChange={() => toggleSection('notes')}>
+        <Card>
+          <CollapsibleTrigger className="w-full">
+            <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+              <div className="flex items-center justify-between">
+                <CardTitle>Additional Notes</CardTitle>
+                {openSections.notes ? (
+                  <ChevronUp className="h-5 w-5 text-muted-foreground" />
+                ) : (
+                  <ChevronDown className="h-5 w-5 text-muted-foreground" />
+                )}
+              </div>
+            </CardHeader>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <CardContent>
           <p className="text-sm text-muted-foreground">
             {data.notes || 'No additional notes provided'}
           </p>
-        </CardContent>
-      </Card>
+            </CardContent>
+          </CollapsibleContent>
+        </Card>
+      </Collapsible>
       </div>
     </div>
   );
