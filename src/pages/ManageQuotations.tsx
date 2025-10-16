@@ -26,6 +26,9 @@ import { format } from "date-fns";
 
 interface SearchFilters {
   query?: string;
+  quoteNumber?: string;
+  customerName?: string;
+  quoteType?: string;
   status?: string;
   dateFrom?: string;
   dateTo?: string;
@@ -33,9 +36,6 @@ interface SearchFilters {
   validTo?: string;
   amountMin?: string;
   amountMax?: string;
-  customer?: string;
-  rfq?: string;
-  vehicle?: string;
 }
 
 interface Customer {
@@ -109,9 +109,19 @@ const ManageQuotations: React.FC = () => {
         query = query.eq("status", quickFilter);
       }
 
-      // Apply search query
+      // Apply search query (quick search)
       if (filters.query) {
         query = query.ilike("quote_number", `%${filters.query}%`);
+      }
+
+      // Apply specific quote number filter
+      if (filters.quoteNumber) {
+        query = query.ilike("quote_number", `%${filters.quoteNumber}%`);
+      }
+
+      // Apply quote type filter
+      if (filters.quoteType) {
+        query = query.eq("quote_type", filters.quoteType);
       }
 
       // Apply other filters
@@ -135,12 +145,6 @@ const ManageQuotations: React.FC = () => {
       }
       if (filters.amountMax) {
         query = query.lte("total_amount", filters.amountMax);
-      }
-      if (filters.customer) {
-        query = query.eq("customer_id", filters.customer);
-      }
-      if (filters.rfq) {
-        query = query.eq("rfq_id", filters.rfq);
       }
 
       const { data, error } = await query;
