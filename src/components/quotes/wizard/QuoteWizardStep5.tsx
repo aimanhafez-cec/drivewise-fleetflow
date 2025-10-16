@@ -28,12 +28,12 @@ export const QuoteWizardStep5: React.FC<QuoteWizardStep5Props> = ({
 
   // Set default expiry date to 30 days from now if not set
   React.useEffect(() => {
-    if (!data.expires_at) {
+    if (!data.validity_date_to) {
       const defaultExpiry = new Date();
       defaultExpiry.setDate(defaultExpiry.getDate() + 30);
-      onChange({ expires_at: defaultExpiry.toISOString().split('T')[0] });
+      onChange({ validity_date_to: defaultExpiry.toISOString().split('T')[0] });
     }
-  }, [data.expires_at, onChange]);
+  }, [data.validity_date_to, onChange]);
 
   return (
     <div className="space-y-6">
@@ -135,15 +135,15 @@ export const QuoteWizardStep5: React.FC<QuoteWizardStep5Props> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="expires_at">Quote Expiry Date *</Label>
+                <Label htmlFor="validity_date_to">Quote Expiry Date *</Label>
                 <Input
-                  id="expires_at"
+                  id="validity_date_to"
                   type="date"
-                  value={data.expires_at || ""}
-                  onChange={(e) => onChange({ expires_at: e.target.value })}
+                  value={data.validity_date_to || ""}
+                  onChange={(e) => onChange({ validity_date_to: e.target.value })}
                 />
-                {errors.expires_at && (
-                  <p className="text-sm text-destructive">{errors.expires_at}</p>
+                {errors.validity_date_to && (
+                  <p className="text-sm text-destructive">{errors.validity_date_to}</p>
                 )}
               </div>
 

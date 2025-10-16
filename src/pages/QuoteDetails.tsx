@@ -355,10 +355,10 @@ const QuoteDetails: React.FC = () => {
                 )}
                 {quote.customer?.full_name}
               </div>
-              {quote.valid_until && (
+              {((quote as any).validity_date_to || quote.valid_until) && (
                 <div className="flex items-center gap-1">
                   <Calendar className="h-4 w-4" />
-                  Valid until {format(new Date(quote.valid_until), "MMM d, yyyy")}
+                  Valid until {format(new Date((quote as any).validity_date_to || quote.valid_until), "MMM d, yyyy")}
                 </div>
               )}
             </div>
@@ -590,7 +590,7 @@ const QuoteDetails: React.FC = () => {
                 )}
                 <div>
                   <p className="text-sm text-muted-foreground">Valid Until</p>
-                  <p className="font-medium">{quote.valid_until ? format(new Date(quote.valid_until), "MMM d, yyyy") : "N/A"}</p>
+                  <p className="font-medium">{((quote as any).validity_date_to || quote.valid_until) ? format(new Date((quote as any).validity_date_to || quote.valid_until), "MMM d, yyyy") : "N/A"}</p>
                 </div>
               </div>
               <div className="space-y-4">
