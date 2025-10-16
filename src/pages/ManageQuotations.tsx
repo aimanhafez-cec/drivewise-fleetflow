@@ -24,6 +24,7 @@ import { Plus, MoreVertical, Eye, Edit, Copy, FileText, Send, CheckCircle, XCirc
 import { Link } from "react-router-dom";
 import { formatCurrency } from "@/lib/utils/currency";
 import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 interface SearchFilters {
   query?: string;
@@ -67,6 +68,7 @@ interface QuoteWithRelations {
   converted_to_agreement?: boolean;
   agreement_id?: string;
   agreement_no?: string;
+  sent_to_customer_at?: string | null;
   customer?: Customer | null;
   calculated_total?: number;
 }
@@ -105,7 +107,7 @@ const ManageQuotations: React.FC = () => {
     queryFn: async () => {
       let query = supabase
         .from("quotes")
-        .select("id, quote_number, customer_id, rfq_id, status, quote_type, total_amount, created_at, validity_date_to, quote_items, vat_percentage, converted_to_agreement, agreement_id, agreement_no")
+        .select("id, quote_number, customer_id, rfq_id, status, quote_type, total_amount, created_at, validity_date_to, quote_items, vat_percentage, converted_to_agreement, agreement_id, agreement_no, sent_to_customer_at")
         .order("created_at", { ascending: false });
 
       // Apply quick filter
@@ -215,12 +217,20 @@ const ManageQuotations: React.FC = () => {
     }
   };
 
-  const isExpiringSoon = (validityDateTo: string | null) => {
-    if (!validityDateTo) return false;
+  const isExpiringSoon = (validityDateTo: string | null, status: string, sentToCustomerAt: string | null) => {
+    // Only show for quotes that have been sent to customer
+    if (!validityDateTo || !sentToCustomerAt) return false;
+    
+    // Only check for "sent" status
+    if (status !== 'sent') return false;
+    
+    // Calculate days until expiry
     const daysUntilExpiry = Math.floor(
       (new Date(validityDateTo).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)
     );
-    return daysUntilExpiry >= 0 && daysUntilExpiry <= 7;
+    
+    // Show warning if expiring within 3 days
+    return daysUntilExpiry >= 0 && daysUntilExpiry <= 3;
   };
 
   const getVehicleDisplay = (quoteItems: any) => {
@@ -423,14 +433,13 @@ const ManageQuotations: React.FC = () => {
                     </TableCell>
                     <TableCell onClick={() => navigate(`/quotes/${quote.id}`)} className="align-middle">
                       {quote.validity_date_to ? (
-                        <div>
-                          <div>{format(new Date(quote.validity_date_to), "MMM dd, yyyy")}</div>
-                          {isExpiringSoon(quote.validity_date_to) && (
-                            <Badge variant="outline" className="text-orange-600 text-xs mt-0.5">
-                              Expiring Soon
-                            </Badge>
-                          )}
-                        </div>
+                        <span className={
+                          isExpiringSoon(quote.validity_date_to, quote.status, quote.sent_to_customer_at)
+                            ? "text-orange-600 font-medium"
+                            : ""
+                        }>
+                          {format(new Date(quote.validity_date_to), "MMM dd, yyyy")}
+                        </span>
                       ) : (
                         <span className="text-muted-foreground">Not set</span>
                       )}
@@ -439,18 +448,27 @@ const ManageQuotations: React.FC = () => {
                       {formatCurrency(quote.calculated_total || Number(quote.total_amount) || 0)}
                     </TableCell>
                     <TableCell onClick={() => navigate(`/quotes/${quote.id}`)} className="align-middle">
-                      <Badge className={statusColor(quote.status)}>
+                      <span className={cn(
+                        "text-sm",
+                        quote.status === 'draft' && "text-gray-600",
+                        quote.status === 'approved' && "text-blue-600 font-medium",
+                        quote.status === 'sent' && "text-purple-600 font-medium",
+                        quote.status === 'accepted' && "text-green-600 font-medium",
+                        quote.status === 'rejected' && "text-red-600 font-medium",
+                        quote.status === 'expired' && "text-gray-400"
+                      )}>
                         {quote.status.charAt(0).toUpperCase() + quote.status.slice(1)}
-                      </Badge>
+                      </span>
                     </TableCell>
                     <TableCell onClick={() => navigate(`/quotes/${quote.id}`)} className="align-middle">
-                      {quote.converted_to_agreement ? (
-                        <Badge variant="default" className="bg-green-600">
-                          Yes
-                        </Badge>
-                      ) : (
-                        <Badge variant="secondary">No</Badge>
-                      )}
+                      <span className={cn(
+                        "text-sm",
+                        quote.converted_to_agreement 
+                          ? "text-green-600 font-medium" 
+                          : "text-gray-400"
+                      )}>
+                        {quote.converted_to_agreement ? "Yes" : "No"}
+                      </span>
                     </TableCell>
                     <TableCell onClick={() => navigate(`/quotes/${quote.id}`)} className="align-middle">
                       {quote.agreement_no ? (
