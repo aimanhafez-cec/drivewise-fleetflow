@@ -262,6 +262,39 @@ export const QuoteWizard: React.FC<QuoteWizardProps> = ({ viewMode = false, quot
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [searchParams] = useSearchParams();
+
+  // Helper function to calculate quote totals
+  const calculateQuoteTotals = (data: Partial<QuoteData>) => {
+    let subtotal = 0;
+    let taxAmount = 0;
+
+    if (data.quote_items && data.quote_items.length > 0) {
+      // Corporate lease: calculate from quote_items
+      subtotal = data.quote_items.reduce((sum, item) => {
+        const months = item.duration_months || 0;
+        const monthlyRate = item.monthly_rate || 0;
+        return sum + (months * monthlyRate);
+      }, 0);
+      
+      // Apply VAT
+      const vatRate = (data.vat_percentage || 0) / 100;
+      taxAmount = subtotal * vatRate;
+      
+    } else if (data.items && data.items.length > 0) {
+      // Legacy quote: calculate from items
+      subtotal = data.items.reduce((sum, item) => {
+        return sum + (item.qty * item.rate);
+      }, 0);
+      
+      // Apply tax_rate
+      const taxRate = data.tax_rate || 0;
+      taxAmount = subtotal * taxRate;
+    }
+
+    const total = subtotal + taxAmount;
+    
+    return { subtotal, taxAmount, total };
+  };
   const { id: quoteIdParam } = useParams<{ id: string }>();
 
   // Check if we're duplicating, revising a quote, creating from RFQ, or editing existing
@@ -309,6 +342,11 @@ export const QuoteWizard: React.FC<QuoteWizardProps> = ({ viewMode = false, quot
           loadedData.items = existingQuote.items;
         }
         setQuoteData(loadedData);
+        
+        // Mark all steps as completed for existing quotes in view or edit mode
+        if (viewMode || editMode) {
+          setCompletedSteps([1, 2, 3, 4, 5, 6]);
+        }
       } else {
         // For duplicate/revise, load minimal data
         setQuoteData({
@@ -336,6 +374,9 @@ export const QuoteWizard: React.FC<QuoteWizardProps> = ({ viewMode = false, quot
 
   const saveDraftMutation = useMutation({
     mutationFn: async (data: Partial<QuoteData>) => {
+      // Calculate financial totals
+      const { subtotal, taxAmount, total } = calculateQuoteTotals(data);
+      
       const quotePayload: any = {
         // Step 1 - Header Information
         legal_entity_id: data.legal_entity_id,
@@ -435,6 +476,11 @@ export const QuoteWizard: React.FC<QuoteWizardProps> = ({ viewMode = false, quot
         // Step 4 - Vehicles
         quote_items: data.quote_items,
         vehicle_type_id: data.vehicle_type_id,
+        
+        // Add calculated totals
+        subtotal,
+        tax_amount: taxAmount,
+        total_amount: total,
       };
 
       // If no ID exists, INSERT new quote
@@ -510,35 +556,9 @@ export const QuoteWizard: React.FC<QuoteWizardProps> = ({ viewMode = false, quot
 
   const createQuoteMutation = useMutation({
     mutationFn: async (data: QuoteData) => {
-      // Calculate totals based on quote type
-      let subtotal = 0;
-      let taxAmount = 0;
-
-      if (data.quote_items && data.quote_items.length > 0) {
-        // Corporate lease: calculate from quote_items
-        subtotal = data.quote_items.reduce((sum, item) => {
-          const months = item.duration_months || 0;
-          const monthlyRate = item.monthly_rate || 0;
-          return sum + (months * monthlyRate);
-        }, 0);
-        
-        // Apply VAT
-        const vatRate = (data.vat_percentage || 0) / 100;
-        taxAmount = subtotal * vatRate;
-        
-      } else if (data.items && data.items.length > 0) {
-        // Legacy quote: calculate from items
-        subtotal = data.items.reduce((sum, item) => {
-          return sum + (item.qty * item.rate);
-        }, 0);
-        
-        // Apply tax_rate
-        const taxRate = data.tax_rate || 0;
-        taxAmount = subtotal * taxRate;
-      }
-
-      const total = subtotal + taxAmount;
-
+      // Calculate totals using shared function
+      const { subtotal, taxAmount, total } = calculateQuoteTotals(data);
+      
       const quotePayload = {
         // Header fields (Step 1)
         legal_entity_id: data.legal_entity_id,
@@ -906,6 +926,7 @@ export const QuoteWizard: React.FC<QuoteWizardProps> = ({ viewMode = false, quot
             data={quoteData}
             onChange={(data) => !viewMode && updateQuoteData(1, data)}
             errors={errors}
+            viewMode={viewMode}
           />
         );
       case 2:
@@ -1042,8 +1063,7 @@ export const QuoteWizard: React.FC<QuoteWizardProps> = ({ viewMode = false, quot
         {renderStep()}
       </div>
 
-      {/* Navigation - Hide during print and in view mode */}
-      {!viewMode && (
+      {/* Navigation - Hide during print only */}
       <div className="no-print">
         <div className="flex justify-between">
           <Button
@@ -1060,32 +1080,33 @@ export const QuoteWizard: React.FC<QuoteWizardProps> = ({ viewMode = false, quot
             <Button
               id="btn-wiz-next"
               onClick={handleNext}
-              disabled={Object.keys(errors).length > 0}
+              disabled={viewMode || Object.keys(errors).length > 0}
             >
               Next
               <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
           ) : (
-            <div className="flex gap-2">
-              {quoteData.status === 'approved' ? (
-                <Button
-                  id="btn-finalize"
-                  onClick={handleSubmit}
-                  disabled={createQuoteMutation.isPending}
-                >
-                  <Send className="h-4 w-4 mr-2" />
-                  Finalize Quote
-                </Button>
-              ) : (
-                <p className="text-sm text-muted-foreground">
-                  Submit quote for approval in the summary section above
-                </p>
-              )}
-            </div>
+            !viewMode && (
+              <div className="flex gap-2">
+                {quoteData.status === 'approved' ? (
+                  <Button
+                    id="btn-finalize"
+                    onClick={handleSubmit}
+                    disabled={createQuoteMutation.isPending}
+                  >
+                    <Send className="h-4 w-4 mr-2" />
+                    Finalize Quote
+                  </Button>
+                ) : (
+                  <p className="text-sm text-muted-foreground">
+                    Submit quote for approval in the summary section above
+                  </p>
+                )}
+              </div>
+            )
           )}
         </div>
       </div>
-      )}
     </div>
   );
 };

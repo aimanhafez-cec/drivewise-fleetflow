@@ -31,12 +31,14 @@ interface QuoteWizardStep1Props {
   data: any;
   onChange: (data: any) => void;
   errors: Record<string, string>;
+  viewMode?: boolean;
 }
 
 export const QuoteWizardStep1: React.FC<QuoteWizardStep1Props> = ({
   data,
   onChange,
   errors,
+  viewMode = false,
 }) => {
   const [showOpportunityDialog, setShowOpportunityDialog] = useState(false);
   
@@ -379,22 +381,26 @@ export const QuoteWizardStep1: React.FC<QuoteWizardStep1Props> = ({
 
             <div className="space-y-2">
               <Label htmlFor="status">Status *</Label>
-              <Select
-                value={data.status || "draft"}
-                onValueChange={(value) => onChange({ status: value })}
-              >
-                <SelectTrigger id="status">
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="draft">Draft</SelectItem>
-                  <SelectItem value="submitted">Submitted</SelectItem>
-                  <SelectItem value="pending_approval">Pending Approval</SelectItem>
-                  <SelectItem value="approved">Approved</SelectItem>
-                  <SelectItem value="won">Won</SelectItem>
-                  <SelectItem value="lost">Lost</SelectItem>
-                </SelectContent>
-              </Select>
+                <Select
+                  value={data.status || "draft"}
+                  onValueChange={(value) => onChange({ status: value })}
+                  disabled={viewMode}
+                >
+                  <SelectTrigger id="status">
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="draft">Draft</SelectItem>
+                    <SelectItem value="submitted">Submitted</SelectItem>
+                    <SelectItem value="pending_approval">Pending Approval</SelectItem>
+                    <SelectItem value="approved">Approved</SelectItem>
+                    <SelectItem value="sent">Sent to Customer</SelectItem>
+                    <SelectItem value="accepted">Accepted</SelectItem>
+                    <SelectItem value="rejected">Rejected</SelectItem>
+                    <SelectItem value="won">Won</SelectItem>
+                    <SelectItem value="lost">Lost</SelectItem>
+                  </SelectContent>
+                </Select>
             </div>
 
             <div className="space-y-2">
