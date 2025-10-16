@@ -5,6 +5,11 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+// Round to 2 decimal places for currency
+const roundCurrency = (value: number): number => {
+  return Math.round(value * 100) / 100
+}
+
 interface ApplyRatesRequest {
   cost_sheet_id: string
 }
@@ -70,10 +75,11 @@ Deno.serve(async (req) => {
     const updatedLines = quoteItems.map((line: any) => {
       const costLine = costSheetLines.find(cl => cl.line_no === line.line_no)
       if (costLine && costLine.suggested_rate_per_month_aed) {
-        console.log(`✅ Updating line ${line.line_no}: ${line.monthly_rate} → ${costLine.suggested_rate_per_month_aed}`)
+        const roundedRate = roundCurrency(costLine.suggested_rate_per_month_aed)
+        console.log(`✅ Updating line ${line.line_no}: ${line.monthly_rate} → ${roundedRate}`)
         return {
           ...line,
-          monthly_rate: costLine.suggested_rate_per_month_aed
+          monthly_rate: roundedRate
         }
       }
       return line

@@ -704,15 +704,18 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
               )}
             </Label>
             <div className="relative">
-              <Input
-                id={`rate_${line.line_no}`}
-                type="number"
-                min="0"
-                step="100"
-                value={line.monthly_rate || ""}
-                onChange={(e) => onUpdate('monthly_rate', parseFloat(e.target.value) || 0)}
-                placeholder={`Auto-defaulted from price list (${periodInfo.label})`}
-              />
+            <Input
+              id={`rate_${line.line_no}`}
+              type="number"
+              min="0"
+              step="0.01"
+              value={line.monthly_rate || ""}
+              onChange={(e) => {
+                const value = parseFloat(e.target.value) || 0;
+                onUpdate('monthly_rate', Math.round(value * 100) / 100);
+              }}
+              placeholder={`Auto-defaulted from price list (${periodInfo.label})`}
+            />
               {isRateCustomized && (
                 <Button
                   type="button"

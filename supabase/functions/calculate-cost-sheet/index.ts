@@ -5,6 +5,11 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+// Round to 2 decimal places for currency
+const roundCurrency = (value: number): number => {
+  return Math.round(value * 100) / 100
+}
+
 interface CalculateCostSheetRequest {
   quote_id: string
   financing_rate?: number
@@ -176,13 +181,13 @@ Deno.serve(async (req) => {
       const totalCost = depreciation + financing + maintenanceCost + insuranceCost + registrationCost + otherCosts + overhead
 
       // Calculate suggested rate based on target margin
-      const suggestedRate = totalCost / (1 - targetMargin / 100)
+      const suggestedRate = roundCurrency(totalCost / (1 - targetMargin / 100))
 
       // Get current quoted rate
-      const quotedRate = item.monthly_rate ?? suggestedRate
+      const quotedRate = roundCurrency(item.monthly_rate ?? suggestedRate)
 
       // Calculate actual margin
-      const actualMargin = quotedRate > 0 ? ((quotedRate - totalCost) / quotedRate) * 100 : 0
+      const actualMargin = roundCurrency(quotedRate > 0 ? ((quotedRate - totalCost) / quotedRate) * 100 : 0)
 
       lines.push({
         cost_sheet_id: costSheet.id,
@@ -190,13 +195,13 @@ Deno.serve(async (req) => {
         vehicle_class_id: item.vehicle_class_id,
         vehicle_id: item.vehicle_id,
         lease_term_months: leaseTerm,
-        acquisition_cost_aed: acquisitionCost,
+        acquisition_cost_aed: roundCurrency(acquisitionCost),
         residual_value_percent: residualValue,
-        maintenance_per_month_aed: maintenanceCost,
-        insurance_per_month_aed: insuranceCost,
-        registration_admin_per_month_aed: registrationCost,
-        other_costs_per_month_aed: otherCosts,
-        total_cost_per_month_aed: totalCost,
+        maintenance_per_month_aed: roundCurrency(maintenanceCost),
+        insurance_per_month_aed: roundCurrency(insuranceCost),
+        registration_admin_per_month_aed: roundCurrency(registrationCost),
+        other_costs_per_month_aed: roundCurrency(otherCosts),
+        total_cost_per_month_aed: roundCurrency(totalCost),
         suggested_rate_per_month_aed: suggestedRate,
         quoted_rate_per_month_aed: quotedRate,
         actual_margin_percent: actualMargin,
@@ -221,9 +226,9 @@ Deno.serve(async (req) => {
     console.log('✅ Cost sheet lines created:', insertedLines.length)
 
     // Calculate summary
-    const totalMonthlyCost = lines.reduce((sum, l) => sum + l.total_cost_per_month_aed, 0)
-    const totalRevenue = lines.reduce((sum, l) => sum + l.quoted_rate_per_month_aed, 0)
-    const avgMargin = totalRevenue > 0 ? ((totalRevenue - totalMonthlyCost) / totalRevenue) * 100 : 0
+    const totalMonthlyCost = roundCurrency(lines.reduce((sum, l) => sum + l.total_cost_per_month_aed, 0))
+    const totalRevenue = roundCurrency(lines.reduce((sum, l) => sum + l.quoted_rate_per_month_aed, 0))
+    const avgMargin = roundCurrency(totalRevenue > 0 ? ((totalRevenue - totalMonthlyCost) / totalRevenue) * 100 : 0)
     const lowestMarginLine = lines.reduce((min, l) => 
       l.actual_margin_percent < min.actual_margin_percent ? l : min, lines[0])
 
