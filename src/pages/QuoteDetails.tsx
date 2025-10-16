@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -31,14 +31,34 @@ import {
   ArrowRight,
   XCircle,
   AlertCircle,
+  Link2,
+  Paperclip,
 } from "lucide-react";
 import { CustomerAcceptanceDialog } from "@/components/quotes/CustomerAcceptanceDialog";
 import { CustomerRejectionDialog } from "@/components/quotes/CustomerRejectionDialog";
 import { ConvertToMasterAgreementDialog } from "@/components/quotes/ConvertToMasterAgreementDialog";
+import { SendQuoteToCustomerDialog } from "@/components/quotes/SendQuoteToCustomerDialog";
+import { QuoteAttachments } from "@/components/quotes/QuoteAttachments";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { formatCurrency } from "@/lib/utils/currency";
 import { format } from "date-fns";
 import { formatDurationInMonthsAndDays } from "@/lib/utils/dateUtils";
+import { useGenerateQuotePDF } from "@/hooks/useQuote";
+import { QuoteHeaderInfo } from "@/components/quotes/details/QuoteHeaderInfo";
+import { QuotePickupReturnInfo } from "@/components/quotes/details/QuotePickupReturnInfo";
+import { QuoteInsuranceDetails } from "@/components/quotes/details/QuoteInsuranceDetails";
+import { QuoteMaintenanceDetails } from "@/components/quotes/details/QuoteMaintenanceDetails";
+import { QuoteAddOnsDisplay } from "@/components/quotes/details/QuoteAddOnsDisplay";
+import { QuoteMileagePooling } from "@/components/quotes/details/QuoteMileagePooling";
+import { QuoteTollsPolicy } from "@/components/quotes/details/QuoteTollsPolicy";
+import { QuotePaymentPolicy } from "@/components/quotes/details/QuotePaymentPolicy";
+import { QuoteFinancialBreakdown } from "@/components/quotes/details/QuoteFinancialBreakdown";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface Quote {
   id: string;
@@ -97,6 +117,42 @@ interface Quote {
   customer_rejection_reason?: string;
   win_loss_reason?: string;
   profiles?: any;
+  // Related data
+  legalEntity?: any;
+  businessUnit?: any;
+  salesOffice?: any;
+  salesRep?: any;
+  opportunity?: any;
+  contactPerson?: any;
+  pickupLocation?: any;
+  returnLocation?: any;
+  pickupSite?: any;
+  returnSite?: any;
+  paymentTerms?: any;
+  priceList?: any;
+  pickup_type?: string;
+  return_type?: string;
+  pickup_customer_site_id?: string;
+  return_customer_site_id?: string;
+  pickup_location_id?: string;
+  return_location_id?: string;
+  mileage_pooling_enabled?: boolean;
+  pooled_mileage_allowance_km?: number;
+  pooled_excess_km_rate?: number;
+  salik_darb_handling?: string;
+  traffic_fines_handling?: string;
+  admin_fee_per_fine_aed?: number;
+  default_addons?: any[];
+  insurance_damage_waiver?: boolean;
+  insurance_theft_protection?: boolean;
+  insurance_third_party_liability?: boolean;
+  insurance_personal_accident?: boolean;
+  insurance_additional_driver?: boolean;
+  insurance_cross_border?: boolean;
+  insurance_notes?: string;
+  insurance_pai_enabled?: boolean;
+  maintenance_plan_source?: string;
+  show_maintenance_separate_line?: boolean;
 }
 
 const statusConfig = {
@@ -115,9 +171,12 @@ const QuoteDetails: React.FC = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
-  const [acceptDialogOpen, setAcceptDialogOpen] = React.useState(false);
-  const [rejectDialogOpen, setRejectDialogOpen] = React.useState(false);
-  const [convertDialogOpen, setConvertDialogOpen] = React.useState(false);
+  const [acceptDialogOpen, setAcceptDialogOpen] = useState(false);
+  const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
+  const [convertDialogOpen, setConvertDialogOpen] = useState(false);
+  const [emailDialogOpen, setEmailDialogOpen] = useState(false);
+  
+  const generatePDFMutation = useGenerateQuotePDF();
 
   useEffect(() => {
     document.title = "Quote Details | Core Car Rental";
@@ -135,11 +194,42 @@ const QuoteDetails: React.FC = () => {
       if (error) throw error;
       if (!data) return null;
 
-      // Fetch related data
-      const [customerResult, vehicleResult] = await Promise.all([
-        supabase.from("customers").select("full_name, email, phone").eq("id", data.customer_id).maybeSingle(),
+      // Fetch all related data in parallel
+      const [
+        customerResult,
+        vehicleResult,
+        businessUnitResult,
+        salesOfficeResult,
+        salesRepResult,
+        opportunityResult,
+        contactPersonResult,
+        pickupSiteResult,
+        returnSiteResult,
+      ] = await Promise.all([
+        supabase.from("profiles").select("full_name, email, phone").eq("id", data.customer_id).maybeSingle(),
         data.vehicle_id
           ? supabase.from("vehicles").select("make, model, year, license_plate").eq("id", data.vehicle_id).maybeSingle()
+          : Promise.resolve({ data: null }),
+        data.business_unit_id
+          ? supabase.from("business_units").select("name, code").eq("id", data.business_unit_id).maybeSingle()
+          : Promise.resolve({ data: null }),
+        data.sales_office_id
+          ? supabase.from("sales_offices").select("name, code").eq("id", data.sales_office_id).maybeSingle()
+          : Promise.resolve({ data: null }),
+        data.sales_rep_id
+          ? supabase.from("sales_representatives").select("full_name, email").eq("id", data.sales_rep_id).maybeSingle()
+          : Promise.resolve({ data: null }),
+        data.opportunity_id
+          ? supabase.from("opportunities").select("opportunity_no").eq("id", data.opportunity_id).maybeSingle()
+          : Promise.resolve({ data: null }),
+        data.contact_person_id
+          ? supabase.from("profiles").select("full_name, email, phone").eq("id", data.contact_person_id).maybeSingle()
+          : Promise.resolve({ data: null }),
+        data.pickup_customer_site_id
+          ? supabase.from("customer_sites").select("*").eq("id", data.pickup_customer_site_id).maybeSingle()
+          : Promise.resolve({ data: null }),
+        data.return_customer_site_id
+          ? supabase.from("customer_sites").select("*").eq("id", data.return_customer_site_id).maybeSingle()
           : Promise.resolve({ data: null }),
       ]);
 
@@ -147,6 +237,13 @@ const QuoteDetails: React.FC = () => {
         ...data,
         customer: customerResult.data,
         vehicle: vehicleResult.data,
+        businessUnit: businessUnitResult.data,
+        salesOffice: salesOfficeResult.data,
+        salesRep: salesRepResult.data,
+        opportunity: opportunityResult.data,
+        contactPerson: contactPersonResult.data,
+        pickupSite: pickupSiteResult.data,
+        returnSite: returnSiteResult.data,
       } as Quote;
     },
     enabled: !!id,
@@ -261,29 +358,61 @@ const QuoteDetails: React.FC = () => {
             </Button>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
-            <Button variant="outline" size="sm">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => window.print()}
+            >
               <Printer className="h-4 w-4 mr-1" />
               Print
-            </Button>
-            <Button variant="outline" size="sm">
-              <Mail className="h-4 w-4 mr-1" />
-              Email
-            </Button>
-            <Button variant="outline" size="sm">
-              <Download className="h-4 w-4 mr-1" />
-              Download
             </Button>
             <Button
               variant="outline"
               size="sm"
-              onClick={() => {
-                navigator.clipboard.writeText(window.location.href);
-                toast({ title: "Link copied to clipboard" });
-              }}
+              onClick={() => setEmailDialogOpen(true)}
             >
-              <Share className="h-4 w-4 mr-1" />
-              Share
+              <Mail className="h-4 w-4 mr-1" />
+              Email
             </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => generatePDFMutation.mutate({})}
+              disabled={generatePDFMutation.isPending}
+            >
+              <Download className="h-4 w-4 mr-1" />
+              {generatePDFMutation.isPending ? "Downloading..." : "Download"}
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <Share className="h-4 w-4 mr-1" />
+                  Share
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  onClick={() => {
+                    navigator.clipboard.writeText(window.location.href);
+                    toast({ title: "Link copied to clipboard" });
+                  }}
+                >
+                  <Link2 className="h-4 w-4 mr-2" />
+                  Copy Link
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setEmailDialogOpen(true)}>
+                  <Mail className="h-4 w-4 mr-2" />
+                  Email Quote
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => generatePDFMutation.mutate({})}
+                  disabled={generatePDFMutation.isPending}
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Download & Share
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <Button variant="outline" size="sm" onClick={() => navigate(`/quotes/new?duplicate=${quote.id}`)}>
               <Copy className="h-4 w-4 mr-1" />
               Duplicate
@@ -383,15 +512,26 @@ const QuoteDetails: React.FC = () => {
 
       {/* Main Content */}
       <Tabs defaultValue="summary" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="summary">Summary</TabsTrigger>
           <TabsTrigger value="vehicles">Vehicles</TabsTrigger>
+          <TabsTrigger value="attachments">Attachments</TabsTrigger>
           <TabsTrigger value="customer">Customer</TabsTrigger>
           <TabsTrigger value="activity">Activity</TabsTrigger>
         </TabsList>
 
         <TabsContent value="summary" className="space-y-6 mt-6">
           {/* Quote Header Information */}
+          <QuoteHeaderInfo
+            quote={quote}
+            businessUnit={quote.businessUnit}
+            salesOffice={quote.salesOffice}
+            salesRep={quote.salesRep}
+            opportunity={quote.opportunity}
+            contactPerson={quote.contactPerson}
+          />
+
+          {/* Quote Details */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -429,14 +569,6 @@ const QuoteDetails: React.FC = () => {
                 </div>
               </div>
               <div className="space-y-4">
-                <div>
-                  <p className="text-sm text-muted-foreground">Payment Terms</p>
-                  <p className="font-medium">{quote.payment_terms_id || "Not specified"}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Payment Method</p>
-                  <p className="font-medium">{quote.payment_method || "Bank Transfer"}</p>
-                </div>
                 {quote.billing_start_date && (
                   <div>
                     <p className="text-sm text-muted-foreground">Billing Start Date</p>
@@ -460,6 +592,31 @@ const QuoteDetails: React.FC = () => {
               </div>
             </CardContent>
           </Card>
+
+          {/* Pickup & Return Configuration */}
+          <QuotePickupReturnInfo
+            quote={quote}
+            pickupSite={quote.pickupSite}
+            returnSite={quote.returnSite}
+          />
+
+          {/* Payment Terms & Policy */}
+          <QuotePaymentPolicy quote={quote} />
+
+          {/* Insurance Details */}
+          <QuoteInsuranceDetails quote={quote} />
+
+          {/* Maintenance Details */}
+          <QuoteMaintenanceDetails quote={quote} />
+
+          {/* Default Add-Ons */}
+          <QuoteAddOnsDisplay quote={quote} />
+
+          {/* Mileage Pooling */}
+          <QuoteMileagePooling quote={quote} />
+
+          {/* Tolls & Fines Policy */}
+          <QuoteTollsPolicy quote={quote} />
 
           {/* Line Items */}
           <Card>
@@ -728,6 +885,21 @@ const QuoteDetails: React.FC = () => {
               </CardContent>
             </Card>
           )}
+        </TabsContent>
+
+        <TabsContent value="attachments" className="space-y-4 mt-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Paperclip className="h-5 w-5" />
+                Quote Attachments
+              </CardTitle>
+              <CardDescription>Documents and files related to this quote</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <QuoteAttachments quoteId={quote.id} />
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="vehicles" className="space-y-4 mt-6">
@@ -1050,6 +1222,15 @@ const QuoteDetails: React.FC = () => {
         open={convertDialogOpen}
         onOpenChange={setConvertDialogOpen}
         quote={quote}
+      />
+
+      <SendQuoteToCustomerDialog
+        open={emailDialogOpen}
+        onOpenChange={setEmailDialogOpen}
+        quoteId={quote.id}
+        quoteNumber={quote.quote_number}
+        customerName={quote.customer?.full_name || ""}
+        customerEmail={quote.customer?.email || ""}
       />
     </div>
   );
