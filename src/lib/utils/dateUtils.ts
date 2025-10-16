@@ -101,3 +101,21 @@ export function formatDurationInMonthsAndDays(startDate: Date, endDate: Date): s
     return "";
   }
 }
+
+/**
+ * Calculate the duration in months between two dates
+ */
+export function calculateMonthsDuration(startDate: string | Date | null, endDate: string | Date | null): number {
+  if (!startDate || !endDate) return 0;
+  
+  try {
+    const start = typeof startDate === 'string' ? new Date(startDate) : startDate;
+    const end = typeof endDate === 'string' ? new Date(endDate) : endDate;
+    
+    if (!isValid(start) || !isValid(end)) return 0;
+    
+    return Math.max(0, differenceInMonths(end, start));
+  } catch {
+    return 0;
+  }
+}

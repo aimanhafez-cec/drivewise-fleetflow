@@ -664,9 +664,16 @@ const QuoteDetails: React.FC = () => {
               {displayItems && displayItems.length > 0 ? (
                 <div className="space-y-6">
                   {displayItems.map((item: any, index: number) => {
+                    // Calculate duration with fallback to date calculation if stored value is 0
+                    const durationMonths = item.duration_months && item.duration_months > 0
+                      ? item.duration_months
+                      : item.pickup_at && item.return_at
+                        ? Math.max(1, Math.round((new Date(item.return_at).getTime() - new Date(item.pickup_at).getTime()) / (1000 * 60 * 60 * 24 * 30.44)))
+                        : 0;
+                    
                     const lineTotal =
                       item.monthly_rate !== undefined
-                        ? (item.monthly_rate || 0) * (item.duration_months || 0)
+                        ? (item.monthly_rate || 0) * durationMonths
                         : (item.qty || 0) * (item.rate || 0);
 
                     return (
@@ -704,11 +711,11 @@ const QuoteDetails: React.FC = () => {
                         </div>
 
                         <div className="grid md:grid-cols-2 gap-4 pt-2 border-t">
-                          {item.duration_months !== undefined && (
+                          {durationMonths > 0 && (
                             <div className="flex items-center gap-2 text-sm">
                               <Calendar className="h-4 w-4 text-muted-foreground" />
                               <span className="text-muted-foreground">Duration:</span>
-                              <span className="font-medium">{item.duration_months} months</span>
+                              <span className="font-medium">{durationMonths} months</span>
                             </div>
                           )}
                           {item.monthly_km_allowance && (
