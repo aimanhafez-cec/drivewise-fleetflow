@@ -466,7 +466,7 @@ export const QuoteWizardStep5_Summary: React.FC<QuoteWizardStep4Props> = ({
                   <Alert className="border-green-500 bg-green-50 dark:bg-green-950">
                     <CheckCircle className="h-4 w-4 text-green-600" />
                     <AlertDescription className="text-green-800 dark:text-green-200">
-                      Cost sheet approved by {costSheet.approver?.full_name || 'Unknown'} on {costSheet.approved_at ? format(new Date(costSheet.approved_at), 'MMM dd, yyyy') : 'N/A'}
+                      Cost sheet approved by {costSheet.approver?.full_name || 'Demo Auto-Approval System'} on {costSheet.approved_at ? format(new Date(costSheet.approved_at), 'MMM dd, yyyy') : 'N/A'}
                       {costSheet.approval_notes && ` — ${costSheet.approval_notes}`}
                     </AlertDescription>
                   </Alert>
