@@ -11,6 +11,7 @@ import { CostSheetStatusBadge } from "../costsheet/CostSheetStatusBadge";
 import { formatCurrency } from "@/lib/utils/currency";
 import { useSubmitQuote, useGenerateQuotePDF, useSendQuoteToCustomer } from "@/hooks/useQuote";
 import { useToast } from "@/hooks/use-toast";
+import { addMonths, format } from "date-fns";
 
 interface QuoteWizardStep4Props {
   data: any;
@@ -77,6 +78,20 @@ export const QuoteWizardStep5_Summary: React.FC<QuoteWizardStep4Props> = ({
       title: 'Coming Soon',
       description: 'Email sending will be implemented in the next phase',
     });
+  };
+  
+  // Helper to calculate end date from start date + duration
+  const calculateEndDate = (startDate: string | null | undefined, durationMonths: number | null | undefined): string => {
+    if (!startDate || !durationMonths) return 'N/A';
+    
+    try {
+      const start = new Date(startDate);
+      const end = addMonths(start, durationMonths);
+      return format(end, 'yyyy-MM-dd');
+    } catch (error) {
+      console.error('Error calculating end date:', error);
+      return 'N/A';
+    }
   };
   
   // Helper to get current quote rate for a line
@@ -411,99 +426,145 @@ export const QuoteWizardStep5_Summary: React.FC<QuoteWizardStep4Props> = ({
           <CardContent>
             <div className="space-y-4">
               {data.quote_items.map((line: any) => (
-                <div key={line.line_no} className="border rounded-lg p-4">
-                  <div className="flex items-start justify-between mb-3">
-                    <div>
-                      <h4 className="font-semibold">Line {line.line_no}</h4>
-                      <p className="text-sm text-muted-foreground">
-                        {line.vehicle_class_id ? 'Vehicle Category Selected' : 'Specific Vehicle Selected'}
+                <div key={line.line_no} className="border-2 rounded-lg p-5 hover:border-primary/30 transition-colors">
+                  {/* Header with badges */}
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge variant="default" className="text-xs">
+                          Line {line.line_no}
+                        </Badge>
+                        {line.duration_months && (
+                          <Badge variant="outline" className="text-xs">
+                            {line.duration_months} months
+                          </Badge>
+                        )}
+                      </div>
+                      
+                      {/* Vehicle Name/Model */}
+                      <p className="text-base font-semibold text-foreground mb-1">
+                        {line._vehicleMeta?.make && line._vehicleMeta?.model 
+                          ? `${line._vehicleMeta.make} ${line._vehicleMeta.model}${line._vehicleMeta.year ? ` (${line._vehicleMeta.year})` : ''}`
+                          : line._vehicleMeta?.category_name 
+                          ? `${line._vehicleMeta.category_name} Class`
+                          : line.vehicle_class_name || 'Vehicle'}
                       </p>
-                      {line.vin && (
-                        <p className="text-xs text-muted-foreground mt-1">
-                          VIN: {line.vin}
+                      
+                      {/* Additional Details */}
+                      <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
+                        {line._vehicleMeta?.color && (
+                          <span>• {line._vehicleMeta.color}</span>
+                        )}
+                        {line._vehicleMeta?.item_code && (
+                          <span>• Code: {line._vehicleMeta.item_code}</span>
+                        )}
+                        {line.vin && (
+                          <span>• VIN: {line.vin}</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Contract & Mileage Details */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    {/* Contract Terms Section */}
+                    <div className="space-y-3">
+                      <h5 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Contract Terms</h5>
+                      <div>
+                        <span className="text-xs text-muted-foreground block mb-1">Start Date</span>
+                        <p className="font-medium">{line.pickup_at || 'TBD'}</p>
+                      </div>
+                      <div>
+                        <span className="text-xs text-muted-foreground block mb-1">End Date</span>
+                        <p className="font-medium">
+                          {line.end_date || calculateEndDate(line.pickup_at, line.duration_months)}
                         </p>
+                      </div>
+                      <div>
+                        <span className="text-xs text-muted-foreground block mb-1">Duration</span>
+                        <p className="font-medium">{line.duration_months} months</p>
+                      </div>
+                    </div>
+                    
+                    {/* Mileage Terms Section */}
+                    <div className="space-y-3">
+                      <h5 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Mileage Package</h5>
+                      <div>
+                        <span className="text-xs text-muted-foreground block mb-1">Included KM/Month</span>
+                        <p className="font-medium">{line.mileage_package_km?.toLocaleString() || 'Unlimited'} km</p>
+                      </div>
+                      <div>
+                        <span className="text-xs text-muted-foreground block mb-1">Excess Rate</span>
+                        <p className="font-medium">{line.excess_km_rate?.toFixed(2) || '0.00'} AED/km</p>
+                      </div>
+                      {line.odometer && (
+                        <div>
+                          <span className="text-xs text-muted-foreground block mb-1">Current Odometer</span>
+                          <p className="font-medium">{line.odometer.toLocaleString()} km</p>
+                        </div>
                       )}
                     </div>
-                    <Badge variant="outline">
-                      {line.duration_months} months
-                    </Badge>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-3 text-sm">
-                    {/* Contract Terms */}
-                    <div>
-                      <span className="text-muted-foreground">Start Date:</span>
-                      <p className="font-medium">{line.pickup_at || 'N/A'}</p>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">End Date:</span>
-                      <p className="font-medium">{line.end_date || 'N/A'}</p>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">Duration:</span>
-                      <p className="font-medium">{line.duration_months} months</p>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">Rate Type:</span>
-                      <p className="font-medium capitalize">{line.rate_type || 'monthly'}</p>
-                    </div>
                     
-                    {/* Mileage Terms */}
-                    <div>
-                      <span className="text-muted-foreground">Mileage Package:</span>
-                      <p className="font-medium">{line.mileage_package_km?.toLocaleString() || 'N/A'} km/month</p>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">Excess Rate:</span>
-                      <p className="font-medium">{line.excess_km_rate?.toFixed(2) || 'N/A'} AED/km</p>
-                    </div>
-                    
-                    {/* Location */}
-                    {line.location_id && (
-                      <div className="col-span-2">
-                        <span className="text-muted-foreground">Location:</span>
-                        <p className="font-medium">{line.location_id}</p>
-                      </div>
-                    )}
-                    
-                    {/* Odometer */}
-                    {line.odometer && (
+                    {/* Financial Terms Section */}
+                    <div className="space-y-3">
+                      <h5 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Financial Details</h5>
                       <div>
-                        <span className="text-muted-foreground">Current Odometer:</span>
-                        <p className="font-medium">{line.odometer.toLocaleString()} km</p>
+                        <span className="text-xs text-muted-foreground block mb-1">Monthly Rate</span>
+                        <p className="font-semibold text-lg">{formatCurrency(line.monthly_rate, 'AED')}</p>
+                      </div>
+                      <div>
+                        <span className="text-xs text-muted-foreground block mb-1">Deposit</span>
+                        <p className="font-medium">{formatCurrency(line.deposit_amount, 'AED')}</p>
+                      </div>
+                      {line.location_id && (
+                        <div>
+                          <span className="text-xs text-muted-foreground block mb-1">Location</span>
+                          <p className="font-medium text-xs">{line.location_id}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <Separator className="my-4" />
+                  
+                  {/* Upfront Costs Breakdown */}
+                  <div className="bg-muted/30 rounded-lg p-4 space-y-2">
+                    <h5 className="text-sm font-semibold mb-3">Upfront Costs</h5>
+                    
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Security Deposit</span>
+                      <span className="font-medium">{formatCurrency(line.deposit_amount, 'AED')}</span>
+                    </div>
+                    
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">
+                        Advance Rent ({line.advance_rent_months || 0} {line.advance_rent_months === 1 ? 'month' : 'months'})
+                      </span>
+                      <span className="font-medium">
+                        {formatCurrency((line.advance_rent_months || 0) * (line.monthly_rate || 0), 'AED')}
+                      </span>
+                    </div>
+                    
+                    {line.delivery_fee > 0 && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Delivery Fee</span>
+                        <span className="font-medium">{formatCurrency(line.delivery_fee, 'AED')}</span>
                       </div>
                     )}
-                  </div>
-                  
-                  <Separator className="my-3" />
-                  
-                  {/* Financial breakdown */}
-                  <div className="grid grid-cols-2 gap-3 text-sm mb-3">
-                    <div>
-                      <span className="text-muted-foreground">
-                        {line.rate_type === 'daily' ? 'Daily' : line.rate_type === 'weekly' ? 'Weekly' : 'Monthly'} Rate:
+                    
+                    <Separator className="my-2" />
+                    
+                    <div className="flex justify-between font-bold text-base">
+                      <span>Line {line.line_no} Total Upfront</span>
+                      <span className="text-primary text-lg">
+                        {formatCurrency(
+                          line.deposit_amount + 
+                          ((line.advance_rent_months || 0) * (line.monthly_rate || 0)) + 
+                          (line.delivery_fee || 0),
+                          'AED'
+                        )}
                       </span>
-                      <p className="font-semibold">{line.monthly_rate.toFixed(2)} AED</p>
                     </div>
-                    <div>
-                      <span className="text-muted-foreground">Deposit:</span>
-                      <p className="font-semibold">{line.deposit_amount.toFixed(2)} AED</p>
-                    </div>
-                    <div className="col-span-2">
-                      <span className="text-muted-foreground">Advance Rent:</span>
-                      <p className="font-semibold">
-                        {line.advance_rent_months} × {line.monthly_rate.toFixed(2)} = {((line.advance_rent_months || 0) * (line.monthly_rate || 0)).toFixed(2)} AED
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <Separator />
-                  
-                  <div className="flex justify-between font-semibold mt-3">
-                    <span>Line Upfront Total:</span>
-                    <span className="text-primary">
-                      {(line.deposit_amount + ((line.advance_rent_months || 0) * (line.monthly_rate || 0))).toFixed(2)} AED
-                    </span>
                   </div>
                 </div>
               ))}
