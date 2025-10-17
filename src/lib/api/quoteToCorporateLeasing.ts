@@ -4,7 +4,7 @@ export const convertQuoteToCorporateLease = async (quoteId: string) => {
   // 1. Fetch full quote with customer data
   const { data: quote, error: fetchError } = await supabase
     .from("quotes")
-    .select("*, profiles(*)")
+    .select("*, customers(*)")
     .eq("id", quoteId)
     .single();
 
