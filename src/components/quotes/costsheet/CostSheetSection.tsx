@@ -10,15 +10,21 @@ import { CostSheetDrawer } from './CostSheetDrawer';
 import { useCostSheets } from '@/hooks/useCostSheet';
 
 interface CostSheetSectionProps {
-  quoteId: string;
-  quoteDurationMonths: number;
+  entityId: string;
+  entityType?: 'quote' | 'agreement';
+  quoteId?: string; // For drawer (can be undefined for agreements)
+  entityNumber?: string; // Quote number or Agreement number
+  durationMonths: number;
   hasUnsavedChanges?: boolean;
   onSaveRequired?: () => void;
 }
 
 export const CostSheetSection: React.FC<CostSheetSectionProps> = ({
+  entityId,
+  entityType = 'quote',
   quoteId,
-  quoteDurationMonths,
+  entityNumber,
+  durationMonths,
   hasUnsavedChanges = false,
   onSaveRequired,
 }) => {
@@ -26,7 +32,7 @@ export const CostSheetSection: React.FC<CostSheetSectionProps> = ({
   const [selectedCostSheetId, setSelectedCostSheetId] = useState<string | null>(null);
   const [showSaveWarning, setShowSaveWarning] = useState(false);
   const [waitingToOpen, setWaitingToOpen] = useState(false);
-  const { data: costSheets = [], isLoading } = useCostSheets(quoteId);
+  const { data: costSheets = [], isLoading } = useCostSheets(entityId, entityType);
 
   const handleCreateNew = () => {
     // Check if there are unsaved changes
@@ -156,9 +162,9 @@ export const CostSheetSection: React.FC<CostSheetSectionProps> = ({
       <CostSheetDrawer
         open={drawerOpen}
         onClose={handleCloseDrawer}
-        quoteId={quoteId}
+        quoteId={quoteId || entityId}
         costSheetId={selectedCostSheetId}
-        quoteDurationMonths={quoteDurationMonths}
+        quoteDurationMonths={durationMonths}
       />
     </>
   );

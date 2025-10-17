@@ -347,8 +347,10 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
         {/* Cost Sheet Section */}
         {data.quote_items && data.quote_items.length > 0 && data.id && (
           <CostSheetSection 
-            quoteId={data.id} 
-            quoteDurationMonths={data.duration_days ? Math.round(data.duration_days / 30) : 36}
+            entityId={data.id}
+            entityType="quote"
+            quoteId={data.id}
+            durationMonths={data.duration_days ? Math.round(data.duration_days / 30) : 36}
             hasUnsavedChanges={hasUnsavedChanges}
             onSaveRequired={onSaveRequired}
           />

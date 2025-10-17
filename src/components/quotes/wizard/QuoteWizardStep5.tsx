@@ -220,8 +220,10 @@ export const QuoteWizardStep5: React.FC<QuoteWizardStep5Props> = ({
       {/* Cost Sheet Section */}
       {data.id && (
         <CostSheetSection 
-          quoteId={data.id} 
-          quoteDurationMonths={data.duration_days ? Math.ceil(data.duration_days / 30) : 12}
+          entityId={data.id}
+          entityType="quote"
+          quoteId={data.id}
+          durationMonths={data.duration_days ? Math.ceil(data.duration_days / 30) : 12}
         />
       )}
     </div>

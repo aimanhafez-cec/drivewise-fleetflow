@@ -67,23 +67,25 @@ export interface CostSheet {
   lines?: CostSheetLine[];
 }
 
-// Fetch all cost sheets for a quote
-export const useCostSheets = (quoteId?: string) => {
+// Fetch all cost sheets for a quote or agreement
+export const useCostSheets = (entityId?: string, entityType: 'quote' | 'agreement' = 'quote') => {
   return useQuery({
-    queryKey: ['cost-sheets', quoteId],
+    queryKey: ['cost-sheets', entityType, entityId],
     queryFn: async () => {
-      if (!quoteId) return [];
+      if (!entityId) return [];
+      
+      const column = entityType === 'quote' ? 'quote_id' : 'corporate_leasing_agreement_id';
       
       const { data, error } = await supabase
         .from('quote_cost_sheets')
         .select('id, cost_sheet_no, version, status, created_at, submitted_at, approved_at, approved_by')
-        .eq('quote_id', quoteId)
+        .eq(column, entityId)
         .order('version', { ascending: false });
       
       if (error) throw error;
       return data as CostSheetListItem[];
     },
-    enabled: !!quoteId,
+    enabled: !!entityId,
   });
 };
 

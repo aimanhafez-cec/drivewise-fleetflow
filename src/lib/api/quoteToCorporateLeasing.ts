@@ -340,7 +340,79 @@ export const convertQuoteToCorporateLease = async (quoteId: string) => {
     }
   }
 
-  // 7. Update quote with conversion tracking (bi-directional link)
+  // 7. Copy latest approved cost sheet if it exists
+  const { data: latestApprovedCS } = await supabase
+    .from('quote_cost_sheets')
+    .select('*')
+    .eq('quote_id', quoteId)
+    .eq('status', 'approved')
+    .order('version', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (latestApprovedCS) {
+    // Extract reference number from quote cost sheet: Q-2025-4789-CS-V1 → 2025-4789
+    const csMatch = latestApprovedCS.cost_sheet_no?.match(/-CS-V(\d+)$/);
+    const versionNumber = csMatch ? csMatch[1] : '1';
+    const referenceMatch = quote.quote_number?.match(/QUO-(\d+)/);
+    const reference = referenceMatch ? `2025-${referenceMatch[1]}` : '2025-000';
+    
+    // Create new cost sheet number: A-2025-4789-CS-V1
+    const newCostSheetNo = `A-${reference}-CS-V${versionNumber}`;
+    
+    // Copy cost sheet
+    const { data: newCS, error: csError } = await supabase
+      .from('quote_cost_sheets')
+      .insert({
+        corporate_leasing_agreement_id: agreement.id,
+        quote_id: null,
+        cost_sheet_no: newCostSheetNo,
+        version: latestApprovedCS.version,
+        financing_rate_percent: latestApprovedCS.financing_rate_percent,
+        overhead_percent: latestApprovedCS.overhead_percent,
+        target_margin_percent: latestApprovedCS.target_margin_percent,
+        residual_value_percent: latestApprovedCS.residual_value_percent,
+        notes_assumptions: latestApprovedCS.notes_assumptions,
+        status: 'approved',
+        source_cost_sheet_id: latestApprovedCS.id,
+        approved_by: latestApprovedCS.approved_by,
+        approved_at: new Date().toISOString(),
+      })
+      .select()
+      .single();
+    
+    if (!csError && newCS) {
+      // Copy cost sheet lines
+      const { data: lines } = await supabase
+        .from('quote_cost_sheet_lines')
+        .select('*')
+        .eq('cost_sheet_id', latestApprovedCS.id);
+      
+      if (lines && lines.length > 0) {
+        const newLines = lines.map(line => ({
+          cost_sheet_id: newCS.id,
+          line_no: line.line_no,
+          vehicle_class_id: line.vehicle_class_id,
+          vehicle_id: line.vehicle_id,
+          lease_term_months: line.lease_term_months,
+          acquisition_cost_aed: line.acquisition_cost_aed,
+          residual_value_percent: line.residual_value_percent,
+          maintenance_per_month_aed: line.maintenance_per_month_aed,
+          insurance_per_month_aed: line.insurance_per_month_aed,
+          registration_admin_per_month_aed: line.registration_admin_per_month_aed,
+          other_costs_per_month_aed: line.other_costs_per_month_aed,
+          total_cost_per_month_aed: line.total_cost_per_month_aed,
+          suggested_rate_per_month_aed: line.suggested_rate_per_month_aed,
+          quoted_rate_per_month_aed: line.quoted_rate_per_month_aed,
+          actual_margin_percent: line.actual_margin_percent,
+        }));
+        
+        await supabase.from('quote_cost_sheet_lines').insert(newLines);
+      }
+    }
+  }
+
+  // 8. Update quote with conversion tracking (bi-directional link)
   const { error: updateError } = await supabase
     .from("quotes")
     .update({
@@ -355,6 +427,6 @@ export const convertQuoteToCorporateLease = async (quoteId: string) => {
 
   if (updateError) throw updateError;
 
-  // 8. Return agreement ID
+  // 9. Return agreement ID
   return agreement.id;
 };

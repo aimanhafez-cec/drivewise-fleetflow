@@ -2817,6 +2817,7 @@ export type Database = {
           approval_notes: string | null
           approved_at: string | null
           approved_by: string | null
+          corporate_leasing_agreement_id: string | null
           cost_sheet_no: string | null
           created_at: string
           financing_rate_percent: number
@@ -2825,6 +2826,7 @@ export type Database = {
           overhead_percent: number
           quote_id: string
           residual_value_percent: number
+          source_cost_sheet_id: string | null
           status: Database["public"]["Enums"]["cost_sheet_status"]
           submitted_at: string | null
           submitted_by: string | null
@@ -2836,6 +2838,7 @@ export type Database = {
           approval_notes?: string | null
           approved_at?: string | null
           approved_by?: string | null
+          corporate_leasing_agreement_id?: string | null
           cost_sheet_no?: string | null
           created_at?: string
           financing_rate_percent?: number
@@ -2844,6 +2847,7 @@ export type Database = {
           overhead_percent?: number
           quote_id: string
           residual_value_percent?: number
+          source_cost_sheet_id?: string | null
           status?: Database["public"]["Enums"]["cost_sheet_status"]
           submitted_at?: string | null
           submitted_by?: string | null
@@ -2855,6 +2859,7 @@ export type Database = {
           approval_notes?: string | null
           approved_at?: string | null
           approved_by?: string | null
+          corporate_leasing_agreement_id?: string | null
           cost_sheet_no?: string | null
           created_at?: string
           financing_rate_percent?: number
@@ -2863,6 +2868,7 @@ export type Database = {
           overhead_percent?: number
           quote_id?: string
           residual_value_percent?: number
+          source_cost_sheet_id?: string | null
           status?: Database["public"]["Enums"]["cost_sheet_status"]
           submitted_at?: string | null
           submitted_by?: string | null
@@ -2872,10 +2878,24 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "quote_cost_sheets_corporate_leasing_agreement_id_fkey"
+            columns: ["corporate_leasing_agreement_id"]
+            isOneToOne: false
+            referencedRelation: "corporate_leasing_agreements"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "quote_cost_sheets_quote_id_fkey"
             columns: ["quote_id"]
             isOneToOne: false
             referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quote_cost_sheets_source_cost_sheet_id_fkey"
+            columns: ["source_cost_sheet_id"]
+            isOneToOne: false
+            referencedRelation: "quote_cost_sheets"
             referencedColumns: ["id"]
           },
         ]
