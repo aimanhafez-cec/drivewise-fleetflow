@@ -34,18 +34,7 @@ Deno.serve(async (req) => {
       throw new Error('Unauthorized')
     }
 
-    // Get user's profile ID
-    const { data: profile, error: profileError } = await supabaseClient
-      .from('profiles')
-      .select('id')
-      .eq('user_id', user.id)
-      .single()
-
-    if (profileError || !profile) {
-      throw new Error('User profile not found')
-    }
-
-    const { 
+    const {
       cost_sheet_id, 
       action, 
       comments, 
@@ -76,7 +65,7 @@ Deno.serve(async (req) => {
       .from('quote_cost_sheets')
       .update({
         status: newStatus,
-        approved_by: profile.id,
+        approved_by: user.id,
         approved_at: new Date().toISOString(),
         approval_notes: comments,
       })
@@ -91,7 +80,7 @@ Deno.serve(async (req) => {
       .from('cost_sheet_approvals')
       .insert({
         cost_sheet_id,
-        approver_user_id: profile.id,
+        approver_user_id: user.id,
         action,
         comments,
       })
