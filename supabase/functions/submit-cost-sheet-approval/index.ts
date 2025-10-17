@@ -32,43 +32,6 @@ Deno.serve(async (req) => {
       throw new Error('Unauthorized')
     }
 
-    // Create service role client for profile lookup (bypasses RLS)
-    const supabaseAdmin = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    )
-
-    // Get user's profile ID using service role
-    let { data: profile, error: profileError } = await supabaseAdmin
-      .from('profiles')
-      .select('id')
-      .eq('user_id', user.id)
-      .maybeSingle()
-
-    // If profile doesn't exist, create one automatically
-    if (!profile) {
-      console.log('Profile not found, creating one for user:', user.id)
-      const { data: newProfile, error: createError } = await supabaseAdmin
-        .from('profiles')
-        .insert({
-          user_id: user.id,
-          email: user.email,
-          full_name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'User',
-        })
-        .select('id')
-        .single()
-      
-      if (createError || !newProfile) {
-        throw new Error(`Failed to create user profile: ${createError?.message}`)
-      }
-      
-      profile = newProfile
-    }
-
-    if (profileError) {
-      throw new Error(`Profile query error: ${profileError.message}`)
-    }
-
     const { cost_sheet_id, notes }: SubmitApprovalRequest = await req.json()
 
     console.log('📤 Submitting cost sheet for approval:', cost_sheet_id)
@@ -93,9 +56,9 @@ Deno.serve(async (req) => {
       .from('quote_cost_sheets')
       .update({
         status: 'approved',
-        submitted_by: profile.id,
+        submitted_by: user.id,
         submitted_at: new Date().toISOString(),
-        approved_by: profile.id,
+        approved_by: user.id,
         approved_at: new Date().toISOString(),
         notes_assumptions: notes ?? costSheet.notes_assumptions,
       })
@@ -110,7 +73,7 @@ Deno.serve(async (req) => {
       .from('cost_sheet_approvals')
       .insert({
         cost_sheet_id,
-        approver_user_id: profile.id,
+        approver_user_id: user.id,
         action: 'approved',
         comments: notes ? `Auto-approved (Demo). ${notes}` : 'Auto-approved (Demo)',
       })
