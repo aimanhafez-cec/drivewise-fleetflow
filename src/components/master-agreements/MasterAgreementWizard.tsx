@@ -124,6 +124,8 @@ export const MasterAgreementWizard: React.FC<MasterAgreementWizardProps> = ({
         contract_effective_to: existingAgreement.contract_end_date,
         // Map invoice_format (DB enum) → form value
         invoice_format: invoiceFormatForm,
+        // PRESERVE agreement_items (vehicles) from database
+        agreement_items: existingAgreement.agreement_items || [],
       };
       setAgreementData(transformedData);
       setCompletedSteps([1, 2, 3, 4, 5, 6]);
