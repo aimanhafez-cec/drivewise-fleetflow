@@ -12,6 +12,9 @@ import { ArrowLeft, FileText, Edit } from 'lucide-react';
 import { format } from 'date-fns';
 import { formatCurrency } from "@/lib/utils";
 import { cn } from "@/lib/utils";
+import { MasterAgreementHeaderInfo } from "@/components/master-agreements/details/MasterAgreementHeaderInfo";
+import { MasterAgreementFinancials } from "@/components/master-agreements/details/MasterAgreementFinancials";
+import { MasterAgreementLines } from "@/components/master-agreements/details/MasterAgreementLines";
 
 const MasterAgreementDetails = () => {
   const { id } = useParams();
