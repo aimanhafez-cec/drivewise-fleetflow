@@ -203,7 +203,7 @@ interface QuoteData {
 
 const steps = [
   { id: 1, title: "Header", description: "Quote header information" },
-  { id: 2, title: "Financials", description: "Billing, deposits & payment terms" },
+  { id: 2, title: "Commercial", description: "Billing, deposits & payment terms" },
   { id: 3, title: "Coverage & Services", description: "Insurance, maintenance & add-ons" },
   { id: 4, title: "Vehicles", description: "Vehicle selection & configuration" },
   { id: 5, title: "Attachments", description: "Upload supporting documents" },
