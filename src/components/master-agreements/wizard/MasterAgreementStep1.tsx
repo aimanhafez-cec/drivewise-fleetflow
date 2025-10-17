@@ -5,8 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Eye, User, Building2 } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Eye, User, Building2, Info } from "lucide-react";
 import { format } from "date-fns";
+import { formatDurationInMonthsAndDays } from "@/lib/utils/dateUtils";
 import { DatePicker } from "@/components/ui/date-picker";
 import {
   LegalEntitySelect,
@@ -17,7 +19,9 @@ import {
   SalesRepSelect,
   CustomerSiteSelect,
   CustomerSelect,
+  LocationSelect,
 } from "@/components/ui/select-components";
+import { FX_RATE_TYPES } from "@/lib/constants/financialOptions";
 import { OpportunityViewDialog } from "@/components/quotes/OpportunityViewDialog";
 import { useOpportunityById } from "@/hooks/useQuoteLOVs";
 import { useQuery } from "@tanstack/react-query";
@@ -60,7 +64,49 @@ export const MasterAgreementStep1: React.FC<MasterAgreementStep1Props> = ({
     if (data.customer_type === "Company" && selectedCustomer?.full_name) {
       onChange({ account_name: selectedCustomer.full_name });
     }
-  }, [data.customer_type, selectedCustomer?.full_name]);
+  }, [data.customer_type, selectedCustomer?.full_name, onChange]);
+
+  // Debug logging for customer data
+  useEffect(() => {
+    console.log('🔍 MasterAgreementStep1 - Customer Data:', {
+      customer_id: data.customer_id,
+      customer_bill_to: data.customer_bill_to,
+      pickup_type: data.pickup_type,
+      pickup_customer_site_id: data.pickup_customer_site_id,
+      return_type: data.return_type,
+      return_customer_site_id: data.return_customer_site_id
+    });
+  }, [data.customer_id, data.customer_bill_to, data.pickup_type, data.pickup_customer_site_id, data.return_type, data.return_customer_site_id]);
+
+  // Auto-calculate duration when dates change
+  useEffect(() => {
+    if (data.contract_effective_from && data.contract_effective_to) {
+      const from = new Date(data.contract_effective_from);
+      const to = new Date(data.contract_effective_to);
+      const diffTime = Math.abs(to.getTime() - from.getTime());
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      onChange({ duration_days: diffDays });
+    }
+  }, [data.contract_effective_from, data.contract_effective_to]);
+
+  // Default pickup/return customer site to Bill To when applicable
+  useEffect(() => {
+    // Default pickup site when conditions are met
+    if (data.pickup_type === 'customer_site' && !data.pickup_customer_site_id) {
+      if (data.customer_bill_to) {
+        console.log('✅ Defaulting pickup_customer_site_id to Bill To:', data.customer_bill_to);
+        onChange({ pickup_customer_site_id: data.customer_bill_to });
+      }
+    }
+    
+    // Default return site when conditions are met
+    if (data.return_type === 'customer_site' && !data.return_customer_site_id) {
+      if (data.customer_bill_to) {
+        console.log('✅ Defaulting return_customer_site_id to Bill To:', data.customer_bill_to);
+        onChange({ return_customer_site_id: data.customer_bill_to });
+      }
+    }
+  }, [data.customer_bill_to, data.pickup_type, data.return_type, data.pickup_customer_site_id, data.return_customer_site_id]);
 
   return (
     <div className="space-y-6">
@@ -186,8 +232,9 @@ export const MasterAgreementStep1: React.FC<MasterAgreementStep1Props> = ({
                     customer_type: value,
                     customer_id: null,
                     account_name: null,
-                    bill_to_site_id: null,
+                    customer_bill_to: null,
                     contact_person_id: null,
+                    project: null,
                   });
                 }}
               >
@@ -224,8 +271,10 @@ export const MasterAgreementStep1: React.FC<MasterAgreementStep1Props> = ({
                     onChange={(value) =>
                       onChange({
                         customer_id: value,
-                        bill_to_site_id: null,
+                        customer_bill_to: null,
                         contact_person_id: null,
+                        pickup_customer_site_id: undefined,
+                        return_customer_site_id: undefined,
                       })
                     }
                     customerType={data.customer_type}
@@ -247,11 +296,11 @@ export const MasterAgreementStep1: React.FC<MasterAgreementStep1Props> = ({
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="bill_to_site_id">Bill To Site</Label>
+                  <Label htmlFor="customer_bill_to">Customer Bill To</Label>
                   <CustomerSiteSelect
                     customerId={data.customer_id}
-                    value={data.bill_to_site_id || ""}
-                    onChange={(value) => onChange({ bill_to_site_id: value })}
+                    value={data.customer_bill_to || ""}
+                    onChange={(value) => onChange({ customer_bill_to: value })}
                     placeholder="Select customer site"
                   />
                 </div>
@@ -267,21 +316,13 @@ export const MasterAgreementStep1: React.FC<MasterAgreementStep1Props> = ({
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="customer_segment">Customer Segment</Label>
-                  <Select
-                    value={data.customer_segment || ""}
-                    onValueChange={(value) => onChange({ customer_segment: value })}
-                  >
-                    <SelectTrigger id="customer_segment">
-                      <SelectValue placeholder="Select segment" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="SMB">SMB (Small/Medium Business)</SelectItem>
-                      <SelectItem value="Enterprise">Enterprise</SelectItem>
-                      <SelectItem value="Government">Government</SelectItem>
-                      <SelectItem value="Fleet Operator">Fleet Operator</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Label htmlFor="project">Project (Optional)</Label>
+                  <Input
+                    id="project"
+                    value={data.project || ""}
+                    onChange={(e) => onChange({ project: e.target.value })}
+                    placeholder="Enter project name"
+                  />
                 </div>
               </div>
             )}
@@ -296,8 +337,10 @@ export const MasterAgreementStep1: React.FC<MasterAgreementStep1Props> = ({
                     onChange={(value) =>
                       onChange({
                         customer_id: value,
-                        bill_to_site_id: null,
+                        customer_bill_to: null,
                         contact_person_id: null,
+                        pickup_customer_site_id: undefined,
+                        return_customer_site_id: undefined,
                       })
                     }
                     customerType="Person"
@@ -309,11 +352,11 @@ export const MasterAgreementStep1: React.FC<MasterAgreementStep1Props> = ({
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="bill_to_site_id">Bill To Site</Label>
+                  <Label htmlFor="customer_bill_to">Customer Bill To</Label>
                   <CustomerSiteSelect
                     customerId={data.customer_id}
-                    value={data.bill_to_site_id || ""}
-                    onChange={(value) => onChange({ bill_to_site_id: value })}
+                    value={data.customer_bill_to || ""}
+                    onChange={(value) => onChange({ customer_bill_to: value })}
                     placeholder="Select customer site"
                   />
                 </div>
@@ -336,21 +379,25 @@ export const MasterAgreementStep1: React.FC<MasterAgreementStep1Props> = ({
 
             <div className="space-y-2">
               <Label htmlFor="status">Status *</Label>
-              <Select
-                value={data.status || "draft"}
-                onValueChange={(value) => onChange({ status: value })}
-              >
-                <SelectTrigger id="status">
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="draft">Draft</SelectItem>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="suspended">Suspended</SelectItem>
-                  <SelectItem value="terminated">Terminated</SelectItem>
-                  <SelectItem value="expired">Expired</SelectItem>
-                </SelectContent>
-              </Select>
+                <Select
+                  value={data.status || "draft"}
+                  onValueChange={(value) => onChange({ status: value })}
+                >
+                  <SelectTrigger id="status">
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="draft">Draft</SelectItem>
+                    <SelectItem value="submitted">Submitted</SelectItem>
+                    <SelectItem value="pending_approval">Pending Approval</SelectItem>
+                    <SelectItem value="approved">Approved</SelectItem>
+                    <SelectItem value="sent">Sent to Customer</SelectItem>
+                    <SelectItem value="accepted">Accepted</SelectItem>
+                    <SelectItem value="rejected">Rejected</SelectItem>
+                    <SelectItem value="won">Won</SelectItem>
+                    <SelectItem value="lost">Lost</SelectItem>
+                  </SelectContent>
+                </Select>
             </div>
 
             <div className="space-y-2">
@@ -364,8 +411,56 @@ export const MasterAgreementStep1: React.FC<MasterAgreementStep1Props> = ({
             </div>
           </div>
 
-          {/* Row 6: Currency & Credit Info */}
+          {(data.status === "won" || data.status === "lost") && (
+            <div className="space-y-2">
+              <Label htmlFor="win_loss_reason">Win / Loss Reason *</Label>
+              <Textarea
+                id="win_loss_reason"
+                value={data.win_loss_reason || ""}
+                onChange={(e) => onChange({ win_loss_reason: e.target.value })}
+                placeholder="Enter reason for win or loss"
+                rows={2}
+              />
+              {errors.win_loss_reason && (
+                <p className="text-sm text-destructive">{errors.win_loss_reason}</p>
+              )}
+            </div>
+          )}
+
+          {/* Row 6: Agreement Date, Agreement Type & Currency */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <DatePicker
+                id="agreement_date"
+                label="Agreement Date"
+                required
+                value={data.agreement_date}
+                onChange={(date) => onChange({ agreement_date: date ? format(date, "yyyy-MM-dd") : null })}
+                placeholder="Select agreement date"
+                error={errors.agreement_date}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="agreement_type">Agreement Type *</Label>
+              <Select
+                value={data.agreement_type || ""}
+                onValueChange={(value) => onChange({ agreement_type: value })}
+              >
+                <SelectTrigger id="agreement_type">
+                  <SelectValue placeholder="Select agreement type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Corporate lease">Corporate lease</SelectItem>
+                  <SelectItem value="Personal Lease">Personal Lease</SelectItem>
+                  <SelectItem value="Rental-Short Term">Rental-Short Term</SelectItem>
+                </SelectContent>
+              </Select>
+              {errors.agreement_type && (
+                <p className="text-sm text-destructive">{errors.agreement_type}</p>
+              )}
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="currency">Currency *</Label>
               <Select
@@ -376,72 +471,293 @@ export const MasterAgreementStep1: React.FC<MasterAgreementStep1Props> = ({
                   <SelectValue placeholder="Select currency" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="AED">AED (د.إ)</SelectItem>
-                  <SelectItem value="USD">USD ($)</SelectItem>
-                  <SelectItem value="EUR">EUR (€)</SelectItem>
-                  <SelectItem value="GBP">GBP (£)</SelectItem>
+                  <SelectItem value="AED">AED</SelectItem>
+                  <SelectItem value="SAR">SAR</SelectItem>
+                  <SelectItem value="EGP">EGP</SelectItem>
+                  <SelectItem value="USD">USD</SelectItem>
                 </SelectContent>
               </Select>
             </div>
+          </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="credit_terms">Credit Terms *</Label>
-              <Select
-                value={data.credit_terms || ""}
-                onValueChange={(value) => onChange({ credit_terms: value })}
-              >
-                <SelectTrigger id="credit_terms">
-                  <SelectValue placeholder="Select credit terms" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Immediate">Immediate</SelectItem>
-                  <SelectItem value="Net 15">Net 15</SelectItem>
-                  <SelectItem value="Net 30">Net 30</SelectItem>
-                  <SelectItem value="Net 45">Net 45</SelectItem>
-                  <SelectItem value="Net 60">Net 60</SelectItem>
-                  <SelectItem value="Custom">Custom</SelectItem>
-                </SelectContent>
-              </Select>
-              {errors.credit_terms && (
-                <p className="text-sm text-destructive">{errors.credit_terms}</p>
-              )}
+          {/* Conditionally show FX Rate Type for non-AED currencies */}
+          {data.currency && data.currency !== "AED" && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="fx_rate_type">FX Rate Type</Label>
+                <Select
+                  value={data.fx_rate_type || "corporate"}
+                  onValueChange={(value) => onChange({ fx_rate_type: value })}
+                >
+                  <SelectTrigger id="fx_rate_type">
+                    <SelectValue placeholder="Select FX rate type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {FX_RATE_TYPES.map((type) => (
+                      <SelectItem key={type.id} value={type.value}>
+                        {type.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          )}
+
+          {/* Row 7: Pickup & Return Configuration */}
+          <div className="space-y-6">
+            {/* Pickup Configuration */}
+            <div className="space-y-4 p-4 border rounded-lg bg-muted/30">
+              <h4 className="font-medium text-sm">Pickup Configuration</h4>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Pickup Type Selector */}
+                <div className="space-y-2">
+                  <Label htmlFor="pickup_type">
+                    <span className="text-destructive">*</span> Pickup From
+                  </Label>
+                  <Select
+                    value={data.pickup_type || "company_location"}
+                    onValueChange={(value: 'company_location' | 'customer_site') => {
+                      const patch: any = {
+                        pickup_type: value,
+                        pickup_location_id: undefined,
+                        pickup_customer_site_id: undefined,
+                      };
+                      if (value === 'customer_site' && !data.pickup_customer_site_id && data.customer_bill_to) {
+                        patch.pickup_customer_site_id = data.customer_bill_to;
+                      }
+                      onChange(patch);
+                    }}
+                  >
+                    <SelectTrigger id="pickup_type" className={errors.pickup_type ? "border-destructive" : ""}>
+                      <SelectValue placeholder="Select pickup type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="company_location">
+                        <div className="flex flex-col py-1">
+                          <span className="font-medium">Our Location</span>
+                          <span className="text-xs text-muted-foreground">
+                            Customer picks up from our branch/airport
+                          </span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="customer_site">
+                        <div className="flex flex-col py-1">
+                          <span className="font-medium">Customer Location (Delivery)</span>
+                          <span className="text-xs text-muted-foreground">
+                            We deliver vehicle to customer site
+                          </span>
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {errors.pickup_type && (
+                    <p className="text-sm text-destructive">{errors.pickup_type}</p>
+                  )}
+                </div>
+
+                {/* Conditional Pickup Location/Site Selector */}
+                <div className="space-y-2">
+                  {data.pickup_type === "company_location" ? (
+                    <>
+                      <Label htmlFor="pickup_location_id">
+                        <span className="text-destructive">*</span> Pickup Location
+                      </Label>
+                      <LocationSelect
+                        value={data.pickup_location_id || ""}
+                        onChange={(value) => onChange({ pickup_location_id: value })}
+                        placeholder="Select pickup location"
+                      />
+                      {errors.pickup_location_id && (
+                        <p className="text-sm text-destructive">{errors.pickup_location_id}</p>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <Label htmlFor="pickup_customer_site_id">
+                        <span className="text-destructive">*</span> Customer Site
+                      </Label>
+                      <CustomerSiteSelect
+                        customerId={data.customer_id}
+                        value={data.pickup_customer_site_id || ""}
+                        onChange={(value) => onChange({ pickup_customer_site_id: value })}
+                        placeholder="Select customer site"
+                        disabled={!data.customer_id}
+                      />
+                      {!data.customer_id && (
+                        <p className="text-xs text-muted-foreground">
+                          Select a customer first
+                        </p>
+                      )}
+                      {data.customer_id && !data.customer_bill_to && (
+                        <Alert className="mt-2">
+                          <Info className="h-4 w-4" />
+                          <AlertDescription>
+                            💡 Tip: Select a "Customer Bill To" site first. It will be used as the default pickup site.
+                          </AlertDescription>
+                        </Alert>
+                      )}
+                      {errors.pickup_customer_site_id && (
+                        <p className="text-sm text-destructive">{errors.pickup_customer_site_id}</p>
+                      )}
+                    </>
+                  )}
+                </div>
+              </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="credit_limit">Credit Limit (AED)</Label>
-              <Input
-                id="credit_limit"
-                type="number"
-                value={data.credit_limit || ""}
-                onChange={(e) => onChange({ credit_limit: parseFloat(e.target.value) || null })}
-                placeholder="0.00"
+            {/* Return Configuration */}
+            <div className="space-y-4 p-4 border rounded-lg bg-muted/30">
+              <h4 className="font-medium text-sm">Return Configuration</h4>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Return Type Selector */}
+                <div className="space-y-2">
+                  <Label htmlFor="return_type">
+                    <span className="text-destructive">*</span> Return To
+                  </Label>
+                  <Select
+                    value={data.return_type || "company_location"}
+                    onValueChange={(value: 'company_location' | 'customer_site') => {
+                      const patch: any = {
+                        return_type: value,
+                        return_location_id: undefined,
+                        return_customer_site_id: undefined,
+                      };
+                      if (value === 'customer_site' && !data.return_customer_site_id && data.customer_bill_to) {
+                        patch.return_customer_site_id = data.customer_bill_to;
+                      }
+                      onChange(patch);
+                    }}
+                  >
+                    <SelectTrigger id="return_type" className={errors.return_type ? "border-destructive" : ""}>
+                      <SelectValue placeholder="Select return type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="company_location">
+                        <div className="flex flex-col py-1">
+                          <span className="font-medium">Our Location</span>
+                          <span className="text-xs text-muted-foreground">
+                            Customer returns to our branch/airport
+                          </span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="customer_site">
+                        <div className="flex flex-col py-1">
+                          <span className="font-medium">Customer Location (Collection)</span>
+                          <span className="text-xs text-muted-foreground">
+                            We collect vehicle from customer site
+                          </span>
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {errors.return_type && (
+                    <p className="text-sm text-destructive">{errors.return_type}</p>
+                  )}
+                </div>
+
+                {/* Conditional Return Location/Site Selector */}
+                <div className="space-y-2">
+                  {data.return_type === "company_location" ? (
+                    <>
+                      <Label htmlFor="return_location_id">
+                        <span className="text-destructive">*</span> Return Location
+                      </Label>
+                      <LocationSelect
+                        value={data.return_location_id || ""}
+                        onChange={(value) => onChange({ return_location_id: value })}
+                        placeholder="Select return location"
+                      />
+                      {errors.return_location_id && (
+                        <p className="text-sm text-destructive">{errors.return_location_id}</p>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <Label htmlFor="return_customer_site_id">
+                        <span className="text-destructive">*</span> Customer Site
+                      </Label>
+                      <CustomerSiteSelect
+                        customerId={data.customer_id}
+                        value={data.return_customer_site_id || ""}
+                        onChange={(value) => onChange({ return_customer_site_id: value })}
+                        placeholder="Select customer site"
+                        disabled={!data.customer_id}
+                      />
+                      {!data.customer_id && (
+                        <p className="text-xs text-muted-foreground">
+                          Select a customer first
+                        </p>
+                      )}
+                      {errors.return_customer_site_id && (
+                        <p className="text-sm text-destructive">{errors.return_customer_site_id}</p>
+                      )}
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Row 8: Contract Dates & Duration */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+              <DatePicker
+                id="validity_date_to"
+                label="Validity Date To"
+                value={data.validity_date_to}
+                onChange={(date) => onChange({ validity_date_to: date ? format(date, "yyyy-MM-dd") : null })}
+                placeholder="Select validity date"
+                error={errors.validity_date_to}
               />
             </div>
-          </div>
+            <div>
+              <DatePicker
+                id="contract_effective_from"
+                label="Contract Effective From"
+                value={data.contract_effective_from}
+                onChange={(date) => onChange({ contract_effective_from: date ? format(date, "yyyy-MM-dd") : null })}
+                placeholder="Select start date"
+                error={errors.contract_effective_from}
+                minDate={data.agreement_date ? new Date(data.agreement_date) : undefined}
+              />
+            </div>
+            <div>
+              <DatePicker
+                id="contract_effective_to"
+                label="Contract Effective To"
+                value={data.contract_effective_to}
+                onChange={(date) => onChange({ contract_effective_to: date ? format(date, "yyyy-MM-dd") : null })}
+                placeholder="Select end date"
+                error={errors.contract_effective_to}
+                minDate={data.contract_effective_from ? new Date(data.contract_effective_from) : undefined}
+              />
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="customer_po_no">Customer PO Number</Label>
-            <Input
-              id="customer_po_no"
-              value={data.customer_po_no || ""}
-              onChange={(e) => onChange({ customer_po_no: e.target.value })}
-              placeholder="Enter PO number"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="notes">Notes</Label>
-            <Textarea
-              id="notes"
-              value={data.notes || ""}
-              onChange={(e) => onChange({ notes: e.target.value })}
-              placeholder="Additional notes"
-              rows={3}
-            />
+            <div className="space-y-2">
+              <Label htmlFor="duration_days">Duration</Label>
+              <Input
+                id="duration_days"
+                type="text"
+                value={
+                  data.contract_effective_from && data.contract_effective_to
+                    ? formatDurationInMonthsAndDays(
+                        new Date(data.contract_effective_from),
+                        new Date(data.contract_effective_to)
+                      )
+                    : ""
+                }
+                disabled
+                placeholder="Auto-calculated"
+              />
+            </div>
           </div>
         </CardContent>
       </Card>
 
+      {/* Opportunity View Dialog */}
       {showOpportunityDialog && data.opportunity_id && (
         <OpportunityViewDialog
           opportunityId={data.opportunity_id}
