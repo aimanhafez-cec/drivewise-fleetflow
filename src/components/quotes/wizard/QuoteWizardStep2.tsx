@@ -78,7 +78,7 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
       if (error) throw error;
       return contact;
     },
-    enabled: !!(data.invoice_contact_person_id || data.contact_person_id) && data.email_invoice_to_contact,
+    enabled: !!(data.invoice_contact_person_id || data.contact_person_id) && !!data.email_invoice_to_contact,
   });
 
   const selectedContactEmail = selectedContact?.email;
