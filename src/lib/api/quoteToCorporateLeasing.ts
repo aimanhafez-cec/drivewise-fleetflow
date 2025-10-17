@@ -28,7 +28,6 @@ export const convertQuoteToCorporateLease = async (quoteId: string) => {
     rental_type: "Corporate Leasing" as any,
     customer_id: quote.customer_id,
     legal_entity_id: quote.legal_entity_id,
-    business_unit_id: quote.business_unit_id,
     bill_to_site_id: quote.customer_bill_to,
     credit_terms: quote.payment_terms_id || ("Net 30" as any),
     contract_start_date: quote.contract_effective_from,
