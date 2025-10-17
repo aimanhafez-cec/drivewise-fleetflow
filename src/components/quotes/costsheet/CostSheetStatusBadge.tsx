@@ -3,7 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { CheckCircle2, Clock, XCircle, FileText } from 'lucide-react';
 
 interface CostSheetStatusBadgeProps {
-  status: 'draft' | 'pending_approval' | 'approved' | 'rejected';
+  status: 'draft' | 'pending_approval' | 'approved' | 'rejected' | 'obsolete';
   className?: string;
 }
 
@@ -35,6 +35,12 @@ export const CostSheetStatusBadge: React.FC<CostSheetStatusBadgeProps> = ({
       variant: 'destructive' as const,
       icon: XCircle,
       className: '',
+    },
+    obsolete: {
+      label: 'Obsolete',
+      variant: 'outline' as const,
+      icon: XCircle,
+      className: 'border-gray-400 text-gray-600 dark:text-gray-400 line-through opacity-70',
     },
   };
 

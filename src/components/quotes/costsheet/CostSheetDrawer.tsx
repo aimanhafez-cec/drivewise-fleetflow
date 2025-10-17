@@ -210,12 +210,23 @@ export const CostSheetDrawer: React.FC<CostSheetDrawerProps> = ({
                       <SelectItem value="pending_approval">Pending Approval</SelectItem>
                       <SelectItem value="approved">Approved</SelectItem>
                       <SelectItem value="rejected">Rejected</SelectItem>
+                      <SelectItem value="obsolete">Obsolete</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </div>
             )}
           
+          {costSheet?.status === 'obsolete' && (
+            <Alert variant="destructive" className="border-amber-600 bg-amber-50 dark:bg-amber-950/40">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertDescription>
+                <strong>Cost Sheet Obsolete:</strong> This cost sheet is obsolete due to vehicle line changes. 
+                Please create a new cost sheet (v{costSheet.version + 1}) with updated vehicle data.
+              </AlertDescription>
+            </Alert>
+          )}
+
           <CostSheetHeader
             financingRate={headerData.financing_rate_percent}
             overheadPercent={headerData.overhead_percent}

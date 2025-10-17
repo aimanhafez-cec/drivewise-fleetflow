@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { format } from 'date-fns';
 import { Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 import { CostSheetStatusBadge } from './CostSheetStatusBadge';
 import { CostSheetListItem } from '@/hooks/useCostSheet';
 import {
@@ -22,6 +24,16 @@ export const CostSheetList: React.FC<CostSheetListProps> = ({
   costSheets,
   onViewCostSheet,
 }) => {
+  const [showObsolete, setShowObsolete] = useState(false);
+
+  const filteredCostSheets = useMemo(() => {
+    return costSheets.filter(cs => showObsolete || cs.status !== 'obsolete');
+  }, [costSheets, showObsolete]);
+
+  const obsoleteCount = useMemo(() => {
+    return costSheets.filter(cs => cs.status === 'obsolete').length;
+  }, [costSheets]);
+
   if (costSheets.length === 0) {
     return (
       <div className="text-center py-8 text-muted-foreground">
@@ -31,7 +43,20 @@ export const CostSheetList: React.FC<CostSheetListProps> = ({
   }
 
   return (
-    <div className="border rounded-lg">
+    <div className="space-y-3">
+      {obsoleteCount > 0 && (
+        <div className="flex items-center space-x-2">
+          <Checkbox 
+            id="show-obsolete" 
+            checked={showObsolete} 
+            onCheckedChange={(checked) => setShowObsolete(checked as boolean)}
+          />
+          <Label htmlFor="show-obsolete" className="text-sm text-muted-foreground cursor-pointer">
+            Show obsolete cost sheets ({obsoleteCount})
+          </Label>
+        </div>
+      )}
+      <div className="border rounded-lg">
       <Table>
         <TableHeader>
           <TableRow>
@@ -45,8 +70,8 @@ export const CostSheetList: React.FC<CostSheetListProps> = ({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {costSheets.map((sheet) => (
-            <TableRow key={sheet.id}>
+          {filteredCostSheets.map((sheet) => (
+            <TableRow key={sheet.id} className={sheet.status === 'obsolete' ? 'opacity-60' : ''}>
               <TableCell className="font-medium">{sheet.cost_sheet_no}</TableCell>
               <TableCell>V{sheet.version}</TableCell>
               <TableCell>
@@ -79,6 +104,7 @@ export const CostSheetList: React.FC<CostSheetListProps> = ({
           ))}
         </TableBody>
       </Table>
+      </div>
     </div>
   );
 };

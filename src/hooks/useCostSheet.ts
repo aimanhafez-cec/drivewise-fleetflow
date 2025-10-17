@@ -33,7 +33,7 @@ export interface CostSheetListItem {
   id: string;
   cost_sheet_no: string;
   version: number;
-  status: 'draft' | 'pending_approval' | 'approved' | 'rejected';
+  status: 'draft' | 'pending_approval' | 'approved' | 'rejected' | 'obsolete';
   created_at: string;
   submitted_at?: string;
   approved_at?: string;
@@ -50,7 +50,7 @@ export interface CostSheet {
   target_margin_percent: number;
   residual_value_percent: number;
   notes_assumptions?: string;
-  status: 'draft' | 'pending_approval' | 'approved' | 'rejected';
+  status: 'draft' | 'pending_approval' | 'approved' | 'rejected' | 'obsolete';
   submitted_by?: string;
   submitted_at?: string;
   approved_by?: string;
@@ -257,7 +257,7 @@ export const useUpdateCostSheetStatus = () => {
   return useMutation({
     mutationFn: async (params: {
       cost_sheet_id: string;
-      status: 'draft' | 'pending_approval' | 'approved' | 'rejected';
+      status: 'draft' | 'pending_approval' | 'approved' | 'rejected' | 'obsolete';
     }) => {
       const { data, error } = await supabase
         .from('quote_cost_sheets')
@@ -351,6 +351,59 @@ export const useDeleteCostSheet = () => {
       toast({
         title: 'Delete Failed',
         description: error.message || 'Failed to delete cost sheet',
+        variant: 'destructive',
+      });
+    },
+  });
+};
+
+// Mark a cost sheet as obsolete
+export const useMarkCostSheetObsolete = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async ({ 
+      costSheetId, 
+      reason 
+    }: { 
+      costSheetId: string; 
+      reason: string;
+    }) => {
+      // Fetch existing notes
+      const { data: existingSheet } = await supabase
+        .from('quote_cost_sheets')
+        .select('notes_assumptions')
+        .eq('id', costSheetId)
+        .single();
+
+      const existingNotes = existingSheet?.notes_assumptions || '';
+      const timestamp = new Date().toISOString();
+      
+      const { error } = await supabase
+        .from('quote_cost_sheets')
+        .update({ 
+          status: 'obsolete',
+          notes_assumptions: `[OBSOLETE - ${timestamp}]\n${reason}\n\n${existingNotes}`
+        })
+        .eq('id', costSheetId);
+
+      if (error) throw error;
+      return { costSheetId };
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['cost-sheets'] });
+      queryClient.invalidateQueries({ queryKey: ['cost-sheet', data.costSheetId] });
+      toast({
+        title: 'Cost Sheet Marked Obsolete',
+        description: 'The cost sheet has been marked as obsolete due to vehicle line changes.',
+        variant: 'default',
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to mark cost sheet as obsolete',
         variant: 'destructive',
       });
     },

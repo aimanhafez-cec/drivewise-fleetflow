@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Label } from "@/components/ui/label";
@@ -13,6 +13,8 @@ import { VehicleSelectionModal } from "../VehicleSelectionModal";
 import { FormError } from "@/components/ui/form-error";
 import { CostSheetSection } from "../costsheet/CostSheetSection";
 import { formatCurrency } from "@/lib/utils/currency";
+import { useDetectVehicleChanges } from "@/hooks/useDetectVehicleChanges";
+import { useMarkCostSheetObsolete } from "@/hooks/useCostSheet";
 
 interface QuoteWizardStep3Props {
   data: any;
@@ -36,6 +38,26 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
   const [selectedLines, setSelectedLines] = React.useState<number[]>([]);
 
   const isCorporate = (data.quote_type || '').toLowerCase() === 'corporate lease';
+
+  // Detect vehicle changes compared to approved cost sheet
+  const { hasChanges, obsoleteCostSheetId, changeDetails } = useDetectVehicleChanges(
+    data.id,
+    data.quote_items || []
+  );
+  
+  const markObsoleteMutation = useMarkCostSheetObsolete();
+
+  // Auto-mark cost sheet as obsolete when vehicle changes are detected
+  useEffect(() => {
+    if (hasChanges && obsoleteCostSheetId && !hasUnsavedChanges) {
+      const reason = `Vehicle line changes detected: ${changeDetails.map(c => c.detail).join(', ')}`;
+      
+      markObsoleteMutation.mutate({
+        costSheetId: obsoleteCostSheetId,
+        reason: reason,
+      });
+    }
+  }, [hasChanges, obsoleteCostSheetId, hasUnsavedChanges, changeDetails]);
 
   // Helper function to calculate default per-period rate based on price list and vehicle category
   const calculateDefaultRate = (priceListId: string, categoryName: string, billingPlan: string): number => {

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Calculator, Plus, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Calculator, Plus, AlertCircle, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -65,9 +65,25 @@ export const CostSheetSection: React.FC<CostSheetSectionProps> = ({
     setSelectedCostSheetId(null);
   };
 
+  const latestObsolete = useMemo(() => {
+    return costSheets.find(cs => cs.status === 'obsolete');
+  }, [costSheets]);
+
   return (
     <>
       <Card className="p-6">
+        {/* Obsolete Cost Sheet Alert */}
+        {latestObsolete && (
+          <Alert variant="destructive" className="mb-4 border-amber-600 bg-amber-50 dark:bg-amber-950/40">
+            <AlertTriangle className="h-4 w-4 text-amber-700" />
+            <AlertTitle className="text-amber-900 dark:text-amber-200">Cost Sheet Out of Sync</AlertTitle>
+            <AlertDescription className="text-amber-800 dark:text-amber-300">
+              Cost sheet <strong>{latestObsolete.cost_sheet_no}</strong> is obsolete because vehicle lines have changed. 
+              Create a new cost sheet to reflect current vehicle details.
+            </AlertDescription>
+          </Alert>
+        )}
+        
         {/* Warning Alert */}
         {hasUnsavedChanges && (
           <Alert className="mb-4 border-amber-300 bg-amber-50 dark:bg-amber-950">
