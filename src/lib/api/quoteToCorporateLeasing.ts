@@ -27,58 +27,71 @@ export const convertQuoteToCorporateLease = async (quoteId: string) => {
   
   // 3.1 Determine framework model based on whether items have vehicle_id
   const hasVehicleIds = quoteItems.some((item: any) => item.vehicle_id);
-  const frameworkModel = hasVehicleIds ? "Fleet Replacement" : "Rate Card by Class";
+  const frameworkModel = hasVehicleIds ? "Fixed Rate per VIN" : "Rate Card by Class";
   
-  // 3.2 Map billing cycle (must be "Monthly", "Quarterly", "Annually")
-  const billingCycleMap: Record<string, string> = {
-    "monthly": "Monthly",
-    "quarterly": "Quarterly",
-    "annually": "Annually",
-  };
-  const billingCycle = billingCycleMap[quote.billing_plan?.toLowerCase()] || "Monthly";
+  // 3.2 Billing cycle - force to Monthly (only valid value)
+  const billingCycle = "Monthly";
   
   // 3.3 Map invoice format (must be "Consolidated", "Per Vehicle", "Per Cost Center")
-  const invoiceFormatMap: Record<string, string> = {
-    "consolidated": "Consolidated",
-    "per vehicle": "Per Vehicle",
-    "per cost center": "Per Cost Center",
-  };
-  const invoiceFormat = invoiceFormatMap[quote.invoice_format?.toLowerCase()] || "Consolidated";
-  
-  // 3.4 Map credit terms (must be "Net 15", "Net 30", "Net 45", "Custom", "Immediate")
-  const creditTermsMap: Record<string, string> = {
-    "net 15": "Net 15",
-    "net 30": "Net 30",
-    "net 45": "Net 45",
-    "immediate": "Immediate",
-  };
-  const creditTerms = creditTermsMap[quote.payment_terms_id?.toLowerCase()] || "Net 30";
-  
-  // 3.5 Calculate master term from duration
-  let masterTerm = "12 months";
-  if (quote.duration_days) {
-    const months = Math.ceil(quote.duration_days / 30);
-    if (months <= 6) masterTerm = "6 months";
-    else if (months <= 12) masterTerm = "12 months";
-    else if (months <= 24) masterTerm = "24 months";
-    else if (months <= 36) masterTerm = "36 months";
-    else masterTerm = "48+ months";
+  let invoiceFormat: "Consolidated" | "Per Vehicle" | "Per Cost Center" = "Consolidated";
+  const formatLower = quote.invoice_format?.toLowerCase();
+  if (formatLower === "per vehicle" || formatLower === "per-vehicle") {
+    invoiceFormat = "Per Vehicle";
+  } else if (formatLower === "per cost center" || formatLower === "per-cost-center") {
+    invoiceFormat = "Per Cost Center";
   }
   
-  // 3.6 Map security instrument
-  let securityInstrument = "None";
+  // 3.4 Map credit terms (valid values: "Net 15", "Net 30", "Net 45", "Custom")
+  let creditTerms: "Net 15" | "Net 30" | "Net 45" | "Custom" = "Net 30";
+  let creditTermsNote = "";
+  const termsLower = (quote.payment_terms_id || "").toString().toLowerCase().trim();
+  
+  switch (termsLower) {
+    case "net 15": creditTerms = "Net 15"; break;
+    case "net 30": creditTerms = "Net 30"; break;
+    case "net 45": creditTerms = "Net 45"; break;
+    case "immediate":
+      creditTerms = "Custom";
+      creditTermsNote = "Original credit terms: Immediate payment required";
+      break;
+    default:
+      if (termsLower) creditTermsNote = `Original credit terms: ${termsLower}`;
+  }
+  
+  // 3.5 Calculate master term from duration (valid: "12 months", "24 months", "36 months", "48 months", "Open-ended")
+  let masterTerm: "12 months" | "24 months" | "36 months" | "48 months" | "Open-ended" = "12 months";
+  if (quote.duration_days) {
+    const months = Math.ceil(quote.duration_days / 30);
+    if (months <= 12) masterTerm = "12 months";
+    else if (months <= 24) masterTerm = "24 months";
+    else if (months <= 36) masterTerm = "36 months";
+    else masterTerm = "48 months";
+  }
+  
+  // 3.6 Map security instrument (valid: "None", "Deposit per Vehicle", "Bank Guarantee")
+  let securityInstrument: "None" | "Deposit per Vehicle" | "Bank Guarantee" = "None";
+  let securityNote = "";
+  
   if (quote.deposit_type === "refundable") {
-    securityInstrument = "Refundable Deposit";
+    securityInstrument = "Deposit per Vehicle";
   } else if (quote.deposit_type === "bank-guarantee") {
     securityInstrument = "Bank Guarantee";
   } else if (quote.deposit_type === "letter-of-credit") {
-    securityInstrument = "Letter of Credit";
+    securityInstrument = "Bank Guarantee";
+    securityNote = "Security type: Letter of Credit (treated as Bank Guarantee)";
   }
   
   // 3.7 Pro-rate initial fees across lines
   const initialFees = Array.isArray(quote.initial_fees) ? quote.initial_fees : [];
   const totalSetupFees = initialFees.reduce((sum: number, fee: any) => sum + (fee.amount || 0), 0);
   const setupFeePerLine = quoteItems.length > 0 ? totalSetupFees / quoteItems.length : 0;
+
+  // 3.8 Combine all notes
+  const allNotes = [
+    quote.notes,
+    creditTermsNote,
+    securityNote
+  ].filter(Boolean).join('\n\n');
 
   // 4. Map quote fields to corporate_leasing_agreements
   const agreementPayload = {
@@ -107,7 +120,7 @@ export const convertQuoteToCorporateLease = async (quoteId: string) => {
     vat_code: "UAE 5%",
     status: "draft" as any,
     signed_date: null,
-    notes: quote.notes,
+    notes: allNotes,
     created_by: quote.created_by,
     customer_po_no: quote.customer_po_number,
     source_quote_id: quoteId,
@@ -159,8 +172,8 @@ export const convertQuoteToCorporateLease = async (quoteId: string) => {
         // Hydrate metadata
         make: vehicleMeta.make,
         model: vehicleMeta.model,
-        year: vehicleMeta.year,
-        color: vehicleMeta.color,
+        model_year: vehicleMeta.year,
+        exterior_color: vehicleMeta.color,
         item_code: vehicleMeta.item_code,
         item_description: vehicleMeta.item_description,
         category_name: vehicleMeta.category_name,
