@@ -140,10 +140,10 @@ export const ConvertToMasterAgreementDialog: React.FC<ConvertToMasterAgreementDi
                   <span className="text-muted-foreground">Quote Number:</span>
                   <p className="font-medium">{quote.quote_number}</p>
                 </div>
-                <div>
-                  <span className="text-muted-foreground">Customer:</span>
-                  <p className="font-medium">{quote.profiles?.full_name || "N/A"}</p>
-                </div>
+              <div>
+                <span className="text-muted-foreground">Customer:</span>
+                <p className="font-medium">{quote.customer?.full_name || "N/A"}</p>
+              </div>
                 <div>
                   <span className="text-muted-foreground">Duration:</span>
                   <p className="font-medium">{quote.duration_days || "N/A"} days</p>
