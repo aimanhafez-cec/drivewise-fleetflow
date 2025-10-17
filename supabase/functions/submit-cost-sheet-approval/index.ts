@@ -32,15 +32,41 @@ Deno.serve(async (req) => {
       throw new Error('Unauthorized')
     }
 
-    // Get user's profile ID
-    const { data: profile, error: profileError } = await supabaseClient
+    // Create service role client for profile lookup (bypasses RLS)
+    const supabaseAdmin = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    )
+
+    // Get user's profile ID using service role
+    let { data: profile, error: profileError } = await supabaseAdmin
       .from('profiles')
       .select('id')
       .eq('user_id', user.id)
-      .single()
+      .maybeSingle()
 
-    if (profileError || !profile) {
-      throw new Error('User profile not found')
+    // If profile doesn't exist, create one automatically
+    if (!profile) {
+      console.log('Profile not found, creating one for user:', user.id)
+      const { data: newProfile, error: createError } = await supabaseAdmin
+        .from('profiles')
+        .insert({
+          user_id: user.id,
+          email: user.email,
+          full_name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'User',
+        })
+        .select('id')
+        .single()
+      
+      if (createError || !newProfile) {
+        throw new Error(`Failed to create user profile: ${createError?.message}`)
+      }
+      
+      profile = newProfile
+    }
+
+    if (profileError) {
+      throw new Error(`Profile query error: ${profileError.message}`)
     }
 
     const { cost_sheet_id, notes }: SubmitApprovalRequest = await req.json()
