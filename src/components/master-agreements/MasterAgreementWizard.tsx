@@ -289,7 +289,11 @@ export const MasterAgreementWizard: React.FC<MasterAgreementWizardProps> = ({
         <div className="flex items-center gap-2">
           <Button variant="outline" onClick={handleSaveDraft} disabled={saveMutation.isPending}>
             <Save className="h-4 w-4 mr-1" />
-            Save Draft
+            {isEditMode || agreementData.id ? "Save Changes" : "Save Draft"}
+          </Button>
+
+          <Button variant="outline" onClick={() => navigate("/master-agreements")} disabled={saveMutation.isPending}>
+            Cancel
           </Button>
 
           {currentStep < steps.length ? (
