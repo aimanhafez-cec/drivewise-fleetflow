@@ -127,6 +127,7 @@ export const CUSTOMER_SEGMENTS = [
 ];
 
 export const CREDIT_TERMS = [
+  { id: 'Immediate', label: 'Immediate Payment' },
   { id: 'Net 15', label: 'Net 15 Days' },
   { id: 'Net 30', label: 'Net 30 Days' },
   { id: 'Net 45', label: 'Net 45 Days' },

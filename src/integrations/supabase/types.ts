@@ -4633,7 +4633,7 @@ export type Database = {
       cost_allocation_mode: "Per Vehicle" | "Per Cost Center" | "Project"
       cost_sheet_approval_action: "approved" | "rejected" | "requested_changes"
       cost_sheet_status: "draft" | "pending_approval" | "approved" | "rejected"
-      credit_terms: "Net 15" | "Net 30" | "Net 45" | "Custom"
+      credit_terms: "Net 15" | "Net 30" | "Net 45" | "Custom" | "Immediate"
       customer_segment: "SME" | "Enterprise" | "Government"
       customer_type: "Company" | "Person"
       damage_type:
@@ -4865,7 +4865,7 @@ export const Constants = {
       cost_allocation_mode: ["Per Vehicle", "Per Cost Center", "Project"],
       cost_sheet_approval_action: ["approved", "rejected", "requested_changes"],
       cost_sheet_status: ["draft", "pending_approval", "approved", "rejected"],
-      credit_terms: ["Net 15", "Net 30", "Net 45", "Custom"],
+      credit_terms: ["Net 15", "Net 30", "Net 45", "Custom", "Immediate"],
       customer_segment: ["SME", "Enterprise", "Government"],
       customer_type: ["Company", "Person"],
       damage_type: [

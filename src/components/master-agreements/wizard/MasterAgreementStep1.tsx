@@ -31,6 +31,7 @@ export const MasterAgreementStep1: React.FC<MasterAgreementStep1Props> = ({
   ];
 
   const CREDIT_TERMS = [
+    { id: "Immediate", label: "Immediate" },
     { id: "Net 15", label: "Net 15" },
     { id: "Net 30", label: "Net 30" },
     { id: "Net 45", label: "Net 45" },

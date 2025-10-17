@@ -41,21 +41,21 @@ export const convertQuoteToCorporateLease = async (quoteId: string) => {
     invoiceFormat = "Per Cost Center";
   }
   
-  // 3.4 Map credit terms (valid values: "Net 15", "Net 30", "Net 45", "Custom")
-  let creditTerms: "Net 15" | "Net 30" | "Net 45" | "Custom" = "Net 30";
+  // 3.4 Map credit terms (valid values: "Immediate", "Net 15", "Net 30", "Net 45", "Custom")
+  let creditTerms: "Immediate" | "Net 15" | "Net 30" | "Net 45" | "Custom" = "Net 30";
   let creditTermsNote = "";
   const termsLower = (quote.payment_terms_id || "").toString().toLowerCase().trim();
   
   switch (termsLower) {
+    case "immediate": creditTerms = "Immediate"; break;
     case "net 15": creditTerms = "Net 15"; break;
     case "net 30": creditTerms = "Net 30"; break;
     case "net 45": creditTerms = "Net 45"; break;
-    case "immediate":
-      creditTerms = "Custom";
-      creditTermsNote = "Original credit terms: Immediate payment required";
-      break;
     default:
-      if (termsLower) creditTermsNote = `Original credit terms: ${termsLower}`;
+      if (termsLower) {
+        creditTerms = "Custom";
+        creditTermsNote = `Original credit terms: ${termsLower}`;
+      }
   }
   
   // 3.5 Calculate master term from duration (valid: "12 months", "24 months", "36 months", "48 months", "Open-ended")

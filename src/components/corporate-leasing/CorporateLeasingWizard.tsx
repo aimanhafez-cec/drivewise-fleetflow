@@ -27,7 +27,7 @@ const corporateLeasingSchema = z.object({
   bill_to_site_id: z.string().min(1, 'Bill-to site is required'),
   contract_manager_id: z.string().optional(),
   customer_po_no: z.string().optional(),
-  credit_terms: z.enum(['Net 15', 'Net 30', 'Net 45', 'Custom']),
+  credit_terms: z.enum(['Immediate', 'Net 15', 'Net 30', 'Net 45', 'Custom']),
   credit_limit: z.number().positive().optional(),
   approver_customer_name: z.string().optional(),
   approver_customer_email: z.string().email().optional(),
