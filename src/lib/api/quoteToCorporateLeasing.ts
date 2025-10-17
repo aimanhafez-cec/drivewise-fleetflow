@@ -134,11 +134,12 @@ export const convertQuoteToCorporateLease = async (quoteId: string) => {
     sales_office_id: quote.sales_office_id,
     sales_rep_id: quote.sales_rep_id,
     agreement_description: quote.quote_description,
-    customer_type: quote.customer_type,
+    customer_segment: quote.customer_type === "Company" 
+      ? "Enterprise" as any 
+      : "Individual" as any,
     customer_id: quote.customer_id,
     account_name: quote.account_name,
     bill_to_site_id: quote.customer_bill_to,
-    contact_person_id: quote.contact_person_id,
     project: quote.project,
     agreement_entry_date: quote.quote_entry_date,
     status: "draft" as any,
