@@ -6,7 +6,7 @@ import { LOVSelect } from "@/components/ui/lov-select";
 
 interface MasterAgreementStep5Props {
   data: any;
-  onChange: (field: string, value: any) => void;
+  onChange: (updates: Record<string, any>) => void;
   errors: Record<string, string>;
 }
 
@@ -50,7 +50,7 @@ export const MasterAgreementStep5: React.FC<MasterAgreementStep5Props> = ({
               <Label>Salik/Darb Handling</Label>
               <LOVSelect
                 value={data.salik_darb_handling}
-                onChange={(value) => onChange("salik_darb_handling", value)}
+                onChange={(value) => onChange({ salik_darb_handling: value })}
                 items={SALIK_DARB_HANDLING}
                 placeholder="Select handling"
               />
@@ -60,7 +60,7 @@ export const MasterAgreementStep5: React.FC<MasterAgreementStep5Props> = ({
               <Label>Tolls Admin Fee Model</Label>
               <LOVSelect
                 value={data.tolls_admin_fee_model}
-                onChange={(value) => onChange("tolls_admin_fee_model", value)}
+                onChange={(value) => onChange({ tolls_admin_fee_model: value })}
                 items={TOLLS_ADMIN_FEE_MODELS}
                 placeholder="Select model"
               />
@@ -70,7 +70,7 @@ export const MasterAgreementStep5: React.FC<MasterAgreementStep5Props> = ({
               <Label>Traffic Fines Handling</Label>
               <LOVSelect
                 value={data.traffic_fines_handling}
-                onChange={(value) => onChange("traffic_fines_handling", value)}
+                onChange={(value) => onChange({ traffic_fines_handling: value })}
                 items={TRAFFIC_FINES_HANDLING}
                 placeholder="Select handling"
               />
@@ -81,7 +81,7 @@ export const MasterAgreementStep5: React.FC<MasterAgreementStep5Props> = ({
               <Input
                 type="number"
                 value={data.admin_fee_per_fine_aed || 25}
-                onChange={(e) => onChange("admin_fee_per_fine_aed", parseFloat(e.target.value) || 25)}
+                onChange={(e) => onChange({ admin_fee_per_fine_aed: parseFloat(e.target.value) || 25 })}
                 placeholder="25"
               />
             </div>
@@ -90,7 +90,7 @@ export const MasterAgreementStep5: React.FC<MasterAgreementStep5Props> = ({
               <Label>Fuel Handling</Label>
               <LOVSelect
                 value={data.fuel_handling}
-                onChange={(value) => onChange("fuel_handling", value)}
+                onChange={(value) => onChange({ fuel_handling: value })}
                 items={FUEL_HANDLING}
                 placeholder="Select fuel handling"
               />

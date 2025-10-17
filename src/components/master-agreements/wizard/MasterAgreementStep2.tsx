@@ -9,7 +9,7 @@ import { FormError } from "@/components/ui/form-error";
 
 interface MasterAgreementStep2Props {
   data: any;
-  onChange: (field: string, value: any) => void;
+  onChange: (updates: Record<string, any>) => void;
   errors: Record<string, string>;
 }
 
@@ -49,7 +49,7 @@ export const MasterAgreementStep2: React.FC<MasterAgreementStep2Props> = ({
               <RequiredLabel>Framework Model</RequiredLabel>
               <LOVSelect
                 value={data.framework_model}
-                onChange={(value) => onChange("framework_model", value)}
+                onChange={(value) => onChange({ framework_model: value })}
                 items={FRAMEWORK_MODELS}
                 placeholder="Select framework"
               />
@@ -61,7 +61,7 @@ export const MasterAgreementStep2: React.FC<MasterAgreementStep2Props> = ({
               <Input
                 type="number"
                 value={data.committed_fleet_size || ""}
-                onChange={(e) => onChange("committed_fleet_size", parseInt(e.target.value) || null)}
+                onChange={(e) => onChange({ committed_fleet_size: parseInt(e.target.value) || null })}
                 placeholder="Number of vehicles"
               />
             </div>
@@ -70,7 +70,7 @@ export const MasterAgreementStep2: React.FC<MasterAgreementStep2Props> = ({
               <RequiredLabel>Master Term</RequiredLabel>
               <LOVSelect
                 value={data.master_term}
-                onChange={(value) => onChange("master_term", value)}
+                onChange={(value) => onChange({ master_term: value })}
                 items={CONTRACT_TERMS}
                 placeholder="Select term"
               />
@@ -82,7 +82,7 @@ export const MasterAgreementStep2: React.FC<MasterAgreementStep2Props> = ({
               <Input
                 type="number"
                 value={data.off_hire_notice_period || 30}
-                onChange={(e) => onChange("off_hire_notice_period", parseInt(e.target.value) || 30)}
+                onChange={(e) => onChange({ off_hire_notice_period: parseInt(e.target.value) || 30 })}
               />
             </div>
           </div>
@@ -91,7 +91,7 @@ export const MasterAgreementStep2: React.FC<MasterAgreementStep2Props> = ({
             <Checkbox
               id="co_terminus"
               checked={data.co_terminus_lines || false}
-              onCheckedChange={(checked) => onChange("co_terminus_lines", checked)}
+              onCheckedChange={(checked) => onChange({ co_terminus_lines: checked })}
             />
             <label htmlFor="co_terminus" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
               Co-terminus Lines (all lines end on same date)
@@ -103,7 +103,7 @@ export const MasterAgreementStep2: React.FC<MasterAgreementStep2Props> = ({
               <Checkbox
                 id="early_termination"
                 checked={data.early_termination_allowed || false}
-                onCheckedChange={(checked) => onChange("early_termination_allowed", checked)}
+                onCheckedChange={(checked) => onChange({ early_termination_allowed: checked })}
               />
               <label htmlFor="early_termination" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                 Early Termination Allowed
@@ -115,7 +115,7 @@ export const MasterAgreementStep2: React.FC<MasterAgreementStep2Props> = ({
                 <Label>Early Termination Rule</Label>
                 <Input
                   value={data.early_termination_rule || ""}
-                  onChange={(e) => onChange("early_termination_rule", e.target.value)}
+                  onChange={(e) => onChange({ early_termination_rule: e.target.value })}
                   placeholder="e.g., 3 months notice + penalty"
                 />
               </div>
@@ -126,7 +126,7 @@ export const MasterAgreementStep2: React.FC<MasterAgreementStep2Props> = ({
             <Label>Renewal Option</Label>
             <LOVSelect
               value={data.renewal_option}
-              onChange={(value) => onChange("renewal_option", value)}
+              onChange={(value) => onChange({ renewal_option: value })}
               items={RENEWAL_OPTIONS}
               placeholder="Select renewal option"
             />

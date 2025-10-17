@@ -7,7 +7,7 @@ import { FormError } from "@/components/ui/form-error";
 
 interface MasterAgreementStep3Props {
   data: any;
-  onChange: (field: string, value: any) => void;
+  onChange: (updates: Record<string, any>) => void;
   errors: Record<string, string>;
 }
 
@@ -45,7 +45,7 @@ export const MasterAgreementStep3: React.FC<MasterAgreementStep3Props> = ({
               <RequiredLabel>Billing Day</RequiredLabel>
               <LOVSelect
                 value={data.billing_day}
-                onChange={(value) => onChange("billing_day", value)}
+                onChange={(value) => onChange({ billing_day: value })}
                 items={BILLING_DAYS}
                 placeholder="Select billing day"
               />
@@ -56,7 +56,7 @@ export const MasterAgreementStep3: React.FC<MasterAgreementStep3Props> = ({
               <RequiredLabel>Invoice Format</RequiredLabel>
               <LOVSelect
                 value={data.invoice_format}
-                onChange={(value) => onChange("invoice_format", value)}
+                onChange={(value) => onChange({ invoice_format: value })}
                 items={INVOICE_FORMATS}
                 placeholder="Select invoice format"
               />
@@ -67,7 +67,7 @@ export const MasterAgreementStep3: React.FC<MasterAgreementStep3Props> = ({
               <RequiredLabel>Line Item Granularity</RequiredLabel>
               <LOVSelect
                 value={data.line_item_granularity}
-                onChange={(value) => onChange("line_item_granularity", value)}
+                onChange={(value) => onChange({ line_item_granularity: value })}
                 items={LINE_ITEM_GRANULARITIES}
                 placeholder="Select granularity"
               />

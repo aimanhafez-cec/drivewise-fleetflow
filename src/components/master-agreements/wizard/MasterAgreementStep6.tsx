@@ -7,7 +7,7 @@ import { DatePicker } from "@/components/ui/date-picker";
 
 interface MasterAgreementStep6Props {
   data: any;
-  onChange: (field: string, value: any) => void;
+  onChange: (updates: Record<string, any>) => void;
   errors: Record<string, string>;
 }
 
@@ -34,7 +34,7 @@ export const MasterAgreementStep6: React.FC<MasterAgreementStep6Props> = ({
               <Label>Security Instrument</Label>
               <LOVSelect
                 value={data.security_instrument}
-                onChange={(value) => onChange("security_instrument", value)}
+                onChange={(value) => onChange({ security_instrument: value })}
                 items={SECURITY_INSTRUMENTS}
                 placeholder="Select instrument"
               />
@@ -46,7 +46,7 @@ export const MasterAgreementStep6: React.FC<MasterAgreementStep6Props> = ({
                 <Input
                   type="number"
                   value={data.deposit_amount_aed || ""}
-                  onChange={(e) => onChange("deposit_amount_aed", parseFloat(e.target.value) || null)}
+                  onChange={(e) => onChange({ deposit_amount_aed: parseFloat(e.target.value) || null })}
                   placeholder="0.00"
                 />
               </div>
@@ -65,7 +65,7 @@ export const MasterAgreementStep6: React.FC<MasterAgreementStep6Props> = ({
               <Label>Contract Start Date</Label>
               <DatePicker
                 value={data.contract_start_date ? new Date(data.contract_start_date) : undefined}
-                onChange={(date) => onChange("contract_start_date", date?.toISOString().split("T")[0])}
+                onChange={(date) => onChange({ contract_start_date: date?.toISOString().split("T")[0] })}
               />
             </div>
 
@@ -73,7 +73,7 @@ export const MasterAgreementStep6: React.FC<MasterAgreementStep6Props> = ({
               <Label>Contract End Date</Label>
               <DatePicker
                 value={data.contract_end_date ? new Date(data.contract_end_date) : undefined}
-                onChange={(date) => onChange("contract_end_date", date?.toISOString().split("T")[0])}
+                onChange={(date) => onChange({ contract_end_date: date?.toISOString().split("T")[0] })}
               />
             </div>
 
@@ -81,7 +81,7 @@ export const MasterAgreementStep6: React.FC<MasterAgreementStep6Props> = ({
               <Label>Signed Date</Label>
               <DatePicker
                 value={data.signed_date ? new Date(data.signed_date) : undefined}
-                onChange={(date) => onChange("signed_date", date?.toISOString().split("T")[0])}
+                onChange={(date) => onChange({ signed_date: date?.toISOString().split("T")[0] })}
               />
             </div>
           </div>

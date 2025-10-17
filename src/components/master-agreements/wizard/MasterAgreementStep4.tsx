@@ -8,7 +8,7 @@ import { RequiredLabel } from "@/components/ui/required-label";
 
 interface MasterAgreementStep4Props {
   data: any;
-  onChange: (field: string, value: any) => void;
+  onChange: (updates: Record<string, any>) => void;
   errors: Record<string, string>;
 }
 
@@ -46,7 +46,7 @@ export const MasterAgreementStep4: React.FC<MasterAgreementStep4Props> = ({
               <RequiredLabel>Insurance Responsibility</RequiredLabel>
               <LOVSelect
                 value={data.insurance_responsibility}
-                onChange={(value) => onChange("insurance_responsibility", value)}
+                onChange={(value) => onChange({ insurance_responsibility: value })}
                 items={INSURANCE_RESPONSIBILITIES}
                 placeholder="Select responsibility"
               />
@@ -58,7 +58,7 @@ export const MasterAgreementStep4: React.FC<MasterAgreementStep4Props> = ({
                 <Input
                   type="number"
                   value={data.insurance_excess_aed || ""}
-                  onChange={(e) => onChange("insurance_excess_aed", parseFloat(e.target.value) || null)}
+                  onChange={(e) => onChange({ insurance_excess_aed: parseFloat(e.target.value) || null })}
                   placeholder="1500"
                 />
               </div>
@@ -77,7 +77,7 @@ export const MasterAgreementStep4: React.FC<MasterAgreementStep4Props> = ({
               <RequiredLabel>Maintenance Policy</RequiredLabel>
               <LOVSelect
                 value={data.maintenance_policy}
-                onChange={(value) => onChange("maintenance_policy", value)}
+                onChange={(value) => onChange({ maintenance_policy: value })}
                 items={MAINTENANCE_POLICIES}
                 placeholder="Select policy"
               />
@@ -88,7 +88,7 @@ export const MasterAgreementStep4: React.FC<MasterAgreementStep4Props> = ({
               <Input
                 type="number"
                 value={data.tyres_included_after_km || ""}
-                onChange={(e) => onChange("tyres_included_after_km", parseInt(e.target.value) || null)}
+                onChange={(e) => onChange({ tyres_included_after_km: parseInt(e.target.value) || null })}
                 placeholder="e.g., 40000"
               />
             </div>
@@ -97,7 +97,7 @@ export const MasterAgreementStep4: React.FC<MasterAgreementStep4Props> = ({
               <Label>Workshop Preference</Label>
               <LOVSelect
                 value={data.workshop_preference}
-                onChange={(value) => onChange("workshop_preference", value)}
+                onChange={(value) => onChange({ workshop_preference: value })}
                 items={WORKSHOP_PREFERENCES}
                 placeholder="Select preference"
               />
@@ -107,7 +107,7 @@ export const MasterAgreementStep4: React.FC<MasterAgreementStep4Props> = ({
               <Label>Registration Responsibility</Label>
               <LOVSelect
                 value={data.registration_responsibility}
-                onChange={(value) => onChange("registration_responsibility", value)}
+                onChange={(value) => onChange({ registration_responsibility: value })}
                 items={[
                   { id: "Lessor", label: "Lessor" },
                   { id: "Customer", label: "Customer" },
@@ -122,7 +122,7 @@ export const MasterAgreementStep4: React.FC<MasterAgreementStep4Props> = ({
               <Checkbox
                 id="roadside"
                 checked={data.roadside_assistance_included || false}
-                onCheckedChange={(checked) => onChange("roadside_assistance_included", checked)}
+                onCheckedChange={(checked) => onChange({ roadside_assistance_included: checked })}
               />
               <label htmlFor="roadside" className="text-sm font-medium leading-none">
                 Roadside Assistance Included
@@ -133,7 +133,7 @@ export const MasterAgreementStep4: React.FC<MasterAgreementStep4Props> = ({
               <Checkbox
                 id="replacement"
                 checked={data.replacement_vehicle_included || false}
-                onCheckedChange={(checked) => onChange("replacement_vehicle_included", checked)}
+                onCheckedChange={(checked) => onChange({ replacement_vehicle_included: checked })}
               />
               <label htmlFor="replacement" className="text-sm font-medium leading-none">
                 Replacement Vehicle Included
@@ -146,7 +146,7 @@ export const MasterAgreementStep4: React.FC<MasterAgreementStep4Props> = ({
                 <Input
                   type="number"
                   value={data.replacement_sla_hours || ""}
-                  onChange={(e) => onChange("replacement_sla_hours", parseInt(e.target.value) || null)}
+                  onChange={(e) => onChange({ replacement_sla_hours: parseInt(e.target.value) || null })}
                   placeholder="24"
                 />
               </div>
