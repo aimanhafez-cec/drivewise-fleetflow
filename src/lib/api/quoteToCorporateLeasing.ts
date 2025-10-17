@@ -22,19 +22,77 @@ export const convertQuoteToCorporateLease = async (quoteId: string) => {
 
   if (agreementNoError) throw agreementNoError;
 
-  // 3. Map quote fields to corporate_leasing_agreements with source tracking
+  // 3. Parse quote items
+  const quoteItems = Array.isArray(quote.quote_items) ? quote.quote_items : [];
+  
+  // 3.1 Determine framework model based on whether items have vehicle_id
+  const hasVehicleIds = quoteItems.some((item: any) => item.vehicle_id);
+  const frameworkModel = hasVehicleIds ? "Fleet Replacement" : "Rate Card by Class";
+  
+  // 3.2 Map billing cycle (must be "Monthly", "Quarterly", "Annually")
+  const billingCycleMap: Record<string, string> = {
+    "monthly": "Monthly",
+    "quarterly": "Quarterly",
+    "annually": "Annually",
+  };
+  const billingCycle = billingCycleMap[quote.billing_plan?.toLowerCase()] || "Monthly";
+  
+  // 3.3 Map invoice format (must be "Consolidated", "Per Vehicle", "Per Cost Center")
+  const invoiceFormatMap: Record<string, string> = {
+    "consolidated": "Consolidated",
+    "per vehicle": "Per Vehicle",
+    "per cost center": "Per Cost Center",
+  };
+  const invoiceFormat = invoiceFormatMap[quote.invoice_format?.toLowerCase()] || "Consolidated";
+  
+  // 3.4 Map credit terms (must be "Net 15", "Net 30", "Net 45", "Custom", "Immediate")
+  const creditTermsMap: Record<string, string> = {
+    "net 15": "Net 15",
+    "net 30": "Net 30",
+    "net 45": "Net 45",
+    "immediate": "Immediate",
+  };
+  const creditTerms = creditTermsMap[quote.payment_terms_id?.toLowerCase()] || "Net 30";
+  
+  // 3.5 Calculate master term from duration
+  let masterTerm = "12 months";
+  if (quote.duration_days) {
+    const months = Math.ceil(quote.duration_days / 30);
+    if (months <= 6) masterTerm = "6 months";
+    else if (months <= 12) masterTerm = "12 months";
+    else if (months <= 24) masterTerm = "24 months";
+    else if (months <= 36) masterTerm = "36 months";
+    else masterTerm = "48+ months";
+  }
+  
+  // 3.6 Map security instrument
+  let securityInstrument = "None";
+  if (quote.deposit_type === "refundable") {
+    securityInstrument = "Refundable Deposit";
+  } else if (quote.deposit_type === "bank-guarantee") {
+    securityInstrument = "Bank Guarantee";
+  } else if (quote.deposit_type === "letter-of-credit") {
+    securityInstrument = "Letter of Credit";
+  }
+  
+  // 3.7 Pro-rate initial fees across lines
+  const initialFees = Array.isArray(quote.initial_fees) ? quote.initial_fees : [];
+  const totalSetupFees = initialFees.reduce((sum: number, fee: any) => sum + (fee.amount || 0), 0);
+  const setupFeePerLine = quoteItems.length > 0 ? totalSetupFees / quoteItems.length : 0;
+
+  // 4. Map quote fields to corporate_leasing_agreements
   const agreementPayload = {
     agreement_no: agreementNo,
     rental_type: "Corporate Leasing" as any,
     customer_id: quote.customer_id,
     legal_entity_id: quote.legal_entity_id,
     bill_to_site_id: quote.customer_bill_to,
-    credit_terms: quote.payment_terms_id || ("Net 30" as any),
+    credit_terms: creditTerms as any,
     contract_start_date: quote.contract_effective_from,
     contract_end_date: quote.contract_effective_to,
-    billing_cycle: quote.billing_plan || ("Monthly" as any),
+    billing_cycle: billingCycle as any,
     billing_day: "Anniversary" as any,
-    invoice_format: quote.invoice_format || ("Consolidated" as any),
+    invoice_format: invoiceFormat as any,
     insurance_responsibility: "Included (Lessor)" as any,
     insurance_excess_aed: quote.insurance_excess_aed || 1500,
     maintenance_policy: quote.maintenance_included
@@ -43,28 +101,29 @@ export const convertQuoteToCorporateLease = async (quoteId: string) => {
     roadside_assistance_included: true,
     replacement_vehicle_included: true,
     admin_fee_per_fine_aed: 25,
-    security_instrument:
-      quote.deposit_type === "refundable"
-        ? ("Refundable Deposit" as any)
-        : ("None" as any),
+    security_instrument: securityInstrument as any,
     deposit_amount_aed: quote.default_deposit_amount,
     currency: quote.currency || "AED",
     vat_code: "UAE 5%",
-    status: "draft" as any, // Start as draft, will be signed later
-    signed_date: null, // Not signed yet
+    status: "draft" as any,
+    signed_date: null,
     notes: quote.notes,
     created_by: quote.created_by,
     customer_po_no: quote.customer_po_number,
-    // Source quote tracking
     source_quote_id: quoteId,
     source_quote_no: quote.quote_number,
-    // Required fields
     cost_allocation_mode: "Per Vehicle" as any,
-    framework_model: "Fleet Replacement" as any,
-    master_term: "12 months" as any,
+    framework_model: frameworkModel as any,
+    master_term: masterTerm as any,
+    registration_responsibility: "Lessor",
+    workshop_preference: "OEM",
+    salik_darb_handling: "Rebill Actual (monthly)",
+    tolls_admin_fee_model: "Per-invoice",
+    traffic_fines_handling: "Auto Rebill + Admin Fee",
+    fuel_handling: "Customer Fuel",
   };
 
-  // 4. Insert corporate leasing agreement
+  // 5. Insert corporate leasing agreement
   const { data: agreement, error: insertError } = await supabase
     .from("corporate_leasing_agreements")
     .insert([agreementPayload])
@@ -73,12 +132,14 @@ export const convertQuoteToCorporateLease = async (quoteId: string) => {
 
   if (insertError) throw insertError;
 
-  // 5. Create lines from quote_items with contract numbers
-  const quoteItems = Array.isArray(quote.quote_items) ? quote.quote_items : [];
+  // 6. Create lines from quote_items with contract numbers
   if (quoteItems.length > 0) {
     const lines = quoteItems.map((item: any, index: number) => {
       const lineNumber = index + 1;
       const contractNo = `${agreementNo}-${String(lineNumber).padStart(2, '0')}`;
+      
+      // Extract metadata from item
+      const vehicleMeta = item._vehicleMeta || {};
       
       return {
         agreement_id: agreement.id,
@@ -87,14 +148,22 @@ export const convertQuoteToCorporateLease = async (quoteId: string) => {
         vehicle_class_id: item.vehicle_class_id,
         vehicle_id: item.vehicle_id,
         qty: item.quantity || 1,
-        lease_start_date: quote.contract_effective_from,
+        lease_start_date: item.pickup_at || quote.contract_effective_from,
+        lease_end_date: item.return_at || quote.contract_effective_to,
         monthly_rate_aed: item.monthly_rate,
-        contract_months: quote.duration_days
-          ? Math.ceil(quote.duration_days / 30)
-          : 12,
-        mileage_allowance_km_month: item.included_km_per_month,
-        excess_km_rate_aed: item.excess_km_charge,
-        line_status: "draft", // Start as draft
+        contract_months: quote.duration_days ? Math.ceil(quote.duration_days / 30) : 12,
+        mileage_allowance_km_month: item.mileage_package_km || item.included_km_per_month,
+        excess_km_rate_aed: item.excess_km_rate || item.excess_km_charge,
+        line_status: "draft",
+        setup_fee_aed: setupFeePerLine,
+        // Hydrate metadata
+        make: vehicleMeta.make,
+        model: vehicleMeta.model,
+        year: vehicleMeta.year,
+        color: vehicleMeta.color,
+        item_code: vehicleMeta.item_code,
+        item_description: vehicleMeta.item_description,
+        category_name: vehicleMeta.category_name,
       };
     });
 
@@ -102,10 +171,18 @@ export const convertQuoteToCorporateLease = async (quoteId: string) => {
       .from("corporate_leasing_lines")
       .insert(lines);
 
-    if (linesError) throw linesError;
+    if (linesError) {
+      // Cleanup: delete the created agreement if lines fail
+      await supabase
+        .from("corporate_leasing_agreements")
+        .delete()
+        .eq("id", agreement.id);
+      
+      throw linesError;
+    }
   }
 
-  // 6. Update quote with conversion tracking (bi-directional link)
+  // 7. Update quote with conversion tracking (bi-directional link)
   const { error: updateError } = await supabase
     .from("quotes")
     .update({
@@ -114,12 +191,12 @@ export const convertQuoteToCorporateLease = async (quoteId: string) => {
       agreement_no: agreementNo,
       conversion_date: new Date().toISOString(),
       converted_by: quote.created_by,
-      status: "accepted", // Keep as accepted, not "converted"
+      status: "accepted",
     })
     .eq("id", quoteId);
 
   if (updateError) throw updateError;
 
-  // 7. Return agreement ID
+  // 8. Return agreement ID
   return agreement.id;
 };
