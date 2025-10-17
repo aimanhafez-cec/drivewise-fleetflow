@@ -95,6 +95,16 @@ export const MasterAgreementWizard: React.FC<MasterAgreementWizardProps> = ({
 
   useEffect(() => {
     if (existingAgreement) {
+      // Map invoice_format (DB enum) → form value
+      let invoiceFormatForm = "consolidated"; // default
+      if (existingAgreement.invoice_format === "Per Vehicle") {
+        invoiceFormatForm = "per_line";
+      } else if (existingAgreement.invoice_format === "Per Cost Center") {
+        invoiceFormatForm = "per_cost_center";
+      } else if (existingAgreement.invoice_format === "Consolidated") {
+        invoiceFormatForm = "consolidated";
+      }
+
       // Transform database fields to form fields
       const transformedData = {
         ...existingAgreement,
@@ -112,6 +122,8 @@ export const MasterAgreementWizard: React.FC<MasterAgreementWizardProps> = ({
         contract_effective_from: existingAgreement.contract_start_date,
         // Map contract_end_date (DB) → contract_effective_to (Form)
         contract_effective_to: existingAgreement.contract_end_date,
+        // Map invoice_format (DB enum) → form value
+        invoice_format: invoiceFormatForm,
       };
       setAgreementData(transformedData);
       setCompletedSteps([1, 2, 3, 4, 5, 6]);
@@ -120,6 +132,17 @@ export const MasterAgreementWizard: React.FC<MasterAgreementWizardProps> = ({
 
   const saveMutation = useMutation({
     mutationFn: async (data: any) => {
+      // Map invoice_format (form value) → DB enum
+      let invoiceFormatDb: "Consolidated" | "Per Vehicle" | "Per Cost Center" = "Consolidated";
+      const formatLower = data.invoice_format?.toLowerCase();
+      if (formatLower === "per_line" || formatLower === "per-line" || formatLower === "per vehicle" || formatLower === "per-vehicle") {
+        invoiceFormatDb = "Per Vehicle";
+      } else if (formatLower === "per_cost_center" || formatLower === "per-cost-center" || formatLower === "per cost center") {
+        invoiceFormatDb = "Per Cost Center";
+      } else if (formatLower === "consolidated") {
+        invoiceFormatDb = "Consolidated";
+      }
+
       // Transform form fields back to database fields
       const dbData = {
         ...data,
@@ -139,6 +162,8 @@ export const MasterAgreementWizard: React.FC<MasterAgreementWizardProps> = ({
         // Map contract_effective_to (Form) → contract_end_date (DB)
         contract_end_date: data.contract_effective_to,
         contract_effective_to: undefined,
+        // Map invoice_format (form value) → DB enum
+        invoice_format: invoiceFormatDb,
       };
       
       if (isEditMode && (id || agreementId)) {
