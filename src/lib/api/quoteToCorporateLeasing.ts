@@ -1,10 +1,10 @@
 import { supabase } from "@/integrations/supabase/client";
 
 export const convertQuoteToCorporateLease = async (quoteId: string) => {
-  // 1. Fetch full quote with customer data
+  // 1. Fetch full quote data
   const { data: quote, error: fetchError } = await supabase
     .from("quotes")
-    .select("*, customers(*)")
+    .select("*")
     .eq("id", quoteId)
     .single();
 
