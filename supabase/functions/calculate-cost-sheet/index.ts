@@ -91,7 +91,7 @@ Deno.serve(async (req) => {
           financing_rate_percent: finRate,
           overhead_percent: overheadPct,
           target_margin_percent: targetMargin,
-          residual_value_percent: residualValue,
+          residual_value_percent: residual_value_percent ?? 40.0,
           updated_at: new Date().toISOString(),
         })
         .eq('id', existingDraft.id)
@@ -120,7 +120,7 @@ Deno.serve(async (req) => {
           financing_rate_percent: finRate,
           overhead_percent: overheadPct,
           target_margin_percent: targetMargin,
-          residual_value_percent: residualValue,
+          residual_value_percent: residual_value_percent ?? 40.0,
           status: 'draft',
         })
         .select()
