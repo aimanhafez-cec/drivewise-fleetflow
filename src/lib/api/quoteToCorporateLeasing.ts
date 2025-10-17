@@ -35,7 +35,7 @@ export const convertQuoteToCorporateLease = async (quoteId: string) => {
   // 3.3 Map invoice format (must be "Consolidated", "Per Vehicle", "Per Cost Center")
   let invoiceFormat: "Consolidated" | "Per Vehicle" | "Per Cost Center" = "Consolidated";
   const formatLower = quote.invoice_format?.toLowerCase();
-  if (formatLower === "per vehicle" || formatLower === "per-vehicle") {
+  if (formatLower === "per vehicle" || formatLower === "per-vehicle" || formatLower === "per_line" || formatLower === "per-line") {
     invoiceFormat = "Per Vehicle";
   } else if (formatLower === "per cost center" || formatLower === "per-cost-center") {
     invoiceFormat = "Per Cost Center";
@@ -189,7 +189,7 @@ export const convertQuoteToCorporateLease = async (quoteId: string) => {
     invoice_format: invoiceFormat as any,
     line_item_granularity: "Base Rent + Add-ons" as any,
     email_invoice_to_contact: quote.email_invoice_to_contact || false,
-    invoice_contact_person_id: quote.invoice_contact_person_id,
+    invoice_contact_person_id: quote.contact_person_id || quote.invoice_contact_person_id,
     payment_method: quote.payment_method || 'bank-transfer',
     customer_po_no: quote.customer_po_number,
     payment_instructions: quote.payment_instructions,
