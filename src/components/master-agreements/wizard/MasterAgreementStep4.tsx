@@ -207,12 +207,41 @@ export const MasterAgreementStep4: React.FC<MasterAgreementStep4Props> = ({
         onSelectLine={(lineNo) => setSelectedLines(prev => prev.includes(lineNo) ? prev.filter(l => l !== lineNo) : [...prev, lineNo])}
         onSelectAll={() => setSelectedLines(selectedLines.length === (data.agreement_items || []).length ? [] : (data.agreement_items || []).map((line: any) => line.line_no))}
         headerDefaults={{
+          customer_id: data.customer_id,
           deposit_amount: data.default_deposit_amount,
           advance_rent_months: data.default_advance_rent_months,
+          default_price_list_id: data.default_price_list_id,
+          billing_plan: data.billing_plan,
+          
+          // Delivery & Collection defaults
+          pickup_type: data.pickup_type,
+          pickup_location_id: data.pickup_location_id,
+          pickup_customer_site_id: data.pickup_customer_site_id,
+          return_type: data.return_type,
+          return_location_id: data.return_location_id,
+          return_customer_site_id: data.return_customer_site_id,
+          default_delivery_fee: data.default_delivery_fee,
+          default_collection_fee: data.default_collection_fee,
+          
+          // Insurance & Coverage defaults
           insurance_coverage_package: data.insurance_coverage_package,
           insurance_excess_aed: data.insurance_excess_aed,
+          insurance_glass_tire_cover: data.insurance_glass_tire_cover,
+          insurance_pai_enabled: data.insurance_pai_enabled,
+          insurance_territorial_coverage: data.insurance_territorial_coverage,
+          
+          // Maintenance defaults
+          maintenance_included: data.maintenance_included,
+          maintenance_package_type: data.maintenance_package_type,
+          monthly_maintenance_cost_per_vehicle: data.monthly_maintenance_cost_per_vehicle,
+          maintenance_plan_source: data.maintenance_plan_source,
+          show_maintenance_separate_line: data.show_maintenance_separate_line,
+          
+          // Add-ons & Mileage defaults
           default_addons: data.default_addons,
           mileage_pooling_enabled: data.mileage_pooling_enabled,
+          pooled_mileage_allowance_km: data.pooled_mileage_allowance_km,
+          pooled_excess_km_rate: data.pooled_excess_km_rate,
         }}
       />
 

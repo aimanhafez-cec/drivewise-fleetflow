@@ -1106,10 +1106,12 @@ export type Database = {
           additional_services: Json | null
           agreement_id: string
           category_name: string | null
+          collection_fee: number | null
           contract_months: number | null
           contract_no: string | null
           cost_center_id: string | null
           created_at: string
+          delivery_fee: number | null
           excess_km_rate_aed: number | null
           exterior_color: string | null
           id: string
@@ -1126,10 +1128,14 @@ export type Database = {
           model_year: number | null
           monthly_km_allowance: number | null
           monthly_rate_aed: number
+          pickup_customer_site_id: string | null
           pickup_location_id: string | null
+          pickup_type: string | null
           project_code: string | null
           qty: number | null
+          return_customer_site_id: string | null
           return_location_id: string | null
+          return_type: string | null
           security_deposit_aed: number | null
           setup_fee_aed: number | null
           updated_at: string
@@ -1143,10 +1149,12 @@ export type Database = {
           additional_services?: Json | null
           agreement_id: string
           category_name?: string | null
+          collection_fee?: number | null
           contract_months?: number | null
           contract_no?: string | null
           cost_center_id?: string | null
           created_at?: string
+          delivery_fee?: number | null
           excess_km_rate_aed?: number | null
           exterior_color?: string | null
           id?: string
@@ -1163,10 +1171,14 @@ export type Database = {
           model_year?: number | null
           monthly_km_allowance?: number | null
           monthly_rate_aed: number
+          pickup_customer_site_id?: string | null
           pickup_location_id?: string | null
+          pickup_type?: string | null
           project_code?: string | null
           qty?: number | null
+          return_customer_site_id?: string | null
           return_location_id?: string | null
+          return_type?: string | null
           security_deposit_aed?: number | null
           setup_fee_aed?: number | null
           updated_at?: string
@@ -1180,10 +1192,12 @@ export type Database = {
           additional_services?: Json | null
           agreement_id?: string
           category_name?: string | null
+          collection_fee?: number | null
           contract_months?: number | null
           contract_no?: string | null
           cost_center_id?: string | null
           created_at?: string
+          delivery_fee?: number | null
           excess_km_rate_aed?: number | null
           exterior_color?: string | null
           id?: string
@@ -1200,10 +1214,14 @@ export type Database = {
           model_year?: number | null
           monthly_km_allowance?: number | null
           monthly_rate_aed?: number
+          pickup_customer_site_id?: string | null
           pickup_location_id?: string | null
+          pickup_type?: string | null
           project_code?: string | null
           qty?: number | null
+          return_customer_site_id?: string | null
           return_location_id?: string | null
+          return_type?: string | null
           security_deposit_aed?: number | null
           setup_fee_aed?: number | null
           updated_at?: string

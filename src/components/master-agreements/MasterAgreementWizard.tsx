@@ -116,12 +116,25 @@ export const MasterAgreementWizard: React.FC<MasterAgreementWizardProps> = ({
         quantity: line.qty,
         pickup_at: line.lease_start_date,
         return_at: line.lease_end_date,
+        duration_months: line.contract_months,
+        lease_term_months: line.contract_months,
         monthly_rate: line.monthly_rate_aed,
         mileage_package_km: line.mileage_allowance_km_month,
         excess_km_rate: line.excess_km_rate_aed,
         deposit_amount: line.security_deposit_aed || existingAgreement.default_deposit_amount,
         advance_rent_months: existingAgreement.default_advance_rent_months,
         setup_fee: line.setup_fee_aed,
+        
+        // Delivery & Collection settings from line OR header
+        pickup_type: line.pickup_type || existingAgreement.pickup_type,
+        pickup_location_id: line.pickup_location_id || existingAgreement.pickup_location_id,
+        pickup_customer_site_id: line.pickup_customer_site_id || existingAgreement.pickup_customer_site_id,
+        return_type: line.return_type || existingAgreement.return_type,
+        return_location_id: line.return_location_id || existingAgreement.return_location_id,
+        return_customer_site_id: line.return_customer_site_id || existingAgreement.return_customer_site_id,
+        delivery_fee: line.delivery_fee ?? existingAgreement.default_delivery_fee ?? 0,
+        collection_fee: line.collection_fee ?? existingAgreement.default_collection_fee ?? 0,
+        
         _vehicleMeta: {
           item_code: line.item_code,
           item_description: line.item_description,
@@ -221,12 +234,87 @@ export const MasterAgreementWizard: React.FC<MasterAgreementWizardProps> = ({
       });
       
       if (isEditMode && (id || agreementId)) {
+        const actualId = id || agreementId;
+        
+        // Update the main agreement
         const { error } = await supabase
           .from("corporate_leasing_agreements")
           .update(dbData)
-          .eq("id", id || agreementId);
+          .eq("id", actualId);
         if (error) throw error;
-        return id || agreementId;
+        
+        // Sync agreement_items back to corporate_leasing_lines
+        const items = data.agreement_items || [];
+        if (items.length > 0) {
+          // Get existing agreement to generate contract numbers
+          const { data: existingAg } = await supabase
+            .from("corporate_leasing_agreements")
+            .select("agreement_no")
+            .eq("id", actualId)
+            .single();
+          
+          const agreementNo = existingAg?.agreement_no || "TBD";
+          
+          // Helper to calculate duration
+          const calculateDurationMonths = (pickupAt?: string, returnAt?: string) => {
+            if (!pickupAt || !returnAt) return 12;
+            const from = new Date(pickupAt);
+            const to = new Date(returnAt);
+            const diffTime = Math.abs(to.getTime() - from.getTime());
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            return Math.ceil(diffDays / 30.44);
+          };
+          
+          // Delete old lines and insert new ones (full replace)
+          await supabase.from("corporate_leasing_lines").delete().eq("agreement_id", actualId);
+          
+          const lines = items.map((item: any, index: number) => {
+            const lineNumber = index + 1;
+            const contractNo = `${agreementNo}-${String(lineNumber).padStart(2, '0')}`;
+            
+            return {
+              agreement_id: actualId,
+              contract_no: contractNo,
+              line_number: lineNumber,
+              vehicle_class_id: item.vehicle_class_id,
+              vehicle_id: item.vehicle_id,
+              qty: item.quantity || 1,
+              lease_start_date: item.pickup_at,
+              lease_end_date: item.return_at,
+              monthly_rate_aed: item.monthly_rate,
+              contract_months: item.duration_months || item.lease_term_months || calculateDurationMonths(item.pickup_at, item.return_at),
+              mileage_allowance_km_month: item.mileage_package_km,
+              excess_km_rate_aed: item.excess_km_rate,
+              security_deposit_aed: item.deposit_amount,
+              setup_fee_aed: item.setup_fee,
+              line_status: "draft",
+              
+              // Delivery & Collection settings
+              pickup_type: item.pickup_type,
+              pickup_location_id: item.pickup_location_id,
+              pickup_customer_site_id: item.pickup_customer_site_id,
+              return_type: item.return_type,
+              return_location_id: item.return_location_id,
+              return_customer_site_id: item.return_customer_site_id,
+              delivery_fee: item.delivery_fee ?? 0,
+              collection_fee: item.collection_fee ?? 0,
+              
+              // Store metadata
+              make: item._vehicleMeta?.make,
+              model: item._vehicleMeta?.model,
+              model_year: item._vehicleMeta?.year,
+              exterior_color: item._vehicleMeta?.color,
+              item_code: item._vehicleMeta?.item_code,
+              item_description: item._vehicleMeta?.item_description,
+              category_name: item._vehicleMeta?.category_name,
+            };
+          });
+          
+          const { error: linesError } = await supabase.from("corporate_leasing_lines").insert(lines);
+          if (linesError) throw linesError;
+        }
+        
+        return actualId;
       } else {
         const { data: newAgreement, error } = await supabase
           .from("corporate_leasing_agreements")

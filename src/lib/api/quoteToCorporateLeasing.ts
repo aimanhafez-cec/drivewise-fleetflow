@@ -274,6 +274,20 @@ export const convertQuoteToCorporateLease = async (quoteId: string) => {
       // Extract metadata from item
       const vehicleMeta = item._vehicleMeta || {};
       
+      // Calculate duration_months from dates or use duration_months field
+      let durationMonths = item.duration_months || item.lease_term_months;
+      if (!durationMonths && item.pickup_at && item.return_at) {
+        const from = new Date(item.pickup_at);
+        const to = new Date(item.return_at);
+        const diffTime = Math.abs(to.getTime() - from.getTime());
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        durationMonths = Math.ceil(diffDays / 30.44);
+      }
+      if (!durationMonths && quote.duration_days) {
+        durationMonths = Math.ceil(quote.duration_days / 30);
+      }
+      if (!durationMonths) durationMonths = 12; // Default fallback
+      
       return {
         agreement_id: agreement.id,
         contract_no: contractNo,
@@ -284,11 +298,22 @@ export const convertQuoteToCorporateLease = async (quoteId: string) => {
         lease_start_date: item.pickup_at || quote.contract_effective_from,
         lease_end_date: item.return_at || quote.contract_effective_to,
         monthly_rate_aed: item.monthly_rate,
-        contract_months: quote.duration_days ? Math.ceil(quote.duration_days / 30) : 12,
+        contract_months: durationMonths,
         mileage_allowance_km_month: item.mileage_package_km || item.included_km_per_month,
         excess_km_rate_aed: item.excess_km_rate || item.excess_km_charge,
         line_status: "draft",
         setup_fee_aed: setupFeePerLine,
+        
+        // Delivery & Collection settings from item OR quote header
+        pickup_type: item.pickup_type || quote.pickup_type,
+        pickup_location_id: item.pickup_location_id || quote.pickup_location_id,
+        pickup_customer_site_id: item.pickup_customer_site_id || quote.pickup_customer_site_id,
+        return_type: item.return_type || quote.return_type,
+        return_location_id: item.return_location_id || quote.return_location_id,
+        return_customer_site_id: item.return_customer_site_id || quote.return_customer_site_id,
+        delivery_fee: item.delivery_fee ?? 0,
+        collection_fee: item.collection_fee ?? 0,
+        
         // Hydrate metadata
         make: vehicleMeta.make,
         model: vehicleMeta.model,
