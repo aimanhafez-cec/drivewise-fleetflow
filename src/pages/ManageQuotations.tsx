@@ -478,7 +478,7 @@ const ManageQuotations: React.FC = () => {
                     <TableCell onClick={() => navigate(`/quotes/${quote.id}`)} className="align-middle">
                       {quote.agreement_no ? (
                         <Link 
-                          to={`/corporate-leasing/${quote.agreement_id}`}
+                          to={`/master-agreements/${quote.agreement_id}`}
                           className="flex items-center gap-1 text-primary hover:underline font-mono"
                           onClick={(e) => e.stopPropagation()}
                         >
