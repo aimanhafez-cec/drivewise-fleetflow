@@ -14,6 +14,63 @@ export type Database = {
   }
   public: {
     Tables: {
+      achievements: {
+        Row: {
+          achievement_key: string
+          badge_color: string | null
+          category: string
+          created_at: string | null
+          criteria_type: string
+          criteria_value: number | null
+          description_ar: string | null
+          description_en: string | null
+          display_order: number | null
+          icon: string
+          id: string
+          is_active: boolean | null
+          name_ar: string
+          name_en: string
+          points_reward: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          achievement_key: string
+          badge_color?: string | null
+          category: string
+          created_at?: string | null
+          criteria_type: string
+          criteria_value?: number | null
+          description_ar?: string | null
+          description_en?: string | null
+          display_order?: number | null
+          icon: string
+          id?: string
+          is_active?: boolean | null
+          name_ar: string
+          name_en: string
+          points_reward?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          achievement_key?: string
+          badge_color?: string | null
+          category?: string
+          created_at?: string | null
+          criteria_type?: string
+          criteria_value?: number | null
+          description_ar?: string | null
+          description_en?: string | null
+          display_order?: number | null
+          icon?: string
+          id?: string
+          is_active?: boolean | null
+          name_ar?: string
+          name_en?: string
+          points_reward?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       addon_items: {
         Row: {
           category: string
@@ -1071,6 +1128,121 @@ export type Database = {
         }
         Relationships: []
       }
+      customer_achievements: {
+        Row: {
+          achievement_id: string
+          claimed_at: string | null
+          customer_id: string
+          id: string
+          is_claimed: boolean | null
+          progress_value: number | null
+          unlocked_at: string | null
+        }
+        Insert: {
+          achievement_id: string
+          claimed_at?: string | null
+          customer_id: string
+          id?: string
+          is_claimed?: boolean | null
+          progress_value?: number | null
+          unlocked_at?: string | null
+        }
+        Update: {
+          achievement_id?: string
+          claimed_at?: string | null
+          customer_id?: string
+          id?: string
+          is_claimed?: boolean | null
+          progress_value?: number | null
+          unlocked_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_achievements_achievement_id_fkey"
+            columns: ["achievement_id"]
+            isOneToOne: false
+            referencedRelation: "achievements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_achievements_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer_loyalty_profile"
+            referencedColumns: ["customer_id"]
+          },
+        ]
+      }
+      customer_loyalty_profile: {
+        Row: {
+          created_at: string | null
+          current_points_balance: number | null
+          current_tier_id: string | null
+          customer_id: string
+          lifetime_value_aed: number | null
+          points_expiring_soon: number | null
+          preferences: Json | null
+          referral_code: string
+          referred_by: string | null
+          tier_anniversary_date: string | null
+          tier_qualification_date: string | null
+          total_points_earned: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          current_points_balance?: number | null
+          current_tier_id?: string | null
+          customer_id: string
+          lifetime_value_aed?: number | null
+          points_expiring_soon?: number | null
+          preferences?: Json | null
+          referral_code: string
+          referred_by?: string | null
+          tier_anniversary_date?: string | null
+          tier_qualification_date?: string | null
+          total_points_earned?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          current_points_balance?: number | null
+          current_tier_id?: string | null
+          customer_id?: string
+          lifetime_value_aed?: number | null
+          points_expiring_soon?: number | null
+          preferences?: Json | null
+          referral_code?: string
+          referred_by?: string | null
+          tier_anniversary_date?: string | null
+          tier_qualification_date?: string | null
+          total_points_earned?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_loyalty_profile_current_tier_id_fkey"
+            columns: ["current_tier_id"]
+            isOneToOne: false
+            referencedRelation: "reward_tiers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_loyalty_profile_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_loyalty_profile_referred_by_fkey"
+            columns: ["referred_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customer_sites: {
         Row: {
           address: Json | null
@@ -1358,6 +1530,47 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      engagement_streaks: {
+        Row: {
+          created_at: string | null
+          current_streak_days: number | null
+          customer_id: string
+          last_activity_date: string | null
+          longest_streak_days: number | null
+          streak_start_date: string | null
+          total_activities: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          current_streak_days?: number | null
+          customer_id: string
+          last_activity_date?: string | null
+          longest_streak_days?: number | null
+          streak_start_date?: string | null
+          total_activities?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          current_streak_days?: number | null
+          customer_id?: string
+          last_activity_date?: string | null
+          longest_streak_days?: number | null
+          streak_start_date?: string | null
+          total_activities?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "engagement_streaks_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: true
+            referencedRelation: "customer_loyalty_profile"
+            referencedColumns: ["customer_id"]
+          },
+        ]
       }
       inspection_in: {
         Row: {
@@ -1790,6 +2003,50 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      notification_preferences: {
+        Row: {
+          booking_updates: boolean
+          created_at: string
+          customer_id: string
+          email_enabled: boolean
+          id: string
+          promotional: boolean
+          push_enabled: boolean
+          ticket_updates: boolean
+          updated_at: string
+        }
+        Insert: {
+          booking_updates?: boolean
+          created_at?: string
+          customer_id: string
+          email_enabled?: boolean
+          id?: string
+          promotional?: boolean
+          push_enabled?: boolean
+          ticket_updates?: boolean
+          updated_at?: string
+        }
+        Update: {
+          booking_updates?: boolean
+          created_at?: string
+          customer_id?: string
+          email_enabled?: boolean
+          id?: string
+          promotional?: boolean
+          push_enabled?: boolean
+          ticket_updates?: boolean
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_preferences_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       notifications: {
         Row: {
@@ -2740,6 +2997,70 @@ export type Database = {
           },
         ]
       }
+      referral_program: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          first_booking_id: string | null
+          id: string
+          referee_customer_id: string | null
+          referee_points_awarded: number | null
+          referral_code: string
+          referrer_customer_id: string
+          referrer_points_awarded: number | null
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          first_booking_id?: string | null
+          id?: string
+          referee_customer_id?: string | null
+          referee_points_awarded?: number | null
+          referral_code: string
+          referrer_customer_id: string
+          referrer_points_awarded?: number | null
+          status?: string
+          updated_at?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          first_booking_id?: string | null
+          id?: string
+          referee_customer_id?: string | null
+          referee_points_awarded?: number | null
+          referral_code?: string
+          referrer_customer_id?: string
+          referrer_points_awarded?: number | null
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referral_program_first_booking_id_fkey"
+            columns: ["first_booking_id"]
+            isOneToOne: false
+            referencedRelation: "reservations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referral_program_referee_customer_id_fkey"
+            columns: ["referee_customer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referral_program_referrer_customer_id_fkey"
+            columns: ["referrer_customer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       report_templates: {
         Row: {
           columns: Json
@@ -2917,6 +3238,301 @@ export type Database = {
             columns: ["vehicle_id"]
             isOneToOne: false
             referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reward_campaigns: {
+        Row: {
+          applicable_tiers: string[] | null
+          applicable_vehicle_classes: string[] | null
+          bonus_points: number | null
+          campaign_name: string
+          campaign_type: string
+          created_at: string | null
+          description_ar: string | null
+          description_en: string | null
+          end_date: string
+          id: string
+          is_active: boolean | null
+          max_redemptions_per_customer: number | null
+          min_booking_amount: number | null
+          min_rental_days: number | null
+          multiplier: number | null
+          points_awarded: number | null
+          start_date: string
+          total_budget_points: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          applicable_tiers?: string[] | null
+          applicable_vehicle_classes?: string[] | null
+          bonus_points?: number | null
+          campaign_name: string
+          campaign_type: string
+          created_at?: string | null
+          description_ar?: string | null
+          description_en?: string | null
+          end_date: string
+          id?: string
+          is_active?: boolean | null
+          max_redemptions_per_customer?: number | null
+          min_booking_amount?: number | null
+          min_rental_days?: number | null
+          multiplier?: number | null
+          points_awarded?: number | null
+          start_date: string
+          total_budget_points?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          applicable_tiers?: string[] | null
+          applicable_vehicle_classes?: string[] | null
+          bonus_points?: number | null
+          campaign_name?: string
+          campaign_type?: string
+          created_at?: string | null
+          description_ar?: string | null
+          description_en?: string | null
+          end_date?: string
+          id?: string
+          is_active?: boolean | null
+          max_redemptions_per_customer?: number | null
+          min_booking_amount?: number | null
+          min_rental_days?: number | null
+          multiplier?: number | null
+          points_awarded?: number | null
+          start_date?: string
+          total_budget_points?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      reward_catalog_items: {
+        Row: {
+          category: string
+          created_at: string | null
+          description_ar: string | null
+          description_en: string | null
+          display_order: number | null
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          min_tier_id: string | null
+          name_ar: string
+          name_en: string
+          points_required: number
+          stock_available: number | null
+          terms_ar: string | null
+          terms_en: string | null
+          updated_at: string | null
+          value_aed: number
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          description_ar?: string | null
+          description_en?: string | null
+          display_order?: number | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          min_tier_id?: string | null
+          name_ar: string
+          name_en: string
+          points_required: number
+          stock_available?: number | null
+          terms_ar?: string | null
+          terms_en?: string | null
+          updated_at?: string | null
+          value_aed: number
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          description_ar?: string | null
+          description_en?: string | null
+          display_order?: number | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          min_tier_id?: string | null
+          name_ar?: string
+          name_en?: string
+          points_required?: number
+          stock_available?: number | null
+          terms_ar?: string | null
+          terms_en?: string | null
+          updated_at?: string | null
+          value_aed?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reward_catalog_items_min_tier_id_fkey"
+            columns: ["min_tier_id"]
+            isOneToOne: false
+            referencedRelation: "reward_tiers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reward_redemptions: {
+        Row: {
+          created_at: string | null
+          customer_id: string
+          expires_at: string | null
+          id: string
+          metadata: Json | null
+          points_used: number
+          redeemed_at: string | null
+          redemption_code: string | null
+          redemption_type: string
+          reservation_id: string | null
+          status: string
+          updated_at: string | null
+          value_aed: number
+        }
+        Insert: {
+          created_at?: string | null
+          customer_id: string
+          expires_at?: string | null
+          id?: string
+          metadata?: Json | null
+          points_used: number
+          redeemed_at?: string | null
+          redemption_code?: string | null
+          redemption_type: string
+          reservation_id?: string | null
+          status?: string
+          updated_at?: string | null
+          value_aed: number
+        }
+        Update: {
+          created_at?: string | null
+          customer_id?: string
+          expires_at?: string | null
+          id?: string
+          metadata?: Json | null
+          points_used?: number
+          redeemed_at?: string | null
+          redemption_code?: string | null
+          redemption_type?: string
+          reservation_id?: string | null
+          status?: string
+          updated_at?: string | null
+          value_aed?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reward_redemptions_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reward_redemptions_reservation_id_fkey"
+            columns: ["reservation_id"]
+            isOneToOne: false
+            referencedRelation: "reservations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reward_tiers: {
+        Row: {
+          benefits: Json | null
+          color: string
+          created_at: string | null
+          display_order: number
+          earn_multiplier: number
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          max_points: number | null
+          min_points: number
+          name_ar: string
+          name_en: string
+          updated_at: string | null
+        }
+        Insert: {
+          benefits?: Json | null
+          color: string
+          created_at?: string | null
+          display_order: number
+          earn_multiplier?: number
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          max_points?: number | null
+          min_points: number
+          name_ar: string
+          name_en: string
+          updated_at?: string | null
+        }
+        Update: {
+          benefits?: Json | null
+          color?: string
+          created_at?: string | null
+          display_order?: number
+          earn_multiplier?: number
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          max_points?: number | null
+          min_points?: number
+          name_ar?: string
+          name_en?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      reward_transactions: {
+        Row: {
+          balance_after: number
+          created_at: string | null
+          customer_id: string
+          description_ar: string
+          description_en: string
+          expires_at: string | null
+          id: string
+          points: number
+          source_id: string | null
+          source_type: string
+          transaction_type: string
+        }
+        Insert: {
+          balance_after: number
+          created_at?: string | null
+          customer_id: string
+          description_ar: string
+          description_en: string
+          expires_at?: string | null
+          id?: string
+          points: number
+          source_id?: string | null
+          source_type: string
+          transaction_type: string
+        }
+        Update: {
+          balance_after?: number
+          created_at?: string | null
+          customer_id?: string
+          description_ar?: string
+          description_en?: string
+          expires_at?: string | null
+          id?: string
+          points?: number
+          source_id?: string | null
+          source_type?: string
+          transaction_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reward_transactions_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -3290,14 +3906,62 @@ export type Database = {
           },
         ]
       }
+      support_ratings: {
+        Row: {
+          created_at: string
+          customer_id: string
+          feedback: string | null
+          id: string
+          rating: number
+          ticket_id: string
+        }
+        Insert: {
+          created_at?: string
+          customer_id: string
+          feedback?: string | null
+          id?: string
+          rating: number
+          ticket_id: string
+        }
+        Update: {
+          created_at?: string
+          customer_id?: string
+          feedback?: string | null
+          id?: string
+          rating?: number
+          ticket_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_ratings_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "support_ratings_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: true
+            referencedRelation: "support_tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       support_tickets: {
         Row: {
           assigned_to: string | null
+          attachments: Json | null
+          booking_number: string | null
+          booking_type: string | null
           category: string
           created_at: string
           customer_id: string
+          emirates_id: string | null
           id: string
+          language_preference: string | null
           message: string
+          preferred_callback_time: string | null
           priority: string
           resolved_at: string | null
           status: string
@@ -3307,11 +3971,17 @@ export type Database = {
         }
         Insert: {
           assigned_to?: string | null
+          attachments?: Json | null
+          booking_number?: string | null
+          booking_type?: string | null
           category: string
           created_at?: string
           customer_id: string
+          emirates_id?: string | null
           id?: string
+          language_preference?: string | null
           message: string
+          preferred_callback_time?: string | null
           priority?: string
           resolved_at?: string | null
           status?: string
@@ -3321,11 +3991,17 @@ export type Database = {
         }
         Update: {
           assigned_to?: string | null
+          attachments?: Json | null
+          booking_number?: string | null
+          booking_type?: string | null
           category?: string
           created_at?: string
           customer_id?: string
+          emirates_id?: string | null
           id?: string
+          language_preference?: string | null
           message?: string
+          preferred_callback_time?: string | null
           priority?: string
           resolved_at?: string | null
           status?: string
@@ -3339,6 +4015,153 @@ export type Database = {
             columns: ["customer_id"]
             isOneToOne: false
             referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ticket_attachments: {
+        Row: {
+          created_at: string
+          file_name: string
+          file_path: string
+          file_size: number | null
+          id: string
+          message_id: string | null
+          mime_type: string | null
+          ticket_id: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          file_name: string
+          file_path: string
+          file_size?: number | null
+          id?: string
+          message_id?: string | null
+          mime_type?: string | null
+          ticket_id: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          file_name?: string
+          file_path?: string
+          file_size?: number | null
+          id?: string
+          message_id?: string | null
+          mime_type?: string | null
+          ticket_id?: string
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ticket_attachments_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "ticket_messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ticket_attachments_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "support_tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ticket_messages: {
+        Row: {
+          attachments: Json | null
+          created_at: string
+          id: string
+          message: string
+          sender_id: string | null
+          sender_type: string
+          ticket_id: string
+          updated_at: string
+        }
+        Insert: {
+          attachments?: Json | null
+          created_at?: string
+          id?: string
+          message: string
+          sender_id?: string | null
+          sender_type: string
+          ticket_id: string
+          updated_at?: string
+        }
+        Update: {
+          attachments?: Json | null
+          created_at?: string
+          id?: string
+          message?: string
+          sender_id?: string | null
+          sender_type?: string
+          ticket_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ticket_messages_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "support_tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tier_upgrade_history: {
+        Row: {
+          bonus_points_awarded: number | null
+          created_at: string | null
+          customer_id: string
+          id: string
+          new_tier_id: string
+          points_at_upgrade: number
+          previous_tier_id: string | null
+          upgrade_date: string
+        }
+        Insert: {
+          bonus_points_awarded?: number | null
+          created_at?: string | null
+          customer_id: string
+          id?: string
+          new_tier_id: string
+          points_at_upgrade: number
+          previous_tier_id?: string | null
+          upgrade_date?: string
+        }
+        Update: {
+          bonus_points_awarded?: number | null
+          created_at?: string | null
+          customer_id?: string
+          id?: string
+          new_tier_id?: string
+          points_at_upgrade?: number
+          previous_tier_id?: string | null
+          upgrade_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tier_upgrade_history_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer_loyalty_profile"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "tier_upgrade_history_new_tier_id_fkey"
+            columns: ["new_tier_id"]
+            isOneToOne: false
+            referencedRelation: "reward_tiers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tier_upgrade_history_previous_tier_id_fkey"
+            columns: ["previous_tier_id"]
+            isOneToOne: false
+            referencedRelation: "reward_tiers"
             referencedColumns: ["id"]
           },
         ]
@@ -3653,6 +4476,55 @@ export type Database = {
         Args: { agreement_id_param: string }
         Returns: boolean
       }
+      calculate_booking_points: {
+        Args: {
+          p_booking_amount: number
+          p_customer_id: string
+          p_rental_days: number
+          p_vehicle_class_id?: string
+        }
+        Returns: {
+          base_points: number
+          campaign_bonus: number
+          tier_multiplier: number
+          total_points: number
+        }[]
+      }
+      calculate_expiring_points: {
+        Args: { p_customer_id: string; p_days_ahead?: number }
+        Returns: number
+      }
+      check_achievements: {
+        Args: { p_customer_id: string }
+        Returns: {
+          achievements_unlocked: string[]
+          newly_unlocked: number
+        }[]
+      }
+      check_tier_anniversary_rewards: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          anniversary_bonus: number
+          customer_id: string
+          tier_name: string
+        }[]
+      }
+      check_tier_upgrade: {
+        Args: { p_customer_id: string }
+        Returns: {
+          bonus_points: number
+          new_tier_name: string
+          old_tier_name: string
+          upgraded: boolean
+        }[]
+      }
+      expire_old_points: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          customer_id: string
+          points_expired: number
+        }[]
+      }
       generate_agreement_no: {
         Args: Record<PropertyKey, never>
         Returns: string
@@ -3667,6 +4539,10 @@ export type Database = {
       }
       generate_cost_sheet_no: {
         Args: { p_quote_id: string; p_version: number }
+        Returns: string
+      }
+      generate_referral_code: {
+        Args: Record<PropertyKey, never>
         Returns: string
       }
       generate_reservation_no: {
@@ -3704,6 +4580,23 @@ export type Database = {
           p_year: number
         }
         Returns: string
+      }
+      redeem_reward: {
+        Args: {
+          p_catalog_item_id: string
+          p_customer_id: string
+          p_quantity?: number
+        }
+        Returns: {
+          message: string
+          new_balance: number
+          redemption_id: string
+          success: boolean
+        }[]
+      }
+      update_engagement_streak: {
+        Args: { p_customer_id: string }
+        Returns: boolean
       }
     }
     Enums: {
