@@ -182,7 +182,7 @@ const MasterAgreementDetails = () => {
           <Button 
             variant="outline" 
             size="sm"
-            onClick={() => navigate(`/corporate-leasing/${agreement.id}/edit`)}
+            onClick={() => navigate(`/master-agreements/${agreement.id}/edit`)}
           >
             <Edit className="mr-2 h-4 w-4" />
             Edit
