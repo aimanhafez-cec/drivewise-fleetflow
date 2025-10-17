@@ -16,12 +16,12 @@ import { MasterAgreementStep5 } from "./wizard/MasterAgreementStep5";
 import { MasterAgreementStep6 } from "./wizard/MasterAgreementStep6";
 
 const steps = [
-  { id: 1, title: "Header Information", description: "Agreement & customer details" },
-  { id: 2, title: "Contract Framework", description: "Terms & conditions" },
-  { id: 3, title: "Financial & Billing", description: "Payment terms & billing" },
-  { id: 4, title: "Services & Coverage", description: "Insurance & maintenance" },
-  { id: 5, title: "Tolls, Fines & Fuel", description: "Additional policies" },
-  { id: 6, title: "Security & Dates", description: "Review & finalize" },
+  { id: 1, title: "Header", description: "Agreement header information" },
+  { id: 2, title: "Financials", description: "Billing, deposits & payment terms" },
+  { id: 3, title: "Coverage & Services", description: "Insurance, maintenance & add-ons" },
+  { id: 4, title: "Vehicles", description: "Vehicle selection & configuration" },
+  { id: 5, title: "Attachments", description: "Upload supporting documents" },
+  { id: 6, title: "Summary", description: "Review & finalize agreement" },
 ];
 
 interface MasterAgreementWizardProps {
@@ -38,41 +38,39 @@ export const MasterAgreementWizard: React.FC<MasterAgreementWizardProps> = ({
   const [currentStep, setCurrentStep] = useState(1);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [agreementData, setAgreementData] = useState<any>(initialData || {
-    // Step 1: Header Information
     customer_type: "Company",
     status: "draft",
     currency: "AED",
     version: 1,
     agreement_entry_date: new Date().toISOString().split('T')[0],
-    
-    // Step 2: Contract Framework
-    credit_terms: "Net 30",
-    off_hire_notice_period: 30,
-    co_terminus_lines: false,
-    early_termination_allowed: false,
-    
-    // Step 3: Financial & Billing
-    billing_cycle: "Monthly",
-    billing_day: "Anniversary",
-    invoice_format: "Consolidated",
-    line_item_granularity: "Base Rent + Add-ons",
-    vat_code: "UAE 5%",
-    
-    // Step 4: Services & Coverage
-    insurance_responsibility: "Included (Lessor)",
-    maintenance_policy: "Full (PM+wear)",
-    roadside_assistance_included: true,
-    replacement_vehicle_included: true,
-    registration_responsibility: "Lessor",
-    workshop_preference: "OEM",
-    
-    // Step 5: Tolls, Fines & Fuel
+    pickup_type: "company_location",
+    return_type: "company_location",
+    billing_plan: "monthly",
+    proration_rule: "first-last",
+    vat_percentage: 5,
+    deposit_type: "refundable",
+    default_deposit_amount: 2500,
+    default_advance_rent_months: 1,
+    payment_method: "bank-transfer",
+    invoice_format: "consolidated",
+    insurance_coverage_package: "comprehensive",
+    insurance_excess_aed: 1500,
+    insurance_glass_tire_cover: true,
+    insurance_territorial_coverage: "uae-only",
+    maintenance_package_type: "none",
+    monthly_maintenance_cost_per_vehicle: 250,
+    maintenance_plan_source: "internal",
+    show_maintenance_separate_line: true,
     salik_darb_handling: "Rebill Actual (monthly)",
-    traffic_fines_handling: "Auto Rebill + Admin Fee",
-    fuel_handling: "Customer Fuel",
     tolls_admin_fee_model: "Per-invoice",
+    traffic_fines_handling: "Auto Rebill + Admin Fee",
     admin_fee_per_fine_aed: 25,
+    initial_fees: [],
+    default_addons: [],
+    agreement_items: [],
   });
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [lastSavedAgreementItems, setLastSavedAgreementItems] = useState<any[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const navigate = useNavigate();
@@ -140,7 +138,15 @@ export const MasterAgreementWizard: React.FC<MasterAgreementWizardProps> = ({
   });
 
   const handleDataChange = (updates: Record<string, any>) => {
-    setAgreementData((prev: any) => ({ ...prev, ...updates }));
+    setAgreementData((prev: any) => {
+      const updated = { ...prev, ...updates };
+      if ('agreement_items' in updates && prev.id) {
+        const currentItems = JSON.stringify(updates.agreement_items || []);
+        const savedItems = JSON.stringify(lastSavedAgreementItems);
+        setHasUnsavedChanges(currentItems !== savedItems);
+      }
+      return updated;
+    });
   };
 
   const handleNext = () => {
@@ -181,7 +187,7 @@ export const MasterAgreementWizard: React.FC<MasterAgreementWizardProps> = ({
       case 3:
         return <MasterAgreementStep3 {...stepProps} />;
       case 4:
-        return <MasterAgreementStep4 {...stepProps} />;
+        return <MasterAgreementStep4 {...stepProps} hasUnsavedChanges={hasUnsavedChanges} onSaveRequired={handleSaveDraft} />;
       case 5:
         return <MasterAgreementStep5 {...stepProps} />;
       case 6:

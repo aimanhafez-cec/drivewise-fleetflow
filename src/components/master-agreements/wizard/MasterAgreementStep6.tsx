@@ -1,88 +1,57 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { LOVSelect } from "@/components/ui/lov-select";
-import { DatePicker } from "@/components/ui/date-picker";
+import { Badge } from "@/components/ui/badge";
+import { FileText, DollarSign, Car, Calendar } from "lucide-react";
+import { formatCurrency } from "@/lib/utils/currency";
 
 interface MasterAgreementStep6Props {
   data: any;
-  onChange: (updates: Record<string, any>) => void;
+  onChange: (data: any) => void;
   errors: Record<string, string>;
 }
 
-export const MasterAgreementStep6: React.FC<MasterAgreementStep6Props> = ({
-  data,
-  onChange,
-  errors,
-}) => {
-  const SECURITY_INSTRUMENTS = [
-    { id: "None", label: "None" },
-    { id: "Deposit per Vehicle", label: "Deposit per Vehicle" },
-    { id: "Bank Guarantee", label: "Bank Guarantee" },
-  ];
+export const MasterAgreementStep6: React.FC<MasterAgreementStep6Props> = ({ data }) => {
+  const calculateTotals = () => {
+    const lines = data.agreement_items || [];
+    const getAddonType = (a: any) => a.pricing_model || a.type;
+    const getAddonTotal = (a: any) => (a.total ?? a.amount ?? 0);
+    
+    const totalDeposits = lines.reduce((sum: number, line: any) => sum + (line.deposit_amount || 0), 0);
+    const monthlyRecurringRental = lines.reduce((sum: number, line: any) => {
+      const baseRate = line.monthly_rate || 0;
+      const monthlyAddOnsCost = (line.addons || []).filter((a: any) => getAddonType(a) === 'monthly').reduce((s: number, a: any) => s + getAddonTotal(a), 0);
+      return sum + baseRate + monthlyAddOnsCost;
+    }, 0);
+    
+    return { deposits: totalDeposits, monthlyRecurringRental, vehicles: lines.length };
+  };
+
+  const totals = calculateTotals();
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Security Deposit</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Security Instrument</Label>
-              <LOVSelect
-                value={data.security_instrument}
-                onChange={(value) => onChange({ security_instrument: value })}
-                items={SECURITY_INSTRUMENTS}
-                placeholder="Select instrument"
-              />
+      <Card className="bg-gradient-to-br from-primary/5 to-primary/10">
+        <CardContent className="pt-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            <div className="text-center">
+              <p className="text-sm text-muted-foreground mb-1">Monthly Recurring</p>
+              <p className="text-3xl font-bold">{formatCurrency(totals.monthlyRecurringRental, data.currency || 'AED')}</p>
+              <p className="text-xs text-muted-foreground">/month</p>
             </div>
-
-            {data.security_instrument !== "None" && (
-              <div className="space-y-2">
-                <Label>Deposit Amount (AED)</Label>
-                <Input
-                  type="number"
-                  value={data.deposit_amount_aed || ""}
-                  onChange={(e) => onChange({ deposit_amount_aed: parseFloat(e.target.value) || null })}
-                  placeholder="0.00"
-                />
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Contract Dates</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Contract Start Date</Label>
-              <DatePicker
-                value={data.contract_start_date ? new Date(data.contract_start_date) : undefined}
-                onChange={(date) => onChange({ contract_start_date: date?.toISOString().split("T")[0] })}
-              />
+            <div className="text-center">
+              <p className="text-sm text-muted-foreground mb-1">Vehicle Lines</p>
+              <p className="text-3xl font-bold">{totals.vehicles}</p>
             </div>
-
-            <div className="space-y-2">
-              <Label>Contract End Date</Label>
-              <DatePicker
-                value={data.contract_end_date ? new Date(data.contract_end_date) : undefined}
-                onChange={(date) => onChange({ contract_end_date: date?.toISOString().split("T")[0] })}
-              />
+            <div className="text-center">
+              <p className="text-sm text-muted-foreground mb-1">Contract Term</p>
+              <p className="text-3xl font-bold">
+                {data.duration_days ? Math.floor(data.duration_days / 30) : 'N/A'}
+                <span className="text-lg font-normal ml-1">months</span>
+              </p>
             </div>
-
-            <div className="space-y-2">
-              <Label>Signed Date</Label>
-              <DatePicker
-                value={data.signed_date ? new Date(data.signed_date) : undefined}
-                onChange={(date) => onChange({ signed_date: date?.toISOString().split("T")[0] })}
-              />
+            <div className="text-center">
+              <p className="text-sm text-muted-foreground mb-1">Total Deposits</p>
+              <p className="text-3xl font-bold">{formatCurrency(totals.deposits, data.currency || 'AED')}</p>
             </div>
           </div>
         </CardContent>
@@ -90,33 +59,25 @@ export const MasterAgreementStep6: React.FC<MasterAgreementStep6Props> = ({
 
       <Card>
         <CardHeader>
-          <CardTitle>Review & Summary</CardTitle>
+          <CardTitle>Agreement Summary</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3 text-sm">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <p className="text-muted-foreground">Customer</p>
-              <p className="font-medium">{data.customer_id ? "Selected" : "Not selected"}</p>
+              <span className="text-muted-foreground">Customer</span>
+              <p className="font-medium">{data.account_name || "Not selected"}</p>
             </div>
             <div>
-              <p className="text-muted-foreground">Credit Terms</p>
-              <p className="font-medium">{data.credit_terms || "Not specified"}</p>
+              <span className="text-muted-foreground">Contract Period</span>
+              <p className="font-medium">{data.contract_effective_from || 'TBD'} to {data.contract_effective_to || 'TBD'}</p>
             </div>
             <div>
-              <p className="text-muted-foreground">Framework Model</p>
-              <p className="font-medium">{data.framework_model || "Not specified"}</p>
+              <span className="text-muted-foreground">Payment Terms</span>
+              <p className="font-medium">{data.payment_terms_id || "Not specified"}</p>
             </div>
             <div>
-              <p className="text-muted-foreground">Master Term</p>
-              <p className="font-medium">{data.master_term || "Not specified"}</p>
-            </div>
-            <div>
-              <p className="text-muted-foreground">Insurance</p>
-              <p className="font-medium">{data.insurance_responsibility || "Not specified"}</p>
-            </div>
-            <div>
-              <p className="text-muted-foreground">Maintenance</p>
-              <p className="font-medium">{data.maintenance_policy || "Not specified"}</p>
+              <span className="text-muted-foreground">Billing Plan</span>
+              <p className="font-medium capitalize">{data.billing_plan || "Monthly"}</p>
             </div>
           </div>
         </CardContent>
