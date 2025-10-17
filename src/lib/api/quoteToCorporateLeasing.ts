@@ -86,6 +86,34 @@ export const convertQuoteToCorporateLease = async (quoteId: string) => {
   const totalSetupFees = initialFees.reduce((sum: number, fee: any) => sum + (fee.amount || 0), 0);
   const setupFeePerLine = quoteItems.length > 0 ? totalSetupFees / quoteItems.length : 0;
 
+  // Validation: Ensure setup fee calculation is valid
+  console.log('[Quote Conversion] Setup fee calculation:', {
+    quoteNumber: quote.quote_number,
+    totalSetupFees,
+    quoteItemsCount: quoteItems.length,
+    setupFeePerLine,
+    initialFeesArray: initialFees,
+  });
+
+  // Critical validation checks
+  if (isNaN(setupFeePerLine)) {
+    const errorMsg = `Invalid setup fee calculation: setupFeePerLine is NaN. Total: ${totalSetupFees}, Lines: ${quoteItems.length}`;
+    console.error('[Quote Conversion ERROR]', errorMsg);
+    throw new Error(errorMsg);
+  }
+
+  if (setupFeePerLine < 0) {
+    const errorMsg = `Invalid setup fee calculation: setupFeePerLine is negative (${setupFeePerLine}). Total: ${totalSetupFees}, Lines: ${quoteItems.length}`;
+    console.error('[Quote Conversion ERROR]', errorMsg);
+    throw new Error(errorMsg);
+  }
+
+  if (setupFeePerLine > 100000) {
+    const errorMsg = `Suspiciously large setup fee per line: ${setupFeePerLine} AED. Total: ${totalSetupFees}, Lines: ${quoteItems.length}. Please verify initial fees are correct.`;
+    console.error('[Quote Conversion ERROR]', errorMsg);
+    throw new Error(errorMsg);
+  }
+
   // 3.8 Combine all notes
   const allNotes = [
     quote.notes,
@@ -204,7 +232,7 @@ export const convertQuoteToCorporateLease = async (quoteId: string) => {
       agreement_no: agreementNo,
       conversion_date: new Date().toISOString(),
       converted_by: quote.created_by,
-      status: "accepted",
+      status: "converted",
     })
     .eq("id", quoteId);
 

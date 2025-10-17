@@ -168,6 +168,12 @@ interface Quote {
   insurance_pai_enabled?: boolean;
   maintenance_plan_source?: string;
   show_maintenance_separate_line?: boolean;
+  // Conversion tracking
+  converted_to_agreement?: boolean;
+  agreement_id?: string;
+  agreement_no?: string;
+  conversion_date?: string;
+  converted_by?: string;
 }
 
 const statusConfig = {
@@ -509,8 +515,8 @@ const QuoteDetails: React.FC = () => {
         </Card>
       )}
 
-      {/* Show acceptance status if accepted */}
-      {quote.status === 'accepted' && (
+      {/* Show acceptance status if accepted but not yet converted */}
+      {quote.status === 'accepted' && !quote.converted_to_agreement && (
         <Card className="border-green-200 bg-green-50 dark:bg-green-950">
           <CardContent className="p-4">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -539,6 +545,47 @@ const QuoteDetails: React.FC = () => {
                 <FileText className="mr-2 h-4 w-4" />
                 Convert to Master Agreement
               </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Show converted status if already converted to Master Agreement */}
+      {quote.converted_to_agreement && quote.agreement_no && (
+        <Card className="border-blue-200 bg-blue-50 dark:bg-blue-950">
+          <CardContent className="p-4">
+            <div className="flex items-start gap-3">
+              <CheckCircle className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5" />
+              <div className="flex-1">
+                <h3 className="font-semibold text-blue-700 dark:text-blue-300 mb-1">
+                  Converted to Master Agreement
+                </h3>
+                <p className="text-sm text-blue-600 dark:text-blue-400">
+                  This quote has been converted to Master Agreement:{' '}
+                  <Button 
+                    variant="link" 
+                    className="p-0 h-auto text-blue-600 dark:text-blue-400 font-semibold underline"
+                    onClick={() => navigate(`/master-agreements/${quote.agreement_id}`)}
+                  >
+                    {quote.agreement_no}
+                  </Button>
+                </p>
+                {quote.conversion_date && (
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Converted on {format(new Date(quote.conversion_date), 'MMM dd, yyyy HH:mm')}
+                  </p>
+                )}
+                {winReason && (
+                  <div className="text-xs text-muted-foreground mt-2">
+                    <strong>Win Reason:</strong> {winReason.reason_label}
+                    {quote.win_loss_notes && (
+                      <p className="mt-1">
+                        <strong>Notes:</strong> {quote.win_loss_notes}
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           </CardContent>
         </Card>
