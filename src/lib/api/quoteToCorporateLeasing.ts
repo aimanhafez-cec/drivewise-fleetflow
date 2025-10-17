@@ -136,7 +136,7 @@ export const convertQuoteToCorporateLease = async (quoteId: string) => {
     agreement_description: quote.quote_description,
     customer_segment: quote.customer_type === "Company" 
       ? "Enterprise" as any 
-      : "Individual" as any,
+      : "SME" as any, // Person → SME (Individual doesn't exist in enum)
     customer_id: quote.customer_id,
     account_name: quote.account_name,
     bill_to_site_id: quote.customer_bill_to,

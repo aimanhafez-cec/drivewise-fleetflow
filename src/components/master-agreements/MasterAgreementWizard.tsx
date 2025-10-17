@@ -95,24 +95,45 @@ export const MasterAgreementWizard: React.FC<MasterAgreementWizardProps> = ({
 
   useEffect(() => {
     if (existingAgreement) {
-      setAgreementData(existingAgreement);
+      // Transform database fields to form fields
+      const transformedData = {
+        ...existingAgreement,
+        // Map customer_segment (DB: SME/Enterprise/Government) → customer_type (Form: Company/Person)
+        customer_type: existingAgreement.customer_segment === "Enterprise" 
+          ? "Company"
+          : existingAgreement.customer_segment === "Government"
+          ? "Company"
+          : "Person", // SME defaults to Person
+      };
+      setAgreementData(transformedData);
       setCompletedSteps([1, 2, 3, 4, 5, 6]);
     }
   }, [existingAgreement]);
 
   const saveMutation = useMutation({
     mutationFn: async (data: any) => {
+      // Transform form fields back to database fields
+      const dbData = {
+        ...data,
+        // Map customer_type (Form: Company/Person) → customer_segment (DB: Enterprise/SME/Government)
+        customer_segment: data.customer_type === "Company"
+          ? "Enterprise" as any
+          : "SME" as any, // Person → SME (Individual doesn't exist in enum)
+        // Remove customer_type since it doesn't exist in DB
+        customer_type: undefined,
+      };
+      
       if (isEditMode && (id || agreementId)) {
         const { error } = await supabase
           .from("corporate_leasing_agreements")
-          .update(data)
+          .update(dbData)
           .eq("id", id || agreementId);
         if (error) throw error;
         return id || agreementId;
       } else {
         const { data: newAgreement, error } = await supabase
           .from("corporate_leasing_agreements")
-          .insert([data])
+          .insert([dbData])
           .select()
           .single();
         if (error) throw error;
