@@ -608,13 +608,11 @@ export const QuoteWizard: React.FC<QuoteWizardProps> = ({ viewMode = false, quot
         clearTimeout(saveToastTimerRef.current);
       }
       
-      // Show toast after 3 seconds delay
-      saveToastTimerRef.current = window.setTimeout(() => {
-        toast({ 
-          title: "Saved", 
-          description: isNew ? "Quote saved as draft" : "Changes saved" 
-        });
-      }, 3000);
+      // Show toast immediately
+      toast({ 
+        title: "Saved", 
+        description: isNew ? "Quote saved as draft" : "Changes saved" 
+      });
       
       // If new quote, silently update URL without navigation
       if (isNew) {
