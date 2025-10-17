@@ -104,6 +104,14 @@ export const MasterAgreementWizard: React.FC<MasterAgreementWizardProps> = ({
           : existingAgreement.customer_segment === "Government"
           ? "Company"
           : "Person", // SME defaults to Person
+        // Map bill_to_site_id (DB) → customer_bill_to (Form)
+        customer_bill_to: existingAgreement.bill_to_site_id,
+        // Map invoice_contact_person_id (DB) → contact_person_id (Form)
+        contact_person_id: existingAgreement.invoice_contact_person_id,
+        // Map contract_start_date (DB) → contract_effective_from (Form)
+        contract_effective_from: existingAgreement.contract_start_date,
+        // Map contract_end_date (DB) → contract_effective_to (Form)
+        contract_effective_to: existingAgreement.contract_end_date,
       };
       setAgreementData(transformedData);
       setCompletedSteps([1, 2, 3, 4, 5, 6]);
@@ -119,8 +127,18 @@ export const MasterAgreementWizard: React.FC<MasterAgreementWizardProps> = ({
         customer_segment: data.customer_type === "Company"
           ? "Enterprise" as any
           : "SME" as any, // Person → SME (Individual doesn't exist in enum)
-        // Remove customer_type since it doesn't exist in DB
         customer_type: undefined,
+        // Map customer_bill_to (Form) → bill_to_site_id (DB)
+        bill_to_site_id: data.customer_bill_to,
+        customer_bill_to: undefined,
+        // Map contact_person_id (Form) → invoice_contact_person_id (DB)
+        invoice_contact_person_id: data.contact_person_id,
+        // Map contract_effective_from (Form) → contract_start_date (DB)
+        contract_start_date: data.contract_effective_from,
+        contract_effective_from: undefined,
+        // Map contract_effective_to (Form) → contract_end_date (DB)
+        contract_end_date: data.contract_effective_to,
+        contract_effective_to: undefined,
       };
       
       if (isEditMode && (id || agreementId)) {
