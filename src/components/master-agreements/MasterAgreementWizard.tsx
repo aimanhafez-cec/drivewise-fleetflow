@@ -203,6 +203,7 @@ export const MasterAgreementWizard: React.FC<MasterAgreementWizardProps> = ({
         <div>
           <h1 className="text-3xl font-bold tracking-tight">
             {isEditMode ? "Edit Master Agreement" : "New Master Agreement"}
+            {agreementData.agreement_no && ` - ${agreementData.agreement_no}`}
           </h1>
           <p className="text-muted-foreground">
             {isEditMode ? "Update agreement details" : "Create a new corporate leasing agreement"}
