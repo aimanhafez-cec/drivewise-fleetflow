@@ -182,15 +182,16 @@ const App = () => {
               }>
                 <Route index element={<Reports />} />
               </Route>
-          <Route path="/master-agreements" element={
-            <ProtectedRoute>
-              <AppLayout />
-            </ProtectedRoute>
-          }>
-            <Route index element={<MasterAgreements />} />
-            <Route path="new" element={<div className="p-8 text-center"><h2 className="text-2xl font-semibold">Master Agreement Creation - Coming Soon</h2></div>} />
-            <Route path=":id" element={<MasterAgreementDetails />} />
-          </Route>
+            <Route path="/master-agreements" element={
+              <ProtectedRoute>
+                <AppLayout />
+              </ProtectedRoute>
+            }>
+              <Route index element={<MasterAgreements />} />
+              <Route path="new" element={<NewMasterAgreement />} />
+              <Route path=":id" element={<MasterAgreementDetails />} />
+              <Route path=":id/edit" element={<MasterAgreementEdit />} />
+            </Route>
 
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
