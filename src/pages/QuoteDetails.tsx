@@ -364,7 +364,10 @@ const QuoteDetails: React.FC = () => {
           <div className="space-y-2">
             <div className="flex items-center gap-3">
               <h1 className="text-3xl font-bold tracking-tight">{quote.quote_number}</h1>
-              <Badge className={statusInfo.color}>{statusInfo.label}</Badge>
+              <Badge className={statusInfo.color}>
+                {statusInfo.label}
+                {quote.converted_to_agreement && " / Converted to Agreement"}
+              </Badge>
             </div>
             <div className="flex items-center gap-4 text-sm text-muted-foreground flex-wrap">
               <div className="flex items-center gap-1">
@@ -471,7 +474,7 @@ const QuoteDetails: React.FC = () => {
                 Send
               </Button>
             )}
-            {(quote.status === "accepted" || quote.status === "sent") && (
+            {(quote.status === "accepted" || quote.status === "sent") && !quote.converted_to_agreement && (
               <Button
                 size="sm"
                 onClick={() => convertToReservationMutation.mutate(quote.id)}
