@@ -94,7 +94,47 @@ export const MasterAgreementWizard: React.FC<MasterAgreementWizardProps> = ({
   });
 
   useEffect(() => {
-    if (existingAgreement) {
+    if (!existingAgreement) return;
+
+    const loadAgreementWithLines = async () => {
+      console.log("[MasterAgreementWizard] Loading existing agreement:", existingAgreement);
+
+      // Fetch agreement lines from corporate_leasing_lines table
+      const { data: agreementLines } = await supabase
+        .from("corporate_leasing_lines")
+        .select("*")
+        .eq("agreement_id", existingAgreement.id)
+        .order("line_number");
+
+      console.log("[MasterAgreementWizard] Loaded lines from DB:", agreementLines);
+
+      // Transform lines back to agreement_items format for the wizard UI
+      const transformedItems = (agreementLines || []).map((line) => ({
+        line_no: line.line_number,
+        vehicle_class_id: line.vehicle_class_id,
+        vehicle_id: line.vehicle_id,
+        quantity: line.qty,
+        pickup_at: line.lease_start_date,
+        return_at: line.lease_end_date,
+        monthly_rate: line.monthly_rate_aed,
+        mileage_package_km: line.mileage_allowance_km_month,
+        excess_km_rate: line.excess_km_rate_aed,
+        deposit_amount: line.security_deposit_aed || existingAgreement.default_deposit_amount,
+        advance_rent_months: existingAgreement.default_advance_rent_months,
+        setup_fee: line.setup_fee_aed,
+        _vehicleMeta: {
+          item_code: line.item_code,
+          item_description: line.item_description,
+          make: line.make,
+          model: line.model,
+          year: line.model_year,
+          color: line.exterior_color,
+          category_name: line.category_name,
+        },
+      }));
+
+      console.log("[MasterAgreementWizard] Transformed items for UI:", transformedItems);
+
       // Map invoice_format (DB enum) → form value
       let invoiceFormatForm = "consolidated"; // default
       if (existingAgreement.invoice_format === "Per Vehicle") {
@@ -124,12 +164,17 @@ export const MasterAgreementWizard: React.FC<MasterAgreementWizardProps> = ({
         contract_effective_to: existingAgreement.contract_end_date,
         // Map invoice_format (DB enum) → form value
         invoice_format: invoiceFormatForm,
-        // PRESERVE agreement_items (vehicles) from database
-        agreement_items: existingAgreement.agreement_items || [],
+        // LOAD agreement_items from corporate_leasing_lines table
+        agreement_items: transformedItems,
       };
       setAgreementData(transformedData);
+      setLastSavedAgreementItems(transformedItems);
       setCompletedSteps([1, 2, 3, 4, 5, 6]);
-    }
+    };
+
+    loadAgreementWithLines().catch((err) => {
+      console.error("[MasterAgreementWizard] Error loading agreement:", err);
+    });
   }, [existingAgreement]);
 
   const saveMutation = useMutation({
@@ -166,7 +211,14 @@ export const MasterAgreementWizard: React.FC<MasterAgreementWizardProps> = ({
         contract_effective_to: undefined,
         // Map invoice_format (form value) → DB enum
         invoice_format: invoiceFormatDb,
+        // SYNC agreement_items JSONB with form data
+        agreement_items: data.agreement_items || [],
       };
+
+      console.log("[MasterAgreementWizard] Saving with agreement_items:", {
+        itemsCount: (data.agreement_items || []).length,
+        firstItem: (data.agreement_items || [])[0],
+      });
       
       if (isEditMode && (id || agreementId)) {
         const { error } = await supabase

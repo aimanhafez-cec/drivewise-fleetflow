@@ -247,6 +247,15 @@ export const convertQuoteToCorporateLease = async (quoteId: string) => {
     notes: allNotes,
   };
 
+  // Debug: Verify agreement_items before insert
+  const itemsArray = Array.isArray(agreementPayload.agreement_items) ? agreementPayload.agreement_items : [];
+  console.log('[Quote Conversion] agreement_items being saved:', {
+    quoteNumber: quote.quote_number,
+    itemsCount: itemsArray.length,
+    firstItem: itemsArray[0],
+    agreementNo,
+  });
+
   // 5. Insert corporate leasing agreement
   const { data: agreement, error: insertError } = await supabase
     .from("corporate_leasing_agreements")
