@@ -18,12 +18,16 @@ interface QuoteWizardStep3Props {
   data: any;
   onChange: (data: any) => void;
   errors: Record<string, string>;
+  hasUnsavedChanges?: boolean;
+  onSaveRequired?: () => void;
 }
 
 export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
   data,
   onChange,
   errors,
+  hasUnsavedChanges = false,
+  onSaveRequired,
 }) => {
   const { data: vehicles = [], isLoading: vehiclesLoading } = useVehicles();
   const { data: categories = [], isLoading: categoriesLoading } = useVehicleCategories();
@@ -323,6 +327,8 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
           <CostSheetSection 
             quoteId={data.id} 
             quoteDurationMonths={data.duration_days ? Math.round(data.duration_days / 30) : 36}
+            hasUnsavedChanges={hasUnsavedChanges}
+            onSaveRequired={onSaveRequired}
           />
         )}
 

@@ -222,6 +222,8 @@ export const QuoteWizard: React.FC<QuoteWizardProps> = ({ viewMode = false, quot
   const [currentStep, setCurrentStep] = useState(1);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const saveToastTimerRef = React.useRef<number | null>(null);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [lastSavedQuoteItems, setLastSavedQuoteItems] = useState<any[]>([]);
   const [quoteData, setQuoteData] = useState<Partial<QuoteData>>({
     items: [],
     tax_rate: 0.08,
@@ -414,6 +416,9 @@ export const QuoteWizard: React.FC<QuoteWizardProps> = ({ viewMode = false, quot
         
         setQuoteData(loadedData);
         
+        // Track saved state for unsaved changes detection
+        setLastSavedQuoteItems(loadedData.quote_items || []);
+        
         // Mark all steps as completed for existing quotes in view or edit mode
         if (viewMode || editMode) {
           setCompletedSteps([1, 2, 3, 4, 5, 6]);
@@ -593,6 +598,10 @@ export const QuoteWizard: React.FC<QuoteWizardProps> = ({ viewMode = false, quot
         queryClient.invalidateQueries({ queryKey: ["rfq", fromRfqId] });
         queryClient.invalidateQueries({ queryKey: ["rfqs"] });
       }
+      
+      // Track saved state for unsaved changes detection
+      setLastSavedQuoteItems(Array.isArray(quote.quote_items) ? quote.quote_items : []);
+      setHasUnsavedChanges(false);
       
       // Clear any pending toast timer
       if (saveToastTimerRef.current) {
@@ -822,7 +831,18 @@ export const QuoteWizard: React.FC<QuoteWizardProps> = ({ viewMode = false, quot
   });
 
   const updateQuoteData = (step: number, data: Partial<QuoteData>) => {
-    setQuoteData(prev => ({ ...prev, ...data }));
+    setQuoteData(prev => {
+      const updated = { ...prev, ...data };
+      
+      // Check if quote_items changed and we have a saved quote
+      if (data.quote_items && prev.id) {
+        const currentItems = JSON.stringify(data.quote_items || []);
+        const savedItems = JSON.stringify(lastSavedQuoteItems);
+        setHasUnsavedChanges(currentItems !== savedItems);
+      }
+      
+      return updated;
+    });
     setErrors({});
   };
 
@@ -1030,6 +1050,8 @@ export const QuoteWizard: React.FC<QuoteWizardProps> = ({ viewMode = false, quot
             data={quoteData}
             onChange={(data) => !viewMode && updateQuoteData(4, data)}
             errors={errors}
+            hasUnsavedChanges={hasUnsavedChanges}
+            onSaveRequired={handleSaveDraft}
           />
         );
       case 5:
