@@ -54,7 +54,44 @@ export const MasterAgreementStep5Drivers: React.FC<MasterAgreementStep5DriversPr
     return agreementDrivers.filter(ad => ad.line_id === lineId);
   };
 
+  const [showValidationWarning, setShowValidationWarning] = useState(false);
+  const [validationWarnings, setValidationWarnings] = useState<string[]>([]);
+
   const handleAssignDriver = async () => {
+    if (!selectedLineId || !selectedDriverId || !data.id) return;
+
+    // Phase 5: Check driver validation (soft validation for demo)
+    const selectedDriver = drivers.find(d => d.id === selectedDriverId);
+    if (selectedDriver) {
+      const warnings: string[] = [];
+      
+      // Check verification status
+      if (selectedDriver.verification_status !== 'verified' && selectedDriver.verification_status !== 'approved') {
+        warnings.push(`Driver verification is incomplete (Status: ${selectedDriver.verification_status || 'unverified'})`);
+      }
+      
+      // Check license expiry
+      if (selectedDriver.license_expiry && new Date(selectedDriver.license_expiry) < new Date()) {
+        warnings.push('Driver license has expired');
+      }
+      
+      // Check visa expiry
+      if (selectedDriver.visa_expiry && new Date(selectedDriver.visa_expiry) < new Date()) {
+        warnings.push('Driver visa has expired');
+      }
+
+      // Show warning dialog if there are issues (non-blocking for demo)
+      if (warnings.length > 0) {
+        setValidationWarnings(warnings);
+        setShowValidationWarning(true);
+        return;
+      }
+    }
+
+    await performAssignment();
+  };
+
+  const performAssignment = async () => {
     if (!selectedLineId || !selectedDriverId || !data.id) return;
 
     const lineDrivers = getDriversForLine(selectedLineId);
@@ -68,8 +105,10 @@ export const MasterAgreementStep5Drivers: React.FC<MasterAgreementStep5DriversPr
     });
 
     setShowAssignDialog(false);
+    setShowValidationWarning(false);
     setSelectedLineId(null);
     setSelectedDriverId(null);
+    setValidationWarnings([]);
   };
 
   const handleDriverCreated = (newDriverId: string) => {
@@ -268,7 +307,7 @@ export const MasterAgreementStep5Drivers: React.FC<MasterAgreementStep5DriversPr
                           </div>
                           
                           {/* Driver list */}
-                          {lineDrivers.length > 0 && (
+                           {lineDrivers.length > 0 && (
                             <div className="space-y-1">
                               {lineDrivers.map((ld) => {
                               const verificationBadge = () => {
@@ -292,6 +331,12 @@ export const MasterAgreementStep5Drivers: React.FC<MasterAgreementStep5DriversPr
                                 )}
                                 <span className="font-medium">
                                   {ld.driver?.full_name}
+                                </span>
+                                <span className="text-muted-foreground">
+                                  ({ld.driver?.nationality || 'N/A'})
+                                </span>
+                                <span className="text-muted-foreground text-xs">
+                                  {ld.driver?.license_no || 'No License'}
                                 </span>
                                 {verificationBadge()}
                                 {ld.is_primary && (
@@ -487,6 +532,49 @@ export const MasterAgreementStep5Drivers: React.FC<MasterAgreementStep5DriversPr
         driverId={viewDocsDriverId || undefined}
         driverName={viewDocsDriverName || undefined}
       />
+
+      {/* Phase 5: Validation Warning Dialog */}
+      <Dialog open={showValidationWarning} onOpenChange={setShowValidationWarning}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-amber-500" />
+              Driver Validation Warnings
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <Alert className="border-amber-500 bg-amber-50">
+              <AlertDescription>
+                <p className="font-semibold text-amber-900 mb-2">
+                  The following issues were found with the selected driver:
+                </p>
+                <ul className="list-disc list-inside space-y-1 text-sm text-amber-800">
+                  {validationWarnings.map((warning, idx) => (
+                    <li key={idx}>{warning}</li>
+                  ))}
+                </ul>
+              </AlertDescription>
+            </Alert>
+
+            <Alert className="border-blue-500 bg-blue-50">
+              <Info className="h-4 w-4 text-blue-600" />
+              <AlertDescription className="text-blue-900">
+                <strong>Demo Mode:</strong> In production, these validation issues must be resolved before vehicle handover. 
+                For demonstration purposes, you can proceed with the assignment.
+              </AlertDescription>
+            </Alert>
+
+            <div className="flex gap-2 justify-end">
+              <Button variant="outline" onClick={() => setShowValidationWarning(false)}>
+                Go Back & Fix Issues
+              </Button>
+              <Button onClick={performAssignment} variant="default">
+                Proceed Anyway (Demo)
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

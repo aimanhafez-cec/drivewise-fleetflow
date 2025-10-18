@@ -329,6 +329,50 @@ export type Database = {
           },
         ]
       }
+      ai_rental_conversations: {
+        Row: {
+          booking_data: Json | null
+          completed_at: string | null
+          conversation_data: Json
+          created_at: string
+          customer_id: string
+          id: string
+          last_message_at: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          booking_data?: Json | null
+          completed_at?: string | null
+          conversation_data?: Json
+          created_at?: string
+          customer_id: string
+          id?: string
+          last_message_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          booking_data?: Json | null
+          completed_at?: string | null
+          conversation_data?: Json
+          created_at?: string
+          customer_id?: string
+          id?: string
+          last_message_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_rental_conversations_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       business_units: {
         Row: {
           code: string
@@ -1519,6 +1563,82 @@ export type Database = {
           },
         ]
       }
+      customer_favorites: {
+        Row: {
+          category_id: string | null
+          created_at: string
+          customer_id: string
+          id: string
+          is_active: boolean | null
+          last_viewed_at: string | null
+          location_id: string | null
+          notes: string | null
+          price_alert_enabled: boolean | null
+          saved_price: number | null
+          search_preferences: Json | null
+          tags: string[] | null
+          updated_at: string
+          vehicle_id: string | null
+          view_count: number | null
+        }
+        Insert: {
+          category_id?: string | null
+          created_at?: string
+          customer_id: string
+          id?: string
+          is_active?: boolean | null
+          last_viewed_at?: string | null
+          location_id?: string | null
+          notes?: string | null
+          price_alert_enabled?: boolean | null
+          saved_price?: number | null
+          search_preferences?: Json | null
+          tags?: string[] | null
+          updated_at?: string
+          vehicle_id?: string | null
+          view_count?: number | null
+        }
+        Update: {
+          category_id?: string | null
+          created_at?: string
+          customer_id?: string
+          id?: string
+          is_active?: boolean | null
+          last_viewed_at?: string | null
+          location_id?: string | null
+          notes?: string | null
+          price_alert_enabled?: boolean | null
+          saved_price?: number | null
+          search_preferences?: Json | null
+          tags?: string[] | null
+          updated_at?: string
+          vehicle_id?: string | null
+          view_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_favorites_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_favorites_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_favorites_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customer_loyalty_profile: {
         Row: {
           created_at: string | null
@@ -1911,7 +2031,7 @@ export type Database = {
           date_of_birth: string | null
           department: string | null
           email: string | null
-          emirates_id: string | null
+          emirates_id: string
           employment_id: string | null
           full_name: string
           id: string
@@ -1921,9 +2041,9 @@ export type Database = {
           license_issue_date: string | null
           license_issued_by: string | null
           license_no: string
-          nationality: string | null
-          passport_number: string | null
-          phone: string | null
+          nationality: string
+          passport_number: string
+          phone: string
           rejection_reason: string | null
           status: string
           updated_at: string
@@ -1939,7 +2059,7 @@ export type Database = {
           date_of_birth?: string | null
           department?: string | null
           email?: string | null
-          emirates_id?: string | null
+          emirates_id: string
           employment_id?: string | null
           full_name: string
           id?: string
@@ -1949,9 +2069,9 @@ export type Database = {
           license_issue_date?: string | null
           license_issued_by?: string | null
           license_no: string
-          nationality?: string | null
-          passport_number?: string | null
-          phone?: string | null
+          nationality: string
+          passport_number: string
+          phone: string
           rejection_reason?: string | null
           status?: string
           updated_at?: string
@@ -1967,7 +2087,7 @@ export type Database = {
           date_of_birth?: string | null
           department?: string | null
           email?: string | null
-          emirates_id?: string | null
+          emirates_id?: string
           employment_id?: string | null
           full_name?: string
           id?: string
@@ -1977,9 +2097,9 @@ export type Database = {
           license_issue_date?: string | null
           license_issued_by?: string | null
           license_no?: string
-          nationality?: string | null
-          passport_number?: string | null
-          phone?: string | null
+          nationality?: string
+          passport_number?: string
+          phone?: string
           rejection_reason?: string | null
           status?: string
           updated_at?: string
@@ -2028,6 +2148,92 @@ export type Database = {
             isOneToOne: true
             referencedRelation: "customer_loyalty_profile"
             referencedColumns: ["customer_id"]
+          },
+        ]
+      }
+      favorites_collection_items: {
+        Row: {
+          added_at: string
+          collection_id: string
+          display_order: number | null
+          favorite_id: string
+          id: string
+        }
+        Insert: {
+          added_at?: string
+          collection_id: string
+          display_order?: number | null
+          favorite_id: string
+          id?: string
+        }
+        Update: {
+          added_at?: string
+          collection_id?: string
+          display_order?: number | null
+          favorite_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "favorites_collection_items_collection_id_fkey"
+            columns: ["collection_id"]
+            isOneToOne: false
+            referencedRelation: "favorites_collections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "favorites_collection_items_favorite_id_fkey"
+            columns: ["favorite_id"]
+            isOneToOne: false
+            referencedRelation: "customer_favorites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      favorites_collections: {
+        Row: {
+          color_theme: string | null
+          created_at: string
+          customer_id: string
+          description: string | null
+          display_order: number | null
+          icon: string | null
+          id: string
+          is_default: boolean | null
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          color_theme?: string | null
+          created_at?: string
+          customer_id: string
+          description?: string | null
+          display_order?: number | null
+          icon?: string | null
+          id?: string
+          is_default?: boolean | null
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          color_theme?: string | null
+          created_at?: string
+          customer_id?: string
+          description?: string | null
+          display_order?: number | null
+          icon?: string | null
+          id?: string
+          is_default?: boolean | null
+          name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "favorites_collections_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
           },
         ]
       }

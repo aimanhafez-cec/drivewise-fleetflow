@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,33 +14,44 @@ import { Separator } from '@/components/ui/separator';
 import { DriverDocumentUpload } from './DriverDocumentUpload';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { User, FileText, Briefcase, Shield, Loader2 } from 'lucide-react';
+import { User, FileText, Briefcase, Shield, Loader2, CheckCircle2, AlertTriangle, Info, XCircle } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+// Validation schema with UAE-specific requirements
+const driverSchema = z.object({
+  full_name: z.string().min(3, 'Full name must be at least 3 characters').max(100, 'Full name is too long'),
+  license_no: z.string().min(5, 'License number is required').max(50, 'License number is too long'),
+  emirates_id: z.string()
+    .min(1, 'Emirates ID is required')
+    .regex(/^\d{3}-\d{4}-\d{7}-\d{1}$/, 'Invalid Emirates ID format. Use: XXX-XXXX-XXXXXXX-X'),
+  passport_number: z.string().min(5, 'Passport number is required').max(50, 'Passport number is too long'),
+  nationality: z.string().min(2, 'Nationality is required').max(100, 'Nationality is too long'),
+  phone: z.string()
+    .min(1, 'Phone number is required')
+    .regex(/^\+971-\d{2}-\d{4}-\d{2}$/, 'Phone must be in UAE format: +971-XX-XXXX-XX'),
+  email: z.string().email('Invalid email address').optional().or(z.literal('')),
+  date_of_birth: z.string().optional(),
+  license_expiry: z.string().optional().refine((date) => {
+    if (!date) return true;
+    return new Date(date) > new Date();
+  }, 'License has expired. Please update before proceeding.'),
+  license_issued_by: z.string().optional(),
+  license_issue_date: z.string().optional(),
+  employment_id: z.string().optional(),
+  department: z.string().optional(),
+  visa_expiry: z.string().optional(),
+  address_emirate: z.string().optional(),
+  status: z.string(),
+  additional_driver_fee: z.number()
+});
+
+type DriverFormData = z.infer<typeof driverSchema>;
 
 interface EnhancedDriverFormProps {
   open: boolean;
   onClose: () => void;
   driverId?: string;
   onSave: (driverId?: string) => void;
-}
-
-interface DriverFormData {
-  full_name: string;
-  license_no: string;
-  phone: string;
-  email: string;
-  date_of_birth: string;
-  license_expiry: string;
-  emirates_id: string;
-  passport_number: string;
-  nationality: string;
-  license_issued_by: string;
-  license_issue_date: string;
-  employment_id: string;
-  department: string;
-  visa_expiry: string;
-  address_emirate: string;
-  status: string;
-  additional_driver_fee: number;
 }
 
 export const EnhancedDriverForm: React.FC<EnhancedDriverFormProps> = ({
@@ -50,34 +64,85 @@ export const EnhancedDriverForm: React.FC<EnhancedDriverFormProps> = ({
   const [saving, setSaving] = useState(false);
   const [documents, setDocuments] = useState<any[]>([]);
   const [verificationStatus, setVerificationStatus] = useState<string>('unverified');
-  const [formData, setFormData] = useState<DriverFormData>({
-    full_name: '',
-    license_no: '',
-    phone: '',
-    email: '',
-    date_of_birth: '',
-    license_expiry: '',
-    emirates_id: '',
-    passport_number: '',
-    nationality: '',
-    license_issued_by: '',
-    license_issue_date: '',
-    employment_id: '',
-    department: '',
-    visa_expiry: '',
-    address_emirate: '',
-    status: 'active',
-    additional_driver_fee: 0
+  const [currentDriverId, setCurrentDriverId] = useState<string | undefined>(driverId);
+  const [activeTab, setActiveTab] = useState('basic');
+  const [hasAutoSaved, setHasAutoSaved] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, touchedFields },
+    setValue,
+    watch,
+    reset,
+    trigger
+  } = useForm<DriverFormData>({
+    resolver: zodResolver(driverSchema),
+    defaultValues: {
+      full_name: '',
+      license_no: '',
+      phone: '',
+      email: '',
+      date_of_birth: '',
+      license_expiry: '',
+      emirates_id: '',
+      passport_number: '',
+      nationality: '',
+      license_issued_by: '',
+      license_issue_date: '',
+      employment_id: '',
+      department: '',
+      visa_expiry: '',
+      address_emirate: '',
+      status: 'active',
+      additional_driver_fee: 0
+    }
   });
 
+  const formValues = watch();
+
   useEffect(() => {
-    if (driverId && open) {
-      loadDriverData();
+    if (open) {
+      setCurrentDriverId(driverId);
+      setHasAutoSaved(!!driverId);
+      setActiveTab('basic');
+      
+      if (driverId) {
+        loadDriverData();
+        loadDocuments();
+      } else {
+        reset({
+          full_name: '',
+          license_no: '',
+          phone: '',
+          email: '',
+          date_of_birth: '',
+          license_expiry: '',
+          emirates_id: '',
+          passport_number: '',
+          nationality: '',
+          license_issued_by: '',
+          license_issue_date: '',
+          employment_id: '',
+          department: '',
+          visa_expiry: '',
+          address_emirate: '',
+          status: 'active',
+          additional_driver_fee: 0
+        });
+      }
+    }
+  }, [driverId, open, reset]);
+
+  useEffect(() => {
+    if (currentDriverId) {
       loadDocuments();
     }
-  }, [driverId, open]);
+  }, [currentDriverId]);
 
   const loadDriverData = async () => {
+    if (!driverId) return;
+    
     setLoading(true);
     try {
       const { data, error } = await supabase
@@ -88,7 +153,7 @@ export const EnhancedDriverForm: React.FC<EnhancedDriverFormProps> = ({
       
       if (error) throw error;
       if (data) {
-        setFormData({
+        reset({
           full_name: data.full_name || '',
           license_no: data.license_no || '',
           phone: data.phone || '',
@@ -118,11 +183,13 @@ export const EnhancedDriverForm: React.FC<EnhancedDriverFormProps> = ({
   };
 
   const loadDocuments = async () => {
+    if (!currentDriverId) return;
+    
     try {
       const { data, error } = await supabase
         .from('driver_documents')
         .select('*')
-        .eq('driver_id', driverId);
+        .eq('driver_id', currentDriverId);
       
       if (error) throw error;
       setDocuments(data || []);
@@ -131,36 +198,91 @@ export const EnhancedDriverForm: React.FC<EnhancedDriverFormProps> = ({
     }
   };
 
-  const handleSubmit = async () => {
+  // Auto-save when moving from Identity tab
+  const handleTabChange = async (newTab: string) => {
+    if (activeTab === 'identity' && !currentDriverId && !hasAutoSaved) {
+      // Validate identity fields before auto-save
+      const isValid = await trigger(['full_name', 'license_no', 'emirates_id', 'passport_number', 'nationality', 'phone']);
+      
+      if (isValid) {
+        await handleAutoSave();
+      } else {
+        toast.error('Please complete all required fields before continuing');
+        return;
+      }
+    }
+    setActiveTab(newTab);
+  };
+
+  const handleAutoSave = async () => {
+    const formData = watch();
+    
+    try {
+      const { data, error } = await supabase
+        .from('drivers')
+        .insert([formData])
+        .select('id')
+        .single();
+      
+      if (error) throw error;
+      
+      setCurrentDriverId(data.id);
+      setHasAutoSaved(true);
+      toast.success('Driver saved! You can now upload documents.');
+      
+      // Automatically switch to documents tab
+      setTimeout(() => setActiveTab('documents'), 500);
+    } catch (error: any) {
+      console.error('Error auto-saving driver:', error);
+      if (error.message?.includes('unique_emirates_id')) {
+        toast.error('This Emirates ID is already registered');
+      } else if (error.message?.includes('emirates_id_format')) {
+        toast.error('Invalid Emirates ID format');
+      } else {
+        toast.error('Failed to save driver');
+      }
+      throw error;
+    }
+  };
+
+  const onSubmit = async (data: DriverFormData) => {
     setSaving(true);
     try {
-      let savedDriverId = driverId;
+      let savedDriverId = currentDriverId;
       
-      if (driverId) {
+      if (currentDriverId) {
         const { error } = await supabase
           .from('drivers')
-          .update(formData)
-          .eq('id', driverId);
+          .update(data)
+          .eq('id', currentDriverId);
         
         if (error) throw error;
         toast.success('Driver updated successfully');
       } else {
-        const { data, error } = await supabase
+        const { data: newDriver, error } = await supabase
           .from('drivers')
-          .insert([formData])
+          .insert([data])
           .select('id')
           .single();
         
         if (error) throw error;
-        savedDriverId = data.id;
+        savedDriverId = newDriver.id;
         toast.success('Driver created successfully');
       }
       
       onSave(savedDriverId);
       onClose();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving driver:', error);
-      toast.error('Failed to save driver');
+      if (error.message?.includes('unique_emirates_id')) {
+        toast.error('This Emirates ID is already registered');
+      } else if (error.message?.includes('emirates_id_format')) {
+        toast.error('Invalid Emirates ID format. Use: XXX-XXXX-XXXXXXX-X');
+      } else if (error.message?.includes('phone_format')) {
+        toast.error('Invalid phone format. Use: +971-XX-XXXX-XX');
+      } else {
+        toast.error('Failed to save driver');
+      }
     } finally {
       setSaving(false);
     }
@@ -182,293 +304,432 @@ export const EnhancedDriverForm: React.FC<EnhancedDriverFormProps> = ({
 
   const getDocument = (type: string) => documents.find(d => d.document_type === type);
 
+  const getFieldClassName = (fieldName: keyof DriverFormData, isRequired: boolean = false) => {
+    const hasError = !!errors[fieldName];
+    const isTouched = touchedFields[fieldName];
+    const hasValue = !!formValues[fieldName];
+    
+    return cn(
+      'transition-all',
+      hasError && isTouched && 'border-red-500 focus-visible:ring-red-500',
+      !hasError && isTouched && hasValue && isRequired && 'border-green-500 focus-visible:ring-green-500'
+    );
+  };
+
+  const getRequiredDocuments = () => {
+    const required = [
+      { type: 'emirates_id_front', label: 'Emirates ID (Front)', has: !!getDocument('emirates_id_front') },
+      { type: 'emirates_id_back', label: 'Emirates ID (Back)', has: !!getDocument('emirates_id_back') },
+      { type: 'driving_license_front', label: 'Driving License (Front)', has: !!getDocument('driving_license_front') },
+      { type: 'driving_license_back', label: 'Driving License (Back)', has: !!getDocument('driving_license_back') },
+      { type: 'passport_bio_page', label: 'Passport (Bio Page)', has: !!getDocument('passport_bio_page') }
+    ];
+    return required;
+  };
+
+  const allDocumentsUploaded = getRequiredDocuments().every(doc => doc.has);
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-center justify-between">
             <DialogTitle>{driverId ? 'Edit Driver' : 'Add Driver'}</DialogTitle>
-            {driverId && getStatusBadge(verificationStatus)}
+            {currentDriverId && getStatusBadge(verificationStatus)}
           </div>
         </DialogHeader>
+
+        {/* Demo Mode Banner */}
+        {process.env.NODE_ENV === 'development' && (
+          <Alert className="border-blue-500 bg-blue-50">
+            <Info className="h-4 w-4 text-blue-600" />
+            <AlertDescription>
+              <strong className="text-blue-900">Demo Mode:</strong> Document validations are relaxed for demonstration. 
+              In production, all driver documents must be verified before vehicle handover.
+            </AlertDescription>
+          </Alert>
+        )}
 
         {loading ? (
           <div className="flex items-center justify-center py-8">
             <Loader2 className="h-8 w-8 animate-spin" />
           </div>
         ) : (
-          <Tabs defaultValue="basic" className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="basic">
-                <User className="h-4 w-4 mr-2" />
-                Basic Info
-              </TabsTrigger>
-              <TabsTrigger value="identity">
-                <Shield className="h-4 w-4 mr-2" />
-                Identity
-              </TabsTrigger>
-              <TabsTrigger value="employment">
-                <Briefcase className="h-4 w-4 mr-2" />
-                Employment
-              </TabsTrigger>
-              <TabsTrigger value="documents" disabled={!driverId}>
-                <FileText className="h-4 w-4 mr-2" />
-                Documents
-              </TabsTrigger>
-            </TabsList>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
+              <TabsList className="grid w-full grid-cols-4">
+                <TabsTrigger value="basic">
+                  <User className="h-4 w-4 mr-2" />
+                  Basic Info
+                </TabsTrigger>
+                <TabsTrigger value="identity">
+                  <Shield className="h-4 w-4 mr-2" />
+                  Identity
+                  {(errors.emirates_id || errors.passport_number || errors.nationality || errors.phone) && (
+                    <AlertTriangle className="h-3 w-3 ml-1 text-red-500" />
+                  )}
+                </TabsTrigger>
+                <TabsTrigger value="employment">
+                  <Briefcase className="h-4 w-4 mr-2" />
+                  Employment
+                </TabsTrigger>
+                <TabsTrigger value="documents" disabled={!currentDriverId}>
+                  <FileText className="h-4 w-4 mr-2" />
+                  Documents
+                  {currentDriverId && !allDocumentsUploaded && (
+                    <AlertTriangle className="h-3 w-3 ml-1 text-amber-500" />
+                  )}
+                  {currentDriverId && allDocumentsUploaded && (
+                    <CheckCircle2 className="h-3 w-3 ml-1 text-green-500" />
+                  )}
+                </TabsTrigger>
+              </TabsList>
 
-            <TabsContent value="basic" className="space-y-4 mt-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="full_name">Full Name *</Label>
-                  <Input
-                    id="full_name"
-                    value={formData.full_name}
-                    onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="license_no">License Number *</Label>
-                  <Input
-                    id="license_no"
-                    value={formData.license_no}
-                    onChange={(e) => setFormData({ ...formData, license_no: e.target.value })}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Phone</Label>
-                  <Input
-                    id="phone"
-                    type="tel"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    placeholder="+971-XX-XXX-XXXX"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="date_of_birth">Date of Birth</Label>
-                  <Input
-                    id="date_of_birth"
-                    type="date"
-                    value={formData.date_of_birth}
-                    onChange={(e) => setFormData({ ...formData, date_of_birth: e.target.value })}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="license_expiry">License Expiry</Label>
-                  <Input
-                    id="license_expiry"
-                    type="date"
-                    value={formData.license_expiry}
-                    onChange={(e) => setFormData({ ...formData, license_expiry: e.target.value })}
-                  />
-                </div>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="identity" className="space-y-4 mt-4">
-              <Alert>
-                <AlertDescription>
-                  UAE-specific identity information required for legal compliance and vehicle handover.
-                </AlertDescription>
-              </Alert>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="emirates_id">Emirates ID *</Label>
-                  <Input
-                    id="emirates_id"
-                    value={formData.emirates_id}
-                    onChange={(e) => setFormData({ ...formData, emirates_id: e.target.value })}
-                    placeholder="XXX-XXXX-XXXXXXX-X"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="passport_number">Passport Number *</Label>
-                  <Input
-                    id="passport_number"
-                    value={formData.passport_number}
-                    onChange={(e) => setFormData({ ...formData, passport_number: e.target.value })}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="nationality">Nationality *</Label>
-                  <Input
-                    id="nationality"
-                    value={formData.nationality}
-                    onChange={(e) => setFormData({ ...formData, nationality: e.target.value })}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="license_issued_by">License Issued By</Label>
-                  <Select value={formData.license_issued_by} onValueChange={(value) => setFormData({ ...formData, license_issued_by: value })}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select authority" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Dubai RTA">Dubai RTA</SelectItem>
-                      <SelectItem value="Abu Dhabi Police">Abu Dhabi Police</SelectItem>
-                      <SelectItem value="Sharjah Police">Sharjah Police</SelectItem>
-                      <SelectItem value="Ajman Police">Ajman Police</SelectItem>
-                      <SelectItem value="RAK Police">RAK Police</SelectItem>
-                      <SelectItem value="Fujairah Police">Fujairah Police</SelectItem>
-                      <SelectItem value="UAQ Police">UAQ Police</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="license_issue_date">License Issue Date</Label>
-                  <Input
-                    id="license_issue_date"
-                    type="date"
-                    value={formData.license_issue_date}
-                    onChange={(e) => setFormData({ ...formData, license_issue_date: e.target.value })}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="visa_expiry">Visa Expiry</Label>
-                  <Input
-                    id="visa_expiry"
-                    type="date"
-                    value={formData.visa_expiry}
-                    onChange={(e) => setFormData({ ...formData, visa_expiry: e.target.value })}
-                  />
-                </div>
-                <div className="space-y-2 col-span-2">
-                  <Label htmlFor="address_emirate">Address Emirate</Label>
-                  <Select value={formData.address_emirate} onValueChange={(value) => setFormData({ ...formData, address_emirate: value })}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select emirate" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Dubai">Dubai</SelectItem>
-                      <SelectItem value="Abu Dhabi">Abu Dhabi</SelectItem>
-                      <SelectItem value="Sharjah">Sharjah</SelectItem>
-                      <SelectItem value="Ajman">Ajman</SelectItem>
-                      <SelectItem value="Ras Al Khaimah">Ras Al Khaimah</SelectItem>
-                      <SelectItem value="Fujairah">Fujairah</SelectItem>
-                      <SelectItem value="Umm Al Quwain">Umm Al Quwain</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="employment" className="space-y-4 mt-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="employment_id">Employee ID / Badge Number</Label>
-                  <Input
-                    id="employment_id"
-                    value={formData.employment_id}
-                    onChange={(e) => setFormData({ ...formData, employment_id: e.target.value })}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="department">Department</Label>
-                  <Input
-                    id="department"
-                    value={formData.department}
-                    onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                  />
-                </div>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="documents" className="space-y-4 mt-4">
-              <Alert>
-                <AlertDescription>
-                  All documents must be uploaded and verified before vehicle handover. Supported formats: JPEG, PNG, PDF (max 5MB).
-                </AlertDescription>
-              </Alert>
-
-              <Separator />
-
-              <div className="space-y-4">
-                <h3 className="font-semibold">Required Documents</h3>
+              <TabsContent value="basic" className="space-y-4 mt-4">
                 <div className="grid grid-cols-2 gap-4">
-                  <DriverDocumentUpload
-                    driverId={driverId!}
-                    documentType="emirates_id_front"
-                    label="Emirates ID (Front)"
-                    isRequired
-                    existingDocument={getDocument('emirates_id_front')}
-                    onUploadComplete={loadDocuments}
-                  />
-                  <DriverDocumentUpload
-                    driverId={driverId!}
-                    documentType="emirates_id_back"
-                    label="Emirates ID (Back)"
-                    isRequired
-                    existingDocument={getDocument('emirates_id_back')}
-                    onUploadComplete={loadDocuments}
-                  />
-                  <DriverDocumentUpload
-                    driverId={driverId!}
-                    documentType="driving_license_front"
-                    label="Driving License (Front)"
-                    isRequired
-                    existingDocument={getDocument('driving_license_front')}
-                    expiryDate={formData.license_expiry}
-                    onUploadComplete={loadDocuments}
-                  />
-                  <DriverDocumentUpload
-                    driverId={driverId!}
-                    documentType="driving_license_back"
-                    label="Driving License (Back)"
-                    isRequired
-                    existingDocument={getDocument('driving_license_back')}
-                    onUploadComplete={loadDocuments}
-                  />
-                  <DriverDocumentUpload
-                    driverId={driverId!}
-                    documentType="passport_bio_page"
-                    label="Passport (Bio Page)"
-                    isRequired
-                    existingDocument={getDocument('passport_bio_page')}
-                    onUploadComplete={loadDocuments}
-                  />
-                  <DriverDocumentUpload
-                    driverId={driverId!}
-                    documentType="visa_page"
-                    label="Visa Page"
-                    isRequired={false}
-                    existingDocument={getDocument('visa_page')}
-                    expiryDate={formData.visa_expiry}
-                    onUploadComplete={loadDocuments}
-                  />
+                  <div className="space-y-2">
+                    <Label htmlFor="full_name" className="flex items-center gap-1">
+                      Full Name <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="full_name"
+                      {...register('full_name')}
+                      className={getFieldClassName('full_name', true)}
+                    />
+                    {errors.full_name && (
+                      <p className="text-xs text-red-500 flex items-center gap-1">
+                        <XCircle className="h-3 w-3" />
+                        {errors.full_name.message}
+                      </p>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="license_no" className="flex items-center gap-1">
+                      License Number <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="license_no"
+                      {...register('license_no')}
+                      className={getFieldClassName('license_no', true)}
+                    />
+                    {errors.license_no && (
+                      <p className="text-xs text-red-500 flex items-center gap-1">
+                        <XCircle className="h-3 w-3" />
+                        {errors.license_no.message}
+                      </p>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      {...register('email')}
+                      className={getFieldClassName('email')}
+                    />
+                    {errors.email && (
+                      <p className="text-xs text-red-500 flex items-center gap-1">
+                        <XCircle className="h-3 w-3" />
+                        {errors.email.message}
+                      </p>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="date_of_birth">Date of Birth</Label>
+                    <Input
+                      id="date_of_birth"
+                      type="date"
+                      {...register('date_of_birth')}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="license_expiry">License Expiry</Label>
+                    <Input
+                      id="license_expiry"
+                      type="date"
+                      {...register('license_expiry')}
+                      className={getFieldClassName('license_expiry')}
+                    />
+                    {errors.license_expiry && (
+                      <p className="text-xs text-red-500 flex items-center gap-1">
+                        <XCircle className="h-3 w-3" />
+                        {errors.license_expiry.message}
+                      </p>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </TabsContent>
-          </Tabs>
-        )}
+              </TabsContent>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose} disabled={saving}>
-            Cancel
-          </Button>
-          <Button onClick={handleSubmit} disabled={saving}>
-            {saving ? (
-              <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Saving...
-              </>
-            ) : (
-              'Save Driver'
-            )}
-          </Button>
-        </DialogFooter>
+              <TabsContent value="identity" className="space-y-4 mt-4">
+                <Alert className="border-amber-500 bg-amber-50">
+                  <AlertTriangle className="h-4 w-4 text-amber-600" />
+                  <AlertDescription className="text-amber-900">
+                    <strong>UAE Legal Requirement:</strong> All identity fields are mandatory for corporate fleet leasing and vehicle handover compliance.
+                  </AlertDescription>
+                </Alert>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="emirates_id" className="flex items-center gap-1">
+                      Emirates ID <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="emirates_id"
+                      {...register('emirates_id')}
+                      placeholder="XXX-XXXX-XXXXXXX-X"
+                      className={getFieldClassName('emirates_id', true)}
+                    />
+                    {errors.emirates_id && (
+                      <p className="text-xs text-red-500 flex items-center gap-1">
+                        <XCircle className="h-3 w-3" />
+                        {errors.emirates_id.message}
+                      </p>
+                    )}
+                    {!errors.emirates_id && touchedFields.emirates_id && formValues.emirates_id && (
+                      <p className="text-xs text-green-600 flex items-center gap-1">
+                        <CheckCircle2 className="h-3 w-3" />
+                        Valid Emirates ID format
+                      </p>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="passport_number" className="flex items-center gap-1">
+                      Passport Number <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="passport_number"
+                      {...register('passport_number')}
+                      className={getFieldClassName('passport_number', true)}
+                    />
+                    {errors.passport_number && (
+                      <p className="text-xs text-red-500 flex items-center gap-1">
+                        <XCircle className="h-3 w-3" />
+                        {errors.passport_number.message}
+                      </p>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="nationality" className="flex items-center gap-1">
+                      Nationality <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="nationality"
+                      {...register('nationality')}
+                      placeholder="e.g., United Arab Emirates"
+                      className={getFieldClassName('nationality', true)}
+                    />
+                    {errors.nationality && (
+                      <p className="text-xs text-red-500 flex items-center gap-1">
+                        <XCircle className="h-3 w-3" />
+                        {errors.nationality.message}
+                      </p>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="phone" className="flex items-center gap-1">
+                      Mobile Number <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="phone"
+                      type="tel"
+                      {...register('phone')}
+                      placeholder="+971-50-1234-56"
+                      className={getFieldClassName('phone', true)}
+                    />
+                    {errors.phone && (
+                      <p className="text-xs text-red-500 flex items-center gap-1">
+                        <XCircle className="h-3 w-3" />
+                        {errors.phone.message}
+                      </p>
+                    )}
+                    {!errors.phone && touchedFields.phone && formValues.phone && (
+                      <p className="text-xs text-green-600 flex items-center gap-1">
+                        <CheckCircle2 className="h-3 w-3" />
+                        Valid UAE phone format
+                      </p>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="license_issued_by">License Issued By</Label>
+                    <Select 
+                      value={formValues.license_issued_by} 
+                      onValueChange={(value) => setValue('license_issued_by', value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select authority" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Dubai RTA">Dubai RTA</SelectItem>
+                        <SelectItem value="Abu Dhabi Police">Abu Dhabi Police</SelectItem>
+                        <SelectItem value="Sharjah Police">Sharjah Police</SelectItem>
+                        <SelectItem value="Ajman Police">Ajman Police</SelectItem>
+                        <SelectItem value="RAK Police">RAK Police</SelectItem>
+                        <SelectItem value="Fujairah Police">Fujairah Police</SelectItem>
+                        <SelectItem value="UAQ Police">UAQ Police</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="license_issue_date">License Issue Date</Label>
+                    <Input
+                      id="license_issue_date"
+                      type="date"
+                      {...register('license_issue_date')}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="visa_expiry">Visa Expiry</Label>
+                    <Input
+                      id="visa_expiry"
+                      type="date"
+                      {...register('visa_expiry')}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="address_emirate">Address Emirate</Label>
+                    <Select 
+                      value={formValues.address_emirate} 
+                      onValueChange={(value) => setValue('address_emirate', value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select emirate" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Dubai">Dubai</SelectItem>
+                        <SelectItem value="Abu Dhabi">Abu Dhabi</SelectItem>
+                        <SelectItem value="Sharjah">Sharjah</SelectItem>
+                        <SelectItem value="Ajman">Ajman</SelectItem>
+                        <SelectItem value="Ras Al Khaimah">Ras Al Khaimah</SelectItem>
+                        <SelectItem value="Fujairah">Fujairah</SelectItem>
+                        <SelectItem value="Umm Al Quwain">Umm Al Quwain</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                {!currentDriverId && !hasAutoSaved && (
+                  <Alert className="border-blue-500 bg-blue-50">
+                    <Info className="h-4 w-4 text-blue-600" />
+                    <AlertDescription className="text-blue-900">
+                      Complete the required identity fields above and click "Next" or "Documents" tab to save driver and enable document uploads.
+                    </AlertDescription>
+                  </Alert>
+                )}
+              </TabsContent>
+
+              <TabsContent value="employment" className="space-y-4 mt-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="employment_id">Employee ID / Badge Number</Label>
+                    <Input
+                      id="employment_id"
+                      {...register('employment_id')}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="department">Department</Label>
+                    <Input
+                      id="department"
+                      {...register('department')}
+                    />
+                  </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="documents" className="space-y-4 mt-4">
+                {/* Document Requirements Checklist */}
+                <Alert className={cn(
+                  "border-2",
+                  allDocumentsUploaded ? "border-green-500 bg-green-50" : "border-red-500 bg-red-50"
+                )}>
+                  <AlertDescription>
+                    <div className="space-y-2">
+                      <strong className={allDocumentsUploaded ? "text-green-900" : "text-red-900"}>
+                        Required Documents (UAE Corporate Leasing):
+                      </strong>
+                      <ul className="mt-2 space-y-1 text-sm">
+                        {getRequiredDocuments().map(doc => (
+                          <li key={doc.type} className={doc.has ? "text-green-700" : "text-red-700"}>
+                            {doc.has ? <CheckCircle2 className="h-3 w-3 inline mr-1" /> : <XCircle className="h-3 w-3 inline mr-1" />}
+                            {doc.label}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </AlertDescription>
+                </Alert>
+
+                <Separator />
+
+                <div className="space-y-4">
+                  <h3 className="font-semibold">Upload Required Documents</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <DriverDocumentUpload
+                      driverId={currentDriverId!}
+                      documentType="emirates_id_front"
+                      label="Emirates ID (Front)"
+                      isRequired
+                      existingDocument={getDocument('emirates_id_front')}
+                      onUploadComplete={loadDocuments}
+                    />
+                    <DriverDocumentUpload
+                      driverId={currentDriverId!}
+                      documentType="emirates_id_back"
+                      label="Emirates ID (Back)"
+                      isRequired
+                      existingDocument={getDocument('emirates_id_back')}
+                      onUploadComplete={loadDocuments}
+                    />
+                    <DriverDocumentUpload
+                      driverId={currentDriverId!}
+                      documentType="driving_license_front"
+                      label="Driving License (Front)"
+                      isRequired
+                      existingDocument={getDocument('driving_license_front')}
+                      expiryDate={formValues.license_expiry}
+                      onUploadComplete={loadDocuments}
+                    />
+                    <DriverDocumentUpload
+                      driverId={currentDriverId!}
+                      documentType="driving_license_back"
+                      label="Driving License (Back)"
+                      isRequired
+                      existingDocument={getDocument('driving_license_back')}
+                      onUploadComplete={loadDocuments}
+                    />
+                    <DriverDocumentUpload
+                      driverId={currentDriverId!}
+                      documentType="passport_bio_page"
+                      label="Passport (Bio Page)"
+                      isRequired
+                      existingDocument={getDocument('passport_bio_page')}
+                      onUploadComplete={loadDocuments}
+                    />
+                    <DriverDocumentUpload
+                      driverId={currentDriverId!}
+                      documentType="visa_page"
+                      label="Visa Page"
+                      isRequired={false}
+                      existingDocument={getDocument('visa_page')}
+                      expiryDate={formValues.visa_expiry}
+                      onUploadComplete={loadDocuments}
+                    />
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
+
+            <DialogFooter className="mt-6">
+              <Button type="button" variant="outline" onClick={onClose}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={saving}>
+                {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+                {currentDriverId ? 'Update Driver' : 'Save Driver'}
+              </Button>
+            </DialogFooter>
+          </form>
+        )}
       </DialogContent>
     </Dialog>
   );

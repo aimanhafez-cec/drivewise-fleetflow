@@ -49,7 +49,7 @@ export const useDrivers = (searchQuery?: string, useEnhanced: boolean = false) =
 
   // Use basic LOV search as fallback
   const result = useLOV<Driver>('drivers', 'id, full_name, license_no, phone, email, date_of_birth, license_expiry, status, additional_driver_fee, emirates_id, passport_number, nationality, license_issued_by, license_issue_date, license_categories, employment_id, department, verification_status, verified_at, verified_by, rejection_reason, visa_expiry, address_emirate, last_verification_check', {
-    searchFields: ['full_name', 'license_no', 'email', 'emirates_id'],
+    searchFields: ['full_name', 'license_no', 'email', 'emirates_id', 'passport_number', 'phone'],
     orderBy: 'full_name'
   });
   
@@ -131,6 +131,9 @@ export const useCreateDriver = () => {
           email: driver.email,
           date_of_birth: driver.date_of_birth,
           license_expiry: driver.license_expiry,
+          emirates_id: driver.emirates_id,
+          passport_number: driver.passport_number,
+          nationality: driver.nationality,
           status: driver.status || 'active',
           additional_driver_fee: driver.additional_driver_fee || 25.00
         })
