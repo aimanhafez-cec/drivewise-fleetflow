@@ -62,7 +62,7 @@ export const useDrivers = (searchQuery?: string, useEnhanced: boolean = false) =
     return {
       items: enhancedSearch.data.map(item => ({
         ...item,
-        label: item.label || `${item.full_name} (${item.license_no})`
+        label: item.label || `${item.full_name}${item.nationality ? ` (${item.nationality})` : ''} - ${item.license_no}`
       })),
       isLoading: enhancedSearch.isLoading,
       error: enhancedSearch.error,
@@ -76,7 +76,7 @@ export const useDrivers = (searchQuery?: string, useEnhanced: boolean = false) =
     ...result,
     items: result.items.map(item => ({
       ...item,
-      label: `${item.full_name} (${item.license_no})`
+      label: `${item.full_name}${item.nationality ? ` (${item.nationality})` : ''} - ${item.license_no}`
     }))
   };
 };
