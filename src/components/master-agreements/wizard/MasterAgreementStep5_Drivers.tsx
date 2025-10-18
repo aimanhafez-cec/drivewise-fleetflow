@@ -108,27 +108,43 @@ export const MasterAgreementStep5Drivers: React.FC<MasterAgreementStep5DriversPr
       <div>
         <h2 className="text-2xl font-bold mb-2">Authorized Drivers</h2>
         <p className="text-muted-foreground">
-          Assign authorized drivers to each vehicle line. At least one driver is required per vehicle before checkout.
+          Assign authorized drivers to each vehicle line. Driver information can be added now or later, but is required before vehicle delivery.
         </p>
       </div>
 
       {/* Status Alert */}
       {vehicleLines.length > 0 && (
-        <Alert variant={hasAllDriversAssigned ? 'default' : 'destructive'}>
-          <AlertDescription className="flex items-center gap-2">
-            {hasAllDriversAssigned ? (
-              <>
-                <CheckCircle2 className="h-4 w-4 text-green-600" />
-                All vehicle lines have assigned drivers
-              </>
-            ) : (
-              <>
-                <AlertTriangle className="h-4 w-4" />
-                {vehicleLines.filter(line => getDriversForLine(line.id).length === 0).length} vehicle line(s) need driver assignment
-              </>
-            )}
-          </AlertDescription>
-        </Alert>
+        <>
+          <Alert variant="default" className={hasAllDriversAssigned ? 'border-green-500 bg-green-50' : 'border-blue-500 bg-blue-50'}>
+            <AlertDescription className="flex items-center gap-2">
+              {hasAllDriversAssigned ? (
+                <>
+                  <CheckCircle2 className="h-4 w-4 text-green-600" />
+                  <span className="text-green-900">All vehicle lines have assigned drivers - Ready for vehicle handover</span>
+                </>
+              ) : (
+                <>
+                  <AlertTriangle className="h-4 w-4 text-blue-600" />
+                  <span className="text-blue-900">
+                    {vehicleLines.filter(line => getDriversForLine(line.id).length === 0).length} vehicle line(s) do not have drivers assigned yet. You can continue and assign drivers later, but they will be required before vehicle delivery.
+                  </span>
+                </>
+              )}
+            </AlertDescription>
+          </Alert>
+
+          <Alert className="border-blue-500 bg-blue-50">
+            <AlertDescription>
+              <strong className="text-blue-900">When are drivers required?</strong>
+              <ul className="list-disc list-inside mt-2 space-y-1 text-sm text-blue-900">
+                <li>Master Agreement can be signed without driver information</li>
+                <li>Drivers must be assigned before vehicle checkout/handover</li>
+                <li>You can add or update drivers anytime from the agreement details page</li>
+                <li>At least one primary driver is required per vehicle line</li>
+              </ul>
+            </AlertDescription>
+          </Alert>
+        </>
       )}
 
       {/* Driver Assignment Table */}
