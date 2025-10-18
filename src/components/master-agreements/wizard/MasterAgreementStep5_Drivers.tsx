@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
+import { format } from 'date-fns';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -8,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { LOVSelect } from '@/components/ui/lov-select';
-import { Plus, AlertTriangle, CheckCircle2, Trash2, Star, Info, Shield, FileCheck, UserPlus, FileText, Pencil } from 'lucide-react';
+import { Plus, AlertTriangle, CheckCircle2, Trash2, Star, Info, Shield, FileCheck, UserPlus, FileText, Pencil, Calendar } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useDrivers } from '@/hooks/useDrivers';
 import { useAgreementDrivers, useAssignDriver, useRemoveDriver, useUpdateDriverAssignment } from '@/hooks/useAgreementDrivers';
@@ -183,9 +184,11 @@ export const MasterAgreementStep5Drivers: React.FC<MasterAgreementStep5DriversPr
               <TableHeader>
                 <TableRow>
                   <TableHead>Line #</TableHead>
-                  <TableHead>Vehicle</TableHead>
+                  <TableHead>Vehicle Details</TableHead>
                   <TableHead>Contract No</TableHead>
-                  <TableHead>Assigned Drivers</TableHead>
+                  <TableHead>Lease Period</TableHead>
+                  <TableHead className="text-right">Monthly Rate</TableHead>
+                  <TableHead>Driver Status</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -196,19 +199,77 @@ export const MasterAgreementStep5Drivers: React.FC<MasterAgreementStep5DriversPr
                     <TableRow key={line.id}>
                       <TableCell className="font-medium">{line.line_number}</TableCell>
                       <TableCell>
-                        {line.vehicle_class_name || line.vehicle_make_model || 'Vehicle TBD'}
+                        <div className="space-y-1">
+                          <div className="font-medium">
+                            {line._vehicleMeta?.item_description || 
+                             `${line._vehicleMeta?.make || ''} ${line._vehicleMeta?.model || ''} ${line._vehicleMeta?.year || ''}`.trim() || 
+                             'Vehicle TBD'}
+                          </div>
+                          {line._vehicleMeta?.category_name && (
+                            <Badge variant="outline" className="text-xs">
+                              {line._vehicleMeta.category_name}
+                            </Badge>
+                          )}
+                        </div>
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {line.contract_no || 'TBD'}
                       </TableCell>
-                      <TableCell>
-                        {lineDrivers.length === 0 ? (
-                          <Badge variant="outline" className="text-muted-foreground">
-                            No drivers assigned
-                          </Badge>
+                      <TableCell className="text-sm">
+                        {line.pickup_at && line.return_at ? (
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-1">
+                              <Calendar className="h-3 w-3 text-muted-foreground" />
+                              <span>{format(new Date(line.pickup_at), 'dd MMM yyyy')}</span>
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              to {format(new Date(line.return_at), 'dd MMM yyyy')}
+                            </div>
+                            {line.duration_months && (
+                              <Badge variant="secondary" className="text-xs">
+                                {line.duration_months} months
+                              </Badge>
+                            )}
+                          </div>
                         ) : (
-                           <div className="space-y-2">
-                            {lineDrivers.map((ld) => {
+                          <span className="text-muted-foreground">TBD</span>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {line.monthly_rate ? (
+                          <div className="space-y-1">
+                            <div className="font-semibold">
+                              AED {line.monthly_rate.toLocaleString('en-AE', { minimumFractionDigits: 2 })}
+                            </div>
+                            {line.mileage_package_km && (
+                              <div className="text-xs text-muted-foreground">
+                                {line.mileage_package_km.toLocaleString()} km/mo
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <span className="text-muted-foreground">TBD</span>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <div className="space-y-2">
+                          {/* Driver count badge */}
+                          <div className="flex items-center gap-2">
+                            <Badge variant={lineDrivers.length === 0 ? 'outline' : 'default'} className="text-xs">
+                              {lineDrivers.length === 0 ? 'No Drivers' : `${lineDrivers.length} Driver${lineDrivers.length > 1 ? 's' : ''}`}
+                            </Badge>
+                            {lineDrivers.length > 0 && lineDrivers.some(ld => ld.is_primary) && (
+                              <Badge className="bg-green-500 text-xs">
+                                <CheckCircle2 className="h-3 w-3 mr-1" />
+                                Ready
+                              </Badge>
+                            )}
+                          </div>
+                          
+                          {/* Driver list */}
+                          {lineDrivers.length > 0 && (
+                            <div className="space-y-1">
+                              {lineDrivers.map((ld) => {
                               const verificationBadge = () => {
                                 const status = ld.driver?.verification_status;
                                 if (!status || status === 'unverified') {
@@ -224,12 +285,12 @@ export const MasterAgreementStep5Drivers: React.FC<MasterAgreementStep5DriversPr
                               };
                               
                               return (
-                              <div key={ld.id} className="flex items-center gap-2 flex-wrap">
+                              <div key={ld.id} className="flex items-center gap-1 flex-wrap text-xs">
                                 {ld.is_primary && (
                                   <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
                                 )}
-                                <span className="text-sm">
-                                  {ld.driver?.full_name} ({ld.driver?.license_no})
+                                <span className="font-medium">
+                                  {ld.driver?.full_name}
                                 </span>
                                 {verificationBadge()}
                                 {ld.is_primary && (
@@ -278,11 +339,12 @@ export const MasterAgreementStep5Drivers: React.FC<MasterAgreementStep5DriversPr
                                   >
                                     Make Primary
                                   </Button>
-                                )}
-                              </div>
-                            )})}
-                          </div>
-                        )}
+                                 )}
+                               </div>
+                             )})}
+                            </div>
+                          )}
+                        </div>
                       </TableCell>
                       <TableCell className="text-right">
                         <Button
