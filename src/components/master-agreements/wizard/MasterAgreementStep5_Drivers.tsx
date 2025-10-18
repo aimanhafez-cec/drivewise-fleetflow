@@ -8,17 +8,16 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Plus, AlertTriangle, CheckCircle2, Trash2, Star, Info, Shield, FileCheck, UserPlus, FileText, Pencil, Calendar, Search, User } from 'lucide-react';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Plus, AlertTriangle, CheckCircle2, Trash2, Star, Info, Shield, FileCheck, UserPlus, FileText, Pencil, Calendar, Check, ChevronsUpDown } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useDrivers } from '@/hooks/useDrivers';
 import { useAgreementDrivers, useAssignDriver, useRemoveDriver, useUpdateDriverAssignment, useDriverDocuments } from '@/hooks/useAgreementDrivers';
 import { getDriverAgeWarning, getLicenseExpiryWarning } from '@/hooks/useDrivers';
 import { EnhancedDriverForm } from '@/components/drivers/EnhancedDriverForm';
 import { DriverDocumentsDialog } from '@/components/drivers/DriverDocumentsDialog';
-import { DriverCard } from '@/components/drivers/DriverCard';
 import { DriverDetailsDisplay } from '@/components/drivers/DriverDetailsDisplay';
 import { DriverDocumentUpload } from '@/components/drivers/DriverDocumentUpload';
 
@@ -47,6 +46,7 @@ export const MasterAgreementStep5Drivers: React.FC<MasterAgreementStep5DriversPr
   const [editDriverId, setEditDriverId] = useState<string | null>(null);
 
   const [driverSearch, setDriverSearch] = useState('');
+  const [comboboxOpen, setComboboxOpen] = useState(false);
   const { items: drivers, isLoading: isSearchingDrivers } = useDrivers(driverSearch, true);
   const { data: agreementDrivers = [], isLoading } = useAgreementDrivers(data.id);
   const assignDriverMutation = useAssignDriver();
@@ -435,145 +435,163 @@ export const MasterAgreementStep5Drivers: React.FC<MasterAgreementStep5DriversPr
         </Alert>
       )}
 
-      {/* Assign Driver Sheet - Large Two-Panel Interface */}
-      <Sheet open={showAssignDialog} onOpenChange={setShowAssignDialog}>
-        <SheetContent side="right" className="w-full sm:max-w-[1200px] overflow-hidden p-0">
-          <SheetHeader className="px-6 py-4 border-b">
-            <SheetTitle>Assign Driver to Vehicle Line #{selectedLineIndex}</SheetTitle>
-          </SheetHeader>
+      {/* Assign Driver Dialog - Compact Single Column */}
+      <Dialog open={showAssignDialog} onOpenChange={setShowAssignDialog}>
+        <DialogContent className="max-w-[700px] max-h-[90vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle>Assign Driver to Vehicle Line #{selectedLineIndex}</DialogTitle>
+          </DialogHeader>
           
-          <div className="flex gap-0 h-[calc(100vh-80px)]">
-            {/* LEFT PANEL: Driver Search & List (40%) */}
-            <div className="w-[40%] border-r flex flex-col">
-              <div className="p-4 space-y-3 border-b">
-                <Button 
-                  variant="outline" 
-                  className="w-full"
-                  onClick={() => setIsCreateDriverOpen(true)}
-                >
-                  <UserPlus className="mr-2 h-4 w-4" />
-                  Create New Driver
-                </Button>
-                
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Search by name, license, Emirates ID, phone..."
-                    value={driverSearch}
-                    onChange={(e) => setDriverSearch(e.target.value)}
-                    className="pl-9"
-                  />
-                </div>
-                
-                {driverSearch.length > 0 && driverSearch.length < 2 && (
-                  <p className="text-xs text-muted-foreground">Type 2+ characters to search</p>
-                )}
-              </div>
-              
-              <ScrollArea className="flex-1 p-4">
-                {isSearchingDrivers ? (
-                  <div className="flex items-center justify-center py-8">
-                    <div className="text-sm text-muted-foreground">Searching...</div>
-                  </div>
-                ) : drivers.length === 0 && driverSearch.length >= 2 ? (
-                  <div className="flex flex-col items-center justify-center py-8 text-center">
-                    <div className="text-sm text-muted-foreground mb-2">No drivers found</div>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => setIsCreateDriverOpen(true)}
-                    >
-                      <UserPlus className="mr-2 h-3 w-3" />
-                      Create New Driver
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    {drivers.filter(d => d.status === 'active').map(driver => (
-                      <DriverCard
-                        key={driver.id}
-                        driver={driver}
-                        isSelected={selectedDriverId === driver.id}
-                        onClick={() => setSelectedDriverId(driver.id)}
-                      />
-                    ))}
-                  </div>
-                )}
-              </ScrollArea>
+          <div className="space-y-4 flex-1 overflow-y-auto">
+            {/* Create New Driver Button */}
+            <Button 
+              variant="outline" 
+              className="w-full"
+              onClick={() => setIsCreateDriverOpen(true)}
+            >
+              <UserPlus className="mr-2 h-4 w-4" />
+              Create New Driver
+            </Button>
+            
+            {/* Driver Search Combobox */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Search Driver</label>
+              <Popover open={comboboxOpen} onOpenChange={setComboboxOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={comboboxOpen}
+                    className="w-full justify-between"
+                  >
+                    {selectedDriverId && selectedDriver
+                      ? selectedDriver.full_name
+                      : "Select driver..."}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[650px] p-0" align="start">
+                  <Command shouldFilter={false}>
+                    <CommandInput 
+                      placeholder="Search by name, license, Emirates ID..." 
+                      value={driverSearch}
+                      onValueChange={setDriverSearch}
+                    />
+                    <CommandList>
+                      <CommandEmpty>
+                        {isSearchingDrivers ? "Searching..." : "No driver found."}
+                      </CommandEmpty>
+                      <CommandGroup>
+                        {drivers.filter(d => d.status === 'active').map((driver) => (
+                          <CommandItem
+                            key={driver.id}
+                            value={driver.id}
+                            onSelect={() => {
+                              setSelectedDriverId(driver.id);
+                              setComboboxOpen(false);
+                            }}
+                            className="flex items-center justify-between py-3"
+                          >
+                            <div className="flex items-center gap-2 flex-1">
+                              <Check
+                                className={`h-4 w-4 ${
+                                  selectedDriverId === driver.id ? "opacity-100" : "opacity-0"
+                                }`}
+                              />
+                              <div className="flex-1">
+                                <div className="font-medium">{driver.full_name}</div>
+                                <div className="text-xs text-muted-foreground space-x-2">
+                                  <span>{driver.nationality || 'N/A'}</span>
+                                  {driver.emirates_id && <span>• ID: {driver.emirates_id}</span>}
+                                  {driver.license_no && <span>• License: {driver.license_no}</span>}
+                                </div>
+                              </div>
+                              <div className="flex gap-1">
+                                {driver.verification_status === 'verified' || driver.verification_status === 'approved' ? (
+                                  <Badge variant="default" className="bg-green-500 text-xs">
+                                    <CheckCircle2 className="h-3 w-3 mr-1" />
+                                    Verified
+                                  </Badge>
+                                ) : driver.verification_status === 'pending_docs' ? (
+                                  <Badge variant="secondary" className="text-xs">Pending</Badge>
+                                ) : (
+                                  <Badge variant="outline" className="text-xs">Unverified</Badge>
+                                )}
+                              </div>
+                            </div>
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
             
-            {/* RIGHT PANEL: Driver Details & Documents (60%) */}
-            <div className="w-[60%] flex flex-col">
-              {selectedDriverId && selectedDriver ? (
-                <>
-                  <Tabs defaultValue="overview" className="flex-1 flex flex-col">
-                    <div className="border-b px-4">
-                      <TabsList className="w-full justify-start">
-                        <TabsTrigger value="overview">Overview</TabsTrigger>
-                        <TabsTrigger value="documents">
-                          Documents
-                          <Badge variant="secondary" className="ml-2 text-xs">
-                            {selectedDriverDocs.length}
-                          </Badge>
-                        </TabsTrigger>
-                      </TabsList>
-                    </div>
-                    
-                    <div className="flex-1 overflow-hidden">
-                      <TabsContent value="overview" className="h-full m-0 p-4">
-                        <DriverDetailsDisplay driver={selectedDriver} />
-                      </TabsContent>
-                      
-                      <TabsContent value="documents" className="h-full m-0 p-4">
-                        <div className="text-sm text-muted-foreground mb-4">
-                          View and manage documents for this driver. Documents can be added or updated directly here.
-                        </div>
-                        <DriverDocumentUpload
-                          driverId={selectedDriverId}
-                          documents={selectedDriverDocs as any}
-                          onDocumentChange={() => {
-                            // Refresh documents - handled by React Query invalidation
-                          }}
-                        />
-                      </TabsContent>
-                    </div>
-                  </Tabs>
-                  
-                  <div className="border-t p-4 flex justify-end gap-2 bg-background">
-                    <Button 
-                      variant="outline" 
-                      onClick={() => setShowAssignDialog(false)}
-                    >
-                      Cancel
-                    </Button>
-                    <Button 
-                      onClick={handleAssignDriver}
-                      disabled={assignDriverMutation.isPending}
-                    >
-                      Assign to Line
-                    </Button>
+            {/* Selected Driver Details with Tabs */}
+            {selectedDriverId && selectedDriver ? (
+              <div className="border rounded-lg">
+                <Tabs defaultValue="overview" className="w-full">
+                  <div className="border-b px-3">
+                    <TabsList className="w-full justify-start h-auto p-0 bg-transparent">
+                      <TabsTrigger value="overview" className="data-[state=active]:bg-transparent">
+                        Overview
+                      </TabsTrigger>
+                      <TabsTrigger value="documents" className="data-[state=active]:bg-transparent">
+                        Documents
+                        <Badge variant="secondary" className="ml-2 text-xs">
+                          {selectedDriverDocs.length}
+                        </Badge>
+                      </TabsTrigger>
+                    </TabsList>
                   </div>
-                </>
-              ) : (
-                <div className="flex-1 flex flex-col items-center justify-center text-center p-8">
-                  <User className="h-12 w-12 text-muted-foreground/50 mb-4" />
-                  <h3 className="font-medium text-lg mb-2">Select a Driver</h3>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Choose a driver from the list or create a new one
-                  </p>
-                  <Button 
-                    variant="outline"
-                    onClick={() => setIsCreateDriverOpen(true)}
-                  >
-                    <UserPlus className="mr-2 h-4 w-4" />
-                    Create New Driver
-                  </Button>
-                </div>
-              )}
-            </div>
+                  
+                  <TabsContent value="overview" className="p-4 max-h-[400px] overflow-y-auto">
+                    <DriverDetailsDisplay driver={selectedDriver} />
+                  </TabsContent>
+                  
+                  <TabsContent value="documents" className="p-4 max-h-[400px] overflow-y-auto">
+                    <div className="text-sm text-muted-foreground mb-4">
+                      View and manage documents for this driver.
+                    </div>
+                    <DriverDocumentUpload
+                      driverId={selectedDriverId}
+                      documents={selectedDriverDocs as any}
+                      onDocumentChange={() => {
+                        // Refresh documents - handled by React Query invalidation
+                      }}
+                    />
+                  </TabsContent>
+                </Tabs>
+              </div>
+            ) : (
+              <div className="border rounded-lg p-8 text-center text-muted-foreground">
+                <p className="text-sm">Select a driver from the search above to view details</p>
+              </div>
+            )}
           </div>
-        </SheetContent>
-      </Sheet>
+          
+          {/* Footer Actions */}
+          <div className="flex justify-end gap-2 pt-4 border-t">
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setShowAssignDialog(false);
+                setSelectedDriverId(null);
+                setDriverSearch('');
+              }}
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleAssignDriver}
+              disabled={!selectedDriverId || assignDriverMutation.isPending}
+            >
+              Assign to Line
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Create Driver Sheet */}
       <Sheet open={isCreateDriverOpen} onOpenChange={(open) => {
