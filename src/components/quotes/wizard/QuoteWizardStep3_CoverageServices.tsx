@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -495,6 +495,136 @@ export const QuoteWizardStep3_CoverageServices: React.FC<QuoteWizardStep3Coverag
               </div>
             </div>
           )}
+
+        </CardContent>
+      </Card>
+
+      {/* Additional Services Section */}
+      <Card>
+        <CardHeader className="pb-3">
+          <div className="flex items-center gap-2">
+            <Wrench className="h-5 w-5 text-primary" />
+            <div>
+              <CardTitle className="text-lg">Additional Services</CardTitle>
+              <CardDescription className="text-xs">
+                Emergency support and replacement vehicle services
+              </CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="p-4 space-y-4">
+          
+          {/* Roadside Assistance */}
+          <div className="space-y-3 p-3 bg-muted/30 rounded-lg">
+            <div className="flex items-center justify-between">
+              <div className="flex-1">
+                <Label className="text-sm font-medium">Roadside Assistance (24/7)</Label>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Emergency towing, flat tire, battery jump-start, fuel delivery
+                </p>
+              </div>
+              <Switch
+                checked={data.roadside_assistance_included ?? true}
+                onCheckedChange={(checked) => 
+                  onChange({ 
+                    roadside_assistance_included: checked,
+                    roadside_assistance_cost_monthly: checked ? (data.roadside_assistance_cost_monthly || 40) : undefined
+                  })
+                }
+              />
+            </div>
+            
+            {data.roadside_assistance_included !== false && (
+              <div className="pl-4 space-y-1.5">
+                <TooltipLabel
+                  label="Monthly Cost per Vehicle (AED)"
+                  tooltip="Cost for 24/7 roadside assistance coverage per vehicle"
+                />
+                <Input
+                  type="number"
+                  min="0"
+                  step="5"
+                  className="h-9"
+                  value={data.roadside_assistance_cost_monthly ?? 40}
+                  onChange={(e) => 
+                    onChange({ roadside_assistance_cost_monthly: parseFloat(e.target.value) || 0 })
+                  }
+                  placeholder="40"
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Replacement Vehicle */}
+          <div className="space-y-3 p-3 bg-muted/30 rounded-lg">
+            <div className="flex items-center justify-between">
+              <div className="flex-1">
+                <Label className="text-sm font-medium">Replacement Vehicle</Label>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Courtesy vehicle provided during breakdowns or scheduled maintenance
+                </p>
+              </div>
+              <Switch
+                checked={data.replacement_vehicle_included ?? true}
+                onCheckedChange={(checked) => 
+                  onChange({ 
+                    replacement_vehicle_included: checked,
+                    replacement_vehicle_cost_monthly: checked ? (data.replacement_vehicle_cost_monthly || 60) : undefined,
+                    replacement_sla_hours: checked ? (data.replacement_sla_hours || 24) : undefined
+                  })
+                }
+              />
+            </div>
+            
+            {data.replacement_vehicle_included !== false && (
+              <div className="pl-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <TooltipLabel
+                    label="Monthly Cost per Vehicle (AED)"
+                    tooltip="Cost for replacement vehicle coverage per vehicle"
+                  />
+                  <Input
+                    type="number"
+                    min="0"
+                    step="5"
+                    className="h-9"
+                    value={data.replacement_vehicle_cost_monthly ?? 60}
+                    onChange={(e) => 
+                      onChange({ replacement_vehicle_cost_monthly: parseFloat(e.target.value) || 0 })
+                    }
+                    placeholder="60"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <TooltipLabel
+                    label="SLA Response Time (hours)"
+                    tooltip="Maximum hours to deliver replacement vehicle"
+                  />
+                  <Input
+                    type="number"
+                    min="1"
+                    step="1"
+                    className="h-9"
+                    value={data.replacement_sla_hours ?? 24}
+                    onChange={(e) => 
+                      onChange({ replacement_sla_hours: parseInt(e.target.value) || 24 })
+                    }
+                    placeholder="24"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Info Banner */}
+          <div className="p-3 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg">
+            <div className="flex gap-2">
+              <Info className="h-4 w-4 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+              <p className="text-xs text-blue-900 dark:text-blue-100">
+                These services can be customized per vehicle in Step 4 if needed.
+              </p>
+            </div>
+          </div>
 
         </CardContent>
       </Card>

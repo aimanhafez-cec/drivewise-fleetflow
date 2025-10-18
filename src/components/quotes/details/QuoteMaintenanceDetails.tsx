@@ -92,6 +92,50 @@ export const QuoteMaintenanceDetails: React.FC<QuoteMaintenanceDetailsProps> = (
             <p className="text-sm">{quote.maintenance_coverage_summary}</p>
           </div>
         )}
+
+        {/* Additional Services */}
+        <div className="pt-4 border-t space-y-4">
+          <h4 className="text-sm font-semibold">Additional Services</h4>
+          
+          {/* Roadside Assistance */}
+          <div className="flex items-center justify-between py-2 border-b">
+            <div>
+              <p className="font-medium">Roadside Assistance</p>
+              <p className="text-sm text-muted-foreground">24/7 emergency support</p>
+            </div>
+            <div className="text-right">
+              <Badge variant={quote.roadside_assistance_included !== false ? "default" : "secondary"}>
+                {quote.roadside_assistance_included !== false ? "Included" : "Not Included"}
+              </Badge>
+              {quote.roadside_assistance_included !== false && quote.roadside_assistance_cost_monthly && (
+                <p className="text-sm text-muted-foreground mt-1">
+                  {formatCurrency(quote.roadside_assistance_cost_monthly, quote.currency || "AED")}/month per vehicle
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Replacement Vehicle */}
+          <div className="flex items-center justify-between py-2">
+            <div>
+              <p className="font-medium">Replacement Vehicle</p>
+              <p className="text-sm text-muted-foreground">
+                Courtesy car during repairs
+                {quote.replacement_sla_hours && ` (${quote.replacement_sla_hours}h SLA)`}
+              </p>
+            </div>
+            <div className="text-right">
+              <Badge variant={quote.replacement_vehicle_included !== false ? "default" : "secondary"}>
+                {quote.replacement_vehicle_included !== false ? "Included" : "Not Included"}
+              </Badge>
+              {quote.replacement_vehicle_included !== false && quote.replacement_vehicle_cost_monthly && (
+                <p className="text-sm text-muted-foreground mt-1">
+                  {formatCurrency(quote.replacement_vehicle_cost_monthly, quote.currency || "AED")}/month per vehicle
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
       </CardContent>
     </Card>
   );

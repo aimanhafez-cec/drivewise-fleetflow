@@ -3170,10 +3170,15 @@ export type Database = {
           quote_items: Json | null
           quote_number: string
           quote_type: string | null
+          replacement_sla_hours: number | null
+          replacement_vehicle_cost_monthly: number | null
+          replacement_vehicle_included: boolean | null
           return_customer_site_id: string | null
           return_location_id: string | null
           return_type: string | null
           rfq_id: string | null
+          roadside_assistance_cost_monthly: number | null
+          roadside_assistance_included: boolean | null
           sales_office_id: string | null
           sales_rep_id: string | null
           sent_to_customer_at: string | null
@@ -3280,10 +3285,15 @@ export type Database = {
           quote_items?: Json | null
           quote_number: string
           quote_type?: string | null
+          replacement_sla_hours?: number | null
+          replacement_vehicle_cost_monthly?: number | null
+          replacement_vehicle_included?: boolean | null
           return_customer_site_id?: string | null
           return_location_id?: string | null
           return_type?: string | null
           rfq_id?: string | null
+          roadside_assistance_cost_monthly?: number | null
+          roadside_assistance_included?: boolean | null
           sales_office_id?: string | null
           sales_rep_id?: string | null
           sent_to_customer_at?: string | null
@@ -3390,10 +3400,15 @@ export type Database = {
           quote_items?: Json | null
           quote_number?: string
           quote_type?: string | null
+          replacement_sla_hours?: number | null
+          replacement_vehicle_cost_monthly?: number | null
+          replacement_vehicle_included?: boolean | null
           return_customer_site_id?: string | null
           return_location_id?: string | null
           return_type?: string | null
           rfq_id?: string | null
+          roadside_assistance_cost_monthly?: number | null
+          roadside_assistance_included?: boolean | null
           sales_office_id?: string | null
           sales_rep_id?: string | null
           sent_to_customer_at?: string | null

@@ -561,11 +561,25 @@ const MasterAgreementDetails = () => {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-muted-foreground mb-1">Roadside Assistance</p>
-                  <p>{agreement.roadside_assistance_included ? "Included" : "Not Included"}</p>
+                  <div className="flex items-center gap-2">
+                    <Badge variant={(agreement as any).roadside_assistance_included ? "default" : "secondary"}>
+                      {(agreement as any).roadside_assistance_included ? "Included" : "Not Included"}
+                    </Badge>
+                    {(agreement as any).roadside_assistance_included && (agreement as any).roadside_assistance_cost_monthly && (
+                      <span className="text-sm">AED {(agreement as any).roadside_assistance_cost_monthly}/month</span>
+                    )}
+                  </div>
                 </div>
                 <div>
                   <p className="text-sm font-medium text-muted-foreground mb-1">Replacement Vehicle</p>
-                  <p>{agreement.replacement_vehicle_included ? "Included" : "Not Included"}</p>
+                  <div className="flex items-center gap-2">
+                    <Badge variant={(agreement as any).replacement_vehicle_included ? "default" : "secondary"}>
+                      {(agreement as any).replacement_vehicle_included ? "Included" : "Not Included"}
+                    </Badge>
+                    {(agreement as any).replacement_vehicle_included && (agreement as any).replacement_vehicle_cost_monthly && (
+                      <span className="text-sm">AED {(agreement as any).replacement_vehicle_cost_monthly}/month</span>
+                    )}
+                  </div>
                 </div>
                 {agreement.replacement_sla_hours && (
                   <div>
