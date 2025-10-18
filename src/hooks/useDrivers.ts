@@ -40,14 +40,36 @@ export interface Driver {
   last_verification_check?: string;
 }
 
-export const useDrivers = (searchQuery?: string) => {
+export const useDrivers = (searchQuery?: string, useEnhanced: boolean = false) => {
+  // Use enhanced search if requested and query is long enough
+  const enhancedSearch = useSearchDriversEnhanced(
+    searchQuery || '', 
+    useEnhanced && (searchQuery?.length || 0) >= 2
+  );
+
+  // Use basic LOV search as fallback
   const result = useLOV<Driver>('drivers', 'id, full_name, license_no, phone, email, date_of_birth, license_expiry, status, additional_driver_fee, emirates_id, passport_number, nationality, license_issued_by, license_issue_date, license_categories, employment_id, department, verification_status, verified_at, verified_by, rejection_reason, visa_expiry, address_emirate, last_verification_check', {
     searchFields: ['full_name', 'license_no', 'email', 'emirates_id'],
     orderBy: 'full_name'
   });
   
-  if (searchQuery !== undefined) {
+  if (searchQuery !== undefined && !useEnhanced) {
     result.updateSearch(searchQuery);
+  }
+
+  // If using enhanced search and it has results, return those
+  if (useEnhanced && enhancedSearch.data) {
+    return {
+      items: enhancedSearch.data.map(item => ({
+        ...item,
+        label: item.label || `${item.full_name} (${item.license_no})`
+      })),
+      isLoading: enhancedSearch.isLoading,
+      error: enhancedSearch.error,
+      updateSearch: () => {}, // Not needed for enhanced search
+      loadMore: () => {},
+      hasMore: false
+    };
   }
   
   return {

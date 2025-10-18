@@ -38,12 +38,8 @@ export const EnhancedDriverPicker: React.FC<EnhancedDriverPickerProps> = ({
     additional_driver_fee: 25.00
   });
 
-  const { items: drivers, isLoading, updateSearch } = useDrivers();
+  const { items: drivers, isLoading } = useDrivers(searchQuery, true);
   const createDriverMutation = useCreateDriver();
-
-  React.useEffect(() => {
-    updateSearch(searchQuery);
-  }, [searchQuery, updateSearch]);
 
   const availableDrivers = drivers.filter(driver => 
     !selectedDrivers.find(selected => selected.id === driver.id)
@@ -161,8 +157,10 @@ export const EnhancedDriverPicker: React.FC<EnhancedDriverPickerProps> = ({
         onChange={handleDriverSelect}
         onSearch={setSearchQuery}
         isLoading={isLoading}
-        placeholder="Select driver(s)..."
-        multiple={false} // We handle multiple selection manually
+        placeholder="Search by name, license, phone, email, ID..."
+        searchPlaceholder="Type at least 2 characters"
+        emptyMessage={searchQuery.length < 2 ? "Type 2+ characters to search" : "No drivers found"}
+        multiple={false}
         allowClear={false}
         className="w-full"
       />

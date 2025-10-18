@@ -9,6 +9,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 interface LOVItem {
   id: string;
   label: string;
+  match_field?: string;
   [key: string]: any;
 }
 interface LOVSelectProps {
@@ -89,6 +90,19 @@ export const LOVSelect = forwardRef<HTMLButtonElement, LOVSelectProps>(({
     }
   };
 
+  // Format match field for display
+  const formatMatchField = (field: string): string => {
+    const fieldMap: Record<string, string> = {
+      name: 'Name',
+      license: 'License',
+      phone: 'Phone',
+      email: 'Email',
+      emirates_id: 'Emirates ID',
+      passport: 'Passport'
+    };
+    return fieldMap[field] || field;
+  };
+
   // Display value for trigger
   const displayValue = () => {
     if (selectedItems.length === 0) {
@@ -128,7 +142,14 @@ export const LOVSelect = forwardRef<HTMLButtonElement, LOVSelectProps>(({
                 </div> : <CommandGroup>
                   {items.length === 0 ? <CommandEmpty>{emptyMessage}</CommandEmpty> : items.map(item => <CommandItem key={item.id} value={item.id} onSelect={() => handleSelect(item.id)} className="flex items-center gap-2">
                         <Check className={cn("h-4 w-4", (multiple ? Array.isArray(value) && value.includes(item.id) : value === item.id) ? "opacity-100" : "opacity-0")} />
-                        <span className="flex-1 truncate">{item.label}</span>
+                        <div className="flex items-center justify-between flex-1 min-w-0">
+                          <span className="truncate">{item.label}</span>
+                          {item.match_field && (
+                            <Badge variant="secondary" className="ml-2 text-xs shrink-0">
+                              {formatMatchField(item.match_field)}
+                            </Badge>
+                          )}
+                        </div>
                       </CommandItem>)}
                   {hasMore && <div className="border-t">
                       <Button variant="ghost" size="sm" className="w-full justify-center" onClick={onLoadMore} disabled={isLoadingMore}>

@@ -40,7 +40,8 @@ export const MasterAgreementStep5Drivers: React.FC<MasterAgreementStep5DriversPr
   const [viewDocsDriverName, setViewDocsDriverName] = useState<string | null>(null);
   const [editDriverId, setEditDriverId] = useState<string | null>(null);
 
-  const { items: drivers, updateSearch } = useDrivers();
+  const [driverSearch, setDriverSearch] = useState('');
+  const { items: drivers, isLoading: isSearchingDrivers } = useDrivers(driverSearch, true);
   const { data: agreementDrivers = [], isLoading } = useAgreementDrivers(data.id);
   const assignDriverMutation = useAssignDriver();
   const removeDriverMutation = useRemoveDriver();
@@ -381,7 +382,7 @@ export const MasterAgreementStep5Drivers: React.FC<MasterAgreementStep5DriversPr
             <DialogTitle>Assign Driver to Vehicle Line</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <div>
+              <div>
               <label className="text-sm font-medium mb-2 block">Select Driver</label>
               <div className="flex gap-2">
                 <div className="flex-1">
@@ -389,8 +390,11 @@ export const MasterAgreementStep5Drivers: React.FC<MasterAgreementStep5DriversPr
                     value={selectedDriverId || undefined}
                     onChange={(value) => setSelectedDriverId(value as string)}
                     items={drivers.filter(d => d.status === 'active')}
-                    placeholder="Search for driver..."
-                    onSearch={updateSearch}
+                    placeholder="Search by name, license, phone, email..."
+                    searchPlaceholder="Type at least 2 characters"
+                    onSearch={setDriverSearch}
+                    isLoading={isSearchingDrivers}
+                    emptyMessage={driverSearch.length < 2 ? "Type 2+ characters to search" : "No drivers found"}
                   />
                 </div>
                 <Button
