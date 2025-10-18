@@ -362,23 +362,53 @@ const MasterAgreementDetails = () => {
                           </div>
 
                           <div>
-                            <p className="text-sm font-medium text-muted-foreground mb-1">Pricing</p>
+                            <p className="text-sm font-medium text-muted-foreground mb-2">Pricing Breakdown</p>
                             <div className="space-y-1">
-                              <p className="text-sm">
-                                <span className="font-medium">Monthly Rate:</span>{" "}
-                                {formatCurrency(line.monthly_rate_aed || 0)} AED
-                              </p>
-                              <p className="text-sm">
-                                <span className="font-medium">Setup Fee:</span>{" "}
-                                {formatCurrency(line.setup_fee_aed || 0)} AED
-                              </p>
-                              <p className="text-sm">
-                                <span className="font-medium">Contract Months:</span> {line.contract_months || "N/A"}
-                              </p>
-                              <p className="text-sm">
-                                <span className="font-medium">Total Value:</span>{" "}
-                                {formatCurrency((line.monthly_rate_aed || 0) * (line.contract_months || 0))} AED
-                              </p>
+                              <div className="flex justify-between items-center text-sm">
+                                <span className="text-muted-foreground">Base Rate:</span>
+                                <span className="font-medium">{formatCurrency((line as any).base_vehicle_rate_per_month || 0, 'AED')}</span>
+                              </div>
+                              <div className="flex justify-between items-center text-sm">
+                                <span className="text-muted-foreground">Insurance:</span>
+                                <span className="font-medium">+{formatCurrency((line as any).monthly_insurance_cost_per_vehicle || 300, 'AED')}</span>
+                              </div>
+                              {(line as any).monthly_maintenance_cost_per_vehicle && (
+                                <div className="flex justify-between items-center text-sm">
+                                  <span className="text-muted-foreground">Maintenance:</span>
+                                  <span className="font-medium">+{formatCurrency((line as any).monthly_maintenance_cost_per_vehicle, 'AED')}</span>
+                                </div>
+                              )}
+                              {(line as any).roadside_assistance_cost_monthly && (
+                                <div className="flex justify-between items-center text-sm">
+                                  <span className="text-muted-foreground">Roadside:</span>
+                                  <span className="font-medium">+{formatCurrency((line as any).roadside_assistance_cost_monthly, 'AED')}</span>
+                                </div>
+                              )}
+                              {(line as any).replacement_vehicle_cost_monthly && (
+                                <div className="flex justify-between items-center text-sm">
+                                  <span className="text-muted-foreground">Replacement:</span>
+                                  <span className="font-medium">+{formatCurrency((line as any).replacement_vehicle_cost_monthly, 'AED')}</span>
+                                </div>
+                              )}
+                              <div className="border-t pt-1 mt-2">
+                                <div className="flex justify-between items-center text-sm font-bold">
+                                  <span>Monthly Total:</span>
+                                  <span>{formatCurrency((line as any).monthly_rate_aed || 0, 'AED')}</span>
+                                </div>
+                              </div>
+                              <div className="mt-2 pt-2 border-t">
+                                <p className="text-sm">
+                                  <span className="font-medium">Setup Fee:</span>{" "}
+                                  {formatCurrency((line as any).setup_fee_aed || 0, 'AED')}
+                                </p>
+                                <p className="text-sm">
+                                  <span className="font-medium">Contract Months:</span> {(line as any).contract_months || "N/A"}
+                                </p>
+                                <p className="text-sm">
+                                  <span className="font-medium">Total Value:</span>{" "}
+                                  {formatCurrency(((line as any).monthly_rate_aed || 0) * ((line as any).contract_months || 0), 'AED')}
+                                </p>
+                              </div>
                             </div>
                           </div>
 
@@ -536,6 +566,11 @@ const MasterAgreementDetails = () => {
                   <p className="text-sm font-medium text-muted-foreground mb-1">Insurance Excess</p>
                   <p>{formatCurrency(agreement.insurance_excess_aed || 0)} AED</p>
                 </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground mb-1">Monthly Insurance Cost / Vehicle</p>
+                  <p className="font-semibold text-lg">{formatCurrency((agreement as any).monthly_insurance_cost_per_vehicle || 300, 'AED')}</p>
+                  <p className="text-xs text-muted-foreground">Included in vehicle monthly rate</p>
+                </div>
               </CardContent>
             </Card>
 
@@ -558,6 +593,13 @@ const MasterAgreementDetails = () => {
                 <div>
                   <p className="text-sm font-medium text-muted-foreground mb-1">Tyres Policy</p>
                   <p>{agreement.tyres_policy || "As per maintenance policy"}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground mb-1">Monthly Maintenance Cost / Vehicle</p>
+                  <p className="font-semibold text-lg">{formatCurrency((agreement as any).monthly_maintenance_cost_per_vehicle || 250, 'AED')}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {(agreement as any).show_maintenance_separate_line ? "Shown as separate line" : "Included in vehicle rate"}
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm font-medium text-muted-foreground mb-1">Roadside Assistance</p>
