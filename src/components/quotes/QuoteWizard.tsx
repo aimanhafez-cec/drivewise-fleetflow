@@ -1096,7 +1096,8 @@ export const QuoteWizard: React.FC<QuoteWizardProps> = ({ viewMode = false, quot
               {quoteData.id ? "Save Changes" : "Save Draft"}
             </Button>
             <Button variant="outline" onClick={() => navigate("/manage-quotations")}>
-              Cancel
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back
             </Button>
           </div>
         </div>

@@ -429,10 +429,20 @@ export const MasterAgreementWizard: React.FC<MasterAgreementWizardProps> = ({
             {isEditMode ? "Update agreement details" : "Create a new corporate leasing agreement"}
           </p>
         </div>
-        <Button variant="outline" onClick={() => navigate("/master-agreements")}>
-          <ArrowLeft className="h-4 w-4 mr-1" />
-          Back
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            onClick={handleSaveDraft} 
+            disabled={saveMutation.isPending}
+          >
+            <Save className="h-4 w-4 mr-2" />
+            {isEditMode || agreementData.id ? "Save Changes" : "Save Draft"}
+          </Button>
+          <Button variant="outline" onClick={() => navigate("/master-agreements")}>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back
+          </Button>
+        </div>
       </div>
 
       <TrainStopStepper 
