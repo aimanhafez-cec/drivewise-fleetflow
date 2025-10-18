@@ -38,6 +38,14 @@ export const QuoteWizardStep3_CoverageServices: React.FC<QuoteWizardStep3Coverag
     
     if (!data.insurance_coverage_package) {
       updates.insurance_coverage_package = 'comprehensive';
+      // Set comprehensive defaults
+      updates.insurance_damage_waiver = true;
+      updates.insurance_theft_protection = true;
+      updates.insurance_third_party_liability = true;
+      updates.insurance_additional_driver = true;
+      updates.insurance_cross_border = false;
+      updates.insurance_glass_tire_cover = true;
+      updates.insurance_pai_enabled = false;
     }
     if (data.insurance_excess_aed === undefined) {
       updates.insurance_excess_aed = 1500;
@@ -179,15 +187,50 @@ export const QuoteWizardStep3_CoverageServices: React.FC<QuoteWizardStep3Coverag
                   <Select
                     value={data.insurance_coverage_package || "comprehensive"}
                     onValueChange={(value) => {
-                      onChange({ insurance_coverage_package: value, insurance_package_type: value });
-                      // Auto-set insurance cost based on package
-                      if (value === 'basic') {
-                        onChange({ monthly_insurance_cost_per_vehicle: 0 });
-                      } else if (value === 'comprehensive') {
-                        onChange({ monthly_insurance_cost_per_vehicle: 300 });
-                      } else if (value === 'full') {
-                        onChange({ monthly_insurance_cost_per_vehicle: 500 });
-                      }
+                      // Define coverage based on real-world business practices
+                      const packageDefaults: Record<string, any> = {
+                        basic: {
+                          insurance_coverage_package: value,
+                          insurance_package_type: value,
+                          monthly_insurance_cost_per_vehicle: 0,
+                          insurance_damage_waiver: false,           // ❌ Customer liable
+                          insurance_theft_protection: false,        // ❌ Customer liable
+                          insurance_third_party_liability: true,    // ✅ Required by law
+                          insurance_additional_driver: false,       // ❌ Not included
+                          insurance_cross_border: false,            // ❌ Separate add-on
+                          insurance_glass_tire_cover: false,        // ❌ Not included
+                          insurance_pai_enabled: false,             // ❌ Optional add-on
+                          insurance_excess_aed: null,               // Not applicable
+                        },
+                        comprehensive: {
+                          insurance_coverage_package: value,
+                          insurance_package_type: value,
+                          monthly_insurance_cost_per_vehicle: 300,
+                          insurance_damage_waiver: true,            // ✅ Included
+                          insurance_theft_protection: true,         // ✅ Included
+                          insurance_third_party_liability: true,    // ✅ Included
+                          insurance_additional_driver: true,        // ✅ Included
+                          insurance_cross_border: data.insurance_cross_border || false, // Keep existing
+                          insurance_glass_tire_cover: true,         // ✅ Included (user can toggle)
+                          insurance_pai_enabled: data.insurance_pai_enabled || false,   // Keep existing
+                          insurance_excess_aed: 1500,               // AED 1,500 excess
+                        },
+                        'full-zero-excess': {
+                          insurance_coverage_package: value,
+                          insurance_package_type: value,
+                          monthly_insurance_cost_per_vehicle: 500,
+                          insurance_damage_waiver: true,            // ✅ Included
+                          insurance_theft_protection: true,         // ✅ Included
+                          insurance_third_party_liability: true,    // ✅ Included
+                          insurance_additional_driver: true,        // ✅ Included
+                          insurance_cross_border: data.insurance_cross_border || false, // Keep existing
+                          insurance_glass_tire_cover: true,         // ✅ Included
+                          insurance_pai_enabled: data.insurance_pai_enabled || false,   // Keep existing
+                          insurance_excess_aed: 0,                  // ⭐ ZERO excess (key difference)
+                        },
+                      };
+
+                      onChange(packageDefaults[value] || packageDefaults.comprehensive);
                     }}
                   >
                     <SelectTrigger className="h-9">
