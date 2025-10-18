@@ -35,6 +35,8 @@ import {
   Paperclip,
   ChevronDown,
   Plus,
+  Gauge,
+  Package,
 } from "lucide-react";
 import { CustomerAcceptanceDialog } from "@/components/quotes/CustomerAcceptanceDialog";
 import { CustomerRejectionDialog } from "@/components/quotes/CustomerRejectionDialog";
@@ -789,19 +791,20 @@ const QuoteDetails: React.FC = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
-              <Accordion type="multiple" defaultValue={["insurance", "maintenance", "addons"]} className="px-6">
-                {/* Insurance & Coverage */}
-                <AccordionItem value="insurance">
-                  <AccordionTrigger className="hover:no-underline">
+              <Accordion type="multiple" defaultValue={["insurance", "maintenance", "mileage", "services", "tolls", "addons"]}>
+                {/* 1. Insurance Coverage */}
+                <AccordionItem value="insurance" className="border-b">
+                  <AccordionTrigger className="px-6 py-4 hover:no-underline">
                     <div className="flex items-center gap-2">
-                      <Shield className="h-4 w-4" />
-                      <span className="font-semibold">Insurance & Coverage</span>
+                      <Shield className="h-4 w-4 text-blue-600" />
+                      <span className="font-semibold">Insurance Coverage</span>
+                      <Badge variant="secondary" className="ml-2 text-xs">Default Settings</Badge>
                     </div>
                   </AccordionTrigger>
-                  <AccordionContent className="pb-4">
-                    <div className="space-y-6">
-                      <div className="grid md:grid-cols-2 gap-6">
-                        <div className="space-y-4">
+                  <AccordionContent className="px-6 pb-4">
+                    <div className="space-y-4">
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div className="space-y-3">
                           <div>
                             <p className="text-sm text-muted-foreground">Coverage Package</p>
                             <Badge variant="secondary" className="mt-1">
@@ -838,9 +841,9 @@ const QuoteDetails: React.FC = () => {
                           </div>
                         </div>
 
-                          <div className="space-y-3">
+                        <div className="space-y-2">
                           <p className="text-sm font-semibold">Included Coverage</p>
-                          <div className="space-y-2">
+                          <div className="space-y-1">
                             <div className="flex items-center gap-2">
                               {isCoverageIncluded(
                                 quote.insurance_glass_tire_cover,
@@ -930,14 +933,14 @@ const QuoteDetails: React.FC = () => {
                       </div>
 
                       {quote.insurance_coverage_summary && (
-                        <div>
+                        <div className="pt-2">
                           <p className="text-sm text-muted-foreground mb-1">Coverage Summary</p>
                           <p className="text-sm">{quote.insurance_coverage_summary}</p>
                         </div>
                       )}
 
                       {quote.insurance_notes && (
-                        <div>
+                        <div className="pt-2">
                           <p className="text-sm text-muted-foreground mb-1">Insurance Notes</p>
                           <p className="text-sm">{quote.insurance_notes}</p>
                         </div>
@@ -946,18 +949,19 @@ const QuoteDetails: React.FC = () => {
                   </AccordionContent>
                 </AccordionItem>
 
-                {/* Maintenance & Services */}
-                <AccordionItem value="maintenance">
-                  <AccordionTrigger className="hover:no-underline">
+                {/* 2. Maintenance Coverage */}
+                <AccordionItem value="maintenance" className="border-b">
+                  <AccordionTrigger className="px-6 py-4 hover:no-underline">
                     <div className="flex items-center gap-2">
-                      <Wrench className="h-4 w-4" />
-                      <span className="font-semibold">Maintenance & Services</span>
+                      <Wrench className="h-4 w-4 text-orange-600" />
+                      <span className="font-semibold">Maintenance Coverage</span>
+                      <Badge variant="secondary" className="ml-2 text-xs">Default Settings</Badge>
                     </div>
                   </AccordionTrigger>
-                  <AccordionContent className="pb-4">
-                    <div className="space-y-6">
-                      <div className="grid md:grid-cols-2 gap-6">
-                        <div className="space-y-4">
+                  <AccordionContent className="px-6 pb-4">
+                    <div className="space-y-4">
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div className="space-y-3">
                           <div>
                             <p className="text-sm text-muted-foreground">Maintenance Status</p>
                             <div className="flex items-center gap-2 mt-1">
@@ -1003,7 +1007,7 @@ const QuoteDetails: React.FC = () => {
                         </div>
 
                         {quote.maintenance_included && (
-                          <div className="space-y-4">
+                          <div className="space-y-3">
                             <div>
                               <p className="text-sm text-muted-foreground">Plan Source</p>
                               <p className="font-medium">
@@ -1023,94 +1027,200 @@ const QuoteDetails: React.FC = () => {
                       </div>
 
                       {quote.maintenance_coverage_summary && (
-                        <div>
+                        <div className="pt-2">
                           <p className="text-sm text-muted-foreground mb-1">Coverage Summary</p>
                           <p className="text-sm">{quote.maintenance_coverage_summary}</p>
                         </div>
                       )}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
 
-                      {/* Additional Services */}
-                      <div className="pt-4 border-t space-y-4">
-                        <h4 className="text-sm font-semibold">Additional Services</h4>
-                        
-                        {/* Roadside Assistance */}
-                        <div className="flex items-center justify-between py-2 border-b">
+                {/* 3. Mileage Configuration */}
+                <AccordionItem value="mileage" className="border-b">
+                  <AccordionTrigger className="px-6 py-4 hover:no-underline">
+                    <div className="flex items-center gap-2">
+                      <Gauge className="h-4 w-4 text-purple-600" />
+                      <span className="font-semibold">Mileage Configuration</span>
+                      <Badge variant="secondary" className="ml-2 text-xs">Default Settings</Badge>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-6 pb-4">
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm text-muted-foreground">Mileage Pooling</p>
+                        <Badge variant={quote.mileage_pooling_enabled ? "default" : "secondary"}>
+                          {quote.mileage_pooling_enabled ? "Enabled" : "Disabled"}
+                        </Badge>
+                      </div>
+                      {quote.mileage_pooling_enabled ? (
+                        <>
                           <div>
-                            <p className="font-medium">Roadside Assistance</p>
-                            <p className="text-sm text-muted-foreground">24/7 emergency support</p>
+                            <p className="text-sm text-muted-foreground">Total Fleet Allowance</p>
+                            <p className="font-medium">{quote.pooled_mileage_allowance_km?.toLocaleString() || 'N/A'} km/month</p>
                           </div>
-                          <div className="text-right">
-                            <Badge variant={(quote as any).roadside_assistance_included !== false ? "default" : "secondary"}>
-                              {(quote as any).roadside_assistance_included !== false ? "Included" : "Not Included"}
-                            </Badge>
-                            {(quote as any).roadside_assistance_included !== false && (quote as any).roadside_assistance_cost_monthly && (
-                              <p className="text-sm text-muted-foreground mt-1">
-                                {formatCurrency((quote as any).roadside_assistance_cost_monthly, quote.currency || "AED")}/month per vehicle
-                              </p>
-                            )}
+                          <div>
+                            <p className="text-sm text-muted-foreground">Excess Rate</p>
+                            <p className="font-medium">{formatCurrency(quote.pooled_excess_km_rate || 1.00, quote.currency || "AED")}/km</p>
                           </div>
+                          <div className="pt-2 text-sm text-muted-foreground">
+                            All vehicles share a common mileage pool. Excess kilometers from one vehicle can be offset by unused kilometers from another.
+                          </div>
+                        </>
+                      ) : (
+                        <div className="text-sm text-muted-foreground">
+                          Individual mileage limits apply per vehicle. Excess rates are calculated separately for each vehicle.
                         </div>
+                      )}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
 
-                        {/* Replacement Vehicle */}
-                        <div className="flex items-center justify-between py-2">
-                          <div>
-                            <p className="font-medium">Replacement Vehicle</p>
-                            <p className="text-sm text-muted-foreground">
-                              Courtesy car during repairs
-                              {(quote as any).replacement_sla_hours && ` (${(quote as any).replacement_sla_hours}h SLA)`}
+                {/* 4. Additional Services */}
+                <AccordionItem value="services" className="border-b">
+                  <AccordionTrigger className="px-6 py-4 hover:no-underline">
+                    <div className="flex items-center gap-2">
+                      <Wrench className="h-4 w-4" />
+                      <span className="font-semibold">Additional Services</span>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-6 pb-4">
+                    <div className="space-y-3">
+                      {/* Roadside Assistance */}
+                      <div className="flex items-center justify-between py-2 border-b">
+                        <div>
+                          <p className="font-medium">Roadside Assistance (24/7)</p>
+                          <p className="text-xs text-muted-foreground">Emergency towing, flat tire, battery jump-start</p>
+                        </div>
+                        <div className="text-right">
+                          <Badge variant={(quote as any).roadside_assistance_included !== false ? "default" : "secondary"}>
+                            {(quote as any).roadside_assistance_included !== false ? "Included" : "Not Included"}
+                          </Badge>
+                          {(quote as any).roadside_assistance_included !== false && (quote as any).roadside_assistance_cost_monthly && (
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {formatCurrency((quote as any).roadside_assistance_cost_monthly, quote.currency || "AED")}/mo per vehicle
                             </p>
-                          </div>
-                          <div className="text-right">
-                            <Badge variant={(quote as any).replacement_vehicle_included !== false ? "default" : "secondary"}>
-                              {(quote as any).replacement_vehicle_included !== false ? "Included" : "Not Included"}
-                            </Badge>
-                            {(quote as any).replacement_vehicle_included !== false && (quote as any).replacement_vehicle_cost_monthly && (
-                              <p className="text-sm text-muted-foreground mt-1">
-                                {formatCurrency((quote as any).replacement_vehicle_cost_monthly, quote.currency || "AED")}/month per vehicle
-                              </p>
-                            )}
-                          </div>
+                          )}
+                        </div>
+                      </div>
+                      
+                      {/* Replacement Vehicle */}
+                      <div className="flex items-center justify-between py-2">
+                        <div>
+                          <p className="font-medium">Replacement Vehicle</p>
+                          <p className="text-xs text-muted-foreground">
+                            Courtesy car during repairs
+                            {(quote as any).replacement_sla_hours && ` (${(quote as any).replacement_sla_hours}h SLA)`}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <Badge variant={(quote as any).replacement_vehicle_included !== false ? "default" : "secondary"}>
+                            {(quote as any).replacement_vehicle_included !== false ? "Included" : "Not Included"}
+                          </Badge>
+                          {(quote as any).replacement_vehicle_included !== false && (quote as any).replacement_vehicle_cost_monthly && (
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {formatCurrency((quote as any).replacement_vehicle_cost_monthly, quote.currency || "AED")}/mo per vehicle
+                            </p>
+                          )}
                         </div>
                       </div>
                     </div>
                   </AccordionContent>
                 </AccordionItem>
 
-                {/* Default Add-Ons & Extras */}
-                <AccordionItem value="addons">
-                  <AccordionTrigger className="hover:no-underline">
+                {/* 5. Toll & Fines Handling */}
+                <AccordionItem value="tolls" className="border-b">
+                  <AccordionTrigger className="px-6 py-4 hover:no-underline">
                     <div className="flex items-center gap-2">
-                      <Plus className="h-4 w-4" />
+                      <DollarSign className="h-4 w-4 text-green-600" />
+                      <span className="font-semibold">Toll & Fines Handling</span>
+                      <Badge variant="secondary" className="ml-2 text-xs">Default Settings</Badge>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-6 pb-4">
+                    <div className="space-y-3">
+                      <div>
+                        <p className="text-sm text-muted-foreground">Salik/Darb Handling</p>
+                        <p className="font-medium">
+                          {(() => {
+                            const labels: Record<string, string> = {
+                              "rebill-actual": "Rebill Actual Costs",
+                              "included-capped": "Included (Capped)",
+                              "customer-responsible": "Customer Responsible",
+                              "lump-sum": "Lump Sum Monthly",
+                            };
+                            return labels[quote.salik_darb_handling || "rebill-actual"] || quote.salik_darb_handling || "Not specified";
+                          })()}
+                        </p>
+                      </div>
+                      {quote.salik_darb_handling === "included-capped" && (quote as any).salik_darb_allowance_cap && (
+                        <div>
+                          <p className="text-sm text-muted-foreground">Monthly Allowance Cap</p>
+                          <p className="font-medium">{formatCurrency((quote as any).salik_darb_allowance_cap, quote.currency || "AED")}</p>
+                        </div>
+                      )}
+                      {(quote as any).tolls_admin_fee_model && (
+                        <div>
+                          <p className="text-sm text-muted-foreground">Admin Fee Model</p>
+                          <p className="font-medium">{(quote as any).tolls_admin_fee_model}</p>
+                        </div>
+                      )}
+                      <div>
+                        <p className="text-sm text-muted-foreground">Traffic Fines Handling</p>
+                        <p className="font-medium">
+                          {(() => {
+                            const labels: Record<string, string> = {
+                              "auto-rebill-admin": "Auto Rebill + Admin Fee",
+                              "customer-direct": "Customer Pays Directly",
+                              "monthly-invoice": "Monthly Invoice",
+                            };
+                            return labels[quote.traffic_fines_handling || "auto-rebill-admin"] || quote.traffic_fines_handling || "Not specified";
+                          })()}
+                        </p>
+                      </div>
+                      {quote.admin_fee_per_fine_aed && (
+                        <div>
+                          <p className="text-sm text-muted-foreground">Admin Fee per Fine</p>
+                          <p className="font-medium">{formatCurrency(quote.admin_fee_per_fine_aed, quote.currency || "AED")}</p>
+                        </div>
+                      )}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+
+                {/* 6. Default Add-Ons & Extras */}
+                <AccordionItem value="addons">
+                  <AccordionTrigger className="px-6 py-4 hover:no-underline">
+                    <div className="flex items-center gap-2">
+                      <Package className="h-4 w-4" />
                       <span className="font-semibold">Default Add-Ons & Extras</span>
                     </div>
                   </AccordionTrigger>
-                  <AccordionContent className="pb-4">
-                    <div className="space-y-4">
+                  <AccordionContent className="px-6 pb-4">
+                    <div className="space-y-3">
                       {quote.default_addons && quote.default_addons.length > 0 ? (
-                        <>
-                          <div className="space-y-2">
-                            {quote.default_addons.map((addon: any, index: number) => (
-                              <div key={index} className="flex items-center justify-between py-2 border-b last:border-0">
-                                <div>
-                                  <p className="font-medium">{addon.name}</p>
-                                  <p className="text-sm text-muted-foreground">
-                                    {addon.charge_type === "monthly" ? "Monthly charge" : "One-time charge"}
-                                  </p>
-                                </div>
-                                <p className="font-medium">
-                                  {formatCurrency(addon.cost, quote.currency || "AED")}
-                                  {addon.charge_type === "monthly" && "/month"}
+                        <div className="space-y-2">
+                          {quote.default_addons.map((addon: any, index: number) => (
+                            <div key={index} className="flex items-center justify-between py-2 border-b last:border-0">
+                              <div>
+                                <p className="font-medium">{addon.name}</p>
+                                <p className="text-xs text-muted-foreground">
+                                  {addon.charge_type === "monthly" ? "Monthly charge" : "One-time charge"}
                                 </p>
                               </div>
-                            ))}
-                          </div>
-                        </>
+                              <p className="font-medium">
+                                {formatCurrency(addon.cost, quote.currency || "AED")}
+                                {addon.charge_type === "monthly" && "/month"}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
                       ) : (
                         <p className="text-sm text-muted-foreground">No default add-ons configured</p>
                       )}
 
                       {(quote as any).addons_summary && (
-                        <div className="pt-4 border-t">
+                        <div className="pt-2 border-t">
                           <p className="text-sm text-muted-foreground mb-1">Add-Ons Summary</p>
                           <p className="text-sm">{(quote as any).addons_summary}</p>
                         </div>
