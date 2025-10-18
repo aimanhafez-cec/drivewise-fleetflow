@@ -3104,6 +3104,7 @@ export type Database = {
           approval_notes: string | null
           approved_at: string | null
           approved_by: string | null
+          base_vehicle_rate_per_month: number | null
           billing_plan: string | null
           billing_start_date: string | null
           business_unit_id: string | null
@@ -3142,6 +3143,7 @@ export type Database = {
           insurance_excess_aed: number | null
           insurance_glass_tire_cover: boolean | null
           insurance_notes: string | null
+          insurance_package_type: string | null
           insurance_pai_enabled: boolean | null
           insurance_personal_accident: boolean | null
           insurance_territorial_coverage: string | null
@@ -3221,6 +3223,7 @@ export type Database = {
           approval_notes?: string | null
           approved_at?: string | null
           approved_by?: string | null
+          base_vehicle_rate_per_month?: number | null
           billing_plan?: string | null
           billing_start_date?: string | null
           business_unit_id?: string | null
@@ -3259,6 +3262,7 @@ export type Database = {
           insurance_excess_aed?: number | null
           insurance_glass_tire_cover?: boolean | null
           insurance_notes?: string | null
+          insurance_package_type?: string | null
           insurance_pai_enabled?: boolean | null
           insurance_personal_accident?: boolean | null
           insurance_territorial_coverage?: string | null
@@ -3338,6 +3342,7 @@ export type Database = {
           approval_notes?: string | null
           approved_at?: string | null
           approved_by?: string | null
+          base_vehicle_rate_per_month?: number | null
           billing_plan?: string | null
           billing_start_date?: string | null
           business_unit_id?: string | null
@@ -3376,6 +3381,7 @@ export type Database = {
           insurance_excess_aed?: number | null
           insurance_glass_tire_cover?: boolean | null
           insurance_notes?: string | null
+          insurance_package_type?: string | null
           insurance_pai_enabled?: boolean | null
           insurance_personal_accident?: boolean | null
           insurance_territorial_coverage?: string | null

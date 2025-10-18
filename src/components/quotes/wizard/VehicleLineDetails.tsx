@@ -28,6 +28,7 @@ interface VehicleLineDetailsProps {
     insurance_glass_tire_cover?: boolean;
     insurance_pai_enabled?: boolean;
     insurance_territorial_coverage?: string;
+    insurance_package_type?: string;
     pickup_type?: string;
     pickup_location_id?: string;
     pickup_customer_site_id?: string;
@@ -1453,7 +1454,58 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
             
             <Card className="bg-muted max-w-2xl">
               <CardContent className="pt-4 space-y-2 min-w-[500px]">
-                <div className="flex justify-between text-sm">
+                {/* Pricing Breakdown */}
+                <div className="space-y-2 pb-2 border-b">
+                  <h4 className="font-semibold text-sm">Monthly Rate Breakdown:</h4>
+                  <div className="flex justify-between text-sm pl-4">
+                    <span className="text-muted-foreground">Base Vehicle Rate:</span>
+                    <span className="font-medium whitespace-nowrap">
+                      {line.base_vehicle_rate_per_month || line.monthly_rate || 0} AED
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-sm pl-4">
+                    <span className="text-muted-foreground">
+                      + Insurance ({line.insurance_package_type || headerDefaults.insurance_package_type || 'comprehensive'}):
+                    </span>
+                    <span className="font-medium whitespace-nowrap">
+                      {(() => {
+                        const pkg = line.insurance_package_type || headerDefaults.insurance_package_type || 'comprehensive';
+                        return pkg === 'basic' ? '0' : pkg === 'full' ? '500' : '300';
+                      })()} AED
+                    </span>
+                  </div>
+                  {(line.maintenance_included ?? headerDefaults.maintenance_included) && (
+                    <div className="flex justify-between text-sm pl-4">
+                      <span className="text-muted-foreground">+ Maintenance:</span>
+                      <span className="font-medium whitespace-nowrap">
+                        {line.monthly_maintenance_cost_per_vehicle || headerDefaults.monthly_maintenance_cost_per_vehicle || 0} AED
+                      </span>
+                    </div>
+                  )}
+                  {(line.roadside_assistance_included ?? headerDefaults.roadside_assistance_included) && (
+                    <div className="flex justify-between text-sm pl-4">
+                      <span className="text-muted-foreground">+ Roadside Assistance (24/7):</span>
+                      <span className="font-medium whitespace-nowrap">
+                        {line.roadside_assistance_cost_monthly ?? headerDefaults.roadside_assistance_cost_monthly ?? 0} AED
+                      </span>
+                    </div>
+                  )}
+                  {(line.replacement_vehicle_included ?? headerDefaults.replacement_vehicle_included) && (
+                    <div className="flex justify-between text-sm pl-4">
+                      <span className="text-muted-foreground">+ Replacement Vehicle:</span>
+                      <span className="font-medium whitespace-nowrap">
+                        {line.replacement_vehicle_cost_monthly ?? headerDefaults.replacement_vehicle_cost_monthly ?? 0} AED
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex justify-between text-sm font-semibold pt-2 border-t">
+                    <span>= Monthly Rate Total:</span>
+                    <span className="text-primary whitespace-nowrap">{line.monthly_rate || 0} AED</span>
+                  </div>
+                </div>
+
+                {/* Upfront Costs */}
+                <div className="flex justify-between text-sm pt-2">
                   <span className="text-muted-foreground">Deposit:</span>
                   <span className="font-medium whitespace-nowrap">{line.deposit_amount || 0} AED</span>
                 </div>
@@ -1471,34 +1523,6 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
                   <span className="text-muted-foreground">Collection Fee:</span>
                   <span className="font-medium whitespace-nowrap">{(line.collection_fee || 0).toFixed(2)} AED</span>
                 </div>
-
-                {/* Maintenance section */}
-                {(line.maintenance_included ?? headerDefaults.maintenance_included) && (
-                  <div className="flex justify-between text-sm border-t pt-2">
-                    <span className="text-muted-foreground">Maintenance (Monthly):</span>
-                    <span className="font-medium whitespace-nowrap">
-                      {line.monthly_maintenance_cost_per_vehicle || headerDefaults.monthly_maintenance_cost_per_vehicle || 0} AED
-                    </span>
-                  </div>
-                )}
-
-                {/* Additional Services */}
-                {(line.roadside_assistance_included ?? headerDefaults.roadside_assistance_included) && (
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Roadside Assistance (Monthly):</span>
-                    <span className="font-medium whitespace-nowrap">
-                      {line.roadside_assistance_cost_monthly ?? headerDefaults.roadside_assistance_cost_monthly ?? 0} AED
-                    </span>
-                  </div>
-                )}
-                {(line.replacement_vehicle_included ?? headerDefaults.replacement_vehicle_included) && (
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Replacement Vehicle (Monthly):</span>
-                    <span className="font-medium whitespace-nowrap">
-                      {line.replacement_vehicle_cost_monthly ?? headerDefaults.replacement_vehicle_cost_monthly ?? 0} AED
-                    </span>
-                  </div>
-                )}
                 
                 <div className="flex justify-between text-sm border-t pt-2">
                   <span className="font-semibold">Upfront Total:</span>

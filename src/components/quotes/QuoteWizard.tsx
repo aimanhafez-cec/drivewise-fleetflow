@@ -158,6 +158,10 @@ interface QuoteData {
   insurance_cross_border?: boolean;
   insurance_notes?: string;
   monthly_insurance_cost_per_vehicle?: number;
+  
+  // Pricing components
+  base_vehicle_rate_per_month?: number;
+  insurance_package_type?: string;
 
   // Phase 3C: Maintenance Header Defaults
   maintenance_included?: boolean;
@@ -527,6 +531,8 @@ export const QuoteWizard: React.FC<QuoteWizardProps> = ({ viewMode = false, quot
         insurance_coverage_summary: data.insurance_coverage_summary,
         insurance_notes: data.insurance_notes,
         monthly_insurance_cost_per_vehicle: data.monthly_insurance_cost_per_vehicle,
+        base_vehicle_rate_per_month: data.base_vehicle_rate_per_month,
+        insurance_package_type: data.insurance_package_type,
         
         // Step 3 - Maintenance
         maintenance_included: data.maintenance_included,
@@ -725,6 +731,8 @@ export const QuoteWizard: React.FC<QuoteWizardProps> = ({ viewMode = false, quot
         insurance_cross_border: data.insurance_cross_border,
         insurance_notes: data.insurance_notes,
         monthly_insurance_cost_per_vehicle: data.monthly_insurance_cost_per_vehicle,
+        base_vehicle_rate_per_month: data.base_vehicle_rate_per_month,
+        insurance_package_type: data.insurance_package_type,
         
         // Maintenance fields (Step 3)
         maintenance_included: data.maintenance_included,

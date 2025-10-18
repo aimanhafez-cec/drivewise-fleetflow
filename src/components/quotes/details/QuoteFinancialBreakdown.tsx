@@ -122,7 +122,15 @@ export const QuoteFinancialBreakdown: React.FC<QuoteFinancialBreakdownProps> = (
 
   // Helper to calculate line total with services
   const calculateLineTotalWithServices = (line: any) => {
-    const baseRate = line.monthly_rate || 0;
+    // Use base rate if available, otherwise use monthly_rate (for legacy quotes)
+    const baseRate = line.base_vehicle_rate_per_month ?? quote.base_vehicle_rate_per_month ?? line.monthly_rate ?? 0;
+    
+    // Get insurance cost based on package type
+    const insurancePackage = line.insurance_package_type ?? quote.insurance_package_type ?? 'comprehensive';
+    const insuranceCost = insurancePackage === 'basic' ? 0 : 
+                         insurancePackage === 'full' ? (quote.monthly_insurance_cost_per_vehicle ?? 500) :
+                         (quote.monthly_insurance_cost_per_vehicle ?? 300);
+    
     const maintenanceCost = (line.maintenance_included ?? quote.maintenance_included) 
       ? (line.monthly_maintenance_cost_per_vehicle ?? quote.monthly_maintenance_cost_per_vehicle ?? 0)
       : 0;
@@ -133,7 +141,7 @@ export const QuoteFinancialBreakdown: React.FC<QuoteFinancialBreakdownProps> = (
       ? (line.replacement_vehicle_cost_monthly ?? quote.replacement_vehicle_cost_monthly ?? 0)
       : 0;
     
-    return baseRate + maintenanceCost + roadsideCost + replacementCost;
+    return baseRate + insuranceCost + maintenanceCost + roadsideCost + replacementCost;
   };
 
   // Helper to get included services list
@@ -190,9 +198,17 @@ export const QuoteFinancialBreakdown: React.FC<QuoteFinancialBreakdownProps> = (
               </h4>
               
               {lines.map((line: any, index: number) => {
-                const baseRate = line.monthly_rate || 0;
                 const vehicleName = line.vehicle_class_name || line._vehicleMeta?.label || `Vehicle ${index + 1}`;
                 const quantity = line.quantity || 1;
+                // Use base rate if available, otherwise use monthly_rate (for legacy quotes)
+                const baseRate = line.base_vehicle_rate_per_month ?? quote.base_vehicle_rate_per_month ?? line.monthly_rate ?? 0;
+                
+                // Get insurance cost based on package type
+                const insurancePackage = line.insurance_package_type ?? quote.insurance_package_type ?? 'comprehensive';
+                const insuranceCost = insurancePackage === 'basic' ? 0 : 
+                                     insurancePackage === 'full' ? (quote.monthly_insurance_cost_per_vehicle ?? 500) :
+                                     (quote.monthly_insurance_cost_per_vehicle ?? 300);
+                
                 const maintenanceCost = (line.maintenance_included ?? quote.maintenance_included) 
                   ? (line.monthly_maintenance_cost_per_vehicle ?? quote.monthly_maintenance_cost_per_vehicle ?? 0)
                   : 0;
@@ -202,7 +218,6 @@ export const QuoteFinancialBreakdown: React.FC<QuoteFinancialBreakdownProps> = (
                 const replacementCost = (line.replacement_vehicle_included ?? quote.replacement_vehicle_included)
                   ? (line.replacement_vehicle_cost_monthly ?? quote.replacement_vehicle_cost_monthly ?? 0)
                   : 0;
-                const insuranceCost = quote.monthly_insurance_cost_per_vehicle ?? 300;
                 const lineTotal = calculateLineTotalWithServices(line);
                 
                 return (

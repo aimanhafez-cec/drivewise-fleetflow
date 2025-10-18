@@ -174,19 +174,29 @@ export const QuoteWizardStep3_CoverageServices: React.FC<QuoteWizardStep3Coverag
                 <div className="md:col-span-3 space-y-1.5">
                   <TooltipLabel 
                     label="Coverage Package *" 
-                    tooltip="Baseline coverage level for all vehicles. CDW covers collision/damage, Comprehensive adds theft/fire, Full includes zero excess."
+                    tooltip="Baseline coverage level for all vehicles. Basic is included, Comprehensive and Full add extra costs."
                   />
                   <Select
-                    value={data.insurance_coverage_package || ""}
-                    onValueChange={(value) => onChange({ insurance_coverage_package: value })}
+                    value={data.insurance_coverage_package || "comprehensive"}
+                    onValueChange={(value) => {
+                      onChange({ insurance_coverage_package: value, insurance_package_type: value });
+                      // Auto-set insurance cost based on package
+                      if (value === 'basic') {
+                        onChange({ monthly_insurance_cost_per_vehicle: 0 });
+                      } else if (value === 'comprehensive') {
+                        onChange({ monthly_insurance_cost_per_vehicle: 300 });
+                      } else if (value === 'full') {
+                        onChange({ monthly_insurance_cost_per_vehicle: 500 });
+                      }
+                    }}
                   >
                     <SelectTrigger className="h-9">
-                      <SelectValue placeholder="Select package" />
+                      <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="cdw">CDW (Collision Damage Waiver)</SelectItem>
-                      <SelectItem value="comprehensive">Comprehensive</SelectItem>
-                      <SelectItem value="full-zero-excess">Full / Zero Excess</SelectItem>
+                      <SelectItem value="basic">Basic (Included - 0 AED/mo)</SelectItem>
+                      <SelectItem value="comprehensive">Comprehensive (+300 AED/mo)</SelectItem>
+                      <SelectItem value="full">Full Coverage (+500 AED/mo)</SelectItem>
                     </SelectContent>
                   </Select>
                   {errors.insurance_coverage_package && <FormError message={errors.insurance_coverage_package} />}
