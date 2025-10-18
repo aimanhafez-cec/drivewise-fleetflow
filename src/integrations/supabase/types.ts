@@ -126,6 +126,7 @@ export type Database = {
         Row: {
           additions: Json | null
           agreement_id: string
+          base_vehicle_rate_per_month: number | null
           check_in_at: string | null
           check_out_at: string | null
           created_at: string
@@ -133,10 +134,15 @@ export type Database = {
           drivers: Json | null
           id: string
           in_location_id: string | null
+          insurance_package_type: string | null
           line_net: number
           line_total: number
+          monthly_insurance_cost_per_vehicle: number | null
+          monthly_maintenance_cost_per_vehicle: number | null
           out_location_id: string | null
           rate_breakdown: Json | null
+          replacement_vehicle_cost_monthly: number | null
+          roadside_assistance_cost_monthly: number | null
           tax_id: string | null
           tax_value: number | null
           updated_at: string
@@ -146,6 +152,7 @@ export type Database = {
         Insert: {
           additions?: Json | null
           agreement_id: string
+          base_vehicle_rate_per_month?: number | null
           check_in_at?: string | null
           check_out_at?: string | null
           created_at?: string
@@ -153,10 +160,15 @@ export type Database = {
           drivers?: Json | null
           id?: string
           in_location_id?: string | null
+          insurance_package_type?: string | null
           line_net?: number
           line_total?: number
+          monthly_insurance_cost_per_vehicle?: number | null
+          monthly_maintenance_cost_per_vehicle?: number | null
           out_location_id?: string | null
           rate_breakdown?: Json | null
+          replacement_vehicle_cost_monthly?: number | null
+          roadside_assistance_cost_monthly?: number | null
           tax_id?: string | null
           tax_value?: number | null
           updated_at?: string
@@ -166,6 +178,7 @@ export type Database = {
         Update: {
           additions?: Json | null
           agreement_id?: string
+          base_vehicle_rate_per_month?: number | null
           check_in_at?: string | null
           check_out_at?: string | null
           created_at?: string
@@ -173,10 +186,15 @@ export type Database = {
           drivers?: Json | null
           id?: string
           in_location_id?: string | null
+          insurance_package_type?: string | null
           line_net?: number
           line_total?: number
+          monthly_insurance_cost_per_vehicle?: number | null
+          monthly_maintenance_cost_per_vehicle?: number | null
           out_location_id?: string | null
           rate_breakdown?: Json | null
+          replacement_vehicle_cost_monthly?: number | null
+          roadside_assistance_cost_monthly?: number | null
           tax_id?: string | null
           tax_value?: number | null
           updated_at?: string
@@ -198,6 +216,7 @@ export type Database = {
           add_ons: Json | null
           agreement_date: string
           agreement_no: string | null
+          base_vehicle_rate_per_month: number | null
           checkout_datetime: string | null
           checkout_fuel: number | null
           checkout_odometer: number | null
@@ -205,12 +224,17 @@ export type Database = {
           created_by: string | null
           customer_id: string
           id: string
+          insurance_package_type: string | null
+          monthly_insurance_cost_per_vehicle: number | null
+          monthly_maintenance_cost_per_vehicle: number | null
           notes: string | null
           rate_overrides: Json | null
+          replacement_vehicle_cost_monthly: number | null
           reservation_id: string | null
           return_datetime: string | null
           return_fuel: number | null
           return_odometer: number | null
+          roadside_assistance_cost_monthly: number | null
           signed_timestamp: string | null
           status: Database["public"]["Enums"]["agreement_status"]
           total_amount: number | null
@@ -223,6 +247,7 @@ export type Database = {
           add_ons?: Json | null
           agreement_date?: string
           agreement_no?: string | null
+          base_vehicle_rate_per_month?: number | null
           checkout_datetime?: string | null
           checkout_fuel?: number | null
           checkout_odometer?: number | null
@@ -230,12 +255,17 @@ export type Database = {
           created_by?: string | null
           customer_id: string
           id?: string
+          insurance_package_type?: string | null
+          monthly_insurance_cost_per_vehicle?: number | null
+          monthly_maintenance_cost_per_vehicle?: number | null
           notes?: string | null
           rate_overrides?: Json | null
+          replacement_vehicle_cost_monthly?: number | null
           reservation_id?: string | null
           return_datetime?: string | null
           return_fuel?: number | null
           return_odometer?: number | null
+          roadside_assistance_cost_monthly?: number | null
           signed_timestamp?: string | null
           status?: Database["public"]["Enums"]["agreement_status"]
           total_amount?: number | null
@@ -248,6 +278,7 @@ export type Database = {
           add_ons?: Json | null
           agreement_date?: string
           agreement_no?: string | null
+          base_vehicle_rate_per_month?: number | null
           checkout_datetime?: string | null
           checkout_fuel?: number | null
           checkout_odometer?: number | null
@@ -255,12 +286,17 @@ export type Database = {
           created_by?: string | null
           customer_id?: string
           id?: string
+          insurance_package_type?: string | null
+          monthly_insurance_cost_per_vehicle?: number | null
+          monthly_maintenance_cost_per_vehicle?: number | null
           notes?: string | null
           rate_overrides?: Json | null
+          replacement_vehicle_cost_monthly?: number | null
           reservation_id?: string | null
           return_datetime?: string | null
           return_fuel?: number | null
           return_odometer?: number | null
+          roadside_assistance_cost_monthly?: number | null
           signed_timestamp?: string | null
           status?: Database["public"]["Enums"]["agreement_status"]
           total_amount?: number | null

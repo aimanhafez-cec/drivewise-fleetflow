@@ -209,6 +209,13 @@ export const convertQuoteToCorporateLease = async (quoteId: string) => {
     maintenance_package_type: quote.maintenance_package_type || 'none',
     monthly_maintenance_cost_per_vehicle: quote.monthly_maintenance_cost_per_vehicle || 250,
     maintenance_plan_source: quote.maintenance_plan_source || 'internal',
+    
+    // === PRICING COMPONENTS (from Quote) ===
+    base_vehicle_rate_per_month: quote.base_vehicle_rate_per_month || 0,
+    insurance_package_type: quote.insurance_package_type || 'comprehensive',
+    monthly_insurance_cost_per_vehicle: quote.monthly_insurance_cost_per_vehicle || 300,
+    roadside_assistance_cost_monthly: quote.roadside_assistance_cost_monthly || 40,
+    replacement_vehicle_cost_monthly: quote.replacement_vehicle_cost_monthly || 60,
     show_maintenance_separate_line: quote.show_maintenance_separate_line ?? true,
     maintenance_coverage_summary: quote.maintenance_coverage_summary,
     mileage_pooling_enabled: quote.mileage_pooling_enabled ?? false,
@@ -234,9 +241,7 @@ export const convertQuoteToCorporateLease = async (quoteId: string) => {
     early_termination_allowed: false,
     cost_allocation_mode: "Per Vehicle" as any,
     roadside_assistance_included: quote.roadside_assistance_included ?? true,
-    roadside_assistance_cost_monthly: quote.roadside_assistance_cost_monthly ?? 40,
     replacement_vehicle_included: quote.replacement_vehicle_included ?? true,
-    replacement_vehicle_cost_monthly: quote.replacement_vehicle_cost_monthly ?? 60,
     replacement_sla_hours: quote.replacement_sla_hours ?? 24,
     pricing_display_mode: 'itemized', // Always itemized for agreements
     registration_responsibility: "Lessor",
@@ -372,6 +377,14 @@ export const convertQuoteToCorporateLease = async (quoteId: string) => {
         return_customer_site_id: item.return_customer_site_id || quote.return_customer_site_id,
         delivery_fee: item.delivery_fee ?? 0,
         collection_fee: item.collection_fee ?? 0,
+        
+        // === PRICING COMPONENTS (from item OR quote) ===
+        base_vehicle_rate_per_month: item.base_vehicle_rate_per_month || item.monthly_rate || 0,
+        insurance_package_type: item.insurance_package_type || quote.insurance_package_type || 'comprehensive',
+        monthly_insurance_cost_per_vehicle: item.monthly_insurance_cost_per_vehicle || quote.monthly_insurance_cost_per_vehicle || 300,
+        monthly_maintenance_cost_per_vehicle: item.monthly_maintenance_cost_per_vehicle || quote.monthly_maintenance_cost_per_vehicle || 250,
+        roadside_assistance_cost_monthly: item.roadside_assistance_cost_monthly || quote.roadside_assistance_cost_monthly || 40,
+        replacement_vehicle_cost_monthly: item.replacement_vehicle_cost_monthly || quote.replacement_vehicle_cost_monthly || 60,
         
         // Hydrate metadata
         make: vehicleMeta.make,

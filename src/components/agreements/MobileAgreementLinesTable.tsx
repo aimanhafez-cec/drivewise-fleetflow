@@ -7,6 +7,7 @@ import { VehicleAssignmentModal } from './VehicleAssignmentModal';
 import { format } from 'date-fns';
 import { RefreshCw, Plus, Car, Calendar, MapPin } from 'lucide-react';
 import { formatCurrency } from "@/lib/utils";
+import { calculateAgreementLinePricing } from "@/lib/utils/agreementPricing";
 
 interface MobileAgreementLinesTableProps {
   agreementId: string;
@@ -150,6 +151,50 @@ export const MobileAgreementLinesTable: React.FC<MobileAgreementLinesTableProps>
                     </p>
                   </div>
                 </div>
+
+                {/* Pricing Breakdown */}
+                {(() => {
+                  const pricing = calculateAgreementLinePricing(line);
+                  return pricing.hasBreakdown ? (
+                    <div className="pt-3 border-t">
+                      <p className="text-sm font-medium text-card-foreground mb-2">Pricing Breakdown</p>
+                      <div className="space-y-1 text-sm text-card-foreground/70">
+                        <div className="flex justify-between">
+                          <span>Base Rate:</span>
+                          <span className="font-medium">{formatCurrency(pricing.baseRate)}</span>
+                        </div>
+                        {pricing.insuranceCost > 0 && (
+                          <div className="flex justify-between">
+                            <span>Insurance ({pricing.insurancePackage}):</span>
+                            <span>+{formatCurrency(pricing.insuranceCost)}</span>
+                          </div>
+                        )}
+                        {pricing.maintenanceCost > 0 && (
+                          <div className="flex justify-between">
+                            <span>Maintenance:</span>
+                            <span>+{formatCurrency(pricing.maintenanceCost)}</span>
+                          </div>
+                        )}
+                        {pricing.roadsideCost > 0 && (
+                          <div className="flex justify-between">
+                            <span>Roadside Assistance:</span>
+                            <span>+{formatCurrency(pricing.roadsideCost)}</span>
+                          </div>
+                        )}
+                        {pricing.replacementCost > 0 && (
+                          <div className="flex justify-between">
+                            <span>Replacement Vehicle:</span>
+                            <span>+{formatCurrency(pricing.replacementCost)}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="pt-3 border-t">
+                      <p className="text-xs text-muted-foreground italic">Legacy pricing format</p>
+                    </div>
+                  );
+                })()}
 
                 {/* Financial Section */}
                 <div className="grid grid-cols-3 gap-3">

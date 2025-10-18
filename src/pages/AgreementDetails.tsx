@@ -301,6 +301,71 @@ const AgreementDetails = () => {
             </div>
           </CardContent>
         </Card>
+
+        {/* Pricing Breakdown - Only show if components exist */}
+        {agreement.base_vehicle_rate_per_month !== null && agreement.base_vehicle_rate_per_month !== undefined && (
+          <Card className="lg:col-span-1">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base sm:text-lg text-card-foreground">
+                Pricing Breakdown
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-card-foreground/70">Base Rate:</span>
+                <span className="font-medium text-card-foreground">
+                  {formatCurrency(agreement.base_vehicle_rate_per_month)}/mo
+                </span>
+              </div>
+              {agreement.monthly_insurance_cost_per_vehicle > 0 && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-card-foreground/70">
+                    Insurance ({agreement.insurance_package_type}):
+                  </span>
+                  <span className="text-card-foreground">
+                    +{formatCurrency(agreement.monthly_insurance_cost_per_vehicle)}/mo
+                  </span>
+                </div>
+              )}
+              {agreement.monthly_maintenance_cost_per_vehicle > 0 && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-card-foreground/70">Maintenance:</span>
+                  <span className="text-card-foreground">
+                    +{formatCurrency(agreement.monthly_maintenance_cost_per_vehicle)}/mo
+                  </span>
+                </div>
+              )}
+              {agreement.roadside_assistance_cost_monthly > 0 && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-card-foreground/70">Roadside:</span>
+                  <span className="text-card-foreground">
+                    +{formatCurrency(agreement.roadside_assistance_cost_monthly)}/mo
+                  </span>
+                </div>
+              )}
+              {agreement.replacement_vehicle_cost_monthly > 0 && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-card-foreground/70">Replacement:</span>
+                  <span className="text-card-foreground">
+                    +{formatCurrency(agreement.replacement_vehicle_cost_monthly)}/mo
+                  </span>
+                </div>
+              )}
+              <div className="pt-2 border-t flex justify-between font-semibold">
+                <span className="text-card-foreground">Total/Month:</span>
+                <span className="text-card-foreground">
+                  {formatCurrency(
+                    (agreement.base_vehicle_rate_per_month || 0) +
+                    (agreement.monthly_insurance_cost_per_vehicle || 0) +
+                    (agreement.monthly_maintenance_cost_per_vehicle || 0) +
+                    (agreement.roadside_assistance_cost_monthly || 0) +
+                    (agreement.replacement_vehicle_cost_monthly || 0)
+                  )}
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       {/* Tabs */}

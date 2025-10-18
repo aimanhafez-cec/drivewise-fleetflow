@@ -81,6 +81,14 @@ export const agreementsApi = {
         notes: data.notes || null,
         rate_overrides: reservation.rate_plan,
         add_ons: reservation.add_ons,
+        
+        // === PRICING COMPONENTS (extract from rate_plan or use defaults) ===
+        base_vehicle_rate_per_month: (reservation.rate_plan as any)?.base_rate || 3000,
+        insurance_package_type: (reservation.rate_plan as any)?.insurance_package || 'comprehensive',
+        monthly_insurance_cost_per_vehicle: (reservation.rate_plan as any)?.insurance_cost || 300,
+        monthly_maintenance_cost_per_vehicle: (reservation.rate_plan as any)?.maintenance_cost || 250,
+        roadside_assistance_cost_monthly: (reservation.rate_plan as any)?.roadside_cost || 40,
+        replacement_vehicle_cost_monthly: (reservation.rate_plan as any)?.replacement_cost || 60,
       })
       .select()
       .single();
@@ -99,6 +107,14 @@ export const agreementsApi = {
         check_in_at: reservation.end_datetime,
         line_net: reservation.total_amount || 0,
         line_total: reservation.total_amount || 0,
+        
+        // === PRICING COMPONENTS (from agreement) ===
+        base_vehicle_rate_per_month: newAgreement.base_vehicle_rate_per_month,
+        insurance_package_type: newAgreement.insurance_package_type,
+        monthly_insurance_cost_per_vehicle: newAgreement.monthly_insurance_cost_per_vehicle,
+        monthly_maintenance_cost_per_vehicle: newAgreement.monthly_maintenance_cost_per_vehicle,
+        roadside_assistance_cost_monthly: newAgreement.roadside_assistance_cost_monthly,
+        replacement_vehicle_cost_monthly: newAgreement.replacement_vehicle_cost_monthly,
       });
 
     if (lineError) {
