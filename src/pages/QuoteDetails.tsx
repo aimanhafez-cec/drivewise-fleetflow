@@ -34,6 +34,7 @@ import {
   Link2,
   Paperclip,
   ChevronDown,
+  Plus,
 } from "lucide-react";
 import { CustomerAcceptanceDialog } from "@/components/quotes/CustomerAcceptanceDialog";
 import { CustomerRejectionDialog } from "@/components/quotes/CustomerRejectionDialog";
@@ -68,6 +69,12 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 interface Quote {
   id: string;
@@ -735,28 +742,318 @@ const QuoteDetails: React.FC = () => {
           </Collapsible>
 
           {/* Coverage & Services */}
-          <Collapsible defaultOpen>
-            <Card>
-              <CollapsibleTrigger className="w-full">
-                <CardHeader className="cursor-pointer">
-                  <CardTitle className="flex items-center justify-between">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Shield className="h-5 w-5" />
+                Coverage & Services
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              <Accordion type="multiple" defaultValue={["insurance", "maintenance", "addons"]} className="px-6">
+                {/* Insurance & Coverage */}
+                <AccordionItem value="insurance">
+                  <AccordionTrigger className="hover:no-underline">
                     <div className="flex items-center gap-2">
-                      <Shield className="h-5 w-5" />
-                      Coverage & Services
+                      <Shield className="h-4 w-4" />
+                      <span className="font-semibold">Insurance & Coverage</span>
                     </div>
-                    <ChevronDown className="h-5 w-5 transition-transform data-[state=open]:rotate-180" />
-                  </CardTitle>
-                </CardHeader>
-              </CollapsibleTrigger>
-              <CollapsibleContent>
-                <CardContent className="space-y-4 pt-0">
-                  <QuoteInsuranceDetails quote={quote} />
-                  <QuoteMaintenanceDetails quote={quote} />
-                  <QuoteAddOnsDisplay quote={quote} />
-                </CardContent>
-              </CollapsibleContent>
-            </Card>
-          </Collapsible>
+                  </AccordionTrigger>
+                  <AccordionContent className="pb-4">
+                    <div className="space-y-6">
+                      <div className="grid md:grid-cols-2 gap-6">
+                        <div className="space-y-4">
+                          <div>
+                            <p className="text-sm text-muted-foreground">Coverage Package</p>
+                            <Badge variant="secondary" className="mt-1">
+                              {(() => {
+                                const labels: Record<string, string> = {
+                                  cdw: "Collision Damage Waiver",
+                                  basic: "Basic / Third Party Only",
+                                  comprehensive: "Comprehensive Coverage",
+                                  "full-zero-excess": "Full Coverage (Zero Excess)",
+                                };
+                                return labels[quote.insurance_coverage_package || "comprehensive"] || quote.insurance_coverage_package;
+                              })()}
+                            </Badge>
+                          </div>
+                          <div>
+                            <p className="text-sm text-muted-foreground">Excess Amount</p>
+                            <p className="font-medium">
+                              {quote.insurance_excess_aed === null || quote.insurance_excess_aed === undefined
+                                ? "N/A (Customer fully liable)"
+                                : formatCurrency(quote.insurance_excess_aed, quote.currency || "AED")}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-sm text-muted-foreground">Territorial Coverage</p>
+                            <p className="font-medium">
+                              {(() => {
+                                const labels: Record<string, string> = {
+                                  "uae-only": "UAE Only",
+                                  gcc: "GCC Countries",
+                                };
+                                return labels[quote.insurance_territorial_coverage || "uae-only"] || quote.insurance_territorial_coverage;
+                              })()}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="space-y-3">
+                          <p className="text-sm font-semibold">Included Coverage</p>
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-2">
+                              {quote.insurance_glass_tire_cover ? (
+                                <CheckCircle className="h-4 w-4 text-green-600" />
+                              ) : (
+                                <XCircle className="h-4 w-4 text-muted-foreground" />
+                              )}
+                              <span className="text-sm">Glass & Tire Cover</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              {quote.insurance_pai_enabled ? (
+                                <CheckCircle className="h-4 w-4 text-green-600" />
+                              ) : (
+                                <XCircle className="h-4 w-4 text-muted-foreground" />
+                              )}
+                              <span className="text-sm">Personal Accident Insurance (PAI)</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              {quote.insurance_damage_waiver ? (
+                                <CheckCircle className="h-4 w-4 text-green-600" />
+                              ) : (
+                                <XCircle className="h-4 w-4 text-muted-foreground" />
+                              )}
+                              <span className="text-sm">Damage Waiver</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              {quote.insurance_theft_protection ? (
+                                <CheckCircle className="h-4 w-4 text-green-600" />
+                              ) : (
+                                <XCircle className="h-4 w-4 text-muted-foreground" />
+                              )}
+                              <span className="text-sm">Theft Protection</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              {quote.insurance_third_party_liability ? (
+                                <CheckCircle className="h-4 w-4 text-green-600" />
+                              ) : (
+                                <XCircle className="h-4 w-4 text-muted-foreground" />
+                              )}
+                              <span className="text-sm">Third Party Liability</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              {quote.insurance_additional_driver ? (
+                                <CheckCircle className="h-4 w-4 text-green-600" />
+                              ) : (
+                                <XCircle className="h-4 w-4 text-muted-foreground" />
+                              )}
+                              <span className="text-sm">Additional Driver</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              {quote.insurance_cross_border ? (
+                                <CheckCircle className="h-4 w-4 text-green-600" />
+                              ) : (
+                                <XCircle className="h-4 w-4 text-muted-foreground" />
+                              )}
+                              <span className="text-sm">Cross Border</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {quote.insurance_coverage_summary && (
+                        <div>
+                          <p className="text-sm text-muted-foreground mb-1">Coverage Summary</p>
+                          <p className="text-sm">{quote.insurance_coverage_summary}</p>
+                        </div>
+                      )}
+
+                      {quote.insurance_notes && (
+                        <div>
+                          <p className="text-sm text-muted-foreground mb-1">Insurance Notes</p>
+                          <p className="text-sm">{quote.insurance_notes}</p>
+                        </div>
+                      )}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+
+                {/* Maintenance & Services */}
+                <AccordionItem value="maintenance">
+                  <AccordionTrigger className="hover:no-underline">
+                    <div className="flex items-center gap-2">
+                      <Wrench className="h-4 w-4" />
+                      <span className="font-semibold">Maintenance & Services</span>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="pb-4">
+                    <div className="space-y-6">
+                      <div className="grid md:grid-cols-2 gap-6">
+                        <div className="space-y-4">
+                          <div>
+                            <p className="text-sm text-muted-foreground">Maintenance Status</p>
+                            <div className="flex items-center gap-2 mt-1">
+                              {quote.maintenance_included ? (
+                                <CheckCircle className="h-4 w-4 text-green-600" />
+                              ) : (
+                                <XCircle className="h-4 w-4 text-muted-foreground" />
+                              )}
+                              <span className="font-medium">
+                                {quote.maintenance_included ? "Included" : "Not Included"}
+                              </span>
+                            </div>
+                          </div>
+
+                          {quote.maintenance_included && (
+                            <>
+                              <div>
+                                <p className="text-sm text-muted-foreground">Package Type</p>
+                                <Badge variant="secondary" className="mt-1">
+                                  {(() => {
+                                    const labels: Record<string, string> = {
+                                      none: "Not Included",
+                                      basic: "Basic Maintenance",
+                                      standard: "Standard Maintenance",
+                                      comprehensive: "Comprehensive Maintenance",
+                                      full: "Full Maintenance & Wear",
+                                    };
+                                    return labels[quote.maintenance_package_type || "standard"] || quote.maintenance_package_type;
+                                  })()}
+                                </Badge>
+                              </div>
+                              <div>
+                                <p className="text-sm text-muted-foreground">Monthly Cost (per vehicle)</p>
+                                <p className="font-medium">
+                                  {formatCurrency(
+                                    quote.monthly_maintenance_cost_per_vehicle || 250,
+                                    quote.currency || "AED"
+                                  )}
+                                </p>
+                              </div>
+                            </>
+                          )}
+                        </div>
+
+                        {quote.maintenance_included && (
+                          <div className="space-y-4">
+                            <div>
+                              <p className="text-sm text-muted-foreground">Plan Source</p>
+                              <p className="font-medium">
+                                {quote.maintenance_plan_source === "internal" ? "Internal" : "External Provider"}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-sm text-muted-foreground">Billing Display</p>
+                              <p className="font-medium">
+                                {quote.show_maintenance_separate_line
+                                  ? "Separate Line Item"
+                                  : "Included in Rental Rate"}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {quote.maintenance_coverage_summary && (
+                        <div>
+                          <p className="text-sm text-muted-foreground mb-1">Coverage Summary</p>
+                          <p className="text-sm">{quote.maintenance_coverage_summary}</p>
+                        </div>
+                      )}
+
+                      {/* Additional Services */}
+                      <div className="pt-4 border-t space-y-4">
+                        <h4 className="text-sm font-semibold">Additional Services</h4>
+                        
+                        {/* Roadside Assistance */}
+                        <div className="flex items-center justify-between py-2 border-b">
+                          <div>
+                            <p className="font-medium">Roadside Assistance</p>
+                            <p className="text-sm text-muted-foreground">24/7 emergency support</p>
+                          </div>
+                          <div className="text-right">
+                            <Badge variant={(quote as any).roadside_assistance_included !== false ? "default" : "secondary"}>
+                              {(quote as any).roadside_assistance_included !== false ? "Included" : "Not Included"}
+                            </Badge>
+                            {(quote as any).roadside_assistance_included !== false && (quote as any).roadside_assistance_cost_monthly && (
+                              <p className="text-sm text-muted-foreground mt-1">
+                                {formatCurrency((quote as any).roadside_assistance_cost_monthly, quote.currency || "AED")}/month per vehicle
+                              </p>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Replacement Vehicle */}
+                        <div className="flex items-center justify-between py-2">
+                          <div>
+                            <p className="font-medium">Replacement Vehicle</p>
+                            <p className="text-sm text-muted-foreground">
+                              Courtesy car during repairs
+                              {(quote as any).replacement_sla_hours && ` (${(quote as any).replacement_sla_hours}h SLA)`}
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <Badge variant={(quote as any).replacement_vehicle_included !== false ? "default" : "secondary"}>
+                              {(quote as any).replacement_vehicle_included !== false ? "Included" : "Not Included"}
+                            </Badge>
+                            {(quote as any).replacement_vehicle_included !== false && (quote as any).replacement_vehicle_cost_monthly && (
+                              <p className="text-sm text-muted-foreground mt-1">
+                                {formatCurrency((quote as any).replacement_vehicle_cost_monthly, quote.currency || "AED")}/month per vehicle
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+
+                {/* Default Add-Ons & Extras */}
+                <AccordionItem value="addons">
+                  <AccordionTrigger className="hover:no-underline">
+                    <div className="flex items-center gap-2">
+                      <Plus className="h-4 w-4" />
+                      <span className="font-semibold">Default Add-Ons & Extras</span>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="pb-4">
+                    <div className="space-y-4">
+                      {quote.default_addons && quote.default_addons.length > 0 ? (
+                        <>
+                          <div className="space-y-2">
+                            {quote.default_addons.map((addon: any, index: number) => (
+                              <div key={index} className="flex items-center justify-between py-2 border-b last:border-0">
+                                <div>
+                                  <p className="font-medium">{addon.name}</p>
+                                  <p className="text-sm text-muted-foreground">
+                                    {addon.charge_type === "monthly" ? "Monthly charge" : "One-time charge"}
+                                  </p>
+                                </div>
+                                <p className="font-medium">
+                                  {formatCurrency(addon.cost, quote.currency || "AED")}
+                                  {addon.charge_type === "monthly" && "/month"}
+                                </p>
+                              </div>
+                            ))}
+                          </div>
+                        </>
+                      ) : (
+                        <p className="text-sm text-muted-foreground">No default add-ons configured</p>
+                      )}
+
+                      {(quote as any).addons_summary && (
+                        <div className="pt-4 border-t">
+                          <p className="text-sm text-muted-foreground mb-1">Add-Ons Summary</p>
+                          <p className="text-sm">{(quote as any).addons_summary}</p>
+                        </div>
+                      )}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </CardContent>
+          </Card>
 
           {/* Operational Policies */}
           <Collapsible defaultOpen>
