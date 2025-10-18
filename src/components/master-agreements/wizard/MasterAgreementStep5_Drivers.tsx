@@ -8,12 +8,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { LOVSelect } from '@/components/ui/lov-select';
-import { Plus, AlertTriangle, CheckCircle2, Trash2, Star, Info, Shield, FileCheck, UserPlus } from 'lucide-react';
+import { Plus, AlertTriangle, CheckCircle2, Trash2, Star, Info, Shield, FileCheck, UserPlus, FileText, Pencil } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useDrivers } from '@/hooks/useDrivers';
 import { useAgreementDrivers, useAssignDriver, useRemoveDriver, useUpdateDriverAssignment } from '@/hooks/useAgreementDrivers';
 import { getDriverAgeWarning, getLicenseExpiryWarning } from '@/hooks/useDrivers';
 import { EnhancedDriverForm } from '@/components/drivers/EnhancedDriverForm';
+import { DriverDocumentsDialog } from '@/components/drivers/DriverDocumentsDialog';
 
 interface MasterAgreementStep5DriversProps {
   data: {
@@ -33,6 +34,10 @@ export const MasterAgreementStep5Drivers: React.FC<MasterAgreementStep5DriversPr
   const [selectedDriverId, setSelectedDriverId] = useState<string | null>(null);
   const [showAssignDialog, setShowAssignDialog] = useState(false);
   const [isCreateDriverOpen, setIsCreateDriverOpen] = useState(false);
+  const [docsDialogOpen, setDocsDialogOpen] = useState(false);
+  const [viewDocsDriverId, setViewDocsDriverId] = useState<string | null>(null);
+  const [viewDocsDriverName, setViewDocsDriverName] = useState<string | null>(null);
+  const [editDriverId, setEditDriverId] = useState<string | null>(null);
 
   const { items: drivers, updateSearch } = useDrivers();
   const { data: agreementDrivers = [], isLoading } = useAgreementDrivers(data.id);
@@ -230,14 +235,40 @@ export const MasterAgreementStep5Drivers: React.FC<MasterAgreementStep5DriversPr
                                 {ld.is_primary && (
                                   <Badge variant="secondary" className="text-xs">Primary</Badge>
                                 )}
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  onClick={() => handleRemoveDriver(ld.id)}
-                                  className="h-6 w-6 p-0"
-                                >
-                                  <Trash2 className="h-3 w-3" />
-                                </Button>
+                                 <Button
+                                   size="sm"
+                                   variant="ghost"
+                                   onClick={() => {
+                                     setViewDocsDriverId(ld.driver?.id || null);
+                                     setViewDocsDriverName(ld.driver?.full_name || null);
+                                     setDocsDialogOpen(true);
+                                   }}
+                                   className="h-6 w-6 p-0"
+                                   title="View Documents"
+                                 >
+                                   <FileText className="h-3 w-3" />
+                                 </Button>
+                                 <Button
+                                   size="sm"
+                                   variant="ghost"
+                                   onClick={() => {
+                                     setEditDriverId(ld.driver?.id || null);
+                                     setIsCreateDriverOpen(true);
+                                   }}
+                                   className="h-6 w-6 p-0"
+                                   title="Edit Driver"
+                                 >
+                                   <Pencil className="h-3 w-3" />
+                                 </Button>
+                                 <Button
+                                   size="sm"
+                                   variant="ghost"
+                                   onClick={() => handleRemoveDriver(ld.id)}
+                                   className="h-6 w-6 p-0"
+                                   title="Remove Driver"
+                                 >
+                                   <Trash2 className="h-3 w-3" />
+                                 </Button>
                                 {!ld.is_primary && lineDrivers.length > 1 && (
                                   <Button
                                     size="sm"
@@ -362,20 +393,34 @@ export const MasterAgreementStep5Drivers: React.FC<MasterAgreementStep5DriversPr
       </Dialog>
 
       {/* Create Driver Sheet */}
-      <Sheet open={isCreateDriverOpen} onOpenChange={setIsCreateDriverOpen}>
+      <Sheet open={isCreateDriverOpen} onOpenChange={(open) => {
+        setIsCreateDriverOpen(open);
+        if (!open) setEditDriverId(null);
+      }}>
         <SheetContent side="right" className="w-full sm:max-w-2xl overflow-y-auto">
           <SheetHeader>
-            <SheetTitle>Create New Driver</SheetTitle>
+            <SheetTitle>{editDriverId ? 'Edit Driver' : 'Create New Driver'}</SheetTitle>
           </SheetHeader>
           <div className="mt-6">
             <EnhancedDriverForm
               open={isCreateDriverOpen}
-              onClose={() => setIsCreateDriverOpen(false)}
+              onClose={() => {
+                setIsCreateDriverOpen(false);
+                setEditDriverId(null);
+              }}
+              driverId={editDriverId || undefined}
               onSave={handleDriverCreated}
             />
           </div>
         </SheetContent>
       </Sheet>
+
+      <DriverDocumentsDialog
+        open={docsDialogOpen}
+        onOpenChange={setDocsDialogOpen}
+        driverId={viewDocsDriverId || undefined}
+        driverName={viewDocsDriverName || undefined}
+      />
     </div>
   );
 };

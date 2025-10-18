@@ -220,3 +220,58 @@ export const useUpdateDriverAssignment = () => {
     }
   });
 };
+
+// Fetch driver documents
+export const useDriverDocuments = (driverId?: string) => {
+  return useQuery({
+    queryKey: ['driver-documents', driverId],
+    queryFn: async () => {
+      if (!driverId) return [];
+      
+      const { data, error } = await supabase
+        .from('driver_documents')
+        .select('*')
+        .eq('driver_id', driverId)
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!driverId
+  });
+};
+
+// Update driver mutation
+export const useUpdateDriver = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: Partial<any> }) => {
+      const { data: updated, error } = await supabase
+        .from('drivers')
+        .update(data)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return updated;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['drivers'] });
+      queryClient.invalidateQueries({ queryKey: ['drivers-enhanced-search'] });
+      toast({
+        title: 'Driver Updated',
+        description: 'Driver information has been updated successfully.'
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: 'Update Failed',
+        description: error.message || 'Failed to update driver.',
+        variant: 'destructive'
+      });
+    }
+  });
+};

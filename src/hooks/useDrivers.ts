@@ -1,6 +1,7 @@
 import { useLOV, useLOVById } from './useLOV';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useState, useEffect } from 'react';
 
 export interface Driver {
   id: string;
@@ -56,6 +57,38 @@ export const useDrivers = (searchQuery?: string) => {
       label: `${item.full_name} (${item.license_no})`
     }))
   };
+};
+
+// Enhanced search across multiple driver fields
+export const useSearchDriversEnhanced = (searchTerm: string, enabled: boolean = true) => {
+  const [debouncedSearch, setDebouncedSearch] = useState(searchTerm);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  return useQuery({
+    queryKey: ['drivers-enhanced-search', debouncedSearch],
+    queryFn: async () => {
+      if (!debouncedSearch || debouncedSearch.length < 2) {
+        return [];
+      }
+
+      const { data, error } = await supabase
+        .rpc('search_drivers_enhanced', {
+          p_search_term: debouncedSearch,
+          p_limit: 50
+        });
+
+      if (error) throw error;
+      return data as Array<Driver & { match_field: string }>;
+    },
+    enabled: enabled && debouncedSearch.length >= 2
+  });
 };
 
 export const useDriverById = (id?: string) => {

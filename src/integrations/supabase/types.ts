@@ -5102,6 +5102,27 @@ export type Database = {
           success: boolean
         }[]
       }
+      search_drivers_enhanced: {
+        Args: { p_limit?: number; p_search_term: string }
+        Returns: {
+          additional_driver_fee: number
+          date_of_birth: string
+          email: string
+          emirates_id: string
+          full_name: string
+          id: string
+          label: string
+          license_expiry: string
+          license_no: string
+          match_field: string
+          nationality: string
+          passport_number: string
+          phone: string
+          status: string
+          verification_status: string
+          visa_expiry: string
+        }[]
+      }
       update_engagement_streak: {
         Args: { p_customer_id: string }
         Returns: boolean
