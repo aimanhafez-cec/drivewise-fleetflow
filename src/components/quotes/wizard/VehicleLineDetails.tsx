@@ -1415,7 +1415,30 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
           </AccordionContent>
         </AccordionItem>
 
-        {/* SECTION 7: Line Summary */}
+        {/* SECTION 7: Add-Ons & Extras Override */}
+        <AccordionItem value="addons">
+          <AccordionTrigger className="hover:bg-muted/50 px-4 py-3">
+            <div className="flex items-center gap-2">
+              <Package className="h-4 w-4 text-primary" />
+              <span className="font-semibold">Add-Ons & Extras</span>
+              <span className="text-sm text-muted-foreground ml-2">
+                {getAddOnsPreview()}
+              </span>
+              {hasCustomizations("addons") && (
+                <Badge variant="secondary" className="ml-2">Customized</Badge>
+              )}
+            </div>
+          </AccordionTrigger>
+          <AccordionContent className="px-4 pb-4 overflow-hidden">
+            <VehicleAddOnsOverride
+              line={line}
+              onUpdate={onUpdate}
+              headerDefaults={headerDefaults}
+            />
+          </AccordionContent>
+        </AccordionItem>
+
+        {/* SECTION 8: Line Summary */}
         <AccordionItem value="summary" className="border-t-2 border-primary/20">
           <AccordionTrigger className="hover:bg-muted/50 px-4 py-3 bg-muted/30">
             <div className="flex items-center gap-2">
@@ -1521,29 +1544,6 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
                 </div>
               </CardContent>
             </Card>
-          </AccordionContent>
-        </AccordionItem>
-
-        {/* SECTION 7: Add-Ons & Extras Override */}
-        <AccordionItem value="addons">
-          <AccordionTrigger className="hover:bg-muted/50 px-4 py-3">
-            <div className="flex items-center gap-2">
-              <Package className="h-4 w-4 text-primary" />
-              <span className="font-semibold">Add-Ons & Extras</span>
-              <span className="text-sm text-muted-foreground ml-2">
-                {getAddOnsPreview()}
-              </span>
-              {hasCustomizations("addons") && (
-                <Badge variant="secondary" className="ml-2">Customized</Badge>
-              )}
-            </div>
-          </AccordionTrigger>
-          <AccordionContent className="px-4 pb-4 overflow-hidden">
-            <VehicleAddOnsOverride
-              line={line}
-              onUpdate={onUpdate}
-              headerDefaults={headerDefaults}
-            />
           </AccordionContent>
         </AccordionItem>
 
