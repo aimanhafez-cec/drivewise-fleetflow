@@ -1428,32 +1428,32 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
           </AccordionTrigger>
           <AccordionContent className="px-4 pb-4">
             
-            <Card className="bg-muted">
-              <CardContent className="pt-4 space-y-2">
+            <Card className="bg-muted max-w-2xl">
+              <CardContent className="pt-4 space-y-2 min-w-[500px]">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Deposit:</span>
-                  <span className="font-medium">{line.deposit_amount || 0} AED</span>
+                  <span className="font-medium whitespace-nowrap">{line.deposit_amount || 0} AED</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Advance Rent:</span>
-                  <span className="font-medium">
+                  <span className="font-medium whitespace-nowrap">
                     {((line.advance_rent_months || 0) * (line.monthly_rate || 0)).toFixed(2)} AED
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Delivery Fee:</span>
-                  <span className="font-medium">{(line.delivery_fee || 0).toFixed(2)} AED</span>
+                  <span className="font-medium whitespace-nowrap">{(line.delivery_fee || 0).toFixed(2)} AED</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Collection Fee:</span>
-                  <span className="font-medium">{(line.collection_fee || 0).toFixed(2)} AED</span>
+                  <span className="font-medium whitespace-nowrap">{(line.collection_fee || 0).toFixed(2)} AED</span>
                 </div>
 
                 {/* Maintenance section */}
                 {(line.maintenance_included ?? headerDefaults.maintenance_included) && (
                   <div className="flex justify-between text-sm border-t pt-2">
                     <span className="text-muted-foreground">Maintenance (Monthly):</span>
-                    <span className="font-medium">
+                    <span className="font-medium whitespace-nowrap">
                       {line.monthly_maintenance_cost_per_vehicle || headerDefaults.monthly_maintenance_cost_per_vehicle || 0} AED
                     </span>
                   </div>
@@ -1463,7 +1463,7 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
                 {(line.roadside_assistance_included ?? headerDefaults.roadside_assistance_included) && (
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Roadside Assistance (Monthly):</span>
-                    <span className="font-medium">
+                    <span className="font-medium whitespace-nowrap">
                       {line.roadside_assistance_cost_monthly ?? headerDefaults.roadside_assistance_cost_monthly ?? 0} AED
                     </span>
                   </div>
@@ -1471,7 +1471,7 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
                 {(line.replacement_vehicle_included ?? headerDefaults.replacement_vehicle_included) && (
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Replacement Vehicle (Monthly):</span>
-                    <span className="font-medium">
+                    <span className="font-medium whitespace-nowrap">
                       {line.replacement_vehicle_cost_monthly ?? headerDefaults.replacement_vehicle_cost_monthly ?? 0} AED
                     </span>
                   </div>
@@ -1479,30 +1479,30 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
                 
                 <div className="flex justify-between text-sm border-t pt-2">
                   <span className="font-semibold">Upfront Total:</span>
-                  <span className="font-bold text-primary">
+                  <span className="font-bold text-primary whitespace-nowrap">
                     {((line.deposit_amount || 0) + (line.advance_rent_months || 0) * (line.monthly_rate || 0) + (line.delivery_fee || 0) + (line.collection_fee || 0)).toFixed(2)} AED
                   </span>
                 </div>
                 
                 <div className="flex justify-between text-sm border-t pt-2 mt-2">
                   <span className="font-semibold">Rate:</span>
-                  <span className="font-medium">
+                  <span className="font-medium whitespace-nowrap">
                     {line.monthly_rate || 0} AED/{periodInfo.abbrev}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="font-semibold">Billing Periods:</span>
-                  <span className="font-medium">
+                  <span className="font-medium whitespace-nowrap">
                     {billingPeriods} × {periodInfo.label}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="font-semibold">Lease Term:</span>
-                  <span className="font-medium">{line.lease_term_months || 0} months</span>
+                  <span className="font-medium whitespace-nowrap">{line.lease_term_months || 0} months</span>
                 </div>
                 <div className="flex justify-between text-sm border-t pt-2 mt-2">
                   <span className="font-bold text-lg">Line Total:</span>
-                  <span className="font-bold text-lg text-primary">
+                  <span className="font-bold text-lg text-primary whitespace-nowrap">
                     {((line.monthly_rate || 0) * billingPeriods).toFixed(2)} AED
                   </span>
                 </div>
@@ -1511,11 +1511,11 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
                 </p>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Duration:</span>
-                  <span className="font-medium">{line.duration_months || 0} months</span>
+                  <span className="font-medium whitespace-nowrap">{line.duration_months || 0} months</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Total Mileage:</span>
-                  <span className="font-medium">
+                  <span className="font-medium whitespace-nowrap">
                     {((line.mileage_package_km || 0) * (line.duration_months || 0)).toLocaleString()} km
                   </span>
                 </div>
