@@ -1176,38 +1176,43 @@ export const QuoteWizard: React.FC<QuoteWizardProps> = ({ viewMode = false, quot
             Back
           </Button>
 
-          {currentStep < steps.length ? (
-            <Button
-              id="btn-wiz-next"
-              onClick={viewMode ? () => {
-                setCurrentStep(prev => Math.min(prev + 1, steps.length));
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              } : handleNext}
-              disabled={!viewMode && Object.keys(errors).length > 0}
-            >
-              Next
-              <ArrowRight className="h-4 w-4 ml-2" />
-            </Button>
-          ) : (
-            !viewMode && (
-              <div className="flex gap-2">
-                {quoteData.status === 'approved' ? (
-                  <Button
-                    id="btn-finalize"
-                    onClick={handleSubmit}
-                    disabled={createQuoteMutation.isPending}
-                  >
-                    <Send className="h-4 w-4 mr-2" />
-                    Finalize Quote
-                  </Button>
-                ) : (
-                  <p className="text-sm text-muted-foreground">
-                    Submit quote for approval in the summary section above
-                  </p>
-                )}
-              </div>
-            )
-          )}
+          <div className="flex gap-2">
+            {!viewMode && (
+              <Button 
+                variant="outline" 
+                onClick={handleSaveDraft}
+                disabled={saveDraftMutation.isPending}
+              >
+                <Save className="h-4 w-4 mr-2" />
+                {quoteData.id ? "Save Changes" : "Save Draft"}
+              </Button>
+            )}
+            
+            {currentStep < steps.length ? (
+              <Button
+                id="btn-wiz-next"
+                onClick={viewMode ? () => {
+                  setCurrentStep(prev => Math.min(prev + 1, steps.length));
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                } : handleNext}
+                disabled={!viewMode && Object.keys(errors).length > 0}
+              >
+                Next
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </Button>
+            ) : (
+              !viewMode && quoteData.status === 'approved' && (
+                <Button
+                  id="btn-finalize"
+                  onClick={handleSubmit}
+                  disabled={createQuoteMutation.isPending}
+                >
+                  <Send className="h-4 w-4 mr-2" />
+                  Finalize Quote
+                </Button>
+              )
+            )}
+          </div>
         </div>
       </div>
     </div>
