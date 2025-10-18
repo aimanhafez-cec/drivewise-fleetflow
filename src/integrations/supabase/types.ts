@@ -2031,7 +2031,7 @@ export type Database = {
           date_of_birth: string | null
           department: string | null
           email: string | null
-          emirates_id: string
+          emirates_id: string | null
           employment_id: string | null
           full_name: string
           id: string
@@ -2041,9 +2041,9 @@ export type Database = {
           license_issue_date: string | null
           license_issued_by: string | null
           license_no: string
-          nationality: string
+          nationality: string | null
           passport_number: string | null
-          phone: string
+          phone: string | null
           rejection_reason: string | null
           status: string
           updated_at: string
@@ -2059,7 +2059,7 @@ export type Database = {
           date_of_birth?: string | null
           department?: string | null
           email?: string | null
-          emirates_id: string
+          emirates_id?: string | null
           employment_id?: string | null
           full_name: string
           id?: string
@@ -2069,9 +2069,9 @@ export type Database = {
           license_issue_date?: string | null
           license_issued_by?: string | null
           license_no: string
-          nationality: string
+          nationality?: string | null
           passport_number?: string | null
-          phone: string
+          phone?: string | null
           rejection_reason?: string | null
           status?: string
           updated_at?: string
@@ -2087,7 +2087,7 @@ export type Database = {
           date_of_birth?: string | null
           department?: string | null
           email?: string | null
-          emirates_id?: string
+          emirates_id?: string | null
           employment_id?: string | null
           full_name?: string
           id?: string
@@ -2097,9 +2097,9 @@ export type Database = {
           license_issue_date?: string | null
           license_issued_by?: string | null
           license_no?: string
-          nationality?: string
+          nationality?: string | null
           passport_number?: string | null
-          phone?: string
+          phone?: string | null
           rejection_reason?: string | null
           status?: string
           updated_at?: string

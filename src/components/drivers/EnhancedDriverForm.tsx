@@ -17,18 +17,20 @@ import { toast } from 'sonner';
 import { User, FileText, Briefcase, Shield, Loader2, CheckCircle2, AlertTriangle, Info, XCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-// Validation schema with UAE-specific requirements
+// Validation schema - all fields optional for flexible data entry
 const driverSchema = z.object({
-  full_name: z.string().min(3, 'Full name must be at least 3 characters').max(100, 'Full name is too long'),
-  license_no: z.string().min(5, 'License number is required').max(50, 'License number is too long'),
-  emirates_id: z.string()
-    .min(1, 'Emirates ID is required')
-    .regex(/^\d{3}-\d{4}-\d{7}-\d{1}$/, 'Invalid Emirates ID format. Use: XXX-XXXX-XXXXXXX-X'),
+  full_name: z.string().max(100, 'Full name is too long').optional().or(z.literal('')),
+  license_no: z.string().max(50, 'License number is too long').optional().or(z.literal('')),
+  emirates_id: z.string().optional().or(z.literal('')).refine((val) => {
+    if (!val || val === '') return true;
+    return /^\d{3}-\d{4}-\d{7}-\d{1}$/.test(val);
+  }, 'Invalid Emirates ID format. Use: XXX-XXXX-XXXXXXX-X'),
   passport_number: z.string().optional().or(z.literal('')),
-  nationality: z.string().min(2, 'Nationality is required').max(100, 'Nationality is too long'),
-  phone: z.string()
-    .min(1, 'Phone number is required')
-    .regex(/^\+971-\d{2}-\d{4}-\d{2}$/, 'Phone must be in UAE format: +971-XX-XXXX-XX'),
+  nationality: z.string().max(100, 'Nationality is too long').optional().or(z.literal('')),
+  phone: z.string().optional().or(z.literal('')).refine((val) => {
+    if (!val || val === '') return true;
+    return /^\+971-\d{2}-\d{4}-\d{2}$/.test(val);
+  }, 'Phone must be in UAE format: +971-XX-XXXX-XX'),
   email: z.string().email('Invalid email address').optional().or(z.literal('')),
   date_of_birth: z.string().optional(),
   license_expiry: z.string().optional().refine((date) => {
@@ -198,29 +200,46 @@ export const EnhancedDriverForm: React.FC<EnhancedDriverFormProps> = ({
     }
   };
 
-  // Auto-save when moving from Identity tab
+  // Allow free tab navigation without validation
   const handleTabChange = async (newTab: string) => {
-    if (activeTab === 'identity' && !currentDriverId && !hasAutoSaved) {
-      // Validate identity fields before auto-save (passport optional)
-      const isValid = await trigger(['full_name', 'license_no', 'emirates_id', 'nationality', 'phone']);
-      
-      if (isValid) {
-        await handleAutoSave();
-      } else {
-        toast.error('Please complete all required fields before continuing');
-        return;
-      }
-    }
     setActiveTab(newTab);
+    
+    // Optional: Show a gentle reminder about saving (non-blocking)
+    if (newTab === 'documents' && !currentDriverId) {
+      toast.info('Tip: Save the driver first to enable document uploads', {
+        duration: 3000
+      });
+    }
   };
 
   const handleAutoSave = async () => {
     const formData = watch();
     
     try {
+      // Ensure empty strings instead of undefined for optional fields
+      const driverData = {
+        full_name: formData.full_name || '',
+        license_no: formData.license_no || '',
+        emirates_id: formData.emirates_id || '',
+        passport_number: formData.passport_number || '',
+        nationality: formData.nationality || '',
+        phone: formData.phone || '',
+        email: formData.email || '',
+        date_of_birth: formData.date_of_birth || '',
+        license_expiry: formData.license_expiry || '',
+        license_issued_by: formData.license_issued_by || '',
+        license_issue_date: formData.license_issue_date || '',
+        employment_id: formData.employment_id || '',
+        department: formData.department || '',
+        visa_expiry: formData.visa_expiry || '',
+        address_emirate: formData.address_emirate || '',
+        status: formData.status,
+        additional_driver_fee: formData.additional_driver_fee
+      };
+
       const { data, error } = await supabase
         .from('drivers')
-        .insert([formData])
+        .insert([driverData])
         .select('id')
         .single();
       
@@ -234,13 +253,7 @@ export const EnhancedDriverForm: React.FC<EnhancedDriverFormProps> = ({
       setTimeout(() => setActiveTab('documents'), 500);
     } catch (error: any) {
       console.error('Error auto-saving driver:', error);
-      if (error.message?.includes('unique_emirates_id')) {
-        toast.error('This Emirates ID is already registered');
-      } else if (error.message?.includes('emirates_id_format')) {
-        toast.error('Invalid Emirates ID format');
-      } else {
-        toast.error('Failed to save driver');
-      }
+      toast.error('Failed to save driver: ' + error.message);
       throw error;
     }
   };
@@ -248,12 +261,33 @@ export const EnhancedDriverForm: React.FC<EnhancedDriverFormProps> = ({
   const onSubmit = async (data: DriverFormData) => {
     setSaving(true);
     try {
+      // Ensure empty strings instead of undefined for optional fields
+      const driverData = {
+        full_name: data.full_name || '',
+        license_no: data.license_no || '',
+        emirates_id: data.emirates_id || '',
+        passport_number: data.passport_number || '',
+        nationality: data.nationality || '',
+        phone: data.phone || '',
+        email: data.email || '',
+        date_of_birth: data.date_of_birth || '',
+        license_expiry: data.license_expiry || '',
+        license_issued_by: data.license_issued_by || '',
+        license_issue_date: data.license_issue_date || '',
+        employment_id: data.employment_id || '',
+        department: data.department || '',
+        visa_expiry: data.visa_expiry || '',
+        address_emirate: data.address_emirate || '',
+        status: data.status,
+        additional_driver_fee: data.additional_driver_fee
+      };
+
       let savedDriverId = currentDriverId;
       
       if (currentDriverId) {
         const { error } = await supabase
           .from('drivers')
-          .update(data)
+          .update(driverData)
           .eq('id', currentDriverId);
         
         if (error) throw error;
@@ -261,7 +295,7 @@ export const EnhancedDriverForm: React.FC<EnhancedDriverFormProps> = ({
       } else {
         const { data: newDriver, error } = await supabase
           .from('drivers')
-          .insert([data])
+          .insert([driverData])
           .select('id')
           .single();
         
@@ -274,15 +308,7 @@ export const EnhancedDriverForm: React.FC<EnhancedDriverFormProps> = ({
       onClose();
     } catch (error: any) {
       console.error('Error saving driver:', error);
-      if (error.message?.includes('unique_emirates_id')) {
-        toast.error('This Emirates ID is already registered');
-      } else if (error.message?.includes('emirates_id_format')) {
-        toast.error('Invalid Emirates ID format. Use: XXX-XXXX-XXXXXXX-X');
-      } else if (error.message?.includes('phone_format')) {
-        toast.error('Invalid phone format. Use: +971-XX-XXXX-XX');
-      } else {
-        toast.error('Failed to save driver');
-      }
+      toast.error('Failed to save driver: ' + error.message);
     } finally {
       setSaving(false);
     }
@@ -317,21 +343,14 @@ export const EnhancedDriverForm: React.FC<EnhancedDriverFormProps> = ({
   };
 
   const getRequiredDocuments = () => {
-    const nationality = watch('nationality');
-    const isUAENational = nationality?.toLowerCase().includes('united arab emirates') || 
-                         nationality?.toLowerCase().includes('uae') ||
-                         nationality?.toLowerCase() === 'emirati';
-    const isGCCNational = ['bahrain', 'kuwait', 'oman', 'qatar', 'saudi arabia'].some(
-      country => nationality?.toLowerCase().includes(country)
-    );
-    
+    // All documents are optional for flexible data entry
     return [
-      { type: 'emirates_id_front', label: 'Emirates ID (Front)', required: true },
-      { type: 'emirates_id_back', label: 'Emirates ID (Back)', required: true },
-      { type: 'driving_license_front', label: 'Driving License (Front)', required: true },
-      { type: 'driving_license_back', label: 'Driving License (Back)', required: true },
-      { type: 'passport_bio_page', label: 'Passport (Bio Page)', required: !isUAENational },
-      { type: 'visa_page', label: 'Visa Page', required: !isUAENational && !isGCCNational }
+      { type: 'emirates_id_front', label: 'Emirates ID (Front)', required: false },
+      { type: 'emirates_id_back', label: 'Emirates ID (Back)', required: false },
+      { type: 'driving_license_front', label: 'Driving License (Front)', required: false },
+      { type: 'driving_license_back', label: 'Driving License (Back)', required: false },
+      { type: 'passport_bio_page', label: 'Passport (Bio Page)', required: false },
+      { type: 'visa_page', label: 'Visa Page', required: false }
     ];
   };
 
@@ -398,8 +417,8 @@ export const EnhancedDriverForm: React.FC<EnhancedDriverFormProps> = ({
               <TabsContent value="basic" className="space-y-4 mt-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="full_name" className="flex items-center gap-1">
-                      Full Name <span className="text-red-500">*</span>
+                    <Label htmlFor="full_name">
+                      Full Name
                     </Label>
                     <Input
                       id="full_name"
@@ -414,8 +433,8 @@ export const EnhancedDriverForm: React.FC<EnhancedDriverFormProps> = ({
                     )}
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="license_no" className="flex items-center gap-1">
-                      License Number <span className="text-red-500">*</span>
+                    <Label htmlFor="license_no">
+                      License Number
                     </Label>
                     <Input
                       id="license_no"
@@ -471,17 +490,17 @@ export const EnhancedDriverForm: React.FC<EnhancedDriverFormProps> = ({
               </TabsContent>
 
               <TabsContent value="identity" className="space-y-4 mt-4">
-                <Alert className="border-amber-500 bg-amber-50">
-                  <AlertTriangle className="h-4 w-4 text-amber-600" />
-                  <AlertDescription className="text-amber-900">
-                    <strong>UAE Legal Requirement:</strong> All identity fields are mandatory for corporate fleet leasing and vehicle handover compliance.
+                <Alert className="border-blue-500 bg-blue-50">
+                  <Info className="h-4 w-4 text-blue-600" />
+                  <AlertDescription className="text-blue-900">
+                    <strong>Recommended Information:</strong> For complete driver records, consider providing Emirates ID, License, and contact details.
                   </AlertDescription>
                 </Alert>
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="emirates_id" className="flex items-center gap-1">
-                      Emirates ID <span className="text-red-500">*</span>
+                    <Label htmlFor="emirates_id">
+                      Emirates ID
                     </Label>
                     <Input
                       id="emirates_id"
@@ -503,16 +522,8 @@ export const EnhancedDriverForm: React.FC<EnhancedDriverFormProps> = ({
                     )}
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="passport_number" className="flex items-center gap-1">
+                    <Label htmlFor="passport_number">
                       Passport Number
-                      {!watch('nationality')?.toLowerCase().includes('united arab emirates') && 
-                       !watch('nationality')?.toLowerCase().includes('uae') &&
-                       !watch('nationality')?.toLowerCase().includes('emirati') && (
-                        <span className="text-red-500">*</span>
-                      )}
-                      <span className="text-xs text-muted-foreground ml-2">
-                        (Optional for UAE nationals)
-                      </span>
                     </Label>
                     <Input
                       id="passport_number"
@@ -528,8 +539,8 @@ export const EnhancedDriverForm: React.FC<EnhancedDriverFormProps> = ({
                     )}
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="nationality" className="flex items-center gap-1">
-                      Nationality <span className="text-red-500">*</span>
+                    <Label htmlFor="nationality">
+                      Nationality
                     </Label>
                     <Input
                       id="nationality"
@@ -545,8 +556,8 @@ export const EnhancedDriverForm: React.FC<EnhancedDriverFormProps> = ({
                     )}
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="phone" className="flex items-center gap-1">
-                      Mobile Number <span className="text-red-500">*</span>
+                    <Label htmlFor="phone">
+                      Mobile Number
                     </Label>
                     <Input
                       id="phone"
@@ -626,14 +637,12 @@ export const EnhancedDriverForm: React.FC<EnhancedDriverFormProps> = ({
                   </div>
                 </div>
 
-                {!currentDriverId && !hasAutoSaved && (
-                  <Alert className="border-blue-500 bg-blue-50">
-                    <Info className="h-4 w-4 text-blue-600" />
-                    <AlertDescription className="text-blue-900">
-                      Complete the required identity fields above and click "Next" or "Documents" tab to save driver and enable document uploads.
-                    </AlertDescription>
-                  </Alert>
-                )}
+                <Alert className="border-blue-500 bg-blue-50">
+                  <Info className="h-4 w-4 text-blue-600" />
+                  <AlertDescription className="text-blue-900">
+                    You can navigate freely between tabs. Click "Save Driver" when ready to save your changes.
+                  </AlertDescription>
+                </Alert>
               </TabsContent>
 
               <TabsContent value="employment" className="space-y-4 mt-4">
@@ -657,10 +666,10 @@ export const EnhancedDriverForm: React.FC<EnhancedDriverFormProps> = ({
 
               <TabsContent value="documents" className="space-y-4 mt-4">
                 {!currentDriverId && (
-                  <Alert className="border-amber-500 bg-amber-50">
-                    <Info className="h-4 w-4 text-amber-600" />
-                    <AlertDescription className="text-amber-900">
-                      <strong>Note:</strong> Save the driver first using the "Save Driver" button below before uploading documents.
+                  <Alert className="border-blue-500 bg-blue-50">
+                    <Info className="h-4 w-4 text-blue-600" />
+                    <AlertDescription className="text-blue-900">
+                      <strong>Tip:</strong> Save the driver first using the "Save Driver" button below to enable document uploads.
                       Documents will be attached to the driver record once saved.
                     </AlertDescription>
                   </Alert>
@@ -670,12 +679,12 @@ export const EnhancedDriverForm: React.FC<EnhancedDriverFormProps> = ({
                   <Alert className="border-blue-500 bg-blue-50">
                     <Info className="h-4 w-4 text-blue-600" />
                     <AlertDescription className="text-blue-900">
-                      <strong>Document Requirements:</strong>
+                      <strong>Recommended Documents:</strong>
                       <ul className="mt-2 list-disc list-inside text-sm space-y-1">
-                        <li>Emirates ID (mandatory for all drivers)</li>
-                        <li>UAE Driving License (mandatory)</li>
-                        <li>Passport (optional for UAE nationals, mandatory for expats)</li>
-                        <li>Visa page (mandatory for non-GCC expats only)</li>
+                        <li>Emirates ID (optional)</li>
+                        <li>UAE Driving License (optional)</li>
+                        <li>Passport (optional)</li>
+                        <li>Visa page (optional)</li>
                       </ul>
                     </AlertDescription>
                   </Alert>
@@ -683,23 +692,19 @@ export const EnhancedDriverForm: React.FC<EnhancedDriverFormProps> = ({
 
                 {currentDriverId && (
                   <>
-                    {/* Document Requirements Checklist */}
-                    <Alert className={cn(
-                      "border-2",
-                      allDocumentsUploaded ? "border-green-500 bg-green-50" : "border-amber-500 bg-amber-50"
-                    )}>
+                    {/* Document Checklist - Informational */}
+                    <Alert className="border-blue-500 bg-blue-50">
                       <AlertDescription>
                         <div className="space-y-2">
-                          <strong className={allDocumentsUploaded ? "text-green-900" : "text-amber-900"}>
-                            Required Documents (UAE Corporate Leasing):
+                          <strong className="text-blue-900">
+                            Document Checklist (Optional):
                           </strong>
                           <ul className="mt-2 space-y-1 text-sm">
-                            {getRequiredDocuments().filter(doc => doc.required).map(doc => {
+                            {getRequiredDocuments().map(doc => {
                               const hasDoc = !!getDocument(doc.type);
                               return (
-                                <li key={doc.type} className={hasDoc ? "text-green-700" : "text-amber-700"}>
-                                  {hasDoc ? <CheckCircle2 className="h-3 w-3 inline mr-1" /> : <AlertTriangle className="h-3 w-3 inline mr-1" />}
-                                  {doc.label}
+                                <li key={doc.type} className={hasDoc ? "text-blue-600" : "text-gray-500"}>
+                                  {hasDoc ? "✓" : "○"} {doc.label}
                                 </li>
                               );
                             })}
@@ -711,7 +716,7 @@ export const EnhancedDriverForm: React.FC<EnhancedDriverFormProps> = ({
                     <Separator />
 
                     <div className="space-y-4">
-                      <h3 className="font-semibold">Upload Required Documents</h3>
+                      <h3 className="font-semibold">Upload Documents</h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {getRequiredDocuments().map((doc) => (
                           <DriverDocumentUpload
