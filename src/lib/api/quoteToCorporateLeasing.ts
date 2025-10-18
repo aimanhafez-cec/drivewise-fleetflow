@@ -276,17 +276,73 @@ export const convertQuoteToCorporateLease = async (quoteId: string) => {
       
       // Calculate duration_months from dates or use duration_months field
       let durationMonths = item.duration_months || item.lease_term_months;
+
+      // Priority 1: Calculate from actual pickup/return dates
       if (!durationMonths && item.pickup_at && item.return_at) {
-        const from = new Date(item.pickup_at);
-        const to = new Date(item.return_at);
-        const diffTime = Math.abs(to.getTime() - from.getTime());
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        durationMonths = Math.ceil(diffDays / 30.44);
+        try {
+          const from = new Date(item.pickup_at);
+          const to = new Date(item.return_at);
+          
+          // Validate dates are valid
+          if (!isNaN(from.getTime()) && !isNaN(to.getTime())) {
+            // Calculate months difference properly
+            const yearsDiff = to.getFullYear() - from.getFullYear();
+            const monthsDiff = to.getMonth() - from.getMonth();
+            const daysDiff = to.getDate() - from.getDate();
+            
+            // Calculate total months
+            durationMonths = yearsDiff * 12 + monthsDiff;
+            
+            // If day difference suggests we should round up, add 1
+            if (daysDiff > 0) {
+              durationMonths += 1;
+            }
+            
+            console.log('[Duration Calc] From item dates:', { from, to, durationMonths });
+          }
+        } catch (error) {
+          console.warn('[Duration Calc] Item date parsing failed:', error);
+        }
       }
+
+      // Priority 2: Use quote contract dates if item dates unavailable
+      if (!durationMonths && quote.contract_effective_from && quote.contract_effective_to) {
+        try {
+          const from = new Date(quote.contract_effective_from);
+          const to = new Date(quote.contract_effective_to);
+          
+          if (!isNaN(from.getTime()) && !isNaN(to.getTime())) {
+            const yearsDiff = to.getFullYear() - from.getFullYear();
+            const monthsDiff = to.getMonth() - from.getMonth();
+            const daysDiff = to.getDate() - from.getDate();
+            
+            durationMonths = yearsDiff * 12 + monthsDiff;
+            if (daysDiff > 0) {
+              durationMonths += 1;
+            }
+            
+            console.log('[Duration Calc] From quote dates:', { from, to, durationMonths });
+          }
+        } catch (error) {
+          console.warn('[Duration Calc] Quote date parsing failed:', error);
+        }
+      }
+
+      // Priority 3: Fallback to duration_days with proper rounding
       if (!durationMonths && quote.duration_days) {
-        durationMonths = Math.ceil(quote.duration_days / 30);
+        // Use Math.round instead of Math.ceil to avoid inflating months
+        // 365 days = 12.02 months → rounds to 12 (correct)
+        // 375 days = 12.35 months → rounds to 12 (correct)
+        // 390 days = 12.85 months → rounds to 13 (correct)
+        durationMonths = Math.round(quote.duration_days / 30.44);
+        console.log('[Duration Calc] From days:', { days: quote.duration_days, durationMonths });
       }
-      if (!durationMonths) durationMonths = 12; // Default fallback
+
+      // Priority 4: Default fallback
+      if (!durationMonths) {
+        durationMonths = 12;
+        console.warn('[Duration Calc] Using default 12 months - no data available');
+      }
       
       return {
         agreement_id: agreement.id,
