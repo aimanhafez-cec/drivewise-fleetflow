@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { TrainStopStepper } from "@/components/ui/train-stop-stepper";
 import { useToast } from "@/hooks/use-toast";
+import { calculateMonthsDuration } from "@/lib/utils/dateUtils";
 import { ArrowLeft, ArrowRight, Save, AlertCircle } from "lucide-react";
 import { MasterAgreementStep1 } from "./wizard/MasterAgreementStep1";
 import { MasterAgreementStep2 } from "./wizard/MasterAgreementStep2";
@@ -261,16 +262,6 @@ export const MasterAgreementWizard: React.FC<MasterAgreementWizardProps> = ({
           
           const agreementNo = existingAg?.agreement_no || "TBD";
           
-          // Helper to calculate duration
-          const calculateDurationMonths = (pickupAt?: string, returnAt?: string) => {
-            if (!pickupAt || !returnAt) return 12;
-            const from = new Date(pickupAt);
-            const to = new Date(returnAt);
-            const diffTime = Math.abs(to.getTime() - from.getTime());
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            return Math.ceil(diffDays / 30.44);
-          };
-          
           // Delete old lines and insert new ones (full replace)
           await supabase.from("corporate_leasing_lines").delete().eq("agreement_id", actualId);
           
@@ -288,7 +279,7 @@ export const MasterAgreementWizard: React.FC<MasterAgreementWizardProps> = ({
               lease_start_date: item.pickup_at,
               lease_end_date: item.return_at,
               monthly_rate_aed: item.monthly_rate,
-              contract_months: item.duration_months || item.lease_term_months || calculateDurationMonths(item.pickup_at, item.return_at),
+              contract_months: item.duration_months || item.lease_term_months || calculateMonthsDuration(item.pickup_at, item.return_at),
               mileage_allowance_km_month: item.mileage_package_km,
               excess_km_rate_aed: item.excess_km_rate,
               security_deposit_aed: item.deposit_amount,
