@@ -36,8 +36,20 @@ export const MasterAgreementStep3: React.FC<MasterAgreementStep3Props> = ({
     if (!data.insurance_coverage_package) updates.insurance_coverage_package = 'comprehensive';
     if (data.insurance_excess_aed === undefined) updates.insurance_excess_aed = 1500;
     if (!data.insurance_territorial_coverage) updates.insurance_territorial_coverage = 'uae-only';
+    if (data.monthly_insurance_cost_per_vehicle === undefined) updates.monthly_insurance_cost_per_vehicle = 300;
     if (Object.keys(updates).length > 0) onChange(updates);
   }, []);
+
+  // Auto-set monthly insurance cost based on coverage package
+  React.useEffect(() => {
+    if (data.insurance_coverage_package === 'cdw') {
+      onChange({ monthly_insurance_cost_per_vehicle: 0 });
+    } else if (data.insurance_coverage_package === 'comprehensive' && !data.monthly_insurance_cost_per_vehicle) {
+      onChange({ monthly_insurance_cost_per_vehicle: 300 });
+    } else if (data.insurance_coverage_package === 'full-zero-excess' && data.monthly_insurance_cost_per_vehicle !== 500) {
+      onChange({ monthly_insurance_cost_per_vehicle: 500 });
+    }
+  }, [data.insurance_coverage_package]);
 
   React.useEffect(() => {
     const parts = [];
@@ -131,9 +143,9 @@ export const MasterAgreementStep3: React.FC<MasterAgreementStep3Props> = ({
                       <SelectValue placeholder="Select package" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="cdw">CDW (Collision Damage Waiver)</SelectItem>
-                      <SelectItem value="comprehensive">Comprehensive</SelectItem>
-                      <SelectItem value="full-zero-excess">Full / Zero Excess</SelectItem>
+                      <SelectItem value="cdw">CDW - Collision Damage Waiver (+0 AED/mo)</SelectItem>
+                      <SelectItem value="comprehensive">Comprehensive (+300 AED/mo)</SelectItem>
+                      <SelectItem value="full-zero-excess">Full / Zero Excess (+500 AED/mo)</SelectItem>
                     </SelectContent>
                   </Select>
                   {errors.insurance_coverage_package && <FormError message={errors.insurance_coverage_package} />}
@@ -188,18 +200,39 @@ export const MasterAgreementStep3: React.FC<MasterAgreementStep3Props> = ({
             </div>
 
             <div className="border-t pt-3">
-              <div className="space-y-1.5">
-                <TooltipLabel label="Territorial Coverage *" tooltip="Geographic area where insurance is valid." />
-                <Select
-                  value={data.insurance_territorial_coverage || "uae-only"}
-                  onValueChange={(value) => onChange({ insurance_territorial_coverage: value })}
-                >
-                  <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="uae-only">UAE Only (Default)</SelectItem>
-                    <SelectItem value="gcc">GCC Coverage (surcharge applies)</SelectItem>
-                  </SelectContent>
-                </Select>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <TooltipLabel 
+                    label="Territorial Coverage *" 
+                    tooltip="Geographic area where insurance is valid. GCC includes UAE, Saudi Arabia, Kuwait, Bahrain, Oman, Qatar (surcharge applies)."
+                  />
+                  <Select
+                    value={data.insurance_territorial_coverage || "uae-only"}
+                    onValueChange={(value) => onChange({ insurance_territorial_coverage: value })}
+                  >
+                    <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="uae-only">UAE Only (Default)</SelectItem>
+                      <SelectItem value="gcc">GCC Coverage (surcharge applies)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-1.5">
+                  <TooltipLabel 
+                    label="Monthly Cost / Vehicle (AED) *" 
+                    tooltip="Amount added to each vehicle's monthly rate for insurance coverage."
+                  />
+                  <Input
+                    type="number"
+                    min="0"
+                    step="50"
+                    className="h-9"
+                    value={data.monthly_insurance_cost_per_vehicle ?? 300}
+                    onChange={(e) => onChange({ monthly_insurance_cost_per_vehicle: parseFloat(e.target.value) || 0 })}
+                    placeholder="300"
+                  />
+                </div>
               </div>
             </div>
           </div>
