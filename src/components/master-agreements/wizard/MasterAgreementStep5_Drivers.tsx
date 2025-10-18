@@ -6,7 +6,8 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { LOVSelect } from '@/components/ui/lov-select';
-import { Plus, AlertTriangle, CheckCircle2, Trash2, Star } from 'lucide-react';
+import { Plus, AlertTriangle, CheckCircle2, Trash2, Star, Info } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useDrivers } from '@/hooks/useDrivers';
 import { useAgreementDrivers, useAssignDriver, useRemoveDriver, useUpdateDriverAssignment } from '@/hooks/useAgreementDrivers';
 import { getDriverAgeWarning, getLicenseExpiryWarning } from '@/hooks/useDrivers';
@@ -106,7 +107,27 @@ export const MasterAgreementStep5Drivers: React.FC<MasterAgreementStep5DriversPr
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold mb-2">Authorized Drivers</h2>
+        <div className="flex items-center gap-2 mb-2">
+          <h2 className="text-2xl font-bold">Authorized Drivers</h2>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Info className="h-5 w-5 text-muted-foreground cursor-help" />
+              </TooltipTrigger>
+              <TooltipContent className="max-w-sm p-4">
+                <div className="space-y-2">
+                  <p className="font-semibold">When are drivers required?</p>
+                  <ul className="list-disc list-inside space-y-1 text-sm">
+                    <li>Master Agreement can be signed without driver information</li>
+                    <li>Drivers must be assigned before vehicle checkout/handover</li>
+                    <li>You can add or update drivers anytime from the agreement details page</li>
+                    <li>At least one primary driver is required per vehicle line</li>
+                  </ul>
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
         <p className="text-muted-foreground">
           Assign authorized drivers to each vehicle line. Driver information can be added now or later, but is required before vehicle delivery.
         </p>
@@ -133,17 +154,6 @@ export const MasterAgreementStep5Drivers: React.FC<MasterAgreementStep5DriversPr
             </AlertDescription>
           </Alert>
 
-          <Alert className="border-blue-500 bg-blue-50">
-            <AlertDescription>
-              <strong className="text-blue-900">When are drivers required?</strong>
-              <ul className="list-disc list-inside mt-2 space-y-1 text-sm text-blue-900">
-                <li>Master Agreement can be signed without driver information</li>
-                <li>Drivers must be assigned before vehicle checkout/handover</li>
-                <li>You can add or update drivers anytime from the agreement details page</li>
-                <li>At least one primary driver is required per vehicle line</li>
-              </ul>
-            </AlertDescription>
-          </Alert>
         </>
       )}
 
