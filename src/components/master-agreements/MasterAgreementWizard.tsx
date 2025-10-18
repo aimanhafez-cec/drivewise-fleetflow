@@ -111,6 +111,7 @@ export const MasterAgreementWizard: React.FC<MasterAgreementWizardProps> = ({
       // Transform lines back to agreement_items format for the wizard UI
       const transformedItems = (agreementLines || []).map((line) => ({
         line_no: line.line_number,
+        contract_no: line.contract_no,
         vehicle_class_id: line.vehicle_class_id,
         vehicle_id: line.vehicle_id,
         quantity: line.qty,

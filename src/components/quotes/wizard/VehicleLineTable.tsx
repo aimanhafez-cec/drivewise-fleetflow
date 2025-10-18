@@ -113,7 +113,7 @@ export const VehicleLineTable: React.FC<VehicleLineTableProps> = ({
   };
 
   return (
-    <div className="border rounded-lg overflow-hidden">
+    <div className="border rounded-lg overflow-x-auto w-full">
       <Table>
         <TableHeader>
           <TableRow className="bg-muted">
@@ -124,14 +124,15 @@ export const VehicleLineTable: React.FC<VehicleLineTableProps> = ({
               />
             </TableHead>
             <TableHead className="w-12">#</TableHead>
-            <TableHead className="min-w-[140px]">Item Code</TableHead>
-            <TableHead className="min-w-[250px]">Item Description</TableHead>
-            <TableHead>Category</TableHead>
-            <TableHead>Start Date</TableHead>
-            <TableHead className="text-right">Duration</TableHead>
-            <TableHead className="text-right">Monthly Rate</TableHead>
-            <TableHead className="text-right">Delivery & Collection</TableHead>
-            <TableHead className="text-right">Upfront Total</TableHead>
+            <TableHead className="min-w-[140px]">Contract No.</TableHead>
+            <TableHead className="min-w-[160px]">Item Code</TableHead>
+            <TableHead className="min-w-[300px]">Item Description</TableHead>
+            <TableHead className="min-w-[120px]">Category</TableHead>
+            <TableHead className="min-w-[120px]">Start Date</TableHead>
+            <TableHead className="text-right min-w-[100px]">Duration</TableHead>
+            <TableHead className="text-right min-w-[140px]">Monthly Rate</TableHead>
+            <TableHead className="text-right min-w-[160px]">Delivery & Collection</TableHead>
+            <TableHead className="text-right min-w-[140px]">Upfront Total</TableHead>
             <TableHead className="w-32 text-center">Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -162,6 +163,9 @@ export const VehicleLineTable: React.FC<VehicleLineTableProps> = ({
                     />
                   </TableCell>
                   <TableCell className="font-medium">{line.line_no}</TableCell>
+                  <TableCell className="font-mono text-sm font-bold text-primary">
+                    {line.contract_no || 'TBD'}
+                  </TableCell>
                   <TableCell className="font-mono text-xs font-semibold text-primary">
                     {itemCode}
                   </TableCell>
@@ -242,7 +246,7 @@ export const VehicleLineTable: React.FC<VehicleLineTableProps> = ({
                 
                 {isExpanded && (
                   <TableRow>
-                    <TableCell colSpan={11} className="bg-muted/30 p-6">
+                    <TableCell colSpan={12} className="bg-muted/30 p-6">
                       <VehicleLineDetails
                         line={line}
                         onUpdate={(field, value) => onUpdate(index, field, value)}

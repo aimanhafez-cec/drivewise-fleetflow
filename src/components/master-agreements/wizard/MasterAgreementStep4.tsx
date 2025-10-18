@@ -45,10 +45,16 @@ export const MasterAgreementStep4: React.FC<MasterAgreementStep4Props> = ({
   const addMultipleVehicleLines = (selectedVehicles: any[]) => {
     const currentLines = data.agreement_items || [];
     const startLineNo = currentLines.length + 1;
+    const agreementNo = data.agreement_no || "DRAFT";
     
-    const newLines = selectedVehicles.map((vehicle, idx) => ({
-      line_no: startLineNo + idx,
-      vehicle_class_id: vehicle.category_id,
+    const newLines = selectedVehicles.map((vehicle, idx) => {
+      const lineNo = startLineNo + idx;
+      const contractNo = `${agreementNo}-${String(lineNo).padStart(2, '0')}`;
+      
+      return {
+        line_no: lineNo,
+        contract_no: contractNo,
+        vehicle_class_id: vehicle.category_id,
       vehicle_id: vehicle.id,
       pickup_at: data.contract_effective_from || "",
       return_at: data.contract_effective_to || "",
@@ -71,14 +77,14 @@ export const MasterAgreementStep4: React.FC<MasterAgreementStep4Props> = ({
       collection_fee: data.default_collection_fee || 0,
       mileage_package_km: data.mileage_pooling_enabled ? undefined : 3000,
       excess_km_rate: data.mileage_pooling_enabled ? undefined : 1.00,
-      rate_type: 'monthly' as const,
-      insurance_coverage_package: data.insurance_coverage_package || 'comprehensive',
+        rate_type: 'monthly' as const,
+        insurance_coverage_package: data.insurance_coverage_package || 'comprehensive',
       insurance_excess_aed: data.insurance_excess_aed ?? 1500,
       insurance_glass_tire_cover: data.insurance_glass_tire_cover ?? true,
       insurance_pai_enabled: data.insurance_pai_enabled ?? false,
-      insurance_territorial_coverage: data.insurance_territorial_coverage || 'uae-only',
-      addons: (data.default_addons || []).map((a: any) => ({ ...a })),
-      _vehicleMeta: {
+        insurance_territorial_coverage: data.insurance_territorial_coverage || 'uae-only',
+        addons: (data.default_addons || []).map((a: any) => ({ ...a })),
+        _vehicleMeta: {
         make: vehicle.make,
         model: vehicle.model,
         year: vehicle.year,
@@ -86,8 +92,9 @@ export const MasterAgreementStep4: React.FC<MasterAgreementStep4Props> = ({
         item_code: vehicle.item_code,
         item_description: vehicle.item_description,
         category_name: vehicle._itemCodeMeta?.category_name || vehicle.categories?.name,
-      },
-    }));
+        },
+      };
+    });
     
     onChange({ agreement_items: [...currentLines, ...newLines] });
   };
@@ -95,7 +102,13 @@ export const MasterAgreementStep4: React.FC<MasterAgreementStep4Props> = ({
   const removeVehicleLine = (index: number) => {
     const currentLines = [...(data.agreement_items || [])];
     currentLines.splice(index, 1);
-    const renumbered = currentLines.map((line, idx) => ({ ...line, line_no: idx + 1 }));
+    const agreementNo = data.agreement_no || "DRAFT";
+    
+    const renumbered = currentLines.map((line, idx) => ({
+      ...line,
+      line_no: idx + 1,
+      contract_no: `${agreementNo}-${String(idx + 1).padStart(2, '0')}`,
+    }));
     onChange({ agreement_items: renumbered });
   };
 
@@ -104,6 +117,24 @@ export const MasterAgreementStep4: React.FC<MasterAgreementStep4Props> = ({
     currentLines[index] = { ...currentLines[index], [field]: value };
     onChange({ agreement_items: currentLines });
   };
+
+  // Regenerate contract numbers when agreement number changes
+  React.useEffect(() => {
+    if (data.agreement_no && data.agreement_items?.length > 0) {
+      const needsUpdate = data.agreement_items.some((line: any) => {
+        const expectedContractNo = `${data.agreement_no}-${String(line.line_no).padStart(2, '0')}`;
+        return line.contract_no !== expectedContractNo;
+      });
+      
+      if (needsUpdate) {
+        const updatedItems = data.agreement_items.map((line: any) => ({
+          ...line,
+          contract_no: `${data.agreement_no}-${String(line.line_no).padStart(2, '0')}`,
+        }));
+        onChange({ agreement_items: updatedItems });
+      }
+    }
+  }, [data.agreement_no]);
 
   const calculateTotals = () => {
     const lines = data.agreement_items || [];
