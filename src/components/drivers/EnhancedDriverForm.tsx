@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
-import { DriverDocumentUpload } from './DriverDocumentUpload';
+import { DriverDocumentUpload, PendingDocument } from './DriverDocumentUpload';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { User, FileText, Briefcase, Shield, Loader2, CheckCircle2, AlertTriangle, Info, XCircle } from 'lucide-react';
@@ -65,20 +65,12 @@ export const EnhancedDriverForm: React.FC<EnhancedDriverFormProps> = ({
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [documents, setDocuments] = useState<any[]>([]);
+  const [pendingDocuments, setPendingDocuments] = useState<PendingDocument[]>([]);
   const [verificationStatus, setVerificationStatus] = useState<string>('unverified');
   const [currentDriverId, setCurrentDriverId] = useState<string | undefined>(driverId);
   const [activeTab, setActiveTab] = useState('basic');
-  const [hasAutoSaved, setHasAutoSaved] = useState(false);
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, touchedFields },
-    setValue,
-    watch,
-    reset,
-    trigger
-  } = useForm<DriverFormData>({
+  const form = useForm<DriverFormData>({
     resolver: zodResolver(driverSchema),
     defaultValues: {
       full_name: '',
@@ -101,17 +93,18 @@ export const EnhancedDriverForm: React.FC<EnhancedDriverFormProps> = ({
     }
   });
 
+  const { register, handleSubmit, formState: { errors, touchedFields }, setValue, watch, reset } = form;
   const formValues = watch();
 
   useEffect(() => {
     if (open) {
       setCurrentDriverId(driverId);
-      setHasAutoSaved(!!driverId);
       setActiveTab('basic');
+      setPendingDocuments([]);
       
       if (driverId) {
         loadDriverData();
-        loadDocuments();
+        loadDocuments(driverId);
       } else {
         reset({
           full_name: '',
@@ -135,12 +128,6 @@ export const EnhancedDriverForm: React.FC<EnhancedDriverFormProps> = ({
       }
     }
   }, [driverId, open, reset]);
-
-  useEffect(() => {
-    if (currentDriverId) {
-      loadDocuments();
-    }
-  }, [currentDriverId]);
 
   const loadDriverData = async () => {
     if (!driverId) return;
@@ -184,14 +171,14 @@ export const EnhancedDriverForm: React.FC<EnhancedDriverFormProps> = ({
     }
   };
 
-  const loadDocuments = async () => {
-    if (!currentDriverId) return;
+  const loadDocuments = async (dId: string) => {
+    if (!dId) return;
     
     try {
       const { data, error } = await supabase
         .from('driver_documents')
         .select('*')
-        .eq('driver_id', currentDriverId);
+        .eq('driver_id', dId);
       
       if (error) throw error;
       setDocuments(data || []);
@@ -200,115 +187,121 @@ export const EnhancedDriverForm: React.FC<EnhancedDriverFormProps> = ({
     }
   };
 
-  // Allow free tab navigation without validation
-  const handleTabChange = async (newTab: string) => {
-    setActiveTab(newTab);
-    
-    // Optional: Show a gentle reminder about saving (non-blocking)
-    if (newTab === 'documents' && !currentDriverId) {
-      toast.info('Tip: Save the driver first to enable document uploads', {
-        duration: 3000
-      });
-    }
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
   };
 
-  const handleAutoSave = async () => {
-    const formData = watch();
-    
-    try {
-      // Ensure empty strings instead of undefined for optional fields
-      const driverData = {
-        full_name: formData.full_name || '',
-        license_no: formData.license_no || '',
-        emirates_id: formData.emirates_id || '',
-        passport_number: formData.passport_number || '',
-        nationality: formData.nationality || '',
-        phone: formData.phone || '',
-        email: formData.email || '',
-        date_of_birth: formData.date_of_birth || '',
-        license_expiry: formData.license_expiry || '',
-        license_issued_by: formData.license_issued_by || '',
-        license_issue_date: formData.license_issue_date || '',
-        employment_id: formData.employment_id || '',
-        department: formData.department || '',
-        visa_expiry: formData.visa_expiry || '',
-        address_emirate: formData.address_emirate || '',
-        status: formData.status,
-        additional_driver_fee: formData.additional_driver_fee
-      };
-
-      const { data, error } = await supabase
-        .from('drivers')
-        .insert([driverData])
-        .select('id')
-        .single();
-      
-      if (error) throw error;
-      
-      setCurrentDriverId(data.id);
-      setHasAutoSaved(true);
-      toast.success('Driver saved! You can now upload documents.');
-      
-      // Automatically switch to documents tab
-      setTimeout(() => setActiveTab('documents'), 500);
-    } catch (error: any) {
-      console.error('Error auto-saving driver:', error);
-      toast.error('Failed to save driver: ' + error.message);
-      throw error;
-    }
+  const handleAddPendingDocument = (doc: Omit<PendingDocument, 'id'>) => {
+    const newDoc: PendingDocument = {
+      ...doc,
+      id: `pending-${Date.now()}-${Math.random()}`
+    };
+    setPendingDocuments(prev => [...prev, newDoc]);
   };
 
-  const onSubmit = async (data: DriverFormData) => {
+  const handleRemovePendingDocument = (id: string) => {
+    setPendingDocuments(prev => prev.filter(doc => doc.id !== id));
+  };
+
+  const uploadPendingDocuments = async (driverId: string) => {
+    if (pendingDocuments.length === 0) return 0;
+
+    let successCount = 0;
+    for (const doc of pendingDocuments) {
+      try {
+        const fileName = `${driverId}/${doc.type}_${Date.now()}_${doc.file.name}`;
+        const { error: uploadError } = await supabase.storage
+          .from('driver-documents')
+          .upload(fileName, doc.file);
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('driver-documents')
+          .getPublicUrl(fileName);
+
+        const { error: dbError } = await supabase
+          .from('driver_documents')
+          .insert([{
+            driver_id: driverId,
+            document_type: doc.type as any,
+            file_url: publicUrl,
+            file_name: doc.file.name,
+            file_size_bytes: doc.file.size,
+            mime_type: doc.file.type,
+            expiry_date: doc.expiryDate || null
+          }]);
+
+        if (dbError) throw dbError;
+        successCount++;
+      } catch (error) {
+        console.error('Error uploading pending document:', error);
+      }
+    }
+
+    setPendingDocuments([]);
+    return successCount;
+  };
+
+  const onSubmit = async (values: DriverFormData) => {
     setSaving(true);
     try {
-      // Ensure empty strings instead of undefined for optional fields
       const driverData = {
-        full_name: data.full_name || '',
-        license_no: data.license_no || '',
-        emirates_id: data.emirates_id || '',
-        passport_number: data.passport_number || '',
-        nationality: data.nationality || '',
-        phone: data.phone || '',
-        email: data.email || '',
-        date_of_birth: data.date_of_birth || '',
-        license_expiry: data.license_expiry || '',
-        license_issued_by: data.license_issued_by || '',
-        license_issue_date: data.license_issue_date || '',
-        employment_id: data.employment_id || '',
-        department: data.department || '',
-        visa_expiry: data.visa_expiry || '',
-        address_emirate: data.address_emirate || '',
-        status: data.status,
-        additional_driver_fee: data.additional_driver_fee
+        full_name: values.full_name || '',
+        license_no: values.license_no || '',
+        emirates_id: values.emirates_id || '',
+        passport_number: values.passport_number || '',
+        phone: values.phone || '',
+        email: values.email || '',
+        date_of_birth: values.date_of_birth || null,
+        nationality: values.nationality || '',
+        license_expiry: values.license_expiry || null,
+        visa_expiry: values.visa_expiry || null,
+        license_issued_by: values.license_issued_by || '',
+        license_issue_date: values.license_issue_date || null,
+        employment_id: values.employment_id || '',
+        department: values.department || '',
+        address_emirate: values.address_emirate || '',
+        additional_driver_fee: values.additional_driver_fee || 0,
+        status: values.status || 'active'
       };
 
-      let savedDriverId = currentDriverId;
-      
       if (currentDriverId) {
         const { error } = await supabase
           .from('drivers')
           .update(driverData)
           .eq('id', currentDriverId);
-        
+
         if (error) throw error;
-        toast.success('Driver updated successfully');
+
+        const uploadedCount = await uploadPendingDocuments(currentDriverId);
+        if (uploadedCount > 0) {
+          toast.success(`Driver updated and ${uploadedCount} document(s) uploaded`);
+        } else {
+          toast.success('Driver updated successfully');
+        }
       } else {
-        const { data: newDriver, error } = await supabase
+        const { data, error } = await supabase
           .from('drivers')
           .insert([driverData])
-          .select('id')
+          .select()
           .single();
-        
+
         if (error) throw error;
-        savedDriverId = newDriver.id;
-        toast.success('Driver created successfully');
+
+        const uploadedCount = await uploadPendingDocuments(data.id);
+        if (uploadedCount > 0) {
+          toast.success(`Driver created and ${uploadedCount} document(s) uploaded`);
+        } else {
+          toast.success('Driver created successfully');
+        }
       }
-      
-      onSave(savedDriverId);
+
+      onSave?.();
       onClose();
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error saving driver:', error);
-      toast.error('Failed to save driver: ' + error.message);
+      toast.error('Failed to save driver');
     } finally {
       setSaving(false);
     }
@@ -328,8 +321,6 @@ export const EnhancedDriverForm: React.FC<EnhancedDriverFormProps> = ({
     return <Badge variant={badge.variant}>{badge.label}</Badge>;
   };
 
-  const getDocument = (type: string) => documents.find(d => d.document_type === type);
-
   const getFieldClassName = (fieldName: keyof DriverFormData, isRequired: boolean = false) => {
     const hasError = !!errors[fieldName];
     const isTouched = touchedFields[fieldName];
@@ -342,22 +333,6 @@ export const EnhancedDriverForm: React.FC<EnhancedDriverFormProps> = ({
     );
   };
 
-  const getRequiredDocuments = () => {
-    // All documents are optional for flexible data entry
-    return [
-      { type: 'emirates_id_front', label: 'Emirates ID (Front)', required: false },
-      { type: 'emirates_id_back', label: 'Emirates ID (Back)', required: false },
-      { type: 'driving_license_front', label: 'Driving License (Front)', required: false },
-      { type: 'driving_license_back', label: 'Driving License (Back)', required: false },
-      { type: 'passport_bio_page', label: 'Passport (Bio Page)', required: false },
-      { type: 'visa_page', label: 'Visa Page', required: false }
-    ];
-  };
-
-  const allDocumentsUploaded = getRequiredDocuments()
-    .filter(doc => doc.required)
-    .every(doc => !!getDocument(doc.type));
-
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -367,17 +342,6 @@ export const EnhancedDriverForm: React.FC<EnhancedDriverFormProps> = ({
             {currentDriverId && getStatusBadge(verificationStatus)}
           </div>
         </DialogHeader>
-
-        {/* Demo Mode Banner */}
-        {process.env.NODE_ENV === 'development' && (
-          <Alert className="border-blue-500 bg-blue-50">
-            <Info className="h-4 w-4 text-blue-600" />
-            <AlertDescription>
-              <strong className="text-blue-900">Demo Mode:</strong> Document validations are relaxed for demonstration. 
-              In production, all driver documents must be verified before vehicle handover.
-            </AlertDescription>
-          </Alert>
-        )}
 
         {loading ? (
           <div className="flex items-center justify-center py-8">
@@ -394,9 +358,6 @@ export const EnhancedDriverForm: React.FC<EnhancedDriverFormProps> = ({
                 <TabsTrigger value="identity">
                   <Shield className="h-4 w-4 mr-2" />
                   Identity
-                  {(errors.emirates_id || errors.passport_number || errors.nationality || errors.phone) && (
-                    <AlertTriangle className="h-3 w-3 ml-1 text-red-500" />
-                  )}
                 </TabsTrigger>
                 <TabsTrigger value="employment">
                   <Briefcase className="h-4 w-4 mr-2" />
@@ -405,21 +366,13 @@ export const EnhancedDriverForm: React.FC<EnhancedDriverFormProps> = ({
                 <TabsTrigger value="documents">
                   <FileText className="h-4 w-4 mr-2" />
                   Documents
-                  {!allDocumentsUploaded && (
-                    <AlertTriangle className="h-3 w-3 ml-1 text-amber-500" />
-                  )}
-                  {allDocumentsUploaded && currentDriverId && (
-                    <CheckCircle2 className="h-3 w-3 ml-1 text-green-500" />
-                  )}
                 </TabsTrigger>
               </TabsList>
 
               <TabsContent value="basic" className="space-y-4 mt-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="full_name">
-                      Full Name
-                    </Label>
+                    <Label htmlFor="full_name">Full Name</Label>
                     <Input
                       id="full_name"
                       {...register('full_name')}
@@ -433,9 +386,7 @@ export const EnhancedDriverForm: React.FC<EnhancedDriverFormProps> = ({
                     )}
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="license_no">
-                      License Number
-                    </Label>
+                    <Label htmlFor="license_no">License Number</Label>
                     <Input
                       id="license_no"
                       {...register('license_no')}
@@ -499,9 +450,7 @@ export const EnhancedDriverForm: React.FC<EnhancedDriverFormProps> = ({
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="emirates_id">
-                      Emirates ID
-                    </Label>
+                    <Label htmlFor="emirates_id">Emirates ID</Label>
                     <Input
                       id="emirates_id"
                       {...register('emirates_id')}
@@ -514,56 +463,29 @@ export const EnhancedDriverForm: React.FC<EnhancedDriverFormProps> = ({
                         {errors.emirates_id.message}
                       </p>
                     )}
-                    {!errors.emirates_id && touchedFields.emirates_id && formValues.emirates_id && (
-                      <p className="text-xs text-green-600 flex items-center gap-1">
-                        <CheckCircle2 className="h-3 w-3" />
-                        Valid Emirates ID format
-                      </p>
-                    )}
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="passport_number">
-                      Passport Number
-                    </Label>
+                    <Label htmlFor="passport_number">Passport Number</Label>
                     <Input
                       id="passport_number"
-                      placeholder="e.g., N1234567"
                       {...register('passport_number')}
-                      className={getFieldClassName('passport_number', false)}
+                      className={getFieldClassName('passport_number', true)}
                     />
-                    {errors.passport_number && (
-                      <p className="text-xs text-red-500 flex items-center gap-1">
-                        <XCircle className="h-3 w-3" />
-                        {errors.passport_number.message}
-                      </p>
-                    )}
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="nationality">
-                      Nationality
-                    </Label>
+                    <Label htmlFor="nationality">Nationality</Label>
                     <Input
                       id="nationality"
                       {...register('nationality')}
-                      placeholder="e.g., United Arab Emirates"
                       className={getFieldClassName('nationality', true)}
                     />
-                    {errors.nationality && (
-                      <p className="text-xs text-red-500 flex items-center gap-1">
-                        <XCircle className="h-3 w-3" />
-                        {errors.nationality.message}
-                      </p>
-                    )}
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="phone">
-                      Mobile Number
-                    </Label>
+                    <Label htmlFor="phone">Mobile Number</Label>
                     <Input
                       id="phone"
-                      type="tel"
                       {...register('phone')}
-                      placeholder="+971-50-1234-56"
+                      placeholder="+971-XX-XXXX-XX"
                       className={getFieldClassName('phone', true)}
                     />
                     {errors.phone && (
@@ -572,40 +494,6 @@ export const EnhancedDriverForm: React.FC<EnhancedDriverFormProps> = ({
                         {errors.phone.message}
                       </p>
                     )}
-                    {!errors.phone && touchedFields.phone && formValues.phone && (
-                      <p className="text-xs text-green-600 flex items-center gap-1">
-                        <CheckCircle2 className="h-3 w-3" />
-                        Valid UAE phone format
-                      </p>
-                    )}
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="license_issued_by">License Issued By</Label>
-                    <Select 
-                      value={formValues.license_issued_by} 
-                      onValueChange={(value) => setValue('license_issued_by', value)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select authority" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Dubai RTA">Dubai RTA</SelectItem>
-                        <SelectItem value="Abu Dhabi Police">Abu Dhabi Police</SelectItem>
-                        <SelectItem value="Sharjah Police">Sharjah Police</SelectItem>
-                        <SelectItem value="Ajman Police">Ajman Police</SelectItem>
-                        <SelectItem value="RAK Police">RAK Police</SelectItem>
-                        <SelectItem value="Fujairah Police">Fujairah Police</SelectItem>
-                        <SelectItem value="UAQ Police">UAQ Police</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="license_issue_date">License Issue Date</Label>
-                    <Input
-                      id="license_issue_date"
-                      type="date"
-                      {...register('license_issue_date')}
-                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="visa_expiry">Visa Expiry</Label>
@@ -615,40 +503,13 @@ export const EnhancedDriverForm: React.FC<EnhancedDriverFormProps> = ({
                       {...register('visa_expiry')}
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="address_emirate">Address Emirate</Label>
-                    <Select 
-                      value={formValues.address_emirate} 
-                      onValueChange={(value) => setValue('address_emirate', value)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select emirate" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Dubai">Dubai</SelectItem>
-                        <SelectItem value="Abu Dhabi">Abu Dhabi</SelectItem>
-                        <SelectItem value="Sharjah">Sharjah</SelectItem>
-                        <SelectItem value="Ajman">Ajman</SelectItem>
-                        <SelectItem value="Ras Al Khaimah">Ras Al Khaimah</SelectItem>
-                        <SelectItem value="Fujairah">Fujairah</SelectItem>
-                        <SelectItem value="Umm Al Quwain">Umm Al Quwain</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
                 </div>
-
-                <Alert className="border-blue-500 bg-blue-50">
-                  <Info className="h-4 w-4 text-blue-600" />
-                  <AlertDescription className="text-blue-900">
-                    You can navigate freely between tabs. Click "Save Driver" when ready to save your changes.
-                  </AlertDescription>
-                </Alert>
               </TabsContent>
 
               <TabsContent value="employment" className="space-y-4 mt-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="employment_id">Employee ID / Badge Number</Label>
+                    <Label htmlFor="employment_id">Employment ID</Label>
                     <Input
                       id="employment_id"
                       {...register('employment_id')}
@@ -664,98 +525,49 @@ export const EnhancedDriverForm: React.FC<EnhancedDriverFormProps> = ({
                 </div>
               </TabsContent>
 
-              <TabsContent value="documents" className="space-y-4 mt-4">
-                {!currentDriverId && (
-                  <Alert className="border-blue-500 bg-blue-50">
-                    <Info className="h-4 w-4 text-blue-600" />
-                    <AlertDescription className="text-blue-900">
-                      <strong>Tip:</strong> Save the driver first using the "Save Driver" button below to enable document uploads.
-                      Documents will be attached to the driver record once saved.
-                    </AlertDescription>
-                  </Alert>
-                )}
-                
-                {process.env.NODE_ENV === 'development' && currentDriverId && (
-                  <Alert className="border-blue-500 bg-blue-50">
-                    <Info className="h-4 w-4 text-blue-600" />
-                    <AlertDescription className="text-blue-900">
-                      <strong>Recommended Documents:</strong>
-                      <ul className="mt-2 list-disc list-inside text-sm space-y-1">
-                        <li>Emirates ID (optional)</li>
-                        <li>UAE Driving License (optional)</li>
-                        <li>Passport (optional)</li>
-                        <li>Visa page (optional)</li>
-                      </ul>
-                    </AlertDescription>
-                  </Alert>
-                )}
+              <TabsContent value="documents" className="space-y-4">
+                <Alert>
+                  <Info className="h-4 w-4" />
+                  <AlertDescription>
+                    {!currentDriverId 
+                      ? 'You can add documents now. They will be uploaded when you save the driver.'
+                      : 'Add documents for this driver. All uploads are saved immediately.'}
+                  </AlertDescription>
+                </Alert>
 
-                {currentDriverId && (
-                  <>
-                    {/* Document Checklist - Informational */}
-                    <Alert className="border-blue-500 bg-blue-50">
-                      <AlertDescription>
-                        <div className="space-y-2">
-                          <strong className="text-blue-900">
-                            Document Checklist (Optional):
-                          </strong>
-                          <ul className="mt-2 space-y-1 text-sm">
-                            {getRequiredDocuments().map(doc => {
-                              const hasDoc = !!getDocument(doc.type);
-                              return (
-                                <li key={doc.type} className={hasDoc ? "text-blue-600" : "text-gray-500"}>
-                                  {hasDoc ? "✓" : "○"} {doc.label}
-                                </li>
-                              );
-                            })}
-                          </ul>
-                        </div>
-                      </AlertDescription>
-                    </Alert>
-
-                    <Separator />
-
-                    <div className="space-y-4">
-                      <h3 className="font-semibold">Upload Documents</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {getRequiredDocuments().map((doc) => (
-                          <DriverDocumentUpload
-                            key={doc.type}
-                            driverId={currentDriverId || ''}
-                            documentType={doc.type}
-                            label={doc.label}
-                            isRequired={doc.required}
-                            existingDocument={getDocument(doc.type)}
-                            expiryDate={doc.type.includes('license') ? formValues.license_expiry : doc.type === 'visa_page' ? formValues.visa_expiry : undefined}
-                            onUploadComplete={loadDocuments}
-                          />
-                        ))}
-                      </div>
-                      
-                      <div className="mt-4 p-4 border border-dashed rounded-lg">
-                        <h4 className="text-sm font-medium mb-3">Upload Additional Documents</h4>
-                        <DriverDocumentUpload
-                          driverId={currentDriverId}
-                          documentType="other"
-                          label="Other Document"
-                          isRequired={false}
-                          onUploadComplete={loadDocuments}
-                          allowCustomType={true}
-                        />
-                      </div>
-                    </div>
-                  </>
-                )}
+                <DriverDocumentUpload
+                  driverId={currentDriverId}
+                  documents={documents}
+                  pendingDocuments={pendingDocuments}
+                  onDocumentChange={() => currentDriverId && loadDocuments(currentDriverId)}
+                  onPendingDocumentAdd={handleAddPendingDocument}
+                  onPendingDocumentRemove={handleRemovePendingDocument}
+                />
               </TabsContent>
             </Tabs>
 
-            <DialogFooter className="mt-6">
+            <Separator className="my-4" />
+
+            <Alert>
+              <Info className="h-4 w-4" />
+              <AlertDescription>
+                You can navigate freely between tabs. Click "Save Driver" when ready to save your changes.
+              </AlertDescription>
+            </Alert>
+
+            <DialogFooter className="mt-4">
               <Button type="button" variant="outline" onClick={onClose}>
                 Cancel
               </Button>
               <Button type="submit" disabled={saving}>
-                {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                {currentDriverId ? 'Update Driver' : 'Save Driver'}
+                {saving ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  currentDriverId ? 'Update Driver' : 'Save Driver'
+                )}
               </Button>
             </DialogFooter>
           </form>
