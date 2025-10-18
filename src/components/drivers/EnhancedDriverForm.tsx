@@ -24,7 +24,7 @@ const driverSchema = z.object({
   emirates_id: z.string()
     .min(1, 'Emirates ID is required')
     .regex(/^\d{3}-\d{4}-\d{7}-\d{1}$/, 'Invalid Emirates ID format. Use: XXX-XXXX-XXXXXXX-X'),
-  passport_number: z.string().min(5, 'Passport number is required').max(50, 'Passport number is too long'),
+  passport_number: z.string().optional().or(z.literal('')),
   nationality: z.string().min(2, 'Nationality is required').max(100, 'Nationality is too long'),
   phone: z.string()
     .min(1, 'Phone number is required')
@@ -201,8 +201,8 @@ export const EnhancedDriverForm: React.FC<EnhancedDriverFormProps> = ({
   // Auto-save when moving from Identity tab
   const handleTabChange = async (newTab: string) => {
     if (activeTab === 'identity' && !currentDriverId && !hasAutoSaved) {
-      // Validate identity fields before auto-save
-      const isValid = await trigger(['full_name', 'license_no', 'emirates_id', 'passport_number', 'nationality', 'phone']);
+      // Validate identity fields before auto-save (passport optional)
+      const isValid = await trigger(['full_name', 'license_no', 'emirates_id', 'nationality', 'phone']);
       
       if (isValid) {
         await handleAutoSave();
@@ -317,17 +317,27 @@ export const EnhancedDriverForm: React.FC<EnhancedDriverFormProps> = ({
   };
 
   const getRequiredDocuments = () => {
-    const required = [
-      { type: 'emirates_id_front', label: 'Emirates ID (Front)', has: !!getDocument('emirates_id_front') },
-      { type: 'emirates_id_back', label: 'Emirates ID (Back)', has: !!getDocument('emirates_id_back') },
-      { type: 'driving_license_front', label: 'Driving License (Front)', has: !!getDocument('driving_license_front') },
-      { type: 'driving_license_back', label: 'Driving License (Back)', has: !!getDocument('driving_license_back') },
-      { type: 'passport_bio_page', label: 'Passport (Bio Page)', has: !!getDocument('passport_bio_page') }
+    const nationality = watch('nationality');
+    const isUAENational = nationality?.toLowerCase().includes('united arab emirates') || 
+                         nationality?.toLowerCase().includes('uae') ||
+                         nationality?.toLowerCase() === 'emirati';
+    const isGCCNational = ['bahrain', 'kuwait', 'oman', 'qatar', 'saudi arabia'].some(
+      country => nationality?.toLowerCase().includes(country)
+    );
+    
+    return [
+      { type: 'emirates_id_front', label: 'Emirates ID (Front)', required: true },
+      { type: 'emirates_id_back', label: 'Emirates ID (Back)', required: true },
+      { type: 'driving_license_front', label: 'Driving License (Front)', required: true },
+      { type: 'driving_license_back', label: 'Driving License (Back)', required: true },
+      { type: 'passport_bio_page', label: 'Passport (Bio Page)', required: !isUAENational },
+      { type: 'visa_page', label: 'Visa Page', required: !isUAENational && !isGCCNational }
     ];
-    return required;
   };
 
-  const allDocumentsUploaded = getRequiredDocuments().every(doc => doc.has);
+  const allDocumentsUploaded = getRequiredDocuments()
+    .filter(doc => doc.required)
+    .every(doc => !!getDocument(doc.type));
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -373,13 +383,13 @@ export const EnhancedDriverForm: React.FC<EnhancedDriverFormProps> = ({
                   <Briefcase className="h-4 w-4 mr-2" />
                   Employment
                 </TabsTrigger>
-                <TabsTrigger value="documents" disabled={!currentDriverId}>
+                <TabsTrigger value="documents">
                   <FileText className="h-4 w-4 mr-2" />
                   Documents
-                  {currentDriverId && !allDocumentsUploaded && (
+                  {!allDocumentsUploaded && (
                     <AlertTriangle className="h-3 w-3 ml-1 text-amber-500" />
                   )}
-                  {currentDriverId && allDocumentsUploaded && (
+                  {allDocumentsUploaded && currentDriverId && (
                     <CheckCircle2 className="h-3 w-3 ml-1 text-green-500" />
                   )}
                 </TabsTrigger>
@@ -494,12 +504,21 @@ export const EnhancedDriverForm: React.FC<EnhancedDriverFormProps> = ({
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="passport_number" className="flex items-center gap-1">
-                      Passport Number <span className="text-red-500">*</span>
+                      Passport Number
+                      {!watch('nationality')?.toLowerCase().includes('united arab emirates') && 
+                       !watch('nationality')?.toLowerCase().includes('uae') &&
+                       !watch('nationality')?.toLowerCase().includes('emirati') && (
+                        <span className="text-red-500">*</span>
+                      )}
+                      <span className="text-xs text-muted-foreground ml-2">
+                        (Optional for UAE nationals)
+                      </span>
                     </Label>
                     <Input
                       id="passport_number"
+                      placeholder="e.g., N1234567"
                       {...register('passport_number')}
-                      className={getFieldClassName('passport_number', true)}
+                      className={getFieldClassName('passport_number', false)}
                     />
                     {errors.passport_number && (
                       <p className="text-xs text-red-500 flex items-center gap-1">
@@ -637,85 +656,91 @@ export const EnhancedDriverForm: React.FC<EnhancedDriverFormProps> = ({
               </TabsContent>
 
               <TabsContent value="documents" className="space-y-4 mt-4">
-                {/* Document Requirements Checklist */}
-                <Alert className={cn(
-                  "border-2",
-                  allDocumentsUploaded ? "border-green-500 bg-green-50" : "border-red-500 bg-red-50"
-                )}>
-                  <AlertDescription>
-                    <div className="space-y-2">
-                      <strong className={allDocumentsUploaded ? "text-green-900" : "text-red-900"}>
-                        Required Documents (UAE Corporate Leasing):
-                      </strong>
-                      <ul className="mt-2 space-y-1 text-sm">
-                        {getRequiredDocuments().map(doc => (
-                          <li key={doc.type} className={doc.has ? "text-green-700" : "text-red-700"}>
-                            {doc.has ? <CheckCircle2 className="h-3 w-3 inline mr-1" /> : <XCircle className="h-3 w-3 inline mr-1" />}
-                            {doc.label}
-                          </li>
-                        ))}
+                {!currentDriverId && (
+                  <Alert className="border-amber-500 bg-amber-50">
+                    <Info className="h-4 w-4 text-amber-600" />
+                    <AlertDescription className="text-amber-900">
+                      <strong>Note:</strong> Save the driver first using the "Save Driver" button below before uploading documents.
+                      Documents will be attached to the driver record once saved.
+                    </AlertDescription>
+                  </Alert>
+                )}
+                
+                {process.env.NODE_ENV === 'development' && currentDriverId && (
+                  <Alert className="border-blue-500 bg-blue-50">
+                    <Info className="h-4 w-4 text-blue-600" />
+                    <AlertDescription className="text-blue-900">
+                      <strong>Document Requirements:</strong>
+                      <ul className="mt-2 list-disc list-inside text-sm space-y-1">
+                        <li>Emirates ID (mandatory for all drivers)</li>
+                        <li>UAE Driving License (mandatory)</li>
+                        <li>Passport (optional for UAE nationals, mandatory for expats)</li>
+                        <li>Visa page (mandatory for non-GCC expats only)</li>
                       </ul>
+                    </AlertDescription>
+                  </Alert>
+                )}
+
+                {currentDriverId && (
+                  <>
+                    {/* Document Requirements Checklist */}
+                    <Alert className={cn(
+                      "border-2",
+                      allDocumentsUploaded ? "border-green-500 bg-green-50" : "border-amber-500 bg-amber-50"
+                    )}>
+                      <AlertDescription>
+                        <div className="space-y-2">
+                          <strong className={allDocumentsUploaded ? "text-green-900" : "text-amber-900"}>
+                            Required Documents (UAE Corporate Leasing):
+                          </strong>
+                          <ul className="mt-2 space-y-1 text-sm">
+                            {getRequiredDocuments().filter(doc => doc.required).map(doc => {
+                              const hasDoc = !!getDocument(doc.type);
+                              return (
+                                <li key={doc.type} className={hasDoc ? "text-green-700" : "text-amber-700"}>
+                                  {hasDoc ? <CheckCircle2 className="h-3 w-3 inline mr-1" /> : <AlertTriangle className="h-3 w-3 inline mr-1" />}
+                                  {doc.label}
+                                </li>
+                              );
+                            })}
+                          </ul>
+                        </div>
+                      </AlertDescription>
+                    </Alert>
+
+                    <Separator />
+
+                    <div className="space-y-4">
+                      <h3 className="font-semibold">Upload Required Documents</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {getRequiredDocuments().map((doc) => (
+                          <DriverDocumentUpload
+                            key={doc.type}
+                            driverId={currentDriverId || ''}
+                            documentType={doc.type}
+                            label={doc.label}
+                            isRequired={doc.required}
+                            existingDocument={getDocument(doc.type)}
+                            expiryDate={doc.type.includes('license') ? formValues.license_expiry : doc.type === 'visa_page' ? formValues.visa_expiry : undefined}
+                            onUploadComplete={loadDocuments}
+                          />
+                        ))}
+                      </div>
+                      
+                      <div className="mt-4 p-4 border border-dashed rounded-lg">
+                        <h4 className="text-sm font-medium mb-3">Upload Additional Documents</h4>
+                        <DriverDocumentUpload
+                          driverId={currentDriverId}
+                          documentType="other"
+                          label="Other Document"
+                          isRequired={false}
+                          onUploadComplete={loadDocuments}
+                          allowCustomType={true}
+                        />
+                      </div>
                     </div>
-                  </AlertDescription>
-                </Alert>
-
-                <Separator />
-
-                <div className="space-y-4">
-                  <h3 className="font-semibold">Upload Required Documents</h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    <DriverDocumentUpload
-                      driverId={currentDriverId!}
-                      documentType="emirates_id_front"
-                      label="Emirates ID (Front)"
-                      isRequired
-                      existingDocument={getDocument('emirates_id_front')}
-                      onUploadComplete={loadDocuments}
-                    />
-                    <DriverDocumentUpload
-                      driverId={currentDriverId!}
-                      documentType="emirates_id_back"
-                      label="Emirates ID (Back)"
-                      isRequired
-                      existingDocument={getDocument('emirates_id_back')}
-                      onUploadComplete={loadDocuments}
-                    />
-                    <DriverDocumentUpload
-                      driverId={currentDriverId!}
-                      documentType="driving_license_front"
-                      label="Driving License (Front)"
-                      isRequired
-                      existingDocument={getDocument('driving_license_front')}
-                      expiryDate={formValues.license_expiry}
-                      onUploadComplete={loadDocuments}
-                    />
-                    <DriverDocumentUpload
-                      driverId={currentDriverId!}
-                      documentType="driving_license_back"
-                      label="Driving License (Back)"
-                      isRequired
-                      existingDocument={getDocument('driving_license_back')}
-                      onUploadComplete={loadDocuments}
-                    />
-                    <DriverDocumentUpload
-                      driverId={currentDriverId!}
-                      documentType="passport_bio_page"
-                      label="Passport (Bio Page)"
-                      isRequired
-                      existingDocument={getDocument('passport_bio_page')}
-                      onUploadComplete={loadDocuments}
-                    />
-                    <DriverDocumentUpload
-                      driverId={currentDriverId!}
-                      documentType="visa_page"
-                      label="Visa Page"
-                      isRequired={false}
-                      existingDocument={getDocument('visa_page')}
-                      expiryDate={formValues.visa_expiry}
-                      onUploadComplete={loadDocuments}
-                    />
-                  </div>
-                </div>
+                  </>
+                )}
               </TabsContent>
             </Tabs>
 

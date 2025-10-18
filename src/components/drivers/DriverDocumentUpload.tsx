@@ -32,6 +32,7 @@ interface DocumentUploadProps {
   existingDocument?: DriverDocument;
   expiryDate?: string;
   onUploadComplete: () => void;
+  allowCustomType?: boolean;
 }
 
 export const DriverDocumentUpload: React.FC<DocumentUploadProps> = ({
@@ -41,10 +42,12 @@ export const DriverDocumentUpload: React.FC<DocumentUploadProps> = ({
   isRequired,
   existingDocument,
   expiryDate,
-  onUploadComplete
+  onUploadComplete,
+  allowCustomType = false
 }) => {
   const [uploading, setUploading] = useState(false);
   const [file, setFile] = useState<File | null>(null);
+  const [selectedDocType, setSelectedDocType] = useState(documentType);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -65,11 +68,12 @@ export const DriverDocumentUpload: React.FC<DocumentUploadProps> = ({
   };
 
   const handleUpload = async () => {
-    if (!file) return;
+    if (!file || !driverId) return;
     
     setUploading(true);
     try {
-      const fileName = `${driverId}/${documentType}_${Date.now()}_${file.name}`;
+      const docType = allowCustomType ? selectedDocType : documentType;
+      const fileName = `${driverId}/${docType}_${Date.now()}_${file.name}`;
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('driver-documents')
         .upload(fileName, file);
@@ -84,7 +88,7 @@ export const DriverDocumentUpload: React.FC<DocumentUploadProps> = ({
         .from('driver_documents')
         .insert([{
           driver_id: driverId,
-          document_type: documentType as any,
+          document_type: docType as any,
           file_url: publicUrl,
           file_name: file.name,
           file_size_bytes: file.size,
@@ -96,6 +100,7 @@ export const DriverDocumentUpload: React.FC<DocumentUploadProps> = ({
       
       toast.success(`${label} uploaded successfully`);
       setFile(null);
+      setSelectedDocType(documentType);
       onUploadComplete();
     } catch (error) {
       console.error('Upload error:', error);
@@ -154,13 +159,38 @@ export const DriverDocumentUpload: React.FC<DocumentUploadProps> = ({
           </div>
         ) : (
           <div className="space-y-2">
+            {allowCustomType && (
+              <select
+                value={selectedDocType}
+                onChange={(e) => setSelectedDocType(e.target.value)}
+                className="w-full p-2 text-sm border rounded-md bg-background"
+                disabled={!driverId}
+              >
+                <option value="other">Other Document</option>
+                <option value="emirates_id_front">Emirates ID (Front)</option>
+                <option value="emirates_id_back">Emirates ID (Back)</option>
+                <option value="driving_license_front">Driving License (Front)</option>
+                <option value="driving_license_back">Driving License (Back)</option>
+                <option value="passport_bio_page">Passport (Bio Page)</option>
+                <option value="visa_page">Visa Page</option>
+                <option value="residence_permit">Residence Permit</option>
+                <option value="employment_letter">Employment Letter</option>
+                <option value="salary_certificate">Salary Certificate</option>
+              </select>
+            )}
             <input
               type="file"
               accept="image/jpeg,image/png,image/jpg,application/pdf"
               onChange={handleFileSelect}
               className="text-sm w-full"
+              disabled={!driverId}
             />
-            {file && (
+            {!driverId && (
+              <p className="text-xs text-muted-foreground">
+                Save the driver first to enable document uploads
+              </p>
+            )}
+            {file && driverId && (
               <Button
                 onClick={handleUpload}
                 disabled={uploading}

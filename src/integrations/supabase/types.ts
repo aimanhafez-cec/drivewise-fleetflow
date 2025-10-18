@@ -2042,7 +2042,7 @@ export type Database = {
           license_issued_by: string | null
           license_no: string
           nationality: string
-          passport_number: string
+          passport_number: string | null
           phone: string
           rejection_reason: string | null
           status: string
@@ -2070,7 +2070,7 @@ export type Database = {
           license_issued_by?: string | null
           license_no: string
           nationality: string
-          passport_number: string
+          passport_number?: string | null
           phone: string
           rejection_reason?: string | null
           status?: string
@@ -2098,7 +2098,7 @@ export type Database = {
           license_issued_by?: string | null
           license_no?: string
           nationality?: string
-          passport_number?: string
+          passport_number?: string | null
           phone?: string
           rejection_reason?: string | null
           status?: string
