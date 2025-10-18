@@ -89,56 +89,93 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
     const currentLines = data.quote_items || [];
     const startLineNo = currentLines.length + 1;
     
-    const newLines = selectedVehicles.map((vehicle, idx) => ({
-      line_no: startLineNo + idx,
-      vehicle_class_id: vehicle.category_id,
-      vehicle_id: vehicle.id,
-      pickup_at: data.contract_effective_from || "",
-      return_at: data.contract_effective_to || "",
-      deposit_amount: data.default_deposit_amount || 2500,
-      deposit_type: data.deposit_type || 'refundable',
-      advance_rent_months: data.default_advance_rent_months || 1,
-      monthly_rate: calculateDefaultRate(
+    const newLines = selectedVehicles.map((vehicle, idx) => {
+      // 1. Calculate base vehicle rate (rental rate without services)
+      const baseVehicleRate = calculateDefaultRate(
         data.default_price_list_id || 'standard',
         vehicle._itemCodeMeta?.category_name || vehicle.categories?.name || 'midsize',
         data.billing_plan || 'monthly'
-      ),
-      duration_months: 0,
-      // Inherit pickup/return configuration from header
-      pickup_type: data.pickup_type || 'company_location',
-      pickup_location_id: data.pickup_location_id,
-      pickup_customer_site_id: data.pickup_customer_site_id,
-      return_type: data.return_type || 'company_location',
-      return_location_id: data.return_location_id,
-      return_customer_site_id: data.return_customer_site_id,
-      delivery_fee: data.default_delivery_fee || 0,
-      collection_fee: data.default_collection_fee || 0,
-      // Only set mileage fields if pooling is disabled
-      mileage_package_km: data.mileage_pooling_enabled ? undefined : 3000,
-      excess_km_rate: data.mileage_pooling_enabled ? undefined : 1.00,
-      rate_type: 'monthly' as const,
-      lease_term_months: undefined,
-      end_date: undefined,
-      insurance_coverage_package: data.insurance_coverage_package || 'comprehensive',
-      insurance_excess_aed: data.insurance_excess_aed ?? 1500,
-      insurance_glass_tire_cover: data.insurance_glass_tire_cover ?? true,
-      insurance_pai_enabled: data.insurance_pai_enabled ?? false,
-      insurance_territorial_coverage: data.insurance_territorial_coverage || 'uae-only',
-      // Auto-populate add-ons from header defaults (deep clone)
-      addons: (data.default_addons || []).map((a: any) => ({ ...a })),
-      // Store vehicle metadata for display
-      _vehicleMeta: {
-        make: vehicle.make,
-        model: vehicle.model,
-        year: vehicle.year,
-        color: vehicle.color,
-        item_code: vehicle.item_code,
-        item_description: vehicle.item_description,
-        category_name: vehicle._itemCodeMeta?.category_name || vehicle.categories?.name,
-        colors: vehicle._itemCodeMeta?.colors || [],
-        _itemCodeMeta: vehicle._itemCodeMeta,
-      },
-    }));
+      );
+
+      // 2. Get service costs from quote header
+      const insurancePackage = data.insurance_package_type || 'comprehensive';
+      const insuranceCost = data.monthly_insurance_cost_per_vehicle || 300;
+
+      // 3. Get maintenance cost if included
+      const maintenanceCost = data.maintenance_included 
+        ? (data.monthly_maintenance_cost_per_vehicle || 250)
+        : 0;
+
+      // 4. Get roadside/replacement costs if included
+      const roadsideCost = data.roadside_assistance_included
+        ? (data.roadside_assistance_cost_monthly || 40)
+        : 0;
+
+      const replacementCost = data.replacement_vehicle_included
+        ? (data.replacement_vehicle_cost_monthly || 60)
+        : 0;
+
+      // 5. Calculate total monthly rate as sum of all components
+      const totalMonthlyRate = baseVehicleRate + insuranceCost + maintenanceCost + roadsideCost + replacementCost;
+
+      return {
+        line_no: startLineNo + idx,
+        vehicle_class_id: vehicle.category_id,
+        vehicle_id: vehicle.id,
+        pickup_at: data.contract_effective_from || "",
+        return_at: data.contract_effective_to || "",
+        deposit_amount: data.default_deposit_amount || 2500,
+        deposit_type: data.deposit_type || 'refundable',
+        advance_rent_months: data.default_advance_rent_months || 1,
+        
+        // ✅ SET ALL PRICING COMPONENT FIELDS
+        base_vehicle_rate_per_month: baseVehicleRate,
+        insurance_package_type: insurancePackage,
+        monthly_insurance_cost_per_vehicle: insuranceCost,
+        monthly_maintenance_cost_per_vehicle: maintenanceCost,
+        roadside_assistance_cost_monthly: roadsideCost,
+        replacement_vehicle_cost_monthly: replacementCost,
+        
+        // Total rate = sum of all components
+        monthly_rate: totalMonthlyRate,
+        
+        duration_months: 0,
+        // Inherit pickup/return configuration from header
+        pickup_type: data.pickup_type || 'company_location',
+        pickup_location_id: data.pickup_location_id,
+        pickup_customer_site_id: data.pickup_customer_site_id,
+        return_type: data.return_type || 'company_location',
+        return_location_id: data.return_location_id,
+        return_customer_site_id: data.return_customer_site_id,
+        delivery_fee: data.default_delivery_fee || 0,
+        collection_fee: data.default_collection_fee || 0,
+        // Only set mileage fields if pooling is disabled
+        mileage_package_km: data.mileage_pooling_enabled ? undefined : 3000,
+        excess_km_rate: data.mileage_pooling_enabled ? undefined : 1.00,
+        rate_type: 'monthly' as const,
+        lease_term_months: undefined,
+        end_date: undefined,
+        insurance_coverage_package: data.insurance_coverage_package || 'comprehensive',
+        insurance_excess_aed: data.insurance_excess_aed ?? 1500,
+        insurance_glass_tire_cover: data.insurance_glass_tire_cover ?? true,
+        insurance_pai_enabled: data.insurance_pai_enabled ?? false,
+        insurance_territorial_coverage: data.insurance_territorial_coverage || 'uae-only',
+        // Auto-populate add-ons from header defaults (deep clone)
+        addons: (data.default_addons || []).map((a: any) => ({ ...a })),
+        // Store vehicle metadata for display
+        _vehicleMeta: {
+          make: vehicle.make,
+          model: vehicle.model,
+          year: vehicle.year,
+          color: vehicle.color,
+          item_code: vehicle.item_code,
+          item_description: vehicle.item_description,
+          category_name: vehicle._itemCodeMeta?.category_name || vehicle.categories?.name,
+          colors: vehicle._itemCodeMeta?.colors || [],
+          _itemCodeMeta: vehicle._itemCodeMeta,
+        },
+      };
+    });
     
     onChange({ quote_items: [...currentLines, ...newLines] });
   };
@@ -159,6 +196,28 @@ export const QuoteWizardStep4_Vehicles: React.FC<QuoteWizardStep3Props> = ({
   const updateVehicleLine = (index: number, field: string, value: any) => {
     const currentLines = [...(data.quote_items || [])];
     currentLines[index] = { ...currentLines[index], [field]: value };
+    
+    // If any pricing component changed, recalculate total monthly_rate
+    const pricingFields = [
+      'base_vehicle_rate_per_month',
+      'monthly_insurance_cost_per_vehicle',
+      'monthly_maintenance_cost_per_vehicle',
+      'roadside_assistance_cost_monthly',
+      'replacement_vehicle_cost_monthly'
+    ];
+    
+    if (pricingFields.includes(field)) {
+      const line = currentLines[index];
+      const recalculatedTotal = (
+        (line.base_vehicle_rate_per_month || 0) +
+        (line.monthly_insurance_cost_per_vehicle || 0) +
+        (line.monthly_maintenance_cost_per_vehicle || 0) +
+        (line.roadside_assistance_cost_monthly || 0) +
+        (line.replacement_vehicle_cost_monthly || 0)
+      );
+      currentLines[index].monthly_rate = recalculatedTotal;
+    }
+    
     onChange({ quote_items: currentLines });
   };
 
