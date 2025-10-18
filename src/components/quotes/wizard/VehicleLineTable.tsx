@@ -124,6 +124,7 @@ export const VehicleLineTable: React.FC<VehicleLineTableProps> = ({
               />
             </TableHead>
             <TableHead className="min-w-[50px] w-12">#</TableHead>
+            <TableHead className="min-w-[70px] w-16 text-center"></TableHead>
             <TableHead className="min-w-[150px]">Contract No.</TableHead>
             <TableHead className="min-w-[180px]">Item Code</TableHead>
             <TableHead className="min-w-[350px]">Item Description</TableHead>
@@ -133,7 +134,7 @@ export const VehicleLineTable: React.FC<VehicleLineTableProps> = ({
             <TableHead className="text-right min-w-[150px]">Monthly Rate</TableHead>
             <TableHead className="text-right min-w-[180px]">Delivery & Collection</TableHead>
             <TableHead className="text-right min-w-[150px]">Upfront Total</TableHead>
-            <TableHead className="min-w-[130px] w-32 text-center">Actions</TableHead>
+            <TableHead className="min-w-[80px] w-20 text-center">Delete</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -163,6 +164,21 @@ export const VehicleLineTable: React.FC<VehicleLineTableProps> = ({
                     />
                   </TableCell>
                   <TableCell className="font-medium">{line.line_no}</TableCell>
+                  <TableCell className="text-center">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => toggleExpand(line.line_no)}
+                      className="h-8 w-8 p-0"
+                    >
+                      {isExpanded ? (
+                        <ChevronUp className="h-4 w-4" />
+                      ) : (
+                        <ChevronDown className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </TableCell>
                   <TableCell className="font-mono text-sm font-bold text-primary">
                     {line.contract_no || 'TBD'}
                   </TableCell>
@@ -218,35 +234,21 @@ export const VehicleLineTable: React.FC<VehicleLineTableProps> = ({
                     {calculateUpfront(line).toFixed(2)} AED
                   </TableCell>
                   <TableCell className="text-center">
-                    <div className="flex items-center justify-center gap-1">
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => toggleExpand(line.line_no)}
-                      >
-                        {isExpanded ? (
-                          <ChevronUp className="h-4 w-4" />
-                        ) : (
-                          <ChevronDown className="h-4 w-4" />
-                        )}
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => onRemove(index)}
-                        className="text-destructive hover:text-destructive"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onRemove(index)}
+                      className="text-destructive hover:text-destructive h-8 w-8 p-0"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </TableCell>
                 </TableRow>
                 
                 {isExpanded && (
                   <TableRow>
-                    <TableCell colSpan={12} className="bg-muted/30 p-6">
+                    <TableCell colSpan={13} className="bg-muted/30 p-6">
                       <VehicleLineDetails
                         line={line}
                         onUpdate={(field, value) => onUpdate(index, field, value)}
