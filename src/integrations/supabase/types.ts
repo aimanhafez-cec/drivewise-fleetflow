@@ -1099,6 +1099,79 @@ export type Database = {
           },
         ]
       }
+      corporate_leasing_line_drivers: {
+        Row: {
+          agreement_id: string
+          assigned_at: string
+          assigned_by: string | null
+          assignment_end_date: string | null
+          assignment_start_date: string
+          created_at: string
+          driver_id: string
+          id: string
+          is_primary: boolean
+          line_id: string
+          notes: string | null
+          removed_at: string | null
+          removed_by: string | null
+          updated_at: string
+        }
+        Insert: {
+          agreement_id: string
+          assigned_at?: string
+          assigned_by?: string | null
+          assignment_end_date?: string | null
+          assignment_start_date?: string
+          created_at?: string
+          driver_id: string
+          id?: string
+          is_primary?: boolean
+          line_id: string
+          notes?: string | null
+          removed_at?: string | null
+          removed_by?: string | null
+          updated_at?: string
+        }
+        Update: {
+          agreement_id?: string
+          assigned_at?: string
+          assigned_by?: string | null
+          assignment_end_date?: string | null
+          assignment_start_date?: string
+          created_at?: string
+          driver_id?: string
+          id?: string
+          is_primary?: boolean
+          line_id?: string
+          notes?: string | null
+          removed_at?: string | null
+          removed_by?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "corporate_leasing_line_drivers_agreement_id_fkey"
+            columns: ["agreement_id"]
+            isOneToOne: false
+            referencedRelation: "corporate_leasing_agreements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "corporate_leasing_line_drivers_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "corporate_leasing_line_drivers_line_id_fkey"
+            columns: ["line_id"]
+            isOneToOne: false
+            referencedRelation: "corporate_leasing_lines"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       corporate_leasing_lines: {
         Row: {
           actual_pickup_date: string | null

@@ -4,13 +4,13 @@ import { Badge } from "@/components/ui/badge";
 import { FileText, DollarSign, Car, Calendar } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/currency";
 
-interface MasterAgreementStep6Props {
+interface MasterAgreementStep6SummaryProps {
   data: any;
   onChange: (data: any) => void;
   errors: Record<string, string>;
 }
 
-export const MasterAgreementStep6: React.FC<MasterAgreementStep6Props> = ({ data }) => {
+export const MasterAgreementStep6Summary: React.FC<MasterAgreementStep6SummaryProps> = ({ data }) => {
   const calculateTotals = () => {
     const lines = data.agreement_items || [];
     const getAddonType = (a: any) => a.pricing_model || a.type;

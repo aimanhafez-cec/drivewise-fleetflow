@@ -12,16 +12,18 @@ import { MasterAgreementStep1 } from "./wizard/MasterAgreementStep1";
 import { MasterAgreementStep2 } from "./wizard/MasterAgreementStep2";
 import { MasterAgreementStep3 } from "./wizard/MasterAgreementStep3";
 import { MasterAgreementStep4 } from "./wizard/MasterAgreementStep4";
-import { MasterAgreementStep5 } from "./wizard/MasterAgreementStep5";
-import { MasterAgreementStep6 } from "./wizard/MasterAgreementStep6";
+import { MasterAgreementStep5Drivers } from "./wizard/MasterAgreementStep5_Drivers";
+import { MasterAgreementStep5Attachments } from "./wizard/MasterAgreementStep5_Attachments";
+import { MasterAgreementStep6Summary } from "./wizard/MasterAgreementStep6_Summary";
 
 const steps = [
   { id: 1, title: "Header", description: "Agreement header information" },
   { id: 2, title: "Commercial", description: "Billing, deposits & payment terms" },
   { id: 3, title: "Coverage & Services", description: "Insurance, maintenance & add-ons" },
   { id: 4, title: "Vehicles", description: "Vehicle selection & configuration" },
-  { id: 5, title: "Attachments", description: "Upload supporting documents" },
-  { id: 6, title: "Summary", description: "Review & finalize agreement" },
+  { id: 5, title: "Drivers", description: "Assign authorized drivers" },
+  { id: 6, title: "Attachments", description: "Upload supporting documents" },
+  { id: 7, title: "Summary", description: "Review & finalize agreement" },
 ];
 
 interface MasterAgreementWizardProps {
@@ -396,9 +398,11 @@ export const MasterAgreementWizard: React.FC<MasterAgreementWizardProps> = ({
       case 4:
         return <MasterAgreementStep4 {...stepProps} hasUnsavedChanges={hasUnsavedChanges} onSaveRequired={handleSaveDraft} />;
       case 5:
-        return <MasterAgreementStep5 {...stepProps} />;
+        return <MasterAgreementStep5Drivers {...stepProps} />;
       case 6:
-        return <MasterAgreementStep6 {...stepProps} />;
+        return <MasterAgreementStep5Attachments {...stepProps} />;
+      case 7:
+        return <MasterAgreementStep6Summary {...stepProps} />;
       default:
         return null;
     }

@@ -1,10 +1,10 @@
 import React from "react";
 
-interface MasterAgreementStep5Props {
+interface MasterAgreementStep5AttachmentsProps {
   data: { id?: string };
 }
 
-export const MasterAgreementStep5: React.FC<MasterAgreementStep5Props> = ({ data }) => {
+export const MasterAgreementStep5Attachments: React.FC<MasterAgreementStep5AttachmentsProps> = ({ data }) => {
   return (
     <div className="space-y-6">
       <div>
