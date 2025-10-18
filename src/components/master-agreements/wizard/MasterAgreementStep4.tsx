@@ -277,6 +277,20 @@ export const MasterAgreementStep4: React.FC<MasterAgreementStep4Props> = ({
         }}
       />
 
+      {/* Cost Sheet Section */}
+      {data.id && (
+        <CostSheetSection 
+          entityId={data.id}
+          entityType="agreement"
+          quoteId={undefined}
+          entityNumber={data.agreement_no}
+          durationMonths={data.duration_days ? Math.round(data.duration_days / 30) : 36}
+          hasUnsavedChanges={hasUnsavedChanges}
+          onSaveRequired={onSaveRequired}
+          sourceQuoteNumber={data.source_quote_no}
+        />
+      )}
+
       {data.agreement_items && data.agreement_items.length > 0 && (
         <Card className="border-primary">
           <CardHeader>
@@ -351,20 +365,6 @@ export const MasterAgreementStep4: React.FC<MasterAgreementStep4Props> = ({
             </div>
           </CardContent>
         </Card>
-      )}
-
-      {/* Cost Sheet Section */}
-      {data.id && (
-        <CostSheetSection 
-          entityId={data.id}
-          entityType="agreement"
-          quoteId={undefined}
-          entityNumber={data.agreement_no}
-          durationMonths={data.duration_days ? Math.round(data.duration_days / 30) : 36}
-          hasUnsavedChanges={hasUnsavedChanges}
-          onSaveRequired={onSaveRequired}
-          sourceQuoteNumber={data.source_quote_no}
-        />
       )}
     </div>
   );
