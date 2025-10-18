@@ -65,7 +65,7 @@ export const DriverDetailsDisplay: React.FC<DriverDetailsDisplayProps> = ({ driv
   };
 
   return (
-    <div className="space-y-6 max-h-[calc(100vh-300px)] overflow-y-auto pr-2">
+    <div className="space-y-6 overflow-y-auto pr-2">
       {/* Warnings */}
       {(ageWarning || licenseWarning) && (
         <Alert variant="default" className="border-yellow-500 bg-yellow-50">

@@ -57,7 +57,11 @@ export const MasterAgreementStep5Drivers: React.FC<MasterAgreementStep5DriversPr
   const selectedDriver = drivers.find(d => d.id === selectedDriverId);
   const { data: selectedDriverDocs = [] } = useDriverDocuments(selectedDriverId || undefined);
 
-  const vehicleLines = data.agreement_items || [];
+  // Generate unique IDs for lines if they don't have them
+  const vehicleLines = (data.agreement_items || []).map((line, idx) => ({
+    ...line,
+    id: line.id || line.line_no || `line-${idx + 1}`
+  }));
 
   // Group drivers by line
   const getDriversForLine = (lineId: string) => {
@@ -437,7 +441,7 @@ export const MasterAgreementStep5Drivers: React.FC<MasterAgreementStep5DriversPr
 
       {/* Assign Driver Dialog - Compact Single Column */}
       <Dialog open={showAssignDialog} onOpenChange={setShowAssignDialog}>
-        <DialogContent className="max-w-[700px] max-h-[90vh] flex flex-col">
+        <DialogContent className="max-w-[900px] max-h-[90vh] flex flex-col">
           <DialogHeader>
             <DialogTitle>Assign Driver to Vehicle Line #{selectedLineIndex}</DialogTitle>
           </DialogHeader>
@@ -546,7 +550,7 @@ export const MasterAgreementStep5Drivers: React.FC<MasterAgreementStep5DriversPr
                     </TabsList>
                   </div>
                   
-                  <TabsContent value="overview" className="p-4 max-h-[400px] overflow-y-auto">
+                  <TabsContent value="overview" className="p-4 overflow-y-auto flex-1">
                     <DriverDetailsDisplay driver={selectedDriver} />
                   </TabsContent>
                   
