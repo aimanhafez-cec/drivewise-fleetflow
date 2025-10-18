@@ -27,6 +27,21 @@ export interface AgreementLineDriver {
     license_expiry?: string;
     status: string;
     additional_driver_fee: number;
+    emirates_id?: string;
+    passport_number?: string;
+    nationality?: string;
+    license_issued_by?: string;
+    license_issue_date?: string;
+    license_categories?: string[];
+    employment_id?: string;
+    department?: string;
+    verification_status?: 'unverified' | 'pending_docs' | 'verified' | 'approved' | 'rejected' | 'expired';
+    verified_at?: string;
+    verified_by?: string;
+    rejection_reason?: string;
+    visa_expiry?: string;
+    address_emirate?: string;
+    last_verification_check?: string;
   };
 }
 

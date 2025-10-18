@@ -14,11 +14,34 @@ export interface Driver {
   status: string;
   additional_driver_fee: number;
   role?: 'PRIMARY' | 'ADDITIONAL';
+  
+  // UAE-Specific Fields
+  emirates_id?: string;
+  passport_number?: string;
+  nationality?: string;
+  license_issued_by?: string;
+  license_issue_date?: string;
+  license_categories?: string[];
+  
+  // Employment
+  employment_id?: string;
+  department?: string;
+  
+  // Verification
+  verification_status?: 'unverified' | 'pending_docs' | 'verified' | 'approved' | 'rejected' | 'expired';
+  verified_at?: string;
+  verified_by?: string;
+  rejection_reason?: string;
+  
+  // Additional UAE fields
+  visa_expiry?: string;
+  address_emirate?: string;
+  last_verification_check?: string;
 }
 
 export const useDrivers = (searchQuery?: string) => {
-  const result = useLOV<Driver>('drivers', 'id, full_name, license_no, phone, email, date_of_birth, license_expiry, status, additional_driver_fee', {
-    searchFields: ['full_name', 'license_no', 'email'],
+  const result = useLOV<Driver>('drivers', 'id, full_name, license_no, phone, email, date_of_birth, license_expiry, status, additional_driver_fee, emirates_id, passport_number, nationality, license_issued_by, license_issue_date, license_categories, employment_id, department, verification_status, verified_at, verified_by, rejection_reason, visa_expiry, address_emirate, last_verification_check', {
+    searchFields: ['full_name', 'license_no', 'email', 'emirates_id'],
     orderBy: 'full_name'
   });
   
@@ -36,7 +59,7 @@ export const useDrivers = (searchQuery?: string) => {
 };
 
 export const useDriverById = (id?: string) => {
-  return useLOVById<Driver>('drivers', 'id, full_name, license_no, phone, email, date_of_birth, license_expiry, status, additional_driver_fee', id);
+  return useLOVById<Driver>('drivers', 'id, full_name, license_no, phone, email, date_of_birth, license_expiry, status, additional_driver_fee, emirates_id, passport_number, nationality, license_issued_by, license_issue_date, license_categories, employment_id, department, verification_status, verified_at, verified_by, rejection_reason, visa_expiry, address_emirate, last_verification_check', id);
 };
 
 export const useCreateDriver = () => {

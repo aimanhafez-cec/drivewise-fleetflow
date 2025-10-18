@@ -1796,45 +1796,158 @@ export type Database = {
           },
         ]
       }
+      driver_documents: {
+        Row: {
+          created_at: string
+          document_type: Database["public"]["Enums"]["driver_document_type"]
+          driver_id: string
+          expiry_date: string | null
+          expiry_notification_sent: boolean | null
+          file_name: string
+          file_size_bytes: number | null
+          file_url: string
+          id: string
+          is_verified: boolean | null
+          mime_type: string | null
+          updated_at: string
+          uploaded_at: string
+          uploaded_by: string | null
+          verification_notes: string | null
+          verified_at: string | null
+          verified_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          document_type: Database["public"]["Enums"]["driver_document_type"]
+          driver_id: string
+          expiry_date?: string | null
+          expiry_notification_sent?: boolean | null
+          file_name: string
+          file_size_bytes?: number | null
+          file_url: string
+          id?: string
+          is_verified?: boolean | null
+          mime_type?: string | null
+          updated_at?: string
+          uploaded_at?: string
+          uploaded_by?: string | null
+          verification_notes?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          document_type?: Database["public"]["Enums"]["driver_document_type"]
+          driver_id?: string
+          expiry_date?: string | null
+          expiry_notification_sent?: boolean | null
+          file_name?: string
+          file_size_bytes?: number | null
+          file_url?: string
+          id?: string
+          is_verified?: boolean | null
+          mime_type?: string | null
+          updated_at?: string
+          uploaded_at?: string
+          uploaded_by?: string | null
+          verification_notes?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "driver_documents_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       drivers: {
         Row: {
           additional_driver_fee: number | null
+          address_emirate: string | null
           created_at: string
           date_of_birth: string | null
+          department: string | null
           email: string | null
+          emirates_id: string | null
+          employment_id: string | null
           full_name: string
           id: string
+          last_verification_check: string | null
+          license_categories: string[] | null
           license_expiry: string | null
+          license_issue_date: string | null
+          license_issued_by: string | null
           license_no: string
+          nationality: string | null
+          passport_number: string | null
           phone: string | null
+          rejection_reason: string | null
           status: string
           updated_at: string
+          verification_status: Database["public"]["Enums"]["driver_verification_status"]
+          verified_at: string | null
+          verified_by: string | null
+          visa_expiry: string | null
         }
         Insert: {
           additional_driver_fee?: number | null
+          address_emirate?: string | null
           created_at?: string
           date_of_birth?: string | null
+          department?: string | null
           email?: string | null
+          emirates_id?: string | null
+          employment_id?: string | null
           full_name: string
           id?: string
+          last_verification_check?: string | null
+          license_categories?: string[] | null
           license_expiry?: string | null
+          license_issue_date?: string | null
+          license_issued_by?: string | null
           license_no: string
+          nationality?: string | null
+          passport_number?: string | null
           phone?: string | null
+          rejection_reason?: string | null
           status?: string
           updated_at?: string
+          verification_status?: Database["public"]["Enums"]["driver_verification_status"]
+          verified_at?: string | null
+          verified_by?: string | null
+          visa_expiry?: string | null
         }
         Update: {
           additional_driver_fee?: number | null
+          address_emirate?: string | null
           created_at?: string
           date_of_birth?: string | null
+          department?: string | null
           email?: string | null
+          emirates_id?: string | null
+          employment_id?: string | null
           full_name?: string
           id?: string
+          last_verification_check?: string | null
+          license_categories?: string[] | null
           license_expiry?: string | null
+          license_issue_date?: string | null
+          license_issued_by?: string | null
           license_no?: string
+          nationality?: string | null
+          passport_number?: string | null
           phone?: string | null
+          rejection_reason?: string | null
           status?: string
           updated_at?: string
+          verification_status?: Database["public"]["Enums"]["driver_verification_status"]
+          verified_at?: string | null
+          verified_by?: string | null
+          visa_expiry?: string | null
         }
         Relationships: []
       }
@@ -4905,6 +5018,14 @@ export type Database = {
           upgraded: boolean
         }[]
       }
+      driver_has_expired_documents: {
+        Args: { p_driver_id: string }
+        Returns: boolean
+      }
+      driver_has_required_documents: {
+        Args: { p_driver_id: string }
+        Returns: boolean
+      }
       expire_old_points: {
         Args: Record<PropertyKey, never>
         Returns: {
@@ -4985,6 +5106,10 @@ export type Database = {
         Args: { p_customer_id: string }
         Returns: boolean
       }
+      validate_driver_for_checkout: {
+        Args: { p_driver_id: string }
+        Returns: Record<string, unknown>
+      }
     }
     Enums: {
       agreement_status: "active" | "completed" | "terminated" | "pending_return"
@@ -5035,6 +5160,23 @@ export type Database = {
         | "missing_part"
         | "interior_damage"
         | "other"
+      driver_document_type:
+        | "emirates_id_front"
+        | "emirates_id_back"
+        | "driving_license_front"
+        | "driving_license_back"
+        | "passport_bio_page"
+        | "visa_page"
+        | "employment_letter"
+        | "salary_certificate"
+        | "other"
+      driver_verification_status:
+        | "unverified"
+        | "pending_docs"
+        | "verified"
+        | "approved"
+        | "rejected"
+        | "expired"
       early_cancellation_fee_type: "None" | "Fixed AED" | "% of remaining month"
       final_billing_type: "Pro-rata" | "Full month"
       framework_model: "Rate Card by Class" | "Fixed Rate per VIN"
@@ -5273,6 +5415,25 @@ export const Constants = {
         "missing_part",
         "interior_damage",
         "other",
+      ],
+      driver_document_type: [
+        "emirates_id_front",
+        "emirates_id_back",
+        "driving_license_front",
+        "driving_license_back",
+        "passport_bio_page",
+        "visa_page",
+        "employment_letter",
+        "salary_certificate",
+        "other",
+      ],
+      driver_verification_status: [
+        "unverified",
+        "pending_docs",
+        "verified",
+        "approved",
+        "rejected",
+        "expired",
       ],
       early_cancellation_fee_type: [
         "None",

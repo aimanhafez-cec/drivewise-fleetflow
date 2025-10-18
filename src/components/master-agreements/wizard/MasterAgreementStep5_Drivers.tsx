@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { UseFormReturn } from 'react-hook-form';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -6,7 +7,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { LOVSelect } from '@/components/ui/lov-select';
-import { Plus, AlertTriangle, CheckCircle2, Trash2, Star, Info } from 'lucide-react';
+import { Plus, AlertTriangle, CheckCircle2, Trash2, Star, Info, Shield, FileCheck } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useDrivers } from '@/hooks/useDrivers';
 import { useAgreementDrivers, useAssignDriver, useRemoveDriver, useUpdateDriverAssignment } from '@/hooks/useAgreementDrivers';
@@ -192,8 +193,23 @@ export const MasterAgreementStep5Drivers: React.FC<MasterAgreementStep5DriversPr
                             No drivers assigned
                           </Badge>
                         ) : (
-                          <div className="space-y-2">
-                            {lineDrivers.map((ld) => (
+                           <div className="space-y-2">
+                            {lineDrivers.map((ld) => {
+                              const verificationBadge = () => {
+                                const status = ld.driver?.verification_status;
+                                if (!status || status === 'unverified') {
+                                  return <Badge variant="destructive" className="text-xs"><Shield className="h-3 w-3 mr-1" />Unverified</Badge>;
+                                } else if (status === 'pending_docs') {
+                                  return <Badge variant="secondary" className="text-xs"><FileCheck className="h-3 w-3 mr-1" />Pending</Badge>;
+                                } else if (status === 'verified' || status === 'approved') {
+                                  return <Badge className="bg-green-500 text-xs"><CheckCircle2 className="h-3 w-3 mr-1" />Verified</Badge>;
+                                } else if (status === 'rejected' || status === 'expired') {
+                                  return <Badge variant="destructive" className="text-xs"><AlertTriangle className="h-3 w-3 mr-1" />{status === 'rejected' ? 'Rejected' : 'Expired'}</Badge>;
+                                }
+                                return null;
+                              };
+                              
+                              return (
                               <div key={ld.id} className="flex items-center gap-2 flex-wrap">
                                 {ld.is_primary && (
                                   <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
@@ -201,6 +217,7 @@ export const MasterAgreementStep5Drivers: React.FC<MasterAgreementStep5DriversPr
                                 <span className="text-sm">
                                   {ld.driver?.full_name} ({ld.driver?.license_no})
                                 </span>
+                                {verificationBadge()}
                                 {ld.is_primary && (
                                   <Badge variant="secondary" className="text-xs">Primary</Badge>
                                 )}
@@ -223,7 +240,7 @@ export const MasterAgreementStep5Drivers: React.FC<MasterAgreementStep5DriversPr
                                   </Button>
                                 )}
                               </div>
-                            ))}
+                            )})}
                           </div>
                         )}
                       </TableCell>
@@ -276,15 +293,36 @@ export const MasterAgreementStep5Drivers: React.FC<MasterAgreementStep5DriversPr
               const driver = drivers.find(d => d.id === selectedDriverId);
               const ageWarning = getDriverAgeWarning(driver?.date_of_birth);
               const licenseWarning = getLicenseExpiryWarning(driver?.license_expiry);
+              const verificationStatus = driver?.verification_status;
               
-              return (ageWarning || licenseWarning) && (
-                <Alert variant="destructive">
-                  <AlertTriangle className="h-4 w-4" />
-                  <AlertDescription>
-                    {ageWarning && <div>{ageWarning}</div>}
-                    {licenseWarning && <div>{licenseWarning}</div>}
-                  </AlertDescription>
-                </Alert>
+              const needsVerification = !verificationStatus || 
+                ['unverified', 'rejected', 'expired'].includes(verificationStatus);
+              
+              return (
+                <>
+                  {needsVerification && (
+                    <Alert variant="destructive">
+                      <Shield className="h-4 w-4" />
+                      <AlertDescription>
+                        <strong>Driver not verified for vehicle handover</strong>
+                        <p className="text-sm mt-1">
+                          This driver requires document verification (Emirates ID, License, Passport) 
+                          before vehicle checkout. You can assign them now and verify documents later 
+                          from the driver management page.
+                        </p>
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                  {(ageWarning || licenseWarning) && (
+                    <Alert variant="destructive">
+                      <AlertTriangle className="h-4 w-4" />
+                      <AlertDescription>
+                        {ageWarning && <div>{ageWarning}</div>}
+                        {licenseWarning && <div>{licenseWarning}</div>}
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                </>
               );
             })()}
             <div className="flex justify-end gap-2">
