@@ -33,6 +33,7 @@ import {
   AlertCircle,
   Link2,
   Paperclip,
+  ChevronDown,
 } from "lucide-react";
 import { CustomerAcceptanceDialog } from "@/components/quotes/CustomerAcceptanceDialog";
 import { CustomerRejectionDialog } from "@/components/quotes/CustomerRejectionDialog";
@@ -62,6 +63,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 interface Quote {
   id: string;
@@ -646,12 +652,12 @@ const QuoteDetails: React.FC = () => {
             billToSite={quote.billToSite}
           />
 
-          {/* Quote Details */}
+          {/* Contract Overview */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <FileText className="h-5 w-5" />
-                Quote Details
+                Contract Overview
               </CardTitle>
             </CardHeader>
             <CardContent className="grid md:grid-cols-2 gap-6">
@@ -678,10 +684,6 @@ const QuoteDetails: React.FC = () => {
                     </p>
                   </div>
                 )}
-                <div>
-                  <p className="text-sm text-muted-foreground">Valid Until</p>
-                  <p className="font-medium">{((quote as any).validity_date_to || quote.valid_until) ? format(new Date((quote as any).validity_date_to || quote.valid_until), "MMM d, yyyy") : "N/A"}</p>
-                </div>
               </div>
               <div className="space-y-4">
                 {quote.billing_start_date && (
@@ -708,155 +710,82 @@ const QuoteDetails: React.FC = () => {
             </CardContent>
           </Card>
 
-          {/* Payment Summary */}
-          <QuotePaymentSummary quote={quote} />
+          {/* Financial Terms & Breakdown */}
+          <Collapsible defaultOpen>
+            <Card>
+              <CollapsibleTrigger className="w-full">
+                <CardHeader className="cursor-pointer">
+                  <CardTitle className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <DollarSign className="h-5 w-5" />
+                      Financial Terms & Breakdown
+                    </div>
+                    <ChevronDown className="h-5 w-5 transition-transform data-[state=open]:rotate-180" />
+                  </CardTitle>
+                </CardHeader>
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <CardContent className="space-y-4 pt-0">
+                  <QuotePaymentSummary quote={quote} />
+                  <QuoteInitialFees quote={quote} />
+                  <QuoteFinancialBreakdown quote={quote} />
+                </CardContent>
+              </CollapsibleContent>
+            </Card>
+          </Collapsible>
 
-          {/* Initial Fees */}
-          <QuoteInitialFees quote={quote} />
+          {/* Coverage & Services */}
+          <Collapsible defaultOpen>
+            <Card>
+              <CollapsibleTrigger className="w-full">
+                <CardHeader className="cursor-pointer">
+                  <CardTitle className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Shield className="h-5 w-5" />
+                      Coverage & Services
+                    </div>
+                    <ChevronDown className="h-5 w-5 transition-transform data-[state=open]:rotate-180" />
+                  </CardTitle>
+                </CardHeader>
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <CardContent className="space-y-4 pt-0">
+                  <QuoteInsuranceDetails quote={quote} />
+                  <QuoteMaintenanceDetails quote={quote} />
+                  <QuoteAddOnsDisplay quote={quote} />
+                </CardContent>
+              </CollapsibleContent>
+            </Card>
+          </Collapsible>
 
-          {/* Financial Breakdown */}
-          <QuoteFinancialBreakdown quote={quote} />
-
-          {/* Pickup & Return Configuration */}
-          <QuotePickupReturnInfo
-            quote={quote}
-            pickupSite={quote.pickupSite}
-            returnSite={quote.returnSite}
-          />
-
-          {/* Payment Terms & Policy */}
-          <QuotePaymentPolicy quote={quote} />
-
-          {/* Insurance Details */}
-          <QuoteInsuranceDetails quote={quote} />
-
-          {/* Maintenance Details */}
-          <QuoteMaintenanceDetails quote={quote} />
-
-          {/* Default Add-Ons */}
-          <QuoteAddOnsDisplay quote={quote} />
-
-          {/* Mileage Pooling */}
-          <QuoteMileagePooling quote={quote} />
-
-          {/* Tolls & Fines Policy */}
-          <QuoteTollsPolicy quote={quote} />
-
-          {/* Line Items */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Car className="h-5 w-5" />
-                Line Items
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {displayItems && displayItems.length > 0 ? (
-                <div className="space-y-6">
-                  {displayItems.map((item: any, index: number) => {
-                    // Calculate duration with fallback to date calculation if stored value is 0
-                    const durationMonths = item.duration_months && item.duration_months > 0
-                      ? item.duration_months
-                      : item.pickup_at && item.return_at
-                        ? Math.max(1, Math.round((new Date(item.return_at).getTime() - new Date(item.pickup_at).getTime()) / (1000 * 60 * 60 * 24 * 30.44)))
-                        : 0;
-                    
-                    const lineTotal =
-                      item.monthly_rate !== undefined
-                        ? (item.monthly_rate || 0) * durationMonths
-                        : (item.qty || 0) * (item.rate || 0);
-
-                    return (
-                      <div key={index} className="p-4 border rounded-lg space-y-3 bg-muted/30">
-                        <div className="flex justify-between items-start">
-                          <div className="flex-1 space-y-2">
-                            <div className="flex items-center gap-2">
-                              <Badge variant="outline">Line {item.line_no || index + 1}</Badge>
-                              <h4 className="font-semibold text-lg">
-                                {item._vehicleMeta
-                                  ? `${item._vehicleMeta.year} ${item._vehicleMeta.make} ${item._vehicleMeta.model}`
-                                  : item.description || `Item ${index + 1}`}
-                              </h4>
-                            </div>
-                            {item._vehicleMeta && (
-                              <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                                <span>{item._vehicleMeta.color}</span>
-                                <span>•</span>
-                                <span>{item._vehicleMeta.category}</span>
-                                {item._vehicleMeta.item_code && (
-                                  <>
-                                    <span>•</span>
-                                    <span className="font-mono">{item._vehicleMeta.item_code}</span>
-                                  </>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                          <div className="text-right">
-                            {item.monthly_rate !== undefined && (
-                              <p className="text-sm text-muted-foreground">{formatCurrency(item.monthly_rate || 0)}/month</p>
-                            )}
-                            <p className="text-lg font-bold">{formatCurrency(lineTotal)}</p>
-                          </div>
-                        </div>
-
-                        <div className="grid md:grid-cols-2 gap-4 pt-2 border-t">
-                          {durationMonths > 0 && (
-                            <div className="flex items-center gap-2 text-sm">
-                              <Calendar className="h-4 w-4 text-muted-foreground" />
-                              <span className="text-muted-foreground">Duration:</span>
-                              <span className="font-medium">{durationMonths} months</span>
-                            </div>
-                          )}
-                          {item.monthly_km_allowance && (
-                            <div className="flex items-center gap-2 text-sm">
-                              <span className="text-muted-foreground">Mileage:</span>
-                              <span className="font-medium">{item.monthly_km_allowance} km/month</span>
-                            </div>
-                          )}
-                          {item.pickup_location_name && (
-                            <div className="flex items-center gap-2 text-sm">
-                              <MapPin className="h-4 w-4 text-muted-foreground" />
-                              <span className="text-muted-foreground">Pickup:</span>
-                              <span className="font-medium">{item.pickup_location_name}</span>
-                            </div>
-                          )}
-                          {item.return_location_name && (
-                            <div className="flex items-center gap-2 text-sm">
-                              <MapPin className="h-4 w-4 text-muted-foreground" />
-                              <span className="text-muted-foreground">Return:</span>
-                              <span className="font-medium">{item.return_location_name}</span>
-                            </div>
-                          )}
-                        </div>
-
-                        {(item.deposit_amount || quote.default_deposit_amount) && (
-                          <div className="flex items-center gap-2 text-sm pt-2 border-t">
-                            <DollarSign className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-muted-foreground">Deposit:</span>
-                            <span className="font-medium">
-                              {formatCurrency(item.deposit_amount || quote.default_deposit_amount || 0)}
-                              {quote.deposit_type && ` (${quote.deposit_type})`}
-                            </span>
-                          </div>
-                        )}
-
-                        {(item.advance_rent_months || quote.default_advance_rent_months) && (
-                          <div className="flex items-center gap-2 text-sm">
-                            <span className="text-muted-foreground">Advance Rent:</span>
-                            <span className="font-medium">{item.advance_rent_months || quote.default_advance_rent_months} month(s)</span>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <p className="text-muted-foreground text-center py-8">No line items available</p>
-              )}
-            </CardContent>
-          </Card>
-
+          {/* Operational Policies */}
+          <Collapsible defaultOpen>
+            <Card>
+              <CollapsibleTrigger className="w-full">
+                <CardHeader className="cursor-pointer">
+                  <CardTitle className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <FileText className="h-5 w-5" />
+                      Operational Policies
+                    </div>
+                    <ChevronDown className="h-5 w-5 transition-transform data-[state=open]:rotate-180" />
+                  </CardTitle>
+                </CardHeader>
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <CardContent className="space-y-4 pt-0">
+                  <QuotePickupReturnInfo
+                    quote={quote}
+                    pickupSite={quote.pickupSite}
+                    returnSite={quote.returnSite}
+                  />
+                  <QuoteMileagePooling quote={quote} />
+                  <QuoteTollsPolicy quote={quote} />
+                  <QuotePaymentPolicy quote={quote} />
+                </CardContent>
+              </CollapsibleContent>
+            </Card>
+          </Collapsible>
 
           {/* Notes */}
           {quote.notes && (
