@@ -22,6 +22,8 @@ export interface CostSheetLine {
   maintenance_per_month_aed: number;
   insurance_per_month_aed: number;
   registration_admin_per_month_aed: number;
+  roadside_assistance_per_month_aed?: number;
+  replacement_vehicle_per_month_aed?: number;
   other_costs_per_month_aed: number;
   total_cost_per_month_aed: number;
   suggested_rate_per_month_aed: number;

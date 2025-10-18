@@ -743,6 +743,7 @@ export type Database = {
           pickup_type: string | null
           pooled_excess_km_rate: number | null
           pooled_mileage_allowance_km: number | null
+          pricing_display_mode: string | null
           project: string | null
           proration_rule: string | null
           registration_responsibility: string
@@ -868,6 +869,7 @@ export type Database = {
           pickup_type?: string | null
           pooled_excess_km_rate?: number | null
           pooled_mileage_allowance_km?: number | null
+          pricing_display_mode?: string | null
           project?: string | null
           proration_rule?: string | null
           registration_responsibility?: string
@@ -993,6 +995,7 @@ export type Database = {
           pickup_type?: string | null
           pooled_excess_km_rate?: number | null
           pooled_mileage_allowance_km?: number | null
+          pricing_display_mode?: string | null
           project?: string | null
           proration_rule?: string | null
           registration_responsibility?: string
@@ -2927,7 +2930,9 @@ export type Database = {
           other_costs_per_month_aed: number
           quoted_rate_per_month_aed: number
           registration_admin_per_month_aed: number
+          replacement_vehicle_per_month_aed: number | null
           residual_value_percent: number
+          roadside_assistance_per_month_aed: number | null
           suggested_rate_per_month_aed: number
           total_cost_per_month_aed: number
           updated_at: string
@@ -2947,7 +2952,9 @@ export type Database = {
           other_costs_per_month_aed?: number
           quoted_rate_per_month_aed?: number
           registration_admin_per_month_aed?: number
+          replacement_vehicle_per_month_aed?: number | null
           residual_value_percent?: number
+          roadside_assistance_per_month_aed?: number | null
           suggested_rate_per_month_aed?: number
           total_cost_per_month_aed?: number
           updated_at?: string
@@ -2967,7 +2974,9 @@ export type Database = {
           other_costs_per_month_aed?: number
           quoted_rate_per_month_aed?: number
           registration_admin_per_month_aed?: number
+          replacement_vehicle_per_month_aed?: number | null
           residual_value_percent?: number
+          roadside_assistance_per_month_aed?: number | null
           suggested_rate_per_month_aed?: number
           total_cost_per_month_aed?: number
           updated_at?: string
@@ -3160,6 +3169,7 @@ export type Database = {
           pickup_type: string | null
           pooled_excess_km_rate: number | null
           pooled_mileage_allowance_km: number | null
+          pricing_display_mode: string | null
           project: string | null
           proration_rule: string | null
           public_token: string | null
@@ -3275,6 +3285,7 @@ export type Database = {
           pickup_type?: string | null
           pooled_excess_km_rate?: number | null
           pooled_mileage_allowance_km?: number | null
+          pricing_display_mode?: string | null
           project?: string | null
           proration_rule?: string | null
           public_token?: string | null
@@ -3390,6 +3401,7 @@ export type Database = {
           pickup_type?: string | null
           pooled_excess_km_rate?: number | null
           pooled_mileage_allowance_km?: number | null
+          pricing_display_mode?: string | null
           project?: string | null
           proration_rule?: string | null
           public_token?: string | null

@@ -637,6 +637,30 @@ export const QuoteWizardStep2: React.FC<QuoteWizardStep2Props> = ({
               </p>
             </div>
 
+            {/* Pricing Display Mode */}
+            <div className="space-y-2">
+              <Label htmlFor="pricing_display_mode">Pricing Display Mode *</Label>
+              <Select
+                value={data.pricing_display_mode || "itemized"}
+                onValueChange={(value) => onChange({ pricing_display_mode: value })}
+              >
+                <SelectTrigger id="pricing_display_mode">
+                  <SelectValue placeholder="Select display mode" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="bundled">
+                    Bundled (Simple) - Show total monthly rate with summary
+                  </SelectItem>
+                  <SelectItem value="itemized">
+                    Itemized (Detailed) - Show line-by-line breakdown of all costs
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                Controls how service costs are presented to the customer
+              </p>
+            </div>
+
             {/* Row 2: Email Invoice Toggle and Contact Person (same row) */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">

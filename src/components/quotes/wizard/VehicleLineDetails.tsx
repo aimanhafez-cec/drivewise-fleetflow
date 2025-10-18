@@ -1262,30 +1262,23 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
                   <span className="text-muted-foreground">Collection Fee:</span>
                   <span className="font-medium">{(line.collection_fee || 0).toFixed(2)} AED</span>
                 </div>
+
+                {/* Maintenance section */}
+                {(line.maintenance_included ?? headerDefaults.maintenance_included) && (
+                  <div className="flex justify-between text-sm border-t pt-2">
+                    <span className="text-muted-foreground">Maintenance (Monthly):</span>
+                    <span className="font-medium">
+                      {line.monthly_maintenance_cost_per_vehicle || headerDefaults.monthly_maintenance_cost_per_vehicle || 0} AED
+                    </span>
+                  </div>
+                )}
+                
                 <div className="flex justify-between text-sm border-t pt-2">
                   <span className="font-semibold">Upfront Total:</span>
                   <span className="font-bold text-primary">
                     {((line.deposit_amount || 0) + (line.advance_rent_months || 0) * (line.monthly_rate || 0) + (line.delivery_fee || 0) + (line.collection_fee || 0)).toFixed(2)} AED
                   </span>
                 </div>
-                
-                {/* Maintenance section */}
-                {(line.maintenance_included ?? headerDefaults.maintenance_included) && (
-                  <>
-                    <div className="flex justify-between text-sm border-t pt-2 mt-2">
-                      <span className="text-muted-foreground">Maintenance (Monthly):</span>
-                      <span className="font-medium">
-                        {line.monthly_maintenance_cost_per_vehicle || headerDefaults.monthly_maintenance_cost_per_vehicle || 0} AED
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Total Maintenance:</span>
-                      <span className="font-medium">
-                        {calculateMaintenanceCost().toFixed(2)} AED
-                      </span>
-                    </div>
-                  </>
-                )}
                 
                 <div className="flex justify-between text-sm border-t pt-2 mt-2">
                   <span className="font-semibold">Rate:</span>

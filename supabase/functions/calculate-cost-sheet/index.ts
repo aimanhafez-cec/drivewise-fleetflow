@@ -222,14 +222,25 @@ Deno.serve(async (req) => {
       const registrationCost = config?.registration_admin_per_month_aed ?? 125
       const otherCosts = config?.other_costs_per_month_aed ?? 75
 
+      // Service cost calculations
+      const roadsideAssistanceCost = 40  // Standard cost per vehicle
+      const replacementVehicleCost = 60  // Standard cost per vehicle
+
+      // Check if services are included (from item or quote level)
+      const roadsideIncluded = item.roadside_assistance_included ?? quote.roadside_assistance_included ?? true
+      const replacementIncluded = item.replacement_vehicle_included ?? quote.replacement_vehicle_included ?? true
+
+      const roadsideCharge = roadsideIncluded ? roadsideAssistanceCost : 0
+      const replacementCharge = replacementIncluded ? replacementVehicleCost : 0
+
       console.log(`Line ${lineNo}: Maintenance ${maintenanceIncluded ? 'INCLUDED' : 'EXCLUDED'} - ${maintenanceCost} AED/month`)
 
       // Calculate total monthly cost
       const depreciation = (acquisitionCost * (1 - dynamicResidualValue / 100)) / leaseTerm
       const financing = (acquisitionCost * finRate / 100) / 12
-      const overhead = (maintenanceCost + insuranceCost + registrationCost + otherCosts) * (overheadPct / 100)
+      const overhead = (maintenanceCost + insuranceCost + registrationCost + roadsideCharge + replacementCharge + otherCosts) * (overheadPct / 100)
       
-      const totalCost = depreciation + financing + maintenanceCost + insuranceCost + registrationCost + otherCosts + overhead
+      const totalCost = depreciation + financing + maintenanceCost + insuranceCost + registrationCost + roadsideCharge + replacementCharge + otherCosts + overhead
 
       // Calculate base suggested rate based on target margin
       let suggestedRate = roundCurrency(totalCost / (1 - targetMargin / 100))
@@ -263,6 +274,8 @@ Deno.serve(async (req) => {
         maintenance_per_month_aed: roundCurrency(maintenanceCost),
         insurance_per_month_aed: roundCurrency(insuranceCost),
         registration_admin_per_month_aed: roundCurrency(registrationCost),
+        roadside_assistance_per_month_aed: roundCurrency(roadsideCharge),
+        replacement_vehicle_per_month_aed: roundCurrency(replacementCharge),
         other_costs_per_month_aed: roundCurrency(otherCosts),
         total_cost_per_month_aed: roundCurrency(totalCost),
         suggested_rate_per_month_aed: suggestedRate,

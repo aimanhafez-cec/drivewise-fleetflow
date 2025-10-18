@@ -237,7 +237,8 @@ export const convertQuoteToCorporateLease = async (quoteId: string) => {
     roadside_assistance_cost_monthly: quote.roadside_assistance_cost_monthly ?? 40,
     replacement_vehicle_included: quote.replacement_vehicle_included ?? true,
     replacement_vehicle_cost_monthly: quote.replacement_vehicle_cost_monthly ?? 60,
-    replacement_sla_hours: quote.replacement_sla_hours ?? undefined,
+    replacement_sla_hours: quote.replacement_sla_hours ?? 24,
+    pricing_display_mode: 'itemized', // Always itemized for agreements
     registration_responsibility: "Lessor",
     workshop_preference: "OEM",
     

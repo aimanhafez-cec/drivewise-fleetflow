@@ -48,6 +48,12 @@ export const CostSheetVehicleTable: React.FC<CostSheetVehicleTableProps> = ({
                   Reg/Admin<br/>/mo
                 </TableHead>
                 <TableHead className="text-right min-w-[100px] whitespace-nowrap">
+                  Roadside<br/>/mo
+                </TableHead>
+                <TableHead className="text-right min-w-[100px] whitespace-nowrap">
+                  Replace<br/>/mo
+                </TableHead>
+                <TableHead className="text-right min-w-[100px] whitespace-nowrap">
                   Other<br/>/mo
                 </TableHead>
                 <TableHead className="text-right min-w-[120px] whitespace-nowrap">
@@ -129,6 +135,28 @@ export const CostSheetVehicleTable: React.FC<CostSheetVehicleTableProps> = ({
                   <FormattedNumberInput
                     value={line.registration_admin_per_month_aed}
                     onChange={(value) => onLineUpdate?.(line.id, 'registration_admin_per_month_aed', value)}
+                    className="w-32 text-right"
+                  />
+                )}
+              </TableCell>
+              <TableCell className="text-right">
+                {disabled ? (
+                  formatCurrency(line.roadside_assistance_per_month_aed || 0, 'AED')
+                ) : (
+                  <FormattedNumberInput
+                    value={line.roadside_assistance_per_month_aed || 0}
+                    onChange={(value) => onLineUpdate?.(line.id, 'roadside_assistance_per_month_aed', value)}
+                    className="w-32 text-right"
+                  />
+                )}
+              </TableCell>
+              <TableCell className="text-right">
+                {disabled ? (
+                  formatCurrency(line.replacement_vehicle_per_month_aed || 0, 'AED')
+                ) : (
+                  <FormattedNumberInput
+                    value={line.replacement_vehicle_per_month_aed || 0}
+                    onChange={(value) => onLineUpdate?.(line.id, 'replacement_vehicle_per_month_aed', value)}
                     className="w-32 text-right"
                   />
                 )}
