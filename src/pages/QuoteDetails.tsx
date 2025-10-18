@@ -370,14 +370,14 @@ const QuoteDetails: React.FC = () => {
         damage_waiver: true,
         theft_protection: true,
         third_party_liability: true,
-        additional_driver: true,
+        additional_driver: false,
         glass_tire: true,
       },
       'full-zero-excess': {
         damage_waiver: true,
         theft_protection: true,
         third_party_liability: true,
-        additional_driver: true,
+        additional_driver: false,
         glass_tire: true,
       },
     };

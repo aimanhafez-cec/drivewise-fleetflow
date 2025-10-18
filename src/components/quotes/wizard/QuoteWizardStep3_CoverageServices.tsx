@@ -209,7 +209,7 @@ export const QuoteWizardStep3_CoverageServices: React.FC<QuoteWizardStep3Coverag
                           insurance_damage_waiver: true,            // ✅ Included
                           insurance_theft_protection: true,         // ✅ Included
                           insurance_third_party_liability: true,    // ✅ Included
-                          insurance_additional_driver: true,        // ✅ Included
+                          insurance_additional_driver: false,       // ❌ Optional add-on
                           insurance_cross_border: data.insurance_cross_border || false, // Keep existing
                           insurance_glass_tire_cover: true,         // ✅ Included (user can toggle)
                           insurance_pai_enabled: data.insurance_pai_enabled || false,   // Keep existing
@@ -222,7 +222,7 @@ export const QuoteWizardStep3_CoverageServices: React.FC<QuoteWizardStep3Coverag
                           insurance_damage_waiver: true,            // ✅ Included
                           insurance_theft_protection: true,         // ✅ Included
                           insurance_third_party_liability: true,    // ✅ Included
-                          insurance_additional_driver: true,        // ✅ Included
+                          insurance_additional_driver: false,       // ❌ Optional add-on
                           insurance_cross_border: data.insurance_cross_border || false, // Keep existing
                           insurance_glass_tire_cover: true,         // ✅ Included
                           insurance_pai_enabled: data.insurance_pai_enabled || false,   // Keep existing
