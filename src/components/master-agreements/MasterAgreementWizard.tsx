@@ -219,6 +219,7 @@ export const MasterAgreementWizard: React.FC<MasterAgreementWizardProps> = ({
         customer_bill_to: undefined,
         // Map contact_person_id (Form) → invoice_contact_person_id (DB)
         invoice_contact_person_id: data.contact_person_id,
+        contact_person_id: undefined,
         // Map contract_effective_from (Form) → contract_start_date (DB)
         contract_start_date: data.contract_effective_from,
         contract_effective_from: undefined,
