@@ -344,6 +344,45 @@ const QuoteDetails: React.FC = () => {
     },
   });
 
+  // Helper to determine if a coverage item is included
+  const isCoverageIncluded = (
+    explicitValue: boolean | null | undefined,
+    coverageItem: string,
+    packageType: string
+  ): boolean => {
+    // If explicitly set, use that value
+    if (explicitValue !== null && explicitValue !== undefined) {
+      return explicitValue;
+    }
+
+    // Otherwise, infer from package type
+    const packageDefaults: Record<string, Record<string, boolean>> = {
+      basic: {
+        damage_waiver: false,
+        theft_protection: false,
+        third_party_liability: true,
+        additional_driver: false,
+        glass_tire: false,
+      },
+      comprehensive: {
+        damage_waiver: true,
+        theft_protection: true,
+        third_party_liability: true,
+        additional_driver: true,
+        glass_tire: true,
+      },
+      'full-zero-excess': {
+        damage_waiver: true,
+        theft_protection: true,
+        third_party_liability: true,
+        additional_driver: true,
+        glass_tire: true,
+      },
+    };
+
+    return packageDefaults[packageType]?.[coverageItem] ?? false;
+  };
+
   if (isLoading) {
     return (
       <div className="space-y-6 p-6">
@@ -799,11 +838,15 @@ const QuoteDetails: React.FC = () => {
                           </div>
                         </div>
 
-                        <div className="space-y-3">
+                          <div className="space-y-3">
                           <p className="text-sm font-semibold">Included Coverage</p>
                           <div className="space-y-2">
                             <div className="flex items-center gap-2">
-                              {quote.insurance_glass_tire_cover ? (
+                              {isCoverageIncluded(
+                                quote.insurance_glass_tire_cover,
+                                'glass_tire',
+                                quote.insurance_coverage_package || 'comprehensive'
+                              ) ? (
                                 <CheckCircle className="h-4 w-4 text-green-600" />
                               ) : (
                                 <XCircle className="h-4 w-4 text-muted-foreground" />
@@ -811,7 +854,11 @@ const QuoteDetails: React.FC = () => {
                               <span className="text-sm">Glass & Tire Cover</span>
                             </div>
                             <div className="flex items-center gap-2">
-                              {quote.insurance_pai_enabled ? (
+                              {isCoverageIncluded(
+                                quote.insurance_pai_enabled,
+                                'pai',
+                                quote.insurance_coverage_package || 'comprehensive'
+                              ) ? (
                                 <CheckCircle className="h-4 w-4 text-green-600" />
                               ) : (
                                 <XCircle className="h-4 w-4 text-muted-foreground" />
@@ -819,7 +866,11 @@ const QuoteDetails: React.FC = () => {
                               <span className="text-sm">Personal Accident Insurance (PAI)</span>
                             </div>
                             <div className="flex items-center gap-2">
-                              {quote.insurance_damage_waiver ? (
+                              {isCoverageIncluded(
+                                quote.insurance_damage_waiver,
+                                'damage_waiver',
+                                quote.insurance_coverage_package || 'comprehensive'
+                              ) ? (
                                 <CheckCircle className="h-4 w-4 text-green-600" />
                               ) : (
                                 <XCircle className="h-4 w-4 text-muted-foreground" />
@@ -827,7 +878,11 @@ const QuoteDetails: React.FC = () => {
                               <span className="text-sm">Damage Waiver</span>
                             </div>
                             <div className="flex items-center gap-2">
-                              {quote.insurance_theft_protection ? (
+                              {isCoverageIncluded(
+                                quote.insurance_theft_protection,
+                                'theft_protection',
+                                quote.insurance_coverage_package || 'comprehensive'
+                              ) ? (
                                 <CheckCircle className="h-4 w-4 text-green-600" />
                               ) : (
                                 <XCircle className="h-4 w-4 text-muted-foreground" />
@@ -835,7 +890,11 @@ const QuoteDetails: React.FC = () => {
                               <span className="text-sm">Theft Protection</span>
                             </div>
                             <div className="flex items-center gap-2">
-                              {quote.insurance_third_party_liability ? (
+                              {isCoverageIncluded(
+                                quote.insurance_third_party_liability,
+                                'third_party_liability',
+                                quote.insurance_coverage_package || 'comprehensive'
+                              ) ? (
                                 <CheckCircle className="h-4 w-4 text-green-600" />
                               ) : (
                                 <XCircle className="h-4 w-4 text-muted-foreground" />
@@ -843,7 +902,11 @@ const QuoteDetails: React.FC = () => {
                               <span className="text-sm">Third Party Liability</span>
                             </div>
                             <div className="flex items-center gap-2">
-                              {quote.insurance_additional_driver ? (
+                              {isCoverageIncluded(
+                                quote.insurance_additional_driver,
+                                'additional_driver',
+                                quote.insurance_coverage_package || 'comprehensive'
+                              ) ? (
                                 <CheckCircle className="h-4 w-4 text-green-600" />
                               ) : (
                                 <XCircle className="h-4 w-4 text-muted-foreground" />
@@ -851,7 +914,11 @@ const QuoteDetails: React.FC = () => {
                               <span className="text-sm">Additional Driver</span>
                             </div>
                             <div className="flex items-center gap-2">
-                              {quote.insurance_cross_border ? (
+                              {isCoverageIncluded(
+                                quote.insurance_cross_border,
+                                'cross_border',
+                                quote.insurance_coverage_package || 'comprehensive'
+                              ) ? (
                                 <CheckCircle className="h-4 w-4 text-green-600" />
                               ) : (
                                 <XCircle className="h-4 w-4 text-muted-foreground" />
