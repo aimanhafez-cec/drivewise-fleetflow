@@ -551,7 +551,7 @@ export const MasterAgreementStep5Drivers: React.FC<MasterAgreementStep5DriversPr
                   </div>
                   
                   <TabsContent value="overview" className="p-4 overflow-y-auto flex-1">
-                    <DriverDetailsDisplay driver={selectedDriver} />
+                    <DriverDetailsDisplay driver={selectedDriver} context="assignment" />
                   </TabsContent>
                   
                   <TabsContent value="documents" className="p-4 max-h-[400px] overflow-y-auto">

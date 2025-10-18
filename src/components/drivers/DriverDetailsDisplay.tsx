@@ -1,15 +1,14 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Separator } from '@/components/ui/separator';
-import { User, Mail, Phone, MapPin, Calendar, Shield, FileCheck, AlertTriangle, CheckCircle2, Briefcase, CreditCard, Globe } from 'lucide-react';
+import { Phone, MapPin, Calendar, Shield, AlertTriangle, CheckCircle2, Briefcase, CreditCard, FileCheck } from 'lucide-react';
 import { Driver } from '@/hooks/useDrivers';
 import { getDriverAgeWarning, getLicenseExpiryWarning } from '@/hooks/useDrivers';
 import { format } from 'date-fns';
 
 interface DriverDetailsDisplayProps {
   driver: Driver;
+  context?: 'assignment' | 'profile' | 'full';
 }
 
 const getNationalityFlag = (nationality?: string): string => {
@@ -43,7 +42,7 @@ const calculateAge = (dateOfBirth?: string): number | null => {
   return age;
 };
 
-export const DriverDetailsDisplay: React.FC<DriverDetailsDisplayProps> = ({ driver }) => {
+export const DriverDetailsDisplay: React.FC<DriverDetailsDisplayProps> = ({ driver, context = 'full' }) => {
   const age = calculateAge(driver.date_of_birth);
   const ageWarning = getDriverAgeWarning(driver.date_of_birth);
   const licenseWarning = getLicenseExpiryWarning(driver.license_expiry);
@@ -65,7 +64,7 @@ export const DriverDetailsDisplay: React.FC<DriverDetailsDisplayProps> = ({ driv
   };
 
   return (
-    <div className="space-y-6 overflow-y-auto pr-2">
+    <div className="space-y-4 overflow-y-auto pr-2">
       {/* Warnings */}
       {(ageWarning || licenseWarning) && (
         <Alert variant="default" className="border-yellow-500 bg-yellow-50">
@@ -79,87 +78,80 @@ export const DriverDetailsDisplay: React.FC<DriverDetailsDisplayProps> = ({ driv
         </Alert>
       )}
 
-      {/* Identity Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2">
-            <User className="h-4 w-4" />
-            Identity Information
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="text-xs font-medium text-muted-foreground">Full Name</label>
-              <p className="text-sm font-medium">{driver.full_name}</p>
-            </div>
-            <div>
-              <label className="text-xs font-medium text-muted-foreground">Nationality</label>
-              <p className="text-sm flex items-center gap-1">
-                <span className="text-lg">{getNationalityFlag(driver.nationality)}</span>
-                {driver.nationality || 'N/A'}
-              </p>
-            </div>
+      {/* Driver Header - Compact */}
+      <div className="flex items-start gap-3 pb-3 border-b">
+        <div className="flex-1">
+          <div className="flex items-center gap-2 mb-1">
+            <h3 className="text-lg font-semibold">{driver.full_name}</h3>
+            <span className="text-xl">{getNationalityFlag(driver.nationality)}</span>
+            <span className="text-sm text-muted-foreground">{driver.nationality}</span>
           </div>
-
-          <Separator />
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="text-xs font-medium text-muted-foreground">Emirates ID</label>
-              <p className="text-sm font-mono">{driver.emirates_id || 'N/A'}</p>
-            </div>
-            <div>
-              <label className="text-xs font-medium text-muted-foreground">Passport Number</label>
-              <p className="text-sm font-mono">{driver.passport_number || 'N/A'}</p>
-            </div>
+          <div className="flex items-center gap-3 text-xs text-muted-foreground">
+            {driver.emirates_id && (
+              <span className="font-mono">{driver.emirates_id}</span>
+            )}
+            {driver.passport_number && (
+              <span className="font-mono">• {driver.passport_number}</span>
+            )}
           </div>
+        </div>
+        {getVerificationBadge()}
+      </div>
 
-          <Separator />
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="text-xs font-medium text-muted-foreground">Date of Birth</label>
-              <p className="text-sm">
-                {driver.date_of_birth 
-                  ? format(new Date(driver.date_of_birth), 'dd MMM yyyy')
-                  : 'N/A'}
-                {age && <span className="text-muted-foreground ml-2">({age} years old)</span>}
-              </p>
-            </div>
-            <div>
-              <label className="text-xs font-medium text-muted-foreground">Address Emirate</label>
-              <p className="text-sm">{driver.address_emirate || 'N/A'}</p>
-            </div>
+      {/* Contact - Compact Inline */}
+      <div className="bg-muted/30 rounded-lg p-3">
+        <div className="flex items-center gap-2 mb-2">
+          <Phone className="h-3.5 w-3.5 text-muted-foreground" />
+          <span className="text-xs font-semibold text-foreground">Contact</span>
+        </div>
+        <div className="grid grid-cols-2 gap-3 text-sm">
+          <div>
+            {driver.phone ? (
+              <a href={`tel:${driver.phone}`} className="text-primary hover:underline">
+                {driver.phone}
+              </a>
+            ) : (
+              <span className="text-muted-foreground">No phone</span>
+            )}
           </div>
-        </CardContent>
-      </Card>
+          <div className="truncate">
+            {driver.email ? (
+              <a href={`mailto:${driver.email}`} className="text-primary hover:underline">
+                {driver.email}
+              </a>
+            ) : (
+              <span className="text-muted-foreground">No email</span>
+            )}
+          </div>
+        </div>
+        {driver.address_emirate && (
+          <div className="mt-2 flex items-center gap-1 text-sm text-muted-foreground">
+            <MapPin className="h-3 w-3" />
+            {driver.address_emirate}
+          </div>
+        )}
+      </div>
 
-      {/* License Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2">
-            <CreditCard className="h-4 w-4" />
-            Driving License
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="grid grid-cols-2 gap-4">
+      {/* License - Compact */}
+      <div className="bg-muted/30 rounded-lg p-3">
+        <div className="flex items-center gap-2 mb-2">
+          <CreditCard className="h-3.5 w-3.5 text-muted-foreground" />
+          <span className="text-xs font-semibold text-foreground">Driving License</span>
+        </div>
+        <div className="space-y-2">
+          <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs font-medium text-muted-foreground">License Number</label>
+              <label className="text-xs text-muted-foreground">Number</label>
               <p className="text-sm font-mono">{driver.license_no || 'N/A'}</p>
             </div>
             <div>
-              <label className="text-xs font-medium text-muted-foreground">Issued By</label>
+              <label className="text-xs text-muted-foreground">Authority</label>
               <p className="text-sm">{driver.license_issued_by || 'N/A'}</p>
             </div>
           </div>
-
-          <Separator />
-
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs font-medium text-muted-foreground">Issue Date</label>
+              <label className="text-xs text-muted-foreground">Issued</label>
               <p className="text-sm">
                 {driver.license_issue_date 
                   ? format(new Date(driver.license_issue_date), 'dd MMM yyyy')
@@ -167,176 +159,114 @@ export const DriverDetailsDisplay: React.FC<DriverDetailsDisplayProps> = ({ driv
               </p>
             </div>
             <div>
-              <label className="text-xs font-medium text-muted-foreground">Expiry Date</label>
+              <label className="text-xs text-muted-foreground">Expires</label>
               <p className="text-sm flex items-center gap-2">
                 {driver.license_expiry 
                   ? format(new Date(driver.license_expiry), 'dd MMM yyyy')
                   : 'N/A'}
                 {licenseWarning && (
-                  <Badge variant="outline" className="text-xs border-yellow-500 text-yellow-700">
-                    <AlertTriangle className="h-3 w-3" />
-                  </Badge>
+                  <AlertTriangle className="h-3 w-3 text-yellow-600" />
                 )}
               </p>
             </div>
           </div>
-
           {driver.license_categories && driver.license_categories.length > 0 && (
-            <>
-              <Separator />
-              <div>
-                <label className="text-xs font-medium text-muted-foreground">License Categories</label>
-                <div className="flex gap-2 mt-1 flex-wrap">
-                  {driver.license_categories.map((cat, idx) => (
-                    <Badge key={idx} variant="secondary" className="text-xs">{cat}</Badge>
-                  ))}
-                </div>
+            <div>
+              <label className="text-xs text-muted-foreground">Categories</label>
+              <div className="flex gap-1.5 mt-1 flex-wrap">
+                {driver.license_categories.map((cat, idx) => (
+                  <Badge key={idx} variant="secondary" className="text-xs px-1.5 py-0">{cat}</Badge>
+                ))}
               </div>
-            </>
+            </div>
           )}
+        </div>
+      </div>
 
-          {driver.visa_expiry && (
-            <>
-              <Separator />
+      {/* Additional Info */}
+      {driver.date_of_birth && (
+        <div className="bg-muted/30 rounded-lg p-3">
+          <div className="flex items-center gap-2 mb-2">
+            <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
+            <span className="text-xs font-semibold text-foreground">Personal Details</span>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs text-muted-foreground">Date of Birth</label>
+              <p className="text-sm">
+                {format(new Date(driver.date_of_birth), 'dd MMM yyyy')}
+                {age && <span className="text-muted-foreground ml-1">({age} yrs)</span>}
+              </p>
+            </div>
+            {driver.visa_expiry && (
               <div>
-                <label className="text-xs font-medium text-muted-foreground">Visa Expiry</label>
-                <p className="text-sm">
+                <label className="text-xs text-muted-foreground">Visa Expiry</label>
+                <p className="text-sm flex items-center gap-2">
                   {format(new Date(driver.visa_expiry), 'dd MMM yyyy')}
                   {new Date(driver.visa_expiry) < new Date() && (
-                    <Badge variant="destructive" className="ml-2 text-xs">Expired</Badge>
+                    <Badge variant="destructive" className="text-xs">Expired</Badge>
                   )}
                 </p>
               </div>
-            </>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Contact Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2">
-            <Phone className="h-4 w-4" />
-            Contact Information
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="text-xs font-medium text-muted-foreground">Phone</label>
-              <p className="text-sm">
-                {driver.phone ? (
-                  <a href={`tel:${driver.phone}`} className="text-primary hover:underline">
-                    {driver.phone}
-                  </a>
-                ) : 'N/A'}
-              </p>
-            </div>
-            <div>
-              <label className="text-xs font-medium text-muted-foreground">Email</label>
-              <p className="text-sm">
-                {driver.email ? (
-                  <a href={`mailto:${driver.email}`} className="text-primary hover:underline truncate block">
-                    {driver.email}
-                  </a>
-                ) : 'N/A'}
-              </p>
-            </div>
+            )}
           </div>
-        </CardContent>
-      </Card>
-
-      {/* Employment Section */}
-      {(driver.employment_id || driver.department) && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2">
-              <Briefcase className="h-4 w-4" />
-              Employment
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="grid grid-cols-2 gap-4">
-              {driver.employment_id && (
-                <div>
-                  <label className="text-xs font-medium text-muted-foreground">Employment ID</label>
-                  <p className="text-sm font-mono">{driver.employment_id}</p>
-                </div>
-              )}
-              {driver.department && (
-                <div>
-                  <label className="text-xs font-medium text-muted-foreground">Department</label>
-                  <p className="text-sm">{driver.department}</p>
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+        </div>
       )}
 
-      {/* Verification Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2">
-            <Shield className="h-4 w-4" />
-            Verification Status
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="flex items-center gap-2">
-            <label className="text-xs font-medium text-muted-foreground">Status:</label>
-            {getVerificationBadge()}
+      {/* Employment */}
+      {(driver.employment_id || driver.department) && (
+        <div className="bg-muted/30 rounded-lg p-3">
+          <div className="flex items-center gap-2 mb-2">
+            <Briefcase className="h-3.5 w-3.5 text-muted-foreground" />
+            <span className="text-xs font-semibold text-foreground">Employment</span>
           </div>
-
-          {driver.verified_at && (
-            <>
-              <Separator />
+          <div className="grid grid-cols-2 gap-3">
+            {driver.employment_id && (
               <div>
-                <label className="text-xs font-medium text-muted-foreground">Verified On</label>
+                <label className="text-xs text-muted-foreground">Employee ID</label>
+                <p className="text-sm font-mono">{driver.employment_id}</p>
+              </div>
+            )}
+            {driver.department && (
+              <div>
+                <label className="text-xs text-muted-foreground">Department</label>
+                <p className="text-sm">{driver.department}</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Verification Details */}
+      {(driver.verified_at || driver.rejection_reason || driver.last_verification_check) && (
+        <div className="bg-muted/30 rounded-lg p-3">
+          <div className="flex items-center gap-2 mb-2">
+            <Shield className="h-3.5 w-3.5 text-muted-foreground" />
+            <span className="text-xs font-semibold text-foreground">Verification Details</span>
+          </div>
+          <div className="space-y-2">
+            {driver.verified_at && (
+              <div>
+                <label className="text-xs text-muted-foreground">Verified On</label>
                 <p className="text-sm">{format(new Date(driver.verified_at), 'dd MMM yyyy HH:mm')}</p>
               </div>
-            </>
-          )}
-
-          {driver.rejection_reason && (
-            <>
-              <Separator />
-              <Alert variant="destructive">
-                <AlertTriangle className="h-4 w-4" />
-                <AlertDescription>
-                  <strong>Rejection Reason:</strong> {driver.rejection_reason}
+            )}
+            {driver.rejection_reason && (
+              <Alert variant="destructive" className="py-2">
+                <AlertTriangle className="h-3 w-3" />
+                <AlertDescription className="text-xs">
+                  <strong>Rejection:</strong> {driver.rejection_reason}
                 </AlertDescription>
               </Alert>
-            </>
-          )}
-
-          {driver.last_verification_check && (
-            <>
-              <Separator />
+            )}
+            {driver.last_verification_check && (
               <div>
-                <label className="text-xs font-medium text-muted-foreground">Last Check</label>
-                <p className="text-sm">{format(new Date(driver.last_verification_check), 'dd MMM yyyy HH:mm')}</p>
+                <label className="text-xs text-muted-foreground">Last Check</label>
+                <p className="text-sm">{format(new Date(driver.last_verification_check), 'dd MMM yyyy')}</p>
               </div>
-            </>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Additional Fee */}
-      {driver.additional_driver_fee > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Additional Driver Fee</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold">
-              AED {driver.additional_driver_fee.toLocaleString('en-AE', { minimumFractionDigits: 2 })}
-            </p>
-            <p className="text-xs text-muted-foreground mt-1">
-              {ageWarning ? 'Applied for drivers under 25' : 'Per agreement terms'}
-            </p>
-          </CardContent>
-        </Card>
+            )}
+          </div>
+        </div>
       )}
     </div>
   );
