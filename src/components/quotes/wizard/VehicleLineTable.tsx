@@ -114,7 +114,7 @@ export const VehicleLineTable: React.FC<VehicleLineTableProps> = ({
 
   return (
     <div className="border rounded-lg overflow-x-auto w-full">
-      <Table className="min-w-[1600px]">
+      <Table className="min-w-[1550px]">
         <TableHeader>
           <TableRow className="bg-muted">
             <TableHead className="min-w-[50px] w-12 text-center">
@@ -125,12 +125,12 @@ export const VehicleLineTable: React.FC<VehicleLineTableProps> = ({
             </TableHead>
             <TableHead className="min-w-[50px] w-12">#</TableHead>
             <TableHead className="min-w-[70px] w-16 text-center"></TableHead>
-            <TableHead className="min-w-[150px]">Contract No.</TableHead>
-            <TableHead className="min-w-[180px]">Item Code</TableHead>
-            <TableHead className="min-w-[350px]">Item Description</TableHead>
-            <TableHead className="min-w-[150px]">Category</TableHead>
-            <TableHead className="min-w-[130px]">Start Date</TableHead>
-            <TableHead className="text-right min-w-[110px]">Duration</TableHead>
+            <TableHead className="min-w-[130px]">Contract No.</TableHead>
+            <TableHead className="min-w-[130px]">Item Code</TableHead>
+            <TableHead className="min-w-[400px]">Item Description</TableHead>
+            <TableHead className="min-w-[100px]">Category</TableHead>
+            <TableHead className="min-w-[115px]">Start Date</TableHead>
+            <TableHead className="text-right min-w-[90px]">Duration</TableHead>
             <TableHead className="text-right min-w-[150px]">Monthly Rate</TableHead>
             <TableHead className="text-right min-w-[180px]">Delivery & Collection</TableHead>
             <TableHead className="text-right min-w-[150px]">Upfront Total</TableHead>
