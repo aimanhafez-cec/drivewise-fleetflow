@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DollarSign, Package } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/currency";
@@ -10,6 +10,11 @@ interface QuoteFinancialBreakdownProps {
 }
 
 export const QuoteFinancialBreakdown: React.FC<QuoteFinancialBreakdownProps> = ({ quote }) => {
+  // Local state for display mode toggle
+  const [displayMode, setDisplayMode] = useState<'itemized' | 'bundled'>(
+    quote.pricing_display_mode || 'bundled'
+  );
+
   const currency = quote.currency || "AED";
   const vatPercentage = quote.vat_percentage || 5;
   const normalizeType = (t?: string) => (t || '').trim().toLowerCase();
@@ -111,8 +116,8 @@ export const QuoteFinancialBreakdown: React.FC<QuoteFinancialBreakdownProps> = (
     sum + (parseFloat(fee.amount) || 0), 0);
   const upfrontDue = totalDeposits + totalAdvance + initialFeesTotal;
 
-  // Determine display mode
-  const pricingDisplayMode = quote.pricing_display_mode || 'bundled';
+  // Use local state for display mode
+  const pricingDisplayMode = displayMode;
   const isItemized = pricingDisplayMode === 'itemized';
 
   // Helper to calculate line total with services
@@ -149,9 +154,28 @@ export const QuoteFinancialBreakdown: React.FC<QuoteFinancialBreakdownProps> = (
             <DollarSign className="h-5 w-5" />
             Financial Breakdown
           </div>
-          <Badge variant={isItemized ? "default" : "secondary"}>
-            {isItemized ? "Itemized View" : "Bundled View"}
-          </Badge>
+          <div className="flex items-center gap-0">
+            <button
+              onClick={() => setDisplayMode('bundled')}
+              className={`px-3 py-1 text-xs font-medium rounded-l-md border transition-colors ${
+                displayMode === 'bundled'
+                  ? 'bg-primary text-primary-foreground border-primary'
+                  : 'bg-background text-muted-foreground border-input hover:bg-muted'
+              }`}
+            >
+              Bundled
+            </button>
+            <button
+              onClick={() => setDisplayMode('itemized')}
+              className={`px-3 py-1 text-xs font-medium rounded-r-md border border-l-0 transition-colors ${
+                displayMode === 'itemized'
+                  ? 'bg-primary text-primary-foreground border-primary'
+                  : 'bg-background text-muted-foreground border-input hover:bg-muted'
+              }`}
+            >
+              Itemized
+            </button>
+          </div>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
