@@ -114,26 +114,26 @@ export const VehicleLineTable: React.FC<VehicleLineTableProps> = ({
 
   return (
     <div className="border rounded-lg overflow-x-auto w-full">
-      <Table>
+      <Table className="min-w-[1600px]">
         <TableHeader>
           <TableRow className="bg-muted">
-            <TableHead className="w-12 text-center">
+            <TableHead className="min-w-[50px] w-12 text-center">
               <Checkbox
                 checked={selectedLines.length === lines.length && lines.length > 0}
                 onCheckedChange={onSelectAll}
               />
             </TableHead>
-            <TableHead className="w-12">#</TableHead>
-            <TableHead className="min-w-[140px]">Contract No.</TableHead>
-            <TableHead className="min-w-[160px]">Item Code</TableHead>
-            <TableHead className="min-w-[300px]">Item Description</TableHead>
-            <TableHead className="min-w-[120px]">Category</TableHead>
-            <TableHead className="min-w-[120px]">Start Date</TableHead>
-            <TableHead className="text-right min-w-[100px]">Duration</TableHead>
-            <TableHead className="text-right min-w-[140px]">Monthly Rate</TableHead>
-            <TableHead className="text-right min-w-[160px]">Delivery & Collection</TableHead>
-            <TableHead className="text-right min-w-[140px]">Upfront Total</TableHead>
-            <TableHead className="w-32 text-center">Actions</TableHead>
+            <TableHead className="min-w-[50px] w-12">#</TableHead>
+            <TableHead className="min-w-[150px]">Contract No.</TableHead>
+            <TableHead className="min-w-[180px]">Item Code</TableHead>
+            <TableHead className="min-w-[350px]">Item Description</TableHead>
+            <TableHead className="min-w-[150px]">Category</TableHead>
+            <TableHead className="min-w-[130px]">Start Date</TableHead>
+            <TableHead className="text-right min-w-[110px]">Duration</TableHead>
+            <TableHead className="text-right min-w-[150px]">Monthly Rate</TableHead>
+            <TableHead className="text-right min-w-[180px]">Delivery & Collection</TableHead>
+            <TableHead className="text-right min-w-[150px]">Upfront Total</TableHead>
+            <TableHead className="min-w-[130px] w-32 text-center">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
