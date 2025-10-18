@@ -17,6 +17,7 @@ interface CostSheetSectionProps {
   durationMonths: number;
   hasUnsavedChanges?: boolean;
   onSaveRequired?: () => void;
+  sourceQuoteNumber?: string; // If agreement was derived from a quote
 }
 
 export const CostSheetSection: React.FC<CostSheetSectionProps> = ({
@@ -27,6 +28,7 @@ export const CostSheetSection: React.FC<CostSheetSectionProps> = ({
   durationMonths,
   hasUnsavedChanges = false,
   onSaveRequired,
+  sourceQuoteNumber,
 }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedCostSheetId, setSelectedCostSheetId] = useState<string | null>(null);
@@ -108,7 +110,9 @@ export const CostSheetSection: React.FC<CostSheetSectionProps> = ({
             <div>
               <h3 className="font-semibold text-lg">Cost Sheets</h3>
               <p className="text-sm text-muted-foreground">
-                Create and manage cost sheet versions for profitability analysis
+                {sourceQuoteNumber 
+                  ? `Cost sheet inherited from Quote ${sourceQuoteNumber}. You can create new versions if vehicle lines change.`
+                  : 'Create and manage cost sheet versions for profitability analysis'}
               </p>
             </div>
           </div>

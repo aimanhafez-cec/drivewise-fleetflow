@@ -270,33 +270,7 @@ export const MasterAgreementStep4: React.FC<MasterAgreementStep4Props> = ({
       )}
 
       {/* Cost Sheet Section */}
-      {data.source_quote_id ? (
-        <Card className="border-blue-300 bg-blue-50">
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <Calculator className="h-5 w-5 text-blue-600" />
-              <div>
-                <CardTitle className="text-blue-900">
-                  Cost Sheets (from Source Quote {data.source_quote_no || ''})
-                </CardTitle>
-                <CardDescription>
-                  Viewing cost analysis from the original quote. Cost sheets are read-only for Master Agreements.
-                </CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <CostSheetSection 
-              entityId={data.source_quote_id}
-              entityType="quote"
-              quoteId={data.source_quote_id}
-              entityNumber={data.source_quote_no}
-              durationMonths={data.duration_days ? Math.round(data.duration_days / 30) : 36}
-              hasUnsavedChanges={false}
-            />
-          </CardContent>
-        </Card>
-      ) : data.id && (
+      {data.id && (
         <CostSheetSection 
           entityId={data.id}
           entityType="agreement"
@@ -305,6 +279,7 @@ export const MasterAgreementStep4: React.FC<MasterAgreementStep4Props> = ({
           durationMonths={data.duration_days ? Math.round(data.duration_days / 30) : 36}
           hasUnsavedChanges={hasUnsavedChanges}
           onSaveRequired={onSaveRequired}
+          sourceQuoteNumber={data.source_quote_no}
         />
       )}
     </div>
