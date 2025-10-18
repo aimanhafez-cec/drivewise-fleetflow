@@ -1,8 +1,9 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { DollarSign } from "lucide-react";
+import { DollarSign, Package } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/currency";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 
 interface QuoteFinancialBreakdownProps {
   quote: any;
@@ -110,15 +111,188 @@ export const QuoteFinancialBreakdown: React.FC<QuoteFinancialBreakdownProps> = (
     sum + (parseFloat(fee.amount) || 0), 0);
   const upfrontDue = totalDeposits + totalAdvance + initialFeesTotal;
 
+  // Determine display mode
+  const pricingDisplayMode = quote.pricing_display_mode || 'bundled';
+  const isItemized = pricingDisplayMode === 'itemized';
+
+  // Helper to calculate line total with services
+  const calculateLineTotalWithServices = (line: any) => {
+    const baseRate = line.monthly_rate || 0;
+    const maintenanceCost = (line.maintenance_included ?? quote.maintenance_included) 
+      ? (line.monthly_maintenance_cost_per_vehicle ?? quote.monthly_maintenance_cost_per_vehicle ?? 0)
+      : 0;
+    const roadsideCost = (line.roadside_assistance_included ?? quote.roadside_assistance_included)
+      ? (line.roadside_assistance_cost_monthly ?? quote.roadside_assistance_cost_monthly ?? 0)
+      : 0;
+    const replacementCost = (line.replacement_vehicle_included ?? quote.replacement_vehicle_included)
+      ? (line.replacement_vehicle_cost_monthly ?? quote.replacement_vehicle_cost_monthly ?? 0)
+      : 0;
+    
+    return baseRate + maintenanceCost + roadsideCost + replacementCost;
+  };
+
+  // Helper to get included services list
+  const getIncludedServices = (line: any) => {
+    const services = [];
+    if (line.insurance_coverage_package || quote.insurance_coverage_package) services.push("Insurance");
+    if (line.maintenance_included ?? quote.maintenance_included) services.push("Maintenance");
+    if (line.roadside_assistance_included ?? quote.roadside_assistance_included) services.push("Roadside Assistance");
+    if (line.replacement_vehicle_included ?? quote.replacement_vehicle_included) services.push("Replacement Vehicle");
+    return services;
+  };
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <DollarSign className="h-5 w-5" />
-          Financial Breakdown
+        <CardTitle className="flex items-center gap-2 justify-between">
+          <div className="flex items-center gap-2">
+            <DollarSign className="h-5 w-5" />
+            Financial Breakdown
+          </div>
+          <Badge variant={isItemized ? "default" : "secondary"}>
+            {isItemized ? "Itemized View" : "Bundled View"}
+          </Badge>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
+        
+        {/* Itemized Monthly Rate Breakdown - Only show if itemized mode */}
+        {isItemized && lines.length > 0 && (
+          <>
+            <div className="space-y-4">
+              <h4 className="font-semibold text-sm flex items-center gap-2">
+                <Package className="h-4 w-4" />
+                Monthly Rate Breakdown by Vehicle
+              </h4>
+              
+              {lines.map((line: any, index: number) => {
+                const baseRate = line.monthly_rate || 0;
+                const vehicleName = line.vehicle_class_name || line._vehicleMeta?.label || `Vehicle ${index + 1}`;
+                const quantity = line.quantity || 1;
+                const maintenanceCost = (line.maintenance_included ?? quote.maintenance_included) 
+                  ? (line.monthly_maintenance_cost_per_vehicle ?? quote.monthly_maintenance_cost_per_vehicle ?? 0)
+                  : 0;
+                const roadsideCost = (line.roadside_assistance_included ?? quote.roadside_assistance_included)
+                  ? (line.roadside_assistance_cost_monthly ?? quote.roadside_assistance_cost_monthly ?? 0)
+                  : 0;
+                const replacementCost = (line.replacement_vehicle_included ?? quote.replacement_vehicle_included)
+                  ? (line.replacement_vehicle_cost_monthly ?? quote.replacement_vehicle_cost_monthly ?? 0)
+                  : 0;
+                const insuranceCost = 300; // Placeholder - should come from line data
+                const lineTotal = calculateLineTotalWithServices(line);
+                
+                return (
+                  <Card key={line.id || index} className="bg-muted/30">
+                    <CardContent className="pt-4 space-y-2">
+                      <div className="flex justify-between font-semibold border-b pb-2">
+                        <span>{vehicleName}</span>
+                        {quantity > 1 && <span className="text-muted-foreground">× {quantity}</span>}
+                      </div>
+                      
+                      <div className="flex justify-between text-sm pl-4">
+                        <span className="text-muted-foreground">Base Vehicle Rate:</span>
+                        <span>{formatCurrency(baseRate, currency)}</span>
+                      </div>
+                      
+                      <div className="flex justify-between text-sm pl-4">
+                        <span className="text-muted-foreground">+ Insurance:</span>
+                        <span>{formatCurrency(insuranceCost, currency)}</span>
+                      </div>
+                      
+                      {maintenanceCost > 0 && (
+                        <div className="flex justify-between text-sm pl-4">
+                          <span className="text-muted-foreground">+ Maintenance:</span>
+                          <span>{formatCurrency(maintenanceCost, currency)}</span>
+                        </div>
+                      )}
+                      
+                      {roadsideCost > 0 && (
+                        <div className="flex justify-between text-sm pl-4">
+                          <span className="text-muted-foreground">+ Roadside Assistance (24/7):</span>
+                          <span>{formatCurrency(roadsideCost, currency)}</span>
+                        </div>
+                      )}
+                      
+                      {replacementCost > 0 && (
+                        <div className="flex justify-between text-sm pl-4">
+                          <span className="text-muted-foreground">
+                            + Replacement Vehicle ({line.replacement_sla_hours || quote.replacement_sla_hours || 24}h SLA):
+                          </span>
+                          <span>{formatCurrency(replacementCost, currency)}</span>
+                        </div>
+                      )}
+                      
+                      <Separator className="my-2" />
+                      
+                      <div className="flex justify-between font-semibold">
+                        <span>Monthly Rate per Vehicle:</span>
+                        <span className="text-primary">{formatCurrency(lineTotal, currency)}</span>
+                      </div>
+                      
+                      {quantity > 1 && (
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Total for {quantity} vehicles:</span>
+                          <span className="font-medium">{formatCurrency(lineTotal * quantity, currency)}</span>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+            
+            <Separator />
+          </>
+        )}
+
+        {/* Bundled View - Show summary with included services */}
+        {!isItemized && lines.length > 0 && (
+          <>
+            <div className="space-y-4">
+              <h4 className="font-semibold text-sm">Monthly Lease Summary</h4>
+              
+              {lines.map((line: any, index: number) => {
+                const vehicleName = line.vehicle_class_name || line._vehicleMeta?.label || `Vehicle ${index + 1}`;
+                const quantity = line.quantity || 1;
+                const lineTotal = calculateLineTotalWithServices(line);
+                const includedServices = getIncludedServices(line);
+                
+                return (
+                  <Card key={line.id || index} className="bg-muted/30">
+                    <CardContent className="pt-4 space-y-2">
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <div className="font-semibold">{vehicleName}</div>
+                          {quantity > 1 && (
+                            <div className="text-sm text-muted-foreground">Quantity: {quantity}</div>
+                          )}
+                          {includedServices.length > 0 && (
+                            <div className="text-xs text-muted-foreground mt-1">
+                              ✓ Includes: {includedServices.join(", ")}
+                            </div>
+                          )}
+                        </div>
+                        <div className="text-right">
+                          <div className="font-bold text-lg text-primary">
+                            {formatCurrency(lineTotal * quantity, currency)}<span className="text-sm">/mo</span>
+                          </div>
+                          {quantity > 1 && (
+                            <div className="text-xs text-muted-foreground">
+                              {formatCurrency(lineTotal, currency)} × {quantity}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+            
+            <Separator />
+          </>
+        )}
+
         <div className="space-y-4">
           <div className="flex justify-between items-center">
             <span className="text-sm text-muted-foreground">Subtotal</span>

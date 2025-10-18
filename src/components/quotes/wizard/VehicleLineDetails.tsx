@@ -44,6 +44,11 @@ interface VehicleLineDetailsProps {
     monthly_maintenance_cost_per_vehicle?: number;
     maintenance_plan_source?: string;
     show_maintenance_separate_line?: boolean;
+    roadside_assistance_included?: boolean;
+    roadside_assistance_cost_monthly?: number;
+    replacement_vehicle_included?: boolean;
+    replacement_vehicle_cost_monthly?: number;
+    replacement_sla_hours?: number;
     default_addons?: AddOnLine[];
     initial_fees?: Array<{
       fee_type: string;
@@ -191,6 +196,12 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
                isCustomized("monthly_maintenance_cost_per_vehicle", line.monthly_maintenance_cost_per_vehicle, headerDefaults.monthly_maintenance_cost_per_vehicle) ||
                isCustomized("maintenance_plan_source", line.maintenance_plan_source, headerDefaults.maintenance_plan_source) ||
                isCustomized("show_maintenance_separate_line", line.show_maintenance_separate_line, headerDefaults.show_maintenance_separate_line);
+      case "additional_services":
+        return isCustomized("roadside_assistance_included", line.roadside_assistance_included, headerDefaults.roadside_assistance_included) ||
+               isCustomized("roadside_assistance_cost_monthly", line.roadside_assistance_cost_monthly, headerDefaults.roadside_assistance_cost_monthly) ||
+               isCustomized("replacement_vehicle_included", line.replacement_vehicle_included, headerDefaults.replacement_vehicle_included) ||
+               isCustomized("replacement_vehicle_cost_monthly", line.replacement_vehicle_cost_monthly, headerDefaults.replacement_vehicle_cost_monthly) ||
+               isCustomized("replacement_sla_hours", line.replacement_sla_hours, headerDefaults.replacement_sla_hours);
       case "addons":
         const headerAddOns = headerDefaults.default_addons || [];
         const lineAddOns = line.addons || [];
@@ -234,6 +245,24 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
     const monthlyCount = addons.filter((a: any) => a.enabled && a.type === 'monthly').length;
     const oneTimeCount = addons.filter((a: any) => a.enabled && a.type === 'one-time').length;
     return `${enabledCount} selected (${monthlyCount} monthly, ${oneTimeCount} one-time)`;
+  };
+
+  const getAdditionalServicesPreview = () => {
+    const roadside = line.roadside_assistance_included ?? headerDefaults.roadside_assistance_included ?? false;
+    const replacement = line.replacement_vehicle_included ?? headerDefaults.replacement_vehicle_included ?? false;
+    
+    if (!roadside && !replacement) return "None";
+    const services = [];
+    if (roadside) {
+      const cost = line.roadside_assistance_cost_monthly ?? headerDefaults.roadside_assistance_cost_monthly ?? 0;
+      services.push(`Roadside (${cost} AED/mo)`);
+    }
+    if (replacement) {
+      const cost = line.replacement_vehicle_cost_monthly ?? headerDefaults.replacement_vehicle_cost_monthly ?? 0;
+      const sla = line.replacement_sla_hours ?? headerDefaults.replacement_sla_hours ?? 24;
+      services.push(`Replacement (${cost} AED/mo, ${sla}h SLA)`);
+    }
+    return services.join(" + ");
   };
 
   // Calculate total maintenance cost
@@ -1229,6 +1258,163 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
           </AccordionContent>
         </AccordionItem>
 
+        {/* SECTION 6.5: Additional Services */}
+        <AccordionItem value="additional_services">
+          <AccordionTrigger className="hover:bg-muted/50 px-4 py-3">
+            <div className="flex items-center gap-2">
+              <Package className="h-4 w-4 text-primary" />
+              <span className="font-semibold">Additional Services</span>
+              <span className="text-sm text-muted-foreground ml-2">{getAdditionalServicesPreview()}</span>
+              {hasCustomizations("additional_services") && (
+                <Badge variant="secondary" className="ml-2">Customized</Badge>
+              )}
+            </div>
+          </AccordionTrigger>
+          <AccordionContent className="px-4 pb-4">
+            <div className="space-y-4">
+              
+              {/* Roadside Assistance */}
+              <div className="p-4 border rounded-lg space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <Label className="font-medium">Roadside Assistance (24/7)</Label>
+                    <p className="text-xs text-muted-foreground">Emergency support and towing services</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Checkbox 
+                      checked={line.roadside_assistance_included ?? headerDefaults.roadside_assistance_included ?? false}
+                      onCheckedChange={(checked) => onUpdate('roadside_assistance_included', checked)}
+                    />
+                    {isCustomized("roadside_assistance_included", line.roadside_assistance_included, headerDefaults.roadside_assistance_included) && (
+                      <Badge variant="secondary" className="text-xs">Customized</Badge>
+                    )}
+                  </div>
+                </div>
+                
+                {(line.roadside_assistance_included ?? headerDefaults.roadside_assistance_included) && (
+                  <div className="space-y-2">
+                    <Label htmlFor={`roadside_cost_${line.line_no}`} className="flex items-center gap-2">
+                      Monthly Cost (AED)
+                      {isCustomized("roadside_assistance_cost_monthly", line.roadside_assistance_cost_monthly, headerDefaults.roadside_assistance_cost_monthly) && (
+                        <Badge variant="secondary" className="text-xs">Customized</Badge>
+                      )}
+                    </Label>
+                    <Input
+                      id={`roadside_cost_${line.line_no}`}
+                      type="number"
+                      min="0"
+                      step="10"
+                      value={line.roadside_assistance_cost_monthly ?? headerDefaults.roadside_assistance_cost_monthly ?? 0}
+                      onChange={(e) => onUpdate('roadside_assistance_cost_monthly', parseFloat(e.target.value) || 0)}
+                      placeholder="0.00"
+                    />
+                    {isCustomized("roadside_assistance_cost_monthly", line.roadside_assistance_cost_monthly, headerDefaults.roadside_assistance_cost_monthly) && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 text-xs"
+                        onClick={() => resetToDefault("roadside_assistance_cost_monthly", headerDefaults.roadside_assistance_cost_monthly)}
+                      >
+                        Reset to default
+                      </Button>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Replacement Vehicle */}
+              <div className="p-4 border rounded-lg space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <Label className="font-medium">Replacement Vehicle</Label>
+                    <p className="text-xs text-muted-foreground">Temporary replacement during maintenance/repairs</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Checkbox 
+                      checked={line.replacement_vehicle_included ?? headerDefaults.replacement_vehicle_included ?? false}
+                      onCheckedChange={(checked) => onUpdate('replacement_vehicle_included', checked)}
+                    />
+                    {isCustomized("replacement_vehicle_included", line.replacement_vehicle_included, headerDefaults.replacement_vehicle_included) && (
+                      <Badge variant="secondary" className="text-xs">Customized</Badge>
+                    )}
+                  </div>
+                </div>
+                
+                {(line.replacement_vehicle_included ?? headerDefaults.replacement_vehicle_included) && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor={`replacement_cost_${line.line_no}`} className="flex items-center gap-2">
+                        Monthly Cost (AED)
+                        {isCustomized("replacement_vehicle_cost_monthly", line.replacement_vehicle_cost_monthly, headerDefaults.replacement_vehicle_cost_monthly) && (
+                          <Badge variant="secondary" className="text-xs">Customized</Badge>
+                        )}
+                      </Label>
+                      <Input
+                        id={`replacement_cost_${line.line_no}`}
+                        type="number"
+                        min="0"
+                        step="10"
+                        value={line.replacement_vehicle_cost_monthly ?? headerDefaults.replacement_vehicle_cost_monthly ?? 0}
+                        onChange={(e) => onUpdate('replacement_vehicle_cost_monthly', parseFloat(e.target.value) || 0)}
+                        placeholder="0.00"
+                      />
+                      {isCustomized("replacement_vehicle_cost_monthly", line.replacement_vehicle_cost_monthly, headerDefaults.replacement_vehicle_cost_monthly) && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 text-xs"
+                          onClick={() => resetToDefault("replacement_vehicle_cost_monthly", headerDefaults.replacement_vehicle_cost_monthly)}
+                        >
+                          Reset to default
+                        </Button>
+                      )}
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor={`replacement_sla_${line.line_no}`} className="flex items-center gap-2">
+                        SLA Response (Hours)
+                        {isCustomized("replacement_sla_hours", line.replacement_sla_hours, headerDefaults.replacement_sla_hours) && (
+                          <Badge variant="secondary" className="text-xs">Customized</Badge>
+                        )}
+                      </Label>
+                      <Input
+                        id={`replacement_sla_${line.line_no}`}
+                        type="number"
+                        min="1"
+                        max="72"
+                        value={line.replacement_sla_hours ?? headerDefaults.replacement_sla_hours ?? 24}
+                        onChange={(e) => onUpdate('replacement_sla_hours', parseInt(e.target.value) || 24)}
+                        placeholder="24"
+                      />
+                      {isCustomized("replacement_sla_hours", line.replacement_sla_hours, headerDefaults.replacement_sla_hours) && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 text-xs"
+                          onClick={() => resetToDefault("replacement_sla_hours", headerDefaults.replacement_sla_hours)}
+                        >
+                          Reset to default
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <Alert>
+                <Info className="h-4 w-4" />
+                <AlertDescription>
+                  These services will be included in the monthly rate calculation. You can view the itemized breakdown in the quote details.
+                </AlertDescription>
+              </Alert>
+
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+
         {/* SECTION 7: Line Summary */}
         <AccordionItem value="summary" className="border-t-2 border-primary/20">
           <AccordionTrigger className="hover:bg-muted/50 px-4 py-3 bg-muted/30">
@@ -1269,6 +1455,24 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
                     <span className="text-muted-foreground">Maintenance (Monthly):</span>
                     <span className="font-medium">
                       {line.monthly_maintenance_cost_per_vehicle || headerDefaults.monthly_maintenance_cost_per_vehicle || 0} AED
+                    </span>
+                  </div>
+                )}
+
+                {/* Additional Services */}
+                {(line.roadside_assistance_included ?? headerDefaults.roadside_assistance_included) && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Roadside Assistance (Monthly):</span>
+                    <span className="font-medium">
+                      {line.roadside_assistance_cost_monthly ?? headerDefaults.roadside_assistance_cost_monthly ?? 0} AED
+                    </span>
+                  </div>
+                )}
+                {(line.replacement_vehicle_included ?? headerDefaults.replacement_vehicle_included) && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Replacement Vehicle (Monthly):</span>
+                    <span className="font-medium">
+                      {line.replacement_vehicle_cost_monthly ?? headerDefaults.replacement_vehicle_cost_monthly ?? 0} AED
                     </span>
                   </div>
                 )}
