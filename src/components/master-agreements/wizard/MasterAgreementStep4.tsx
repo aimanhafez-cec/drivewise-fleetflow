@@ -178,6 +178,7 @@ export const MasterAgreementStep4: React.FC<MasterAgreementStep4Props> = ({
       oneTimeAddOns,
       monthlyRecurringRental,
       taxableSubtotal,
+      nonTaxableSubtotal: totalDeposits,
       subtotal: totalDeposits + taxableSubtotal,
       vatPercentage,
       vatAmount,
@@ -288,12 +289,64 @@ export const MasterAgreementStep4: React.FC<MasterAgreementStep4Props> = ({
                 <span className="font-semibold">{totals.vehicles}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Monthly Recurring Rental:</span>
+                <span className="text-muted-foreground">Total Deposits:</span>
+                <span className="font-semibold">{formatCurrency(totals.deposits)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Total Advance Rent:</span>
+                <span className="font-semibold">{formatCurrency(totals.advance)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Total Delivery Fees:</span>
+                <span className="font-semibold">{formatCurrency(totals.deliveryFees)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Total Collection Fees:</span>
+                <span className="font-semibold">{formatCurrency(totals.collectionFees)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Initial Fees (One-time):</span>
+                <span className="font-semibold">{formatCurrency(totals.initialFees)}</span>
+              </div>
+              
+              {/* Add-Ons Section */}
+              {(totals.monthlyAddOns > 0 || totals.oneTimeAddOns > 0) && (
+                <>
+                  <div className="border-t pt-3 flex justify-between">
+                    <span className="text-muted-foreground">Monthly Add-Ons (Total):</span>
+                    <span className="font-semibold text-blue-600">{formatCurrency(totals.monthlyAddOns)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">One-Time Add-Ons:</span>
+                    <span className="font-semibold">{formatCurrency(totals.oneTimeAddOns)}</span>
+                  </div>
+                </>
+              )}
+              
+              {/* Monthly Recurring Section */}
+              <div className="border-t pt-3 flex justify-between">
+                <span className="font-semibold">Monthly Recurring Rental:</span>
                 <span className="font-semibold text-blue-600">{formatCurrency(totals.monthlyRecurringRental)}</span>
               </div>
+              
+              {/* Subtotal and VAT */}
               <div className="border-t pt-3 flex justify-between">
-                <span className="font-semibold">Total Upfront Due (incl. VAT):</span>
-                <span className="font-semibold text-lg text-primary">{formatCurrency(totals.totalIncludingVat)}</span>
+                <span className="text-muted-foreground">Subtotal (Taxable):</span>
+                <span>{formatCurrency(totals.taxableSubtotal)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Deposits (Non-taxable):</span>
+                <span>{formatCurrency(totals.nonTaxableSubtotal)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">VAT ({totals.vatPercentage}%):</span>
+                <span>{formatCurrency(totals.vatAmount)}</span>
+              </div>
+              
+              {/* Grand Total */}
+              <div className="border-t pt-3 flex justify-between">
+                <span className="font-bold text-lg">Total Upfront Due (incl. VAT):</span>
+                <span className="font-bold text-lg text-primary">{formatCurrency(totals.totalIncludingVat)}</span>
               </div>
             </div>
           </CardContent>
