@@ -275,7 +275,7 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
   };
 
   return (
-    <div className="space-y-2 max-w-5xl">
+    <div className="space-y-2 max-w-4xl">
       <Accordion type="multiple" defaultValue={[]} className="w-full">
         
         {/* SECTION 1: Delivery & Collection */}
@@ -290,8 +290,8 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
               )}
             </div>
           </AccordionTrigger>
-          <AccordionContent className="px-4 pb-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <AccordionContent className="px-4 pb-4 overflow-hidden">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-full">
           
           {/* Pickup Configuration */}
           <div className="space-y-2">
@@ -662,8 +662,8 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
               </span>
             </div>
           </AccordionTrigger>
-          <AccordionContent className="px-4 pb-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <AccordionContent className="px-4 pb-4 overflow-hidden">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-full">
           
           <div className="space-y-2">
             <Label htmlFor={`pickup_${line.line_no}`}>Start Date *</Label>
@@ -796,8 +796,8 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
                 </span>
               </div>
             </AccordionTrigger>
-            <AccordionContent className="px-4 pb-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <AccordionContent className="px-4 pb-4 overflow-hidden">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-full">
             
             <div className="space-y-2">
               <Label htmlFor={`mileage_${line.line_no}`}>Included KM / Month *</Label>
@@ -861,8 +861,8 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
               )}
             </div>
           </AccordionTrigger>
-          <AccordionContent className="px-4 pb-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <AccordionContent className="px-4 pb-4 overflow-hidden">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-full">
           
           <div className="space-y-2">
             <Label htmlFor={`deposit_${line.line_no}`} className="flex items-center gap-2">
@@ -941,8 +941,8 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
               )}
             </div>
           </AccordionTrigger>
-          <AccordionContent className="px-4 pb-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <AccordionContent className="px-4 pb-4 overflow-hidden">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-full">
           
           <div className="space-y-2">
             <Label htmlFor={`ins_coverage_${line.line_no}`} className="flex items-center gap-2">
@@ -1117,8 +1117,8 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
               )}
             </div>
           </AccordionTrigger>
-          <AccordionContent className="px-4 pb-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <AccordionContent className="px-4 pb-4 overflow-hidden">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-full">
               
               {/* Enable/Disable Maintenance */}
               <div className="space-y-2 col-span-full">
@@ -1270,8 +1270,8 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
               )}
             </div>
           </AccordionTrigger>
-          <AccordionContent className="px-4 pb-4">
-            <div className="space-y-4">
+          <AccordionContent className="px-4 pb-4 overflow-hidden">
+            <div className="space-y-4 max-w-full">
               
               {/* Roadside Assistance */}
               <div className="p-4 border rounded-lg space-y-3">
@@ -1426,7 +1426,7 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
               </span>
             </div>
           </AccordionTrigger>
-          <AccordionContent className="px-4 pb-4">
+          <AccordionContent className="px-4 pb-4 overflow-hidden">
             
             <Card className="bg-muted max-w-2xl">
               <CardContent className="pt-4 space-y-2 min-w-[500px]">
@@ -1538,7 +1538,7 @@ export const VehicleLineDetails: React.FC<VehicleLineDetailsProps> = ({
               )}
             </div>
           </AccordionTrigger>
-          <AccordionContent className="px-4 pb-4">
+          <AccordionContent className="px-4 pb-4 overflow-hidden">
             <VehicleAddOnsOverride
               line={line}
               onUpdate={onUpdate}
