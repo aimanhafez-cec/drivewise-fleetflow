@@ -17,7 +17,7 @@ interface EnhancedDriverFormProps {
   open: boolean;
   onClose: () => void;
   driverId?: string;
-  onSave: () => void;
+  onSave: (driverId?: string) => void;
 }
 
 interface DriverFormData {
@@ -134,6 +134,8 @@ export const EnhancedDriverForm: React.FC<EnhancedDriverFormProps> = ({
   const handleSubmit = async () => {
     setSaving(true);
     try {
+      let savedDriverId = driverId;
+      
       if (driverId) {
         const { error } = await supabase
           .from('drivers')
@@ -143,15 +145,18 @@ export const EnhancedDriverForm: React.FC<EnhancedDriverFormProps> = ({
         if (error) throw error;
         toast.success('Driver updated successfully');
       } else {
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('drivers')
-          .insert([formData]);
+          .insert([formData])
+          .select('id')
+          .single();
         
         if (error) throw error;
+        savedDriverId = data.id;
         toast.success('Driver created successfully');
       }
       
-      onSave();
+      onSave(savedDriverId);
       onClose();
     } catch (error) {
       console.error('Error saving driver:', error);

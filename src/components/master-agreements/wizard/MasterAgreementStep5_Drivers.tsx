@@ -6,12 +6,14 @@ import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { LOVSelect } from '@/components/ui/lov-select';
-import { Plus, AlertTriangle, CheckCircle2, Trash2, Star, Info, Shield, FileCheck } from 'lucide-react';
+import { Plus, AlertTriangle, CheckCircle2, Trash2, Star, Info, Shield, FileCheck, UserPlus } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useDrivers } from '@/hooks/useDrivers';
 import { useAgreementDrivers, useAssignDriver, useRemoveDriver, useUpdateDriverAssignment } from '@/hooks/useAgreementDrivers';
 import { getDriverAgeWarning, getLicenseExpiryWarning } from '@/hooks/useDrivers';
+import { EnhancedDriverForm } from '@/components/drivers/EnhancedDriverForm';
 
 interface MasterAgreementStep5DriversProps {
   data: {
@@ -30,6 +32,7 @@ export const MasterAgreementStep5Drivers: React.FC<MasterAgreementStep5DriversPr
   const [selectedLineId, setSelectedLineId] = useState<string | null>(null);
   const [selectedDriverId, setSelectedDriverId] = useState<string | null>(null);
   const [showAssignDialog, setShowAssignDialog] = useState(false);
+  const [isCreateDriverOpen, setIsCreateDriverOpen] = useState(false);
 
   const { items: drivers, updateSearch } = useDrivers();
   const { data: agreementDrivers = [], isLoading } = useAgreementDrivers(data.id);
@@ -60,6 +63,12 @@ export const MasterAgreementStep5Drivers: React.FC<MasterAgreementStep5DriversPr
     setShowAssignDialog(false);
     setSelectedLineId(null);
     setSelectedDriverId(null);
+  };
+
+  const handleDriverCreated = (newDriverId: string) => {
+    setIsCreateDriverOpen(false);
+    setSelectedDriverId(newDriverId);
+    // Dialog stays open so user can assign the newly created driver
   };
 
   const handleRemoveDriver = async (assignmentId: string) => {
@@ -280,14 +289,26 @@ export const MasterAgreementStep5Drivers: React.FC<MasterAgreementStep5DriversPr
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <label className="text-sm font-medium">Select Driver</label>
-              <LOVSelect
-                value={selectedDriverId || undefined}
-                onChange={(value) => setSelectedDriverId(value as string)}
-                items={drivers.filter(d => d.status === 'active')}
-                placeholder="Search for driver..."
-                onSearch={updateSearch}
-              />
+              <label className="text-sm font-medium mb-2 block">Select Driver</label>
+              <div className="flex gap-2">
+                <div className="flex-1">
+                  <LOVSelect
+                    value={selectedDriverId || undefined}
+                    onChange={(value) => setSelectedDriverId(value as string)}
+                    items={drivers.filter(d => d.status === 'active')}
+                    placeholder="Search for driver..."
+                    onSearch={updateSearch}
+                  />
+                </div>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setIsCreateDriverOpen(true)}
+                  title="Create New Driver"
+                >
+                  <UserPlus className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
             {selectedDriverId && (() => {
               const driver = drivers.find(d => d.id === selectedDriverId);
@@ -339,6 +360,22 @@ export const MasterAgreementStep5Drivers: React.FC<MasterAgreementStep5DriversPr
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Create Driver Sheet */}
+      <Sheet open={isCreateDriverOpen} onOpenChange={setIsCreateDriverOpen}>
+        <SheetContent side="right" className="w-full sm:max-w-2xl overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle>Create New Driver</SheetTitle>
+          </SheetHeader>
+          <div className="mt-6">
+            <EnhancedDriverForm
+              open={isCreateDriverOpen}
+              onClose={() => setIsCreateDriverOpen(false)}
+              onSave={handleDriverCreated}
+            />
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 };
