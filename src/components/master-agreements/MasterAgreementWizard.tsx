@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -74,6 +74,8 @@ export const MasterAgreementWizard: React.FC<MasterAgreementWizardProps> = ({
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [lastSavedAgreementItems, setLastSavedAgreementItems] = useState<any[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  
+  const saveActionRef = useRef<'draft' | 'finalize'>('draft');
 
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -332,11 +334,24 @@ export const MasterAgreementWizard: React.FC<MasterAgreementWizardProps> = ({
     onSuccess: (agreementId) => {
       queryClient.invalidateQueries({ queryKey: ["master-agreements"] });
       queryClient.invalidateQueries({ queryKey: ["master-agreement", agreementId] });
-      toast({
-        title: "Success",
-        description: isEditMode ? "Master Agreement updated" : "Master Agreement created",
-      });
-      navigate(`/master-agreements/${agreementId}`);
+      
+      const actionType = saveActionRef.current;
+      
+      if (actionType === 'finalize') {
+        toast({
+          title: "Success",
+          description: isEditMode ? "Master Agreement updated" : "Master Agreement created",
+        });
+        navigate(`/master-agreements/${agreementId}`);
+      } else {
+        // Draft save - stay in wizard
+        toast({
+          title: "Changes saved",
+          description: "Your changes have been saved. You can continue editing.",
+        });
+        setLastSavedAgreementItems(agreementData.agreement_items || []);
+        setHasUnsavedChanges(false);
+      }
     },
     onError: (error: any) => {
       toast({
@@ -375,10 +390,12 @@ export const MasterAgreementWizard: React.FC<MasterAgreementWizardProps> = ({
   };
 
   const handleSaveDraft = () => {
+    saveActionRef.current = 'draft';
     saveMutation.mutate({ ...agreementData, status: "draft" });
   };
 
   const handleFinalize = () => {
+    saveActionRef.current = 'finalize';
     saveMutation.mutate({ ...agreementData, status: "active" });
   };
 
