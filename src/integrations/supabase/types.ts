@@ -3158,6 +3158,7 @@ export type Database = {
           maintenance_package_type: string | null
           maintenance_plan_source: string | null
           mileage_pooling_enabled: boolean | null
+          monthly_insurance_cost_per_vehicle: number | null
           monthly_maintenance_cost_per_vehicle: number | null
           notes: string | null
           opportunity_id: string | null
@@ -3274,6 +3275,7 @@ export type Database = {
           maintenance_package_type?: string | null
           maintenance_plan_source?: string | null
           mileage_pooling_enabled?: boolean | null
+          monthly_insurance_cost_per_vehicle?: number | null
           monthly_maintenance_cost_per_vehicle?: number | null
           notes?: string | null
           opportunity_id?: string | null
@@ -3390,6 +3392,7 @@ export type Database = {
           maintenance_package_type?: string | null
           maintenance_plan_source?: string | null
           mileage_pooling_enabled?: boolean | null
+          monthly_insurance_cost_per_vehicle?: number | null
           monthly_maintenance_cost_per_vehicle?: number | null
           notes?: string | null
           opportunity_id?: string | null

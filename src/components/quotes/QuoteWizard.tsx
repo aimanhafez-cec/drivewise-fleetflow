@@ -157,6 +157,7 @@ interface QuoteData {
   insurance_additional_driver?: boolean;
   insurance_cross_border?: boolean;
   insurance_notes?: string;
+  monthly_insurance_cost_per_vehicle?: number;
 
   // Phase 3C: Maintenance Header Defaults
   maintenance_included?: boolean;
@@ -511,7 +512,7 @@ export const QuoteWizard: React.FC<QuoteWizardProps> = ({ viewMode = false, quot
         customer_po_number: data.customer_po_number,
         payment_instructions: data.payment_instructions,
         
-        // Step 3 - Insurance
+        // Step 3 - Insurance  
         insurance_coverage_package: data.insurance_coverage_package,
         insurance_excess_aed: data.insurance_excess_aed,
         insurance_territorial_coverage: data.insurance_territorial_coverage,
@@ -525,6 +526,7 @@ export const QuoteWizard: React.FC<QuoteWizardProps> = ({ viewMode = false, quot
         insurance_cross_border: data.insurance_cross_border,
         insurance_coverage_summary: data.insurance_coverage_summary,
         insurance_notes: data.insurance_notes,
+        monthly_insurance_cost_per_vehicle: data.monthly_insurance_cost_per_vehicle,
         
         // Step 3 - Maintenance
         maintenance_included: data.maintenance_included,
@@ -722,6 +724,7 @@ export const QuoteWizard: React.FC<QuoteWizardProps> = ({ viewMode = false, quot
         insurance_additional_driver: data.insurance_additional_driver,
         insurance_cross_border: data.insurance_cross_border,
         insurance_notes: data.insurance_notes,
+        monthly_insurance_cost_per_vehicle: data.monthly_insurance_cost_per_vehicle,
         
         // Maintenance fields (Step 3)
         maintenance_included: data.maintenance_included,

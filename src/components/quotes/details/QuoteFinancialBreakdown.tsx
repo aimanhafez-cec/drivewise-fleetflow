@@ -202,7 +202,7 @@ export const QuoteFinancialBreakdown: React.FC<QuoteFinancialBreakdownProps> = (
                 const replacementCost = (line.replacement_vehicle_included ?? quote.replacement_vehicle_included)
                   ? (line.replacement_vehicle_cost_monthly ?? quote.replacement_vehicle_cost_monthly ?? 0)
                   : 0;
-                const insuranceCost = 300; // Placeholder - should come from line data
+                const insuranceCost = quote.monthly_insurance_cost_per_vehicle ?? 300;
                 const lineTotal = calculateLineTotalWithServices(line);
                 
                 return (

@@ -255,26 +255,44 @@ export const QuoteWizardStep3_CoverageServices: React.FC<QuoteWizardStep3Coverag
               </div>
             </div>
 
-            {/* Visual Separator + Row 3: Territorial Coverage */}
+            {/* Visual Separator + Row 3: Territorial Coverage + Monthly Cost */}
             <div className="border-t pt-3">
-              <div className="space-y-1.5">
-                <TooltipLabel 
-                  label="Territorial Coverage *" 
-                  tooltip="Geographic area where insurance is valid. GCC includes UAE, Saudi Arabia, Kuwait, Bahrain, Oman, Qatar (surcharge applies)."
-                />
-                <Select
-                  value={data.insurance_territorial_coverage || "uae-only"}
-                  onValueChange={(value) => onChange({ insurance_territorial_coverage: value })}
-                >
-                  <SelectTrigger className="h-9">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="uae-only">UAE Only (Default)</SelectItem>
-                    <SelectItem value="gcc">GCC Coverage (surcharge applies)</SelectItem>
-                  </SelectContent>
-                </Select>
-                {errors.insurance_territorial_coverage && <FormError message={errors.insurance_territorial_coverage} />}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <TooltipLabel 
+                    label="Territorial Coverage *" 
+                    tooltip="Geographic area where insurance is valid. GCC includes UAE, Saudi Arabia, Kuwait, Bahrain, Oman, Qatar (surcharge applies)."
+                  />
+                  <Select
+                    value={data.insurance_territorial_coverage || "uae-only"}
+                    onValueChange={(value) => onChange({ insurance_territorial_coverage: value })}
+                  >
+                    <SelectTrigger className="h-9">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="uae-only">UAE Only (Default)</SelectItem>
+                      <SelectItem value="gcc">GCC Coverage (surcharge applies)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {errors.insurance_territorial_coverage && <FormError message={errors.insurance_territorial_coverage} />}
+                </div>
+
+                <div className="space-y-1.5">
+                  <TooltipLabel 
+                    label="Monthly Cost / Vehicle (AED) *" 
+                    tooltip="Amount added to each vehicle's monthly rate for insurance coverage."
+                  />
+                  <Input
+                    type="number"
+                    min="0"
+                    step="50"
+                    className="h-9"
+                    value={data.monthly_insurance_cost_per_vehicle ?? 300}
+                    onChange={(e) => onChange({ monthly_insurance_cost_per_vehicle: parseFloat(e.target.value) || 0 })}
+                    placeholder="300"
+                  />
+                </div>
               </div>
             </div>
           </div>
