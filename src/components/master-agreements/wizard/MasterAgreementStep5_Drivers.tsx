@@ -193,11 +193,11 @@ export const MasterAgreementStep5Drivers: React.FC<MasterAgreementStep5DriversPr
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {vehicleLines.map((line) => {
+                {vehicleLines.map((line, index) => {
                   const lineDrivers = getDriversForLine(line.id);
                   return (
                     <TableRow key={line.id}>
-                      <TableCell className="font-medium">{line.line_number}</TableCell>
+                      <TableCell className="font-medium">{index + 1}</TableCell>
                       <TableCell>
                         <div className="space-y-1">
                           <div className="font-medium">
