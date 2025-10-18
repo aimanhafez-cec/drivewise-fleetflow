@@ -2824,7 +2824,7 @@ export type Database = {
           id: string
           notes_assumptions: string | null
           overhead_percent: number
-          quote_id: string
+          quote_id: string | null
           residual_value_percent: number
           source_cost_sheet_id: string | null
           status: Database["public"]["Enums"]["cost_sheet_status"]
@@ -2845,7 +2845,7 @@ export type Database = {
           id?: string
           notes_assumptions?: string | null
           overhead_percent?: number
-          quote_id: string
+          quote_id?: string | null
           residual_value_percent?: number
           source_cost_sheet_id?: string | null
           status?: Database["public"]["Enums"]["cost_sheet_status"]
@@ -2866,7 +2866,7 @@ export type Database = {
           id?: string
           notes_assumptions?: string | null
           overhead_percent?: number
-          quote_id?: string
+          quote_id?: string | null
           residual_value_percent?: number
           source_cost_sheet_id?: string | null
           status?: Database["public"]["Enums"]["cost_sheet_status"]
