@@ -186,7 +186,7 @@ export const MasterAgreementStep5Drivers: React.FC<MasterAgreementStep5DriversPr
                 <TableRow>
                   <TableHead>Line #</TableHead>
                   <TableHead>Vehicle Details</TableHead>
-                  <TableHead>Contract No</TableHead>
+                  <TableHead>Contract No.</TableHead>
                   <TableHead>Lease Period</TableHead>
                   <TableHead className="text-right">Monthly Rate</TableHead>
                   <TableHead>Driver Status</TableHead>
