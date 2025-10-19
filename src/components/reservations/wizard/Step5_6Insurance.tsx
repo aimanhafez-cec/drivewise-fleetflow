@@ -2,7 +2,7 @@ import React from 'react';
 import { useReservationWizard } from './ReservationWizardContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { InsuranceLevelSelect, InsuranceGroupSelect, InsuranceProviderSelect } from '@/components/ui/select-components';
 import { Shield, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
@@ -34,21 +34,10 @@ export const Step5_6Insurance: React.FC = () => {
             <Label htmlFor="insuranceLevel">
               Insurance Level
             </Label>
-            <Select
-              value={wizardData.insuranceLevelId || ''}
-              onValueChange={(value) => updateWizardData({ insuranceLevelId: value })}
-            >
-              <SelectTrigger id="insuranceLevel">
-                <SelectValue placeholder="Select insurance level" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="basic">Basic Coverage</SelectItem>
-                <SelectItem value="standard">Standard Coverage</SelectItem>
-                <SelectItem value="comprehensive">Comprehensive Coverage</SelectItem>
-                <SelectItem value="premium">Premium Coverage</SelectItem>
-                <SelectItem value="zero-excess">Zero Excess</SelectItem>
-              </SelectContent>
-            </Select>
+            <InsuranceLevelSelect
+              value={wizardData.insuranceLevelId}
+              onChange={(value) => updateWizardData({ insuranceLevelId: value as string })}
+            />
           </div>
 
           {/* Insurance Group */}
@@ -56,22 +45,10 @@ export const Step5_6Insurance: React.FC = () => {
             <Label htmlFor="insuranceGroup">
               Insurance Group
             </Label>
-            <Select
-              value={wizardData.insuranceGroupId || ''}
-              onValueChange={(value) => updateWizardData({ insuranceGroupId: value })}
-            >
-              <SelectTrigger id="insuranceGroup">
-                <SelectValue placeholder="Select insurance group" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="group-a">Group A (Economy)</SelectItem>
-                <SelectItem value="group-b">Group B (Compact)</SelectItem>
-                <SelectItem value="group-c">Group C (Midsize)</SelectItem>
-                <SelectItem value="group-d">Group D (Standard)</SelectItem>
-                <SelectItem value="group-e">Group E (SUV)</SelectItem>
-                <SelectItem value="group-f">Group F (Luxury)</SelectItem>
-              </SelectContent>
-            </Select>
+            <InsuranceGroupSelect
+              value={wizardData.insuranceGroupId}
+              onChange={(value) => updateWizardData({ insuranceGroupId: value as string })}
+            />
           </div>
 
           {/* Insurance Provider */}
@@ -79,22 +56,10 @@ export const Step5_6Insurance: React.FC = () => {
             <Label htmlFor="insuranceProvider">
               Insurance Provider
             </Label>
-            <Select
-              value={wizardData.insuranceProviderId || ''}
-              onValueChange={(value) => updateWizardData({ insuranceProviderId: value })}
-            >
-              <SelectTrigger id="insuranceProvider">
-                <SelectValue placeholder="Select insurance provider" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="axa">AXA Insurance</SelectItem>
-                <SelectItem value="oman">Oman Insurance Company</SelectItem>
-                <SelectItem value="orient">Orient Insurance</SelectItem>
-                <SelectItem value="dubai">Dubai Insurance</SelectItem>
-                <SelectItem value="abu-dhabi">Abu Dhabi National Insurance</SelectItem>
-                <SelectItem value="alliance">Alliance Insurance</SelectItem>
-              </SelectContent>
-            </Select>
+            <InsuranceProviderSelect
+              value={wizardData.insuranceProviderId}
+              onChange={(value) => updateWizardData({ insuranceProviderId: value as string })}
+            />
           </div>
 
           {/* Insurance Summary */}

@@ -3,7 +3,7 @@ import { useReservationWizard } from './ReservationWizardContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { PriceListSelect } from '@/components/ui/select-components';
 import { DollarSign, Clock, Calendar, TrendingUp } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils/currency';
 
@@ -18,6 +18,8 @@ export const Step2_5PriceList: React.FC = () => {
         'standard': { hourly: 50, daily: 150, weekly: 900, monthly: 3500, kmCharge: 0.5, dailyKm: 150 },
         'premium': { hourly: 75, daily: 200, weekly: 1200, monthly: 4500, kmCharge: 0.4, dailyKm: 200 },
         'luxury': { hourly: 120, daily: 350, weekly: 2100, monthly: 7500, kmCharge: 0.3, dailyKm: 250 },
+        'corporate': { hourly: 45, daily: 130, weekly: 800, monthly: 3000, kmCharge: 0.6, dailyKm: 100 },
+        'seasonal': { hourly: 40, daily: 120, weekly: 700, monthly: 2800, kmCharge: 0.5, dailyKm: 150 },
       };
 
       const rates = mockRates[wizardData.priceListId as keyof typeof mockRates] || mockRates.standard;
@@ -57,21 +59,10 @@ export const Step2_5PriceList: React.FC = () => {
             <Label htmlFor="priceList">
               Price List <span className="text-destructive">*</span>
             </Label>
-            <Select
+            <PriceListSelect
               value={wizardData.priceListId}
-              onValueChange={(value) => updateWizardData({ priceListId: value })}
-            >
-              <SelectTrigger id="priceList">
-                <SelectValue placeholder="Select price list" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="standard">Standard Rates</SelectItem>
-                <SelectItem value="premium">Premium Rates</SelectItem>
-                <SelectItem value="luxury">Luxury Rates</SelectItem>
-                <SelectItem value="corporate">Corporate Discount</SelectItem>
-                <SelectItem value="seasonal">Seasonal Special</SelectItem>
-              </SelectContent>
-            </Select>
+              onChange={(value) => updateWizardData({ priceListId: value as string })}
+            />
           </div>
 
           {wizardData.priceListId && (

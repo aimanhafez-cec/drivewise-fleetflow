@@ -2,15 +2,11 @@ import React from 'react';
 import { useReservationWizard } from './ReservationWizardContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useBusinessUnits, usePaymentTerms } from '@/hooks/useBusinessLOVs';
+import { BusinessUnitSelect, PaymentTermsSelect, ReservationMethodSelect } from '@/components/ui/select-components';
 import { Building2, CreditCard, Briefcase, DollarSign } from 'lucide-react';
 
 export const Step1_5BusinessConfig: React.FC = () => {
   const { wizardData, updateWizardData } = useReservationWizard();
-  const { items: businessUnits, isLoading: loadingUnits } = useBusinessUnits();
-  const { items: paymentTerms, isLoading: loadingTerms } = usePaymentTerms();
-  const isLoading = loadingUnits || loadingTerms;
 
   return (
     <div className="space-y-6">
@@ -37,22 +33,10 @@ export const Step1_5BusinessConfig: React.FC = () => {
             <Label htmlFor="reservationMethod">
               Reservation Method <span className="text-destructive">*</span>
             </Label>
-            <Select
+            <ReservationMethodSelect
               value={wizardData.reservationMethodId}
-              onValueChange={(value) => updateWizardData({ reservationMethodId: value })}
-            >
-              <SelectTrigger id="reservationMethod">
-                <SelectValue placeholder="Select reservation method" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="walk-in">Walk-in</SelectItem>
-                <SelectItem value="phone">Phone</SelectItem>
-                <SelectItem value="email">Email</SelectItem>
-                <SelectItem value="online">Online Portal</SelectItem>
-                <SelectItem value="corporate">Corporate Contract</SelectItem>
-                <SelectItem value="agent">Travel Agent</SelectItem>
-              </SelectContent>
-            </Select>
+              onChange={(value) => updateWizardData({ reservationMethodId: value as string })}
+            />
           </div>
 
           {/* Business Unit */}
@@ -60,22 +44,10 @@ export const Step1_5BusinessConfig: React.FC = () => {
             <Label htmlFor="businessUnit">
               Business Unit <span className="text-destructive">*</span>
             </Label>
-            <Select
+            <BusinessUnitSelect
               value={wizardData.businessUnitId}
-              onValueChange={(value) => updateWizardData({ businessUnitId: value })}
-              disabled={isLoading}
-            >
-              <SelectTrigger id="businessUnit">
-                <SelectValue placeholder="Select business unit" />
-              </SelectTrigger>
-              <SelectContent>
-                {businessUnits?.map((unit: any) => (
-                  <SelectItem key={unit.id} value={unit.id}>
-                    {unit.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              onChange={(value) => updateWizardData({ businessUnitId: value as string })}
+            />
           </div>
 
           {/* Payment Terms */}
@@ -83,22 +55,10 @@ export const Step1_5BusinessConfig: React.FC = () => {
             <Label htmlFor="paymentTerms">
               Payment Terms <span className="text-destructive">*</span>
             </Label>
-            <Select
+            <PaymentTermsSelect
               value={wizardData.paymentTermsId}
-              onValueChange={(value) => updateWizardData({ paymentTermsId: value })}
-              disabled={isLoading}
-            >
-              <SelectTrigger id="paymentTerms">
-                <SelectValue placeholder="Select payment terms" />
-              </SelectTrigger>
-              <SelectContent>
-                {paymentTerms?.map((term: any) => (
-                  <SelectItem key={term.id} value={term.id}>
-                    {term.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              onChange={(value) => updateWizardData({ paymentTermsId: value as string })}
+            />
           </div>
 
           {/* Currency */}

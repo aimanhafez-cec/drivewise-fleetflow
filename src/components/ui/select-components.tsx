@@ -437,3 +437,143 @@ export const PriceListSelect: React.FC<BaseSelectProps> = (props) => {
     />
   );
 };
+
+// Tax Level Select (Mock data until table created)
+export const TaxLevelSelect: React.FC<BaseSelectProps> = (props) => {
+  const mockTaxLevels = [
+    { id: 'vat-5', label: 'UAE VAT (5%)' },
+    { id: 'vat-0', label: 'Zero Rated (0%)' },
+    { id: 'exempt', label: 'VAT Exempt' },
+  ];
+
+  return (
+    <LOVSelect
+      {...props}
+      items={mockTaxLevels}
+      isLoading={false}
+      placeholder={props.placeholder || "Select tax level..."}
+    />
+  );
+};
+
+// Tax Code Select (Mock data until table created)
+interface TaxCodeSelectProps extends BaseSelectProps {
+  taxLevelId?: string;
+}
+
+export const TaxCodeSelect: React.FC<TaxCodeSelectProps> = ({ taxLevelId, ...props }) => {
+  const mockTaxCodes = taxLevelId === 'vat-5' ? [
+    { id: 'std-rate', label: 'S - Standard Rate' },
+    { id: 'reduced', label: 'R - Reduced Rate' },
+  ] : taxLevelId === 'vat-0' ? [
+    { id: 'zero-rated', label: 'Z - Zero Rated' },
+  ] : [
+    { id: 'exempt', label: 'E - Exempt' },
+  ];
+
+  return (
+    <LOVSelect
+      {...props}
+      items={mockTaxCodes}
+      isLoading={false}
+      disabled={props.disabled || !taxLevelId}
+      placeholder={props.placeholder || "Select tax code..."}
+    />
+  );
+};
+
+// Insurance Level Select (Mock data until table created)
+export const InsuranceLevelSelect: React.FC<BaseSelectProps> = (props) => {
+  const mockInsuranceLevels = [
+    { id: 'comprehensive', label: 'Comprehensive' },
+    { id: 'third-party', label: 'Third Party' },
+    { id: 'tpl-fire-theft', label: 'TPL + Fire & Theft' },
+  ];
+
+  return (
+    <LOVSelect
+      {...props}
+      items={mockInsuranceLevels}
+      isLoading={false}
+      placeholder={props.placeholder || "Select insurance level..."}
+    />
+  );
+};
+
+// Insurance Group Select (Mock data until table created)
+export const InsuranceGroupSelect: React.FC<BaseSelectProps> = (props) => {
+  const mockInsuranceGroups = [
+    { id: 'group-a', label: 'Group A - Sedan' },
+    { id: 'group-b', label: 'Group B - SUV' },
+    { id: 'group-c', label: 'Group C - Luxury' },
+    { id: 'group-d', label: 'Group D - Sports' },
+  ];
+
+  return (
+    <LOVSelect
+      {...props}
+      items={mockInsuranceGroups}
+      isLoading={false}
+      placeholder={props.placeholder || "Select insurance group..."}
+    />
+  );
+};
+
+// Insurance Provider Select (Mock data until table created)
+export const InsuranceProviderSelect: React.FC<BaseSelectProps> = (props) => {
+  const mockInsuranceProviders = [
+    { id: 'provider-1', label: 'AXA Insurance' },
+    { id: 'provider-2', label: 'Oman Insurance' },
+    { id: 'provider-3', label: 'Dubai Insurance' },
+    { id: 'provider-4', label: 'Orient Insurance' },
+  ];
+
+  return (
+    <LOVSelect
+      {...props}
+      items={mockInsuranceProviders}
+      isLoading={false}
+      placeholder={props.placeholder || "Select insurance provider..."}
+    />
+  );
+};
+
+// Discount Type Select (Mock data until table created)
+export const DiscountTypeSelect: React.FC<BaseSelectProps> = (props) => {
+  const mockDiscountTypes = [
+    { id: 'percentage', label: 'Percentage Discount (%)' },
+    { id: 'fixed-amount', label: 'Fixed Amount (AED)' },
+    { id: 'corporate', label: 'Corporate Rate' },
+    { id: 'seasonal', label: 'Seasonal Promotion' },
+  ];
+
+  return (
+    <LOVSelect
+      {...props}
+      items={mockDiscountTypes}
+      isLoading={false}
+      placeholder={props.placeholder || "Select discount type..."}
+    />
+  );
+};
+
+// Reservation Method Select (Mock data until table created)
+export const ReservationMethodSelect: React.FC<BaseSelectProps> = (props) => {
+  const mockReservationMethods = [
+    { id: 'walk-in', label: 'Walk-in' },
+    { id: 'phone', label: 'Phone Call' },
+    { id: 'email', label: 'Email' },
+    { id: 'website', label: 'Website' },
+    { id: 'mobile-app', label: 'Mobile App' },
+    { id: 'agent', label: 'Travel Agent' },
+  ];
+
+  return (
+    <LOVSelect
+      {...props}
+      items={mockReservationMethods}
+      isLoading={false}
+      placeholder={props.placeholder || "Select reservation method..."}
+    />
+  );
+};

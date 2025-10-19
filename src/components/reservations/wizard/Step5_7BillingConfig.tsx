@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
+import { TaxLevelSelect, TaxCodeSelect, DiscountTypeSelect } from '@/components/ui/select-components';
 import { Receipt, DollarSign, Calendar, Percent } from 'lucide-react';
 
 export const Step5_7BillingConfig: React.FC = () => {
@@ -127,19 +128,10 @@ export const Step5_7BillingConfig: React.FC = () => {
               <Label htmlFor="taxLevel">
                 Tax Level <span className="text-destructive">*</span>
               </Label>
-              <Select
+              <TaxLevelSelect
                 value={wizardData.taxLevelId}
-                onValueChange={(value) => updateWizardData({ taxLevelId: value })}
-              >
-                <SelectTrigger id="taxLevel">
-                  <SelectValue placeholder="Select tax level" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="standard">Standard VAT (5%)</SelectItem>
-                  <SelectItem value="exempt">Exempt</SelectItem>
-                  <SelectItem value="zero-rated">Zero Rated</SelectItem>
-                </SelectContent>
-              </Select>
+                onChange={(value) => updateWizardData({ taxLevelId: value as string })}
+              />
             </div>
 
             {/* Tax Code */}
@@ -147,20 +139,12 @@ export const Step5_7BillingConfig: React.FC = () => {
               <Label htmlFor="taxCode">
                 Tax Code <span className="text-destructive">*</span>
               </Label>
-              <Select
+              <TaxCodeSelect
                 value={wizardData.taxCodeId}
-                onValueChange={(value) => updateWizardData({ taxCodeId: value })}
+                onChange={(value) => updateWizardData({ taxCodeId: value as string })}
+                taxLevelId={wizardData.taxLevelId}
                 disabled={!wizardData.taxLevelId}
-              >
-                <SelectTrigger id="taxCode">
-                  <SelectValue placeholder="Select tax code" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="vat-5">VAT-5 (Standard Rate)</SelectItem>
-                  <SelectItem value="vat-0">VAT-0 (Zero Rate)</SelectItem>
-                  <SelectItem value="exempt-001">EXEMPT-001</SelectItem>
-                </SelectContent>
-              </Select>
+              />
             </div>
           </div>
         </CardContent>
@@ -182,21 +166,10 @@ export const Step5_7BillingConfig: React.FC = () => {
             {/* Discount Type */}
             <div className="space-y-2">
               <Label htmlFor="discountType">Discount Type</Label>
-              <Select
-                value={wizardData.discountTypeId || ''}
-                onValueChange={(value) => updateWizardData({ discountTypeId: value })}
-              >
-                <SelectTrigger id="discountType">
-                  <SelectValue placeholder="No discount" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="percentage">Percentage</SelectItem>
-                  <SelectItem value="fixed">Fixed Amount</SelectItem>
-                  <SelectItem value="promo">Promo Code</SelectItem>
-                  <SelectItem value="loyalty">Loyalty Points</SelectItem>
-                  <SelectItem value="corporate">Corporate Discount</SelectItem>
-                </SelectContent>
-              </Select>
+              <DiscountTypeSelect
+                value={wizardData.discountTypeId}
+                onChange={(value) => updateWizardData({ discountTypeId: value as string })}
+              />
             </div>
 
             {/* Discount Value */}
