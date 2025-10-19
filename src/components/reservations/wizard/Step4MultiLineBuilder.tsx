@@ -7,6 +7,7 @@ import { ReservationLineTable } from './ReservationLineTable';
 import { LineEditorModal } from './LineEditorModal';
 import { Plus, AlertCircle, Package } from 'lucide-react';
 import type { ReservationLine } from './ReservationWizardContext';
+import { usePricingContext, calculateLinePrice } from '@/hooks/usePricingContext';
 
 export const Step4MultiLineBuilder: React.FC = () => {
   const { wizardData, updateWizardData } = useReservationWizard();
@@ -20,10 +21,49 @@ export const Step4MultiLineBuilder: React.FC = () => {
   };
 
   const handleSaveLine = (line: ReservationLine) => {
+    // Calculate pricing for this line before saving
+    const pricingContext = usePricingContext({
+      priceListId: wizardData.priceListId,
+      promotionCode: '',
+      hourlyRate: wizardData.hourlyRate,
+      dailyRate: wizardData.dailyRate,
+      weeklyRate: wizardData.weeklyRate,
+      monthlyRate: wizardData.monthlyRate,
+      kilometerCharge: wizardData.kilometerCharge,
+      dailyKilometerAllowed: wizardData.dailyKilometerAllowed,
+    });
+    
+    const checkOutDate = new Date(`${line.checkOutDate}T${line.checkOutTime}`);
+    const checkInDate = new Date(`${line.checkInDate}T${line.checkInTime}`);
+    
+    const { lineNetPrice } = calculateLinePrice(pricingContext, checkOutDate, checkInDate);
+    
+    // Calculate add-ons and driver fees
+    const lineAddOns = Object.values(line.addOnPrices).reduce((sum, price) => sum + price, 0);
+    const lineDriverFees = line.drivers.reduce((sum, driver) => sum + (driver.fee || 0), 0);
+    
+    // Update line with calculated totals
+    const lineWithPricing: ReservationLine = {
+      ...line,
+      baseRate: lineNetPrice,
+      lineNet: lineNetPrice + lineAddOns + lineDriverFees,
+      taxValue: 0, // VAT calculated at total level, not per line
+      lineTotal: lineNetPrice + lineAddOns + lineDriverFees,
+    };
+    
+    console.log('💰 Line Pricing Calculated:', {
+      lineNo: line.lineNo || 'new',
+      baseRate: lineNetPrice,
+      addOns: lineAddOns,
+      driverFees: lineDriverFees,
+      lineTotal: lineNetPrice + lineAddOns + lineDriverFees,
+      dates: { checkOut: line.checkOutDate, checkIn: line.checkInDate },
+    });
+    
     if (isAddingNew) {
       // Add new line
       const newLine: ReservationLine = {
-        ...line,
+        ...lineWithPricing,
         id: crypto.randomUUID(),
         lineNo: lines.length + 1,
       };
@@ -34,7 +74,7 @@ export const Step4MultiLineBuilder: React.FC = () => {
     } else {
       // Update existing line
       updateWizardData({
-        reservationLines: lines.map((l) => (l.id === line.id ? line : l)),
+        reservationLines: lines.map((l) => (l.id === line.id ? lineWithPricing : l)),
       });
       setEditingLineId(null);
     }
