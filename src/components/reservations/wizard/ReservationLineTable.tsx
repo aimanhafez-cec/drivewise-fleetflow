@@ -2,7 +2,7 @@ import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Edit, Trash2, Copy } from 'lucide-react';
+import { Edit, Trash2, Copy, Clock } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils/currency';
 import { format } from 'date-fns';
 import type { ReservationLine } from './ReservationWizardContext';
@@ -93,8 +93,24 @@ export const ReservationLineTable: React.FC<ReservationLineTableProps> = ({
                   {line.selectedAddOns?.length || 0}
                 </Badge>
               </TableCell>
-              <TableCell className="text-right font-medium">
-                {formatCurrency(line.lineTotal || 0)}
+              <TableCell className="text-right">
+                {line.lineTotal && line.lineTotal > 0 ? (
+                  <div className="space-y-1">
+                    <div className="font-semibold font-mono text-base">
+                      {formatCurrency(line.lineTotal)}
+                    </div>
+                    {line.baseRate && (
+                      <div className="text-xs text-muted-foreground">
+                        Base: {formatCurrency(line.baseRate)}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <Badge variant="outline" className="bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800">
+                    <Clock className="h-3 w-3 mr-1" />
+                    Pricing Pending
+                  </Badge>
+                )}
               </TableCell>
               <TableCell className="text-right">
                 <div className="flex items-center justify-end gap-1">
