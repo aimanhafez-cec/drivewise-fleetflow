@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import {
@@ -24,12 +25,16 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
+import BookingDetailsDrawer from './BookingDetailsDrawer';
+import CancelBookingDialog from './CancelBookingDialog';
+import VehicleAssignmentDialog from './VehicleAssignmentDialog';
 
 interface BookingsTableProps {
   filters: {
@@ -44,6 +49,18 @@ interface BookingsTableProps {
 
 const BookingsTable = ({ filters }: BookingsTableProps) => {
   const navigate = useNavigate();
+  
+  // Dialog states
+  const [detailsDrawerOpen, setDetailsDrawerOpen] = useState(false);
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [assignVehicleDialogOpen, setAssignVehicleDialogOpen] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState<{
+    id: string;
+    number: string;
+    vehicleId: string | null;
+    startDate: string;
+    endDate: string;
+  } | null>(null);
 
   const { data: bookings, isLoading } = useQuery({
     queryKey: ['instant-bookings', filters],
@@ -297,27 +314,69 @@ const BookingsTable = ({ filters }: BookingsTableProps) => {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => navigate(`/reservations/${booking.id}`)}>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setSelectedBooking({
+                              id: booking.id,
+                              number: booking.ro_number,
+                              vehicleId: booking.vehicle_id,
+                              startDate: booking.start_datetime,
+                              endDate: booking.end_datetime,
+                            });
+                            setDetailsDrawerOpen(true);
+                          }}
+                        >
                           <Eye className="h-4 w-4 mr-2" />
                           View Details
                         </DropdownMenuItem>
-                        {!(booking as any).down_payment_paid && booking.status === 'pending' && (
-                          <DropdownMenuItem>
-                            <CreditCard className="h-4 w-4 mr-2" />
-                            Process Payment
+                        
+                        {!booking.vehicle_id && booking.status !== 'cancelled' && (
+                          <DropdownMenuItem
+                            onClick={() => {
+                              setSelectedBooking({
+                                id: booking.id,
+                                number: booking.ro_number,
+                                vehicleId: booking.vehicle_id,
+                                startDate: booking.start_datetime,
+                                endDate: booking.end_datetime,
+                              });
+                              setAssignVehicleDialogOpen(true);
+                            }}
+                          >
+                            <Car className="h-4 w-4 mr-2" />
+                            Assign Vehicle
                           </DropdownMenuItem>
                         )}
-                        {booking.status === 'confirmed' && !booking.converted_agreement_id && (
-                          <DropdownMenuItem>
+                        
+                        {booking.converted_agreement_id && (
+                          <DropdownMenuItem
+                            onClick={() => navigate(`/agreements/${booking.converted_agreement_id}`)}
+                          >
                             <FileText className="h-4 w-4 mr-2" />
-                            Convert to Agreement
+                            View Agreement
                           </DropdownMenuItem>
                         )}
+                        
                         {booking.status !== 'cancelled' && booking.status !== 'completed' && (
-                          <DropdownMenuItem className="text-destructive">
-                            <XCircle className="h-4 w-4 mr-2" />
-                            Cancel Booking
-                          </DropdownMenuItem>
+                          <>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              className="text-destructive focus:text-destructive"
+                              onClick={() => {
+                                setSelectedBooking({
+                                  id: booking.id,
+                                  number: booking.ro_number,
+                                  vehicleId: booking.vehicle_id,
+                                  startDate: booking.start_datetime,
+                                  endDate: booking.end_datetime,
+                                });
+                                setCancelDialogOpen(true);
+                              }}
+                            >
+                              <XCircle className="h-4 w-4 mr-2" />
+                              Cancel Booking
+                            </DropdownMenuItem>
+                          </>
                         )}
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -328,6 +387,39 @@ const BookingsTable = ({ filters }: BookingsTableProps) => {
           </Table>
         </div>
       </CardContent>
+
+      {/* Dialogs */}
+      <BookingDetailsDrawer
+        bookingId={selectedBooking?.id || null}
+        open={detailsDrawerOpen}
+        onClose={() => {
+          setDetailsDrawerOpen(false);
+          setSelectedBooking(null);
+        }}
+      />
+      
+      <CancelBookingDialog
+        bookingId={selectedBooking?.id || null}
+        bookingNumber={selectedBooking?.number || null}
+        open={cancelDialogOpen}
+        onClose={() => {
+          setCancelDialogOpen(false);
+          setSelectedBooking(null);
+        }}
+      />
+      
+      <VehicleAssignmentDialog
+        bookingId={selectedBooking?.id || null}
+        bookingNumber={selectedBooking?.number || null}
+        currentVehicleId={selectedBooking?.vehicleId || null}
+        startDate={selectedBooking?.startDate || null}
+        endDate={selectedBooking?.endDate || null}
+        open={assignVehicleDialogOpen}
+        onClose={() => {
+          setAssignVehicleDialogOpen(false);
+          setSelectedBooking(null);
+        }}
+      />
     </Card>
   );
 };
