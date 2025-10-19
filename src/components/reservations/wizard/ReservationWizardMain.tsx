@@ -350,6 +350,15 @@ const ReservationWizardContent: React.FC = () => {
         if (!wizardData.totalAmount || wizardData.totalAmount <= 0) {
           errors.totalAmount = 'Total amount must be greater than zero';
         }
+        // Validate that all lines have calculated pricing
+        if (wizardData.reservationLines && wizardData.reservationLines.length > 0) {
+          const linesWithZeroTotal = wizardData.reservationLines.filter(
+            line => !line.lineTotal || line.lineTotal <= 0
+          );
+          if (linesWithZeroTotal.length > 0) {
+            errors.linePricing = `${linesWithZeroTotal.length} line(s) have zero or missing pricing. Please go back to Step 6 to ensure rates are properly configured.`;
+          }
+        }
         // Edge case: Verify payment amounts add up
         if (wizardData.totalAmount && wizardData.downPaymentAmount && wizardData.balanceDue) {
           const calculatedBalance = wizardData.totalAmount - wizardData.downPaymentAmount;

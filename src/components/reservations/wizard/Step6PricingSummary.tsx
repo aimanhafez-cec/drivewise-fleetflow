@@ -173,6 +173,17 @@ export const Step6PricingSummary: React.FC = () => {
         </p>
       </div>
 
+      {/* Validation: Check for lines with zero pricing */}
+      {wizardData.reservationLines.some(line => !line.lineTotal || line.lineTotal <= 0) && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            <strong>Pricing Issue Detected:</strong> Some reservation lines have zero or missing pricing.
+            Please go back to Step 6 and ensure a valid price list with rates is selected.
+          </AlertDescription>
+        </Alert>
+      )}
+
       {/* Line-by-Line Breakdown */}
       {detailedPricing.lineDetails.length > 0 && (
         <Card className="border-border/50">

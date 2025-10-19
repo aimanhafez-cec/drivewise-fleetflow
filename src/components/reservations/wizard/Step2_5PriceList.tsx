@@ -8,6 +8,8 @@ import { DollarSign, Clock, Calendar, TrendingUp, AlertCircle, CheckCircle } fro
 import { formatCurrency } from '@/lib/utils/currency';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
+import { usePricingContext, calculateLinePrice } from '@/hooks/usePricingContext';
+import type { ReservationLine } from './ReservationWizardContext';
 
 export const Step2_5PriceList: React.FC = () => {
   const { wizardData, updateWizardData } = useReservationWizard();
@@ -49,6 +51,75 @@ export const Step2_5PriceList: React.FC = () => {
     (wizardData.weeklyRate && wizardData.weeklyRate > 0) || 
     (wizardData.monthlyRate && wizardData.monthlyRate > 0);
 
+  // Create pricing context for recalculation
+  const pricingContext = usePricingContext({
+    priceListId: wizardData.priceListId,
+    promotionCode: '',
+    hourlyRate: wizardData.hourlyRate,
+    dailyRate: wizardData.dailyRate,
+    weeklyRate: wizardData.weeklyRate,
+    monthlyRate: wizardData.monthlyRate,
+    kilometerCharge: wizardData.kilometerCharge,
+    dailyKilometerAllowed: wizardData.dailyKilometerAllowed,
+  });
+
+  // Recalculate all reservation lines when rates change
+  useEffect(() => {
+    if (!hasValidRates || !wizardData.reservationLines || wizardData.reservationLines.length === 0) {
+      return;
+    }
+
+    console.log('🔄 Recalculating line pricing after price list change...', {
+      priceListId: wizardData.priceListId,
+      lineCount: wizardData.reservationLines.length,
+      rates: {
+        hourly: wizardData.hourlyRate,
+        daily: wizardData.dailyRate,
+        weekly: wizardData.weeklyRate,
+        monthly: wizardData.monthlyRate,
+      },
+    });
+
+    const updatedLines = wizardData.reservationLines.map((line) => {
+      const checkOutDate = new Date(`${line.checkOutDate}T${line.checkOutTime}`);
+      const checkInDate = new Date(`${line.checkInDate}T${line.checkInTime}`);
+      
+      const { lineNetPrice } = calculateLinePrice(pricingContext, checkOutDate, checkInDate);
+      
+      // Calculate add-ons and driver fees
+      const lineAddOns = Object.values(line.addOnPrices).reduce((sum, price) => sum + price, 0);
+      const lineDriverFees = line.drivers.reduce((sum, driver) => sum + (driver.fee || 0), 0);
+      
+      const updatedLine: ReservationLine = {
+        ...line,
+        baseRate: lineNetPrice,
+        lineNet: lineNetPrice + lineAddOns + lineDriverFees,
+        taxValue: 0,
+        lineTotal: lineNetPrice + lineAddOns + lineDriverFees,
+      };
+
+      console.log(`  ✓ Line ${line.lineNo} recalculated:`, {
+        baseRate: lineNetPrice,
+        addOns: lineAddOns,
+        driverFees: lineDriverFees,
+        lineTotal: updatedLine.lineTotal,
+      });
+
+      return updatedLine;
+    });
+
+    updateWizardData({ reservationLines: updatedLines });
+  }, [
+    wizardData.priceListId,
+    wizardData.hourlyRate,
+    wizardData.dailyRate,
+    wizardData.weeklyRate,
+    wizardData.monthlyRate,
+    wizardData.kilometerCharge,
+    wizardData.dailyKilometerAllowed,
+    hasValidRates,
+  ]);
+
   return (
     <div className="space-y-6">
       <div>
@@ -73,6 +144,11 @@ export const Step2_5PriceList: React.FC = () => {
           <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
           <AlertDescription className="text-green-900 dark:text-green-100">
             <strong>Rates loaded successfully.</strong> Your pricing is configured and ready for line calculations.
+            {wizardData.reservationLines && wizardData.reservationLines.length > 0 && (
+              <span className="block mt-1">
+                ✓ {wizardData.reservationLines.length} reservation line{wizardData.reservationLines.length > 1 ? 's' : ''} automatically recalculated with new rates.
+              </span>
+            )}
           </AlertDescription>
         </Alert>
       )}
