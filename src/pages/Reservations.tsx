@@ -86,55 +86,51 @@ const Reservations = () => {
   const { data: kpiData } = useQuery({
     queryKey: ['reservations-kpis'],
     queryFn: async () => {
-      const today = new Date();
-      const weekStart = startOfWeek(today);
-      const weekEnd = endOfWeek(today);
-
-      // Total open reservations
-      const { count: totalCount } = await supabase
+      // Fetch all reservations for calculations
+      const { data: allReservations, error } = await supabase
         .from('reservations')
-        .select('id', { count: 'exact', head: true })
-        .is('converted_agreement_id', null)
-        .neq('status', 'cancelled');
-
-      // Pending payments amount
-      const { data: pendingPayments } = await supabase
-        .from('reservations')
-        .select('down_payment_amount')
-        .in('down_payment_status', ['pending', 'partial'])
+        .select('*')
         .is('converted_agreement_id', null);
 
-      const pendingTotal = pendingPayments?.reduce(
-        (sum, r) => sum + (r.down_payment_amount || 0),
-        0
-      ) || 0;
+      if (error) throw error;
 
-      // Today's pickups
-      const { count: todayCount } = await supabase
-        .from('reservations')
-        .select('id', { count: 'exact', head: true })
-        .gte('start_datetime', startOfDay(today).toISOString())
-        .lte('start_datetime', endOfDay(today).toISOString())
-        .eq('down_payment_status', 'paid');
+      const reservations = allReservations || [];
+      const total = reservations.length;
+      const confirmed = reservations.filter(r => r.status === 'confirmed').length;
+      const pending = reservations.filter(r => r.status === 'pending').length;
+      const cancelled = reservations.filter(r => r.status === 'cancelled').length;
+      const completed = reservations.filter(r => r.status === 'completed').length;
 
-      // This week's revenue
-      const { data: weekReservations } = await supabase
-        .from('reservations')
-        .select('total_amount')
-        .gte('created_at', weekStart.toISOString())
-        .lte('created_at', weekEnd.toISOString())
-        .is('converted_agreement_id', null);
+      const totalRevenue = reservations.reduce((sum, r) => 
+        sum + (Number(r.total_amount) || 0), 0);
 
-      const weekRevenue = weekReservations?.reduce(
-        (sum, r) => sum + (r.total_amount || 0),
-        0
-      ) || 0;
+      const averageBookingValue = total > 0 ? totalRevenue / total : 0;
+      const conversionRate = total > 0 ? (confirmed / total) * 100 : 0;
+
+      // Calculate average days to confirm
+      const confirmedReservations = reservations.filter(r => 
+        r.status === 'confirmed' && r.updated_at && r.created_at
+      );
+      
+      const avgDaysToConfirm = confirmedReservations.length > 0
+        ? confirmedReservations.reduce((sum, r) => {
+            const created = new Date(r.created_at).getTime();
+            const updated = new Date(r.updated_at).getTime();
+            const days = (updated - created) / (1000 * 60 * 60 * 24);
+            return sum + days;
+          }, 0) / confirmedReservations.length
+        : 0;
 
       return {
-        totalReservations: totalCount || 0,
-        pendingPayments: pendingTotal,
-        todayPickups: todayCount || 0,
-        weekRevenue,
+        totalReservations: total,
+        confirmedReservations: confirmed,
+        pendingReservations: pending,
+        cancelledReservations: cancelled,
+        completedReservations: completed,
+        totalRevenue,
+        averageBookingValue,
+        conversionRate,
+        avgDaysToConfirm
       };
     },
   });
@@ -193,11 +189,16 @@ const Reservations = () => {
 
       {/* KPI Cards */}
       <ReservationKPICards
-        data={kpiData || {
+        metrics={kpiData || {
           totalReservations: 0,
-          pendingPayments: 0,
-          todayPickups: 0,
-          weekRevenue: 0,
+          confirmedReservations: 0,
+          pendingReservations: 0,
+          cancelledReservations: 0,
+          completedReservations: 0,
+          totalRevenue: 0,
+          averageBookingValue: 0,
+          conversionRate: 0,
+          avgDaysToConfirm: 0
         }}
         isLoading={!kpiData}
       />

@@ -1,79 +1,118 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Calendar, DollarSign, Clock, CheckCircle } from 'lucide-react';
-import { formatCurrency } from '@/lib/utils';
+import { Calendar, CheckCircle, Clock, DollarSign, XCircle, TrendingUp, Package } from 'lucide-react';
+import { formatCurrency } from '@/lib/utils/currency';
 
-interface KPIData {
+export interface ReservationMetrics {
   totalReservations: number;
-  pendingPayments: number;
-  todayPickups: number;
-  weekRevenue: number;
+  confirmedReservations: number;
+  pendingReservations: number;
+  cancelledReservations: number;
+  completedReservations: number;
+  totalRevenue: number;
+  averageBookingValue: number;
+  conversionRate: number;
+  avgDaysToConfirm: number;
 }
 
 interface ReservationKPICardsProps {
-  data: KPIData;
+  metrics: ReservationMetrics;
   isLoading?: boolean;
 }
 
-export const ReservationKPICards: React.FC<ReservationKPICardsProps> = ({
-  data,
-  isLoading,
+export const ReservationKPICards: React.FC<ReservationKPICardsProps> = ({ 
+  metrics, 
+  isLoading 
 }) => {
+  if (isLoading) {
+    return (
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {[...Array(8)].map((_, i) => (
+          <Card key={i}>
+            <CardContent className="p-6">
+              <div className="h-6 bg-muted rounded animate-pulse mb-2"></div>
+              <div className="h-8 bg-muted rounded animate-pulse"></div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    );
+  }
+
   const kpis = [
     {
-      title: 'Open Reservations',
-      value: data.totalReservations.toString(),
-      subtitle: 'Active bookings',
+      title: 'Total Reservations',
+      value: metrics.totalReservations,
       icon: Calendar,
-      iconColor: 'text-blue-600',
-      bgColor: 'bg-blue-50 dark:bg-blue-950',
+      description: 'All bookings',
     },
     {
-      title: 'Pending Payments',
-      value: formatCurrency(data.pendingPayments),
-      subtitle: 'Awaiting collection',
-      icon: DollarSign,
-      iconColor: 'text-amber-600',
-      bgColor: 'bg-amber-50 dark:bg-amber-950',
-    },
-    {
-      title: "Today's Pickups",
-      value: data.todayPickups.toString(),
-      subtitle: 'Ready for handover',
+      title: 'Confirmed',
+      value: metrics.confirmedReservations,
       icon: CheckCircle,
-      iconColor: 'text-emerald-600',
-      bgColor: 'bg-emerald-50 dark:bg-emerald-950',
+      description: 'Ready to proceed',
+      trend: metrics.totalReservations > 0 
+        ? `${((metrics.confirmedReservations / metrics.totalReservations) * 100).toFixed(1)}%`
+        : '0%'
     },
     {
-      title: "This Week's Revenue",
-      value: formatCurrency(data.weekRevenue),
-      subtitle: 'From reservations',
+      title: 'Pending',
+      value: metrics.pendingReservations,
       icon: Clock,
-      iconColor: 'text-purple-600',
-      bgColor: 'bg-purple-50 dark:bg-purple-950',
+      description: 'Awaiting confirmation',
+      trend: metrics.totalReservations > 0 
+        ? `${((metrics.pendingReservations / metrics.totalReservations) * 100).toFixed(1)}%`
+        : '0%'
+    },
+    {
+      title: 'Total Revenue',
+      value: formatCurrency(metrics.totalRevenue),
+      icon: DollarSign,
+      description: 'From all reservations',
+    },
+    {
+      title: 'Average Booking Value',
+      value: formatCurrency(metrics.averageBookingValue),
+      icon: TrendingUp,
+      description: 'Per reservation',
+    },
+    {
+      title: 'Conversion Rate',
+      value: `${metrics.conversionRate.toFixed(1)}%`,
+      icon: Package,
+      description: 'Confirmed / Total',
+    },
+    {
+      title: 'Completed',
+      value: metrics.completedReservations,
+      icon: CheckCircle,
+      description: 'Successfully finished',
+    },
+    {
+      title: 'Cancelled',
+      value: metrics.cancelledReservations,
+      icon: XCircle,
+      description: 'Cancelled bookings',
+      trend: metrics.totalReservations > 0 
+        ? `${((metrics.cancelledReservations / metrics.totalReservations) * 100).toFixed(1)}%`
+        : '0%'
     },
   ];
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      {kpis.map((kpi) => (
-        <Card
-          key={kpi.title}
-          className="border-border/50 hover:shadow-md transition-shadow"
-        >
+      {kpis.map((kpi, index) => (
+        <Card key={index}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              {kpi.title}
-            </CardTitle>
-            <div className={`rounded-full p-2 ${kpi.bgColor}`}>
-              <kpi.icon className={`h-4 w-4 ${kpi.iconColor}`} />
-            </div>
+            <CardTitle className="text-sm font-medium">{kpi.title}</CardTitle>
+            <kpi.icon className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {isLoading ? '...' : kpi.value}
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">{kpi.subtitle}</p>
+            <div className="text-2xl font-bold">{kpi.value}</div>
+            <p className="text-xs text-muted-foreground mt-1">
+              {kpi.description}
+              {kpi.trend && <span className="ml-2 text-primary">({kpi.trend})</span>}
+            </p>
           </CardContent>
         </Card>
       ))}
