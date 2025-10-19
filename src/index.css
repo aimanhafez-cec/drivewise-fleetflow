@@ -75,7 +75,12 @@
   .sidebar,
   .navigation,
   .train-stop-stepper,
-  .wizard-progress {
+  .wizard-progress,
+  /* Hide Lovable badge and any iframes during print */
+  iframe,
+  [id*="lovable"],
+  [class*="lovable"],
+  a[href*="lovable"] {
     display: none !important;
   }
   
