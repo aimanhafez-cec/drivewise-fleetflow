@@ -24,7 +24,7 @@ const CustomerIdentification = ({ selectedCustomerId, onCustomerSelect }: Custom
       const { data, error } = await supabase
         .from('customers')
         .select('*')
-        .or(`full_name.ilike.%${searchTerm}%,phone.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%,tax_id.ilike.%${searchTerm}%`)
+        .or(`full_name.ilike.%${searchTerm}%,phone.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%,national_id.ilike.%${searchTerm}%,passport_number.ilike.%${searchTerm}%`)
         .limit(10);
       
       if (error) throw error;
@@ -63,7 +63,7 @@ const CustomerIdentification = ({ selectedCustomerId, onCustomerSelect }: Custom
       <div className="relative">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
         <Input
-          placeholder="Search by name, phone, email, or Emirates ID..."
+          placeholder="Search by name, phone, email, Emirates ID, or passport..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="pl-10 text-base h-12"
