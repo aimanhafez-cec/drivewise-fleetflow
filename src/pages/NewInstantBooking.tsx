@@ -10,8 +10,9 @@ import DatesLocations from '@/components/instant-booking/wizard/DatesLocations';
 import VehicleSelection from '@/components/instant-booking/wizard/VehicleSelection';
 import ServicesAddOns from '@/components/instant-booking/wizard/ServicesAddOns';
 import PricingSummary from '@/components/instant-booking/wizard/PricingSummary';
-import DownPaymentForm from '@/components/instant-booking/wizard/DownPaymentForm';
+import DemoPayment from '@/components/instant-booking/DemoPayment';
 import WizardBookingConfirmation from '@/components/instant-booking/wizard/WizardBookingConfirmation';
+import { useInstantBooking } from '@/hooks/useInstantBooking';
 
 export interface BookingWizardData {
   // Step 1: Reservation Type
@@ -54,11 +55,17 @@ export interface BookingWizardData {
   // Step 7: Payment
   paymentMethod: string;
   paymentTransactionId?: string;
+  
+  // Step 8: Created Agreement
+  agreementNo?: string;
+  agreementId?: string;
 }
 
 const NewInstantBooking = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
+  const { createInstantBooking } = useInstantBooking();
+  const [isCreatingBooking, setIsCreatingBooking] = useState(false);
   const [bookingData, setBookingData] = useState<BookingWizardData>({
     reservationType: null,
     customerId: '',
@@ -138,6 +145,39 @@ const NewInstantBooking = () => {
   const handleCancel = () => {
     if (window.confirm('Are you sure you want to cancel? All progress will be lost.')) {
       navigate('/instant-booking');
+    }
+  };
+
+  const handlePaymentComplete = async () => {
+    setIsCreatingBooking(true);
+    
+    try {
+      // Create the booking and agreement
+      const result = await createInstantBooking({
+        pickupDate: `${bookingData.pickupDate}T${bookingData.pickupTime}`,
+        returnDate: `${bookingData.returnDate}T${bookingData.returnTime}`,
+        pickupLocation: bookingData.pickupLocation,
+        returnLocation: bookingData.returnLocation,
+        vehicleId: bookingData.specificVehicleId || '',
+        customerId: bookingData.customerId,
+        customerType: bookingData.customerType,
+        selectedAddOns: bookingData.selectedAddOns,
+        addOnCharges: bookingData.addOnCharges,
+        pricing: bookingData.pricing,
+      });
+
+      // Update booking data with agreement details
+      updateBookingData({
+        agreementNo: result.agreementNo,
+        agreementId: result.agreement.id,
+      });
+
+      // Move to confirmation step
+      setCurrentStep(8);
+    } catch (error) {
+      console.error('Booking creation failed:', error);
+    } finally {
+      setIsCreatingBooking(false);
     }
   };
 
@@ -258,13 +298,20 @@ const NewInstantBooking = () => {
                   />
                 )}
                 
-                {currentStep === 7 && bookingData.pricing && (
-                  <DownPaymentForm
+                {currentStep === 7 && bookingData.pricing && !isCreatingBooking && (
+                  <DemoPayment
                     amount={bookingData.pricing.downPaymentRequired}
-                    onPaymentComplete={(transactionId) => 
-                      updateBookingData({ paymentTransactionId: transactionId })
-                    }
+                    agreementNo="Pending..."
+                    onPaymentComplete={handlePaymentComplete}
                   />
+                )}
+                
+                {isCreatingBooking && (
+                  <div className="text-center py-12">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold text-foreground mb-2">Creating Your Booking...</h3>
+                    <p className="text-muted-foreground">Please wait while we finalize your agreement</p>
+                  </div>
                 )}
                 
                 {currentStep === 8 && (

@@ -1,7 +1,8 @@
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle, Calendar, MapPin, Car, User, CreditCard, Download, Mail, MessageSquare, Printer } from 'lucide-react';
+import { CheckCircle, Calendar, MapPin, Car, User, CreditCard, Download, Mail, MessageSquare, Printer, Eye } from 'lucide-react';
 import type { BookingWizardData } from '@/pages/NewInstantBooking';
 import { format } from 'date-fns';
 
@@ -11,7 +12,7 @@ interface WizardBookingConfirmationProps {
 }
 
 const WizardBookingConfirmation = ({ bookingData, onComplete }: WizardBookingConfirmationProps) => {
-  const bookingReference = `RES-${Date.now().toString().substr(-6)}`;
+  const navigate = useNavigate();
 
   return (
     <div className="space-y-6">
@@ -25,12 +26,12 @@ const WizardBookingConfirmation = ({ bookingData, onComplete }: WizardBookingCon
         <div>
           <h2 className="text-3xl font-bold text-foreground mb-2">Booking Confirmed!</h2>
           <p className="text-muted-foreground">
-            Your instant booking has been successfully created
+            Your instant booking and agreement have been successfully created
           </p>
         </div>
         <div className="flex justify-center">
-          <Badge className="bg-primary text-primary-foreground text-lg px-6 py-2">
-            {bookingReference}
+          <Badge className="bg-emerald-600 text-white text-lg px-6 py-2">
+            Agreement: {bookingData.agreementNo || 'Processing...'}
           </Badge>
         </div>
       </div>
@@ -174,17 +175,19 @@ const WizardBookingConfirmation = ({ bookingData, onComplete }: WizardBookingCon
 
       {/* Action Buttons */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {bookingData.agreementId && (
+          <Button 
+            variant="default" 
+            className="gap-2 md:col-span-2"
+            onClick={() => navigate(`/agreements/${bookingData.agreementId}`)}
+          >
+            <Eye className="h-4 w-4" />
+            View Agreement
+          </Button>
+        )}
         <Button variant="outline" className="gap-2">
           <Mail className="h-4 w-4" />
           Email
-        </Button>
-        <Button variant="outline" className="gap-2">
-          <MessageSquare className="h-4 w-4" />
-          SMS
-        </Button>
-        <Button variant="outline" className="gap-2">
-          <Printer className="h-4 w-4" />
-          Print
         </Button>
         <Button variant="outline" className="gap-2">
           <Download className="h-4 w-4" />
@@ -194,7 +197,7 @@ const WizardBookingConfirmation = ({ bookingData, onComplete }: WizardBookingCon
 
       {/* Complete Button */}
       <div className="flex justify-center pt-4">
-        <Button size="lg" onClick={onComplete} className="px-12">
+        <Button size="lg" onClick={onComplete} className="px-12" variant="outline">
           Return to Dashboard
         </Button>
       </div>
