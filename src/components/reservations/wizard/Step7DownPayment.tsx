@@ -4,16 +4,22 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Separator } from '@/components/ui/separator';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   CreditCard,
   Banknote,
   Building,
   FileText,
   CheckCircle,
+  Shield,
+  DollarSign,
+  Receipt,
 } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils/currency';
 import { useReservationWizard } from './ReservationWizardContext';
 import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const paymentMethods = [
   {
@@ -49,6 +55,15 @@ const paymentMethods = [
 export const Step7DownPayment: React.FC = () => {
   const { wizardData, updateWizardData } = useReservationWizard();
   const [paymentCompleted, setPaymentCompleted] = useState(false);
+  const [collectSecurityDeposit, setCollectSecurityDeposit] = useState(false);
+  const [collectAdvancePayment, setCollectAdvancePayment] = useState(false);
+  
+  // Default security deposit amount (can be customized)
+  const defaultSecurityDeposit = 1000;
+  const securityDepositAmount = collectSecurityDeposit ? wizardData.securityDepositPaid || defaultSecurityDeposit : 0;
+  const advancePaymentAmount = collectAdvancePayment ? wizardData.advancePayment || 0 : 0;
+  
+  const totalCollected = wizardData.downPaymentAmount + securityDepositAmount + advancePaymentAmount;
 
   const handlePaymentMethodSelect = (method: string) => {
     updateWizardData({ paymentMethod: method });
@@ -66,30 +81,214 @@ export const Step7DownPayment: React.FC = () => {
     (m) => m.id === wizardData.paymentMethod
   );
 
+  const handleSecurityDepositChange = (checked: boolean) => {
+    setCollectSecurityDeposit(checked);
+    if (checked) {
+      updateWizardData({ securityDepositPaid: defaultSecurityDeposit });
+    } else {
+      updateWizardData({ securityDepositPaid: 0 });
+    }
+  };
+
+  const handleSecurityDepositAmountChange = (amount: string) => {
+    const numAmount = parseFloat(amount) || 0;
+    updateWizardData({ securityDepositPaid: numAmount });
+  };
+
+  const handleAdvancePaymentChange = (checked: boolean) => {
+    setCollectAdvancePayment(checked);
+    if (!checked) {
+      updateWizardData({ advancePayment: 0 });
+    }
+  };
+
+  const handleAdvancePaymentAmountChange = (amount: string) => {
+    const numAmount = parseFloat(amount) || 0;
+    updateWizardData({ advancePayment: numAmount });
+  };
+
   return (
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold text-foreground mb-2">
-          Down Payment Collection
+          Payment & Deposits Collection
         </h2>
         <p className="text-muted-foreground">
-          Collect the mandatory down payment to secure this reservation
+          Collect down payment and optional deposits to secure this reservation
         </p>
       </div>
 
-      {/* Payment Amount Display */}
+      {/* Payment Summary Card */}
       <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
-        <CardContent className="p-6">
-          <div className="text-center">
-            <p className="text-sm font-medium text-muted-foreground mb-2">
-              Down Payment Amount
-            </p>
-            <p className="text-4xl font-bold text-primary mb-2">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Receipt className="h-5 w-5" />
+            Payment Summary
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Down Payment */}
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-semibold">Down Payment</p>
+              <p className="text-xs text-muted-foreground">Required • 30% of total</p>
+            </div>
+            <Badge className="bg-primary text-primary-foreground px-3 py-1">
               {formatCurrency(wizardData.downPaymentAmount)}
-            </p>
-            <Badge className="bg-primary text-primary-foreground">
-              30% of Total
             </Badge>
+          </div>
+
+          {/* Security Deposit */}
+          {collectSecurityDeposit && (
+            <>
+              <Separator />
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-semibold">Security Deposit</p>
+                  <p className="text-xs text-muted-foreground">Refundable</p>
+                </div>
+                <span className="font-mono font-semibold">
+                  {formatCurrency(securityDepositAmount)}
+                </span>
+              </div>
+            </>
+          )}
+
+          {/* Advance Payment */}
+          {collectAdvancePayment && advancePaymentAmount > 0 && (
+            <>
+              <Separator />
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-semibold">Advance Payment</p>
+                  <p className="text-xs text-muted-foreground">Towards balance</p>
+                </div>
+                <span className="font-mono font-semibold">
+                  {formatCurrency(advancePaymentAmount)}
+                </span>
+              </div>
+            </>
+          )}
+
+          <Separator className="border-t-2" />
+
+          {/* Total to Collect */}
+          <div className="flex items-center justify-between">
+            <p className="text-lg font-bold">Total to Collect Now</p>
+            <p className="text-2xl font-bold text-primary font-mono">
+              {formatCurrency(totalCollected)}
+            </p>
+          </div>
+
+          {/* Remaining Balance */}
+          <Alert>
+            <DollarSign className="h-4 w-4" />
+            <AlertDescription>
+              <strong>Remaining Balance:</strong>{' '}
+              {formatCurrency(Math.max(0, wizardData.balanceDue - advancePaymentAmount))}{' '}
+              due at pickup
+            </AlertDescription>
+          </Alert>
+        </CardContent>
+      </Card>
+
+      {/* Optional Deposits Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Shield className="h-5 w-5" />
+            Optional Deposits & Advance Payment
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Security Deposit */}
+          <div className="space-y-3">
+            <div className="flex items-start gap-3">
+              <Checkbox
+                id="security-deposit"
+                checked={collectSecurityDeposit}
+                onCheckedChange={handleSecurityDepositChange}
+              />
+              <div className="flex-1">
+                <Label
+                  htmlFor="security-deposit"
+                  className="font-semibold cursor-pointer"
+                >
+                  Collect Security Deposit
+                </Label>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Refundable deposit held against damages or excess charges
+                </p>
+              </div>
+            </div>
+
+            {collectSecurityDeposit && (
+              <div className="ml-6 space-y-2">
+                <Label htmlFor="security-amount">Deposit Amount</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="security-amount"
+                    type="number"
+                    min="0"
+                    step="50"
+                    value={securityDepositAmount}
+                    onChange={(e) => handleSecurityDepositAmountChange(e.target.value)}
+                    className="font-mono"
+                  />
+                  <Badge variant="outline" className="px-3 whitespace-nowrap">
+                    AED
+                  </Badge>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <Separator />
+
+          {/* Advance Payment */}
+          <div className="space-y-3">
+            <div className="flex items-start gap-3">
+              <Checkbox
+                id="advance-payment"
+                checked={collectAdvancePayment}
+                onCheckedChange={handleAdvancePaymentChange}
+              />
+              <div className="flex-1">
+                <Label
+                  htmlFor="advance-payment"
+                  className="font-semibold cursor-pointer"
+                >
+                  Collect Advance Payment
+                </Label>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Additional payment towards the final balance
+                </p>
+              </div>
+            </div>
+
+            {collectAdvancePayment && (
+              <div className="ml-6 space-y-2">
+                <Label htmlFor="advance-amount">Advance Amount</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="advance-amount"
+                    type="number"
+                    min="0"
+                    step="100"
+                    max={wizardData.balanceDue}
+                    value={advancePaymentAmount}
+                    onChange={(e) => handleAdvancePaymentAmountChange(e.target.value)}
+                    className="font-mono"
+                  />
+                  <Badge variant="outline" className="px-3 whitespace-nowrap">
+                    AED
+                  </Badge>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Maximum: {formatCurrency(wizardData.balanceDue)}
+                </p>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -220,6 +419,60 @@ export const Step7DownPayment: React.FC = () => {
         </Card>
       )}
 
+      {/* Security Deposit Payment Method (if different) */}
+      {collectSecurityDeposit && wizardData.paymentMethod && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Security Deposit Payment Method</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="deposit-payment-method">
+                Payment Method (Optional - defaults to same as down payment)
+              </Label>
+              <RadioGroup
+                value={wizardData.depositPaymentMethod || wizardData.paymentMethod}
+                onValueChange={(value) =>
+                  updateWizardData({ depositPaymentMethod: value })
+                }
+              >
+                <div className="grid grid-cols-2 gap-2">
+                  {paymentMethods.map((method) => (
+                    <div key={method.id} className="flex items-center gap-2">
+                      <RadioGroupItem value={method.id} id={`dep-${method.id}`} />
+                      <Label
+                        htmlFor={`dep-${method.id}`}
+                        className="text-sm cursor-pointer"
+                      >
+                        {method.name}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+              </RadioGroup>
+            </div>
+
+            {(!paymentMethods.find(
+              (m) => m.id === (wizardData.depositPaymentMethod || wizardData.paymentMethod)
+            )?.requiresOnline) && (
+              <div className="space-y-2">
+                <Label htmlFor="deposit-transaction-id">
+                  Deposit Receipt / Transaction ID
+                </Label>
+                <Input
+                  id="deposit-transaction-id"
+                  placeholder="Receipt number for security deposit"
+                  value={wizardData.depositTransactionId || ''}
+                  onChange={(e) =>
+                    updateWizardData({ depositTransactionId: e.target.value })
+                  }
+                />
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
       {/* Payment Confirmation Status */}
       {(paymentCompleted ||
         (wizardData.paymentMethod &&
@@ -231,14 +484,41 @@ export const Step7DownPayment: React.FC = () => {
               <div className="p-2 rounded-full bg-emerald-500">
                 <CheckCircle className="h-6 w-6 text-white" />
               </div>
-              <div>
+              <div className="flex-1">
                 <p className="font-semibold text-emerald-900 dark:text-emerald-100">
-                  Payment Recorded
+                  Payment Recorded Successfully
                 </p>
-                <p className="text-sm text-emerald-700 dark:text-emerald-300">
-                  Down payment of {formatCurrency(wizardData.downPaymentAmount)}{' '}
-                  has been recorded successfully
-                </p>
+                <div className="text-sm text-emerald-700 dark:text-emerald-300 mt-2 space-y-1">
+                  <div className="flex justify-between">
+                    <span>Down Payment:</span>
+                    <span className="font-mono font-semibold">
+                      {formatCurrency(wizardData.downPaymentAmount)}
+                    </span>
+                  </div>
+                  {collectSecurityDeposit && (
+                    <div className="flex justify-between">
+                      <span>Security Deposit:</span>
+                      <span className="font-mono font-semibold">
+                        {formatCurrency(securityDepositAmount)}
+                      </span>
+                    </div>
+                  )}
+                  {collectAdvancePayment && advancePaymentAmount > 0 && (
+                    <div className="flex justify-between">
+                      <span>Advance Payment:</span>
+                      <span className="font-mono font-semibold">
+                        {formatCurrency(advancePaymentAmount)}
+                      </span>
+                    </div>
+                  )}
+                  <Separator className="my-2" />
+                  <div className="flex justify-between font-bold text-base">
+                    <span>Total Collected:</span>
+                    <span className="font-mono">
+                      {formatCurrency(totalCollected)}
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
           </CardContent>
