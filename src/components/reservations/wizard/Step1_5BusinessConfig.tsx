@@ -30,7 +30,7 @@ export const Step1_5BusinessConfig: React.FC = () => {
         <CardContent className="space-y-4">
           {/* Reservation Method */}
           <div className="space-y-2">
-            <Label htmlFor="reservationMethod">
+            <Label htmlFor="reservationMethodId">
               Reservation Method <span className="text-destructive">*</span>
             </Label>
             <ReservationMethodSelect
@@ -41,7 +41,7 @@ export const Step1_5BusinessConfig: React.FC = () => {
 
           {/* Business Unit */}
           <div className="space-y-2">
-            <Label htmlFor="businessUnit">
+            <Label htmlFor="businessUnitId">
               Business Unit <span className="text-destructive">*</span>
             </Label>
             <BusinessUnitSelect
@@ -52,7 +52,7 @@ export const Step1_5BusinessConfig: React.FC = () => {
 
           {/* Payment Terms */}
           <div className="space-y-2">
-            <Label htmlFor="paymentTerms">
+            <Label htmlFor="paymentTermsId">
               Payment Terms <span className="text-destructive">*</span>
             </Label>
             <PaymentTermsSelect

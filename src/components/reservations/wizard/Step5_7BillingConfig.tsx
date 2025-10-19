@@ -125,7 +125,7 @@ export const Step5_7BillingConfig: React.FC = () => {
           <div className="grid grid-cols-2 gap-4">
             {/* Tax Level */}
             <div className="space-y-2">
-              <Label htmlFor="taxLevel">
+              <Label htmlFor="taxLevelId">
                 Tax Level <span className="text-destructive">*</span>
               </Label>
               <TaxLevelSelect
@@ -136,7 +136,7 @@ export const Step5_7BillingConfig: React.FC = () => {
 
             {/* Tax Code */}
             <div className="space-y-2">
-              <Label htmlFor="taxCode">
+              <Label htmlFor="taxCodeId">
                 Tax Code <span className="text-destructive">*</span>
               </Label>
               <TaxCodeSelect

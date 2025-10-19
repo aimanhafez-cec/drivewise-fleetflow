@@ -26,6 +26,8 @@ import { Step7DownPayment } from './Step7DownPayment';
 import { Step7_5ReferralNotes } from './Step7_5ReferralNotes';
 import { Step8Confirmation } from './Step8Confirmation';
 import { useReservationDataConsistency } from '@/hooks/useReservationDataConsistency';
+import { validateReservation, validateHeader } from '@/lib/validation/reservationSchema';
+import { ValidationErrorBanner } from '@/components/ui/validation-error-banner';
 
 const wizardSteps = [
   { number: 1, title: 'Reservation Type', description: 'Select booking type' },
@@ -50,11 +52,24 @@ const ReservationWizardContent: React.FC = () => {
   const queryClient = useQueryClient();
   const { currentStep, wizardData, nextStep, prevStep, resetWizard, updateWizardData } =
     useReservationWizard();
-  const { validateBeforeSubmission, ensureDataIntegrity } = useReservationDataConsistency();
-  const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  const { validateBeforeSubmission, ensureDataIntegrity, checkDataConsistency } = useReservationDataConsistency();
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
   const createReservationMutation = useMutation({
     mutationFn: async () => {
+      // Run comprehensive validation
+      const validationResult = validateReservation(wizardData);
+      if (!validationResult.success) {
+        const errorMessages = validationResult.errors.map(e => e.message).join(', ');
+        throw new Error(`Validation failed: ${errorMessages}`);
+      }
+
+      // Check data consistency
+      const { isConsistent, issues } = checkDataConsistency(wizardData);
+      if (!isConsistent) {
+        throw new Error(`Data consistency issues: ${issues.join(', ')}`);
+      }
+
       // Validate before submission
       if (!validateBeforeSubmission(wizardData)) {
         throw new Error('Data validation failed');
@@ -125,30 +140,120 @@ const ReservationWizardContent: React.FC = () => {
     },
   });
 
-  const canProceed = () => {
+  const validateCurrentStep = () => {
+    const errors: Record<string, string> = {};
+
     switch (currentStep) {
-      case 1: return !!wizardData.reservationType;
-      case 2: return !!(wizardData.businessUnitId && wizardData.paymentTermsId);
-      case 3: return !!wizardData.customerId;
-      case 4: return !!wizardData.priceListId;
-      case 5: return !!(wizardData.pickupDate && wizardData.returnDate && wizardData.pickupLocation);
-      case 6: return !!wizardData.reservationLines?.length;
-      case 10: return !!(wizardData.billToType && wizardData.taxLevelId && wizardData.taxCodeId);
-      case 12: return !!(wizardData.paymentMethod && wizardData.downPaymentAmount);
-      default: return true;
+      case 1: // Reservation Type
+        if (!wizardData.reservationType) {
+          errors.reservationType = 'Please select a reservation type';
+        }
+        break;
+      
+      case 2: // Business Config
+        if (!wizardData.businessUnitId) {
+          errors.businessUnitId = 'Business unit is required';
+        }
+        if (!wizardData.reservationMethodId) {
+          errors.reservationMethodId = 'Reservation method is required';
+        }
+        break;
+      
+      case 3: // Customer
+        if (!wizardData.customerId) {
+          errors.customerId = 'Customer selection is required';
+        }
+        break;
+      
+      case 4: // Price List
+        if (!wizardData.priceListId) {
+          errors.priceListId = 'Price list selection is required';
+        }
+        break;
+      
+      case 5: // Dates & Locations
+        if (!wizardData.pickupDate) {
+          errors.pickupDate = 'Pickup date is required';
+        }
+        if (!wizardData.pickupTime) {
+          errors.pickupTime = 'Pickup time is required';
+        }
+        if (!wizardData.returnDate) {
+          errors.returnDate = 'Return date is required';
+        }
+        if (!wizardData.returnTime) {
+          errors.returnTime = 'Return time is required';
+        }
+        if (!wizardData.pickupLocation) {
+          errors.pickupLocation = 'Pickup location is required';
+        }
+        if (!wizardData.returnLocation) {
+          errors.returnLocation = 'Return location is required';
+        }
+        
+        // Date consistency check
+        if (wizardData.pickupDate && wizardData.returnDate && wizardData.pickupTime && wizardData.returnTime) {
+          const pickup = new Date(`${wizardData.pickupDate}T${wizardData.pickupTime}`);
+          const returnDate = new Date(`${wizardData.returnDate}T${wizardData.returnTime}`);
+          if (pickup >= returnDate) {
+            errors.dateRange = 'Return date/time must be after pickup date/time';
+          }
+        }
+        break;
+      
+      case 6: // Vehicle Lines
+        if (!wizardData.reservationLines || wizardData.reservationLines.length === 0) {
+          errors.reservationLines = 'At least one vehicle line is required';
+        }
+        break;
+      
+      case 10: // Billing Config
+        if (!wizardData.billToType) {
+          errors.billToType = 'Bill to type is required';
+        }
+        if (!wizardData.taxLevelId) {
+          errors.taxLevelId = 'Tax level is required';
+        }
+        if (!wizardData.taxCodeId) {
+          errors.taxCodeId = 'Tax code is required';
+        }
+        break;
+      
+      case 12: // Payment
+        if (wizardData.downPaymentAmount && wizardData.downPaymentAmount > 0) {
+          if (!wizardData.paymentMethod) {
+            errors.paymentMethod = 'Payment method is required for down payment';
+          }
+        }
+        break;
     }
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const canProceed = () => {
+    return validateCurrentStep();
   };
 
   const handleNext = () => {
-    setValidationErrors([]);
     if (canProceed()) {
+      setValidationErrors({});
       nextStep();
     } else {
       toast({
-        title: 'Validation Error',
-        description: 'Please complete all required fields before proceeding',
+        title: 'Validation Failed',
+        description: 'Please correct the errors before proceeding',
         variant: 'destructive',
       });
+    }
+  };
+
+  const handleFieldFocus = (field: string) => {
+    const element = document.getElementById(field);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      element.focus();
     }
   };
 
@@ -176,15 +281,12 @@ const ReservationWizardContent: React.FC = () => {
     <div className="min-h-screen bg-background">
       <WizardProgress currentStep={currentStep} totalSteps={14} steps={wizardSteps} />
       <div className="max-w-6xl mx-auto px-4 py-8">
-        {validationErrors.length > 0 && (
-          <Alert variant="destructive" className="mb-6">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              {validationErrors.map((err, idx) => (
-                <div key={idx}>{err}</div>
-              ))}
-            </AlertDescription>
-          </Alert>
+        {Object.keys(validationErrors).length > 0 && (
+          <ValidationErrorBanner
+            errors={validationErrors}
+            onDismiss={() => setValidationErrors({})}
+            onFieldFocus={handleFieldFocus}
+          />
         )}
         <div className="mb-8">{renderStep()}</div>
         <div className="flex items-center justify-between mt-8 pt-6 border-t">
