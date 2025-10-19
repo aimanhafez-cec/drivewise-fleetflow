@@ -131,6 +131,39 @@ export const Step6PricingSummary: React.FC = () => {
     });
   }, [detailedPricing, updateWizardData]);
 
+  // Update each reservation line with its calculated pricing
+  useEffect(() => {
+    const updatedLines = wizardData.reservationLines.map((line) => {
+      const lineDetail = detailedPricing.lineDetails.find(ld => ld.lineNo === line.lineNo);
+      if (!lineDetail) return line;
+      
+      // Only update if values have changed to avoid infinite loops
+      const needsUpdate = 
+        line.baseRate !== lineDetail.baseRate ||
+        line.lineNet !== lineDetail.lineTotal ||
+        line.lineTotal !== lineDetail.lineTotal;
+      
+      if (!needsUpdate) return line;
+      
+      return {
+        ...line,
+        baseRate: lineDetail.baseRate,
+        lineNet: lineDetail.lineTotal,
+        taxValue: 0, // VAT calculated at total level, not per line
+        lineTotal: lineDetail.lineTotal,
+      };
+    });
+    
+    // Only update if at least one line changed
+    const hasChanges = updatedLines.some((line, idx) => 
+      line !== wizardData.reservationLines[idx]
+    );
+    
+    if (hasChanges) {
+      updateWizardData({ reservationLines: updatedLines });
+    }
+  }, [detailedPricing.lineDetails, wizardData.reservationLines, updateWizardData]);
+
   return (
     <div className="space-y-6">
       <div>
