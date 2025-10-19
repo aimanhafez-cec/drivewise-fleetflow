@@ -47,6 +47,7 @@ import MasterAgreements from "./pages/MasterAgreements";
 import MasterAgreementDetails from "./pages/MasterAgreementDetails";
 import NewMasterAgreement from "./pages/NewMasterAgreement";
 import MasterAgreementEdit from "./pages/MasterAgreementEdit";
+import ReservationWizardRoadmap from "./pages/ReservationWizardRoadmap";
 // Hidden - commented out imports
 // import { CarSubscriptions } from "./pages/CarSubscriptions";
 // import { NewCarSubscription } from "./pages/NewCarSubscription";
@@ -93,6 +94,7 @@ const App = () => {
                   <Route path="new" element={<NewReservationWizard />} />
                   <Route path="new-legacy" element={<NewReservation />} />
                   <Route path="new-multi" element={<ReservationsMulti />} />
+                  <Route path="wizard-roadmap" element={<ReservationWizardRoadmap />} />
                   <Route path=":id" element={<ReservationDetailsPage />} />
                 </Route>
               <Route path="/vehicles" element={
