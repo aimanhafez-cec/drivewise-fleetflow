@@ -254,9 +254,9 @@ export const ReservationWizardProvider: React.FC<{ children: ReactNode }> = ({
     setWizardData((prev) => ({ ...prev, ...updates }));
   };
 
-  const nextStep = () => setCurrentStep((prev) => Math.min(prev + 1, 8));
+  const nextStep = () => setCurrentStep((prev) => Math.min(prev + 1, 14));
   const prevStep = () => setCurrentStep((prev) => Math.max(prev - 1, 1));
-  const goToStep = (step: number) => setCurrentStep(Math.max(1, Math.min(step, 8)));
+  const goToStep = (step: number) => setCurrentStep(Math.max(1, Math.min(step, 14)));
   
   const resetWizard = () => {
     setCurrentStep(1);
