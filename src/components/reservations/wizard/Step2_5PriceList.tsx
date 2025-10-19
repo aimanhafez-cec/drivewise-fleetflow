@@ -4,8 +4,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { PriceListSelect } from '@/components/ui/select-components';
-import { DollarSign, Clock, Calendar, TrendingUp } from 'lucide-react';
+import { DollarSign, Clock, Calendar, TrendingUp, AlertCircle, CheckCircle } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils/currency';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
 
 export const Step2_5PriceList: React.FC = () => {
   const { wizardData, updateWizardData } = useReservationWizard();
@@ -24,6 +26,12 @@ export const Step2_5PriceList: React.FC = () => {
 
       const rates = mockRates[wizardData.priceListId as keyof typeof mockRates] || mockRates.standard;
       
+      console.log('💵 Price List Loaded:', {
+        priceListId: wizardData.priceListId,
+        rates,
+        timestamp: new Date().toISOString(),
+      });
+      
       updateWizardData({
         hourlyRate: rates.hourly,
         dailyRate: rates.daily,
@@ -35,6 +43,12 @@ export const Step2_5PriceList: React.FC = () => {
     }
   }, [wizardData.priceListId]);
 
+  // Check if we have valid rates
+  const hasValidRates = 
+    (wizardData.dailyRate && wizardData.dailyRate > 0) || 
+    (wizardData.weeklyRate && wizardData.weeklyRate > 0) || 
+    (wizardData.monthlyRate && wizardData.monthlyRate > 0);
+
   return (
     <div className="space-y-6">
       <div>
@@ -43,6 +57,25 @@ export const Step2_5PriceList: React.FC = () => {
           Select a price list or customize rates for this reservation
         </p>
       </div>
+
+      {/* Validation Alert */}
+      {wizardData.priceListId && !hasValidRates && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            <strong>No valid rates configured.</strong> Please ensure at least one rate (daily, weekly, or monthly) is set before proceeding.
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {wizardData.priceListId && hasValidRates && (
+        <Alert className="bg-green-50 dark:bg-green-950 border-green-200 dark:border-green-800">
+          <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+          <AlertDescription className="text-green-900 dark:text-green-100">
+            <strong>Rates loaded successfully.</strong> Your pricing is configured and ready for line calculations.
+          </AlertDescription>
+        </Alert>
+      )}
 
       <Card>
         <CardHeader>
@@ -160,15 +193,38 @@ export const Step2_5PriceList: React.FC = () => {
               {/* Rate Summary */}
               <Card className="bg-primary/5 border-primary/20">
                 <CardContent className="p-4">
-                  <h4 className="font-semibold mb-2">Rate Summary</h4>
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="font-semibold">Rate Summary</h4>
+                    {hasValidRates ? (
+                      <Badge variant="outline" className="bg-green-50 dark:bg-green-950 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800">
+                        ✓ Valid
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline" className="bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800">
+                        ⚠ No Rates
+                      </Badge>
+                    )}
+                  </div>
                   <div className="grid grid-cols-2 gap-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Daily:</span>
-                      <span className="font-medium">{formatCurrency(wizardData.dailyRate)}</span>
+                      <span className="text-muted-foreground">Hourly:</span>
+                      <span className="font-medium">{formatCurrency(wizardData.hourlyRate || 0)}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">KM/day:</span>
-                      <span className="font-medium">{wizardData.dailyKilometerAllowed} km</span>
+                      <span className="text-muted-foreground">Daily:</span>
+                      <span className="font-medium">{formatCurrency(wizardData.dailyRate || 0)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Weekly:</span>
+                      <span className="font-medium">{formatCurrency(wizardData.weeklyRate || 0)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Monthly:</span>
+                      <span className="font-medium">{formatCurrency(wizardData.monthlyRate || 0)}</span>
+                    </div>
+                    <div className="flex justify-between col-span-2">
+                      <span className="text-muted-foreground">Daily KM Allowance:</span>
+                      <span className="font-medium">{wizardData.dailyKilometerAllowed || 0} km</span>
                     </div>
                   </div>
                 </CardContent>
