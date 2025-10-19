@@ -9,7 +9,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Plus, Trash2, Star, UserPlus, Edit, Calendar, Check, ChevronsUpDown, CheckCircle2, XCircle } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Plus, Trash2, Star, UserPlus, Edit, Calendar, Check, ChevronsUpDown, CheckCircle2, XCircle, Filter } from 'lucide-react';
 import { useDrivers } from '@/hooks/useDrivers';
 import { useAgreementDrivers, useAssignDriver, useRemoveDriver, useUpdateDriverAssignment } from '@/hooks/useAgreementDrivers';
 import { EnhancedDriverForm } from '@/components/drivers/EnhancedDriverForm';
@@ -33,6 +34,7 @@ export const MasterAgreementStep5Drivers: React.FC<MasterAgreementStep5DriversPr
   const [editDriverId, setEditDriverId] = useState<string | null>(null);
   const [searchByLine, setSearchByLine] = useState<Record<string, string>>({});
   const [comboboxOpenByLine, setComboboxOpenByLine] = useState<Record<string, boolean>>({});
+  const [filterStatus, setFilterStatus] = useState<'all' | 'assigned' | 'unassigned'>('all');
 
   const { items: allDrivers, isLoading: isSearchingDrivers } = useDrivers('', true);
   const { data: agreementDrivers = [] } = useAgreementDrivers(data.id);
@@ -82,6 +84,14 @@ export const MasterAgreementStep5Drivers: React.FC<MasterAgreementStep5DriversPr
     agreementDrivers.some(ad => ad.line_id === line.id)
   ).length;
   const linesWithoutDrivers = vehicleLines.length - linesWithDrivers;
+
+  // Filter vehicle lines based on selected status
+  const filteredVehicleLines = vehicleLines.filter(line => {
+    const hasDrivers = agreementDrivers.some(ad => ad.line_id === line.id);
+    if (filterStatus === 'assigned') return hasDrivers;
+    if (filterStatus === 'unassigned') return !hasDrivers;
+    return true; // 'all'
+  });
 
   const handleAssignDriver = async (lineId: string, driverId: string) => {
     if (!data.id) return;
@@ -186,10 +196,28 @@ export const MasterAgreementStep5Drivers: React.FC<MasterAgreementStep5DriversPr
         </Card>
       )}
 
+      {/* Filter Bar */}
+      {vehicleLines.length > 0 && (
+        <div className="flex items-center gap-3">
+          <Filter className="h-4 w-4 text-muted-foreground" />
+          <span className="text-sm font-medium">Filter:</span>
+          <Select value={filterStatus} onValueChange={(value: any) => setFilterStatus(value)}>
+            <SelectTrigger className="w-[200px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Vehicles ({vehicleLines.length})</SelectItem>
+              <SelectItem value="assigned">Assigned Only ({linesWithDrivers})</SelectItem>
+              <SelectItem value="unassigned">Unassigned Only ({linesWithoutDrivers})</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+
       {/* Inline Driver Assignment by Line */}
       {vehicleLines.length > 0 ? (
         <div className="space-y-4">
-          {vehicleLines.map((line, index) => {
+          {filteredVehicleLines.map((line, index) => {
             const lineDrivers = getDriversForLine(line.id);
             const filteredDrivers = getFilteredDrivers(line.id);
             const isComboboxOpen = comboboxOpenByLine[line.id] || false;
@@ -197,11 +225,24 @@ export const MasterAgreementStep5Drivers: React.FC<MasterAgreementStep5DriversPr
             return (
               <Card key={line.id}>
                 <CardHeader className="pb-2">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <CardTitle className="text-base">
-                        Line {line.line_number}: {line.item_description || `${line.make} ${line.model} ${line.model_year}`}
-                      </CardTitle>
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <CardTitle className="text-base">
+                          Line {line.line_number}: {line.item_description || `${line.make} ${line.model} ${line.model_year}`}
+                        </CardTitle>
+                        {lineDrivers.length > 0 ? (
+                          <Badge className="bg-green-500 hover:bg-green-600 gap-1">
+                            <CheckCircle2 className="h-3 w-3" />
+                            Assigned
+                          </Badge>
+                        ) : (
+                          <Badge variant="destructive" className="gap-1">
+                            <XCircle className="h-3 w-3" />
+                            Unassigned
+                          </Badge>
+                        )}
+                      </div>
                       <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
                         <span>{line.contract_no}</span>
                         {line.category_name && (
@@ -343,6 +384,15 @@ export const MasterAgreementStep5Drivers: React.FC<MasterAgreementStep5DriversPr
               </Card>
             );
           })}
+          {filteredVehicleLines.length === 0 && vehicleLines.length > 0 && (
+            <Card>
+              <CardContent className="pt-6">
+                <p className="text-muted-foreground text-center">
+                  No {filterStatus} vehicles found.
+                </p>
+              </CardContent>
+            </Card>
+          )}
         </div>
       ) : (
         <Card>
