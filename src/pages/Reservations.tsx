@@ -1,115 +1,143 @@
 import React, { useState } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Plus, Calendar, Car, User, Clock, FileText } from 'lucide-react';
+import { Plus, Calendar, FileText, Download } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
-import { format } from 'date-fns';
-import { ReservationSearch, SearchFilters } from '@/components/reservations/ReservationSearch';
 import { ConvertToAgreementPreCheck } from '@/components/agreements/ConvertToAgreementPreCheck';
-import { formatCurrency } from '@/lib/utils';
+import { ReservationFilters, ReservationFilterState } from '@/components/reservations/ReservationFilters';
+import { ReservationKPICards } from '@/components/reservations/ReservationKPICards';
+import { ReservationCard } from '@/components/reservations/ReservationCard';
+import { startOfDay, endOfDay, startOfWeek, endOfWeek } from 'date-fns';
 
 const Reservations = () => {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
-  const [searchFilters, setSearchFilters] = useState<SearchFilters>({});
-  const [convertModal, setConvertModal] = useState<{ open: boolean; reservation?: any }>({ open: false });
+  const [filters, setFilters] = useState<ReservationFilterState>({});
+  const [convertModal, setConvertModal] = useState<{ open: boolean; reservation?: any }>({ 
+    open: false 
+  });
 
-  // Fetch open reservations (not converted/cancelled) with search filters
-  const { data: reservations, isLoading, error } = useQuery({
-    queryKey: ['reservations:open', searchFilters],
+  // Fetch reservations with filters
+  const { data: reservations, isLoading } = useQuery({
+    queryKey: ['reservations', filters],
     queryFn: async () => {
-      console.log('Fetching reservations with filters:', searchFilters);
-      
       let query = supabase
         .from('reservations')
         .select(`
           *,
           profiles:customer_id (
             full_name,
-            email
+            email,
+            phone
           ),
-          vehicles (
+          vehicles:vehicle_id (
             make,
             model,
-            license_plate
+            license_plate,
+            vin
+          ),
+          categories:vehicle_class_id (
+            name,
+            description
           )
         `)
-        .in('status', searchFilters.status ? [searchFilters.status as any] : ['pending', 'confirmed', 'checked_out'])
-        .is('converted_agreement_id', null);
+        .is('converted_agreement_id', null)
+        .neq('status', 'cancelled');
 
-      // Apply search filter
-      if (searchFilters.query) {
-        query = query.or(`profiles.full_name.ilike.%${searchFilters.query}%,id.ilike.%${searchFilters.query}%`);
+      // Apply filters
+      if (filters.search) {
+        query = query.or(
+          `profiles.full_name.ilike.%${filters.search}%,` +
+          `profiles.phone.ilike.%${filters.search}%,` +
+          `ro_number.ilike.%${filters.search}%`
+        );
       }
 
-      // Apply date filters
-      if (searchFilters.dateFrom) {
-        query = query.gte('start_datetime', searchFilters.dateFrom);
+      if (filters.reservationType) {
+        query = query.eq('reservation_type', filters.reservationType);
       }
-      if (searchFilters.dateTo) {
-        query = query.lte('end_datetime', searchFilters.dateTo);
+
+      if (filters.paymentStatus) {
+        query = query.eq('down_payment_status', filters.paymentStatus);
+      }
+
+      if (filters.status) {
+        query = query.eq('status', filters.status as any);
+      }
+
+      if (filters.dateFrom) {
+        query = query.gte('start_datetime', startOfDay(filters.dateFrom).toISOString());
+      }
+
+      if (filters.dateTo) {
+        query = query.lte('start_datetime', endOfDay(filters.dateTo).toISOString());
       }
 
       const { data, error } = await query.order('created_at', { ascending: false });
 
-      console.log('Reservations query result:', { data, error });
-      if (error) {
-        console.error('Reservations query error:', error);
-        throw error;
-      }
-      return data;
+      if (error) throw error;
+      return data || [];
     },
   });
 
-  // Get counts for summary cards
-  const { data: counts } = useQuery({
-    queryKey: ['reservations:counts'],
+  // Fetch KPI data
+  const { data: kpiData } = useQuery({
+    queryKey: ['reservations-kpis'],
     queryFn: async () => {
-      const [totalQuery, checkedOutQuery, pendingQuery] = await Promise.all([
-        supabase
-          .from('reservations')
-          .select('id', { count: 'exact' })
-          .in('status', ['pending', 'confirmed', 'checked_out'])
-          .is('converted_agreement_id', null),
-        supabase
-          .from('reservations')
-          .select('id', { count: 'exact' })
-          .eq('status', 'confirmed')
-          .is('converted_agreement_id', null),
-        supabase
-          .from('reservations')
-          .select('id', { count: 'exact' })
-          .eq('status', 'pending')
-          .is('converted_agreement_id', null),
-      ]);
+      const today = new Date();
+      const weekStart = startOfWeek(today);
+      const weekEnd = endOfWeek(today);
+
+      // Total open reservations
+      const { count: totalCount } = await supabase
+        .from('reservations')
+        .select('id', { count: 'exact', head: true })
+        .is('converted_agreement_id', null)
+        .neq('status', 'cancelled');
+
+      // Pending payments amount
+      const { data: pendingPayments } = await supabase
+        .from('reservations')
+        .select('down_payment_amount')
+        .in('down_payment_status', ['pending', 'partial'])
+        .is('converted_agreement_id', null);
+
+      const pendingTotal = pendingPayments?.reduce(
+        (sum, r) => sum + (r.down_payment_amount || 0),
+        0
+      ) || 0;
+
+      // Today's pickups
+      const { count: todayCount } = await supabase
+        .from('reservations')
+        .select('id', { count: 'exact', head: true })
+        .gte('start_datetime', startOfDay(today).toISOString())
+        .lte('start_datetime', endOfDay(today).toISOString())
+        .eq('down_payment_status', 'paid');
+
+      // This week's revenue
+      const { data: weekReservations } = await supabase
+        .from('reservations')
+        .select('total_amount')
+        .gte('created_at', weekStart.toISOString())
+        .lte('created_at', weekEnd.toISOString())
+        .is('converted_agreement_id', null);
+
+      const weekRevenue = weekReservations?.reduce(
+        (sum, r) => sum + (r.total_amount || 0),
+        0
+      ) || 0;
 
       return {
-        total: totalQuery.count || 0,
-        confirmed: checkedOutQuery.count || 0,
-        pending: pendingQuery.count || 0,
+        totalReservations: totalCount || 0,
+        pendingPayments: pendingTotal,
+        todayPickups: todayCount || 0,
+        weekRevenue,
       };
     },
   });
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'confirmed':
-        return 'bg-blue-100 text-blue-800';
-      case 'checked_out':
-        return 'bg-green-100 text-green-800';
-      case 'completed':
-        return 'bg-gray-100 text-gray-800';
-      case 'cancelled':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
 
   const handleConvertToAgreement = (reservation: any) => {
     setConvertModal({ open: true, reservation });
@@ -118,209 +146,109 @@ const Reservations = () => {
   const handleConfirmConvert = () => {
     if (convertModal.reservation) {
       setConvertModal({ open: false });
-      // Navigate to agreement wizard
       navigate(`/agreements/new?fromReservation=${convertModal.reservation.id}`);
     }
   };
 
+  const handleClearFilters = () => {
+    setFilters({});
+  };
+
   if (isLoading) {
     return (
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <div>
-            <Skeleton className="h-8 w-48" />
-            <Skeleton className="h-4 w-72 mt-2" />
-          </div>
-          <div className="flex gap-2">
-            <Skeleton className="h-10 w-32" />
-            <Skeleton className="h-10 w-24" />
-          </div>
-        </div>
-        <div className="grid gap-4 md:grid-cols-4">
+      <div className="space-y-6 p-6">
+        <Skeleton className="h-12 w-full" />
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {[...Array(4)].map((_, i) => (
-            <Skeleton key={i} className="h-24 w-full" />
+            <Skeleton key={i} className="h-32 w-full" />
           ))}
         </div>
         <Skeleton className="h-96 w-full" />
       </div>
     );
   }
-  return <div className="space-y-4 sm:space-y-6 w-full min-w-0">
-      <div className="flex flex-col gap-4 sm:gap-0 sm:flex-row items-start sm:items-center justify-between">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">Open Reservations</h1>
-            <p className="text-muted-foreground text-sm sm:text-base">
-              Manage active customer reservations and bookings
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-2 w-full sm:w-auto">
-            <Button id="btn-new-reservation" onClick={() => navigate('/reservations/new')} size="sm" className="min-h-[44px] px-3">
-              <Plus className="mr-2 h-4 w-4" />
-              <span className="hidden sm:inline">New Reservation</span>
-              <span className="sm:hidden">New</span>
-            </Button>
-            
-            <Button variant="outline" onClick={() => navigate('/daily-planner')} size="sm" className="min-h-[44px] px-3">
-              <Calendar className="mr-2 h-4 w-4" />
-              <span className="hidden sm:inline">Planner</span>
-            </Button>
-            
-            <Button variant="outline" onClick={() => navigate('/agreements')} size="sm" className="min-h-[44px] px-3">
-              <FileText className="mr-2 h-4 w-4" />
-              <span className="hidden sm:inline">Agreements</span>
-            </Button>
-          </div>
+
+  return (
+    <div className="space-y-6 p-6">
+      {/* Header */}
+      <div className="flex flex-col gap-4 sm:flex-row items-start sm:items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Reservations</h1>
+          <p className="text-muted-foreground">
+            Manage reservations, payments, and agreements
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Button onClick={() => navigate('/reservations/new')} size="sm">
+            <Plus className="mr-2 h-4 w-4" />
+            New Reservation
+          </Button>
+          <Button variant="outline" onClick={() => navigate('/daily-planner')} size="sm">
+            <Calendar className="mr-2 h-4 w-4" />
+            Planner
+          </Button>
+          <Button variant="outline" onClick={() => navigate('/agreements')} size="sm">
+            <FileText className="mr-2 h-4 w-4" />
+            Agreements
+          </Button>
+          <Button variant="outline" size="sm">
+            <Download className="mr-2 h-4 w-4" />
+            Export
+          </Button>
+        </div>
       </div>
 
-      {/* Search & Filters */}
-      <ReservationSearch 
-        onSearch={setSearchFilters}
-        isLoading={isLoading}
+      {/* KPI Cards */}
+      <ReservationKPICards
+        data={kpiData || {
+          totalReservations: 0,
+          pendingPayments: 0,
+          todayPickups: 0,
+          weekRevenue: 0,
+        }}
+        isLoading={!kpiData}
       />
 
-      {/* Summary Cards */}
-      <div className="grid gap-3 sm:gap-4 grid-cols-2 md:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs sm:text-sm font-medium text-card-foreground">Open Reservations</CardTitle>
-            <Calendar className="h-4 w-4 text-card-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-xl sm:text-2xl font-bold text-card-foreground">{counts?.total || 0}</div>
-            <p className="text-xs text-muted-foreground">
-              Not yet converted
-            </p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs sm:text-sm font-medium text-card-foreground">Confirmed</CardTitle>
-            <Car className="h-4 w-4 text-card-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-xl sm:text-2xl font-bold text-card-foreground">{counts?.confirmed || 0}</div>
-            <p className="text-xs text-muted-foreground">
-              Ready to proceed
-            </p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs sm:text-sm font-medium text-card-foreground">Pending</CardTitle>
-            <Clock className="h-4 w-4 text-card-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-xl sm:text-2xl font-bold text-card-foreground">{counts?.pending || 0}</div>
-            <p className="text-xs text-muted-foreground">
-              Awaiting confirmation
-            </p>
-          </CardContent>
-        </Card>
-        
-        <Card className="col-span-2 md:col-span-1">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs sm:text-sm font-medium text-card-foreground">Revenue</CardTitle>
-            <Calendar className="h-4 w-4 text-card-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-xl sm:text-2xl font-bold text-card-foreground">
-              {formatCurrency(reservations?.reduce((sum, r) => sum + (r.total_amount || 0), 0) || 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              From open reservations
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Filters */}
+      <ReservationFilters
+        filters={filters}
+        onFiltersChange={setFilters}
+        onClear={handleClearFilters}
+      />
 
       {/* Reservations List */}
-      <Card>
+      <Card className="border-border/50">
         <CardHeader>
-          <CardTitle className="text-card-foreground">Open Reservations</CardTitle>
-          <CardDescription className="text-card-foreground">
-            Active reservations that haven't been converted to agreements
+          <CardTitle>Open Reservations</CardTitle>
+          <CardDescription>
+            {reservations?.length || 0} active reservation(s) found
           </CardDescription>
         </CardHeader>
         <CardContent>
           {reservations && reservations.length > 0 ? (
-            <div id="reservations-table" className="space-y-3 sm:space-y-4">
-              {reservations.map(reservation => (
-                <div 
-                  key={reservation.id} 
-                  className="flex flex-col gap-3 p-3 sm:p-4 border rounded-lg hover:bg-muted/50 transition-colors" 
-                >
-                  <div 
-                    className="flex items-start gap-3 cursor-pointer min-w-0 flex-1"
-                    onClick={() => navigate(`/reservations/${reservation.id}`)}
-                  >
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 shrink-0">
-                      <User className="h-5 w-5 text-card-foreground" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium leading-none truncate text-card-foreground">
-                        {reservation.profiles?.full_name || 'Unknown Customer'}
-                      </p>
-                      <p className="text-xs sm:text-sm text-muted-foreground truncate mt-1">
-                        {reservation.vehicles ? 
-                          `${reservation.vehicles.make} ${reservation.vehicles.model}` : 
-                          'No vehicle assigned'
-                        }
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm">
-                      <div>
-                        <span className="font-medium text-card-foreground">
-                          {reservation.start_datetime && reservation.end_datetime ? (
-                            <>
-                              {format(new Date(reservation.start_datetime), 'MMM dd')} - {format(new Date(reservation.end_datetime), 'MMM dd, yyyy')}
-                            </>
-                          ) : (
-                            'Dates TBD'
-                          )}
-                        </span>
-                      </div>
-                      <div className="text-muted-foreground">
-                        {formatCurrency(reservation.total_amount || 0)}
-                      </div>
-                    </div>
-                    
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full sm:w-auto">
-                      <Badge className={getStatusColor(reservation.status)}>
-                        {reservation.status}
-                      </Badge>
-                      <Button
-                        id={`btn-convert-agreement-${reservation.id}`}
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleConvertToAgreement(reservation);
-                        }}
-                        className="w-full sm:w-auto min-h-[44px] px-3"
-                      >
-                        <span className="hidden sm:inline">Convert to Agreement</span>
-                        <span className="sm:hidden">Convert</span>
-                      </Button>
-                    </div>
-                  </div>
-                </div>
+            <div className="grid gap-4 md:grid-cols-2">
+              {reservations.map((reservation) => (
+                <ReservationCard
+                  key={reservation.id}
+                  reservation={reservation}
+                  onConvertToAgreement={handleConvertToAgreement}
+                  onCollectPayment={(res) => {
+                    // TODO: Open payment collection dialog
+                    console.log('Collect payment for:', res.id);
+                  }}
+                />
               ))}
             </div>
           ) : (
-            <div className="text-center py-8 sm:py-12">
+            <div className="text-center py-12">
               <Calendar className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold text-card-foreground mb-2">No open reservations</h3>
-              <p className="text-muted-foreground text-sm sm:text-base mb-4">
-                Create your first reservation to get started.
+              <h3 className="text-lg font-semibold mb-2">No reservations found</h3>
+              <p className="text-muted-foreground mb-4">
+                {Object.values(filters).some(v => v)
+                  ? 'Try adjusting your filters'
+                  : 'Create your first reservation to get started'}
               </p>
-              <Button 
-                className="min-h-[44px] px-4"
-                onClick={() => navigate('/reservations/new')}
-              >
+              <Button onClick={() => navigate('/reservations/new')}>
                 <Plus className="mr-2 h-4 w-4" />
                 New Reservation
               </Button>
@@ -333,11 +261,15 @@ const Reservations = () => {
       {convertModal.reservation && (
         <ConvertToAgreementPreCheck
           open={convertModal.open}
-          onOpenChange={(open) => setConvertModal({ open, reservation: open ? convertModal.reservation : undefined })}
+          onOpenChange={(open) =>
+            setConvertModal({ open, reservation: open ? convertModal.reservation : undefined })
+          }
           onConfirm={handleConfirmConvert}
           reservation={convertModal.reservation}
         />
       )}
-    </div>;
+    </div>
+  );
 };
+
 export default Reservations;
