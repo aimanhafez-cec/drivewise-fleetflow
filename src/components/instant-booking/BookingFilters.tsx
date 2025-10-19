@@ -99,12 +99,12 @@ const BookingFilters = ({ filters, onFilterChange }: BookingFiltersProps) => {
 
         {/* Location Filter (Second Row) */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mt-4">
-          <Select value={filters.location} onValueChange={(value) => onFilterChange('location', value)}>
+          <Select value={filters.location || 'all'} onValueChange={(value) => onFilterChange('location', value === 'all' ? '' : value)}>
             <SelectTrigger className="lg:col-span-2">
               <SelectValue placeholder="Pickup Location" />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="">All Locations</SelectItem>
+            <SelectContent className="bg-popover z-50">
+              <SelectItem value="all">All Locations</SelectItem>
               <SelectItem value="Dubai Airport Terminal 1">Dubai Airport T1</SelectItem>
               <SelectItem value="Dubai Airport Terminal 2">Dubai Airport T2</SelectItem>
               <SelectItem value="Dubai Airport Terminal 3">Dubai Airport T3</SelectItem>
