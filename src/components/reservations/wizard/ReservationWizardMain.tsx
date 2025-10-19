@@ -71,6 +71,18 @@ const ReservationWizardContent: React.FC = () => {
   const createReservationMutation = useMutation({
     mutationFn: async () => {
       try {
+        // Validate all steps before submission
+        const { isValid, invalidSteps } = validateAllSteps();
+        if (!isValid) {
+          const stepNames = invalidSteps
+            .map((step) => wizardSteps.find((s) => s.number === step)?.title)
+            .filter(Boolean)
+            .join(', ');
+          throw new Error(
+            `Please complete all required steps. Incomplete/invalid steps: ${stepNames}`
+          );
+        }
+
         // Run comprehensive validation
         const validationResult = validateReservation(wizardData);
         if (!validationResult.success) {
@@ -457,7 +469,10 @@ const ReservationWizardContent: React.FC = () => {
       nextStep();
     } else {
       setValidationErrors(errors);
-      markStepIncomplete(currentStep);
+      // Mark as has-errors if there are validation errors, otherwise incomplete
+      updateWizardData({ 
+        [`step${currentStep}ValidationStatus`]: 'has-errors' as any 
+      });
       toast({
         title: 'Validation Failed',
         description: 'Please correct the errors before proceeding',
@@ -472,15 +487,37 @@ const ReservationWizardContent: React.FC = () => {
       return;
     }
     
-    // Allow going back to any visited or completed step
+    // Validate current step before leaving
+    const errors = validateCurrentStep();
+    if (Object.keys(errors).length > 0) {
+      // Mark current step with errors but still allow navigation
+      setValidationErrors(errors);
+      markStepIncomplete(currentStep);
+    } else {
+      // Mark as complete if no errors
+      if (currentStep < stepNumber) {
+        markStepComplete(currentStep);
+      }
+      setValidationErrors({});
+    }
+    
+    // Allow going to any visited or completed step
     if (stepNumber < currentStep || completedSteps.includes(stepNumber)) {
       goToStep(stepNumber);
       return;
     }
     
-    // Allow going to next step only if current step is valid
+    // Allow going to next step if current step is valid or just one step ahead
     if (stepNumber === currentStep + 1) {
-      handleNext();
+      if (Object.keys(errors).length === 0) {
+        goToStep(stepNumber);
+      } else {
+        toast({
+          title: 'Validation Required',
+          description: 'Please correct the errors before proceeding',
+          variant: 'destructive',
+        });
+      }
       return;
     }
     
@@ -490,6 +527,23 @@ const ReservationWizardContent: React.FC = () => {
       description: 'Please complete the previous steps first',
       variant: 'destructive',
     });
+  };
+
+  const validateAllSteps = (): { isValid: boolean; invalidSteps: number[] } => {
+    const invalidSteps: number[] = [];
+    const requiredSteps = [1, 2, 3, 4, 5, 6, 10]; // Core required steps
+    
+    requiredSteps.forEach((step) => {
+      const status = getStepStatus(step);
+      if (status === 'has-errors' || status === 'incomplete' || status === 'not-visited') {
+        invalidSteps.push(step);
+      }
+    });
+    
+    return {
+      isValid: invalidSteps.length === 0,
+      invalidSteps,
+    };
   };
 
   const handleFieldFocus = (field: string) => {
@@ -542,7 +596,21 @@ const ReservationWizardContent: React.FC = () => {
         <div className="flex items-center justify-between mt-8 pt-6 border-t">
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => { if (confirm('Cancel reservation?')) { resetWizard(); navigate('/reservations'); } }}><X className="mr-2 h-4 w-4" />Cancel</Button>
-            {currentStep > 1 && currentStep < 14 && <Button variant="outline" onClick={prevStep}><ArrowLeft className="mr-2 h-4 w-4" />Previous</Button>}
+            {currentStep > 1 && currentStep < 14 && (
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  // Save validation status of current step before going back
+                  const errors = validateCurrentStep();
+                  if (Object.keys(errors).length > 0) {
+                    markStepIncomplete(currentStep);
+                  }
+                  prevStep();
+                }}
+              >
+                <ArrowLeft className="mr-2 h-4 w-4" />Previous
+              </Button>
+            )}
           </div>
           <div className="flex gap-2">
             {currentStep < 14 && (
