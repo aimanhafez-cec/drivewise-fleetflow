@@ -1,0 +1,134 @@
+import React from 'react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Edit, Trash2, Copy } from 'lucide-react';
+import { formatCurrency } from '@/lib/utils/currency';
+import { format } from 'date-fns';
+import type { ReservationLine } from './ReservationWizardContext';
+
+interface ReservationLineTableProps {
+  lines: ReservationLine[];
+  reservationType: 'vehicle_class' | 'make_model' | 'specific_vin' | null;
+  onEdit: (lineId: string) => void;
+  onDelete: (lineId: string) => void;
+  onDuplicate: (lineId: string) => void;
+}
+
+export const ReservationLineTable: React.FC<ReservationLineTableProps> = ({
+  lines,
+  reservationType,
+  onEdit,
+  onDelete,
+  onDuplicate,
+}) => {
+  const getVehicleDisplay = (line: ReservationLine) => {
+    if (reservationType === 'vehicle_class' && line.vehicleClassId) {
+      return line.vehicleData?.name || `Class: ${line.vehicleClassId}`;
+    } else if (reservationType === 'make_model') {
+      return line.vehicleData?.makeModel || 'Make/Model';
+    } else if (reservationType === 'specific_vin' && line.vehicleId) {
+      const vehicle = line.vehicleData;
+      return vehicle ? `${vehicle.make} ${vehicle.model} (${vehicle.license_plate})` : 'Vehicle';
+    }
+    return 'Not Selected';
+  };
+
+  const getDatesDisplay = (line: ReservationLine) => {
+    if (!line.checkOutDate || !line.checkInDate) return 'Not Set';
+    try {
+      const checkOut = format(new Date(line.checkOutDate), 'MMM dd');
+      const checkIn = format(new Date(line.checkInDate), 'MMM dd');
+      return `${checkOut} → ${checkIn}`;
+    } catch {
+      return 'Invalid Date';
+    }
+  };
+
+  return (
+    <div className="rounded-md border">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-12">#</TableHead>
+            <TableHead>Vehicle</TableHead>
+            <TableHead>Dates</TableHead>
+            <TableHead>Drivers</TableHead>
+            <TableHead>Add-ons</TableHead>
+            <TableHead className="text-right">Line Total</TableHead>
+            <TableHead className="w-32 text-right">Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {lines.map((line) => (
+            <TableRow key={line.id}>
+              <TableCell className="font-medium">{line.lineNo}</TableCell>
+              <TableCell>
+                <div className="space-y-1">
+                  <div className="font-medium">{getVehicleDisplay(line)}</div>
+                  {!line.vehicleId && !line.vehicleClassId && (
+                    <Badge variant="outline" className="text-xs">
+                      Not Selected
+                    </Badge>
+                  )}
+                </div>
+              </TableCell>
+              <TableCell>
+                <div className="text-sm">{getDatesDisplay(line)}</div>
+              </TableCell>
+              <TableCell>
+                <div className="flex items-center gap-1">
+                  <Badge variant="secondary">
+                    {line.drivers?.length || 0}
+                  </Badge>
+                  {line.drivers?.length > 0 && (
+                    <span className="text-xs text-muted-foreground">
+                      driver{line.drivers.length > 1 ? 's' : ''}
+                    </span>
+                  )}
+                </div>
+              </TableCell>
+              <TableCell>
+                <Badge variant="outline">
+                  {line.selectedAddOns?.length || 0}
+                </Badge>
+              </TableCell>
+              <TableCell className="text-right font-medium">
+                {formatCurrency(line.lineTotal || 0)}
+              </TableCell>
+              <TableCell className="text-right">
+                <div className="flex items-center justify-end gap-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onEdit(line.id)}
+                    title="Edit line"
+                  >
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onDuplicate(line.id)}
+                    title="Duplicate line"
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onDelete(line.id)}
+                    className="text-destructive hover:text-destructive"
+                    title="Delete line"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  );
+};

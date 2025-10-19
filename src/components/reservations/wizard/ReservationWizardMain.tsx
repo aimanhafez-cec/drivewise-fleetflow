@@ -14,7 +14,7 @@ import { WizardProgress } from './WizardProgress';
 import ReservationTypeSelector from '@/components/instant-booking/wizard/ReservationTypeSelector';
 import CustomerIdentification from '@/components/instant-booking/wizard/CustomerIdentification';
 import DatesLocations from '@/components/instant-booking/wizard/DatesLocations';
-import { Step4SmartVehicleSelection } from './Step4SmartVehicleSelection';
+import { Step4MultiLineBuilder } from './Step4MultiLineBuilder';
 import { Step5ServicesAddOns } from './Step5ServicesAddOns';
 import { Step6PricingSummary } from './Step6PricingSummary';
 import { Step7DownPayment } from './Step7DownPayment';
@@ -142,7 +142,7 @@ const ReservationWizardContent: React.FC = () => {
       case 1: return <ReservationTypeSelector selectedType={wizardData.reservationType} onTypeSelect={(type) => updateWizardData({ reservationType: type })} />;
       case 2: return <CustomerIdentification selectedCustomerId={wizardData.customerId} onCustomerSelect={(c) => updateWizardData({ customerId: c.id, customerData: c })} />;
       case 3: return <DatesLocations data={{ pickupDate: wizardData.pickupDate, pickupTime: wizardData.pickupTime, returnDate: wizardData.returnDate, returnTime: wizardData.returnTime, pickupLocation: wizardData.pickupLocation, returnLocation: wizardData.returnLocation }} onUpdate={(u) => updateWizardData(u)} />;
-      case 4: return <Step4SmartVehicleSelection />;
+      case 4: return <Step4MultiLineBuilder />;
       case 5: return <Step5ServicesAddOns />;
       case 6: return <Step6PricingSummary />;
       case 7: return <Step7DownPayment />;
