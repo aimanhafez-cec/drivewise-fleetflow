@@ -1955,6 +1955,42 @@ export type Database = {
           },
         ]
       }
+      discount_types: {
+        Row: {
+          code: string
+          created_at: string
+          description: string | null
+          discount_type: string
+          display_order: number | null
+          id: string
+          is_active: boolean
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          description?: string | null
+          discount_type: string
+          display_order?: number | null
+          id?: string
+          is_active?: boolean
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          description?: string | null
+          discount_type?: string
+          display_order?: number | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       driver_documents: {
         Row: {
           created_at: string
@@ -2500,6 +2536,125 @@ export type Database = {
         }
         Relationships: []
       }
+      insurance_groups: {
+        Row: {
+          code: string
+          created_at: string
+          description: string | null
+          display_order: number | null
+          excess_amount: number | null
+          id: string
+          insurance_level_id: string | null
+          is_active: boolean
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          excess_amount?: number | null
+          id?: string
+          insurance_level_id?: string | null
+          is_active?: boolean
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          excess_amount?: number | null
+          id?: string
+          insurance_level_id?: string | null
+          is_active?: boolean
+          name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "insurance_groups_insurance_level_id_fkey"
+            columns: ["insurance_level_id"]
+            isOneToOne: false
+            referencedRelation: "insurance_levels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      insurance_levels: {
+        Row: {
+          code: string
+          created_at: string
+          description: string | null
+          display_order: number | null
+          id: string
+          is_active: boolean
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          is_active?: boolean
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      insurance_providers: {
+        Row: {
+          code: string
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string
+          description: string | null
+          display_order: number | null
+          id: string
+          is_active: boolean
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          is_active?: boolean
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       invoices: {
         Row: {
           agreement_id: string | null
@@ -2954,6 +3109,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      price_lists: {
+        Row: {
+          code: string
+          created_at: string
+          currency: string
+          description: string | null
+          display_order: number | null
+          effective_from: string | null
+          effective_to: string | null
+          id: string
+          is_active: boolean
+          is_default: boolean | null
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          currency?: string
+          description?: string | null
+          display_order?: number | null
+          effective_from?: string | null
+          effective_to?: string | null
+          id?: string
+          is_active?: boolean
+          is_default?: boolean | null
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          currency?: string
+          description?: string | null
+          display_order?: number | null
+          effective_from?: string | null
+          effective_to?: string | null
+          id?: string
+          is_active?: boolean
+          is_default?: boolean | null
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
@@ -3890,6 +4090,39 @@ export type Database = {
         }
         Relationships: []
       }
+      reservation_methods: {
+        Row: {
+          code: string
+          created_at: string
+          description: string | null
+          display_order: number | null
+          id: string
+          is_active: boolean
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          is_active?: boolean
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       reservation_payments: {
         Row: {
           amount: number
@@ -3953,18 +4186,29 @@ export type Database = {
       reservations: {
         Row: {
           add_ons: Json | null
+          advance_payment: number | null
           airport_info: Json | null
+          airport_pickup: boolean | null
+          airport_return: boolean | null
           airport_surcharge: number | null
           auto_approved: boolean | null
           balance_due: number | null
+          bill_to_meta: Json | null
+          bill_to_type: string | null
           billing_address: Json | null
           booking_type: Database["public"]["Enums"]["booking_type"] | null
+          business_unit_id: string | null
           converted_agreement_id: string | null
           created_at: string
           created_by: string | null
           cross_border_permits: Json | null
           customer_id: string
+          customer_notes: string | null
           darb_package: Json | null
+          deposit_payment_method: string | null
+          deposit_transaction_id: string | null
+          discount_type_id: string | null
+          discount_value: number | null
           down_payment_amount: number | null
           down_payment_method: string | null
           down_payment_paid_at: string | null
@@ -3975,40 +4219,68 @@ export type Database = {
           fuel_option: string | null
           id: string
           instant_booking_score: number | null
+          insurance_group_id: string | null
+          insurance_level_id: string | null
+          insurance_provider_id: string | null
+          internal_notes: string | null
+          lease_to_own: boolean | null
           make_model: string | null
           mileage_package: Json | null
           one_way_surcharge: number | null
+          pickup_flight_no: string | null
+          pickup_flight_time: string | null
           pickup_location: string
           po_number: string | null
+          price_list_id: string | null
           rate_plan: Json | null
           referral_code: string | null
+          referral_details: string | null
+          referral_source: string | null
+          reservation_method_id: string | null
           reservation_type: string | null
+          return_flight_no: string | null
+          return_flight_time: string | null
           return_location: string
           ro_number: string | null
           salik_package: Json | null
+          security_deposit_paid: number | null
           special_requests: string | null
           start_datetime: string
           status: Database["public"]["Enums"]["reservation_status"]
+          tax_code_id: string | null
+          tax_level_id: string | null
           taxes: Json | null
           total_amount: number | null
           updated_at: string
+          validity_date_to: string | null
           vehicle_class_id: string | null
           vehicle_id: string | null
         }
         Insert: {
           add_ons?: Json | null
+          advance_payment?: number | null
           airport_info?: Json | null
+          airport_pickup?: boolean | null
+          airport_return?: boolean | null
           airport_surcharge?: number | null
           auto_approved?: boolean | null
           balance_due?: number | null
+          bill_to_meta?: Json | null
+          bill_to_type?: string | null
           billing_address?: Json | null
           booking_type?: Database["public"]["Enums"]["booking_type"] | null
+          business_unit_id?: string | null
           converted_agreement_id?: string | null
           created_at?: string
           created_by?: string | null
           cross_border_permits?: Json | null
           customer_id: string
+          customer_notes?: string | null
           darb_package?: Json | null
+          deposit_payment_method?: string | null
+          deposit_transaction_id?: string | null
+          discount_type_id?: string | null
+          discount_value?: number | null
           down_payment_amount?: number | null
           down_payment_method?: string | null
           down_payment_paid_at?: string | null
@@ -4019,40 +4291,68 @@ export type Database = {
           fuel_option?: string | null
           id?: string
           instant_booking_score?: number | null
+          insurance_group_id?: string | null
+          insurance_level_id?: string | null
+          insurance_provider_id?: string | null
+          internal_notes?: string | null
+          lease_to_own?: boolean | null
           make_model?: string | null
           mileage_package?: Json | null
           one_way_surcharge?: number | null
+          pickup_flight_no?: string | null
+          pickup_flight_time?: string | null
           pickup_location: string
           po_number?: string | null
+          price_list_id?: string | null
           rate_plan?: Json | null
           referral_code?: string | null
+          referral_details?: string | null
+          referral_source?: string | null
+          reservation_method_id?: string | null
           reservation_type?: string | null
+          return_flight_no?: string | null
+          return_flight_time?: string | null
           return_location: string
           ro_number?: string | null
           salik_package?: Json | null
+          security_deposit_paid?: number | null
           special_requests?: string | null
           start_datetime: string
           status?: Database["public"]["Enums"]["reservation_status"]
+          tax_code_id?: string | null
+          tax_level_id?: string | null
           taxes?: Json | null
           total_amount?: number | null
           updated_at?: string
+          validity_date_to?: string | null
           vehicle_class_id?: string | null
           vehicle_id?: string | null
         }
         Update: {
           add_ons?: Json | null
+          advance_payment?: number | null
           airport_info?: Json | null
+          airport_pickup?: boolean | null
+          airport_return?: boolean | null
           airport_surcharge?: number | null
           auto_approved?: boolean | null
           balance_due?: number | null
+          bill_to_meta?: Json | null
+          bill_to_type?: string | null
           billing_address?: Json | null
           booking_type?: Database["public"]["Enums"]["booking_type"] | null
+          business_unit_id?: string | null
           converted_agreement_id?: string | null
           created_at?: string
           created_by?: string | null
           cross_border_permits?: Json | null
           customer_id?: string
+          customer_notes?: string | null
           darb_package?: Json | null
+          deposit_payment_method?: string | null
+          deposit_transaction_id?: string | null
+          discount_type_id?: string | null
+          discount_value?: number | null
           down_payment_amount?: number | null
           down_payment_method?: string | null
           down_payment_paid_at?: string | null
@@ -4063,27 +4363,51 @@ export type Database = {
           fuel_option?: string | null
           id?: string
           instant_booking_score?: number | null
+          insurance_group_id?: string | null
+          insurance_level_id?: string | null
+          insurance_provider_id?: string | null
+          internal_notes?: string | null
+          lease_to_own?: boolean | null
           make_model?: string | null
           mileage_package?: Json | null
           one_way_surcharge?: number | null
+          pickup_flight_no?: string | null
+          pickup_flight_time?: string | null
           pickup_location?: string
           po_number?: string | null
+          price_list_id?: string | null
           rate_plan?: Json | null
           referral_code?: string | null
+          referral_details?: string | null
+          referral_source?: string | null
+          reservation_method_id?: string | null
           reservation_type?: string | null
+          return_flight_no?: string | null
+          return_flight_time?: string | null
           return_location?: string
           ro_number?: string | null
           salik_package?: Json | null
+          security_deposit_paid?: number | null
           special_requests?: string | null
           start_datetime?: string
           status?: Database["public"]["Enums"]["reservation_status"]
+          tax_code_id?: string | null
+          tax_level_id?: string | null
           taxes?: Json | null
           total_amount?: number | null
           updated_at?: string
+          validity_date_to?: string | null
           vehicle_class_id?: string | null
           vehicle_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "reservations_business_unit_id_fkey"
+            columns: ["business_unit_id"]
+            isOneToOne: false
+            referencedRelation: "business_units"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "reservations_converted_agreement_id_fkey"
             columns: ["converted_agreement_id"]
@@ -4096,6 +4420,62 @@ export type Database = {
             columns: ["customer_id"]
             isOneToOne: false
             referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reservations_discount_type_id_fkey"
+            columns: ["discount_type_id"]
+            isOneToOne: false
+            referencedRelation: "discount_types"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reservations_insurance_group_id_fkey"
+            columns: ["insurance_group_id"]
+            isOneToOne: false
+            referencedRelation: "insurance_groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reservations_insurance_level_id_fkey"
+            columns: ["insurance_level_id"]
+            isOneToOne: false
+            referencedRelation: "insurance_levels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reservations_insurance_provider_id_fkey"
+            columns: ["insurance_provider_id"]
+            isOneToOne: false
+            referencedRelation: "insurance_providers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reservations_price_list_id_fkey"
+            columns: ["price_list_id"]
+            isOneToOne: false
+            referencedRelation: "price_lists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reservations_reservation_method_id_fkey"
+            columns: ["reservation_method_id"]
+            isOneToOne: false
+            referencedRelation: "reservation_methods"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reservations_tax_code_id_fkey"
+            columns: ["tax_code_id"]
+            isOneToOne: false
+            referencedRelation: "tax_codes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reservations_tax_level_id_fkey"
+            columns: ["tax_level_id"]
+            isOneToOne: false
+            referencedRelation: "tax_levels"
             referencedColumns: ["id"]
           },
           {
@@ -4890,6 +5270,86 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      tax_codes: {
+        Row: {
+          code: string
+          created_at: string
+          description: string | null
+          display_order: number | null
+          id: string
+          is_active: boolean
+          name: string
+          rate: number
+          tax_level_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          is_active?: boolean
+          name: string
+          rate?: number
+          tax_level_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          rate?: number
+          tax_level_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tax_codes_tax_level_id_fkey"
+            columns: ["tax_level_id"]
+            isOneToOne: false
+            referencedRelation: "tax_levels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tax_levels: {
+        Row: {
+          code: string
+          created_at: string
+          description: string | null
+          display_order: number | null
+          id: string
+          is_active: boolean
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          is_active?: boolean
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       ticket_attachments: {
         Row: {
