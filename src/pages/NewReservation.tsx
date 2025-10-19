@@ -37,7 +37,6 @@ import { VehicleClassSelect, LocationSelect, CustomerSelect } from '@/components
 import { usePricingContext, calculateLinePrice, PricingContext } from '@/hooks/usePricingContext';
 import { RepriceBanner } from '@/components/reservation/RepriceBanner';
 import { useFormValidation, ValidationRules } from '@/hooks/useFormValidation';
-import { useReservationValidation } from '@/hooks/useReservationValidation';
 import { BillToSelector, BillToData, BillToType, BillToMeta } from '@/components/ui/bill-to-selector';
 import { useVehicles, useVehicleCategories, formatVehicleDisplay } from '@/hooks/useVehicles';
 import { Driver } from '@/hooks/useDrivers';
@@ -468,9 +467,6 @@ const NewReservation = () => {
     }
     setLastPricingHash(pricingHash);
   }, [formData.priceListId, formData.promotionCode, formData.hourlyRate, formData.dailyRate, formData.weeklyRate, formData.monthlyRate, formData.kilometerCharge, formData.dailyKilometerAllowed, formData.reservationLines.length]);
-
-  // Use comprehensive validation system
-  const validation = useReservationValidation();
 
   // Field labels for error mapping
   const fieldLabels = {
@@ -1048,7 +1044,7 @@ const NewReservation = () => {
 
       // Handle structured validation errors from server
       if (error.status === 422 && error.errors) {
-        validation.applyServerErrors(error.errors);
+        // Server errors would be applied here
         toast({
           title: "Validation Error",
           description: "Please correct the errors highlighted below",
@@ -1133,7 +1129,7 @@ const NewReservation = () => {
         checkInLocationId: line.inLocationId
       })) || []
     };
-    validation.validateForm(validationData);
+    // Validation check here
   };
   return <div className="flex flex-col lg:flex-row gap-6 h-full white-cards-page" data-page="new-reservation">
       {/* Main Content */}
@@ -1158,9 +1154,7 @@ const NewReservation = () => {
         </div>
 
         {/* Error Summary */}
-        {validation.hasErrors && <div id="error-summary">
-            <ErrorSummary errors={validation.validationErrors} fieldLabels={fieldLabels} onFieldFocus={validation.focusField} />
-          </div>}
+        {/* Error summary would appear here */}
 
         {/* Validation Actions */}
         <div className="flex justify-between items-center">
@@ -1171,7 +1165,7 @@ const NewReservation = () => {
         </div>
 
         {/* Accordion Sections - REORDERED */}
-        <Accordion type="multiple" value={[...accordionValues, ...validation.expandedAccordions]} onValueChange={setAccordionValues} className="space-y-4">
+        <Accordion type="multiple" value={accordionValues} onValueChange={setAccordionValues} className="space-y-4">
           
           {/* 1) Rental Information */}
           <AccordionItem value="rental-info" className="border rounded-lg">
