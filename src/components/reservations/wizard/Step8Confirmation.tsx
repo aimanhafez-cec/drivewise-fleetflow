@@ -42,12 +42,13 @@ export const Step8Confirmation: React.FC = () => {
       if (reservationNoError) throw reservationNoError;
 
       // Create reservation
+      const firstLine = wizardData.reservationLines[0];
       const reservationData = {
         ro_number: reservationNoData,
         customer_id: wizardData.customerId,
         reservation_type: wizardData.reservationType,
-        vehicle_class_id: wizardData.vehicleClassId,
-        vehicle_id: wizardData.vehicleId,
+        vehicle_class_id: firstLine?.vehicleClassId,
+        vehicle_id: firstLine?.vehicleId,
         start_datetime: `${wizardData.pickupDate}T${wizardData.pickupTime}:00`,
         end_datetime: `${wizardData.returnDate}T${wizardData.returnTime}:00`,
         pickup_location: wizardData.pickupLocation,
@@ -60,8 +61,8 @@ export const Step8Confirmation: React.FC = () => {
         down_payment_paid_at: new Date().toISOString(),
         balance_due: wizardData.balanceDue,
         status: 'confirmed' as const,
-        add_ons: wizardData.selectedAddOns,
-        make_model: wizardData.makeModel,
+        add_ons: wizardData.globalAddOns,
+        make_model: firstLine?.vehicleData?.makeModel,
         special_requests: wizardData.notes,
       };
 
@@ -187,11 +188,11 @@ export const Step8Confirmation: React.FC = () => {
                 <span className="text-sm text-muted-foreground">Vehicle:</span>
                 <span className="font-medium">
                   {wizardData.reservationType === 'vehicle_class' &&
-                    wizardData.vehicleData?.name}
+                    wizardData.reservationLines[0]?.vehicleData?.name}
                   {wizardData.reservationType === 'make_model' &&
-                    wizardData.makeModel}
+                    wizardData.reservationLines[0]?.vehicleData?.makeModel}
                   {wizardData.reservationType === 'specific_vin' &&
-                    `${wizardData.vehicleData?.make} ${wizardData.vehicleData?.model}`}
+                    `${wizardData.reservationLines[0]?.vehicleData?.make} ${wizardData.reservationLines[0]?.vehicleData?.model}`}
                 </span>
               </div>
             </div>

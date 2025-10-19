@@ -23,8 +23,8 @@ export const Step6PricingSummary: React.FC = () => {
     const baseRate = durationDays * 150;
 
     // Add-ons total
-    const addOnsTotal = Object.values(wizardData.addOnPrices).reduce(
-      (sum, price) => sum + price,
+    const addOnsTotal = Object.values(wizardData.globalAddOnPrices).reduce(
+      (sum, price) => sum + (price as number),
       0
     );
 
@@ -57,7 +57,7 @@ export const Step6PricingSummary: React.FC = () => {
     wizardData.pickupTime,
     wizardData.returnDate,
     wizardData.returnTime,
-    wizardData.addOnPrices,
+    wizardData.globalAddOnPrices,
   ]);
 
   const durationDays = Math.ceil(
@@ -98,18 +98,18 @@ export const Step6PricingSummary: React.FC = () => {
           </div>
 
           {/* Add-ons */}
-          {wizardData.selectedAddOns.length > 0 && (
+          {wizardData.globalAddOns.length > 0 && (
             <>
               <Separator />
               <div>
                 <p className="text-sm font-medium mb-2">Add-ons & Services</p>
-                {Object.entries(wizardData.addOnPrices).map(([addOnId, price]) => (
+                {Object.entries(wizardData.globalAddOnPrices).map(([addOnId, price]) => (
                   <div
                     key={addOnId}
                     className="flex items-center justify-between text-sm ml-4 mb-1"
                   >
                     <span className="text-muted-foreground">{addOnId}</span>
-                    <span>{formatCurrency(price)}</span>
+                    <span>{formatCurrency(price as number)}</span>
                   </div>
                 ))}
                 <div className="flex items-center justify-between text-sm font-medium mt-2">

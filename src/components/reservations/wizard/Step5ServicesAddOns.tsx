@@ -22,20 +22,20 @@ export const Step5ServicesAddOns: React.FC = () => {
   const { data: addOns, isLoading } = useAddonItems();
 
   const handleAddOnToggle = (addOnId: string, price: number) => {
-    const isSelected = wizardData.selectedAddOns.includes(addOnId);
+    const isSelected = wizardData.globalAddOns.includes(addOnId);
     
     if (isSelected) {
       updateWizardData({
-        selectedAddOns: wizardData.selectedAddOns.filter((id) => id !== addOnId),
-        addOnPrices: Object.fromEntries(
-          Object.entries(wizardData.addOnPrices).filter(([key]) => key !== addOnId)
+        globalAddOns: wizardData.globalAddOns.filter((id) => id !== addOnId),
+        globalAddOnPrices: Object.fromEntries(
+          Object.entries(wizardData.globalAddOnPrices).filter(([key]) => key !== addOnId)
         ),
       });
     } else {
       updateWizardData({
-        selectedAddOns: [...wizardData.selectedAddOns, addOnId],
-        addOnPrices: {
-          ...wizardData.addOnPrices,
+        globalAddOns: [...wizardData.globalAddOns, addOnId],
+        globalAddOnPrices: {
+          ...wizardData.globalAddOnPrices,
           [addOnId]: price,
         },
       });
@@ -78,7 +78,7 @@ export const Step5ServicesAddOns: React.FC = () => {
           <h3 className="font-semibold text-lg capitalize">{category}</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {items.map((addOn: any) => {
-              const isSelected = wizardData.selectedAddOns.includes(addOn.id);
+              const isSelected = wizardData.globalAddOns.includes(addOn.id);
               const IconComponent = iconMap[addOn.item_code] || Car;
 
               return (
@@ -138,7 +138,7 @@ export const Step5ServicesAddOns: React.FC = () => {
       ))}
 
       {/* Summary */}
-      {wizardData.selectedAddOns.length > 0 && (
+      {wizardData.globalAddOns.length > 0 && (
         <Card className="bg-primary/5 border-primary/20">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
@@ -147,7 +147,7 @@ export const Step5ServicesAddOns: React.FC = () => {
                   Selected Add-ons
                 </p>
                 <p className="text-2xl font-bold">
-                  {wizardData.selectedAddOns.length} service(s)
+                  {wizardData.globalAddOns.length} service(s)
                 </p>
               </div>
               <div className="text-right">
@@ -156,8 +156,8 @@ export const Step5ServicesAddOns: React.FC = () => {
                 </p>
                 <p className="text-2xl font-bold">
                   {formatCurrency(
-                    Object.values(wizardData.addOnPrices).reduce(
-                      (sum, price) => sum + price,
+                    Object.values(wizardData.globalAddOnPrices).reduce(
+                      (sum, price) => sum + (price as number),
                       0
                     )
                   )}

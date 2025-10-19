@@ -71,24 +71,77 @@ export const Step4SmartVehicleSelection: React.FC = () => {
 
   const handleVehicleClassSelect = (classId: string) => {
     const selectedClass = vehicleClasses?.find((c) => c.id === classId);
-    updateWizardData({
+    const newLine: import('./ReservationWizardContext').ReservationLine = {
+      id: crypto.randomUUID(),
+      lineNo: 1,
       vehicleClassId: classId,
       vehicleData: selectedClass,
+      drivers: [],
+      checkOutDate: wizardData.pickupDate,
+      checkOutTime: wizardData.pickupTime,
+      checkOutLocationId: wizardData.pickupLocation,
+      checkInDate: wizardData.returnDate,
+      checkInTime: wizardData.returnTime,
+      checkInLocationId: wizardData.returnLocation,
+      selectedAddOns: [],
+      addOnPrices: {},
+      baseRate: 0,
+      lineNet: 0,
+      taxValue: 0,
+      lineTotal: 0,
+    };
+    updateWizardData({
+      reservationLines: [newLine],
     });
   };
 
   const handleMakeModelSelect = (makeModel: string) => {
+    const newLine: import('./ReservationWizardContext').ReservationLine = {
+      id: crypto.randomUUID(),
+      lineNo: 1,
+      vehicleData: { makeModel, vehicles: makeModelOptions[makeModel] },
+      drivers: [],
+      checkOutDate: wizardData.pickupDate,
+      checkOutTime: wizardData.pickupTime,
+      checkOutLocationId: wizardData.pickupLocation,
+      checkInDate: wizardData.returnDate,
+      checkInTime: wizardData.returnTime,
+      checkInLocationId: wizardData.returnLocation,
+      selectedAddOns: [],
+      addOnPrices: {},
+      baseRate: 0,
+      lineNet: 0,
+      taxValue: 0,
+      lineTotal: 0,
+    };
     updateWizardData({
-      makeModel,
-      vehicleData: makeModelOptions[makeModel],
+      reservationLines: [newLine],
     });
   };
 
   const handleSpecificVehicleSelect = (vehicleId: string) => {
     const selectedVehicle = vehicles?.find((v) => v.id === vehicleId);
-    updateWizardData({
+    const newLine: import('./ReservationWizardContext').ReservationLine = {
+      id: crypto.randomUUID(),
+      lineNo: 1,
       vehicleId,
       vehicleData: selectedVehicle,
+      drivers: [],
+      checkOutDate: wizardData.pickupDate,
+      checkOutTime: wizardData.pickupTime,
+      checkOutLocationId: wizardData.pickupLocation,
+      checkInDate: wizardData.returnDate,
+      checkInTime: wizardData.returnTime,
+      checkInLocationId: wizardData.returnLocation,
+      selectedAddOns: [],
+      addOnPrices: {},
+      baseRate: 0,
+      lineNet: 0,
+      taxValue: 0,
+      lineTotal: 0,
+    };
+    updateWizardData({
+      reservationLines: [newLine],
     });
   };
 
@@ -130,7 +183,7 @@ export const Step4SmartVehicleSelection: React.FC = () => {
             <Card
               key={vehicleClass.id}
               className={`cursor-pointer transition-all hover:shadow-lg ${
-                wizardData.vehicleClassId === vehicleClass.id
+                wizardData.reservationLines[0]?.vehicleClassId === vehicleClass.id
                   ? 'ring-2 ring-primary shadow-lg'
                   : ''
               }`}
@@ -141,7 +194,7 @@ export const Step4SmartVehicleSelection: React.FC = () => {
                   <div className="p-3 rounded-lg bg-primary/10">
                     <Package className="h-8 w-8 text-primary" />
                   </div>
-                  {wizardData.vehicleClassId === vehicleClass.id && (
+                  {wizardData.reservationLines[0]?.vehicleClassId === vehicleClass.id && (
                     <Check className="h-6 w-6 text-primary" />
                   )}
                 </div>
@@ -173,7 +226,7 @@ export const Step4SmartVehicleSelection: React.FC = () => {
               <Card
                 key={makeModel}
                 className={`cursor-pointer transition-all hover:shadow-lg ${
-                  wizardData.makeModel === makeModel
+                  wizardData.reservationLines[0]?.vehicleData?.makeModel === makeModel
                     ? 'ring-2 ring-primary shadow-lg'
                     : ''
                 }`}
@@ -192,7 +245,7 @@ export const Step4SmartVehicleSelection: React.FC = () => {
                         </Badge>
                       </div>
                     </div>
-                    {wizardData.makeModel === makeModel && (
+                    {wizardData.reservationLines[0]?.vehicleData?.makeModel === makeModel && (
                       <Check className="h-5 w-5 text-primary" />
                     )}
                   </div>
@@ -221,7 +274,7 @@ export const Step4SmartVehicleSelection: React.FC = () => {
               <Card
                 key={vehicle.id}
                 className={`cursor-pointer transition-all hover:shadow-lg ${
-                  wizardData.vehicleId === vehicle.id
+                  wizardData.reservationLines[0]?.vehicleId === vehicle.id
                     ? 'ring-2 ring-primary shadow-lg'
                     : ''
                 }`}
@@ -250,7 +303,7 @@ export const Step4SmartVehicleSelection: React.FC = () => {
                         </div>
                       </div>
                     </div>
-                    {wizardData.vehicleId === vehicle.id && (
+                    {wizardData.reservationLines[0]?.vehicleId === vehicle.id && (
                       <Check className="h-5 w-5 text-primary shrink-0 ml-2" />
                     )}
                   </div>
