@@ -28,6 +28,7 @@ import { Step8Confirmation } from './Step8Confirmation';
 import { useReservationDataConsistency } from '@/hooks/useReservationDataConsistency';
 import { validateReservation, validateHeader } from '@/lib/validation/reservationSchema';
 import { ValidationErrorBanner } from '@/components/ui/validation-error-banner';
+import { WizardDebugPanel } from './WizardDebugPanel';
 
 const wizardSteps = [
   { number: 1, title: 'Reservation Type', description: 'Select booking type' },
@@ -600,7 +601,8 @@ const ReservationWizardContent: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <WizardProgress 
+      <WizardDebugPanel />
+      <WizardProgress
         currentStep={currentStep} 
         totalSteps={14} 
         steps={wizardSteps}
