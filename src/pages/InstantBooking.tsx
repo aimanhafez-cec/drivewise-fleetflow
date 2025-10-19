@@ -41,11 +41,11 @@ const InstantBooking = () => {
           {/* Quick Actions */}
           <div className="flex items-center gap-3">
             <Button
-              variant="outline"
-              className="gap-2"
+              variant="default"
+              size="sm"
               onClick={() => navigate('/instant-booking/analytics')}
             >
-              <BarChart3 className="h-4 w-4" />
+              <BarChart3 className="h-4 w-4 mr-2" />
               Analytics
             </Button>
             <Button

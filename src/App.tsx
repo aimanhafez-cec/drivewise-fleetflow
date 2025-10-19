@@ -40,6 +40,7 @@ import CustomerDetails from "./pages/CustomerDetails";
 import InstantBooking from "./pages/InstantBooking";
 import NewInstantBooking from "./pages/NewInstantBooking";
 import InstantBookingSettings from "./pages/InstantBookingSettings";
+import InstantBookingAnalytics from "./pages/InstantBookingAnalytics";
 import Reports from "./pages/Reports";
 import MasterAgreements from "./pages/MasterAgreements";
 import MasterAgreementDetails from "./pages/MasterAgreementDetails";
@@ -80,6 +81,7 @@ const App = () => {
                 <Route index element={<InstantBooking />} />
                 <Route path="new" element={<NewInstantBooking />} />
                 <Route path="settings" element={<InstantBookingSettings />} />
+                <Route path="analytics" element={<InstantBookingAnalytics />} />
               </Route>
               <Route path="/reservations" element={
                   <ProtectedRoute>
