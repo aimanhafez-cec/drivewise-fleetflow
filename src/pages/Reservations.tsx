@@ -6,7 +6,7 @@ import { Plus, Calendar, FileText, Download } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ConvertToAgreementPreCheck } from '@/components/agreements/ConvertToAgreementPreCheck';
+import { ConvertToAgreementModal } from '@/components/reservation/ConvertToAgreementModal';
 import { ReservationFilters, ReservationFilterState } from '@/components/reservations/ReservationFilters';
 import { ReservationKPICards } from '@/components/reservations/ReservationKPICards';
 import { ReservationCard } from '@/components/reservations/ReservationCard';
@@ -143,13 +143,6 @@ const Reservations = () => {
     setConvertModal({ open: true, reservation });
   };
 
-  const handleConfirmConvert = () => {
-    if (convertModal.reservation) {
-      setConvertModal({ open: false });
-      navigate(`/agreements/new?fromReservation=${convertModal.reservation.id}`);
-    }
-  };
-
   const handleClearFilters = () => {
     setFilters({});
   };
@@ -259,12 +252,11 @@ const Reservations = () => {
 
       {/* Convert to Agreement Modal */}
       {convertModal.reservation && (
-        <ConvertToAgreementPreCheck
+        <ConvertToAgreementModal
           open={convertModal.open}
           onOpenChange={(open) =>
             setConvertModal({ open, reservation: open ? convertModal.reservation : undefined })
           }
-          onConfirm={handleConfirmConvert}
           reservation={convertModal.reservation}
         />
       )}

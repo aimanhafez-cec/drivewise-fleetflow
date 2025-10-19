@@ -17,7 +17,7 @@ import { AddDepositModal } from '@/components/reservation/AddDepositModal';
 import { agreementsApi } from '@/lib/api/agreements';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency } from '@/lib/utils/currency';
 
 interface ReservationHeader {
   id: string;
@@ -77,6 +77,7 @@ const ReservationDetailsPage = () => {
   const [convertModalOpen, setConvertModalOpen] = useState(false);
   const [addDepositModalOpen, setAddDepositModalOpen] = useState(false);
   const [converting, setConverting] = useState(false);
+  const [rawReservationData, setRawReservationData] = useState<any>(null);
   
   const queryClient = useQueryClient();
   
@@ -144,6 +145,9 @@ const ReservationDetailsPage = () => {
 
       const data = reservationResponse.data;
       const paymentsData = paymentsResponse.data || [];
+
+      // Store raw reservation data
+      setRawReservationData(data);
 
       const actualData = {
         header: {
@@ -623,23 +627,13 @@ const ReservationDetailsPage = () => {
       </Tabs>
 
       {/* Convert to Agreement Modal */}
-      <ConvertToAgreementModal
-        open={convertModalOpen}
-        onOpenChange={setConvertModalOpen}
-        onConfirm={performConversion}
-        isConverting={converting}
-        reservation={{
-          reservationNo: reservationData.header?.reservationNo || '',
-          customer: reservationData.header?.customer || '',
-          priceList: 'Standard Price List',
-          linesCount: reservationData.lines.length,
-          checkOutDate: reservationData.lines[0]?.checkOutDate || '',
-          checkInDate: reservationData.lines[0]?.checkInDate || '',
-          grandTotal: summary.grandTotal,
-          advancePaid: summary.advancePaid,
-          balanceDue: summary.balanceDue,
-        }}
-      />
+      {rawReservationData && (
+        <ConvertToAgreementModal
+          open={convertModalOpen}
+          onOpenChange={setConvertModalOpen}
+          reservation={rawReservationData}
+        />
+      )}
 
       {/* Add Deposit Modal */}
       {reservationData.header && (
