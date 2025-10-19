@@ -56,19 +56,10 @@ export const WizardProgress: React.FC<WizardProgressProps> = ({
       };
     }
 
-    // Has errors / Incomplete
-    if (status === 'has-errors' || status === 'incomplete') {
-      return {
-        circle: 'border-amber-500 bg-amber-50 text-amber-700 cursor-pointer hover:bg-amber-100',
-        text: 'text-foreground',
-        clickable: isClickable,
-      };
-    }
-
-    // Not visited / Can navigate freely
+    // Has errors / Incomplete / Not visited - all amber until completed
     return {
-      circle: 'border-muted-foreground/30 text-muted-foreground cursor-pointer hover:border-primary/50 hover:text-primary transition-all',
-      text: 'text-muted-foreground',
+      circle: 'border-amber-500 bg-amber-50 text-amber-700 cursor-pointer hover:bg-amber-100 transition-all',
+      text: 'text-foreground',
       clickable: true,
     };
   };
