@@ -9,11 +9,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Plus, Trash2, Star, UserPlus, FileText, Calendar, Check, ChevronsUpDown } from 'lucide-react';
+import { Plus, Trash2, Star, UserPlus, Edit, Calendar, Check, ChevronsUpDown } from 'lucide-react';
 import { useDrivers } from '@/hooks/useDrivers';
 import { useAgreementDrivers, useAssignDriver, useRemoveDriver, useUpdateDriverAssignment } from '@/hooks/useAgreementDrivers';
 import { EnhancedDriverForm } from '@/components/drivers/EnhancedDriverForm';
-import { DriverDocumentsDialog } from '@/components/drivers/DriverDocumentsDialog';
 import { supabase } from '@/integrations/supabase/client';
 
 interface MasterAgreementStep5DriversProps {
@@ -31,9 +30,6 @@ export const MasterAgreementStep5Drivers: React.FC<MasterAgreementStep5DriversPr
   errors 
 }) => {
   const [isCreateDriverOpen, setIsCreateDriverOpen] = useState(false);
-  const [docsDialogOpen, setDocsDialogOpen] = useState(false);
-  const [viewDocsDriverId, setViewDocsDriverId] = useState<string | null>(null);
-  const [viewDocsDriverName, setViewDocsDriverName] = useState<string | null>(null);
   const [editDriverId, setEditDriverId] = useState<string | null>(null);
   const [searchByLine, setSearchByLine] = useState<Record<string, string>>({});
   const [comboboxOpenByLine, setComboboxOpenByLine] = useState<Record<string, boolean>>({});
@@ -280,13 +276,12 @@ export const MasterAgreementStep5Drivers: React.FC<MasterAgreementStep5DriversPr
                                 size="sm"
                                 variant="ghost"
                                 onClick={() => {
-                                  setViewDocsDriverId(ld.driver?.id || null);
-                                  setViewDocsDriverName(ld.driver?.full_name || null);
-                                  setDocsDialogOpen(true);
+                                  setEditDriverId(ld.driver?.id || null);
+                                  setIsCreateDriverOpen(true);
                                 }}
-                                title="View Documents"
+                                title="Edit Driver"
                               >
-                                <FileText className="h-4 w-4" />
+                                <Edit className="h-4 w-4" />
                               </Button>
                               {!ld.is_primary && (
                                 <Button
@@ -353,13 +348,6 @@ export const MasterAgreementStep5Drivers: React.FC<MasterAgreementStep5DriversPr
           </div>
         </SheetContent>
       </Sheet>
-
-      <DriverDocumentsDialog
-        open={docsDialogOpen}
-        onOpenChange={setDocsDialogOpen}
-        driverId={viewDocsDriverId || undefined}
-        driverName={viewDocsDriverName || undefined}
-      />
     </div>
   );
 };
