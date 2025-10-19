@@ -50,8 +50,21 @@ const ReservationWizardContent: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { currentStep, wizardData, nextStep, prevStep, resetWizard, updateWizardData } =
-    useReservationWizard();
+  const { 
+    currentStep, 
+    wizardData, 
+    nextStep, 
+    prevStep, 
+    goToStep, 
+    resetWizard, 
+    updateWizardData,
+    completedSteps,
+    visitedSteps,
+    stepValidationStatus,
+    markStepComplete,
+    markStepIncomplete,
+    getStepStatus
+  } = useReservationWizard();
   const { validateBeforeSubmission, ensureDataIntegrity, checkDataConsistency } = useReservationDataConsistency();
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
@@ -440,15 +453,43 @@ const ReservationWizardContent: React.FC = () => {
     
     if (Object.keys(errors).length === 0) {
       setValidationErrors({});
+      markStepComplete(currentStep);
       nextStep();
     } else {
       setValidationErrors(errors);
+      markStepIncomplete(currentStep);
       toast({
         title: 'Validation Failed',
         description: 'Please correct the errors before proceeding',
         variant: 'destructive',
       });
     }
+  };
+
+  const handleStepClick = (stepNumber: number) => {
+    // Already on this step - no action needed
+    if (stepNumber === currentStep) {
+      return;
+    }
+    
+    // Allow going back to any visited or completed step
+    if (stepNumber < currentStep || completedSteps.includes(stepNumber)) {
+      goToStep(stepNumber);
+      return;
+    }
+    
+    // Allow going to next step only if current step is valid
+    if (stepNumber === currentStep + 1) {
+      handleNext();
+      return;
+    }
+    
+    // Don't allow jumping ahead multiple steps
+    toast({
+      title: 'Cannot Skip Steps',
+      description: 'Please complete the previous steps first',
+      variant: 'destructive',
+    });
   };
 
   const handleFieldFocus = (field: string) => {
@@ -481,7 +522,14 @@ const ReservationWizardContent: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <WizardProgress currentStep={currentStep} totalSteps={14} steps={wizardSteps} />
+      <WizardProgress 
+        currentStep={currentStep} 
+        totalSteps={14} 
+        steps={wizardSteps}
+        completedSteps={completedSteps}
+        stepValidationStatus={stepValidationStatus}
+        onStepClick={handleStepClick}
+      />
       <div className="max-w-6xl mx-auto px-4 py-8">
         {Object.keys(validationErrors).length > 0 && (
           <ValidationErrorBanner

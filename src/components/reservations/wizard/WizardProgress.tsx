@@ -1,6 +1,7 @@
 import React from 'react';
-import { Check } from 'lucide-react';
+import { Check, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import type { StepStatus } from './ReservationWizardContext';
 
 interface WizardProgressProps {
   currentStep: number;
@@ -10,13 +11,73 @@ interface WizardProgressProps {
     title: string;
     description: string;
   }>;
+  completedSteps: number[];
+  stepValidationStatus: Record<number, StepStatus>;
+  onStepClick: (stepNumber: number) => void;
 }
 
 export const WizardProgress: React.FC<WizardProgressProps> = ({
   currentStep,
   totalSteps,
   steps,
+  completedSteps,
+  stepValidationStatus,
+  onStepClick,
 }) => {
+  const getStepIcon = (step: number, status: StepStatus, isCurrent: boolean) => {
+    if (status === 'complete') {
+      return <Check className="h-5 w-5" />;
+    }
+    if (status === 'has-errors' || status === 'incomplete') {
+      return <AlertCircle className="h-4 w-4" />;
+    }
+    return <span className="font-semibold">{step}</span>;
+  };
+
+  const getStepStyles = (stepNumber: number, status: StepStatus, isCurrent: boolean) => {
+    const isCompleted = completedSteps.includes(stepNumber);
+    const isClickable = stepNumber <= currentStep || isCompleted || stepNumber === currentStep + 1;
+
+    // Completed step
+    if (isCompleted || status === 'complete') {
+      return {
+        circle: 'bg-green-500 border-green-500 text-white cursor-pointer hover:bg-green-600 transition-all',
+        text: 'text-foreground',
+        clickable: true,
+      };
+    }
+
+    // Current step
+    if (isCurrent) {
+      return {
+        circle: 'border-primary bg-primary/10 text-primary ring-2 ring-primary/20 cursor-pointer',
+        text: 'text-foreground',
+        clickable: true,
+      };
+    }
+
+    // Has errors / Incomplete
+    if (status === 'has-errors' || status === 'incomplete') {
+      return {
+        circle: 'border-amber-500 bg-amber-50 text-amber-700 cursor-pointer hover:bg-amber-100',
+        text: 'text-foreground',
+        clickable: isClickable,
+      };
+    }
+
+    // Not visited / Cannot access yet
+    return {
+      circle: 'border-muted-foreground/30 text-muted-foreground cursor-not-allowed opacity-50',
+      text: 'text-muted-foreground',
+      clickable: false,
+    };
+  };
+
+  const completedCount = completedSteps.length;
+  const incompleteCount = Object.values(stepValidationStatus).filter(
+    (status) => status === 'has-errors' || status === 'incomplete'
+  ).length;
+
   return (
     <div className="w-full px-4 py-6 bg-gradient-to-r from-primary/5 to-primary/10 border-b sticky top-0 z-10">
       <div className="max-w-7xl mx-auto">
@@ -27,13 +88,13 @@ export const WizardProgress: React.FC<WizardProgressProps> = ({
               Step {currentStep} of {totalSteps}
             </span>
             <span className="text-sm font-medium text-muted-foreground">
-              {Math.round((currentStep / totalSteps) * 100)}% Complete
+              {completedCount} of {totalSteps} steps completed
             </span>
           </div>
           <div className="h-2 bg-muted rounded-full overflow-hidden">
             <div
               className="h-full bg-gradient-to-r from-primary to-primary/80 transition-all duration-500 ease-out"
-              style={{ width: `${(currentStep / totalSteps) * 100}%` }}
+              style={{ width: `${(completedCount / totalSteps) * 100}%` }}
             />
           </div>
         </div>
@@ -43,9 +104,9 @@ export const WizardProgress: React.FC<WizardProgressProps> = ({
           <div className="overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent">
             <div className="flex items-center min-w-max px-4">
               {steps.map((step, index) => {
-                const isCompleted = currentStep > step.number;
                 const isCurrent = currentStep === step.number;
-                const isUpcoming = currentStep < step.number;
+                const status = stepValidationStatus[step.number] || 'not-visited';
+                const styles = getStepStyles(step.number, status, isCurrent);
 
                 return (
                   <React.Fragment key={step.number}>
@@ -53,24 +114,25 @@ export const WizardProgress: React.FC<WizardProgressProps> = ({
                       <div
                         className={cn(
                           'flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all',
-                          isCompleted &&
-                            'bg-primary border-primary text-primary-foreground',
-                          isCurrent &&
-                            'border-primary bg-primary/10 text-primary ring-2 ring-primary/20',
-                          isUpcoming && 'border-muted-foreground/30 text-muted-foreground'
+                          styles.circle
                         )}
+                        onClick={() => styles.clickable && onStepClick(step.number)}
+                        role={styles.clickable ? 'button' : undefined}
+                        tabIndex={styles.clickable ? 0 : undefined}
+                        onKeyDown={(e) => {
+                          if (styles.clickable && (e.key === 'Enter' || e.key === ' ')) {
+                            e.preventDefault();
+                            onStepClick(step.number);
+                          }
+                        }}
                       >
-                        {isCompleted ? (
-                          <Check className="h-5 w-5" />
-                        ) : (
-                          <span className="font-semibold">{step.number}</span>
-                        )}
+                        {getStepIcon(step.number, status, isCurrent)}
                       </div>
                       <div className="mt-2 text-center w-full px-1">
                         <p
                           className={cn(
                             'text-xs font-medium transition-colors line-clamp-2',
-                            (isCurrent || isCompleted) ? 'text-foreground' : 'text-muted-foreground'
+                            styles.text
                           )}
                         >
                           {step.title}
@@ -82,7 +144,7 @@ export const WizardProgress: React.FC<WizardProgressProps> = ({
                         <div
                           className={cn(
                             'w-16 h-0.5 transition-colors',
-                            isCompleted ? 'bg-primary' : 'bg-muted-foreground/20'
+                            completedSteps.includes(step.number) ? 'bg-primary' : 'bg-muted-foreground/20'
                           )}
                         />
                       </div>
