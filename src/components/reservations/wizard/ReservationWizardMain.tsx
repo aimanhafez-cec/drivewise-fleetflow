@@ -228,19 +228,32 @@ const ReservationWizardContent: React.FC = () => {
         break;
     }
 
-    setValidationErrors(errors);
-    return Object.keys(errors).length === 0;
+    return errors;
   };
 
   const canProceed = () => {
-    return validateCurrentStep();
+    // Pure function that checks without updating state
+    switch (currentStep) {
+      case 1: return !!wizardData.reservationType;
+      case 2: return !!(wizardData.businessUnitId && wizardData.reservationMethodId);
+      case 3: return !!wizardData.customerId;
+      case 4: return !!wizardData.priceListId;
+      case 5: return !!(wizardData.pickupDate && wizardData.returnDate && wizardData.pickupLocation && wizardData.returnLocation);
+      case 6: return !!wizardData.reservationLines?.length;
+      case 10: return !!(wizardData.billToType && wizardData.taxLevelId && wizardData.taxCodeId);
+      case 12: return wizardData.downPaymentAmount ? !!wizardData.paymentMethod : true;
+      default: return true;
+    }
   };
 
   const handleNext = () => {
-    if (canProceed()) {
+    const errors = validateCurrentStep();
+    
+    if (Object.keys(errors).length === 0) {
       setValidationErrors({});
       nextStep();
     } else {
+      setValidationErrors(errors);
       toast({
         title: 'Validation Failed',
         description: 'Please correct the errors before proceeding',
