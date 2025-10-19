@@ -1,79 +1,190 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, DollarSign, CreditCard, AlertCircle } from 'lucide-react';
+import { DollarSign, CreditCard, AlertCircle, Car, Package } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils/currency';
 import { useReservationWizard } from './ReservationWizardContext';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { usePricingContext, calculateLinePrice } from '@/hooks/usePricingContext';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 export const Step6PricingSummary: React.FC = () => {
   const { wizardData, updateWizardData } = useReservationWizard();
 
-  // Calculate pricing
-  useEffect(() => {
-    // Calculate rental duration
-    const pickup = new Date(`${wizardData.pickupDate}T${wizardData.pickupTime}`);
-    const returnDate = new Date(`${wizardData.returnDate}T${wizardData.returnTime}`);
-    const durationMs = returnDate.getTime() - pickup.getTime();
-    const durationDays = Math.ceil(durationMs / (1000 * 60 * 60 * 24));
+  // Create pricing context from wizard data
+  const pricingContext = usePricingContext({
+    priceListId: wizardData.priceListId,
+    promotionCode: '',
+    hourlyRate: wizardData.hourlyRate,
+    dailyRate: wizardData.dailyRate,
+    weeklyRate: wizardData.weeklyRate,
+    monthlyRate: wizardData.monthlyRate,
+    kilometerCharge: wizardData.kilometerCharge,
+    dailyKilometerAllowed: wizardData.dailyKilometerAllowed,
+  });
 
-    // Base rate calculation (simplified - in production, fetch from price lists)
-    // For demo: AED 150/day base rate
-    const baseRate = durationDays * 150;
+  // Calculate detailed pricing for all lines
+  const detailedPricing = useMemo(() => {
+    let totalBaseRate = 0;
+    let totalAddOns = 0;
+    let totalDriverFees = 0;
 
-    // Add-ons total
-    const addOnsTotal = Object.values(wizardData.globalAddOnPrices).reduce(
+    const lineDetails = wizardData.reservationLines.map((line) => {
+      // Calculate base rate for this line using pricing context
+      const checkOutDate = new Date(`${line.checkOutDate}T${line.checkOutTime}`);
+      const checkInDate = new Date(`${line.checkInDate}T${line.checkInTime}`);
+      
+      const { lineNetPrice } = calculateLinePrice(
+        pricingContext,
+        checkOutDate,
+        checkInDate
+      );
+
+      // Calculate add-ons for this line
+      const lineAddOns = Object.values(line.addOnPrices).reduce(
+        (sum, price) => sum + price,
+        0
+      );
+
+      // Calculate driver fees for this line
+      const lineDriverFees = line.drivers.reduce(
+        (sum, driver) => sum + (driver.fee || 0),
+        0
+      );
+
+      totalBaseRate += lineNetPrice;
+      totalAddOns += lineAddOns;
+      totalDriverFees += lineDriverFees;
+
+      return {
+        lineNo: line.lineNo,
+        vehicleDisplay: line.vehicleData?.make && line.vehicleData?.model 
+          ? `${line.vehicleData.make} ${line.vehicleData.model}`
+          : 'Vehicle Class',
+        baseRate: lineNetPrice,
+        addOns: lineAddOns,
+        driverFees: lineDriverFees,
+        lineTotal: lineNetPrice + lineAddOns + lineDriverFees,
+      };
+    });
+
+    // Calculate global add-ons
+    const globalAddOnsTotal = Object.values(wizardData.globalAddOnPrices).reduce(
       (sum, price) => sum + (price as number),
       0
     );
 
-    // Subtotal
-    const subtotal = baseRate + addOnsTotal;
+    // Pre-subtotal
+    const preSubtotal = totalBaseRate + totalAddOns + totalDriverFees + globalAddOnsTotal;
+
+    // Apply discount if any
+    const discountAmount = wizardData.discountValue || 0;
+
+    // Subtotal after discount
+    const subtotal = preSubtotal - discountAmount;
 
     // VAT (5% in UAE)
     const vatAmount = subtotal * 0.05;
 
-    // Total
-    const totalAmount = subtotal + vatAmount;
+    // Grand Total
+    const grandTotal = subtotal + vatAmount;
 
-    // Down payment (30% of total)
-    const downPaymentAmount = totalAmount * 0.3;
+    // Down payment (30% of grand total)
+    const downPaymentAmount = grandTotal * 0.3;
 
     // Balance due
-    const balanceDue = totalAmount - downPaymentAmount;
+    const balanceDue = grandTotal - downPaymentAmount;
 
-    updateWizardData({
-      baseRate,
-      addOnsTotal,
+    return {
+      lineDetails,
+      totalBaseRate,
+      totalAddOns,
+      totalDriverFees,
+      globalAddOnsTotal,
+      preSubtotal,
+      discountAmount,
       subtotal,
       vatAmount,
-      totalAmount,
+      grandTotal,
       downPaymentAmount,
       balanceDue,
-    });
+    };
   }, [
-    wizardData.pickupDate,
-    wizardData.pickupTime,
-    wizardData.returnDate,
-    wizardData.returnTime,
+    wizardData.reservationLines,
     wizardData.globalAddOnPrices,
+    wizardData.discountValue,
+    pricingContext,
   ]);
 
-  const durationDays = Math.ceil(
-    (new Date(`${wizardData.returnDate}T${wizardData.returnTime}`).getTime() -
-      new Date(`${wizardData.pickupDate}T${wizardData.pickupTime}`).getTime()) /
-      (1000 * 60 * 60 * 24)
-  );
+  // Update wizard data with calculated pricing
+  useEffect(() => {
+    updateWizardData({
+      baseRate: detailedPricing.totalBaseRate,
+      addOnsTotal: detailedPricing.totalAddOns + detailedPricing.globalAddOnsTotal,
+      driverFeesTotal: detailedPricing.totalDriverFees,
+      subtotal: detailedPricing.subtotal,
+      vatAmount: detailedPricing.vatAmount,
+      totalAmount: detailedPricing.grandTotal,
+      downPaymentAmount: detailedPricing.downPaymentAmount,
+      balanceDue: detailedPricing.balanceDue,
+    });
+  }, [detailedPricing, updateWizardData]);
 
   return (
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold text-foreground mb-2">Pricing Summary</h2>
         <p className="text-muted-foreground">
-          Review the total cost and payment breakdown
+          Detailed breakdown of all reservation lines and charges
         </p>
       </div>
+
+      {/* Line-by-Line Breakdown */}
+      {detailedPricing.lineDetails.length > 0 && (
+        <Card className="border-border/50">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Car className="h-5 w-5" />
+              Reservation Lines
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Line</TableHead>
+                  <TableHead>Vehicle</TableHead>
+                  <TableHead className="text-right">Base Rate</TableHead>
+                  <TableHead className="text-right">Add-ons</TableHead>
+                  <TableHead className="text-right">Driver Fees</TableHead>
+                  <TableHead className="text-right">Line Total</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {detailedPricing.lineDetails.map((line) => (
+                  <TableRow key={line.lineNo}>
+                    <TableCell className="font-medium">#{line.lineNo}</TableCell>
+                    <TableCell>{line.vehicleDisplay}</TableCell>
+                    <TableCell className="text-right font-mono">
+                      {formatCurrency(line.baseRate)}
+                    </TableCell>
+                    <TableCell className="text-right font-mono">
+                      {formatCurrency(line.addOns)}
+                    </TableCell>
+                    <TableCell className="text-right font-mono">
+                      {formatCurrency(line.driverFees)}
+                    </TableCell>
+                    <TableCell className="text-right font-semibold font-mono">
+                      {formatCurrency(line.lineTotal)}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Pricing Breakdown */}
       <Card className="border-border/50">
@@ -84,37 +195,57 @@ export const Step6PricingSummary: React.FC = () => {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Rental Period */}
+          {/* Base Rates */}
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm">
-                Base Rental ({durationDays} day{durationDays !== 1 ? 's' : ''})
-              </span>
-            </div>
-            <span className="font-semibold">
-              {formatCurrency(wizardData.baseRate)}
+            <span className="text-sm">Total Base Rates (All Lines)</span>
+            <span className="font-semibold font-mono">
+              {formatCurrency(detailedPricing.totalBaseRate)}
             </span>
           </div>
 
-          {/* Add-ons */}
-          {wizardData.globalAddOns.length > 0 && (
+          {/* Line Add-ons */}
+          {detailedPricing.totalAddOns > 0 && (
+            <div className="flex items-center justify-between">
+              <span className="text-sm">Line-specific Add-ons</span>
+              <span className="font-semibold font-mono">
+                {formatCurrency(detailedPricing.totalAddOns)}
+              </span>
+            </div>
+          )}
+
+          {/* Driver Fees */}
+          {detailedPricing.totalDriverFees > 0 && (
+            <div className="flex items-center justify-between">
+              <span className="text-sm">Additional Driver Fees</span>
+              <span className="font-semibold font-mono">
+                {formatCurrency(detailedPricing.totalDriverFees)}
+              </span>
+            </div>
+          )}
+
+          {/* Global Add-ons */}
+          {detailedPricing.globalAddOnsTotal > 0 && (
             <>
               <Separator />
               <div>
-                <p className="text-sm font-medium mb-2">Add-ons & Services</p>
+                <p className="text-sm font-medium mb-2 flex items-center gap-2">
+                  <Package className="h-4 w-4" />
+                  Global Add-ons & Services
+                </p>
                 {Object.entries(wizardData.globalAddOnPrices).map(([addOnId, price]) => (
                   <div
                     key={addOnId}
                     className="flex items-center justify-between text-sm ml-4 mb-1"
                   >
                     <span className="text-muted-foreground">{addOnId}</span>
-                    <span>{formatCurrency(price as number)}</span>
+                    <span className="font-mono">{formatCurrency(price as number)}</span>
                   </div>
                 ))}
                 <div className="flex items-center justify-between text-sm font-medium mt-2">
-                  <span>Add-ons Total</span>
-                  <span>{formatCurrency(wizardData.addOnsTotal)}</span>
+                  <span>Global Add-ons Total</span>
+                  <span className="font-mono">
+                    {formatCurrency(detailedPricing.globalAddOnsTotal)}
+                  </span>
                 </div>
               </div>
             </>
@@ -122,25 +253,41 @@ export const Step6PricingSummary: React.FC = () => {
 
           <Separator />
 
+          {/* Pre-Subtotal */}
+          <div className="flex items-center justify-between font-medium">
+            <span>Pre-Subtotal</span>
+            <span className="font-mono">{formatCurrency(detailedPricing.preSubtotal)}</span>
+          </div>
+
+          {/* Discount */}
+          {detailedPricing.discountAmount > 0 && (
+            <div className="flex items-center justify-between text-sm text-green-600 dark:text-green-400">
+              <span>Discount</span>
+              <span className="font-mono">
+                -{formatCurrency(detailedPricing.discountAmount)}
+              </span>
+            </div>
+          )}
+
           {/* Subtotal */}
           <div className="flex items-center justify-between font-medium">
             <span>Subtotal</span>
-            <span>{formatCurrency(wizardData.subtotal)}</span>
+            <span className="font-mono">{formatCurrency(detailedPricing.subtotal)}</span>
           </div>
 
           {/* VAT */}
           <div className="flex items-center justify-between text-sm">
             <span className="text-muted-foreground">VAT (5%)</span>
-            <span>{formatCurrency(wizardData.vatAmount)}</span>
+            <span className="font-mono">{formatCurrency(detailedPricing.vatAmount)}</span>
           </div>
 
           <Separator className="border-t-2" />
 
-          {/* Total */}
+          {/* Grand Total */}
           <div className="flex items-center justify-between text-lg font-bold">
             <span>Grand Total</span>
-            <span className="text-primary">
-              {formatCurrency(wizardData.totalAmount)}
+            <span className="text-primary font-mono">
+              {formatCurrency(detailedPricing.grandTotal)}
             </span>
           </div>
         </CardContent>
@@ -170,8 +317,8 @@ export const Step6PricingSummary: React.FC = () => {
                 REQUIRED
               </Badge>
             </div>
-            <p className="text-3xl font-bold text-amber-900 dark:text-amber-100">
-              {formatCurrency(wizardData.downPaymentAmount)}
+            <p className="text-3xl font-bold text-amber-900 dark:text-amber-100 font-mono">
+              {formatCurrency(detailedPricing.downPaymentAmount)}
             </p>
           </div>
 
@@ -183,8 +330,8 @@ export const Step6PricingSummary: React.FC = () => {
                 Payable when collecting the vehicle
               </p>
             </div>
-            <span className="text-xl font-bold">
-              {formatCurrency(wizardData.balanceDue)}
+            <span className="text-xl font-bold font-mono">
+              {formatCurrency(detailedPricing.balanceDue)}
             </span>
           </div>
         </CardContent>
@@ -196,7 +343,8 @@ export const Step6PricingSummary: React.FC = () => {
         <AlertDescription>
           <strong>Important:</strong> The down payment is mandatory to confirm this
           reservation. The remaining balance will be collected when the customer
-          arrives to collect the vehicle.
+          arrives to collect the vehicle. All pricing is calculated using the selected
+          price list rates.
         </AlertDescription>
       </Alert>
     </div>
