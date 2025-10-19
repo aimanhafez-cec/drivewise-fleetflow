@@ -330,11 +330,21 @@ const ReservationWizardContent: React.FC = () => {
         if (!wizardData.reservationLines || wizardData.reservationLines.length === 0) {
           errors.reservationLines = 'At least one vehicle line is required';
         }
-        // Edge case: Validate vehicle lines have required data
-        if (wizardData.reservationLines) {
+        // Validate vehicle lines based on reservation type
+        if (wizardData.reservationLines && wizardData.reservationLines.length > 0) {
           wizardData.reservationLines.forEach((line, index) => {
-            if (!line.vehicleClassId && !line.vehicleId) {
-              errors[`line${index}_vehicle`] = `Line ${index + 1}: Vehicle class or specific vehicle is required`;
+            if (wizardData.reservationType === 'vehicle_class') {
+              if (!line.vehicleClassId) {
+                errors[`line${index}_vehicle`] = `Line ${index + 1}: Vehicle class selection is required`;
+              }
+            } else if (wizardData.reservationType === 'specific_vin') {
+              if (!line.vehicleId) {
+                errors[`line${index}_vehicle`] = `Line ${index + 1}: Specific vehicle (VIN) selection is required`;
+              }
+            } else if (wizardData.reservationType === 'make_model') {
+              if (!line.vehicleData?.make || !line.vehicleData?.model) {
+                errors[`line${index}_vehicle`] = `Line ${index + 1}: Make and model selection is required`;
+              }
             }
           });
         }
@@ -343,6 +353,15 @@ const ReservationWizardContent: React.FC = () => {
       case 6: // Price List
         if (!wizardData.priceListId) {
           errors.priceListId = 'Price list selection is required';
+        }
+        // Validate that rates are configured
+        const hasValidRates = 
+          (wizardData.dailyRate && wizardData.dailyRate > 0) || 
+          (wizardData.weeklyRate && wizardData.weeklyRate > 0) || 
+          (wizardData.monthlyRate && wizardData.monthlyRate > 0);
+        
+        if (!hasValidRates) {
+          errors.priceListRates = 'At least one rate (daily, weekly, or monthly) must be greater than zero';
         }
         break;
       
@@ -449,8 +468,17 @@ const ReservationWizardContent: React.FC = () => {
         const returnDate = new Date(`${wizardData.returnDate}T${wizardData.returnTime || '00:00'}`);
         return pickup < returnDate;
       }
-      case 5: return !!(wizardData.reservationLines?.length && wizardData.reservationLines.every(line => line.vehicleClassId || line.vehicleId));
-      case 6: return !!wizardData.priceListId;
+      case 5: return !!(wizardData.reservationLines?.length && wizardData.reservationLines.every(line => {
+        if (wizardData.reservationType === 'vehicle_class') return !!line.vehicleClassId;
+        if (wizardData.reservationType === 'specific_vin') return !!line.vehicleId;
+        if (wizardData.reservationType === 'make_model') return !!(line.vehicleData?.make && line.vehicleData?.model);
+        return false;
+      }));
+      case 6: return !!(wizardData.priceListId && (
+        (wizardData.dailyRate && wizardData.dailyRate > 0) || 
+        (wizardData.weeklyRate && wizardData.weeklyRate > 0) || 
+        (wizardData.monthlyRate && wizardData.monthlyRate > 0)
+      ));
       case 7: return !!(wizardData.totalAmount && wizardData.totalAmount > 0);
       case 9: {
         // Airport info is optional unless airport pickup/return is selected
@@ -495,6 +523,12 @@ const ReservationWizardContent: React.FC = () => {
     if (stepNumber === currentStep) {
       return;
     }
+    
+    console.log('🔄 Step Navigation:', {
+      from: currentStep,
+      to: stepNumber,
+      stepName: wizardSteps.find(s => s.number === stepNumber)?.title,
+    });
     
     // Validate current step before leaving
     const errors = validateCurrentStep();
