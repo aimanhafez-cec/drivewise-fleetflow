@@ -97,6 +97,25 @@ export const WizardProgress: React.FC<WizardProgressProps> = ({
               style={{ width: `${(completedCount / totalSteps) * 100}%` }}
             />
           </div>
+          
+          {/* Completion Status Summary */}
+          <div className="flex items-center justify-between mt-3 text-xs text-muted-foreground">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-1.5">
+                <Check className="h-3.5 w-3.5 text-green-500" />
+                <span>{completedCount} completed</span>
+              </div>
+              {incompleteCount > 0 && (
+                <div className="flex items-center gap-1.5">
+                  <AlertCircle className="h-3.5 w-3.5 text-amber-500" />
+                  <span>{incompleteCount} need attention</span>
+                </div>
+              )}
+            </div>
+            <span className="text-muted-foreground/70">
+              Click any step to navigate
+            </span>
+          </div>
         </div>
 
         {/* Steps - Scrollable Horizontal */}
