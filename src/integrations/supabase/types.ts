@@ -3890,12 +3890,73 @@ export type Database = {
         }
         Relationships: []
       }
+      reservation_payments: {
+        Row: {
+          amount: number
+          created_at: string | null
+          id: string
+          notes: string | null
+          payment_method: string
+          payment_status: string
+          payment_type: string
+          processed_at: string | null
+          processed_by: string | null
+          reservation_id: string
+          transaction_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          payment_method: string
+          payment_status?: string
+          payment_type: string
+          processed_at?: string | null
+          processed_by?: string | null
+          reservation_id: string
+          transaction_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          payment_method?: string
+          payment_status?: string
+          payment_type?: string
+          processed_at?: string | null
+          processed_by?: string | null
+          reservation_id?: string
+          transaction_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reservation_payments_processed_by_fkey"
+            columns: ["processed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reservation_payments_reservation_id_fkey"
+            columns: ["reservation_id"]
+            isOneToOne: false
+            referencedRelation: "reservations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reservations: {
         Row: {
           add_ons: Json | null
           airport_info: Json | null
           airport_surcharge: number | null
           auto_approved: boolean | null
+          balance_due: number | null
           billing_address: Json | null
           booking_type: Database["public"]["Enums"]["booking_type"] | null
           converted_agreement_id: string | null
@@ -3904,17 +3965,24 @@ export type Database = {
           cross_border_permits: Json | null
           customer_id: string
           darb_package: Json | null
+          down_payment_amount: number | null
+          down_payment_method: string | null
+          down_payment_paid_at: string | null
+          down_payment_status: string | null
+          down_payment_transaction_id: string | null
           end_datetime: string
           estimated_tolls: number | null
           fuel_option: string | null
           id: string
           instant_booking_score: number | null
+          make_model: string | null
           mileage_package: Json | null
           one_way_surcharge: number | null
           pickup_location: string
           po_number: string | null
           rate_plan: Json | null
           referral_code: string | null
+          reservation_type: string | null
           return_location: string
           ro_number: string | null
           salik_package: Json | null
@@ -3924,6 +3992,7 @@ export type Database = {
           taxes: Json | null
           total_amount: number | null
           updated_at: string
+          vehicle_class_id: string | null
           vehicle_id: string | null
         }
         Insert: {
@@ -3931,6 +4000,7 @@ export type Database = {
           airport_info?: Json | null
           airport_surcharge?: number | null
           auto_approved?: boolean | null
+          balance_due?: number | null
           billing_address?: Json | null
           booking_type?: Database["public"]["Enums"]["booking_type"] | null
           converted_agreement_id?: string | null
@@ -3939,17 +4009,24 @@ export type Database = {
           cross_border_permits?: Json | null
           customer_id: string
           darb_package?: Json | null
+          down_payment_amount?: number | null
+          down_payment_method?: string | null
+          down_payment_paid_at?: string | null
+          down_payment_status?: string | null
+          down_payment_transaction_id?: string | null
           end_datetime: string
           estimated_tolls?: number | null
           fuel_option?: string | null
           id?: string
           instant_booking_score?: number | null
+          make_model?: string | null
           mileage_package?: Json | null
           one_way_surcharge?: number | null
           pickup_location: string
           po_number?: string | null
           rate_plan?: Json | null
           referral_code?: string | null
+          reservation_type?: string | null
           return_location: string
           ro_number?: string | null
           salik_package?: Json | null
@@ -3959,6 +4036,7 @@ export type Database = {
           taxes?: Json | null
           total_amount?: number | null
           updated_at?: string
+          vehicle_class_id?: string | null
           vehicle_id?: string | null
         }
         Update: {
@@ -3966,6 +4044,7 @@ export type Database = {
           airport_info?: Json | null
           airport_surcharge?: number | null
           auto_approved?: boolean | null
+          balance_due?: number | null
           billing_address?: Json | null
           booking_type?: Database["public"]["Enums"]["booking_type"] | null
           converted_agreement_id?: string | null
@@ -3974,17 +4053,24 @@ export type Database = {
           cross_border_permits?: Json | null
           customer_id?: string
           darb_package?: Json | null
+          down_payment_amount?: number | null
+          down_payment_method?: string | null
+          down_payment_paid_at?: string | null
+          down_payment_status?: string | null
+          down_payment_transaction_id?: string | null
           end_datetime?: string
           estimated_tolls?: number | null
           fuel_option?: string | null
           id?: string
           instant_booking_score?: number | null
+          make_model?: string | null
           mileage_package?: Json | null
           one_way_surcharge?: number | null
           pickup_location?: string
           po_number?: string | null
           rate_plan?: Json | null
           referral_code?: string | null
+          reservation_type?: string | null
           return_location?: string
           ro_number?: string | null
           salik_package?: Json | null
@@ -3994,6 +4080,7 @@ export type Database = {
           taxes?: Json | null
           total_amount?: number | null
           updated_at?: string
+          vehicle_class_id?: string | null
           vehicle_id?: string | null
         }
         Relationships: [
@@ -4009,6 +4096,13 @@ export type Database = {
             columns: ["customer_id"]
             isOneToOne: false
             referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reservations_vehicle_class_id_fkey"
+            columns: ["vehicle_class_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
             referencedColumns: ["id"]
           },
           {
@@ -5267,6 +5361,10 @@ export type Database = {
           tier_multiplier: number
           total_points: number
         }[]
+      }
+      calculate_down_payment: {
+        Args: { p_total_amount: number }
+        Returns: number
       }
       calculate_expiring_points: {
         Args: { p_customer_id: string; p_days_ahead?: number }
