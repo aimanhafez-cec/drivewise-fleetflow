@@ -38,57 +38,60 @@ export const WizardProgress: React.FC<WizardProgressProps> = ({
           </div>
         </div>
 
-        {/* Steps */}
-        <div className="hidden lg:flex items-center justify-between">
-          {steps.map((step, index) => {
-            const isCompleted = currentStep > step.number;
-            const isCurrent = currentStep === step.number;
-            const isUpcoming = currentStep < step.number;
+        {/* Steps - Scrollable Horizontal */}
+        <div className="hidden lg:block">
+          <div className="overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent">
+            <div className="flex items-center min-w-max px-4">
+              {steps.map((step, index) => {
+                const isCompleted = currentStep > step.number;
+                const isCurrent = currentStep === step.number;
+                const isUpcoming = currentStep < step.number;
 
-            return (
-              <React.Fragment key={step.number}>
-                <div className="flex flex-col items-center flex-1 min-w-0">
-                  <div
-                    className={cn(
-                      'flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all',
-                      isCompleted &&
-                        'bg-primary border-primary text-primary-foreground',
-                      isCurrent &&
-                        'border-primary bg-primary/10 text-primary scale-110',
-                      isUpcoming && 'border-muted-foreground/30 text-muted-foreground'
+                return (
+                  <React.Fragment key={step.number}>
+                    <div className="flex flex-col items-center w-32 flex-shrink-0">
+                      <div
+                        className={cn(
+                          'flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all',
+                          isCompleted &&
+                            'bg-primary border-primary text-primary-foreground',
+                          isCurrent &&
+                            'border-primary bg-primary/10 text-primary ring-2 ring-primary/20',
+                          isUpcoming && 'border-muted-foreground/30 text-muted-foreground'
+                        )}
+                      >
+                        {isCompleted ? (
+                          <Check className="h-5 w-5" />
+                        ) : (
+                          <span className="font-semibold">{step.number}</span>
+                        )}
+                      </div>
+                      <div className="mt-2 text-center w-full px-1">
+                        <p
+                          className={cn(
+                            'text-xs font-medium transition-colors line-clamp-2',
+                            (isCurrent || isCompleted) ? 'text-foreground' : 'text-muted-foreground'
+                          )}
+                        >
+                          {step.title}
+                        </p>
+                      </div>
+                    </div>
+                    {index < steps.length - 1 && (
+                      <div className="flex items-center h-10 mb-auto flex-shrink-0">
+                        <div
+                          className={cn(
+                            'w-16 h-0.5 transition-colors',
+                            isCompleted ? 'bg-primary' : 'bg-muted-foreground/20'
+                          )}
+                        />
+                      </div>
                     )}
-                  >
-                    {isCompleted ? (
-                      <Check className="h-5 w-5" />
-                    ) : (
-                      <span className="font-semibold">{step.number}</span>
-                    )}
-                  </div>
-                  <div className="mt-2 text-center">
-                    <p
-                      className={cn(
-                        'text-xs font-medium transition-colors',
-                        (isCurrent || isCompleted) ? 'text-foreground' : 'text-muted-foreground'
-                      )}
-                    >
-                      {step.title}
-                    </p>
-                    <p className="text-xs text-muted-foreground hidden xl:block">
-                      {step.description}
-                    </p>
-                  </div>
-                </div>
-                {index < steps.length - 1 && (
-                  <div
-                    className={cn(
-                      'flex-1 h-0.5 mx-2 transition-colors',
-                      isCompleted ? 'bg-primary' : 'bg-muted-foreground/20'
-                    )}
-                  />
-                )}
-              </React.Fragment>
-            );
-          })}
+                  </React.Fragment>
+                );
+              })}
+            </div>
+          </div>
         </div>
 
         {/* Mobile: Current Step Only */}
