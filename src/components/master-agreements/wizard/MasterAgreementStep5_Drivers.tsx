@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Plus, Trash2, Star, UserPlus, Edit, Calendar, Check, ChevronsUpDown } from 'lucide-react';
+import { Plus, Trash2, Star, UserPlus, Edit, Calendar, Check, ChevronsUpDown, CheckCircle2, XCircle } from 'lucide-react';
 import { useDrivers } from '@/hooks/useDrivers';
 import { useAgreementDrivers, useAssignDriver, useRemoveDriver, useUpdateDriverAssignment } from '@/hooks/useAgreementDrivers';
 import { EnhancedDriverForm } from '@/components/drivers/EnhancedDriverForm';
@@ -76,6 +76,12 @@ export const MasterAgreementStep5Drivers: React.FC<MasterAgreementStep5DriversPr
   const getDriversForLine = (lineId: string) => {
     return agreementDrivers.filter(ad => ad.line_id === lineId);
   };
+
+  // Calculate driver assignment statistics
+  const linesWithDrivers = vehicleLines.filter(line => 
+    agreementDrivers.some(ad => ad.line_id === line.id)
+  ).length;
+  const linesWithoutDrivers = vehicleLines.length - linesWithDrivers;
 
   const handleAssignDriver = async (lineId: string, driverId: string) => {
     if (!data.id) return;
@@ -150,17 +156,39 @@ export const MasterAgreementStep5Drivers: React.FC<MasterAgreementStep5DriversPr
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div>
-        <h2 className="text-2xl font-bold mb-2">Authorized Drivers</h2>
+        <h2 className="text-2xl font-bold">Authorized Drivers</h2>
         <p className="text-sm text-muted-foreground">
           Assign drivers to each vehicle line. Search and click to assign instantly.
         </p>
       </div>
 
+      {/* Summary Card */}
+      {vehicleLines.length > 0 && (
+        <Card className="border-2">
+          <CardContent className="py-3">
+            <div className="flex items-center gap-4 flex-wrap">
+              <span className="text-sm font-medium">Driver Assignment Status:</span>
+              <Badge variant="secondary" className="gap-1.5">
+                <span className="font-semibold">{vehicleLines.length}</span> Vehicle{vehicleLines.length !== 1 ? 's' : ''}
+              </Badge>
+              <Badge variant="default" className="gap-1.5 bg-green-500 hover:bg-green-600">
+                <CheckCircle2 className="h-3.5 w-3.5" />
+                <span className="font-semibold">{linesWithDrivers}</span> Assigned
+              </Badge>
+              <Badge variant="destructive" className="gap-1.5">
+                <XCircle className="h-3.5 w-3.5" />
+                <span className="font-semibold">{linesWithoutDrivers}</span> Unassigned
+              </Badge>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Inline Driver Assignment by Line */}
       {vehicleLines.length > 0 ? (
-        <div className="space-y-6">
+        <div className="space-y-4">
           {vehicleLines.map((line, index) => {
             const lineDrivers = getDriversForLine(line.id);
             const filteredDrivers = getFilteredDrivers(line.id);
@@ -168,13 +196,13 @@ export const MasterAgreementStep5Drivers: React.FC<MasterAgreementStep5DriversPr
             
             return (
               <Card key={line.id}>
-                <CardHeader className="pb-3">
+                <CardHeader className="pb-2">
                   <div className="flex items-start justify-between">
-                    <div className="space-y-1">
-                      <CardTitle className="text-lg">
+                    <div>
+                      <CardTitle className="text-base">
                         Line {line.line_number}: {line.item_description || `${line.make} ${line.model} ${line.model_year}`}
                       </CardTitle>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
                         <span>{line.contract_no}</span>
                         {line.category_name && (
                           <>
@@ -192,7 +220,7 @@ export const MasterAgreementStep5Drivers: React.FC<MasterAgreementStep5DriversPr
                     </div>
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-3">
                   {/* Search & Create Row */}
                   <div className="flex gap-2">
                     <div className="flex-1">
@@ -253,12 +281,12 @@ export const MasterAgreementStep5Drivers: React.FC<MasterAgreementStep5DriversPr
                   {/* Assigned Drivers Table */}
                   {lineDrivers.length > 0 ? (
                     <div className="border rounded-lg">
-                      <div className="p-3 border-b bg-muted/30">
+                      <div className="p-2 border-b bg-muted/30">
                         <div className="text-sm font-semibold">Assigned Drivers</div>
                       </div>
                       <div className="divide-y">
                         {lineDrivers.map((ld) => (
-                          <div key={ld.id} className="p-3 flex items-center justify-between hover:bg-muted/50 transition-colors">
+                          <div key={ld.id} className="p-2 flex items-center justify-between hover:bg-muted/50 transition-colors">
                             <div className="flex items-center gap-3 flex-1">
                               {ld.is_primary && <Star className="h-4 w-4 fill-yellow-500 text-yellow-500 flex-shrink-0" />}
                               <div className="flex-1 min-w-0">
@@ -266,7 +294,7 @@ export const MasterAgreementStep5Drivers: React.FC<MasterAgreementStep5DriversPr
                                   <span className="font-medium">{ld.driver?.full_name}</span>
                                   {ld.is_primary && <Badge variant="secondary" className="text-xs">Primary</Badge>}
                                 </div>
-                                <div className="text-xs text-muted-foreground mt-1">
+                                <div className="text-xs text-muted-foreground">
                                   {ld.driver?.phone} • ID: {ld.driver?.emirates_id} • License: {ld.driver?.license_no}
                                 </div>
                               </div>
@@ -307,7 +335,7 @@ export const MasterAgreementStep5Drivers: React.FC<MasterAgreementStep5DriversPr
                       </div>
                     </div>
                   ) : (
-                    <div className="text-sm text-muted-foreground text-center py-6 border rounded-lg bg-muted/30">
+                    <div className="text-sm text-muted-foreground text-center py-4 border rounded-lg bg-muted/30">
                       No drivers assigned yet
                     </div>
                   )}
