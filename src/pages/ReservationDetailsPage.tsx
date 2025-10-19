@@ -1,69 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ArrowLeft, Edit, FileText, DollarSign, Printer, Mail, Calendar, Building, CreditCard, Clock } from 'lucide-react';
+import { ArrowLeft, Edit, FileText, Printer, Mail, ExternalLink } from 'lucide-react';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
-import { SummaryCard } from '@/components/reservation/SummaryCard';
-import { useReservationSummary } from '@/hooks/useReservationSummary';
 import { ConvertToAgreementModal } from '@/components/reservation/ConvertToAgreementModal';
-import { AddDepositModal } from '@/components/reservation/AddDepositModal';
-import { agreementsApi } from '@/lib/api/agreements';
-import { useQueryClient } from '@tanstack/react-query';
+import { ReservationInfoCards } from '@/components/reservations/ReservationInfoCards';
+import { ReservationPaymentHistory } from '@/components/reservations/ReservationPaymentHistory';
+import { ReservationTimeline } from '@/components/reservations/ReservationTimeline';
 import { supabase } from '@/integrations/supabase/client';
-import { formatCurrency } from '@/lib/utils/currency';
-
-interface ReservationHeader {
-  id: string;
-  customerId: string;
-  reservationNo: string;
-  customer: string;
-  businessUnit: string;
-  customerBillTo: string;
-  paymentTerms: string;
-  validityDate: string;
-  contractBillingPlan: string;
-  createdAt: string;
-  status: string;
-}
-
-interface ReservationLine {
-  id: string;
-  lineNo: number;
-  reservationType: string;
-  vehicleClass: string;
-  vehicle: string;
-  driverName: string;
-  checkOutDate: string;
-  checkInDate: string;
-  lineNetPrice: number;
-  additionAmount: number;
-  discount: string;
-  discountValue: number;
-  tax: string;
-  taxValue: number;
-  lineTotal: number;
-}
-
-interface Payment {
-  id: string;
-  paymentDate: string;
-  method: string;
-  amount: number;
-  reference: string;
-  status: string;
-}
-
-interface ReservationNotes {
-  note: string;
-  specialNote: string;
-}
 
 const ReservationDetailsPage = () => {
   const { id } = useParams();
@@ -72,40 +22,12 @@ const ReservationDetailsPage = () => {
   const { toast } = useToast();
   
   const [loading, setLoading] = useState(true);
-  const [editMode, setEditMode] = useState(false);
-  const [activeTab, setActiveTab] = useState('summary');
+  const [activeTab, setActiveTab] = useState('overview');
   const [convertModalOpen, setConvertModalOpen] = useState(false);
-  const [addDepositModalOpen, setAddDepositModalOpen] = useState(false);
-  const [converting, setConverting] = useState(false);
-  const [rawReservationData, setRawReservationData] = useState<any>(null);
   
-  const queryClient = useQueryClient();
-  
-  const [reservationData, setReservationData] = useState<{
-    header: ReservationHeader | null;
-    lines: ReservationLine[];
-    payments: Payment[];
-    notes: ReservationNotes | null;
-  }>({
-    header: null,
-    lines: [],
-    payments: [],
-    notes: null,
-  });
-
-  // Mock data for demonstration
-  const mockFormData = {
-    reservationLines: reservationData.lines,
-    selectedMiscCharges: [],
-    promotionCode: '',
-    preAdjustment: 0,
-    advancePayment: 0,
-    cancellationCharges: 0,
-    securityDepositPaid: 0,
-    discountValue: 0,
-  };
-
-  const summary = useReservationSummary(mockFormData);
+  const [reservationData, setReservationData] = useState<any>(null);
+  const [payments, setPayments] = useState<any[]>([]);
+  const [timelineEvents, setTimelineEvents] = useState<any[]>([]);
 
   const fetchReservationData = async () => {
     if (!id) return;
@@ -118,18 +40,32 @@ const ReservationDetailsPage = () => {
           .from('reservations')
           .select(`
             *,
-            customers (
+            customers:customer_id (
               full_name,
-              email
+              email,
+              phone
+            ),
+            vehicles:vehicle_id (
+              make,
+              model,
+              license_plate,
+              vin
+            ),
+            categories:vehicle_class_id (
+              name,
+              description
+            ),
+            agreements:converted_agreement_id (
+              agreement_no
             )
           `)
           .eq('id', id)
           .single(),
         supabase
-          .from('payments')
+          .from('reservation_payments')
           .select('*')
           .eq('reservation_id', id)
-          .order('processed_at', { ascending: false })
+          .order('payment_date', { ascending: false })
       ]);
 
       if (reservationResponse.error) {
@@ -144,65 +80,60 @@ const ReservationDetailsPage = () => {
       }
 
       const data = reservationResponse.data;
-      const paymentsData = paymentsResponse.data || [];
+      setReservationData(data);
+      setPayments(paymentsResponse.data || []);
 
-      // Store raw reservation data
-      setRawReservationData(data);
-
-      const actualData = {
-        header: {
-          id: data.id,
-          customerId: data.customer_id,
-          reservationNo: data.ro_number || 'RES-000000',
-          customer: data.customers?.full_name || 'Unknown Customer',
-          businessUnit: data.pickup_location || 'Main Location',
-          customerBillTo: `${data.customers?.full_name || 'Unknown'} - Personal`,
-          paymentTerms: 'Net 30 Days',
-          validityDate: format(new Date(data.end_datetime), 'yyyy-MM-dd'),
-          contractBillingPlan: 'Standard Plan',
-          createdAt: format(new Date(data.created_at), 'yyyy-MM-dd'),
-          status: data.status.toUpperCase(),
+      // Build timeline events
+      const events: any[] = [
+        {
+          id: 'created',
+          type: 'created',
+          title: 'Reservation Created',
+          description: `Reservation ${data.ro_number} was created`,
+          timestamp: data.created_at,
+          status: 'info',
         },
-        lines: [
-          {
-            id: data.id,
-            lineNo: 1,
-            reservationType: 'Rental',
-            vehicleClass: data.vehicle_id ? 'Assigned Vehicle' : 'TBD',
-            vehicle: data.vehicle_id || 'To be assigned',
-            driverName: 'TBD',
-            checkOutDate: format(new Date(data.start_datetime), 'yyyy-MM-dd'),
-            checkInDate: format(new Date(data.end_datetime), 'yyyy-MM-dd'),
-            lineNetPrice: data.total_amount || 0,
-            additionAmount: 0,
-            discount: '',
-            discountValue: 0,
-            tax: 'VAT',
-            taxValue: Math.round((data.total_amount || 0) * 0.14 * 100) / 100, // 14% VAT
-            lineTotal: Math.round((data.total_amount || 0) * 1.14 * 100) / 100,
-          },
-        ],
-        payments: paymentsData.map(payment => ({
-          id: payment.id,
-          paymentDate: payment.processed_at || payment.created_at,
-          method: payment.payment_method.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-          amount: payment.amount,
-          reference: payment.transaction_id || '-',
-          status: payment.status.charAt(0).toUpperCase() + payment.status.slice(1),
-        })),
-        notes: {
-          note: 'Customer requested early pickup.',
-          specialNote: 'VIP customer - provide excellent service.',
-        },
-      };
+      ];
 
-      setReservationData(actualData);
+      // Add payment events
+      if (paymentsResponse.data) {
+        paymentsResponse.data.forEach((payment: any) => {
+          events.push({
+            id: payment.id,
+            type: 'payment',
+            title: 'Payment Received',
+            description: `${payment.payment_type.replace(/_/g, ' ')} via ${payment.payment_method.replace(/_/g, ' ')}`,
+            timestamp: payment.payment_date,
+            status: payment.payment_status === 'completed' ? 'success' : 'pending',
+            metadata: {
+              amount: `${payment.amount} AED`,
+              reference: payment.transaction_id || '-',
+            },
+          });
+        });
+      }
+
+      // Add conversion event
+      if (data.converted_agreement_id && data.agreements) {
+        events.push({
+          id: 'converted',
+          type: 'converted',
+          title: 'Converted to Agreement',
+          description: `Converted to Agreement ${data.agreements.agreement_no}`,
+          timestamp: data.updated_at,
+          status: 'success',
+        });
+      }
+
+      setTimelineEvents(events.sort((a, b) => 
+        new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+      ));
 
       // Show creation toast if redirected from new reservation
       if (searchParams.get('created') === '1') {
         toast({
           title: "Reservation Created",
-          description: `Reservation ${actualData.header.reservationNo} has been created successfully.`,
+          description: `Reservation ${data.ro_number} has been created successfully.`,
         });
       }
 
@@ -210,7 +141,7 @@ const ReservationDetailsPage = () => {
       console.error('Failed to fetch reservation data:', error);
       toast({
         title: "Error",
-        description: "Reservation not found.",
+        description: "Failed to load reservation details.",
         variant: "destructive",
       });
       navigate('/reservations');
@@ -219,15 +150,11 @@ const ReservationDetailsPage = () => {
     }
   };
 
-  const refreshDeposits = () => {
-    fetchReservationData();
-  };
-
   useEffect(() => {
     if (id) {
       fetchReservationData();
     }
-  }, [id, navigate, toast, searchParams]);
+  }, [id]);
 
   const handlePrint = () => {
     toast({
@@ -244,118 +171,61 @@ const ReservationDetailsPage = () => {
   };
 
   const handleEdit = () => {
-    // Navigate to new reservation page with pre-populated data
-    const editData = {
-      reservationId: id,
-      customerId: reservationData.header?.customerId,
-      reservationNo: reservationData.header?.reservationNo,
-      businessUnit: reservationData.header?.businessUnit,
-      validityDate: reservationData.header?.validityDate,
-      paymentTerms: reservationData.header?.paymentTerms,
-      lines: reservationData.lines,
-    };
-    
     navigate('/reservations/new', { 
-      state: { editData } 
+      state: { editData: reservationData } 
     });
   };
 
   const handleConvertToAgreement = () => {
-    if (!reservationData.header || reservationData.lines.length === 0) {
-      toast({
-        title: "Cannot Convert",
-        description: "Reservation must have at least one line to convert to agreement.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
+    if (!reservationData) return;
     setConvertModalOpen(true);
   };
 
-  const performConversion = async () => {
-    if (!reservationData.header || !id) return;
-
-    setConverting(true);
-    try {
-      const idempotencyKey = crypto.randomUUID();
-      const result = await agreementsApi.convertReservation(id, {}, idempotencyKey);
-      
-      toast({
-        title: "Agreement Created",
-        description: `Agreement ${result.agreementNo} created successfully.`,
-      });
-      
-      // Invalidate cache to refresh lists
-      queryClient.invalidateQueries({ queryKey: ['agreements:list'] });
-      queryClient.invalidateQueries({ queryKey: ['reservations:open'] });
-      
-      // Navigate to agreement details
-      navigate(`/agreements/${result.agreementId}?fromReservation=${id}`);
-      
-    } catch (error: any) {
-      console.error('Failed to convert reservation:', error);
-      toast({
-        title: "Conversion Failed", 
-        description: error.message || "Could not convert reservation. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setConverting(false);
-      setConvertModalOpen(false);
+  const handleViewAgreement = () => {
+    if (reservationData?.converted_agreement_id) {
+      navigate(`/agreements/${reservationData.converted_agreement_id}`);
     }
   };
 
-  // Check if reservation is convertible
-  const isConvertible = reservationData.header && 
-    reservationData.lines.length > 0 && 
-    reservationData.header.status !== 'COMPLETED';
+  const getStatusColor = (status: string) => {
+    const colors: Record<string, string> = {
+      pending: 'bg-amber-100 text-amber-800',
+      confirmed: 'bg-blue-100 text-blue-800',
+      checked_out: 'bg-emerald-100 text-emerald-800',
+      completed: 'bg-gray-100 text-gray-800',
+      cancelled: 'bg-red-100 text-red-800',
+    };
+    return colors[status] || 'bg-gray-100 text-gray-800';
+  };
 
-  if (loading || !reservationData.header) {
+  if (loading || !reservationData) {
     return (
-      <div id="reservation-details-page" className="space-y-6">
-        {/* Breadcrumbs Skeleton */}
+      <div className="space-y-6">
         <Skeleton className="h-4 w-48" />
-        
-        {/* Header Skeleton */}
         <Card>
-          <CardHeader>
-            <div className="flex justify-between items-start">
-              <div className="space-y-2">
-                <Skeleton className="h-8 w-64" />
-                <Skeleton className="h-4 w-32" />
-              </div>
-              <div className="flex gap-2">
-                <Skeleton className="h-9 w-16" />
+          <CardContent className="p-6">
+            <div className="space-y-4">
+              <Skeleton className="h-8 w-64" />
+              <Skeleton className="h-4 w-32" />
+              <div className="flex gap-2 mt-4">
                 <Skeleton className="h-9 w-20" />
-                <Skeleton className="h-9 w-16" />
-                <Skeleton className="h-9 w-16" />
+                <Skeleton className="h-9 w-20" />
+                <Skeleton className="h-9 w-20" />
               </div>
             </div>
-            <div className="flex flex-wrap gap-2 mt-4">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <Skeleton key={i} className="h-6 w-24" />
-              ))}
-            </div>
-          </CardHeader>
+          </CardContent>
         </Card>
-
-        {/* Content Skeleton */}
-        <div className="grid gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2 space-y-6">
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-64 w-full" />
-          </div>
-          <div>
-            <Skeleton className="h-96 w-full" />
-          </div>
-        </div>
+        <Skeleton className="h-96 w-full" />
       </div>
     );
   }
 
+  const isConvertible = reservationData.status === 'confirmed' && 
+    reservationData.down_payment_status === 'paid' && 
+    !reservationData.converted_agreement_id;
+
   return (
-    <div id="reservation-details-page" className="space-y-6">
+    <div className="space-y-6">
       {/* Breadcrumbs */}
       <Breadcrumb>
         <BreadcrumbList>
@@ -363,13 +233,13 @@ const ReservationDetailsPage = () => {
             <BreadcrumbLink href="/reservations">Reservations</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
-          <BreadcrumbItem>{reservationData.header.reservationNo}</BreadcrumbItem>
+          <BreadcrumbItem>{reservationData.ro_number}</BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
 
       {/* Header Card */}
       <Card>
-        <CardHeader>
+        <CardContent className="p-6">
           <div className="flex justify-between items-start">
             <div className="flex items-center gap-4">
               <Button 
@@ -380,269 +250,106 @@ const ReservationDetailsPage = () => {
                 <ArrowLeft className="h-4 w-4" />
               </Button>
               <div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 mb-1">
                   <h1 className="text-3xl font-bold tracking-tight">
-                    Reservation no. {reservationData.header.reservationNo}
+                    {reservationData.ro_number}
                   </h1>
-                  <Badge className="bg-green-100 text-green-800 px-3 py-1">
-                    {reservationData.header.reservationNo}
+                  <Badge className={getStatusColor(reservationData.status)}>
+                    {reservationData.status}
                   </Badge>
+                  {reservationData.converted_agreement_id && (
+                    <Badge variant="outline" className="border-emerald-500 text-emerald-700">
+                      <FileText className="h-3 w-3 mr-1" />
+                      Converted
+                    </Badge>
+                  )}
                 </div>
-                <p className="text-muted-foreground mt-1">
-                  Created on {format(new Date(reservationData.header.createdAt), 'PPP')}
+                <p className="text-muted-foreground">
+                  Created on {format(new Date(reservationData.created_at), 'PPP')}
                 </p>
               </div>
             </div>
             
             <div className="flex items-center gap-2">
-              <Button id="btn-edit" variant="outline" size="sm" onClick={() => handleEdit()}>
+              <Button variant="outline" size="sm" onClick={handleEdit}>
                 <Edit className="mr-2 h-4 w-4" />
                 Edit
               </Button>
-              <Button 
-                id="btn-convert" 
-                variant="outline" 
-                size="sm" 
-                onClick={handleConvertToAgreement}
-                disabled={!isConvertible}
-              >
-                <FileText className="mr-2 h-4 w-4" />
-                Convert to Agreement
-              </Button>
-              <Button id="btn-print" variant="outline" size="sm" onClick={handlePrint}>
+              
+              {isConvertible && (
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleConvertToAgreement}
+                >
+                  <FileText className="mr-2 h-4 w-4" />
+                  Convert to Agreement
+                </Button>
+              )}
+
+              {reservationData.converted_agreement_id && (
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleViewAgreement}
+                >
+                  <ExternalLink className="mr-2 h-4 w-4" />
+                  View Agreement
+                </Button>
+              )}
+              
+              <Button variant="outline" size="sm" onClick={handlePrint}>
                 <Printer className="mr-2 h-4 w-4" />
                 Print
               </Button>
-              <Button id="btn-email" variant="outline" size="sm" onClick={handleEmail}>
+              <Button variant="outline" size="sm" onClick={handleEmail}>
                 <Mail className="mr-2 h-4 w-4" />
                 Email
               </Button>
             </div>
           </div>
-
-          {/* Header Chips */}
-          <div className="flex flex-wrap gap-2 mt-4">
-            <Badge id="chip-customer" variant="outline" className="flex items-center gap-1">
-              <DollarSign className="h-3 w-3" />
-              {reservationData.header.customer}
-            </Badge>
-            <Badge id="chip-business-unit" variant="outline" className="flex items-center gap-1">
-              <Building className="h-3 w-3" />
-              {reservationData.header.businessUnit}
-            </Badge>
-            <Badge id="chip-bill-to" variant="outline" className="flex items-center gap-1">
-              <CreditCard className="h-3 w-3" />
-              {reservationData.header.customerBillTo}
-            </Badge>
-            <Badge id="chip-payment-terms" variant="outline" className="flex items-center gap-1">
-              <Clock className="h-3 w-3" />
-              {reservationData.header.paymentTerms}
-            </Badge>
-            <Badge id="chip-validity" variant="outline" className="flex items-center gap-1">
-              <Calendar className="h-3 w-3" />
-              Valid until {format(new Date(reservationData.header.validityDate), 'PP')}
-            </Badge>
-            <Badge id="chip-billing-plan" variant="outline">
-              {reservationData.header.contractBillingPlan}
-            </Badge>
-          </div>
-        </CardHeader>
+        </CardContent>
       </Card>
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger id="tab-summary" value="summary">Summary</TabsTrigger>
-          <TabsTrigger id="tab-deposits" value="deposits">Deposits</TabsTrigger>
-          <TabsTrigger id="tab-notes" value="notes">Notes</TabsTrigger>
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="payments">Payments</TabsTrigger>
+          <TabsTrigger value="timeline">Timeline</TabsTrigger>
         </TabsList>
 
-        {/* Summary Tab */}
-        <TabsContent value="summary" className="space-y-6">
-          <div className="grid gap-6 lg:grid-cols-3">
-            {/* Reservation Lines */}
-            <div className="lg:col-span-2">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Reservation Lines</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div id="grid-reservation-lines">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Line No.</TableHead>
-                          <TableHead>Reservation Type</TableHead>
-                          <TableHead>Vehicle Class</TableHead>
-                          <TableHead>Vehicle</TableHead>
-                          <TableHead>Driver Name</TableHead>
-                          <TableHead>Check out Date</TableHead>
-                          <TableHead>Check In Date</TableHead>
-                          <TableHead>Line Net Price</TableHead>
-                          <TableHead>Addition Amount</TableHead>
-                          <TableHead>Discount</TableHead>
-                          <TableHead>Discount Value</TableHead>
-                          <TableHead>Tax</TableHead>
-                          <TableHead>Tax Value</TableHead>
-                          <TableHead>Line Total</TableHead>
-                          <TableHead>Actions</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {reservationData.lines.map((line) => (
-                          <TableRow key={line.id}>
-                            <TableCell>{line.lineNo}</TableCell>
-                            <TableCell>{line.reservationType}</TableCell>
-                            <TableCell>{line.vehicleClass}</TableCell>
-                            <TableCell>{line.vehicle}</TableCell>
-                            <TableCell>{line.driverName}</TableCell>
-                            <TableCell>{format(new Date(line.checkOutDate), 'PP')}</TableCell>
-                            <TableCell>{format(new Date(line.checkInDate), 'PP')}</TableCell>
-                            <TableCell>{formatCurrency(line.lineNetPrice)}</TableCell>
-                            <TableCell>{formatCurrency(line.additionAmount)}</TableCell>
-                            <TableCell>{line.discount}</TableCell>
-                            <TableCell>{formatCurrency(line.discountValue)}</TableCell>
-                            <TableCell>{line.tax}</TableCell>
-                            <TableCell>{formatCurrency(line.taxValue)}</TableCell>
-                            <TableCell>{formatCurrency(line.lineTotal)}</TableCell>
-                            <TableCell>
-                              <Button variant="ghost" size="sm" onClick={() => handleEdit()}>
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                        {reservationData.lines.length === 0 && (
-                          <TableRow>
-                            <TableCell colSpan={15} className="text-center py-8 text-muted-foreground">
-                              No reservation lines added yet.
-                            </TableCell>
-                          </TableRow>
-                        )}
-                      </TableBody>
-                    </Table>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Summary of Charge */}
-            <div className="space-y-6">
-              <div id="summary-card" className="sticky top-6">
-                <SummaryCard
-                  summary={summary}
-                  currencyCode="AED"
-                />
-              </div>
-            </div>
-          </div>
+        {/* Overview Tab */}
+        <TabsContent value="overview" className="space-y-6">
+          <ReservationInfoCards
+            reservation={reservationData}
+            customer={reservationData.customers}
+            vehicle={reservationData.vehicles}
+            vehicleClass={reservationData.categories}
+          />
         </TabsContent>
 
-        {/* Deposits Tab */}
-        <TabsContent value="deposits" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <div className="flex justify-between items-center">
-                <CardTitle>Customer Deposits</CardTitle>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => setAddDepositModalOpen(true)}
-                >
-                  <DollarSign className="mr-2 h-4 w-4" />
-                  Add Deposit
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Method</TableHead>
-                    <TableHead>Amount</TableHead>
-                    <TableHead>Reference</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {reservationData.payments.map((payment) => (
-                    <TableRow key={payment.id}>
-                      <TableCell>{format(new Date(payment.paymentDate), 'PP')}</TableCell>
-                      <TableCell>{payment.method}</TableCell>
-                      <TableCell>{formatCurrency(payment.amount)}</TableCell>
-                      <TableCell>{payment.reference}</TableCell>
-                      <TableCell>
-                        <Badge variant={payment.status === 'Completed' ? 'default' : 'secondary'}>
-                          {payment.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Button variant="ghost" size="sm">
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                  {reservationData.payments.length === 0 && (
-                    <TableRow>
-                      <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                        No deposits recorded yet.
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+        {/* Payments Tab */}
+        <TabsContent value="payments">
+          <ReservationPaymentHistory
+            payments={payments}
+            totalAmount={reservationData.total_amount || 0}
+            downPaymentRequired={reservationData.down_payment_amount || 0}
+          />
         </TabsContent>
 
-        {/* Notes Tab */}
-        <TabsContent value="notes" className="space-y-6">
-          <div className="grid gap-6 md:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>Note</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  {reservationData.notes?.note || 'No notes available.'}
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Special Note</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  {reservationData.notes?.specialNote || 'No special notes available.'}
-                </p>
-              </CardContent>
-            </Card>
-          </div>
+        {/* Timeline Tab */}
+        <TabsContent value="timeline">
+          <ReservationTimeline events={timelineEvents} />
         </TabsContent>
       </Tabs>
 
       {/* Convert to Agreement Modal */}
-      {rawReservationData && (
+      {reservationData && (
         <ConvertToAgreementModal
           open={convertModalOpen}
           onOpenChange={setConvertModalOpen}
-          reservation={rawReservationData}
-        />
-      )}
-
-      {/* Add Deposit Modal */}
-      {reservationData.header && (
-        <AddDepositModal
-          open={addDepositModalOpen}
-          onOpenChange={setAddDepositModalOpen}
-          reservationId={reservationData.header.id}
-          customerId={reservationData.header.customerId}
-          onDepositAdded={refreshDeposits}
+          reservation={reservationData}
         />
       )}
     </div>

@@ -25,7 +25,8 @@ import {
   CreditCard,
 } from 'lucide-react';
 import { format } from 'date-fns';
-import { formatCurrency, cn } from '@/lib/utils';
+import { formatCurrency } from '@/lib/utils/currency';
+import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 
 interface ReservationCardProps {
