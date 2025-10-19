@@ -8,7 +8,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { LOVSelect } from '@/components/ui/lov-select';
-import { useVehicleClasses, useVehicleOptions, useLocations } from '@/hooks/useBusinessLOVs';
+import { useVehicleClasses, useVehicleOptions, useLocations, useVehicleMakes, useVehicleModels } from '@/hooks/useBusinessLOVs';
 import { useAddonItems } from '@/hooks/useAddonItems';
 import { EnhancedDriverPicker } from '@/components/reservation/EnhancedDriverPicker';
 import { Car, MapPin, Calendar, Users, Plus, AlertCircle } from 'lucide-react';
@@ -46,6 +46,8 @@ export const LineEditorModal: React.FC<LineEditorModalProps> = ({
   // Initialize with line data or defaults
   const [vehicleClassId, setVehicleClassId] = useState(line?.vehicleClassId || '');
   const [vehicleId, setVehicleId] = useState(line?.vehicleId || '');
+  const [selectedMake, setSelectedMake] = useState(line?.vehicleData?.make || '');
+  const [selectedModel, setSelectedModel] = useState(line?.vehicleData?.model || '');
   const [checkOutDate, setCheckOutDate] = useState(line?.checkOutDate || defaultDates.checkOutDate);
   const [checkOutTime, setCheckOutTime] = useState(line?.checkOutTime || defaultDates.checkOutTime);
   const [checkInDate, setCheckInDate] = useState(line?.checkInDate || defaultDates.checkInDate);
@@ -62,6 +64,8 @@ export const LineEditorModal: React.FC<LineEditorModalProps> = ({
   const { items: vehicles } = useVehicleOptions({ status: 'available' });
   const { items: locations } = useLocations();
   const { data: addOns } = useAddonItems();
+  const { items: makes } = useVehicleMakes();
+  const { items: models } = useVehicleModels(selectedMake);
 
   const handleSave = () => {
     const newLine: ReservationLine = {
@@ -73,6 +77,8 @@ export const LineEditorModal: React.FC<LineEditorModalProps> = ({
         ? vehicleClasses.find(c => c.id === vehicleClassId)
         : reservationType === 'specific_vin'
         ? vehicles.find(v => v.id === vehicleId)
+        : reservationType === 'make_model' && selectedMake && selectedModel
+        ? { make: selectedMake, model: selectedModel, makeModel: `${selectedMake} ${selectedModel}` }
         : undefined,
       drivers: selectedDrivers.map((driver, index) => ({
         driverId: driver.id,
@@ -111,6 +117,7 @@ export const LineEditorModal: React.FC<LineEditorModalProps> = ({
   const isValid = () => {
     if (reservationType === 'vehicle_class') return !!vehicleClassId;
     if (reservationType === 'specific_vin') return !!vehicleId;
+    if (reservationType === 'make_model') return !!selectedMake && !!selectedModel;
     return true;
   };
 
@@ -176,12 +183,41 @@ export const LineEditorModal: React.FC<LineEditorModalProps> = ({
             )}
 
             {reservationType === 'make_model' && (
-              <Alert>
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>
-                  Make/Model selection will be assigned during vehicle handover
-                </AlertDescription>
-              </Alert>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Vehicle Make <span className="text-destructive">*</span></Label>
+                  <LOVSelect
+                    items={makes}
+                    value={selectedMake}
+                    onChange={(val) => {
+                      setSelectedMake(val as string);
+                      setSelectedModel(''); // Reset model when make changes
+                    }}
+                    placeholder="Select vehicle make"
+                  />
+                </div>
+                
+                {selectedMake && (
+                  <div className="space-y-2">
+                    <Label>Vehicle Model <span className="text-destructive">*</span></Label>
+                    <LOVSelect
+                      items={models}
+                      value={selectedModel}
+                      onChange={(val) => setSelectedModel(val as string)}
+                      placeholder="Select vehicle model"
+                    />
+                  </div>
+                )}
+                
+                {!selectedMake && (
+                  <Alert>
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>
+                      Select a make to see available models
+                    </AlertDescription>
+                  </Alert>
+                )}
+              </div>
             )}
           </TabsContent>
 

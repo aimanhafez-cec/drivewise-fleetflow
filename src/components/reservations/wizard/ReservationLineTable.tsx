@@ -66,7 +66,12 @@ export const ReservationLineTable: React.FC<ReservationLineTableProps> = ({
               <TableCell>
                 <div className="space-y-1">
                   <div className="font-medium">{getVehicleDisplay(line)}</div>
-                  {!line.vehicleId && !line.vehicleClassId && (
+                  {!line.vehicleId && !line.vehicleClassId && reservationType !== 'make_model' && (
+                    <Badge variant="outline" className="text-xs">
+                      Not Selected
+                    </Badge>
+                  )}
+                  {reservationType === 'make_model' && !line.vehicleData?.makeModel && (
                     <Badge variant="outline" className="text-xs">
                       Not Selected
                     </Badge>
