@@ -33,14 +33,14 @@ const wizardSteps = [
   { number: 1, title: 'Reservation Type', description: 'Select booking type' },
   { number: 2, title: 'Business Config', description: 'Setup business rules' },
   { number: 3, title: 'Customer', description: 'Identify customer' },
-  { number: 4, title: 'Price List', description: 'Select rates' },
-  { number: 5, title: 'Dates & Locations', description: 'Set schedule' },
-  { number: 6, title: 'Vehicle Lines', description: 'Build reservation' },
-  { number: 7, title: 'Services & Add-ons', description: 'Select extras' },
-  { number: 8, title: 'Airport Info', description: 'Flight details' },
-  { number: 9, title: 'Insurance', description: 'Coverage options' },
-  { number: 10, title: 'Billing', description: 'Setup billing' },
-  { number: 11, title: 'Pricing Summary', description: 'Review costs' },
+  { number: 4, title: 'Dates & Locations', description: 'Set schedule' },
+  { number: 5, title: 'Vehicle Lines', description: 'Build reservation' },
+  { number: 6, title: 'Price List', description: 'Select rates' },
+  { number: 7, title: 'Pricing Summary', description: 'Review costs' },
+  { number: 8, title: 'Services & Add-ons', description: 'Select extras' },
+  { number: 9, title: 'Airport Info', description: 'Flight details' },
+  { number: 10, title: 'Insurance', description: 'Coverage options' },
+  { number: 11, title: 'Billing', description: 'Setup billing' },
   { number: 12, title: 'Payment', description: 'Collect deposit' },
   { number: 13, title: 'Referral & Notes', description: 'Additional info' },
   { number: 14, title: 'Confirmation', description: 'Complete booking' },
@@ -275,13 +275,7 @@ const ReservationWizardContent: React.FC = () => {
         }
         break;
       
-      case 4: // Price List
-        if (!wizardData.priceListId) {
-          errors.priceListId = 'Price list selection is required';
-        }
-        break;
-      
-      case 5: // Dates & Locations
+      case 4: // Dates & Locations
         if (!wizardData.pickupDate) {
           errors.pickupDate = 'Pickup date is required';
         }
@@ -332,7 +326,7 @@ const ReservationWizardContent: React.FC = () => {
         }
         break;
       
-      case 6: // Vehicle Lines
+      case 5: // Vehicle Lines
         if (!wizardData.reservationLines || wizardData.reservationLines.length === 0) {
           errors.reservationLines = 'At least one vehicle line is required';
         }
@@ -346,7 +340,26 @@ const ReservationWizardContent: React.FC = () => {
         }
         break;
       
-      case 8: // Airport Info
+      case 6: // Price List
+        if (!wizardData.priceListId) {
+          errors.priceListId = 'Price list selection is required';
+        }
+        break;
+      
+      case 7: // Pricing Summary
+        if (!wizardData.totalAmount || wizardData.totalAmount <= 0) {
+          errors.totalAmount = 'Total amount must be greater than zero';
+        }
+        // Edge case: Verify payment amounts add up
+        if (wizardData.totalAmount && wizardData.downPaymentAmount && wizardData.balanceDue) {
+          const calculatedBalance = wizardData.totalAmount - wizardData.downPaymentAmount;
+          if (Math.abs(calculatedBalance - wizardData.balanceDue) > 0.01) {
+            errors.paymentMismatch = 'Payment amounts do not match total amount';
+          }
+        }
+        break;
+      
+      case 9: // Airport Info
         // Conditional validation: If airport pickup is enabled, require flight details
         if (wizardData.airportPickup) {
           if (!wizardData.pickupFlightNo) {
@@ -366,7 +379,7 @@ const ReservationWizardContent: React.FC = () => {
         }
         break;
       
-      case 9: // Insurance
+      case 10: // Insurance
         if (!wizardData.insuranceLevelId) {
           errors.insuranceLevelId = 'Insurance level is required';
         }
@@ -375,7 +388,7 @@ const ReservationWizardContent: React.FC = () => {
         }
         break;
       
-      case 10: // Billing Config
+      case 11: // Billing Config
         if (!wizardData.billToType) {
           errors.billToType = 'Bill to type is required';
         }
@@ -384,19 +397,6 @@ const ReservationWizardContent: React.FC = () => {
         }
         if (!wizardData.taxCodeId) {
           errors.taxCodeId = 'Tax code is required';
-        }
-        break;
-      
-      case 11: // Pricing Summary
-        if (!wizardData.totalAmount || wizardData.totalAmount <= 0) {
-          errors.totalAmount = 'Total amount must be greater than zero';
-        }
-        // Edge case: Verify payment amounts add up
-        if (wizardData.totalAmount && wizardData.downPaymentAmount && wizardData.balanceDue) {
-          const calculatedBalance = wizardData.totalAmount - wizardData.downPaymentAmount;
-          if (Math.abs(calculatedBalance - wizardData.balanceDue) > 0.01) {
-            errors.paymentMismatch = 'Payment amounts do not match total amount';
-          }
         }
         break;
       
@@ -431,8 +431,7 @@ const ReservationWizardContent: React.FC = () => {
       case 1: return !!wizardData.reservationType;
       case 2: return !!(wizardData.businessUnitId && wizardData.reservationMethodId && wizardData.paymentTermsId);
       case 3: return !!(wizardData.customerId && wizardData.customerData);
-      case 4: return !!wizardData.priceListId;
-      case 5: {
+      case 4: {
         if (!wizardData.pickupDate || !wizardData.returnDate || !wizardData.pickupLocation || !wizardData.returnLocation) {
           return false;
         }
@@ -441,8 +440,10 @@ const ReservationWizardContent: React.FC = () => {
         const returnDate = new Date(`${wizardData.returnDate}T${wizardData.returnTime || '00:00'}`);
         return pickup < returnDate;
       }
-      case 6: return !!(wizardData.reservationLines?.length && wizardData.reservationLines.every(line => line.vehicleClassId || line.vehicleId));
-      case 8: {
+      case 5: return !!(wizardData.reservationLines?.length && wizardData.reservationLines.every(line => line.vehicleClassId || line.vehicleId));
+      case 6: return !!wizardData.priceListId;
+      case 7: return !!(wizardData.totalAmount && wizardData.totalAmount > 0);
+      case 9: {
         // Airport info is optional unless airport pickup/return is selected
         if (wizardData.airportPickup && (!wizardData.pickupFlightNo || !wizardData.pickupFlightTime)) {
           return false;
@@ -452,9 +453,8 @@ const ReservationWizardContent: React.FC = () => {
         }
         return true;
       }
-      case 9: return !!(wizardData.insuranceLevelId && wizardData.insuranceGroupId);
-      case 10: return !!(wizardData.billToType && wizardData.taxLevelId && wizardData.taxCodeId);
-      case 11: return !!(wizardData.totalAmount && wizardData.totalAmount > 0);
+      case 10: return !!(wizardData.insuranceLevelId && wizardData.insuranceGroupId);
+      case 11: return !!(wizardData.billToType && wizardData.taxLevelId && wizardData.taxCodeId);
       case 12: return wizardData.downPaymentAmount && wizardData.downPaymentAmount > 0 ? !!wizardData.paymentMethod : true;
       default: return true;
     }
@@ -512,7 +512,7 @@ const ReservationWizardContent: React.FC = () => {
 
   const validateAllSteps = (): { isValid: boolean; invalidSteps: number[] } => {
     const invalidSteps: number[] = [];
-    const requiredSteps = [1, 2, 3, 4, 5, 6, 10]; // Core required steps
+    const requiredSteps = [1, 2, 3, 4, 5, 6, 7, 11]; // Core required steps
     
     requiredSteps.forEach((step) => {
       const status = getStepStatus(step);
@@ -540,14 +540,14 @@ const ReservationWizardContent: React.FC = () => {
       case 1: return <ReservationTypeSelector selectedType={wizardData.reservationType} onTypeSelect={(type) => updateWizardData({ reservationType: type })} />;
       case 2: return <Step1_5BusinessConfig />;
       case 3: return <CustomerIdentification selectedCustomerId={wizardData.customerId} onCustomerSelect={(c) => updateWizardData({ customerId: c.id, customerData: c })} />;
-      case 4: return <Step2_5PriceList />;
-      case 5: return <DatesLocations data={{ pickupDate: wizardData.pickupDate, pickupTime: wizardData.pickupTime, returnDate: wizardData.returnDate, returnTime: wizardData.returnTime, pickupLocation: wizardData.pickupLocation, returnLocation: wizardData.returnLocation }} onUpdate={(u) => updateWizardData(u)} />;
-      case 6: return <Step4MultiLineBuilder />;
-      case 7: return <Step5ServicesAddOns />;
-      case 8: return <Step5_5AirportInfo />;
-      case 9: return <Step5_6Insurance />;
-      case 10: return <Step5_7BillingConfig />;
-      case 11: return <Step6PricingSummary />;
+      case 4: return <DatesLocations data={{ pickupDate: wizardData.pickupDate, pickupTime: wizardData.pickupTime, returnDate: wizardData.returnDate, returnTime: wizardData.returnTime, pickupLocation: wizardData.pickupLocation, returnLocation: wizardData.returnLocation }} onUpdate={(u) => updateWizardData(u)} />;
+      case 5: return <Step4MultiLineBuilder />;
+      case 6: return <Step2_5PriceList />;
+      case 7: return <Step6PricingSummary />;
+      case 8: return <Step5ServicesAddOns />;
+      case 9: return <Step5_5AirportInfo />;
+      case 10: return <Step5_6Insurance />;
+      case 11: return <Step5_7BillingConfig />;
       case 12: return <Step7DownPayment />;
       case 13: return <Step7_5ReferralNotes />;
       case 14: return <Step8Confirmation />;
