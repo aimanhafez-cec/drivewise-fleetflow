@@ -13,6 +13,7 @@ import { Navigate } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import Reservations from "./pages/Reservations";
 import NewReservation from "./pages/NewReservation";
+import NewReservationWizard from "./pages/NewReservationWizard";
 import ReservationsMulti from "./pages/ReservationsMulti";
 import Planner from "./pages/Planner";
 import DailyPlanner from "./pages/DailyPlanner";
@@ -89,7 +90,8 @@ const App = () => {
                   </ProtectedRoute>
                 }>
                   <Route index element={<Reservations />} />
-                  <Route path="new" element={<NewReservation />} />
+                  <Route path="new" element={<NewReservationWizard />} />
+                  <Route path="new-legacy" element={<NewReservation />} />
                   <Route path="new-multi" element={<ReservationsMulti />} />
                   <Route path=":id" element={<ReservationDetailsPage />} />
                 </Route>
