@@ -118,7 +118,7 @@ const ReservationWizardContent: React.FC = () => {
       case 1: return !!wizardData.reservationType;
       case 2: return !!wizardData.customerId;
       case 3: return !!(wizardData.pickupDate && wizardData.returnDate && wizardData.pickupLocation);
-      case 4: return wizardData.reservationLines.length > 0;
+      case 4: return !!wizardData.reservationLines?.length;
       case 7: return !!(wizardData.paymentMethod && wizardData.downPaymentAmount);
       default: return true;
     }
