@@ -38,6 +38,8 @@ import NewRFQ from "./pages/NewRFQ";
 import RFQDetails from "./pages/RFQDetails";
 import CustomerDetails from "./pages/CustomerDetails";
 import InstantBooking from "./pages/InstantBooking";
+import NewInstantBooking from "./pages/NewInstantBooking";
+import InstantBookingSettings from "./pages/InstantBookingSettings";
 import Reports from "./pages/Reports";
 import MasterAgreements from "./pages/MasterAgreements";
 import MasterAgreementDetails from "./pages/MasterAgreementDetails";
@@ -76,6 +78,8 @@ const App = () => {
                 </ProtectedRoute>
               }>
                 <Route index element={<InstantBooking />} />
+                <Route path="new" element={<NewInstantBooking />} />
+                <Route path="settings" element={<InstantBookingSettings />} />
               </Route>
               <Route path="/reservations" element={
                   <ProtectedRoute>
