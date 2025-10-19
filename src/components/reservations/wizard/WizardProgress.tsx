@@ -65,11 +65,11 @@ export const WizardProgress: React.FC<WizardProgressProps> = ({
       };
     }
 
-    // Not visited / Cannot access yet
+    // Not visited / Can navigate freely
     return {
-      circle: 'border-muted-foreground/30 text-muted-foreground cursor-not-allowed opacity-50',
+      circle: 'border-muted-foreground/30 text-muted-foreground cursor-pointer hover:border-primary/50 hover:text-primary transition-all',
       text: 'text-muted-foreground',
-      clickable: false,
+      clickable: true,
     };
   };
 

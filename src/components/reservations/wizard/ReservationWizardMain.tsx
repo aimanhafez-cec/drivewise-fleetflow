@@ -490,43 +490,24 @@ const ReservationWizardContent: React.FC = () => {
     // Validate current step before leaving
     const errors = validateCurrentStep();
     if (Object.keys(errors).length > 0) {
-      // Mark current step with errors but still allow navigation
+      // Mark current step with errors but allow navigation
       setValidationErrors(errors);
       markStepIncomplete(currentStep);
+      toast({
+        title: 'Step Has Validation Issues',
+        description: 'You can navigate freely, but please fix these issues before final submission.',
+        variant: 'default',
+      });
     } else {
-      // Mark as complete if no errors
-      if (currentStep < stepNumber) {
+      // Mark as complete if no errors and moving forward
+      if (stepNumber > currentStep) {
         markStepComplete(currentStep);
       }
       setValidationErrors({});
     }
     
-    // Allow going to any visited or completed step
-    if (stepNumber < currentStep || completedSteps.includes(stepNumber)) {
-      goToStep(stepNumber);
-      return;
-    }
-    
-    // Allow going to next step if current step is valid or just one step ahead
-    if (stepNumber === currentStep + 1) {
-      if (Object.keys(errors).length === 0) {
-        goToStep(stepNumber);
-      } else {
-        toast({
-          title: 'Validation Required',
-          description: 'Please correct the errors before proceeding',
-          variant: 'destructive',
-        });
-      }
-      return;
-    }
-    
-    // Don't allow jumping ahead multiple steps
-    toast({
-      title: 'Cannot Skip Steps',
-      description: 'Please complete the previous steps first',
-      variant: 'destructive',
-    });
+    // Allow free navigation to any step
+    goToStep(stepNumber);
   };
 
   const validateAllSteps = (): { isValid: boolean; invalidSteps: number[] } => {
