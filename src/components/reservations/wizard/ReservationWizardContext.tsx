@@ -149,13 +149,21 @@ export interface ReservationWizardData {
   draftSavedAt?: string;
 }
 
+export type StepStatus = 'complete' | 'incomplete' | 'has-errors' | 'not-visited';
+
 interface ReservationWizardContextType {
   currentStep: number;
   wizardData: ReservationWizardData;
+  completedSteps: number[];
+  visitedSteps: number[];
+  stepValidationStatus: Record<number, StepStatus>;
   updateWizardData: (updates: Partial<ReservationWizardData>) => void;
   nextStep: () => void;
   prevStep: () => void;
   goToStep: (step: number) => void;
+  markStepComplete: (stepNumber: number) => void;
+  markStepIncomplete: (stepNumber: number) => void;
+  getStepStatus: (stepNumber: number) => StepStatus;
   resetWizard: () => void;
 }
 
@@ -263,18 +271,84 @@ export const ReservationWizardProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [wizardData, setWizardData] = useState<ReservationWizardData>(initialWizardData);
+  const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+  const [visitedSteps, setVisitedSteps] = useState<number[]>([1]); // Step 1 is visited by default
+  const [stepValidationStatus, setStepValidationStatus] = useState<Record<number, StepStatus>>({});
 
   const updateWizardData = (updates: Partial<ReservationWizardData>) => {
     setWizardData((prev) => ({ ...prev, ...updates }));
   };
 
-  const nextStep = () => setCurrentStep((prev) => Math.min(prev + 1, 14));
-  const prevStep = () => setCurrentStep((prev) => Math.max(prev - 1, 1));
-  const goToStep = (step: number) => setCurrentStep(Math.max(1, Math.min(step, 14)));
+  const markStepComplete = (stepNumber: number) => {
+    setCompletedSteps((prev) => {
+      if (!prev.includes(stepNumber)) {
+        return [...prev, stepNumber];
+      }
+      return prev;
+    });
+    setStepValidationStatus((prev) => ({
+      ...prev,
+      [stepNumber]: 'complete',
+    }));
+  };
+
+  const markStepIncomplete = (stepNumber: number) => {
+    setCompletedSteps((prev) => prev.filter((step) => step !== stepNumber));
+    setStepValidationStatus((prev) => ({
+      ...prev,
+      [stepNumber]: 'incomplete',
+    }));
+  };
+
+  const getStepStatus = (stepNumber: number): StepStatus => {
+    if (stepValidationStatus[stepNumber]) {
+      return stepValidationStatus[stepNumber];
+    }
+    if (visitedSteps.includes(stepNumber)) {
+      return 'incomplete';
+    }
+    return 'not-visited';
+  };
+
+  const nextStep = () => {
+    const next = Math.min(currentStep + 1, 14);
+    setCurrentStep(next);
+    setVisitedSteps((prev) => {
+      if (!prev.includes(next)) {
+        return [...prev, next];
+      }
+      return prev;
+    });
+  };
+
+  const prevStep = () => {
+    const prev = Math.max(currentStep - 1, 1);
+    setCurrentStep(prev);
+    setVisitedSteps((prevVisited) => {
+      if (!prevVisited.includes(prev)) {
+        return [...prevVisited, prev];
+      }
+      return prevVisited;
+    });
+  };
+
+  const goToStep = (step: number) => {
+    const targetStep = Math.max(1, Math.min(step, 14));
+    setCurrentStep(targetStep);
+    setVisitedSteps((prev) => {
+      if (!prev.includes(targetStep)) {
+        return [...prev, targetStep];
+      }
+      return prev;
+    });
+  };
   
   const resetWizard = () => {
     setCurrentStep(1);
     setWizardData(initialWizardData);
+    setCompletedSteps([]);
+    setVisitedSteps([1]);
+    setStepValidationStatus({});
   };
 
   return (
@@ -282,10 +356,16 @@ export const ReservationWizardProvider: React.FC<{ children: ReactNode }> = ({
       value={{
         currentStep,
         wizardData,
+        completedSteps,
+        visitedSteps,
+        stepValidationStatus,
         updateWizardData,
         nextStep,
         prevStep,
         goToStep,
+        markStepComplete,
+        markStepIncomplete,
+        getStepStatus,
         resetWizard,
       }}
     >
