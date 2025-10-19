@@ -11,7 +11,7 @@ import {
   FileText,
   CheckCircle,
 } from 'lucide-react';
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency } from '@/lib/utils/currency';
 import { useReservationWizard } from './ReservationWizardContext';
 import { Badge } from '@/components/ui/badge';
 

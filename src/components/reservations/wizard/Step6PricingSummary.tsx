@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, DollarSign, CreditCard, AlertCircle } from 'lucide-react';
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency } from '@/lib/utils/currency';
 import { useReservationWizard } from './ReservationWizardContext';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
