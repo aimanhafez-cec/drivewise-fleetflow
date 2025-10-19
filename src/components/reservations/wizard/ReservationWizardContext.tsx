@@ -74,6 +74,12 @@ export interface ReservationWizardData {
   
   // Step 5.5: Airport Information
   enableAirportInfo: boolean;
+  airportPickup?: boolean;
+  pickupFlightNo?: string;
+  pickupFlightTime?: string;
+  airportReturn?: boolean;
+  returnFlightNo?: string;
+  returnFlightTime?: string;
   arrivalFlightNo?: string;
   arrivalAirport?: string;
   arrivalCity?: string;
@@ -131,6 +137,10 @@ export interface ReservationWizardData {
   // Step 7.5: Referral & Notes
   referralCustomerId?: string;
   referralCode?: string;
+  referralSource?: string;
+  referralDetails?: string;
+  internalNotes?: string;
+  customerNotes?: string;
   notes?: string;
   specialNotes?: string;
   
@@ -236,6 +246,10 @@ const initialWizardData: ReservationWizardData = {
   // Step 7.5
   referralCustomerId: undefined,
   referralCode: undefined,
+  referralSource: undefined,
+  referralDetails: undefined,
+  internalNotes: undefined,
+  customerNotes: undefined,
   notes: undefined,
   specialNotes: undefined,
   

@@ -20,6 +20,34 @@ interface ReservationData {
   balanceDue?: number;
   paymentMethod?: string;
   transactionId?: string;
+  // Phase 9 additions
+  businessUnitId?: string;
+  reservationMethodId?: string;
+  paymentTermsId?: string;
+  priceListId?: string;
+  billToType?: string;
+  billToMeta?: any;
+  taxLevelId?: string;
+  taxCodeId?: string;
+  discountTypeId?: string;
+  discountValue?: number;
+  validityDateTo?: string;
+  leaseToOwn?: boolean;
+  insuranceLevelId?: string;
+  insuranceGroupId?: string;
+  insuranceProviderId?: string;
+  airportPickup?: boolean;
+  pickupFlightNo?: string;
+  pickupFlightTime?: string;
+  airportReturn?: boolean;
+  returnFlightNo?: string;
+  returnFlightTime?: string;
+  referralSource?: string;
+  referralDetails?: string;
+  internalNotes?: string;
+  customerNotes?: string;
+  advancePayment?: number;
+  securityDepositPaid?: number;
 }
 
 export const useReservationDataConsistency = () => {

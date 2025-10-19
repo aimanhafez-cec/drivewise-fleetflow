@@ -57,70 +57,148 @@ const ReservationWizardContent: React.FC = () => {
 
   const createReservationMutation = useMutation({
     mutationFn: async () => {
-      // Run comprehensive validation
-      const validationResult = validateReservation(wizardData);
-      if (!validationResult.success) {
-        const errorMessages = validationResult.errors.map(e => e.message).join(', ');
-        throw new Error(`Validation failed: ${errorMessages}`);
+      try {
+        // Run comprehensive validation
+        const validationResult = validateReservation(wizardData);
+        if (!validationResult.success) {
+          const errorMessages = validationResult.errors.map(e => e.message).join(', ');
+          throw new Error(`Validation failed: ${errorMessages}`);
+        }
+
+        // Check data consistency
+        const { isConsistent, issues } = checkDataConsistency(wizardData);
+        if (!isConsistent) {
+          throw new Error(`Data consistency issues: ${issues.join(', ')}`);
+        }
+
+        // Validate before submission
+        if (!validateBeforeSubmission(wizardData)) {
+          throw new Error('Data validation failed');
+        }
+
+        // Ensure data integrity
+        const cleanData = ensureDataIntegrity(wizardData);
+
+        // Edge case: Verify dates are not in the past
+        const now = new Date();
+        const pickupDateTime = new Date(`${cleanData.pickupDate}T${cleanData.pickupTime}`);
+        if (pickupDateTime < now && pickupDateTime.getTime() < now.getTime() - 86400000) {
+          throw new Error('Pickup date cannot be more than 24 hours in the past');
+        }
+
+        // Edge case: Verify return is after pickup
+        const returnDateTime = new Date(`${cleanData.returnDate}T${cleanData.returnTime}`);
+        if (returnDateTime <= pickupDateTime) {
+          throw new Error('Return date/time must be after pickup date/time');
+        }
+
+        // Edge case: Verify payment amounts
+        if (cleanData.totalAmount && cleanData.totalAmount <= 0) {
+          throw new Error('Total amount must be greater than zero');
+        }
+        if (cleanData.downPaymentAmount && cleanData.downPaymentAmount < 0) {
+          throw new Error('Down payment amount cannot be negative');
+        }
+        if (cleanData.downPaymentAmount && cleanData.totalAmount && cleanData.downPaymentAmount > cleanData.totalAmount) {
+          throw new Error('Down payment cannot exceed total amount');
+        }
+
+        // Generate reservation number
+        const { data: reservationNo, error: rpcError } = await supabase.rpc('generate_reservation_no');
+        if (rpcError) throw new Error(`Failed to generate reservation number: ${rpcError.message}`);
+        if (!reservationNo) throw new Error('Failed to generate reservation number');
+
+        // Insert reservation with all new fields
+        const { data: reservation, error } = await supabase
+          .from('reservations')
+          .insert({
+            ro_number: reservationNo,
+            customer_id: cleanData.customerId,
+            reservation_type: cleanData.reservationType,
+            business_unit_id: cleanData.businessUnitId || null,
+            reservation_method_id: cleanData.reservationMethodId || null,
+            payment_terms_id: cleanData.paymentTermsId || null,
+            price_list_id: cleanData.priceListId || null,
+            vehicle_class_id: cleanData.vehicleClassId || null,
+            make_model: cleanData.makeModel || null,
+            vehicle_id: cleanData.vehicleId || null,
+            start_datetime: pickupDateTime.toISOString(),
+            end_datetime: returnDateTime.toISOString(),
+            pickup_location: cleanData.pickupLocation,
+            return_location: cleanData.returnLocation || cleanData.pickupLocation,
+            bill_to_type: cleanData.billToType || null,
+            bill_to_meta: cleanData.billToMeta || null,
+            tax_level_id: cleanData.taxLevelId || null,
+            tax_code_id: cleanData.taxCodeId || null,
+            discount_type_id: cleanData.discountTypeId || null,
+            discount_value: cleanData.discountValue || null,
+            validity_date_to: cleanData.validityDateTo || null,
+            lease_to_own: cleanData.leaseToOwn || false,
+            insurance_level_id: cleanData.insuranceLevelId || null,
+            insurance_group_id: cleanData.insuranceGroupId || null,
+            insurance_provider_id: cleanData.insuranceProviderId || null,
+            airport_pickup: cleanData.airportPickup || false,
+            pickup_flight_no: cleanData.pickupFlightNo || null,
+            pickup_flight_time: cleanData.pickupFlightTime || null,
+            airport_return: cleanData.airportReturn || false,
+            return_flight_no: cleanData.returnFlightNo || null,
+            return_flight_time: cleanData.returnFlightTime || null,
+            referral_source: cleanData.referralSource || null,
+            referral_details: cleanData.referralDetails || null,
+            internal_notes: cleanData.internalNotes || null,
+            customer_notes: cleanData.customerNotes || null,
+            total_amount: cleanData.totalAmount || 0,
+            down_payment_amount: cleanData.downPaymentAmount || 0,
+            down_payment_status: cleanData.downPaymentAmount && cleanData.downPaymentAmount > 0 ? 'paid' : 'pending',
+            deposit_payment_method: cleanData.paymentMethod || null,
+            deposit_transaction_id: cleanData.transactionId || null,
+            down_payment_paid_at: cleanData.downPaymentAmount && cleanData.downPaymentAmount > 0 ? new Date().toISOString() : null,
+            advance_payment: cleanData.advancePayment || 0,
+            security_deposit_paid: cleanData.securityDepositPaid || 0,
+            balance_due: cleanData.balanceDue || 0,
+            status: 'confirmed',
+            add_ons: cleanData.selectedAddons || [],
+          })
+          .select()
+          .single();
+        
+        if (error) {
+          console.error('Reservation insert error:', error);
+          throw new Error(`Failed to create reservation: ${error.message || 'Unknown error'}`);
+        }
+        
+        if (!reservation) {
+          throw new Error('Reservation was not created properly');
+        }
+
+        // Record payment if down payment was made
+        if (cleanData.downPaymentAmount && cleanData.downPaymentAmount > 0) {
+          const { error: paymentError } = await supabase.from('reservation_payments').insert({
+            reservation_id: reservation.id,
+            payment_type: 'down_payment',
+            amount: cleanData.downPaymentAmount,
+            payment_method: cleanData.paymentMethod,
+            transaction_id: cleanData.transactionId,
+            payment_status: 'completed',
+            processed_at: new Date().toISOString(),
+          });
+
+          if (paymentError) {
+            console.error('Payment record error:', paymentError);
+            // Don't fail the entire reservation, just log the error
+            toast({
+              title: 'Warning',
+              description: 'Reservation created but payment record failed. Please check payment history.',
+              variant: 'destructive',
+            });
+          }
+        }
+
+        return reservation;
+      } catch (error) {
+        console.error('Reservation creation error:', error);
+        throw error;
       }
-
-      // Check data consistency
-      const { isConsistent, issues } = checkDataConsistency(wizardData);
-      if (!isConsistent) {
-        throw new Error(`Data consistency issues: ${issues.join(', ')}`);
-      }
-
-      // Validate before submission
-      if (!validateBeforeSubmission(wizardData)) {
-        throw new Error('Data validation failed');
-      }
-
-      // Ensure data integrity
-      const cleanData = ensureDataIntegrity(wizardData);
-
-      const { data: reservationNo } = await supabase.rpc('generate_reservation_no');
-      const { data: reservation, error } = await supabase
-        .from('reservations')
-        .insert({
-          ro_number: reservationNo,
-          customer_id: cleanData.customerId,
-          reservation_type: cleanData.reservationType,
-          vehicle_class_id: cleanData.vehicleClassId || null,
-          make_model: cleanData.makeModel || null,
-          vehicle_id: cleanData.vehicleId || null,
-          start_datetime: new Date(`${cleanData.pickupDate}T${cleanData.pickupTime}`).toISOString(),
-          end_datetime: new Date(`${cleanData.returnDate}T${cleanData.returnTime}`).toISOString(),
-          pickup_location: cleanData.pickupLocation,
-          return_location: cleanData.returnLocation || cleanData.pickupLocation,
-          total_amount: cleanData.totalAmount,
-          down_payment_amount: cleanData.downPaymentAmount,
-          down_payment_status: cleanData.downPaymentAmount > 0 ? 'paid' : 'pending',
-          down_payment_method: cleanData.paymentMethod,
-          down_payment_transaction_id: cleanData.transactionId,
-          down_payment_paid_at: cleanData.downPaymentAmount > 0 ? new Date().toISOString() : null,
-          balance_due: cleanData.balanceDue,
-          status: 'confirmed',
-          add_ons: cleanData.selectedAddons || [],
-        })
-        .select()
-        .single();
-      
-      if (error) throw error;
-
-      // Record payment if down payment was made
-      if (cleanData.downPaymentAmount && cleanData.downPaymentAmount > 0) {
-        await supabase.from('reservation_payments').insert({
-          reservation_id: reservation.id,
-          payment_type: 'down_payment',
-          amount: cleanData.downPaymentAmount,
-          payment_method: cleanData.paymentMethod,
-          transaction_id: cleanData.transactionId,
-          payment_status: 'completed',
-          processed_at: new Date().toISOString(),
-        });
-      }
-
-      return reservation;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['reservations'] });
@@ -157,11 +235,18 @@ const ReservationWizardContent: React.FC = () => {
         if (!wizardData.reservationMethodId) {
           errors.reservationMethodId = 'Reservation method is required';
         }
+        if (!wizardData.paymentTermsId) {
+          errors.paymentTermsId = 'Payment terms are required';
+        }
         break;
       
       case 3: // Customer
         if (!wizardData.customerId) {
           errors.customerId = 'Customer selection is required';
+        }
+        // Edge case: Verify customer data is loaded
+        if (wizardData.customerId && !wizardData.customerData) {
+          errors.customerData = 'Customer data could not be loaded. Please reselect the customer.';
         }
         break;
       
@@ -191,12 +276,33 @@ const ReservationWizardContent: React.FC = () => {
           errors.returnLocation = 'Return location is required';
         }
         
-        // Date consistency check
+        // Date consistency checks
         if (wizardData.pickupDate && wizardData.returnDate && wizardData.pickupTime && wizardData.returnTime) {
           const pickup = new Date(`${wizardData.pickupDate}T${wizardData.pickupTime}`);
           const returnDate = new Date(`${wizardData.returnDate}T${wizardData.returnTime}`);
+          
+          if (isNaN(pickup.getTime())) {
+            errors.pickupDateTime = 'Invalid pickup date/time format';
+          }
+          if (isNaN(returnDate.getTime())) {
+            errors.returnDateTime = 'Invalid return date/time format';
+          }
+          
           if (pickup >= returnDate) {
             errors.dateRange = 'Return date/time must be after pickup date/time';
+          }
+          
+          // Edge case: Warn if pickup is more than 24h in the past
+          const now = new Date();
+          if (pickup < now && pickup.getTime() < now.getTime() - 86400000) {
+            errors.pickupPast = 'Warning: Pickup date is more than 24 hours in the past';
+          }
+
+          // Edge case: Minimum rental duration (1 hour)
+          const durationMs = returnDate.getTime() - pickup.getTime();
+          const durationHours = durationMs / (1000 * 60 * 60);
+          if (durationHours < 1) {
+            errors.duration = 'Minimum rental duration is 1 hour';
           }
         }
         break;
@@ -204,6 +310,43 @@ const ReservationWizardContent: React.FC = () => {
       case 6: // Vehicle Lines
         if (!wizardData.reservationLines || wizardData.reservationLines.length === 0) {
           errors.reservationLines = 'At least one vehicle line is required';
+        }
+        // Edge case: Validate vehicle lines have required data
+        if (wizardData.reservationLines) {
+          wizardData.reservationLines.forEach((line, index) => {
+            if (!line.vehicleClassId && !line.vehicleId) {
+              errors[`line${index}_vehicle`] = `Line ${index + 1}: Vehicle class or specific vehicle is required`;
+            }
+          });
+        }
+        break;
+      
+      case 8: // Airport Info
+        // Conditional validation: If airport pickup is enabled, require flight details
+        if (wizardData.airportPickup) {
+          if (!wizardData.pickupFlightNo) {
+            errors.pickupFlightNo = 'Flight number is required for airport pickup';
+          }
+          if (!wizardData.pickupFlightTime) {
+            errors.pickupFlightTime = 'Flight time is required for airport pickup';
+          }
+        }
+        if (wizardData.airportReturn) {
+          if (!wizardData.returnFlightNo) {
+            errors.returnFlightNo = 'Flight number is required for airport return';
+          }
+          if (!wizardData.returnFlightTime) {
+            errors.returnFlightTime = 'Flight time is required for airport return';
+          }
+        }
+        break;
+      
+      case 9: // Insurance
+        if (!wizardData.insuranceLevelId) {
+          errors.insuranceLevelId = 'Insurance level is required';
+        }
+        if (!wizardData.insuranceGroupId) {
+          errors.insuranceGroupId = 'Insurance group is required';
         }
         break;
       
@@ -219,10 +362,30 @@ const ReservationWizardContent: React.FC = () => {
         }
         break;
       
+      case 11: // Pricing Summary
+        if (!wizardData.totalAmount || wizardData.totalAmount <= 0) {
+          errors.totalAmount = 'Total amount must be greater than zero';
+        }
+        // Edge case: Verify payment amounts add up
+        if (wizardData.totalAmount && wizardData.downPaymentAmount && wizardData.balanceDue) {
+          const calculatedBalance = wizardData.totalAmount - wizardData.downPaymentAmount;
+          if (Math.abs(calculatedBalance - wizardData.balanceDue) > 0.01) {
+            errors.paymentMismatch = 'Payment amounts do not match total amount';
+          }
+        }
+        break;
+      
       case 12: // Payment
         if (wizardData.downPaymentAmount && wizardData.downPaymentAmount > 0) {
           if (!wizardData.paymentMethod) {
             errors.paymentMethod = 'Payment method is required for down payment';
+          }
+          // Edge case: Validate down payment amount
+          if (wizardData.downPaymentAmount < 0) {
+            errors.downPaymentNegative = 'Down payment cannot be negative';
+          }
+          if (wizardData.totalAmount && wizardData.downPaymentAmount > wizardData.totalAmount) {
+            errors.downPaymentExcessive = 'Down payment cannot exceed total amount';
           }
         }
         break;
@@ -232,16 +395,42 @@ const ReservationWizardContent: React.FC = () => {
   };
 
   const canProceed = () => {
+    // Check if there are any validation errors for the current step
+    const currentErrors = validateCurrentStep();
+    if (Object.keys(currentErrors).length > 0) {
+      return false;
+    }
+
     // Pure function that checks without updating state
     switch (currentStep) {
       case 1: return !!wizardData.reservationType;
-      case 2: return !!(wizardData.businessUnitId && wizardData.reservationMethodId);
-      case 3: return !!wizardData.customerId;
+      case 2: return !!(wizardData.businessUnitId && wizardData.reservationMethodId && wizardData.paymentTermsId);
+      case 3: return !!(wizardData.customerId && wizardData.customerData);
       case 4: return !!wizardData.priceListId;
-      case 5: return !!(wizardData.pickupDate && wizardData.returnDate && wizardData.pickupLocation && wizardData.returnLocation);
-      case 6: return !!wizardData.reservationLines?.length;
+      case 5: {
+        if (!wizardData.pickupDate || !wizardData.returnDate || !wizardData.pickupLocation || !wizardData.returnLocation) {
+          return false;
+        }
+        // Additional validation for dates
+        const pickup = new Date(`${wizardData.pickupDate}T${wizardData.pickupTime || '00:00'}`);
+        const returnDate = new Date(`${wizardData.returnDate}T${wizardData.returnTime || '00:00'}`);
+        return pickup < returnDate;
+      }
+      case 6: return !!(wizardData.reservationLines?.length && wizardData.reservationLines.every(line => line.vehicleClassId || line.vehicleId));
+      case 8: {
+        // Airport info is optional unless airport pickup/return is selected
+        if (wizardData.airportPickup && (!wizardData.pickupFlightNo || !wizardData.pickupFlightTime)) {
+          return false;
+        }
+        if (wizardData.airportReturn && (!wizardData.returnFlightNo || !wizardData.returnFlightTime)) {
+          return false;
+        }
+        return true;
+      }
+      case 9: return !!(wizardData.insuranceLevelId && wizardData.insuranceGroupId);
       case 10: return !!(wizardData.billToType && wizardData.taxLevelId && wizardData.taxCodeId);
-      case 12: return wizardData.downPaymentAmount ? !!wizardData.paymentMethod : true;
+      case 11: return !!(wizardData.totalAmount && wizardData.totalAmount > 0);
+      case 12: return wizardData.downPaymentAmount && wizardData.downPaymentAmount > 0 ? !!wizardData.paymentMethod : true;
       default: return true;
     }
   };
