@@ -8,10 +8,10 @@ const OperationsHub: React.FC = () => {
 
   const operationCards = [
     {
-      title: 'Manage Replacement',
-      description: 'Track and manage vehicle replacements, swap schedules, and fleet rotations',
+      title: 'Fleet Operations',
+      description: 'Manage vehicle ownership transfers, inter-branch movements, and fleet logistics',
       icon: RefreshCw,
-      route: '/operations/replacement',
+      route: '/operations/fleet',
       gradient: 'from-purple-500/10 to-pink-500/10',
     },
     {
