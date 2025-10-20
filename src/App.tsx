@@ -58,6 +58,12 @@ import ManageReplacement from "./pages/operations/ManageReplacement";
 import Maintenance from "./pages/operations/Maintenance";
 import TransactionsHub from "./pages/transactions/TransactionsHub";
 import OperationsHub from "./pages/operations/OperationsHub";
+import FleetOperationsHub from "./pages/operations/FleetOperationsHub";
+import NewMovement from "./pages/operations/NewMovement";
+import MovementDetail from "./pages/operations/MovementDetail";
+import VehicleOwnershipHub from "./pages/operations/VehicleOwnershipHub";
+import ExpensesHub from "./pages/operations/ExpensesHub";
+import NewExpense from "./pages/operations/NewExpense";
 import Custody from "./pages/Custody";
 import NewCustody from "./pages/NewCustody";
 import CustodySettings from "./pages/CustodySettings";
@@ -204,6 +210,12 @@ const App = () => {
                 </ProtectedRoute>
               }>
                 <Route index element={<OperationsHub />} />
+                <Route path="fleet" element={<FleetOperationsHub />} />
+                <Route path="movements/new" element={<NewMovement />} />
+                <Route path="movements/:id" element={<MovementDetail />} />
+                <Route path="ownership" element={<VehicleOwnershipHub />} />
+                <Route path="expenses" element={<ExpensesHub />} />
+                <Route path="expenses/new" element={<NewExpense />} />
                 <Route path="replacement" element={<ManageReplacement />} />
                 <Route path="maintenance" element={<Maintenance />} />
               </Route>
