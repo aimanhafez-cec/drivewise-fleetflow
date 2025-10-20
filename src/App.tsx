@@ -64,6 +64,7 @@ import SecurityHub from "./pages/security/SecurityHub";
 import AnalyticsHub from "./pages/analytics/AnalyticsHub";
 import ComponentsLibrary from "./pages/components/ComponentsLibrary";
 import TestingHub from "./pages/testing/TestingHub";
+import DeploymentHub from "./pages/deployment/DeploymentHub";
 import TransactionsHub from "./pages/transactions/TransactionsHub";
 import OperationsHub from "./pages/operations/OperationsHub";
 import FleetOperationsHub from "./pages/operations/FleetOperationsHub";
@@ -286,6 +287,13 @@ const App = () => {
               </ProtectedRoute>
             }>
               <Route index element={<TestingHub />} />
+            </Route>
+            <Route path="/deployment" element={
+              <ProtectedRoute>
+                <AppLayout />
+              </ProtectedRoute>
+            }>
+              <Route index element={<DeploymentHub />} />
             </Route>
             <Route path="/components" element={
               <ProtectedRoute>
