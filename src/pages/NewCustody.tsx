@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
-import { ArrowLeft, ArrowRight, Save, Send } from "lucide-react";
+import { ArrowLeft, ArrowRight, Save, Send, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
+import { useCustodyValidation } from "@/hooks/useCustodyValidation";
 import { custodyApi } from "@/lib/api/custody";
 import type { CustodyTransactionCreate } from "@/lib/api/custody";
 
@@ -37,6 +39,14 @@ export default function NewCustody() {
     rate_policy: 'inherit',
   });
   const [documentIds, setDocumentIds] = useState<string[]>([]);
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  const [validationWarnings, setValidationWarnings] = useState<string[]>([]);
+
+  const {
+    validateForSubmission,
+    showValidationErrors,
+    showValidationWarnings,
+  } = useCustodyValidation();
 
   // Create custody mutation
   const createMutation = useMutation({
@@ -85,12 +95,95 @@ export default function NewCustody() {
   };
 
   const handleNext = () => {
+    // Clear previous validation messages
+    setValidationErrors([]);
+    setValidationWarnings([]);
+
+    // Validate current step before proceeding
+    let isValid = true;
+    const errors: string[] = [];
+    const warnings: string[] = [];
+
+    switch (currentStep) {
+      case 1:
+        if (!formData.customer_id) {
+          errors.push("Customer is required");
+          isValid = false;
+        }
+        break;
+      case 2:
+        if (!formData.reason_code) {
+          errors.push("Reason code is required");
+          isValid = false;
+        }
+        if (!formData.incident_date) {
+          errors.push("Incident date is required");
+          isValid = false;
+        }
+        if (formData.incident_date && new Date(formData.incident_date) > new Date()) {
+          errors.push("Incident date cannot be in the future");
+          isValid = false;
+        }
+        break;
+      case 3:
+        if (!formData.custodian_type) {
+          errors.push("Custodian type is required");
+          isValid = false;
+        }
+        if (!formData.custodian_name || formData.custodian_name.trim().length === 0) {
+          errors.push("Custodian name is required");
+          isValid = false;
+        }
+        break;
+      case 5:
+        if (!formData.rate_policy) {
+          errors.push("Rate policy is required");
+          isValid = false;
+        }
+        if (formData.rate_policy === 'special_code' && !formData.special_rate_code) {
+          errors.push("Special rate code is required");
+          isValid = false;
+        }
+        if (!formData.effective_from) {
+          errors.push("Effective date is required");
+          isValid = false;
+        }
+        if (formData.effective_from && formData.expected_return_date) {
+          const effectiveDate = new Date(formData.effective_from);
+          const returnDate = new Date(formData.expected_return_date);
+          if (returnDate <= effectiveDate) {
+            errors.push("Expected return date must be after effective date");
+            isValid = false;
+          }
+        }
+        break;
+    }
+
+    if (!isValid) {
+      setValidationErrors(errors);
+      if (warnings.length > 0) {
+        setValidationWarnings(warnings);
+      }
+      toast({
+        title: "Validation Error",
+        description: errors[0],
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (warnings.length > 0) {
+      setValidationWarnings(warnings);
+    }
+
     if (currentStep < STEPS.length) {
       setCurrentStep(currentStep + 1);
     }
   };
 
   const handleBack = () => {
+    setValidationErrors([]);
+    setValidationWarnings([]);
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
     }
@@ -101,13 +194,20 @@ export default function NewCustody() {
   };
 
   const handleSubmit = () => {
-    if (!formData.customer_id || !formData.custodian_name || !formData.reason_code || !formData.incident_date || !formData.effective_from) {
-      toast({
-        title: "Missing required fields",
-        description: "Please complete all required fields before submitting.",
-        variant: "destructive",
-      });
+    setValidationErrors([]);
+    setValidationWarnings([]);
+
+    const validationResult = validateForSubmission(formData);
+
+    if (!validationResult.valid) {
+      setValidationErrors(validationResult.errors);
+      showValidationErrors(validationResult);
       return;
+    }
+
+    if (validationResult.warnings.length > 0) {
+      setValidationWarnings(validationResult.warnings);
+      showValidationWarnings(validationResult);
     }
 
     createMutation.mutate(formData as CustodyTransactionCreate);
@@ -180,6 +280,36 @@ export default function NewCustody() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Validation Errors */}
+      {validationErrors.length > 0 && (
+        <Alert variant="destructive" className="mb-6">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Validation Errors</AlertTitle>
+          <AlertDescription>
+            <ul className="list-disc list-inside space-y-1 mt-2">
+              {validationErrors.map((error, index) => (
+                <li key={index} className="text-sm">{error}</li>
+              ))}
+            </ul>
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {/* Validation Warnings */}
+      {validationWarnings.length > 0 && (
+        <Alert className="mb-6">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Warnings</AlertTitle>
+          <AlertDescription>
+            <ul className="list-disc list-inside space-y-1 mt-2">
+              {validationWarnings.map((warning, index) => (
+                <li key={index} className="text-sm">{warning}</li>
+              ))}
+            </ul>
+          </AlertDescription>
+        </Alert>
+      )}
 
       {/* Step Content */}
       <Card className="mb-6">

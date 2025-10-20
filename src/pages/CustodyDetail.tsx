@@ -5,8 +5,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Edit, CheckCircle, XCircle, Trash2 } from "lucide-react";
+import { ArrowLeft, Edit, CheckCircle, XCircle, Trash2, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useCustodyValidation } from "@/hooks/useCustodyValidation";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   StatusBadge,
   CustodyTimeline,
@@ -34,6 +36,12 @@ export default function CustodyDetail() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  
+  const {
+    validateStatusTransition,
+    showValidationErrors,
+    showValidationWarnings,
+  } = useCustodyValidation();
 
   const { data: custody, isLoading } = useQuery({
     queryKey: ["custody", id],
@@ -66,38 +74,83 @@ export default function CustodyDetail() {
   });
 
   const approveMutation = useMutation({
-    mutationFn: ({ userId, notes }: { userId: string; notes: string }) =>
-      custodyApi.approveCustody(id!, userId, notes),
+    mutationFn: ({ userId, notes }: { userId: string; notes: string }) => {
+      // Validate transition before approving
+      if (custody) {
+        const validation = validateStatusTransition(custody.status, 'approved', custody);
+        if (!validation.valid) {
+          showValidationErrors(validation);
+          throw new Error(validation.errors.join(', '));
+        }
+        if (validation.warnings.length > 0) {
+          showValidationWarnings(validation);
+        }
+      }
+      return custodyApi.approveCustody(id!, userId, notes);
+    },
     onSuccess: () => {
       toast({ title: "Custody approved successfully" });
       queryClient.invalidateQueries({ queryKey: ["custody", id] });
     },
-    onError: () => {
-      toast({ title: "Failed to approve custody", variant: "destructive" });
+    onError: (error: any) => {
+      toast({ 
+        title: "Failed to approve custody", 
+        description: error.message,
+        variant: "destructive" 
+      });
     },
   });
 
   const rejectMutation = useMutation({
-    mutationFn: ({ userId, reason }: { userId: string; reason: string }) =>
-      custodyApi.rejectCustody(id!, userId, reason),
+    mutationFn: ({ userId, reason }: { userId: string; reason: string }) => {
+      // Validate transition before rejecting
+      if (custody) {
+        const validation = validateStatusTransition(custody.status, 'draft', custody);
+        if (!validation.valid) {
+          showValidationErrors(validation);
+          throw new Error(validation.errors.join(', '));
+        }
+      }
+      return custodyApi.rejectCustody(id!, userId, reason);
+    },
     onSuccess: () => {
       toast({ title: "Custody rejected" });
       queryClient.invalidateQueries({ queryKey: ["custody", id] });
     },
-    onError: () => {
-      toast({ title: "Failed to reject custody", variant: "destructive" });
+    onError: (error: any) => {
+      toast({ 
+        title: "Failed to reject custody",
+        description: error.message,
+        variant: "destructive" 
+      });
     },
   });
 
   const voidMutation = useMutation({
-    mutationFn: ({ reason, userId }: { reason: string; userId: string }) => 
-      custodyApi.voidCustody(id!, reason, userId),
+    mutationFn: ({ reason, userId }: { reason: string; userId: string }) => {
+      // Validate transition before voiding
+      if (custody) {
+        const validation = validateStatusTransition(custody.status, 'voided', custody);
+        if (!validation.valid) {
+          showValidationErrors(validation);
+          throw new Error(validation.errors.join(', '));
+        }
+        if (validation.warnings.length > 0) {
+          showValidationWarnings(validation);
+        }
+      }
+      return custodyApi.voidCustody(id!, reason, userId);
+    },
     onSuccess: () => {
       toast({ title: "Custody voided" });
       queryClient.invalidateQueries({ queryKey: ["custody", id] });
     },
-    onError: () => {
-      toast({ title: "Failed to void custody", variant: "destructive" });
+    onError: (error: any) => {
+      toast({ 
+        title: "Failed to void custody",
+        description: error.message,
+        variant: "destructive" 
+      });
     },
   });
 
