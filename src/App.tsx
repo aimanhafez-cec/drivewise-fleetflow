@@ -47,6 +47,12 @@ import MasterAgreements from "./pages/MasterAgreements";
 import MasterAgreementDetails from "./pages/MasterAgreementDetails";
 import NewMasterAgreement from "./pages/NewMasterAgreement";
 import MasterAgreementEdit from "./pages/MasterAgreementEdit";
+import ManageExpenses from "./pages/transactions/ManageExpenses";
+import ManageInvoices from "./pages/transactions/ManageInvoices";
+import PaymentProcessing from "./pages/transactions/PaymentProcessing";
+import RevenueReports from "./pages/transactions/RevenueReports";
+import AccountLedger from "./pages/transactions/AccountLedger";
+import FinancialSummary from "./pages/transactions/FinancialSummary";
 // Hidden - commented out imports
 // import { CarSubscriptions } from "./pages/CarSubscriptions";
 // import { NewCarSubscription } from "./pages/NewCarSubscription";
@@ -199,6 +205,18 @@ const App = () => {
               <Route path="new" element={<NewMasterAgreement />} />
               <Route path=":id" element={<MasterAgreementDetails />} />
               <Route path=":id/edit" element={<MasterAgreementEdit />} />
+            </Route>
+            <Route path="/transactions" element={
+              <ProtectedRoute>
+                <AppLayout />
+              </ProtectedRoute>
+            }>
+              <Route path="expenses" element={<ManageExpenses />} />
+              <Route path="invoices" element={<ManageInvoices />} />
+              <Route path="payments" element={<PaymentProcessing />} />
+              <Route path="revenue" element={<RevenueReports />} />
+              <Route path="ledger" element={<AccountLedger />} />
+              <Route path="summary" element={<FinancialSummary />} />
             </Route>
 
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
