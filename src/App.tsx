@@ -55,6 +55,8 @@ import AccountLedger from "./pages/transactions/AccountLedger";
 import FinancialSummary from "./pages/transactions/FinancialSummary";
 import ManageReplacement from "./pages/operations/ManageReplacement";
 import Maintenance from "./pages/operations/Maintenance";
+import TransactionsHub from "./pages/transactions/TransactionsHub";
+import OperationsHub from "./pages/operations/OperationsHub";
 // Hidden - commented out imports
 // import { CarSubscriptions } from "./pages/CarSubscriptions";
 // import { NewCarSubscription } from "./pages/NewCarSubscription";
@@ -196,7 +198,7 @@ const App = () => {
                   <AppLayout />
                 </ProtectedRoute>
               }>
-                <Route index element={<div>Operations Hub - Coming Soon</div>} />
+                <Route index element={<OperationsHub />} />
                 <Route path="replacement" element={<ManageReplacement />} />
                 <Route path="maintenance" element={<Maintenance />} />
               </Route>
@@ -222,7 +224,7 @@ const App = () => {
                 <AppLayout />
               </ProtectedRoute>
             }>
-              <Route index element={<div>Transactions Hub - Coming Soon</div>} />
+              <Route index element={<TransactionsHub />} />
               <Route path="expenses" element={<ManageExpenses />} />
               <Route path="invoices" element={<ManageInvoices />} />
               <Route path="payments" element={<PaymentProcessing />} />
