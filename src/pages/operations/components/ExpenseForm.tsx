@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/select";
 import { useCreateExpense, useSubmitExpense } from "@/hooks/useExpenses";
 import { CreateExpenseData, ExpenseCategory } from "@/lib/api/expenses";
-import { VehicleSelect } from "@/components/shared/VehicleSelect";
+import { VehicleSelect } from "@/components/ui/select-components";
 
 interface ExpenseFormProps {
   onSuccess?: () => void;
@@ -64,7 +64,7 @@ export function ExpenseForm({ onSuccess }: ExpenseFormProps) {
           </Label>
           <VehicleSelect
             value={vehicleId}
-            onValueChange={(value) => setValue('vehicle_id', value)}
+            onChange={(value) => setValue('vehicle_id', value as string | undefined)}
             placeholder="Select vehicle (leave empty for general expense)"
           />
           <p className="text-xs text-muted-foreground">

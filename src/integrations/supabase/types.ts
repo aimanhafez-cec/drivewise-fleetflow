@@ -6447,6 +6447,80 @@ export type Database = {
           },
         ]
       }
+      vehicle_expenses: {
+        Row: {
+          amount: number
+          approved_at: string | null
+          approved_by: string | null
+          attachment_url: string | null
+          category: string
+          created_at: string
+          created_by: string | null
+          currency: string
+          description: string
+          expense_date: string
+          expense_no: string | null
+          id: string
+          notes: string | null
+          paid_at: string | null
+          status: string
+          updated_at: string
+          vehicle_id: string | null
+          vendor_invoice_no: string | null
+          vendor_name: string | null
+        }
+        Insert: {
+          amount: number
+          approved_at?: string | null
+          approved_by?: string | null
+          attachment_url?: string | null
+          category: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          description: string
+          expense_date: string
+          expense_no?: string | null
+          id?: string
+          notes?: string | null
+          paid_at?: string | null
+          status?: string
+          updated_at?: string
+          vehicle_id?: string | null
+          vendor_invoice_no?: string | null
+          vendor_name?: string | null
+        }
+        Update: {
+          amount?: number
+          approved_at?: string | null
+          approved_by?: string | null
+          attachment_url?: string | null
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          description?: string
+          expense_date?: string
+          expense_no?: string | null
+          id?: string
+          notes?: string | null
+          paid_at?: string | null
+          status?: string
+          updated_at?: string
+          vehicle_id?: string | null
+          vendor_invoice_no?: string | null
+          vendor_name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_expenses_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vehicle_movements: {
         Row: {
           actual_arrival: string | null
@@ -7284,10 +7358,6 @@ export type Database = {
         Returns: string
       }
       generate_custody_no: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      generate_expense_no: {
         Args: Record<PropertyKey, never>
         Returns: string
       }
