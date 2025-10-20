@@ -242,13 +242,13 @@ export default function NewCustody() {
 
       {/* Progress Stepper */}
       <Card className="mb-6">
-        <CardContent className="pt-6">
-          <div className="flex items-center justify-between">
+        <CardContent className="pt-6 overflow-x-auto">
+          <div className="flex items-start min-w-max px-2">
             {STEPS.map((step, index) => (
-              <div key={step.id} className="flex items-center">
-                <div className="flex flex-col items-center">
+              <div key={step.id} className="flex items-center flex-1 min-w-0">
+                <div className="flex flex-col items-center gap-2 min-w-[80px]">
                   <div
-                    className={`flex h-10 w-10 items-center justify-center rounded-full border-2 transition-colors ${
+                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
                       currentStep === step.id
                         ? "border-primary bg-primary text-primary-foreground"
                         : currentStep > step.id
@@ -256,10 +256,10 @@ export default function NewCustody() {
                         : "border-muted bg-background text-muted-foreground"
                     }`}
                   >
-                    {step.id}
+                    <span className="text-sm font-semibold">{step.id}</span>
                   </div>
                   <span
-                    className={`mt-2 text-xs font-medium ${
+                    className={`text-xs font-medium text-center max-w-[80px] leading-tight ${
                       currentStep === step.id
                         ? "text-primary"
                         : "text-muted-foreground"
@@ -270,7 +270,7 @@ export default function NewCustody() {
                 </div>
                 {index < STEPS.length - 1 && (
                   <div
-                    className={`mx-4 h-0.5 w-12 lg:w-24 transition-colors ${
+                    className={`h-0.5 flex-1 min-w-[40px] mx-2 transition-colors ${
                       currentStep > step.id ? "bg-primary" : "bg-muted"
                     }`}
                   />
