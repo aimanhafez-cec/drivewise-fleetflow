@@ -57,6 +57,8 @@ import ManageReplacement from "./pages/operations/ManageReplacement";
 import Maintenance from "./pages/operations/Maintenance";
 import TransactionsHub from "./pages/transactions/TransactionsHub";
 import OperationsHub from "./pages/operations/OperationsHub";
+import Custody from "./pages/Custody";
+import NewCustody from "./pages/NewCustody";
 // Hidden - commented out imports
 // import { CarSubscriptions } from "./pages/CarSubscriptions";
 // import { NewCarSubscription } from "./pages/NewCarSubscription";
@@ -231,6 +233,14 @@ const App = () => {
               <Route path="revenue" element={<RevenueReports />} />
               <Route path="ledger" element={<AccountLedger />} />
               <Route path="summary" element={<FinancialSummary />} />
+            </Route>
+            <Route path="/custody" element={
+              <ProtectedRoute>
+                <AppLayout />
+              </ProtectedRoute>
+            }>
+              <Route index element={<Custody />} />
+              <Route path="new" element={<NewCustody />} />
             </Route>
 
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
