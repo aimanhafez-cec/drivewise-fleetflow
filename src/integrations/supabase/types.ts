@@ -2849,6 +2849,121 @@ export type Database = {
           },
         ]
       }
+      fleet_expenses: {
+        Row: {
+          amount: number
+          approved_at: string | null
+          approved_by: string | null
+          attachments: Json | null
+          branch_id: string | null
+          category: Database["public"]["Enums"]["expense_category"]
+          cost_center: string | null
+          created_at: string | null
+          created_by: string | null
+          currency: string | null
+          expense_no: string
+          gl_account: string | null
+          id: string
+          invoice_date: string
+          invoice_number: string | null
+          linked_object_id: string | null
+          linked_object_type: string | null
+          notes: string | null
+          posted: boolean | null
+          posted_at: string | null
+          status: Database["public"]["Enums"]["approval_status"] | null
+          subcategory: string | null
+          tax_amount: number | null
+          tax_code: string | null
+          total_amount: number
+          updated_at: string | null
+          vehicle_id: string | null
+          vendor: string
+        }
+        Insert: {
+          amount: number
+          approved_at?: string | null
+          approved_by?: string | null
+          attachments?: Json | null
+          branch_id?: string | null
+          category: Database["public"]["Enums"]["expense_category"]
+          cost_center?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          currency?: string | null
+          expense_no: string
+          gl_account?: string | null
+          id?: string
+          invoice_date: string
+          invoice_number?: string | null
+          linked_object_id?: string | null
+          linked_object_type?: string | null
+          notes?: string | null
+          posted?: boolean | null
+          posted_at?: string | null
+          status?: Database["public"]["Enums"]["approval_status"] | null
+          subcategory?: string | null
+          tax_amount?: number | null
+          tax_code?: string | null
+          total_amount: number
+          updated_at?: string | null
+          vehicle_id?: string | null
+          vendor: string
+        }
+        Update: {
+          amount?: number
+          approved_at?: string | null
+          approved_by?: string | null
+          attachments?: Json | null
+          branch_id?: string | null
+          category?: Database["public"]["Enums"]["expense_category"]
+          cost_center?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          currency?: string | null
+          expense_no?: string
+          gl_account?: string | null
+          id?: string
+          invoice_date?: string
+          invoice_number?: string | null
+          linked_object_id?: string | null
+          linked_object_type?: string | null
+          notes?: string | null
+          posted?: boolean | null
+          posted_at?: string | null
+          status?: Database["public"]["Enums"]["approval_status"] | null
+          subcategory?: string | null
+          tax_amount?: number | null
+          tax_code?: string | null
+          total_amount?: number
+          updated_at?: string | null
+          vehicle_id?: string | null
+          vendor?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fleet_expenses_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fleet_expenses_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fleet_expenses_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       inspection_in: {
         Row: {
           agreement_id: string
@@ -5493,6 +5608,54 @@ export type Database = {
           },
         ]
       }
+      sla_configurations: {
+        Row: {
+          applies_to: string
+          approval_sla_hours: number | null
+          branch_id: string | null
+          completion_sla_hours: number | null
+          created_at: string | null
+          escalate_before_hours: number | null
+          escalate_to_role: string | null
+          id: string
+          is_active: boolean | null
+          priority: Database["public"]["Enums"]["priority_level"] | null
+          reason_code: string | null
+          response_sla_hours: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          applies_to: string
+          approval_sla_hours?: number | null
+          branch_id?: string | null
+          completion_sla_hours?: number | null
+          created_at?: string | null
+          escalate_before_hours?: number | null
+          escalate_to_role?: string | null
+          id?: string
+          is_active?: boolean | null
+          priority?: Database["public"]["Enums"]["priority_level"] | null
+          reason_code?: string | null
+          response_sla_hours?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          applies_to?: string
+          approval_sla_hours?: number | null
+          branch_id?: string | null
+          completion_sla_hours?: number | null
+          created_at?: string | null
+          escalate_before_hours?: number | null
+          escalate_to_role?: string | null
+          id?: string
+          is_active?: boolean | null
+          priority?: Database["public"]["Enums"]["priority_level"] | null
+          reason_code?: string | null
+          response_sla_hours?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       subscription_billing_history: {
         Row: {
           actual_km: number | null
@@ -6284,20 +6447,260 @@ export type Database = {
           },
         ]
       }
+      vehicle_movements: {
+        Row: {
+          actual_arrival: string | null
+          approved_at: string | null
+          approved_by: string | null
+          carrier_vendor: string | null
+          completed_at: string | null
+          cost_center_change: boolean | null
+          created_at: string | null
+          created_by: string | null
+          documents: Json | null
+          effective_from: string
+          expected_arrival: string | null
+          from_branch_id: string | null
+          from_cost_center: string | null
+          from_department: string | null
+          from_owner: string | null
+          fuel_level_at_dispatch: number | null
+          gl_accounts: Json | null
+          handover_notes: string | null
+          handover_photos: Json | null
+          id: string
+          movement_no: string
+          movement_type: Database["public"]["Enums"]["movement_type"]
+          odometer_at_dispatch: number | null
+          reason_code: string
+          reason_description: string | null
+          rejected_at: string | null
+          rejected_by: string | null
+          rejection_reason: string | null
+          requires_finance_approval: boolean | null
+          status: Database["public"]["Enums"]["approval_status"] | null
+          submitted_at: string | null
+          submitted_by: string | null
+          to_branch_id: string | null
+          to_cost_center: string | null
+          to_department: string | null
+          to_owner: string | null
+          tracking_ref: string | null
+          transfer_price: number | null
+          transport_job_ref: string | null
+          updated_at: string | null
+          vehicle_ids: string[]
+        }
+        Insert: {
+          actual_arrival?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
+          carrier_vendor?: string | null
+          completed_at?: string | null
+          cost_center_change?: boolean | null
+          created_at?: string | null
+          created_by?: string | null
+          documents?: Json | null
+          effective_from: string
+          expected_arrival?: string | null
+          from_branch_id?: string | null
+          from_cost_center?: string | null
+          from_department?: string | null
+          from_owner?: string | null
+          fuel_level_at_dispatch?: number | null
+          gl_accounts?: Json | null
+          handover_notes?: string | null
+          handover_photos?: Json | null
+          id?: string
+          movement_no: string
+          movement_type: Database["public"]["Enums"]["movement_type"]
+          odometer_at_dispatch?: number | null
+          reason_code: string
+          reason_description?: string | null
+          rejected_at?: string | null
+          rejected_by?: string | null
+          rejection_reason?: string | null
+          requires_finance_approval?: boolean | null
+          status?: Database["public"]["Enums"]["approval_status"] | null
+          submitted_at?: string | null
+          submitted_by?: string | null
+          to_branch_id?: string | null
+          to_cost_center?: string | null
+          to_department?: string | null
+          to_owner?: string | null
+          tracking_ref?: string | null
+          transfer_price?: number | null
+          transport_job_ref?: string | null
+          updated_at?: string | null
+          vehicle_ids: string[]
+        }
+        Update: {
+          actual_arrival?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
+          carrier_vendor?: string | null
+          completed_at?: string | null
+          cost_center_change?: boolean | null
+          created_at?: string | null
+          created_by?: string | null
+          documents?: Json | null
+          effective_from?: string
+          expected_arrival?: string | null
+          from_branch_id?: string | null
+          from_cost_center?: string | null
+          from_department?: string | null
+          from_owner?: string | null
+          fuel_level_at_dispatch?: number | null
+          gl_accounts?: Json | null
+          handover_notes?: string | null
+          handover_photos?: Json | null
+          id?: string
+          movement_no?: string
+          movement_type?: Database["public"]["Enums"]["movement_type"]
+          odometer_at_dispatch?: number | null
+          reason_code?: string
+          reason_description?: string | null
+          rejected_at?: string | null
+          rejected_by?: string | null
+          rejection_reason?: string | null
+          requires_finance_approval?: boolean | null
+          status?: Database["public"]["Enums"]["approval_status"] | null
+          submitted_at?: string | null
+          submitted_by?: string | null
+          to_branch_id?: string | null
+          to_cost_center?: string | null
+          to_department?: string | null
+          to_owner?: string | null
+          tracking_ref?: string | null
+          transfer_price?: number | null
+          transport_job_ref?: string | null
+          updated_at?: string | null
+          vehicle_ids?: string[]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_movements_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicle_movements_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicle_movements_rejected_by_fkey"
+            columns: ["rejected_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicle_movements_submitted_by_fkey"
+            columns: ["submitted_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vehicle_status_history: {
+        Row: {
+          attachments: Json | null
+          changed_at: string | null
+          changed_by: string | null
+          expected_available_at: string | null
+          from_status:
+            | Database["public"]["Enums"]["vehicle_operational_status"]
+            | null
+          id: string
+          linked_object_id: string | null
+          linked_object_type: string | null
+          notes: string | null
+          reason_code: string
+          reason_description: string | null
+          to_status: Database["public"]["Enums"]["vehicle_operational_status"]
+          vehicle_id: string
+        }
+        Insert: {
+          attachments?: Json | null
+          changed_at?: string | null
+          changed_by?: string | null
+          expected_available_at?: string | null
+          from_status?:
+            | Database["public"]["Enums"]["vehicle_operational_status"]
+            | null
+          id?: string
+          linked_object_id?: string | null
+          linked_object_type?: string | null
+          notes?: string | null
+          reason_code: string
+          reason_description?: string | null
+          to_status: Database["public"]["Enums"]["vehicle_operational_status"]
+          vehicle_id: string
+        }
+        Update: {
+          attachments?: Json | null
+          changed_at?: string | null
+          changed_by?: string | null
+          expected_available_at?: string | null
+          from_status?:
+            | Database["public"]["Enums"]["vehicle_operational_status"]
+            | null
+          id?: string
+          linked_object_id?: string | null
+          linked_object_type?: string | null
+          notes?: string | null
+          reason_code?: string
+          reason_description?: string | null
+          to_status?: Database["public"]["Enums"]["vehicle_operational_status"]
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_status_history_changed_by_fkey"
+            columns: ["changed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicle_status_history_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vehicles: {
         Row: {
           acquisition_cost: number | null
+          acquisition_date: string | null
+          asset_id: string | null
+          book_value: number | null
+          branch_id: string | null
           category_id: string | null
           color: string | null
+          cost_center: string | null
           created_at: string
           daily_rate: number | null
+          department: string | null
+          depreciation_bucket: string | null
           engine_size: string | null
+          expected_available_date: string | null
           features: string[] | null
           fuel_level: number | null
+          funding_source: string | null
           id: string
           insurance_expiry: string | null
           item_code: string | null
           item_description: string | null
+          last_status_change: string | null
           license_expiry: string | null
           license_plate: string
           location: string | null
@@ -6305,8 +6708,13 @@ export type Database = {
           model: string
           monthly_rate: number | null
           odometer: number | null
+          operational_status:
+            | Database["public"]["Enums"]["vehicle_operational_status"]
+            | null
+          ownership_entity: string | null
           ownership_type: string | null
           photo_url: string | null
+          rented_to_company: string | null
           status: Database["public"]["Enums"]["vehicle_status"]
           subtype: string | null
           transmission: string | null
@@ -6317,17 +6725,27 @@ export type Database = {
         }
         Insert: {
           acquisition_cost?: number | null
+          acquisition_date?: string | null
+          asset_id?: string | null
+          book_value?: number | null
+          branch_id?: string | null
           category_id?: string | null
           color?: string | null
+          cost_center?: string | null
           created_at?: string
           daily_rate?: number | null
+          department?: string | null
+          depreciation_bucket?: string | null
           engine_size?: string | null
+          expected_available_date?: string | null
           features?: string[] | null
           fuel_level?: number | null
+          funding_source?: string | null
           id?: string
           insurance_expiry?: string | null
           item_code?: string | null
           item_description?: string | null
+          last_status_change?: string | null
           license_expiry?: string | null
           license_plate: string
           location?: string | null
@@ -6335,8 +6753,13 @@ export type Database = {
           model: string
           monthly_rate?: number | null
           odometer?: number | null
+          operational_status?:
+            | Database["public"]["Enums"]["vehicle_operational_status"]
+            | null
+          ownership_entity?: string | null
           ownership_type?: string | null
           photo_url?: string | null
+          rented_to_company?: string | null
           status?: Database["public"]["Enums"]["vehicle_status"]
           subtype?: string | null
           transmission?: string | null
@@ -6347,17 +6770,27 @@ export type Database = {
         }
         Update: {
           acquisition_cost?: number | null
+          acquisition_date?: string | null
+          asset_id?: string | null
+          book_value?: number | null
+          branch_id?: string | null
           category_id?: string | null
           color?: string | null
+          cost_center?: string | null
           created_at?: string
           daily_rate?: number | null
+          department?: string | null
+          depreciation_bucket?: string | null
           engine_size?: string | null
+          expected_available_date?: string | null
           features?: string[] | null
           fuel_level?: number | null
+          funding_source?: string | null
           id?: string
           insurance_expiry?: string | null
           item_code?: string | null
           item_description?: string | null
+          last_status_change?: string | null
           license_expiry?: string | null
           license_plate?: string
           location?: string | null
@@ -6365,8 +6798,13 @@ export type Database = {
           model?: string
           monthly_rate?: number | null
           odometer?: number | null
+          operational_status?:
+            | Database["public"]["Enums"]["vehicle_operational_status"]
+            | null
+          ownership_entity?: string | null
           ownership_type?: string | null
           photo_url?: string | null
+          rented_to_company?: string | null
           status?: Database["public"]["Enums"]["vehicle_status"]
           subtype?: string | null
           transmission?: string | null
@@ -6376,6 +6814,13 @@ export type Database = {
           year?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "fk_vehicles_rented_to_company"
+            columns: ["rented_to_company"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "vehicles_category_id_fkey"
             columns: ["category_id"]
@@ -6417,6 +6862,293 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      work_order_parts: {
+        Row: {
+          created_at: string | null
+          expected_eta: string | null
+          id: string
+          notes: string | null
+          ordered_at: string | null
+          ordered_from: string | null
+          part_name: string
+          part_number: string | null
+          quantity: number
+          received_at: string | null
+          status: string | null
+          supplier: string | null
+          total_price: number | null
+          unit_price: number | null
+          updated_at: string | null
+          work_order_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          expected_eta?: string | null
+          id?: string
+          notes?: string | null
+          ordered_at?: string | null
+          ordered_from?: string | null
+          part_name: string
+          part_number?: string | null
+          quantity?: number
+          received_at?: string | null
+          status?: string | null
+          supplier?: string | null
+          total_price?: number | null
+          unit_price?: number | null
+          updated_at?: string | null
+          work_order_id: string
+        }
+        Update: {
+          created_at?: string | null
+          expected_eta?: string | null
+          id?: string
+          notes?: string | null
+          ordered_at?: string | null
+          ordered_from?: string | null
+          part_name?: string
+          part_number?: string | null
+          quantity?: number
+          received_at?: string | null
+          status?: string | null
+          supplier?: string | null
+          total_price?: number | null
+          unit_price?: number | null
+          updated_at?: string | null
+          work_order_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "work_order_parts_work_order_id_fkey"
+            columns: ["work_order_id"]
+            isOneToOne: false
+            referencedRelation: "work_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      work_order_tasks: {
+        Row: {
+          actual_hours: number | null
+          cause: string | null
+          complaint: string
+          completed_at: string | null
+          correction: string | null
+          created_at: string | null
+          estimated_hours: number | null
+          id: string
+          labor_cost: number | null
+          labor_rate: number | null
+          status: string | null
+          task_number: number
+          technician_id: string | null
+          updated_at: string | null
+          work_order_id: string
+        }
+        Insert: {
+          actual_hours?: number | null
+          cause?: string | null
+          complaint: string
+          completed_at?: string | null
+          correction?: string | null
+          created_at?: string | null
+          estimated_hours?: number | null
+          id?: string
+          labor_cost?: number | null
+          labor_rate?: number | null
+          status?: string | null
+          task_number: number
+          technician_id?: string | null
+          updated_at?: string | null
+          work_order_id: string
+        }
+        Update: {
+          actual_hours?: number | null
+          cause?: string | null
+          complaint?: string
+          completed_at?: string | null
+          correction?: string | null
+          created_at?: string | null
+          estimated_hours?: number | null
+          id?: string
+          labor_cost?: number | null
+          labor_rate?: number | null
+          status?: string | null
+          task_number?: number
+          technician_id?: string | null
+          updated_at?: string | null
+          work_order_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "work_order_tasks_technician_id_fkey"
+            columns: ["technician_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "work_order_tasks_work_order_id_fkey"
+            columns: ["work_order_id"]
+            isOneToOne: false
+            referencedRelation: "work_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      work_orders: {
+        Row: {
+          actual_start: string | null
+          approved_at: string | null
+          approved_by: string | null
+          assigned_to: string | null
+          bay_allocation: string | null
+          completed_at: string | null
+          cost_approved: boolean | null
+          cost_posted: boolean | null
+          created_at: string | null
+          created_by: string | null
+          custody_transaction_id: string | null
+          documents: Json | null
+          due_date: string | null
+          estimated_cost: number | null
+          fault_codes: Json | null
+          id: string
+          incident_ref: string | null
+          labor_cost: number | null
+          mileage: number | null
+          notes: string | null
+          parts_cost: number | null
+          photos: Json | null
+          priority: Database["public"]["Enums"]["priority_level"] | null
+          qa_checklist: Json | null
+          qa_passed: boolean | null
+          reason: Database["public"]["Enums"]["work_order_reason"]
+          requires_approval: boolean | null
+          scheduled_start: string | null
+          status: Database["public"]["Enums"]["work_order_status"] | null
+          tax_amount: number | null
+          test_drive_notes: string | null
+          total_cost: number | null
+          updated_at: string | null
+          vehicle_id: string
+          wo_number: string
+          workshop_vendor: string | null
+        }
+        Insert: {
+          actual_start?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
+          assigned_to?: string | null
+          bay_allocation?: string | null
+          completed_at?: string | null
+          cost_approved?: boolean | null
+          cost_posted?: boolean | null
+          created_at?: string | null
+          created_by?: string | null
+          custody_transaction_id?: string | null
+          documents?: Json | null
+          due_date?: string | null
+          estimated_cost?: number | null
+          fault_codes?: Json | null
+          id?: string
+          incident_ref?: string | null
+          labor_cost?: number | null
+          mileage?: number | null
+          notes?: string | null
+          parts_cost?: number | null
+          photos?: Json | null
+          priority?: Database["public"]["Enums"]["priority_level"] | null
+          qa_checklist?: Json | null
+          qa_passed?: boolean | null
+          reason: Database["public"]["Enums"]["work_order_reason"]
+          requires_approval?: boolean | null
+          scheduled_start?: string | null
+          status?: Database["public"]["Enums"]["work_order_status"] | null
+          tax_amount?: number | null
+          test_drive_notes?: string | null
+          total_cost?: number | null
+          updated_at?: string | null
+          vehicle_id: string
+          wo_number: string
+          workshop_vendor?: string | null
+        }
+        Update: {
+          actual_start?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
+          assigned_to?: string | null
+          bay_allocation?: string | null
+          completed_at?: string | null
+          cost_approved?: boolean | null
+          cost_posted?: boolean | null
+          created_at?: string | null
+          created_by?: string | null
+          custody_transaction_id?: string | null
+          documents?: Json | null
+          due_date?: string | null
+          estimated_cost?: number | null
+          fault_codes?: Json | null
+          id?: string
+          incident_ref?: string | null
+          labor_cost?: number | null
+          mileage?: number | null
+          notes?: string | null
+          parts_cost?: number | null
+          photos?: Json | null
+          priority?: Database["public"]["Enums"]["priority_level"] | null
+          qa_checklist?: Json | null
+          qa_passed?: boolean | null
+          reason?: Database["public"]["Enums"]["work_order_reason"]
+          requires_approval?: boolean | null
+          scheduled_start?: string | null
+          status?: Database["public"]["Enums"]["work_order_status"] | null
+          tax_amount?: number | null
+          test_drive_notes?: string | null
+          total_cost?: number | null
+          updated_at?: string | null
+          vehicle_id?: string
+          wo_number?: string
+          workshop_vendor?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "work_orders_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "work_orders_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "work_orders_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "work_orders_custody_transaction_id_fkey"
+            columns: ["custody_transaction_id"]
+            isOneToOne: false
+            referencedRelation: "custody_transactions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "work_orders_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
@@ -6555,6 +7287,14 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      generate_expense_no: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      generate_movement_no: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       generate_referral_code: {
         Args: Record<PropertyKey, never>
         Returns: string
@@ -6593,6 +7333,10 @@ export type Database = {
           p_model: string
           p_year: number
         }
+        Returns: string
+      }
+      generate_wo_number: {
+        Args: Record<PropertyKey, never>
         Returns: string
       }
       get_custody_statistics: {
@@ -6819,6 +7563,16 @@ export type Database = {
         | "expired"
       early_cancellation_fee_type: "None" | "Fixed AED" | "% of remaining month"
       esign_status: "pending" | "signed" | "declined"
+      expense_category:
+        | "registration"
+        | "fines"
+        | "cleaning"
+        | "towing"
+        | "transport"
+        | "parking"
+        | "diagnostics"
+        | "insurance"
+        | "other"
       final_billing_type: "Pro-rata" | "Full month"
       framework_model: "Rate Card by Class" | "Fixed Rate per VIN"
       geo_restrictions: "UAE-only" | "GCC Allowed" | "Off-road Prohibited"
@@ -6834,6 +7588,11 @@ export type Database = {
       maintenance_trigger: "Every X km" | "Every Y months" | "Both (first due)"
       mileage_rollover: "No" | "Yes"
       minimum_commitment: "None" | "1" | "3" | "6"
+      movement_type:
+        | "ownership_transfer"
+        | "inter_branch"
+        | "department_reallocation"
+        | "third_party"
       payment_method_type:
         | "Card Autopay"
         | "Direct Debit"
@@ -6845,6 +7604,7 @@ export type Database = {
         | "failed"
         | "refunded"
       preferred_workshop: "OEM" | "In-house" | "Partner"
+      priority_level: "low" | "normal" | "high" | "urgent"
       rate_policy_type: "inherit" | "prorate" | "free" | "special_code"
       renewal_cycle: "Monthly (anniversary)" | "3-Monthly"
       rental_type: "Corporate Leasing"
@@ -6870,6 +7630,16 @@ export type Database = {
         | "customer"
         | "maintenance"
         | "finance"
+      vehicle_operational_status:
+        | "available"
+        | "reserved"
+        | "rented"
+        | "under_maintenance"
+        | "accident_repair"
+        | "registration_pending"
+        | "internal_use"
+        | "sold"
+        | "de_fleeted"
       vehicle_status:
         | "available"
         | "rented"
@@ -6877,6 +7647,20 @@ export type Database = {
         | "out_of_service"
         | "reserved"
       vehicle_swap_rules: "Same class" | "Up to +1 class (fee)"
+      work_order_reason:
+        | "pm"
+        | "breakdown"
+        | "accident"
+        | "recall"
+        | "inspection"
+        | "other"
+      work_order_status:
+        | "open"
+        | "in_progress"
+        | "waiting_parts"
+        | "qa"
+        | "closed"
+        | "cancelled"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -7129,6 +7913,17 @@ export const Constants = {
         "% of remaining month",
       ],
       esign_status: ["pending", "signed", "declined"],
+      expense_category: [
+        "registration",
+        "fines",
+        "cleaning",
+        "towing",
+        "transport",
+        "parking",
+        "diagnostics",
+        "insurance",
+        "other",
+      ],
       final_billing_type: ["Pro-rata", "Full month"],
       framework_model: ["Rate Card by Class", "Fixed Rate per VIN"],
       geo_restrictions: ["UAE-only", "GCC Allowed", "Off-road Prohibited"],
@@ -7145,6 +7940,12 @@ export const Constants = {
       maintenance_trigger: ["Every X km", "Every Y months", "Both (first due)"],
       mileage_rollover: ["No", "Yes"],
       minimum_commitment: ["None", "1", "3", "6"],
+      movement_type: [
+        "ownership_transfer",
+        "inter_branch",
+        "department_reallocation",
+        "third_party",
+      ],
       payment_method_type: [
         "Card Autopay",
         "Direct Debit",
@@ -7158,6 +7959,7 @@ export const Constants = {
         "refunded",
       ],
       preferred_workshop: ["OEM", "In-house", "Partner"],
+      priority_level: ["low", "normal", "high", "urgent"],
       rate_policy_type: ["inherit", "prorate", "free", "special_code"],
       renewal_cycle: ["Monthly (anniversary)", "3-Monthly"],
       rental_type: ["Corporate Leasing"],
@@ -7185,6 +7987,17 @@ export const Constants = {
         "maintenance",
         "finance",
       ],
+      vehicle_operational_status: [
+        "available",
+        "reserved",
+        "rented",
+        "under_maintenance",
+        "accident_repair",
+        "registration_pending",
+        "internal_use",
+        "sold",
+        "de_fleeted",
+      ],
       vehicle_status: [
         "available",
         "rented",
@@ -7193,6 +8006,22 @@ export const Constants = {
         "reserved",
       ],
       vehicle_swap_rules: ["Same class", "Up to +1 class (fee)"],
+      work_order_reason: [
+        "pm",
+        "breakdown",
+        "accident",
+        "recall",
+        "inspection",
+        "other",
+      ],
+      work_order_status: [
+        "open",
+        "in_progress",
+        "waiting_parts",
+        "qa",
+        "closed",
+        "cancelled",
+      ],
     },
   },
 } as const
