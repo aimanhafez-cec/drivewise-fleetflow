@@ -33,6 +33,7 @@ import ReservationDetails from "./pages/ReservationDetails";
 import ReservationDetailsPage from "./pages/ReservationDetailsPage";
 import Agreements from "./pages/Agreements";
 import AgreementDetails from "./pages/AgreementDetails";
+import CustodyDetail from "@/pages/CustodyDetail";
 import AgreementWizardPage from "./pages/AgreementWizardPage";
 import RFQs from "./pages/RFQs";
 import NewRFQ from "./pages/NewRFQ";
@@ -241,6 +242,7 @@ const App = () => {
             }>
               <Route index element={<Custody />} />
               <Route path="new" element={<NewCustody />} />
+              <Route path=":id" element={<CustodyDetail />} />
             </Route>
 
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
