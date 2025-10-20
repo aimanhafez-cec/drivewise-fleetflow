@@ -32,7 +32,7 @@ const OperationsHub: React.FC = () => {
       title: 'Vehicle Replacements',
       description: 'Manage temporary and permanent vehicle replacements, custody transactions',
       icon: RefreshCw,
-      route: '/operations/replacements',
+      route: '/operations/replacement',
       gradient: 'from-orange-500/10 to-red-500/10',
     },
     {
