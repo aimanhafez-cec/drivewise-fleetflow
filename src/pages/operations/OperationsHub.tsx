@@ -21,6 +21,13 @@ const OperationsHub: React.FC = () => {
       route: '/operations/maintenance',
       gradient: 'from-blue-500/10 to-indigo-500/10',
     },
+    {
+      title: 'Vehicle Status Board',
+      description: 'Real-time visual board showing fleet status, movements, and comprehensive history',
+      icon: RefreshCw,
+      route: '/operations/status-board',
+      gradient: 'from-green-500/10 to-emerald-500/10',
+    },
   ];
 
   return (
