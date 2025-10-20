@@ -2,6 +2,11 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Building, User, Briefcase } from "lucide-react";
 import { format } from "date-fns";
+import { 
+  getBillingDayLabel, 
+  getLineItemGranularityLabel, 
+  getBillingStartTriggerLabel 
+} from "@/lib/constants/billingOptions";
 
 interface QuoteHeaderInfoProps {
   quote: any;
@@ -96,6 +101,24 @@ export const QuoteHeaderInfo: React.FC<QuoteHeaderInfoProps> = ({
               <p className="font-medium">{quote.project}</p>
             </div>
           )}
+        </div>
+      </CardContent>
+      
+      <CardHeader className="border-t pt-4">
+        <CardTitle className="text-base">Billing Configuration</CardTitle>
+      </CardHeader>
+      <CardContent className="grid md:grid-cols-3 gap-6">
+        <div>
+          <p className="text-sm text-muted-foreground">Billing Day</p>
+          <p className="font-medium">{getBillingDayLabel(quote.billing_day)}</p>
+        </div>
+        <div>
+          <p className="text-sm text-muted-foreground">Invoice Granularity</p>
+          <p className="font-medium">{getLineItemGranularityLabel(quote.line_item_granularity)}</p>
+        </div>
+        <div>
+          <p className="text-sm text-muted-foreground">Billing Start Trigger</p>
+          <p className="font-medium">{getBillingStartTriggerLabel(quote.billing_start_trigger)}</p>
         </div>
       </CardContent>
     </Card>
