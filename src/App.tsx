@@ -60,6 +60,7 @@ import TransactionsHub from "./pages/transactions/TransactionsHub";
 import OperationsHub from "./pages/operations/OperationsHub";
 import Custody from "./pages/Custody";
 import NewCustody from "./pages/NewCustody";
+import CustodySettings from "./pages/CustodySettings";
 // Hidden - commented out imports
 // import { CarSubscriptions } from "./pages/CarSubscriptions";
 // import { NewCarSubscription } from "./pages/NewCarSubscription";
@@ -242,6 +243,7 @@ const App = () => {
             }>
               <Route index element={<Custody />} />
               <Route path="new" element={<NewCustody />} />
+              <Route path="settings" element={<CustodySettings />} />
               <Route path=":id" element={<CustodyDetail />} />
             </Route>
 

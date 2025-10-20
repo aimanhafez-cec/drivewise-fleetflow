@@ -19,3 +19,4 @@ export { CustodyTable } from './CustodyTable';
 
 // Phase 7 - Integrations
 export { NotificationPreferences } from './NotificationPreferences';
+export { IntegrationSettings } from './IntegrationSettings';

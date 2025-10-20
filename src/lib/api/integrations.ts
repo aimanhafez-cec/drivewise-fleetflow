@@ -194,9 +194,17 @@ export class IntegrationsAPI {
   async handleCustodyStatusChange(
     custodyId: string,
     oldStatus: string,
-    newStatus: string,
-    custody: any
+    newStatus: string
   ): Promise<void> {
+    // Fetch custody details
+    const { data: custody } = await supabase
+      .from('custody_transactions')
+      .select('*')
+      .eq('id', custodyId)
+      .single();
+
+    if (!custody) return;
+
     // Send notification
     const eventMap: Record<string, any> = {
       'pending_approval': 'submitted',
