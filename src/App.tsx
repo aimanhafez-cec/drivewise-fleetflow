@@ -61,6 +61,7 @@ import VehicleStatusBoard from "./pages/operations/VehicleStatusBoard";
 import OperationsWorkbench from "./pages/operations/OperationsWorkbench";
 import IntegrationsHub from "./pages/integrations/IntegrationsHub";
 import SecurityHub from "./pages/security/SecurityHub";
+import AnalyticsHub from "./pages/analytics/AnalyticsHub";
 import ComponentsLibrary from "./pages/components/ComponentsLibrary";
 import TransactionsHub from "./pages/transactions/TransactionsHub";
 import OperationsHub from "./pages/operations/OperationsHub";
@@ -270,6 +271,13 @@ const App = () => {
               </ProtectedRoute>
             }>
               <Route index element={<SecurityHub />} />
+            </Route>
+            <Route path="/analytics" element={
+              <ProtectedRoute>
+                <AppLayout />
+              </ProtectedRoute>
+            }>
+              <Route index element={<AnalyticsHub />} />
             </Route>
             <Route path="/components" element={
               <ProtectedRoute>
