@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { RefreshCw, Settings2 } from 'lucide-react';
+import { RefreshCw, Settings2, FileText } from 'lucide-react';
 import HubCard from '@/components/navigation/HubCard';
 
 const OperationsHub: React.FC = () => {
@@ -34,6 +34,13 @@ const OperationsHub: React.FC = () => {
       icon: RefreshCw,
       route: '/operations/replacements',
       gradient: 'from-orange-500/10 to-red-500/10',
+    },
+    {
+      title: 'Vehicle Ownership',
+      description: 'Manage fleet ownership records, documentation, and compliance',
+      icon: FileText,
+      route: '/operations/ownership',
+      gradient: 'from-violet-500/10 to-purple-500/10',
     },
   ];
 
