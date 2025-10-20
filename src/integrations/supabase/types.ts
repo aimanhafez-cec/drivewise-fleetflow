@@ -1754,6 +1754,90 @@ export type Database = {
           },
         ]
       }
+      custody_integration_settings: {
+        Row: {
+          api_key_name: string | null
+          config: Json | null
+          created_at: string
+          endpoint_url: string | null
+          id: string
+          integration_type: string
+          is_enabled: boolean | null
+          updated_at: string
+        }
+        Insert: {
+          api_key_name?: string | null
+          config?: Json | null
+          created_at?: string
+          endpoint_url?: string | null
+          id?: string
+          integration_type: string
+          is_enabled?: boolean | null
+          updated_at?: string
+        }
+        Update: {
+          api_key_name?: string | null
+          config?: Json | null
+          created_at?: string
+          endpoint_url?: string | null
+          id?: string
+          integration_type?: string
+          is_enabled?: boolean | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      custody_notification_preferences: {
+        Row: {
+          created_at: string
+          email_address: string | null
+          email_enabled: boolean | null
+          id: string
+          notify_on_approval: boolean | null
+          notify_on_closure: boolean | null
+          notify_on_handover: boolean | null
+          notify_on_rejection: boolean | null
+          notify_on_sla_breach: boolean | null
+          notify_on_submission: boolean | null
+          phone_number: string | null
+          sms_enabled: boolean | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email_address?: string | null
+          email_enabled?: boolean | null
+          id?: string
+          notify_on_approval?: boolean | null
+          notify_on_closure?: boolean | null
+          notify_on_handover?: boolean | null
+          notify_on_rejection?: boolean | null
+          notify_on_sla_breach?: boolean | null
+          notify_on_submission?: boolean | null
+          phone_number?: string | null
+          sms_enabled?: boolean | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email_address?: string | null
+          email_enabled?: boolean | null
+          id?: string
+          notify_on_approval?: boolean | null
+          notify_on_closure?: boolean | null
+          notify_on_handover?: boolean | null
+          notify_on_rejection?: boolean | null
+          notify_on_sla_breach?: boolean | null
+          notify_on_submission?: boolean | null
+          phone_number?: string | null
+          sms_enabled?: boolean | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       custody_sla_config: {
         Row: {
           approve_within_hours: number
@@ -1959,6 +2043,53 @@ export type Database = {
             columns: ["replacement_vehicle_id"]
             isOneToOne: false
             referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      custody_webhook_logs: {
+        Row: {
+          created_at: string
+          custody_id: string | null
+          endpoint: string
+          error_message: string | null
+          id: string
+          payload: Json | null
+          response: Json | null
+          status_code: number | null
+          success: boolean | null
+          webhook_type: string
+        }
+        Insert: {
+          created_at?: string
+          custody_id?: string | null
+          endpoint: string
+          error_message?: string | null
+          id?: string
+          payload?: Json | null
+          response?: Json | null
+          status_code?: number | null
+          success?: boolean | null
+          webhook_type: string
+        }
+        Update: {
+          created_at?: string
+          custody_id?: string | null
+          endpoint?: string
+          error_message?: string | null
+          id?: string
+          payload?: Json | null
+          response?: Json | null
+          status_code?: number | null
+          success?: boolean | null
+          webhook_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "custody_webhook_logs_custody_id_fkey"
+            columns: ["custody_id"]
+            isOneToOne: false
+            referencedRelation: "custody_transactions"
             referencedColumns: ["id"]
           },
         ]

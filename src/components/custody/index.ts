@@ -16,3 +16,6 @@ export { SLAIndicator } from './SLAIndicator';
 export { CustodyKPICards } from './CustodyKPICards';
 export { CustodyFilters } from './CustodyFilters';
 export { CustodyTable } from './CustodyTable';
+
+// Phase 7 - Integrations
+export { NotificationPreferences } from './NotificationPreferences';

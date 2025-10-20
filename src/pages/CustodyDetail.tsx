@@ -17,6 +17,7 @@ import {
   ApprovalStepper,
   AuditLogViewer,
   SLAIndicator,
+  NotificationPreferences,
 } from "@/components/custody";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -254,7 +255,7 @@ export default function CustodyDetail() {
 
       {/* Tabs */}
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-7">
+        <TabsList className="grid w-full grid-cols-8">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="timeline">Timeline</TabsTrigger>
           <TabsTrigger value="vehicles">Vehicles</TabsTrigger>
@@ -262,6 +263,7 @@ export default function CustodyDetail() {
           <TabsTrigger value="charges">Charges</TabsTrigger>
           <TabsTrigger value="approvals">Approvals</TabsTrigger>
           <TabsTrigger value="audit">Audit Log</TabsTrigger>
+          <TabsTrigger value="notifications">Notifications</TabsTrigger>
         </TabsList>
 
         {/* Overview Tab */}
@@ -552,6 +554,11 @@ export default function CustodyDetail() {
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* Notifications Tab */}
+        <TabsContent value="notifications">
+          <NotificationPreferences userId="current-user-id" />
         </TabsContent>
       </Tabs>
     </div>
