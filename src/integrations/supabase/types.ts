@@ -755,6 +755,7 @@ export type Database = {
           billing_day: Database["public"]["Enums"]["billing_day"]
           billing_plan: string | null
           billing_start_date: string | null
+          billing_start_trigger: string | null
           business_unit_id: string | null
           co_terminus_lines: boolean
           committed_fleet_size: number | null
@@ -881,6 +882,7 @@ export type Database = {
           billing_day?: Database["public"]["Enums"]["billing_day"]
           billing_plan?: string | null
           billing_start_date?: string | null
+          billing_start_trigger?: string | null
           business_unit_id?: string | null
           co_terminus_lines?: boolean
           committed_fleet_size?: number | null
@@ -1007,6 +1009,7 @@ export type Database = {
           billing_day?: Database["public"]["Enums"]["billing_day"]
           billing_plan?: string | null
           billing_start_date?: string | null
+          billing_start_trigger?: string | null
           business_unit_id?: string | null
           co_terminus_lines?: boolean
           committed_fleet_size?: number | null
@@ -3547,8 +3550,10 @@ export type Database = {
           approved_at: string | null
           approved_by: string | null
           base_vehicle_rate_per_month: number | null
+          billing_day: string | null
           billing_plan: string | null
           billing_start_date: string | null
+          billing_start_trigger: string | null
           business_unit_id: string | null
           contact_person_id: string | null
           contract_effective_from: string | null
@@ -3596,6 +3601,7 @@ export type Database = {
           items: Json
           late_fee_percentage: number | null
           legal_entity_id: string | null
+          line_item_granularity: string | null
           loss_reason_id: string | null
           maintenance_coverage_summary: string | null
           maintenance_included: boolean | null
@@ -3666,8 +3672,10 @@ export type Database = {
           approved_at?: string | null
           approved_by?: string | null
           base_vehicle_rate_per_month?: number | null
+          billing_day?: string | null
           billing_plan?: string | null
           billing_start_date?: string | null
+          billing_start_trigger?: string | null
           business_unit_id?: string | null
           contact_person_id?: string | null
           contract_effective_from?: string | null
@@ -3715,6 +3723,7 @@ export type Database = {
           items?: Json
           late_fee_percentage?: number | null
           legal_entity_id?: string | null
+          line_item_granularity?: string | null
           loss_reason_id?: string | null
           maintenance_coverage_summary?: string | null
           maintenance_included?: boolean | null
@@ -3785,8 +3794,10 @@ export type Database = {
           approved_at?: string | null
           approved_by?: string | null
           base_vehicle_rate_per_month?: number | null
+          billing_day?: string | null
           billing_plan?: string | null
           billing_start_date?: string | null
+          billing_start_trigger?: string | null
           business_unit_id?: string | null
           contact_person_id?: string | null
           contract_effective_from?: string | null
@@ -3834,6 +3845,7 @@ export type Database = {
           items?: Json
           late_fee_percentage?: number | null
           legal_entity_id?: string | null
+          line_item_granularity?: string | null
           loss_reason_id?: string | null
           maintenance_coverage_summary?: string | null
           maintenance_included?: boolean | null
