@@ -212,13 +212,15 @@ export const Step8Confirmation: React.FC = () => {
                 <div className="flex-1">
                   <p className="text-sm font-medium">Pickup</p>
                   <p className="text-sm text-muted-foreground">
-                    {format(
-                      new Date(`${wizardData.pickupDate}T${wizardData.pickupTime}`),
-                      'PPP p'
-                    )}
+                    {wizardData.pickupDate && wizardData.pickupTime
+                      ? format(
+                          new Date(`${wizardData.pickupDate}T${wizardData.pickupTime}`),
+                          'PPP p'
+                        )
+                      : 'Not specified'}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    {wizardData.pickupLocation}
+                    {wizardData.pickupLocation || 'Not specified'}
                   </p>
                 </div>
               </div>
@@ -227,13 +229,15 @@ export const Step8Confirmation: React.FC = () => {
                 <div className="flex-1">
                   <p className="text-sm font-medium">Return</p>
                   <p className="text-sm text-muted-foreground">
-                    {format(
-                      new Date(`${wizardData.returnDate}T${wizardData.returnTime}`),
-                      'PPP p'
-                    )}
+                    {wizardData.returnDate && wizardData.returnTime
+                      ? format(
+                          new Date(`${wizardData.returnDate}T${wizardData.returnTime}`),
+                          'PPP p'
+                        )
+                      : 'Not specified'}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    {wizardData.returnLocation}
+                    {wizardData.returnLocation || 'Not specified'}
                   </p>
                 </div>
               </div>
