@@ -11,3 +11,8 @@ export { DocumentUploader } from './DocumentUploader';
 export { ApprovalStepper } from './ApprovalStepper';
 export { AuditLogViewer } from './AuditLogViewer';
 export { SLAIndicator } from './SLAIndicator';
+
+// Phase 3 - List & Workbench
+export { CustodyKPICards } from './CustodyKPICards';
+export { CustodyFilters } from './CustodyFilters';
+export { CustodyTable } from './CustodyTable';
