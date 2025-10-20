@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { RefreshCw, Settings2, FileText } from 'lucide-react';
+import { RefreshCw, Settings2, FileText, Receipt } from 'lucide-react';
 import HubCard from '@/components/navigation/HubCard';
 
 const OperationsHub: React.FC = () => {
@@ -41,6 +41,13 @@ const OperationsHub: React.FC = () => {
       icon: FileText,
       route: '/operations/ownership',
       gradient: 'from-violet-500/10 to-purple-500/10',
+    },
+    {
+      title: 'Manage Expenses',
+      description: 'Track and manage all vehicle-related expenses and transactions',
+      icon: Receipt,
+      route: '/operations/expenses',
+      gradient: 'from-amber-500/10 to-yellow-500/10',
     },
   ];
 
