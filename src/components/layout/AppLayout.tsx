@@ -18,7 +18,12 @@ import {
   BarChart3,
   Building2,
   FileCheck,
-  FileSpreadsheet
+  FileSpreadsheet,
+  ChevronDown,
+  Receipt,
+  Wallet,
+  TrendingUp,
+  DollarSign
 } from 'lucide-react';
 import {
   Sidebar,
@@ -33,6 +38,11 @@ import {
   SidebarTrigger,
   useSidebar,
 } from '@/components/ui/sidebar';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
@@ -96,6 +106,18 @@ const navigation = [
     icon: Building2,
   },
   {
+    title: 'Transactions',
+    icon: Receipt,
+    subItems: [
+      { title: 'Manage Expenses', url: '/transactions/expenses', icon: Receipt },
+      { title: 'Manage Invoices', url: '/transactions/invoices', icon: FileText },
+      { title: 'Payment Processing', url: '/transactions/payments', icon: CreditCard },
+      { title: 'Revenue Reports', url: '/transactions/revenue', icon: TrendingUp },
+      { title: 'Account Ledger', url: '/transactions/ledger', icon: Wallet },
+      { title: 'Financial Summary', url: '/transactions/summary', icon: DollarSign },
+    ],
+  },
+  {
     title: 'Reports',
     url: '/reports',
     icon: BarChart3,
@@ -144,6 +166,7 @@ function AppSidebar() {
   const navigate = useNavigate();
   const location = useLocation();
   const { state, open, setOpen } = useSidebar();
+  const [expandedItem, setExpandedItem] = useState<string | null>(null);
 
   const handleSignOut = async () => {
     const { error } = await signOut();
@@ -163,6 +186,11 @@ function AppSidebar() {
   };
 
   const isActive = (path: string) => location.pathname === path;
+  
+  const isSubItemActive = (subItems?: Array<{ url: string }>) => {
+    if (!subItems) return false;
+    return subItems.some(item => location.pathname.startsWith(item.url));
+  };
 
   return (
     <Sidebar 
@@ -178,21 +206,67 @@ function AppSidebar() {
             <SidebarMenu className="space-y-1">
               {navigation.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild className="h-10 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:p-2">
-                    <NavLink
-                      to={item.url}
-                      className={({ isActive }) =>
-                        `flex items-center justify-start group-data-[collapsible=icon]:justify-center gap-3 rounded-md transition-colors min-h-[44px] group-data-[collapsible=icon]:min-h-[40px] ${
-                          isActive 
-                            ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" 
-                            : "hover:bg-sidebar-accent/50 text-sidebar-foreground"
-                        }`
-                      }
+                  {item.subItems ? (
+                    <Collapsible
+                      open={expandedItem === item.title}
+                      onOpenChange={() => setExpandedItem(expandedItem === item.title ? null : item.title)}
                     >
-                      <item.icon className="h-5 w-5 shrink-0 !text-black dark:!text-white" />
-                      <span className="truncate text-sm group-data-[collapsible=icon]:hidden">{item.title}</span>
-                    </NavLink>
-                  </SidebarMenuButton>
+                      <CollapsibleTrigger asChild>
+                        <SidebarMenuButton className={`h-10 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:p-2 ${
+                          isSubItemActive(item.subItems) ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" : "hover:bg-sidebar-accent/50 text-sidebar-foreground"
+                        }`}>
+                          <div className="flex items-center justify-between w-full">
+                            <div className="flex items-center gap-3">
+                              <item.icon className="h-5 w-5 shrink-0 !text-black dark:!text-white" />
+                              <span className="truncate text-sm group-data-[collapsible=icon]:hidden">{item.title}</span>
+                            </div>
+                            <ChevronDown className={`h-4 w-4 shrink-0 transition-transform group-data-[collapsible=icon]:hidden ${
+                              expandedItem === item.title ? 'rotate-180' : ''
+                            }`} />
+                          </div>
+                        </SidebarMenuButton>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="group-data-[collapsible=icon]:hidden">
+                        <SidebarMenu className="ml-6 mt-1 space-y-1">
+                          {item.subItems.map((subItem) => (
+                            <SidebarMenuItem key={subItem.url}>
+                              <SidebarMenuButton asChild className="h-9">
+                                <NavLink
+                                  to={subItem.url}
+                                  className={({ isActive }) =>
+                                    `flex items-center gap-2 rounded-md transition-colors text-sm ${
+                                      isActive 
+                                        ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" 
+                                        : "hover:bg-sidebar-accent/50 text-sidebar-foreground"
+                                    }`
+                                  }
+                                >
+                                  <subItem.icon className="h-4 w-4 shrink-0 !text-black dark:!text-white" />
+                                  <span className="truncate">{subItem.title}</span>
+                                </NavLink>
+                              </SidebarMenuButton>
+                            </SidebarMenuItem>
+                          ))}
+                        </SidebarMenu>
+                      </CollapsibleContent>
+                    </Collapsible>
+                  ) : (
+                    <SidebarMenuButton asChild className="h-10 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:p-2">
+                      <NavLink
+                        to={item.url!}
+                        className={({ isActive }) =>
+                          `flex items-center justify-start group-data-[collapsible=icon]:justify-center gap-3 rounded-md transition-colors min-h-[44px] group-data-[collapsible=icon]:min-h-[40px] ${
+                            isActive 
+                              ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" 
+                              : "hover:bg-sidebar-accent/50 text-sidebar-foreground"
+                          }`
+                        }
+                      >
+                        <item.icon className="h-5 w-5 shrink-0 !text-black dark:!text-white" />
+                        <span className="truncate text-sm group-data-[collapsible=icon]:hidden">{item.title}</span>
+                      </NavLink>
+                    </SidebarMenuButton>
+                  )}
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
