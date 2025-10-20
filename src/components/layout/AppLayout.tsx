@@ -171,17 +171,6 @@ function AppSidebar() {
     }
   };
 
-  const isActive = (path: string) => {
-    // For hub pages, also highlight if on any sub-route
-    if (path === '/transactions' && location.pathname.startsWith('/transactions')) {
-      return true;
-    }
-    if (path === '/operations' && location.pathname.startsWith('/operations')) {
-      return true;
-    }
-    return location.pathname === path;
-  };
-
   return (
     <Sidebar 
       className="data-[state=open]:w-64 data-[state=closed]:w-0 md:data-[state=closed]:w-16 border-r"
