@@ -23,7 +23,10 @@ import {
   Receipt,
   Wallet,
   TrendingUp,
-  DollarSign
+  DollarSign,
+  Wrench,
+  RefreshCw,
+  Settings2
 } from 'lucide-react';
 import {
   Sidebar,
@@ -100,6 +103,14 @@ const navigation = [
     title: 'Inspections',
     url: '/inspections',
     icon: ClipboardCheck,
+  },
+  {
+    title: 'Operations',
+    icon: Wrench,
+    subItems: [
+      { title: 'Manage Replacement', url: '/operations/replacement', icon: RefreshCw },
+      { title: 'Maintenance', url: '/operations/maintenance', icon: Settings2 },
+    ],
   },
   {
     title: 'Agreements',
