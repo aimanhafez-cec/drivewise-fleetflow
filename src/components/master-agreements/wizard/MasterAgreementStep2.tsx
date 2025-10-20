@@ -279,10 +279,7 @@ export const MasterAgreementStep2: React.FC<MasterAgreementStep2Props> = ({
                 <SelectContent>
                   {LINE_ITEM_GRANULARITY_OPTIONS.map((option) => (
                     <SelectItem key={option.id} value={option.value}>
-                      <div>
-                        <div className="font-medium">{option.label}</div>
-                        <div className="text-xs text-muted-foreground">{option.description}</div>
-                      </div>
+                      {option.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -301,10 +298,7 @@ export const MasterAgreementStep2: React.FC<MasterAgreementStep2Props> = ({
                 <SelectContent>
                   {BILLING_START_TRIGGER_OPTIONS.map((option) => (
                     <SelectItem key={option.id} value={option.value}>
-                      <div>
-                        <div className="font-medium">{option.label}</div>
-                        <div className="text-xs text-muted-foreground">{option.description}</div>
-                      </div>
+                      {option.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
