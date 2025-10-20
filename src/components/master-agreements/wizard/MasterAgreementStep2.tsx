@@ -25,6 +25,11 @@ import {
   PAYMENT_METHODS,
   INITIAL_FEE_TYPES,
 } from "@/lib/constants/financialOptions";
+import {
+  BILLING_DAY_OPTIONS,
+  LINE_ITEM_GRANULARITY_OPTIONS,
+  BILLING_START_TRIGGER_OPTIONS,
+} from "@/lib/constants/billingOptions";
 import { Calendar, DollarSign, Receipt, CreditCard, AlertCircle, TrendingUp, Plus, Trash2 } from "lucide-react";
 import { FormError } from "@/components/ui/form-error";
 
@@ -130,6 +135,15 @@ export const MasterAgreementStep2: React.FC<MasterAgreementStep2Props> = ({
     if (!data.currency) {
       updates.currency = 'AED';
     }
+    if (!data.billing_day) {
+      updates.billing_day = 'Anniversary';
+    }
+    if (!data.line_item_granularity) {
+      updates.line_item_granularity = 'base_rent_addons';
+    }
+    if (!data.billing_start_trigger) {
+      updates.billing_start_trigger = 'vehicle_delivery';
+    }
     
     if (Object.keys(updates).length > 0) {
       onChange(updates);
@@ -228,6 +242,69 @@ export const MasterAgreementStep2: React.FC<MasterAgreementStep2Props> = ({
                   {PRORATION_RULES.map((rule) => (
                     <SelectItem key={rule.id} value={rule.value}>
                       {rule.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="billing_day">Billing Day</Label>
+              <Select
+                value={data.billing_day || "Anniversary"}
+                onValueChange={(value) => onChange({ billing_day: value })}
+              >
+                <SelectTrigger id="billing_day">
+                  <SelectValue placeholder="Select billing day" />
+                </SelectTrigger>
+                <SelectContent>
+                  {BILLING_DAY_OPTIONS.map((option) => (
+                    <SelectItem key={option.id} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="line_item_granularity">Invoice Line Item Granularity</Label>
+              <Select
+                value={data.line_item_granularity || "base_rent_addons"}
+                onValueChange={(value) => onChange({ line_item_granularity: value })}
+              >
+                <SelectTrigger id="line_item_granularity">
+                  <SelectValue placeholder="Select granularity" />
+                </SelectTrigger>
+                <SelectContent>
+                  {LINE_ITEM_GRANULARITY_OPTIONS.map((option) => (
+                    <SelectItem key={option.id} value={option.value}>
+                      <div>
+                        <div className="font-medium">{option.label}</div>
+                        <div className="text-xs text-muted-foreground">{option.description}</div>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="billing_start_trigger">Billing Start Trigger</Label>
+              <Select
+                value={data.billing_start_trigger || "vehicle_delivery"}
+                onValueChange={(value) => onChange({ billing_start_trigger: value })}
+              >
+                <SelectTrigger id="billing_start_trigger">
+                  <SelectValue placeholder="Select trigger" />
+                </SelectTrigger>
+                <SelectContent>
+                  {BILLING_START_TRIGGER_OPTIONS.map((option) => (
+                    <SelectItem key={option.id} value={option.value}>
+                      <div>
+                        <div className="font-medium">{option.label}</div>
+                        <div className="text-xs text-muted-foreground">{option.description}</div>
+                      </div>
                     </SelectItem>
                   ))}
                 </SelectContent>
