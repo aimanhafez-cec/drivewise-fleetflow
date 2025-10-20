@@ -110,10 +110,10 @@ const ReplacementForm: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <FormField
             control={form.control}
-            name="affected_vehicle_id"
+            name="original_vehicle_id"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Affected Vehicle *</FormLabel>
+                <FormLabel>Original Vehicle *</FormLabel>
                 <FormControl>
                   <Input placeholder="Select vehicle..." {...field} />
                 </FormControl>
@@ -139,6 +139,47 @@ const ReplacementForm: React.FC = () => {
           />
         </div>
 
+        {/* Custodian Info */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <FormField
+            control={form.control}
+            name="custodian_name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Custodian Name *</FormLabel>
+                <FormControl>
+                  <Input placeholder="Enter custodian name..." {...field} />
+                </FormControl>
+                <FormDescription>Person or entity receiving the vehicle</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="custodian_type"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Custodian Type *</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select custodian type" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="customer">Customer</SelectItem>
+                    <SelectItem value="driver">Driver</SelectItem>
+                    <SelectItem value="originator">Originator</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
         {/* Reason & Details */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <FormField
@@ -156,10 +197,8 @@ const ReplacementForm: React.FC = () => {
                   <SelectContent>
                     <SelectItem value="accident">Accident</SelectItem>
                     <SelectItem value="breakdown">Breakdown</SelectItem>
-                    <SelectItem value="scheduled_maintenance">Scheduled Maintenance</SelectItem>
-                    <SelectItem value="recall">Recall</SelectItem>
-                    <SelectItem value="customer_request">Customer Request</SelectItem>
-                    <SelectItem value="upgrade_downgrade">Upgrade/Downgrade</SelectItem>
+                    <SelectItem value="maintenance">Maintenance</SelectItem>
+                    <SelectItem value="damage">Damage</SelectItem>
                     <SelectItem value="other">Other</SelectItem>
                   </SelectContent>
                 </Select>
@@ -185,13 +224,13 @@ const ReplacementForm: React.FC = () => {
 
         <FormField
           control={form.control}
-          name="reason_details"
+          name="incident_narrative"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Reason Details</FormLabel>
+              <FormLabel>Incident Details</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="Provide additional details about the replacement reason..."
+                  placeholder="Provide additional details about the incident..."
                   {...field}
                 />
               </FormControl>
@@ -248,10 +287,10 @@ const ReplacementForm: React.FC = () => {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="standard">Standard</SelectItem>
+                    <SelectItem value="inherit">Inherit from Agreement</SelectItem>
+                    <SelectItem value="prorate">Prorate</SelectItem>
+                    <SelectItem value="free">Free (No Charge)</SelectItem>
                     <SelectItem value="special_code">Special Code</SelectItem>
-                    <SelectItem value="waived">Waived</SelectItem>
-                    <SelectItem value="customer_pays">Customer Pays</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
@@ -268,22 +307,6 @@ const ReplacementForm: React.FC = () => {
                   <FormLabel>Special Rate Code</FormLabel>
                   <FormControl>
                     <Input placeholder="Enter special rate code..." {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          )}
-
-          {ratePolicy === 'customer_pays' && (
-            <FormField
-              control={form.control}
-              name="daily_rate_override"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Daily Rate Override (AED)</FormLabel>
-                  <FormControl>
-                    <Input type="number" step="0.01" placeholder="0.00" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
