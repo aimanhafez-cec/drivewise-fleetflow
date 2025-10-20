@@ -1521,6 +1521,448 @@ export type Database = {
         }
         Relationships: []
       }
+      custody_approvals: {
+        Row: {
+          approval_level: number
+          approver_role: string
+          approver_user_id: string | null
+          created_at: string | null
+          custody_id: string
+          decision_notes: string | null
+          decision_timestamp: string | null
+          due_by: string | null
+          id: string
+          reminded_at: string | null
+          required: boolean | null
+          status: Database["public"]["Enums"]["approval_status"]
+        }
+        Insert: {
+          approval_level: number
+          approver_role: string
+          approver_user_id?: string | null
+          created_at?: string | null
+          custody_id: string
+          decision_notes?: string | null
+          decision_timestamp?: string | null
+          due_by?: string | null
+          id?: string
+          reminded_at?: string | null
+          required?: boolean | null
+          status?: Database["public"]["Enums"]["approval_status"]
+        }
+        Update: {
+          approval_level?: number
+          approver_role?: string
+          approver_user_id?: string | null
+          created_at?: string | null
+          custody_id?: string
+          decision_notes?: string | null
+          decision_timestamp?: string | null
+          due_by?: string | null
+          id?: string
+          reminded_at?: string | null
+          required?: boolean | null
+          status?: Database["public"]["Enums"]["approval_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "custody_approvals_custody_id_fkey"
+            columns: ["custody_id"]
+            isOneToOne: false
+            referencedRelation: "custody_transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      custody_audit_log: {
+        Row: {
+          action_type: Database["public"]["Enums"]["custody_action_type"]
+          api_source: string | null
+          custody_id: string
+          field_name: string | null
+          id: string
+          ip_address: unknown | null
+          metadata: Json | null
+          new_value: string | null
+          old_value: string | null
+          performed_at: string | null
+          performed_by: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          action_type: Database["public"]["Enums"]["custody_action_type"]
+          api_source?: string | null
+          custody_id: string
+          field_name?: string | null
+          id?: string
+          ip_address?: unknown | null
+          metadata?: Json | null
+          new_value?: string | null
+          old_value?: string | null
+          performed_at?: string | null
+          performed_by?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          action_type?: Database["public"]["Enums"]["custody_action_type"]
+          api_source?: string | null
+          custody_id?: string
+          field_name?: string | null
+          id?: string
+          ip_address?: unknown | null
+          metadata?: Json | null
+          new_value?: string | null
+          old_value?: string | null
+          performed_at?: string | null
+          performed_by?: string | null
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "custody_audit_log_custody_id_fkey"
+            columns: ["custody_id"]
+            isOneToOne: false
+            referencedRelation: "custody_transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      custody_charges: {
+        Row: {
+          charge_type: Database["public"]["Enums"]["charge_type"]
+          created_at: string | null
+          custody_id: string
+          description: string
+          id: string
+          invoice_id: string | null
+          item_code: string | null
+          notes: string | null
+          posted_at: string | null
+          posted_by: string | null
+          quantity: number | null
+          responsibility: Database["public"]["Enums"]["charge_responsibility"]
+          status: Database["public"]["Enums"]["charge_status"]
+          tax_amount: number | null
+          tax_rate: number | null
+          total_amount: number
+          unit_price: number
+        }
+        Insert: {
+          charge_type: Database["public"]["Enums"]["charge_type"]
+          created_at?: string | null
+          custody_id: string
+          description: string
+          id?: string
+          invoice_id?: string | null
+          item_code?: string | null
+          notes?: string | null
+          posted_at?: string | null
+          posted_by?: string | null
+          quantity?: number | null
+          responsibility?: Database["public"]["Enums"]["charge_responsibility"]
+          status?: Database["public"]["Enums"]["charge_status"]
+          tax_amount?: number | null
+          tax_rate?: number | null
+          total_amount: number
+          unit_price: number
+        }
+        Update: {
+          charge_type?: Database["public"]["Enums"]["charge_type"]
+          created_at?: string | null
+          custody_id?: string
+          description?: string
+          id?: string
+          invoice_id?: string | null
+          item_code?: string | null
+          notes?: string | null
+          posted_at?: string | null
+          posted_by?: string | null
+          quantity?: number | null
+          responsibility?: Database["public"]["Enums"]["charge_responsibility"]
+          status?: Database["public"]["Enums"]["charge_status"]
+          tax_amount?: number | null
+          tax_rate?: number | null
+          total_amount?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "custody_charges_custody_id_fkey"
+            columns: ["custody_id"]
+            isOneToOne: false
+            referencedRelation: "custody_transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      custody_documents: {
+        Row: {
+          custody_id: string
+          document_category: Database["public"]["Enums"]["document_category"]
+          document_type: Database["public"]["Enums"]["document_type"]
+          esign_signed_at: string | null
+          esign_signed_by: string | null
+          esign_status: Database["public"]["Enums"]["esign_status"] | null
+          file_name: string
+          file_size: number | null
+          file_url: string
+          id: string
+          metadata: Json | null
+          mime_type: string | null
+          uploaded_at: string | null
+          uploaded_by: string | null
+        }
+        Insert: {
+          custody_id: string
+          document_category?: Database["public"]["Enums"]["document_category"]
+          document_type: Database["public"]["Enums"]["document_type"]
+          esign_signed_at?: string | null
+          esign_signed_by?: string | null
+          esign_status?: Database["public"]["Enums"]["esign_status"] | null
+          file_name: string
+          file_size?: number | null
+          file_url: string
+          id?: string
+          metadata?: Json | null
+          mime_type?: string | null
+          uploaded_at?: string | null
+          uploaded_by?: string | null
+        }
+        Update: {
+          custody_id?: string
+          document_category?: Database["public"]["Enums"]["document_category"]
+          document_type?: Database["public"]["Enums"]["document_type"]
+          esign_signed_at?: string | null
+          esign_signed_by?: string | null
+          esign_status?: Database["public"]["Enums"]["esign_status"] | null
+          file_name?: string
+          file_size?: number | null
+          file_url?: string
+          id?: string
+          metadata?: Json | null
+          mime_type?: string | null
+          uploaded_at?: string | null
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "custody_documents_custody_id_fkey"
+            columns: ["custody_id"]
+            isOneToOne: false
+            referencedRelation: "custody_transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      custody_sla_config: {
+        Row: {
+          approve_within_hours: number
+          branch_id: string | null
+          close_within_hours_after_ready: number
+          created_at: string | null
+          escalation_path: Json | null
+          handover_within_hours: number
+          id: string
+          is_active: boolean | null
+          reason_code: Database["public"]["Enums"]["custody_reason"]
+          updated_at: string | null
+          vehicle_class_id: string | null
+        }
+        Insert: {
+          approve_within_hours?: number
+          branch_id?: string | null
+          close_within_hours_after_ready?: number
+          created_at?: string | null
+          escalation_path?: Json | null
+          handover_within_hours?: number
+          id?: string
+          is_active?: boolean | null
+          reason_code: Database["public"]["Enums"]["custody_reason"]
+          updated_at?: string | null
+          vehicle_class_id?: string | null
+        }
+        Update: {
+          approve_within_hours?: number
+          branch_id?: string | null
+          close_within_hours_after_ready?: number
+          created_at?: string | null
+          escalation_path?: Json | null
+          handover_within_hours?: number
+          id?: string
+          is_active?: boolean | null
+          reason_code?: Database["public"]["Enums"]["custody_reason"]
+          updated_at?: string | null
+          vehicle_class_id?: string | null
+        }
+        Relationships: []
+      }
+      custody_transactions: {
+        Row: {
+          actual_return_date: string | null
+          agreement_id: string | null
+          agreement_line_id: string | null
+          approved_at: string | null
+          approved_by: string | null
+          branch_id: string | null
+          closed_at: string | null
+          closed_by: string | null
+          created_at: string | null
+          created_by: string | null
+          custodian_contact: Json | null
+          custodian_name: string
+          custodian_party_id: string | null
+          custodian_type: Database["public"]["Enums"]["custodian_type"]
+          custody_no: string | null
+          customer_id: string
+          damage_preauth_card_ref: string | null
+          damage_preauth_hold: number | null
+          deposit_carryover: boolean | null
+          effective_from: string
+          expected_return_date: string | null
+          id: string
+          incident_date: string
+          incident_location: Json | null
+          incident_narrative: string | null
+          incident_odometer: number | null
+          incident_ref: string | null
+          linked_maintenance_ticket_id: string | null
+          notes: string | null
+          original_vehicle_id: string | null
+          rate_policy: Database["public"]["Enums"]["rate_policy_type"]
+          reason_code: Database["public"]["Enums"]["custody_reason"]
+          reason_subcode: string | null
+          replacement_vehicle_id: string | null
+          sla_breached: boolean | null
+          sla_target_approve_by: string | null
+          sla_target_handover_by: string | null
+          special_rate_code: string | null
+          status: Database["public"]["Enums"]["custody_status"]
+          tags: string[] | null
+          tax_profile_id: string | null
+          until_original_ready: boolean | null
+          updated_at: string | null
+        }
+        Insert: {
+          actual_return_date?: string | null
+          agreement_id?: string | null
+          agreement_line_id?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
+          branch_id?: string | null
+          closed_at?: string | null
+          closed_by?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          custodian_contact?: Json | null
+          custodian_name: string
+          custodian_party_id?: string | null
+          custodian_type: Database["public"]["Enums"]["custodian_type"]
+          custody_no?: string | null
+          customer_id: string
+          damage_preauth_card_ref?: string | null
+          damage_preauth_hold?: number | null
+          deposit_carryover?: boolean | null
+          effective_from: string
+          expected_return_date?: string | null
+          id?: string
+          incident_date: string
+          incident_location?: Json | null
+          incident_narrative?: string | null
+          incident_odometer?: number | null
+          incident_ref?: string | null
+          linked_maintenance_ticket_id?: string | null
+          notes?: string | null
+          original_vehicle_id?: string | null
+          rate_policy?: Database["public"]["Enums"]["rate_policy_type"]
+          reason_code: Database["public"]["Enums"]["custody_reason"]
+          reason_subcode?: string | null
+          replacement_vehicle_id?: string | null
+          sla_breached?: boolean | null
+          sla_target_approve_by?: string | null
+          sla_target_handover_by?: string | null
+          special_rate_code?: string | null
+          status?: Database["public"]["Enums"]["custody_status"]
+          tags?: string[] | null
+          tax_profile_id?: string | null
+          until_original_ready?: boolean | null
+          updated_at?: string | null
+        }
+        Update: {
+          actual_return_date?: string | null
+          agreement_id?: string | null
+          agreement_line_id?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
+          branch_id?: string | null
+          closed_at?: string | null
+          closed_by?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          custodian_contact?: Json | null
+          custodian_name?: string
+          custodian_party_id?: string | null
+          custodian_type?: Database["public"]["Enums"]["custodian_type"]
+          custody_no?: string | null
+          customer_id?: string
+          damage_preauth_card_ref?: string | null
+          damage_preauth_hold?: number | null
+          deposit_carryover?: boolean | null
+          effective_from?: string
+          expected_return_date?: string | null
+          id?: string
+          incident_date?: string
+          incident_location?: Json | null
+          incident_narrative?: string | null
+          incident_odometer?: number | null
+          incident_ref?: string | null
+          linked_maintenance_ticket_id?: string | null
+          notes?: string | null
+          original_vehicle_id?: string | null
+          rate_policy?: Database["public"]["Enums"]["rate_policy_type"]
+          reason_code?: Database["public"]["Enums"]["custody_reason"]
+          reason_subcode?: string | null
+          replacement_vehicle_id?: string | null
+          sla_breached?: boolean | null
+          sla_target_approve_by?: string | null
+          sla_target_handover_by?: string | null
+          special_rate_code?: string | null
+          status?: Database["public"]["Enums"]["custody_status"]
+          tags?: string[] | null
+          tax_profile_id?: string | null
+          until_original_ready?: boolean | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "custody_transactions_agreement_id_fkey"
+            columns: ["agreement_id"]
+            isOneToOne: false
+            referencedRelation: "agreements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "custody_transactions_agreement_line_id_fkey"
+            columns: ["agreement_line_id"]
+            isOneToOne: false
+            referencedRelation: "agreement_lines"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "custody_transactions_original_vehicle_id_fkey"
+            columns: ["original_vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "custody_transactions_replacement_vehicle_id_fkey"
+            columns: ["replacement_vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customer_achievements: {
         Row: {
           achievement_id: string
@@ -5607,8 +6049,12 @@ export type Database = {
       vehicle_exchanges: {
         Row: {
           agreement_id: string
+          allocation_rationale: string | null
+          approval_notes: string | null
+          approved_by: string | null
           created_at: string
           created_by: string | null
+          custody_transaction_id: string | null
           exchange_at: string
           fees_added: Json | null
           fuel_in_old: number
@@ -5629,8 +6075,12 @@ export type Database = {
         }
         Insert: {
           agreement_id: string
+          allocation_rationale?: string | null
+          approval_notes?: string | null
+          approved_by?: string | null
           created_at?: string
           created_by?: string | null
+          custody_transaction_id?: string | null
           exchange_at: string
           fees_added?: Json | null
           fuel_in_old: number
@@ -5651,8 +6101,12 @@ export type Database = {
         }
         Update: {
           agreement_id?: string
+          allocation_rationale?: string | null
+          approval_notes?: string | null
+          approved_by?: string | null
           created_at?: string
           created_by?: string | null
+          custody_transaction_id?: string | null
           exchange_at?: string
           fees_added?: Json | null
           fuel_in_old?: number
@@ -5671,7 +6125,15 @@ export type Database = {
           segment_b?: Json
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_exchanges_custody_transaction_id_fkey"
+            columns: ["custody_transaction_id"]
+            isOneToOne: false
+            referencedRelation: "custody_transactions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       vehicles: {
         Row: {
@@ -5834,6 +6296,10 @@ export type Database = {
           total_points: number
         }[]
       }
+      calculate_custody_sla: {
+        Args: { p_custody_id: string }
+        Returns: Json
+      }
       calculate_down_payment: {
         Args: { p_total_amount: number }
         Returns: number
@@ -5866,6 +6332,10 @@ export type Database = {
           upgraded: boolean
         }[]
       }
+      check_vehicle_custody_availability: {
+        Args: { p_date_from: string; p_date_to: string; p_vehicle_id: string }
+        Returns: boolean
+      }
       driver_has_expired_documents: {
         Args: { p_driver_id: string }
         Returns: boolean
@@ -5895,6 +6365,10 @@ export type Database = {
       }
       generate_cost_sheet_no: {
         Args: { p_quote_id: string; p_version: number }
+        Returns: string
+      }
+      generate_custody_no: {
+        Args: Record<PropertyKey, never>
         Returns: string
       }
       generate_referral_code: {
@@ -5975,6 +6449,14 @@ export type Database = {
         Args: { p_customer_id: string }
         Returns: boolean
       }
+      validate_custody_status_change: {
+        Args: {
+          p_custody_id: string
+          p_from_status: Database["public"]["Enums"]["custody_status"]
+          p_to_status: Database["public"]["Enums"]["custody_status"]
+        }
+        Returns: Json
+      }
       validate_driver_for_checkout: {
         Args: { p_driver_id: string }
         Returns: Record<string, unknown>
@@ -5982,6 +6464,7 @@ export type Database = {
     }
     Enums: {
       agreement_status: "active" | "completed" | "terminated" | "pending_return"
+      approval_status: "pending" | "approved" | "rejected" | "escalated"
       billing_cycle: "Monthly"
       billing_day: "1st" | "15th" | "Month-End" | "Anniversary"
       billing_day_type: "Anniversary" | "1st" | "15th"
@@ -5993,6 +6476,13 @@ export type Database = {
         | "suspended"
         | "cancelled"
         | "expired"
+      charge_responsibility:
+        | "customer"
+        | "company"
+        | "insurance"
+        | "third_party"
+      charge_status: "draft" | "posted" | "invoiced" | "paid"
+      charge_type: "damage" | "upgrade" | "downgrade" | "admin_fee" | "other"
       condition_report_cadence:
         | "On start"
         | "On swap"
@@ -6020,6 +6510,30 @@ export type Database = {
         | "rejected"
         | "obsolete"
       credit_terms: "Net 15" | "Net 30" | "Net 45" | "Custom" | "Immediate"
+      custodian_type: "customer" | "driver" | "originator"
+      custody_action_type:
+        | "created"
+        | "updated"
+        | "status_changed"
+        | "document_added"
+        | "approval_requested"
+        | "approved"
+        | "rejected"
+        | "closed"
+        | "voided"
+      custody_reason:
+        | "accident"
+        | "breakdown"
+        | "maintenance"
+        | "damage"
+        | "other"
+      custody_status:
+        | "draft"
+        | "pending_approval"
+        | "approved"
+        | "active"
+        | "closed"
+        | "voided"
       customer_segment: "SME" | "Enterprise" | "Government"
       customer_type: "Company" | "Person"
       damage_type:
@@ -6029,6 +6543,15 @@ export type Database = {
         | "missing_part"
         | "interior_damage"
         | "other"
+      document_category: "required" | "optional"
+      document_type:
+        | "customer_acknowledgment"
+        | "incident_report"
+        | "photos"
+        | "police_report"
+        | "insurance_docs"
+        | "handover_checklist"
+        | "signature"
       driver_document_type:
         | "emirates_id_front"
         | "emirates_id_back"
@@ -6047,6 +6570,7 @@ export type Database = {
         | "rejected"
         | "expired"
       early_cancellation_fee_type: "None" | "Fixed AED" | "% of remaining month"
+      esign_status: "pending" | "signed" | "declined"
       final_billing_type: "Pro-rata" | "Full month"
       framework_model: "Rate Card by Class" | "Fixed Rate per VIN"
       geo_restrictions: "UAE-only" | "GCC Allowed" | "Off-road Prohibited"
@@ -6073,6 +6597,7 @@ export type Database = {
         | "failed"
         | "refunded"
       preferred_workshop: "OEM" | "In-house" | "Partner"
+      rate_policy_type: "inherit" | "prorate" | "free" | "special_code"
       renewal_cycle: "Monthly (anniversary)" | "3-Monthly"
       rental_type: "Corporate Leasing"
       replacement_sla_unit: "Hours" | "Days"
@@ -6232,6 +6757,7 @@ export const Constants = {
   public: {
     Enums: {
       agreement_status: ["active", "completed", "terminated", "pending_return"],
+      approval_status: ["pending", "approved", "rejected", "escalated"],
       billing_cycle: ["Monthly"],
       billing_day: ["1st", "15th", "Month-End", "Anniversary"],
       billing_day_type: ["Anniversary", "1st", "15th"],
@@ -6244,6 +6770,14 @@ export const Constants = {
         "cancelled",
         "expired",
       ],
+      charge_responsibility: [
+        "customer",
+        "company",
+        "insurance",
+        "third_party",
+      ],
+      charge_status: ["draft", "posted", "invoiced", "paid"],
+      charge_type: ["damage", "upgrade", "downgrade", "admin_fee", "other"],
       condition_report_cadence: [
         "On start",
         "On swap",
@@ -6275,6 +6809,33 @@ export const Constants = {
         "obsolete",
       ],
       credit_terms: ["Net 15", "Net 30", "Net 45", "Custom", "Immediate"],
+      custodian_type: ["customer", "driver", "originator"],
+      custody_action_type: [
+        "created",
+        "updated",
+        "status_changed",
+        "document_added",
+        "approval_requested",
+        "approved",
+        "rejected",
+        "closed",
+        "voided",
+      ],
+      custody_reason: [
+        "accident",
+        "breakdown",
+        "maintenance",
+        "damage",
+        "other",
+      ],
+      custody_status: [
+        "draft",
+        "pending_approval",
+        "approved",
+        "active",
+        "closed",
+        "voided",
+      ],
       customer_segment: ["SME", "Enterprise", "Government"],
       customer_type: ["Company", "Person"],
       damage_type: [
@@ -6284,6 +6845,16 @@ export const Constants = {
         "missing_part",
         "interior_damage",
         "other",
+      ],
+      document_category: ["required", "optional"],
+      document_type: [
+        "customer_acknowledgment",
+        "incident_report",
+        "photos",
+        "police_report",
+        "insurance_docs",
+        "handover_checklist",
+        "signature",
       ],
       driver_document_type: [
         "emirates_id_front",
@@ -6309,6 +6880,7 @@ export const Constants = {
         "Fixed AED",
         "% of remaining month",
       ],
+      esign_status: ["pending", "signed", "declined"],
       final_billing_type: ["Pro-rata", "Full month"],
       framework_model: ["Rate Card by Class", "Fixed Rate per VIN"],
       geo_restrictions: ["UAE-only", "GCC Allowed", "Off-road Prohibited"],
@@ -6338,6 +6910,7 @@ export const Constants = {
         "refunded",
       ],
       preferred_workshop: ["OEM", "In-house", "Partner"],
+      rate_policy_type: ["inherit", "prorate", "free", "special_code"],
       renewal_cycle: ["Monthly (anniversary)", "3-Monthly"],
       rental_type: ["Corporate Leasing"],
       replacement_sla_unit: ["Hours", "Days"],
