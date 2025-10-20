@@ -192,7 +192,7 @@ const ManageQuotations: React.FC = () => {
     q.status === "draft" || q.status === "submitted" || q.status === "sent"
   ).length;
   const acceptedQuotes = quotes.filter((q) => 
-    q.status === "accepted" || q.status === "approved"
+    q.status === "accepted"
   ).length;
   const totalValue = quotes.reduce((sum, q) => 
     sum + (q.calculated_total || Number(q.total_amount) || 0), 0
