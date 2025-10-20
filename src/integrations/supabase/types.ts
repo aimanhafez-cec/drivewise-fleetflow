@@ -1572,13 +1572,6 @@ export type Database = {
             referencedRelation: "custody_transactions"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "custody_approvals_custody_id_fkey"
-            columns: ["custody_id"]
-            isOneToOne: false
-            referencedRelation: "custody_transactions_secure"
-            referencedColumns: ["id"]
-          },
         ]
       }
       custody_audit_log: {
@@ -1630,13 +1623,6 @@ export type Database = {
             columns: ["custody_id"]
             isOneToOne: false
             referencedRelation: "custody_transactions"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "custody_audit_log_custody_id_fkey"
-            columns: ["custody_id"]
-            isOneToOne: false
-            referencedRelation: "custody_transactions_secure"
             referencedColumns: ["id"]
           },
         ]
@@ -1707,13 +1693,6 @@ export type Database = {
             referencedRelation: "custody_transactions"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "custody_charges_custody_id_fkey"
-            columns: ["custody_id"]
-            isOneToOne: false
-            referencedRelation: "custody_transactions_secure"
-            referencedColumns: ["id"]
-          },
         ]
       }
       custody_documents: {
@@ -1771,13 +1750,6 @@ export type Database = {
             columns: ["custody_id"]
             isOneToOne: false
             referencedRelation: "custody_transactions"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "custody_documents_custody_id_fkey"
-            columns: ["custody_id"]
-            isOneToOne: false
-            referencedRelation: "custody_transactions_secure"
             referencedColumns: ["id"]
           },
         ]
@@ -2118,13 +2090,6 @@ export type Database = {
             columns: ["custody_id"]
             isOneToOne: false
             referencedRelation: "custody_transactions"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "custody_webhook_logs_custody_id_fkey"
-            columns: ["custody_id"]
-            isOneToOne: false
-            referencedRelation: "custody_transactions_secure"
             referencedColumns: ["id"]
           },
         ]
@@ -6317,13 +6282,6 @@ export type Database = {
             referencedRelation: "custody_transactions"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "vehicle_exchanges_custody_transaction_id_fkey"
-            columns: ["custody_transaction_id"]
-            isOneToOne: false
-            referencedRelation: "custody_transactions_secure"
-            referencedColumns: ["id"]
-          },
         ]
       }
       vehicles: {
@@ -6462,176 +6420,7 @@ export type Database = {
       }
     }
     Views: {
-      custody_transactions_secure: {
-        Row: {
-          actual_return_date: string | null
-          agreement_id: string | null
-          agreement_line_id: string | null
-          approved_at: string | null
-          approved_by: string | null
-          branch_id: string | null
-          closed_at: string | null
-          closed_by: string | null
-          created_at: string | null
-          created_by: string | null
-          custodian_contact: Json | null
-          custodian_contact_masked: Json | null
-          custodian_name: string | null
-          custodian_party_id: string | null
-          custodian_type: Database["public"]["Enums"]["custodian_type"] | null
-          custody_no: string | null
-          customer_id: string | null
-          damage_preauth_card_ref: string | null
-          damage_preauth_hold: number | null
-          deposit_carryover: boolean | null
-          effective_from: string | null
-          expected_return_date: string | null
-          id: string | null
-          incident_date: string | null
-          incident_location: Json | null
-          incident_narrative: string | null
-          incident_odometer: number | null
-          incident_ref: string | null
-          linked_maintenance_ticket_id: string | null
-          notes: string | null
-          original_vehicle_id: string | null
-          rate_policy: Database["public"]["Enums"]["rate_policy_type"] | null
-          reason_code: Database["public"]["Enums"]["custody_reason"] | null
-          reason_subcode: string | null
-          replacement_vehicle_id: string | null
-          sla_breached: boolean | null
-          sla_target_approve_by: string | null
-          sla_target_handover_by: string | null
-          special_rate_code: string | null
-          status: Database["public"]["Enums"]["custody_status"] | null
-          tags: string[] | null
-          tax_profile_id: string | null
-          until_original_ready: boolean | null
-          updated_at: string | null
-        }
-        Insert: {
-          actual_return_date?: string | null
-          agreement_id?: string | null
-          agreement_line_id?: string | null
-          approved_at?: string | null
-          approved_by?: string | null
-          branch_id?: string | null
-          closed_at?: string | null
-          closed_by?: string | null
-          created_at?: string | null
-          created_by?: string | null
-          custodian_contact?: Json | null
-          custodian_contact_masked?: never
-          custodian_name?: string | null
-          custodian_party_id?: string | null
-          custodian_type?: Database["public"]["Enums"]["custodian_type"] | null
-          custody_no?: string | null
-          customer_id?: string | null
-          damage_preauth_card_ref?: string | null
-          damage_preauth_hold?: number | null
-          deposit_carryover?: boolean | null
-          effective_from?: string | null
-          expected_return_date?: string | null
-          id?: string | null
-          incident_date?: string | null
-          incident_location?: Json | null
-          incident_narrative?: string | null
-          incident_odometer?: number | null
-          incident_ref?: string | null
-          linked_maintenance_ticket_id?: string | null
-          notes?: string | null
-          original_vehicle_id?: string | null
-          rate_policy?: Database["public"]["Enums"]["rate_policy_type"] | null
-          reason_code?: Database["public"]["Enums"]["custody_reason"] | null
-          reason_subcode?: string | null
-          replacement_vehicle_id?: string | null
-          sla_breached?: boolean | null
-          sla_target_approve_by?: string | null
-          sla_target_handover_by?: string | null
-          special_rate_code?: string | null
-          status?: Database["public"]["Enums"]["custody_status"] | null
-          tags?: string[] | null
-          tax_profile_id?: string | null
-          until_original_ready?: boolean | null
-          updated_at?: string | null
-        }
-        Update: {
-          actual_return_date?: string | null
-          agreement_id?: string | null
-          agreement_line_id?: string | null
-          approved_at?: string | null
-          approved_by?: string | null
-          branch_id?: string | null
-          closed_at?: string | null
-          closed_by?: string | null
-          created_at?: string | null
-          created_by?: string | null
-          custodian_contact?: Json | null
-          custodian_contact_masked?: never
-          custodian_name?: string | null
-          custodian_party_id?: string | null
-          custodian_type?: Database["public"]["Enums"]["custodian_type"] | null
-          custody_no?: string | null
-          customer_id?: string | null
-          damage_preauth_card_ref?: string | null
-          damage_preauth_hold?: number | null
-          deposit_carryover?: boolean | null
-          effective_from?: string | null
-          expected_return_date?: string | null
-          id?: string | null
-          incident_date?: string | null
-          incident_location?: Json | null
-          incident_narrative?: string | null
-          incident_odometer?: number | null
-          incident_ref?: string | null
-          linked_maintenance_ticket_id?: string | null
-          notes?: string | null
-          original_vehicle_id?: string | null
-          rate_policy?: Database["public"]["Enums"]["rate_policy_type"] | null
-          reason_code?: Database["public"]["Enums"]["custody_reason"] | null
-          reason_subcode?: string | null
-          replacement_vehicle_id?: string | null
-          sla_breached?: boolean | null
-          sla_target_approve_by?: string | null
-          sla_target_handover_by?: string | null
-          special_rate_code?: string | null
-          status?: Database["public"]["Enums"]["custody_status"] | null
-          tags?: string[] | null
-          tax_profile_id?: string | null
-          until_original_ready?: boolean | null
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "custody_transactions_agreement_id_fkey"
-            columns: ["agreement_id"]
-            isOneToOne: false
-            referencedRelation: "agreements"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "custody_transactions_agreement_line_id_fkey"
-            columns: ["agreement_line_id"]
-            isOneToOne: false
-            referencedRelation: "agreement_lines"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "custody_transactions_original_vehicle_id_fkey"
-            columns: ["original_vehicle_id"]
-            isOneToOne: false
-            referencedRelation: "vehicles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "custody_transactions_replacement_vehicle_id_fkey"
-            columns: ["replacement_vehicle_id"]
-            isOneToOne: false
-            referencedRelation: "vehicles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
+      [_ in never]: never
     }
     Functions: {
       agreement_has_locked_in_inspection: {
@@ -6770,6 +6559,21 @@ export type Database = {
           p_year: number
         }
         Returns: string
+      }
+      get_custody_transaction_masked: {
+        Args: { p_custody_id: string }
+        Returns: {
+          actual_return_date: string
+          created_at: string
+          custodian_contact_masked: Json
+          custodian_name: string
+          custody_no: string
+          customer_id: string
+          effective_from: string
+          expected_return_date: string
+          id: string
+          status: Database["public"]["Enums"]["custody_status"]
+        }[]
       }
       has_any_role: {
         Args: {
