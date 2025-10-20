@@ -53,6 +53,8 @@ import PaymentProcessing from "./pages/transactions/PaymentProcessing";
 import RevenueReports from "./pages/transactions/RevenueReports";
 import AccountLedger from "./pages/transactions/AccountLedger";
 import FinancialSummary from "./pages/transactions/FinancialSummary";
+import ManageReplacement from "./pages/operations/ManageReplacement";
+import Maintenance from "./pages/operations/Maintenance";
 // Hidden - commented out imports
 // import { CarSubscriptions } from "./pages/CarSubscriptions";
 // import { NewCarSubscription } from "./pages/NewCarSubscription";
@@ -188,6 +190,14 @@ const App = () => {
                 <Route index element={<Inspections />} />
                 <Route path="new" element={<NewInspection />} />
                 <Route path=":id" element={<InspectionDetails />} />
+              </Route>
+              <Route path="/operations" element={
+                <ProtectedRoute>
+                  <AppLayout />
+                </ProtectedRoute>
+              }>
+                <Route path="replacement" element={<ManageReplacement />} />
+                <Route path="maintenance" element={<Maintenance />} />
               </Route>
               <Route path="/reports" element={
                 <ProtectedRoute>
