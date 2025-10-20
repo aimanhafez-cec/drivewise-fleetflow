@@ -58,6 +58,7 @@ import ReplacementsHub from "./pages/operations/ReplacementsHub";
 import MaintenanceHub from "./pages/operations/MaintenanceHub";
 import NewWorkOrder from "./pages/operations/NewWorkOrder";
 import VehicleStatusBoard from "./pages/operations/VehicleStatusBoard";
+import OperationsWorkbench from "./pages/operations/OperationsWorkbench";
 import TransactionsHub from "./pages/transactions/TransactionsHub";
 import OperationsHub from "./pages/operations/OperationsHub";
 import FleetOperationsHub from "./pages/operations/FleetOperationsHub";
@@ -211,7 +212,7 @@ const App = () => {
                   <AppLayout />
                 </ProtectedRoute>
               }>
-                <Route index element={<OperationsHub />} />
+                <Route index element={<OperationsWorkbench />} />
                 <Route path="fleet" element={<FleetOperationsHub />} />
                 <Route path="movements/new" element={<NewMovement />} />
                 <Route path="movements/:id" element={<MovementDetail />} />
