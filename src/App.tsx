@@ -59,6 +59,7 @@ import MaintenanceHub from "./pages/operations/MaintenanceHub";
 import NewWorkOrder from "./pages/operations/NewWorkOrder";
 import VehicleStatusBoard from "./pages/operations/VehicleStatusBoard";
 import OperationsWorkbench from "./pages/operations/OperationsWorkbench";
+import IntegrationsHub from "./pages/integrations/IntegrationsHub";
 import TransactionsHub from "./pages/transactions/TransactionsHub";
 import OperationsHub from "./pages/operations/OperationsHub";
 import FleetOperationsHub from "./pages/operations/FleetOperationsHub";
@@ -253,6 +254,13 @@ const App = () => {
               <Route path="revenue" element={<RevenueReports />} />
               <Route path="ledger" element={<AccountLedger />} />
               <Route path="summary" element={<FinancialSummary />} />
+            </Route>
+            <Route path="/integrations" element={
+              <ProtectedRoute>
+                <AppLayout />
+              </ProtectedRoute>
+            }>
+              <Route index element={<IntegrationsHub />} />
             </Route>
             <Route path="/custody" element={
               <ProtectedRoute>
