@@ -60,6 +60,7 @@ import NewWorkOrder from "./pages/operations/NewWorkOrder";
 import VehicleStatusBoard from "./pages/operations/VehicleStatusBoard";
 import OperationsWorkbench from "./pages/operations/OperationsWorkbench";
 import IntegrationsHub from "./pages/integrations/IntegrationsHub";
+import SecurityHub from "./pages/security/SecurityHub";
 import TransactionsHub from "./pages/transactions/TransactionsHub";
 import OperationsHub from "./pages/operations/OperationsHub";
 import FleetOperationsHub from "./pages/operations/FleetOperationsHub";
@@ -261,6 +262,13 @@ const App = () => {
               </ProtectedRoute>
             }>
               <Route index element={<IntegrationsHub />} />
+            </Route>
+            <Route path="/security" element={
+              <ProtectedRoute>
+                <AppLayout />
+              </ProtectedRoute>
+            }>
+              <Route index element={<SecurityHub />} />
             </Route>
             <Route path="/custody" element={
               <ProtectedRoute>
