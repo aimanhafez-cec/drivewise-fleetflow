@@ -196,6 +196,7 @@ const App = () => {
                   <AppLayout />
                 </ProtectedRoute>
               }>
+                <Route index element={<div>Operations Hub - Coming Soon</div>} />
                 <Route path="replacement" element={<ManageReplacement />} />
                 <Route path="maintenance" element={<Maintenance />} />
               </Route>
@@ -221,6 +222,7 @@ const App = () => {
                 <AppLayout />
               </ProtectedRoute>
             }>
+              <Route index element={<div>Transactions Hub - Coming Soon</div>} />
               <Route path="expenses" element={<ManageExpenses />} />
               <Route path="invoices" element={<ManageInvoices />} />
               <Route path="payments" element={<PaymentProcessing />} />
