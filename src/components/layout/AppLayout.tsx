@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -43,6 +43,12 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
@@ -192,6 +198,16 @@ function AppSidebar() {
     return subItems.some(item => location.pathname.startsWith(item.url));
   };
 
+  // Auto-expand menu if a sub-route is active
+  useEffect(() => {
+    const activeMenuItem = navigation.find(item => 
+      item.subItems && isSubItemActive(item.subItems)
+    );
+    if (activeMenuItem) {
+      setExpandedItem(activeMenuItem.title);
+    }
+  }, [location.pathname]);
+
   return (
     <Sidebar 
       className="data-[state=open]:w-64 data-[state=closed]:w-0 md:data-[state=closed]:w-16 border-r"
@@ -207,49 +223,82 @@ function AppSidebar() {
               {navigation.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   {item.subItems ? (
-                    <Collapsible
-                      open={expandedItem === item.title}
-                      onOpenChange={() => setExpandedItem(expandedItem === item.title ? null : item.title)}
-                    >
-                      <CollapsibleTrigger asChild>
-                        <SidebarMenuButton className={`h-10 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:p-2 ${
-                          isSubItemActive(item.subItems) ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" : "hover:bg-sidebar-accent/50 text-sidebar-foreground"
-                        }`}>
-                          <div className="flex items-center justify-between w-full">
-                            <div className="flex items-center gap-3">
+                    <>
+                      {/* Expanded sidebar: Collapsible menu */}
+                      <div className="group-data-[collapsible=icon]:hidden">
+                        <Collapsible
+                          open={expandedItem === item.title}
+                          onOpenChange={() => setExpandedItem(expandedItem === item.title ? null : item.title)}
+                        >
+                          <CollapsibleTrigger asChild>
+                            <SidebarMenuButton className={`h-10 transition-all duration-200 ${
+                              isSubItemActive(item.subItems) ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" : "hover:bg-sidebar-accent/50 text-sidebar-foreground"
+                            }`}>
+                              <div className="flex items-center justify-between w-full">
+                                <div className="flex items-center gap-3">
+                                  <item.icon className="h-5 w-5 shrink-0 !text-black dark:!text-white" />
+                                  <span className="truncate text-sm">{item.title}</span>
+                                </div>
+                                <ChevronDown className={`h-4 w-4 shrink-0 transition-transform duration-200 ${
+                                  expandedItem === item.title ? 'rotate-180' : ''
+                                }`} />
+                              </div>
+                            </SidebarMenuButton>
+                          </CollapsibleTrigger>
+                          <CollapsibleContent className="animate-accordion-down">
+                            <SidebarMenu className="ml-6 mt-1 space-y-0.5 border-l border-sidebar-border/50 pl-3">
+                              {item.subItems.map((subItem) => (
+                                <SidebarMenuItem key={subItem.url}>
+                                  <SidebarMenuButton asChild className="h-9">
+                                    <NavLink
+                                      to={subItem.url}
+                                      className={({ isActive }) =>
+                                        `flex items-center gap-2 rounded-md transition-all duration-200 text-xs ${
+                                          isActive 
+                                            ? "bg-sidebar-accent/80 text-sidebar-accent-foreground font-medium shadow-sm" 
+                                            : "hover:bg-sidebar-accent/40 text-sidebar-foreground/90 hover:text-sidebar-foreground"
+                                        }`
+                                      }
+                                    >
+                                      <subItem.icon className="h-3.5 w-3.5 shrink-0 !text-black dark:!text-white opacity-70" />
+                                      <span className="truncate">{subItem.title}</span>
+                                    </NavLink>
+                                  </SidebarMenuButton>
+                                </SidebarMenuItem>
+                              ))}
+                            </SidebarMenu>
+                          </CollapsibleContent>
+                        </Collapsible>
+                      </div>
+
+                      {/* Collapsed sidebar: Dropdown menu */}
+                      <div className="hidden group-data-[collapsible=icon]:block">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <SidebarMenuButton className={`h-10 w-10 p-2 transition-all duration-200 ${
+                              isSubItemActive(item.subItems) ? "bg-sidebar-accent text-sidebar-accent-foreground" : "hover:bg-sidebar-accent/50"
+                            }`}>
                               <item.icon className="h-5 w-5 shrink-0 !text-black dark:!text-white" />
-                              <span className="truncate text-sm group-data-[collapsible=icon]:hidden">{item.title}</span>
-                            </div>
-                            <ChevronDown className={`h-4 w-4 shrink-0 transition-transform group-data-[collapsible=icon]:hidden ${
-                              expandedItem === item.title ? 'rotate-180' : ''
-                            }`} />
-                          </div>
-                        </SidebarMenuButton>
-                      </CollapsibleTrigger>
-                      <CollapsibleContent className="group-data-[collapsible=icon]:hidden">
-                        <SidebarMenu className="ml-6 mt-1 space-y-1">
-                          {item.subItems.map((subItem) => (
-                            <SidebarMenuItem key={subItem.url}>
-                              <SidebarMenuButton asChild className="h-9">
-                                <NavLink
-                                  to={subItem.url}
-                                  className={({ isActive }) =>
-                                    `flex items-center gap-2 rounded-md transition-colors text-sm ${
-                                      isActive 
-                                        ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" 
-                                        : "hover:bg-sidebar-accent/50 text-sidebar-foreground"
-                                    }`
-                                  }
-                                >
-                                  <subItem.icon className="h-4 w-4 shrink-0 !text-black dark:!text-white" />
-                                  <span className="truncate">{subItem.title}</span>
-                                </NavLink>
-                              </SidebarMenuButton>
-                            </SidebarMenuItem>
-                          ))}
-                        </SidebarMenu>
-                      </CollapsibleContent>
-                    </Collapsible>
+                            </SidebarMenuButton>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent side="right" align="start" className="w-56 animate-scale-in">
+                            <div className="px-2 py-1.5 text-sm font-semibold">{item.title}</div>
+                            {item.subItems.map((subItem) => (
+                              <DropdownMenuItem 
+                                key={subItem.url}
+                                onClick={() => navigate(subItem.url)}
+                                className={`cursor-pointer ${
+                                  location.pathname.startsWith(subItem.url) ? 'bg-accent' : ''
+                                }`}
+                              >
+                                <subItem.icon className="mr-2 h-4 w-4" />
+                                <span>{subItem.title}</span>
+                              </DropdownMenuItem>
+                            ))}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </>
                   ) : (
                     <SidebarMenuButton asChild className="h-10 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:p-2">
                       <NavLink
