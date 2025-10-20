@@ -12,6 +12,11 @@ import { ArrowLeft, FileText, Edit, ExternalLink } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { formatCurrency } from "@/lib/utils";
+import { 
+  getBillingDayLabel, 
+  getLineItemGranularityLabel, 
+  getBillingStartTriggerLabel 
+} from "@/lib/constants/billingOptions";
 
 const CorporateLeasingDetails = () => {
   const { id } = useParams();
@@ -473,16 +478,20 @@ const CorporateLeasingDetails = () => {
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex justify-between">
-                <span className="text-card-foreground">Billing Day:</span>
-                <span className="text-card-foreground font-medium">{agreement.billing_day}</span>
+                <span className="text-card-foreground">Billing Day Reference:</span>
+                <span className="text-card-foreground font-medium">{getBillingDayLabel((agreement as any).billing_day)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-card-foreground">Billing Start Trigger:</span>
+                <span className="text-card-foreground font-medium">{getBillingStartTriggerLabel((agreement as any).billing_start_trigger)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-card-foreground">Invoice Format:</span>
                 <span className="text-card-foreground font-medium">{agreement.invoice_format}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-card-foreground">Line Item Granularity:</span>
-                <span className="text-card-foreground font-medium">{agreement.line_item_granularity}</span>
+                <span className="text-card-foreground">Line-Item Granularity:</span>
+                <span className="text-card-foreground font-medium">{getLineItemGranularityLabel((agreement as any).line_item_granularity)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-card-foreground">Currency:</span>

@@ -2,6 +2,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrency } from "@/lib/utils/currency";
 import { Calculator } from "lucide-react";
+import { 
+  getBillingDayLabel, 
+  getLineItemGranularityLabel, 
+  getBillingStartTriggerLabel 
+} from "@/lib/constants/billingOptions";
 
 interface QuotePaymentSummaryProps {
   quote: any;
@@ -138,6 +143,21 @@ export const QuotePaymentSummary: React.FC<QuotePaymentSummaryProps> = ({ quote 
                 </Badge>
               </div>
             )}
+
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">Billing Day Reference</span>
+              <Badge variant="outline">{getBillingDayLabel(quote.billing_day)}</Badge>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">Line-Item Granularity</span>
+              <Badge variant="outline">{getLineItemGranularityLabel(quote.line_item_granularity)}</Badge>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">Billing Start Trigger</span>
+              <Badge variant="outline">{getBillingStartTriggerLabel(quote.billing_start_trigger)}</Badge>
+            </div>
           </div>
         </div>
       </CardContent>

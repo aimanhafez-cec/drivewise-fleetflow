@@ -40,6 +40,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { 
+  getBillingDayLabel, 
+  getLineItemGranularityLabel, 
+  getBillingStartTriggerLabel 
+} from "@/lib/constants/billingOptions";
 
 const statusConfig = {
   draft: { label: "Draft", color: "bg-muted text-muted-foreground" },
@@ -755,16 +760,20 @@ const MasterAgreementDetails = () => {
                   <p className="capitalize">{agreement.billing_cycle || "N/A"}</p>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground mb-1">Billing Day</p>
-                  <p>{agreement.billing_day || "N/A"}</p>
+                  <p className="text-sm font-medium text-muted-foreground mb-1">Billing Day Reference</p>
+                  <p>{getBillingDayLabel((agreement as any).billing_day)}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground mb-1">Billing Start Trigger</p>
+                  <p>{getBillingStartTriggerLabel((agreement as any).billing_start_trigger)}</p>
                 </div>
                 <div>
                   <p className="text-sm font-medium text-muted-foreground mb-1">Invoice Format</p>
                   <p>{agreement.invoice_format || "N/A"}</p>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground mb-1">Line Item Granularity</p>
-                  <p>{agreement.line_item_granularity || "N/A"}</p>
+                  <p className="text-sm font-medium text-muted-foreground mb-1">Line-Item Granularity</p>
+                  <p>{getLineItemGranularityLabel((agreement as any).line_item_granularity)}</p>
                 </div>
                 <div>
                   <p className="text-sm font-medium text-muted-foreground mb-1">Credit Terms</p>

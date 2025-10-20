@@ -3,6 +3,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CreditCard, Calendar, AlertCircle } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/currency";
 import { format } from "date-fns";
+import { 
+  getBillingDayLabel, 
+  getLineItemGranularityLabel, 
+  getBillingStartTriggerLabel 
+} from "@/lib/constants/billingOptions";
 
 interface QuotePaymentPolicyProps {
   quote: any;
@@ -60,6 +65,14 @@ export const QuotePaymentPolicy: React.FC<QuotePaymentPolicyProps> = ({
               <p className="text-sm text-muted-foreground">Billing Plan</p>
               <p className="font-medium">{getBillingPlanLabel(quote.billing_plan || "monthly")}</p>
             </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Billing Day Reference</p>
+              <p className="font-medium">{getBillingDayLabel(quote.billing_day)}</p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Billing Start Trigger</p>
+              <p className="font-medium">{getBillingStartTriggerLabel(quote.billing_start_trigger)}</p>
+            </div>
             {quote.billing_start_date && (
               <div>
                 <p className="text-sm text-muted-foreground">Billing Start Date</p>
@@ -71,6 +84,10 @@ export const QuotePaymentPolicy: React.FC<QuotePaymentPolicyProps> = ({
           </div>
 
           <div className="space-y-4">
+            <div>
+              <p className="text-sm text-muted-foreground">Line-Item Granularity</p>
+              <p className="font-medium">{getLineItemGranularityLabel(quote.line_item_granularity)}</p>
+            </div>
             {quote.grace_period_days && (
               <div>
                 <p className="text-sm text-muted-foreground">Grace Period</p>
