@@ -28,6 +28,13 @@ const OperationsHub: React.FC = () => {
       route: '/operations/status-board',
       gradient: 'from-green-500/10 to-emerald-500/10',
     },
+    {
+      title: 'Vehicle Replacements',
+      description: 'Manage temporary and permanent vehicle replacements, custody transactions',
+      icon: RefreshCw,
+      route: '/operations/replacements',
+      gradient: 'from-orange-500/10 to-red-500/10',
+    },
   ];
 
   return (
