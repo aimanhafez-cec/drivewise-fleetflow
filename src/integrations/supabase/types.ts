@@ -6431,6 +6431,18 @@ export type Database = {
         Args: { agreement_id_param: string }
         Returns: boolean
       }
+      auto_close_expired_custodies: {
+        Args: { p_days_overdue?: number }
+        Returns: {
+          action_taken: string
+          custody_id: string
+          custody_no: string
+        }[]
+      }
+      auto_detect_sla_breaches: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
       calculate_booking_points: {
         Args: {
           p_booking_amount: number
@@ -6462,6 +6474,29 @@ export type Database = {
         Returns: {
           achievements_unlocked: string[]
           newly_unlocked: number
+        }[]
+      }
+      check_custody_overlap: {
+        Args: {
+          p_date_from: string
+          p_date_to: string
+          p_exclude_custody_id?: string
+          p_vehicle_id: string
+        }
+        Returns: {
+          has_overlap: boolean
+          overlapping_custody_id: string
+          overlapping_custody_no: string
+        }[]
+      }
+      check_document_expiry: {
+        Args: { p_days_ahead?: number }
+        Returns: {
+          custody_id: string
+          custody_no: string
+          days_until_expiry: number
+          document_type: string
+          is_expired: boolean
         }[]
       }
       check_tier_anniversary_rewards: {
@@ -6560,6 +6595,10 @@ export type Database = {
         }
         Returns: string
       }
+      get_custody_statistics: {
+        Args: { p_date_from?: string; p_date_to?: string }
+        Returns: Json
+      }
       get_custody_transaction_masked: {
         Args: { p_custody_id: string }
         Returns: {
@@ -6573,6 +6612,16 @@ export type Database = {
           expected_return_date: string
           id: string
           status: Database["public"]["Enums"]["custody_status"]
+        }[]
+      }
+      get_overdue_custodies: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          custody_id: string
+          custody_no: string
+          customer_name: string
+          days_overdue: number
+          expected_return_date: string
         }[]
       }
       has_any_role: {
@@ -6612,6 +6661,15 @@ export type Database = {
           new_balance: number
           redemption_id: string
           success: boolean
+        }[]
+      }
+      retry_failed_webhooks: {
+        Args: { p_max_age_hours?: number; p_max_retries?: number }
+        Returns: {
+          custody_id: string
+          event_type: string
+          retry_count: number
+          webhook_id: string
         }[]
       }
       search_drivers_enhanced: {
