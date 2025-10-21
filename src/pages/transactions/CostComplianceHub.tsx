@@ -2,6 +2,7 @@ import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ExpensesTab } from '@/components/cost-compliance/ExpensesTab';
+import { TollsFinesTab } from '@/components/cost-compliance/TollsFinesTab';
 
 const CostComplianceHub: React.FC = () => {
   return (
@@ -26,15 +27,7 @@ const CostComplianceHub: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="tolls" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Tolls & Fines</CardTitle>
-              <CardDescription>Manage toll charges and traffic violations</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">Tolls & Fines tab - Coming in Phase 4</p>
-            </CardContent>
-          </Card>
+          <TollsFinesTab />
         </TabsContent>
 
         <TabsContent value="exceptions" className="space-y-4">

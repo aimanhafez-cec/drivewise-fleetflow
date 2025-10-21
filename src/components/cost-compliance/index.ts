@@ -20,3 +20,7 @@ export {
 // Phase 3 - Expenses Tab
 export { ExpensesTab } from './ExpensesTab';
 export { ExpenseFormDialog } from './ExpenseFormDialog';
+
+// Phase 4 - Tolls & Fines Tab
+export { TollsFinesTab } from './TollsFinesTab';
+export { TollFineFormDialog } from './TollFineFormDialog';
