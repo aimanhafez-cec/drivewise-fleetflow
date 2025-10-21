@@ -64,14 +64,6 @@ const AgreementDetails = () => {
             vin,
             color,
             status
-          ),
-          agreement_lines (
-            *,
-            vehicles (
-              make,
-              model,
-              license_plate
-            )
           )
         `)
         .eq('id', id)
