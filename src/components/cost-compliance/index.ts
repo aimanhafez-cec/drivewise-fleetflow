@@ -32,3 +32,6 @@ export { ExceptionFormDialog } from './ExceptionFormDialog';
 // Phase 6 - Billing Cycles Tab
 export { BillingCyclesTab } from './BillingCyclesTab';
 export { BillingCycleFormDialog } from './BillingCycleFormDialog';
+
+// Phase 7 - Main Dashboard
+export { CostComplianceDashboard } from './CostComplianceDashboard';

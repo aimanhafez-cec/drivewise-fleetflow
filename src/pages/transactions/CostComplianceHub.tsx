@@ -1,12 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { CostComplianceDashboard } from '@/components/cost-compliance/CostComplianceDashboard';
 import { ExpensesTab } from '@/components/cost-compliance/ExpensesTab';
 import { TollsFinesTab } from '@/components/cost-compliance/TollsFinesTab';
 import { ExceptionsTab } from '@/components/cost-compliance/ExceptionsTab';
 import { BillingCyclesTab } from '@/components/cost-compliance/BillingCyclesTab';
 
 const CostComplianceHub: React.FC = () => {
+  const [activeTab, setActiveTab] = useState('dashboard');
+
   return (
     <div className="space-y-6">
       <div>
@@ -16,13 +19,18 @@ const CostComplianceHub: React.FC = () => {
         </p>
       </div>
 
-      <Tabs defaultValue="expenses" className="space-y-6">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList>
+          <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
           <TabsTrigger value="expenses">Expenses</TabsTrigger>
           <TabsTrigger value="tolls">Tolls & Fines</TabsTrigger>
           <TabsTrigger value="exceptions">Exceptions</TabsTrigger>
           <TabsTrigger value="billing">Billing Cycles</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="dashboard" className="space-y-4">
+          <CostComplianceDashboard onTabChange={setActiveTab} />
+        </TabsContent>
 
         <TabsContent value="expenses" className="space-y-4">
           <ExpensesTab />
