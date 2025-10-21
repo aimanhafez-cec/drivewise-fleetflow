@@ -9,6 +9,14 @@ import { toast } from 'sonner';
 import { useWizardProgress } from '@/hooks/useWizardProgress';
 import { validateStep } from '@/lib/wizard/validation';
 import { SourceSelection } from './wizard/SourceSelection';
+import { AgreementTermsStep } from './wizard/AgreementTermsStep';
+import { VehicleInspectionStep } from './wizard/VehicleInspectionStep';
+import { PricingConfigurationStep } from './wizard/PricingConfigurationStep';
+import { AddonsSelectionStep } from './wizard/AddonsSelectionStep';
+import { BillingPaymentStep } from './wizard/BillingPaymentStep';
+import { DocumentsVerificationStep } from './wizard/DocumentsVerificationStep';
+import { TermsSignatureStep } from './wizard/TermsSignatureStep';
+import { FinalReviewStep } from './wizard/FinalReviewStep';
 import type { EnhancedWizardData, AgreementSource } from '@/types/agreement-wizard';
 
 const TOTAL_STEPS = 9; // 0-8
@@ -234,6 +242,20 @@ export const EnhancedAgreementWizard = () => {
     }
   };
 
+  const handleStepDataChange = (stepKey: keyof EnhancedWizardData, field: string, value: any) => {
+    const currentStepData = wizardData[stepKey] as any;
+    const updatedStepData = {
+      ...currentStepData,
+      [field]: value,
+    };
+    updateWizardData(stepKey, updatedStepData as any);
+  };
+
+  const calculateTotalAmount = (): number => {
+    const pricing = wizardData.step3?.pricingBreakdown;
+    return pricing?.total || 0;
+  };
+
   const renderStepContent = () => {
     switch (progress.currentStep) {
       case 0:
@@ -249,107 +271,68 @@ export const EnhancedAgreementWizard = () => {
         );
       case 1:
         return (
-          <Card>
-            <CardHeader>
-              <CardTitle>Step 1: Agreement Terms</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                Coming soon: Enhanced agreement terms with UAE-specific fields
-              </p>
-            </CardContent>
-          </Card>
+          <AgreementTermsStep
+            data={wizardData.step1}
+            onChange={(field, value) => handleStepDataChange('step1', field, value)}
+            errors={validationResult.errors}
+          />
         );
       case 2:
         return (
-          <Card>
-            <CardHeader>
-              <CardTitle>Step 2: Vehicle Inspection</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                Coming soon: Interactive vehicle diagram with damage markers
-              </p>
-            </CardContent>
-          </Card>
+          <VehicleInspectionStep
+            data={wizardData.step2}
+            onChange={(field, value) => handleStepDataChange('step2', field, value)}
+            errors={validationResult.errors}
+          />
         );
       case 3:
         return (
-          <Card>
-            <CardHeader>
-              <CardTitle>Step 3: Pricing Configuration</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                Coming soon: Dynamic pricing calculator
-              </p>
-            </CardContent>
-          </Card>
+          <PricingConfigurationStep
+            data={wizardData.step3}
+            onChange={(field, value) => handleStepDataChange('step3', field, value)}
+            errors={validationResult.errors}
+          />
         );
       case 4:
         return (
-          <Card>
-            <CardHeader>
-              <CardTitle>Step 4: Add-ons Selection</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                Coming soon: Categorized add-ons with recommendations
-              </p>
-            </CardContent>
-          </Card>
+          <AddonsSelectionStep
+            data={wizardData.step4}
+            onChange={(field, value) => handleStepDataChange('step4', field, value)}
+            errors={validationResult.errors}
+          />
         );
       case 5:
         return (
-          <Card>
-            <CardHeader>
-              <CardTitle>Step 5: Billing & Payment</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                Coming soon: Payment processor integration
-              </p>
-            </CardContent>
-          </Card>
+          <BillingPaymentStep
+            data={wizardData.step5}
+            totalAmount={calculateTotalAmount()}
+            onChange={(field, value) => handleStepDataChange('step5', field, value)}
+            errors={validationResult.errors}
+          />
         );
       case 6:
         return (
-          <Card>
-            <CardHeader>
-              <CardTitle>Step 6: Documents & Verification</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                Coming soon: Document uploader with verification workflow
-              </p>
-            </CardContent>
-          </Card>
+          <DocumentsVerificationStep
+            data={wizardData.step6}
+            onChange={(field, value) => handleStepDataChange('step6', field, value)}
+            errors={validationResult.errors}
+          />
         );
       case 7:
         return (
-          <Card>
-            <CardHeader>
-              <CardTitle>Step 7: Terms & Signature</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                Coming soon: Enhanced signature pad with key terms
-              </p>
-            </CardContent>
-          </Card>
+          <TermsSignatureStep
+            data={wizardData.step7}
+            onChange={(field, value) => handleStepDataChange('step7', field, value)}
+            errors={validationResult.errors}
+          />
         );
       case 8:
         return (
-          <Card>
-            <CardHeader>
-              <CardTitle>Step 8: Final Review</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                Coming soon: Comprehensive agreement summary
-              </p>
-            </CardContent>
-          </Card>
+          <FinalReviewStep
+            wizardData={wizardData}
+            onChange={(field, value) => handleStepDataChange('step8', field, value)}
+            errors={validationResult.errors}
+          />
         );
       default:
         return null;
