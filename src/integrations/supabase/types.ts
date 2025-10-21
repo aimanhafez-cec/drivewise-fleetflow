@@ -693,6 +693,117 @@ export type Database = {
         }
         Relationships: []
       }
+      compliance_exceptions: {
+        Row: {
+          amount_involved: number | null
+          assigned_to: string | null
+          auto_detected: boolean | null
+          contract_id: string | null
+          created_at: string
+          customer_id: string | null
+          detection_rule: string | null
+          exception_no: string
+          exception_reason: string
+          exception_type: string
+          flagged_at: string
+          flagged_by: string | null
+          id: string
+          resolution_notes: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          severity: string
+          source_module: string
+          source_record_id: string
+          status: string
+          updated_at: string
+          vehicle_id: string | null
+        }
+        Insert: {
+          amount_involved?: number | null
+          assigned_to?: string | null
+          auto_detected?: boolean | null
+          contract_id?: string | null
+          created_at?: string
+          customer_id?: string | null
+          detection_rule?: string | null
+          exception_no: string
+          exception_reason: string
+          exception_type: string
+          flagged_at?: string
+          flagged_by?: string | null
+          id?: string
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+          source_module: string
+          source_record_id: string
+          status?: string
+          updated_at?: string
+          vehicle_id?: string | null
+        }
+        Update: {
+          amount_involved?: number | null
+          assigned_to?: string | null
+          auto_detected?: boolean | null
+          contract_id?: string | null
+          created_at?: string
+          customer_id?: string | null
+          detection_rule?: string | null
+          exception_no?: string
+          exception_reason?: string
+          exception_type?: string
+          flagged_at?: string
+          flagged_by?: string | null
+          id?: string
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+          source_module?: string
+          source_record_id?: string
+          status?: string
+          updated_at?: string
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "compliance_exceptions_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "compliance_exceptions_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "compliance_exceptions_flagged_by_fkey"
+            columns: ["flagged_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "compliance_exceptions_resolved_by_fkey"
+            columns: ["resolved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "compliance_exceptions_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contact_persons: {
         Row: {
           created_at: string
@@ -733,6 +844,74 @@ export type Database = {
             columns: ["customer_id"]
             isOneToOne: false
             referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contract_billing_cycles: {
+        Row: {
+          billing_cycle_no: string
+          contract_id: string
+          created_at: string
+          export_url: string | null
+          finalized_at: string | null
+          generated_at: string | null
+          generated_by: string | null
+          id: string
+          invoice_id: string | null
+          period_end: string
+          period_start: string
+          status: string
+          total_exceptions: number | null
+          total_expenses: number | null
+          total_fines: number | null
+          total_tolls: number | null
+          updated_at: string
+        }
+        Insert: {
+          billing_cycle_no: string
+          contract_id: string
+          created_at?: string
+          export_url?: string | null
+          finalized_at?: string | null
+          generated_at?: string | null
+          generated_by?: string | null
+          id?: string
+          invoice_id?: string | null
+          period_end: string
+          period_start: string
+          status?: string
+          total_exceptions?: number | null
+          total_expenses?: number | null
+          total_fines?: number | null
+          total_tolls?: number | null
+          updated_at?: string
+        }
+        Update: {
+          billing_cycle_no?: string
+          contract_id?: string
+          created_at?: string
+          export_url?: string | null
+          finalized_at?: string | null
+          generated_at?: string | null
+          generated_by?: string | null
+          id?: string
+          invoice_id?: string | null
+          period_end?: string
+          period_start?: string
+          status?: string
+          total_exceptions?: number | null
+          total_expenses?: number | null
+          total_fines?: number | null
+          total_tolls?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contract_billing_cycles_generated_by_fkey"
+            columns: ["generated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -6246,6 +6425,188 @@ export type Database = {
           },
         ]
       }
+      toll_integration_config: {
+        Row: {
+          api_endpoint: string
+          auth_type: string
+          created_at: string
+          credentials_encrypted: string | null
+          id: string
+          is_active: boolean | null
+          last_sync_at: string | null
+          mapping_config: Json | null
+          provider_name: string
+          sync_frequency: string | null
+          sync_mode: string | null
+          updated_at: string
+        }
+        Insert: {
+          api_endpoint: string
+          auth_type: string
+          created_at?: string
+          credentials_encrypted?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_sync_at?: string | null
+          mapping_config?: Json | null
+          provider_name: string
+          sync_frequency?: string | null
+          sync_mode?: string | null
+          updated_at?: string
+        }
+        Update: {
+          api_endpoint?: string
+          auth_type?: string
+          created_at?: string
+          credentials_encrypted?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_sync_at?: string | null
+          mapping_config?: Json | null
+          provider_name?: string
+          sync_frequency?: string | null
+          sync_mode?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      tolls_fines: {
+        Row: {
+          amount: number
+          billable_to_contract: boolean | null
+          category: string
+          contract_id: string | null
+          created_at: string
+          created_by: string | null
+          currency: string
+          customer_id: string | null
+          driver_id: string | null
+          due_date: string | null
+          external_reference_no: string | null
+          gate_id: string | null
+          id: string
+          incident_date: string
+          incident_time: string | null
+          integration_source: string | null
+          issuing_authority: string
+          last_sync_at: string | null
+          location: string | null
+          notes: string | null
+          paid_date: string | null
+          payment_reference: string | null
+          penalty_amount: number | null
+          plate_number: string | null
+          responsibility: string | null
+          status: string
+          sync_status: string | null
+          toll_fine_no: string
+          total_amount: number
+          type: string
+          updated_at: string
+          vehicle_id: string | null
+          violation_code: string | null
+        }
+        Insert: {
+          amount?: number
+          billable_to_contract?: boolean | null
+          category: string
+          contract_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          customer_id?: string | null
+          driver_id?: string | null
+          due_date?: string | null
+          external_reference_no?: string | null
+          gate_id?: string | null
+          id?: string
+          incident_date: string
+          incident_time?: string | null
+          integration_source?: string | null
+          issuing_authority: string
+          last_sync_at?: string | null
+          location?: string | null
+          notes?: string | null
+          paid_date?: string | null
+          payment_reference?: string | null
+          penalty_amount?: number | null
+          plate_number?: string | null
+          responsibility?: string | null
+          status?: string
+          sync_status?: string | null
+          toll_fine_no: string
+          total_amount?: number
+          type: string
+          updated_at?: string
+          vehicle_id?: string | null
+          violation_code?: string | null
+        }
+        Update: {
+          amount?: number
+          billable_to_contract?: boolean | null
+          category?: string
+          contract_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          customer_id?: string | null
+          driver_id?: string | null
+          due_date?: string | null
+          external_reference_no?: string | null
+          gate_id?: string | null
+          id?: string
+          incident_date?: string
+          incident_time?: string | null
+          integration_source?: string | null
+          issuing_authority?: string
+          last_sync_at?: string | null
+          location?: string | null
+          notes?: string | null
+          paid_date?: string | null
+          payment_reference?: string | null
+          penalty_amount?: number | null
+          plate_number?: string | null
+          responsibility?: string | null
+          status?: string
+          sync_status?: string | null
+          toll_fine_no?: string
+          total_amount?: number
+          type?: string
+          updated_at?: string
+          vehicle_id?: string | null
+          violation_code?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tolls_fines_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tolls_fines_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tolls_fines_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tolls_fines_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       traffic_tickets: {
         Row: {
           agreement_id: string | null
@@ -7361,6 +7722,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      generate_exception_no: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       generate_movement_no: {
         Args: Record<PropertyKey, never>
         Returns: string
@@ -7382,6 +7747,10 @@ export type Database = {
         Returns: string
       }
       generate_ticket_no: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      generate_toll_fine_no: {
         Args: Record<PropertyKey, never>
         Returns: string
       }
