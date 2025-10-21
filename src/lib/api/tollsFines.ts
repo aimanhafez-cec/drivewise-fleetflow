@@ -199,9 +199,8 @@ export class TollsFinesAPI {
         ...data,
         total_amount: totalAmount,
         currency: 'AED',
-        status: 'pending',
         sync_status: data.integration_source ? 'synced' : 'manual',
-      })
+      } as any)
       .select()
       .single();
 

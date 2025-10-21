@@ -173,9 +173,8 @@ export class ComplianceExceptionsAPI {
       .from("compliance_exceptions")
       .insert({
         ...data,
-        status: 'open',
         auto_detected: data.auto_detected || false,
-      })
+      } as any)
       .select()
       .single();
 
