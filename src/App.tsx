@@ -9,7 +9,7 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import AppLayout from "@/components/layout/AppLayout";
 import PWAInstallPrompt from "@/components/ui/pwa-install-prompt";
 import Auth from "./pages/Auth";
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import Reservations from "./pages/Reservations";
 import NewReservation from "./pages/NewReservation";
@@ -85,6 +85,12 @@ import CustodyAnalytics from "./pages/CustodyAnalytics";
 
 const queryClient = new QueryClient();
 
+// Phase 1: Root redirect component that preserves query strings (including __lovable_token)
+const RootRedirect = () => {
+  const location = useLocation();
+  return <Navigate to={{ pathname: '/dashboard', search: location.search }} replace />;
+};
+
 const App = () => {
   console.log('App rendering. React version:', React.version);
   
@@ -97,7 +103,7 @@ const App = () => {
           <PWAInstallPrompt />
           <BrowserRouter>
             <Routes>
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
+              <Route path="/" element={<RootRedirect />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/dashboard" element={
                 <ProtectedRoute>
