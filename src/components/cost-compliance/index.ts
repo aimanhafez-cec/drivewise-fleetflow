@@ -24,3 +24,7 @@ export { ExpenseFormDialog } from './ExpenseFormDialog';
 // Phase 4 - Tolls & Fines Tab
 export { TollsFinesTab } from './TollsFinesTab';
 export { TollFineFormDialog } from './TollFineFormDialog';
+
+// Phase 5 - Exceptions Tab
+export { ExceptionsTab } from './ExceptionsTab';
+export { ExceptionFormDialog } from './ExceptionFormDialog';
