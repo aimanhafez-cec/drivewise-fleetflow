@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Receipt, FileText, CreditCard, TrendingUp, Wallet, DollarSign } from 'lucide-react';
+import { Receipt, FileText, CreditCard, TrendingUp, Wallet, DollarSign, AlertTriangle } from 'lucide-react';
 import HubCard from '@/components/navigation/HubCard';
 
 const TransactionsHub: React.FC = () => {
@@ -48,6 +48,13 @@ const TransactionsHub: React.FC = () => {
       icon: DollarSign,
       route: '/transactions/summary',
       gradient: 'from-rose-500/10 to-red-500/10',
+    },
+    {
+      title: 'Cost & Compliance',
+      description: 'Manage tolls, fines, compliance exceptions, and billing cycles',
+      icon: AlertTriangle,
+      route: '/transactions/cost-compliance',
+      gradient: 'from-yellow-500/10 to-orange-500/10',
     },
   ];
 

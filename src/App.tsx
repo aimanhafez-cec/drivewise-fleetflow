@@ -66,6 +66,7 @@ import ComponentsLibrary from "./pages/components/ComponentsLibrary";
 import TestingHub from "./pages/testing/TestingHub";
 import DeploymentHub from "./pages/deployment/DeploymentHub";
 import TransactionsHub from "./pages/transactions/TransactionsHub";
+import CostComplianceHub from "./pages/transactions/CostComplianceHub";
 import OperationsHub from "./pages/operations/OperationsHub";
 import FleetOperationsHub from "./pages/operations/FleetOperationsHub";
 import NewMovement from "./pages/operations/NewMovement";
@@ -259,6 +260,7 @@ const App = () => {
               <Route path="revenue" element={<RevenueReports />} />
               <Route path="ledger" element={<AccountLedger />} />
               <Route path="summary" element={<FinancialSummary />} />
+              <Route path="cost-compliance" element={<CostComplianceHub />} />
             </Route>
             <Route path="/integrations" element={
               <ProtectedRoute>
