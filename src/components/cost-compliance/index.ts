@@ -40,3 +40,6 @@ export { CostComplianceDashboard } from './CostComplianceDashboard';
 export { UAEViolationLookup } from './UAEViolationLookup';
 export { UAETollGateSelector } from './UAETollGateSelector';
 export { BlackPointsTracker } from './BlackPointsTracker';
+
+// Phase 10 - Help & Documentation
+export { HelpDialog } from './HelpDialog';

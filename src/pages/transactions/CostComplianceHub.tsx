@@ -6,17 +6,21 @@ import { ExpensesTab } from '@/components/cost-compliance/ExpensesTab';
 import { TollsFinesTab } from '@/components/cost-compliance/TollsFinesTab';
 import { ExceptionsTab } from '@/components/cost-compliance/ExceptionsTab';
 import { BillingCyclesTab } from '@/components/cost-compliance/BillingCyclesTab';
+import { HelpDialog } from '@/components/cost-compliance/HelpDialog';
 
 const CostComplianceHub: React.FC = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Cost & Compliance</h1>
-        <p className="text-muted-foreground mt-2">
-          Manage tolls, fines, compliance exceptions, and billing cycles
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Cost & Compliance</h1>
+          <p className="text-muted-foreground mt-2">
+            Manage tolls, fines, compliance exceptions, and billing cycles
+          </p>
+        </div>
+        <HelpDialog />
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
