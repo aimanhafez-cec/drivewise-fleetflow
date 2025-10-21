@@ -12,7 +12,8 @@ import {
   AlertCircle, 
   Download,
   RefreshCw,
-  Calendar
+  Calendar,
+  Sparkles
 } from 'lucide-react';
 
 export const AgreementQuickActions: React.FC = () => {
@@ -55,10 +56,17 @@ export const AgreementQuickActions: React.FC = () => {
 
   const quickActions = [
     {
-      title: 'New Agreement',
-      description: 'Create a new rental agreement from scratch',
-      icon: Plus,
+      title: 'Enhanced Wizard',
+      description: '9-step wizard with inspection & verification',
+      icon: Sparkles,
       variant: 'default' as const,
+      onClick: () => navigate('/agreements/new-enhanced'),
+    },
+    {
+      title: 'Quick Agreement',
+      description: 'Simple wizard for basic agreements',
+      icon: Plus,
+      variant: 'outline' as const,
       onClick: () => navigate('/agreements/new'),
     },
     {
@@ -87,7 +95,7 @@ export const AgreementQuickActions: React.FC = () => {
   ];
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
       {quickActions.map((action) => {
         const Icon = action.icon;
         return (

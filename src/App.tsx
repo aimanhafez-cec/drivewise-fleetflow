@@ -35,6 +35,7 @@ import Agreements from "./pages/Agreements";
 import AgreementDetails from "./pages/AgreementDetails";
 import CustodyDetail from "@/pages/CustodyDetail";
 import AgreementWizardPage from "./pages/AgreementWizardPage";
+import EnhancedAgreementWizardPage from "./pages/EnhancedAgreementWizardPage";
 import RFQs from "./pages/RFQs";
 import NewRFQ from "./pages/NewRFQ";
 import RFQDetails from "./pages/RFQDetails";
@@ -163,6 +164,7 @@ const App = () => {
               }>
                 <Route index element={<Agreements />} />
                 <Route path="new" element={<AgreementWizardPage />} />
+                <Route path="new-enhanced" element={<EnhancedAgreementWizardPage />} />
                 <Route path=":id" element={<AgreementDetails />} />
               </Route>
               <Route path="/payments" element={
