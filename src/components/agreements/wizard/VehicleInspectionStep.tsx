@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { VehicleDiagramInteractive } from '@/components/agreements/shared/VehicleDiagramInteractive';
 import { MobilePhotoCapture } from '@/components/agreements/shared/MobilePhotoCapture';
-import type { EnhancedWizardData } from '@/types/agreement-wizard';
+import type { EnhancedWizardData, VehicleView, DamageMarker } from '@/types/agreement-wizard';
 
 interface VehicleInspectionStepProps {
   data: EnhancedWizardData['step2'];
@@ -18,11 +18,25 @@ export const VehicleInspectionStep: React.FC<VehicleInspectionStepProps> = ({
   onChange,
   errors = [],
 }) => {
+  const [currentView, setCurrentView] = useState<VehicleView>('front');
+
   const updateChecklist = (key: keyof EnhancedWizardData['step2']['preHandoverChecklist'], value: boolean) => {
     onChange('preHandoverChecklist', {
       ...data.preHandoverChecklist,
       [key]: value,
     });
+  };
+
+  const handleAddMarker = (marker: Omit<DamageMarker, 'id'>) => {
+    const newMarker: DamageMarker = {
+      ...marker,
+      id: `marker-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    };
+    onChange('damageMarkers', [...data.damageMarkers, newMarker]);
+  };
+
+  const handleRemoveMarker = (id: string) => {
+    onChange('damageMarkers', data.damageMarkers.filter(m => m.id !== id));
   };
 
   return (
@@ -122,9 +136,10 @@ export const VehicleInspectionStep: React.FC<VehicleInspectionStepProps> = ({
               <Label>Odometer Photo *</Label>
               <MobilePhotoCapture
                 photos={data.odometerPhoto ? [data.odometerPhoto] : []}
-                onPhotosChange={(photos) => onChange('odometerPhoto', photos[0])}
+                onCapture={(photo) => onChange('odometerPhoto', photo)}
+                onRemove={() => onChange('odometerPhoto', undefined)}
                 maxPhotos={1}
-                label="Capture odometer reading"
+                category="odometer"
               />
             </div>
 
@@ -132,9 +147,10 @@ export const VehicleInspectionStep: React.FC<VehicleInspectionStepProps> = ({
               <Label>Fuel Gauge Photo *</Label>
               <MobilePhotoCapture
                 photos={data.fuelGaugePhoto ? [data.fuelGaugePhoto] : []}
-                onPhotosChange={(photos) => onChange('fuelGaugePhoto', photos[0])}
+                onCapture={(photo) => onChange('fuelGaugePhoto', photo)}
+                onRemove={() => onChange('fuelGaugePhoto', undefined)}
                 maxPhotos={1}
-                label="Capture fuel gauge"
+                category="fuel-gauge"
               />
             </div>
           </div>
@@ -147,8 +163,11 @@ export const VehicleInspectionStep: React.FC<VehicleInspectionStepProps> = ({
         </CardHeader>
         <CardContent>
           <VehicleDiagramInteractive
-            damageMarkers={data.damageMarkers}
-            onMarkersChange={(markers) => onChange('damageMarkers', markers)}
+            markers={data.damageMarkers}
+            currentView={currentView}
+            onAddMarker={handleAddMarker}
+            onRemoveMarker={handleRemoveMarker}
+            onViewChange={setCurrentView}
           />
         </CardContent>
       </Card>
@@ -162,11 +181,14 @@ export const VehicleInspectionStep: React.FC<VehicleInspectionStepProps> = ({
             <Label>Exterior Photos</Label>
             <MobilePhotoCapture
               photos={data.photos.exterior}
-              onPhotosChange={(photos) =>
-                onChange('photos', { ...data.photos, exterior: photos })
+              onCapture={(photo) =>
+                onChange('photos', { ...data.photos, exterior: [...data.photos.exterior, photo] })
+              }
+              onRemove={(photo) =>
+                onChange('photos', { ...data.photos, exterior: data.photos.exterior.filter(p => p !== photo) })
               }
               maxPhotos={8}
-              label="Capture exterior photos (all 4 sides)"
+              category="exterior"
             />
           </div>
 
@@ -174,11 +196,14 @@ export const VehicleInspectionStep: React.FC<VehicleInspectionStepProps> = ({
             <Label>Interior Photos</Label>
             <MobilePhotoCapture
               photos={data.photos.interior}
-              onPhotosChange={(photos) =>
-                onChange('photos', { ...data.photos, interior: photos })
+              onCapture={(photo) =>
+                onChange('photos', { ...data.photos, interior: [...data.photos.interior, photo] })
+              }
+              onRemove={(photo) =>
+                onChange('photos', { ...data.photos, interior: data.photos.interior.filter(p => p !== photo) })
               }
               maxPhotos={6}
-              label="Capture interior photos"
+              category="interior"
             />
           </div>
 
@@ -186,11 +211,14 @@ export const VehicleInspectionStep: React.FC<VehicleInspectionStepProps> = ({
             <Label>Document Photos</Label>
             <MobilePhotoCapture
               photos={data.photos.documents}
-              onPhotosChange={(photos) =>
-                onChange('photos', { ...data.photos, documents: photos })
+              onCapture={(photo) =>
+                onChange('photos', { ...data.photos, documents: [...data.photos.documents, photo] })
+              }
+              onRemove={(photo) =>
+                onChange('photos', { ...data.photos, documents: data.photos.documents.filter(p => p !== photo) })
               }
               maxPhotos={4}
-              label="Capture registration, insurance documents"
+              category="documents"
             />
           </div>
 
@@ -199,11 +227,14 @@ export const VehicleInspectionStep: React.FC<VehicleInspectionStepProps> = ({
               <Label>Damage Photos</Label>
               <MobilePhotoCapture
                 photos={data.photos.damages}
-                onPhotosChange={(photos) =>
-                  onChange('photos', { ...data.photos, damages: photos })
+                onCapture={(photo) =>
+                  onChange('photos', { ...data.photos, damages: [...data.photos.damages, photo] })
+                }
+                onRemove={(photo) =>
+                  onChange('photos', { ...data.photos, damages: data.photos.damages.filter(p => p !== photo) })
                 }
                 maxPhotos={10}
-                label="Capture detailed damage photos"
+                category="damages"
               />
             </div>
           )}

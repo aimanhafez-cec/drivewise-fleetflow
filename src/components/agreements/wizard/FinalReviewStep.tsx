@@ -96,7 +96,7 @@ export const FinalReviewStep: React.FC<FinalReviewStepProps> = ({
               {wizardData.step4.selectedAddons.length > 0 && (
                 <div className="flex justify-between">
                   <dt className="text-muted-foreground">Add-ons ({wizardData.step4.selectedAddons.length}):</dt>
-                  <dd>AED {wizardData.step4.selectedAddons.reduce((sum, a) => sum + a.totalCost, 0).toFixed(2)}</dd>
+                  <dd>AED {wizardData.step4.selectedAddons.reduce((sum, a) => sum + (a.unitPrice * a.quantity), 0).toFixed(2)}</dd>
                 </div>
               )}
               <div className="flex justify-between">

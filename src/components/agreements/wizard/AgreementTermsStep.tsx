@@ -5,8 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { CustomerSelect } from '@/components/customers/CustomerSelect';
-import { LocationSelect } from '@/components/locations/LocationSelect';
+import { CustomerSelect, LocationSelect } from '@/components/ui/select-components';
 import type { EnhancedWizardData } from '@/types/agreement-wizard';
 
 interface AgreementTermsStepProps {
@@ -32,10 +31,8 @@ export const AgreementTermsStep: React.FC<AgreementTermsStepProps> = ({
               Customer *
             </Label>
             <CustomerSelect
-              value={data.customerId}
-              onValueChange={(value) => onChange('customerId', value)}
-              required
-              aria-required="true"
+              value={data.customerId || ''}
+              onChange={(value) => onChange('customerId', value)}
             />
           </div>
 
@@ -94,9 +91,7 @@ export const AgreementTermsStep: React.FC<AgreementTermsStepProps> = ({
               </Label>
               <LocationSelect
                 value={data.pickupLocationId}
-                onValueChange={(value) => onChange('pickupLocationId', value)}
-                required
-                aria-required="true"
+                onChange={(value) => onChange('pickupLocationId', value)}
               />
             </div>
 
@@ -122,9 +117,7 @@ export const AgreementTermsStep: React.FC<AgreementTermsStepProps> = ({
               </Label>
               <LocationSelect
                 value={data.dropoffLocationId}
-                onValueChange={(value) => onChange('dropoffLocationId', value)}
-                required
-                aria-required="true"
+                onChange={(value) => onChange('dropoffLocationId', value)}
               />
             </div>
 

@@ -185,10 +185,15 @@ export const TermsSignatureStep: React.FC<TermsSignatureStepProps> = ({
         </CardHeader>
         <CardContent>
           <EnhancedSignaturePad
-            signature={data.customerSignature}
-            onSignatureChange={(sig) => onChange('customerSignature', sig)}
-            signerLabel="Customer Name"
-            required
+            signerName={data.customerSignature?.signerName}
+            title="Customer Signature"
+            onSave={(signatureData, signerName) => {
+              onChange('customerSignature', {
+                signatureData,
+                signerName,
+                signedAt: new Date().toISOString(),
+              });
+            }}
           />
         </CardContent>
       </Card>
@@ -199,9 +204,15 @@ export const TermsSignatureStep: React.FC<TermsSignatureStepProps> = ({
         </CardHeader>
         <CardContent>
           <EnhancedSignaturePad
-            signature={data.witnessSignature}
-            onSignatureChange={(sig) => onChange('witnessSignature', sig)}
-            signerLabel="Witness Name"
+            signerName={data.witnessSignature?.signerName}
+            title="Witness Signature"
+            onSave={(signatureData, signerName) => {
+              onChange('witnessSignature', {
+                signatureData,
+                signerName,
+                signedAt: new Date().toISOString(),
+              });
+            }}
           />
         </CardContent>
       </Card>

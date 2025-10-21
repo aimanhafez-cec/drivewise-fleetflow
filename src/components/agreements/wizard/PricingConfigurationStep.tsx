@@ -20,7 +20,7 @@ export const PricingConfigurationStep: React.FC<PricingConfigurationStepProps> =
 }) => {
   // Calculate pricing breakdown
   useEffect(() => {
-    const baseRate = data.rateOverride || data.baseRate;
+    const baseRate = data.rateOverride ? data.rateOverride.amount : data.baseRate;
     const insurance = data.insurancePackage === 'comprehensive' ? 50 : 25; // Example rates
     const maintenance = data.maintenanceIncluded ? (data.maintenanceCost || 0) : 0;
     const addons = 0; // Will be calculated from step 4
@@ -77,10 +77,11 @@ export const PricingConfigurationStep: React.FC<PricingConfigurationStepProps> =
                 id="rateOverride"
                 type="number"
                 step="0.01"
-                value={data.rateOverride || ''}
-                onChange={(e) =>
-                  onChange('rateOverride', e.target.value ? parseFloat(e.target.value) : undefined)
-                }
+                value={data.rateOverride?.amount || ''}
+                onChange={(e) => {
+                  const amount = e.target.value ? parseFloat(e.target.value) : undefined;
+                  onChange('rateOverride', amount ? { amount, reason: data.rateOverride?.reason || '' } : undefined);
+                }}
               />
               <p className="text-xs text-muted-foreground">Leave empty to use system rate</p>
             </div>

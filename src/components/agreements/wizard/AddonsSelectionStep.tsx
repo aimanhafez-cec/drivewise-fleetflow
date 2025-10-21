@@ -89,22 +89,21 @@ export const AddonsSelectionStep: React.FC<AddonsSelectionStepProps> = ({
     const addon = AVAILABLE_ADDONS.find((a) => a.id === addonId);
     if (!addon) return;
 
-    const isSelected = data.selectedAddons.some((a) => a.id === addonId);
+    const isSelected = data.selectedAddons.some((a) => a.addonId === addonId);
 
     if (isSelected) {
       onChange(
         'selectedAddons',
-        data.selectedAddons.filter((a) => a.id !== addonId)
+        data.selectedAddons.filter((a) => a.addonId !== addonId)
       );
     } else {
       onChange('selectedAddons', [
         ...data.selectedAddons,
         {
-          id: addon.id,
-          name: addon.name,
+          addonId: addon.id,
           quantity: 1,
-          dailyRate: addon.dailyRate,
-          totalCost: addon.dailyRate,
+          unitPrice: addon.dailyRate,
+          notes: addon.description,
         },
       ]);
     }
@@ -119,7 +118,7 @@ export const AddonsSelectionStep: React.FC<AddonsSelectionStepProps> = ({
     return acc;
   }, {} as Record<string, typeof AVAILABLE_ADDONS>);
 
-  const totalAddonsCost = data.selectedAddons.reduce((sum, addon) => sum + addon.totalCost, 0);
+  const totalAddonsCost = data.selectedAddons.reduce((sum, addon) => sum + (addon.unitPrice * addon.quantity), 0);
 
   return (
     <div className="space-y-6">
@@ -133,7 +132,7 @@ export const AddonsSelectionStep: React.FC<AddonsSelectionStepProps> = ({
           </CardHeader>
           <CardContent className="space-y-3">
             {recommendedAddons.map((addon) => {
-              const isSelected = data.selectedAddons.some((a) => a.id === addon.id);
+              const isSelected = data.selectedAddons.some((a) => a.addonId === addon.id);
               return (
                 <div
                   key={addon.id}
@@ -171,7 +170,7 @@ export const AddonsSelectionStep: React.FC<AddonsSelectionStepProps> = ({
           </CardHeader>
           <CardContent className="space-y-3">
             {addons.map((addon) => {
-              const isSelected = data.selectedAddons.some((a) => a.id === addon.id);
+              const isSelected = data.selectedAddons.some((a) => a.addonId === addon.id);
               return (
                 <div
                   key={addon.id}
@@ -205,12 +204,15 @@ export const AddonsSelectionStep: React.FC<AddonsSelectionStepProps> = ({
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
-              {data.selectedAddons.map((addon) => (
-                <div key={addon.id} className="flex justify-between text-sm">
-                  <span>{addon.name}</span>
-                  <span className="font-medium">AED {addon.totalCost.toFixed(2)}</span>
-                </div>
-              ))}
+              {data.selectedAddons.map((addon) => {
+                const addonInfo = AVAILABLE_ADDONS.find(a => a.id === addon.addonId);
+                return (
+                  <div key={addon.addonId} className="flex justify-between text-sm">
+                    <span>{addonInfo?.name || addon.addonId}</span>
+                    <span className="font-medium">AED {(addon.unitPrice * addon.quantity).toFixed(2)}</span>
+                  </div>
+                );
+              })}
               <div className="flex justify-between font-bold text-lg pt-2 border-t">
                 <span>Total Add-ons:</span>
                 <span className="text-primary">AED {totalAddonsCost.toFixed(2)}</span>

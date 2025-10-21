@@ -30,9 +30,24 @@ export const BillingPaymentStep: React.FC<BillingPaymentStepProps> = ({
         </CardHeader>
         <CardContent>
           <PaymentProcessor
-            totalAmount={totalAmount}
-            paymentData={data}
-            onPaymentDataChange={handlePaymentDataChange}
+            amount={totalAmount}
+            depositAmount={data.securityDeposit.amount}
+            onPaymentComplete={(transactionRef, method) => {
+              onChange('advancePayment', {
+                ...data.advancePayment,
+                amount: totalAmount,
+                status: 'completed',
+                transactionRef,
+              });
+              onChange('paymentMethod', method);
+            }}
+            onDepositAuthorize={(authorizationRef) => {
+              onChange('securityDeposit', {
+                ...data.securityDeposit,
+                status: 'authorized',
+                authorizationRef,
+              });
+            }}
           />
         </CardContent>
       </Card>
