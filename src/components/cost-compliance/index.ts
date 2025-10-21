@@ -35,3 +35,8 @@ export { BillingCycleFormDialog } from './BillingCycleFormDialog';
 
 // Phase 7 - Main Dashboard
 export { CostComplianceDashboard } from './CostComplianceDashboard';
+
+// Phase 9 - UAE-Specific Features
+export { UAEViolationLookup } from './UAEViolationLookup';
+export { UAETollGateSelector } from './UAETollGateSelector';
+export { BlackPointsTracker } from './BlackPointsTracker';
