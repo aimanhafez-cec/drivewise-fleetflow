@@ -11,6 +11,10 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { user, loading } = useAuth();
   const location = useLocation();
 
+  // Check for Lovable preview token (for "open in new tab" functionality)
+  const searchParams = new URLSearchParams(location.search);
+  const hasLovableToken = searchParams.has('__lovable_token');
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -19,7 +23,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     );
   }
 
-  if (!user) {
+  // Allow access if user is authenticated OR if it's a Lovable preview
+  if (!user && !hasLovableToken) {
     // Redirect to auth page with return URL
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }

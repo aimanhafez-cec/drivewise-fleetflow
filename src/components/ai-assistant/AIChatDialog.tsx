@@ -8,6 +8,7 @@ import { useAIAssistant } from '@/hooks/useAIAssistant';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
@@ -178,11 +179,12 @@ export const AIChatDialog: React.FC<AIChatDialogProps> = ({ open, onOpenChange }
                 <Sparkles className="h-5 w-5" />
                 AI System Assistant
               </DialogTitle>
-              {location.pathname !== '/' && (
-                <span className="text-xs text-white/80 font-normal">
-                  📍 Context: {location.pathname.split('/')[1]?.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) || 'Home'}
-                </span>
-              )}
+              <DialogDescription className="text-white/80 text-xs">
+                {location.pathname !== '/' 
+                  ? `📍 Context: ${location.pathname.split('/')[1]?.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) || 'Home'}`
+                  : 'Your AI guide for the car rental management system'
+                }
+              </DialogDescription>
             </div>
             <div className="flex gap-2">
               {messages.length > 0 && (
