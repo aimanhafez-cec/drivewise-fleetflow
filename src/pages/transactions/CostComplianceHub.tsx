@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { ExpensesTab } from '@/components/cost-compliance/ExpensesTab';
 import { TollsFinesTab } from '@/components/cost-compliance/TollsFinesTab';
 import { ExceptionsTab } from '@/components/cost-compliance/ExceptionsTab';
+import { BillingCyclesTab } from '@/components/cost-compliance/BillingCyclesTab';
 
 const CostComplianceHub: React.FC = () => {
   return (
@@ -36,15 +37,7 @@ const CostComplianceHub: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="billing" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Billing Cycles</CardTitle>
-              <CardDescription>Manage contract billing and invoicing</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">Billing Cycles tab - Coming in Phase 6</p>
-            </CardContent>
-          </Card>
+          <BillingCyclesTab />
         </TabsContent>
       </Tabs>
     </div>

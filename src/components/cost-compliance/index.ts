@@ -28,3 +28,7 @@ export { TollFineFormDialog } from './TollFineFormDialog';
 // Phase 5 - Exceptions Tab
 export { ExceptionsTab } from './ExceptionsTab';
 export { ExceptionFormDialog } from './ExceptionFormDialog';
+
+// Phase 6 - Billing Cycles Tab
+export { BillingCyclesTab } from './BillingCyclesTab';
+export { BillingCycleFormDialog } from './BillingCycleFormDialog';
