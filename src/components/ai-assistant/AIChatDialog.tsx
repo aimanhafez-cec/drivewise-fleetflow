@@ -170,7 +170,7 @@ export const AIChatDialog: React.FC<AIChatDialogProps> = ({ open, onOpenChange }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl h-[600px] flex flex-col p-0">
+      <DialogContent className="sm:max-w-2xl h-[600px] flex flex-col p-0 [&>button]:hidden">
         <DialogHeader className="px-6 py-4 border-b bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500">
           <div className="flex items-center justify-between">
             <div className="flex flex-col gap-1">

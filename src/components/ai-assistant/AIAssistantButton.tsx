@@ -10,7 +10,7 @@ export const AIAssistantButton: React.FC = () => {
     <>
       <Button
         onClick={() => setIsOpen(true)}
-        className="relative h-10 w-10 rounded-full bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 p-0 hover:scale-110 transition-transform duration-200 animate-pulse hover:animate-none shadow-lg"
+        className="relative h-10 w-10 rounded-full bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 p-0 hover:scale-110 transition-transform duration-200 shadow-lg"
         title="AI System Assistant"
       >
         <Bot className="h-5 w-5 text-white" />
