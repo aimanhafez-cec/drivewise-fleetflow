@@ -122,6 +122,82 @@ export type Database = {
         }
         Relationships: []
       }
+      agreement_documents: {
+        Row: {
+          agreement_id: string
+          created_at: string
+          document_side: string | null
+          document_type: string
+          expiry_date: string | null
+          extracted_data: Json | null
+          file_url: string
+          id: string
+          rejection_reason: string | null
+          updated_at: string
+          uploaded_at: string
+          uploaded_by: string | null
+          verification_status: string | null
+          verified_at: string | null
+          verified_by: string | null
+        }
+        Insert: {
+          agreement_id: string
+          created_at?: string
+          document_side?: string | null
+          document_type: string
+          expiry_date?: string | null
+          extracted_data?: Json | null
+          file_url: string
+          id?: string
+          rejection_reason?: string | null
+          updated_at?: string
+          uploaded_at?: string
+          uploaded_by?: string | null
+          verification_status?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Update: {
+          agreement_id?: string
+          created_at?: string
+          document_side?: string | null
+          document_type?: string
+          expiry_date?: string | null
+          extracted_data?: Json | null
+          file_url?: string
+          id?: string
+          rejection_reason?: string | null
+          updated_at?: string
+          uploaded_at?: string
+          uploaded_by?: string | null
+          verification_status?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agreement_documents_agreement_id_fkey"
+            columns: ["agreement_id"]
+            isOneToOne: false
+            referencedRelation: "agreements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agreement_documents_uploaded_by_fkey"
+            columns: ["uploaded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agreement_documents_verified_by_fkey"
+            columns: ["verified_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       agreement_lines: {
         Row: {
           additions: Json | null
@@ -211,31 +287,116 @@ export type Database = {
           },
         ]
       }
+      agreement_payments: {
+        Row: {
+          agreement_id: string
+          amount: number
+          authorization_ref: string | null
+          card_last_4: string | null
+          card_token: string | null
+          created_at: string
+          id: string
+          metadata: Json | null
+          notes: string | null
+          payment_method: string | null
+          payment_type: string
+          processed_at: string | null
+          receipt_url: string | null
+          refund_amount: number | null
+          refund_reason: string | null
+          refunded_at: string | null
+          status: string | null
+          transaction_ref: string | null
+          updated_at: string
+        }
+        Insert: {
+          agreement_id: string
+          amount: number
+          authorization_ref?: string | null
+          card_last_4?: string | null
+          card_token?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          notes?: string | null
+          payment_method?: string | null
+          payment_type: string
+          processed_at?: string | null
+          receipt_url?: string | null
+          refund_amount?: number | null
+          refund_reason?: string | null
+          refunded_at?: string | null
+          status?: string | null
+          transaction_ref?: string | null
+          updated_at?: string
+        }
+        Update: {
+          agreement_id?: string
+          amount?: number
+          authorization_ref?: string | null
+          card_last_4?: string | null
+          card_token?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          notes?: string | null
+          payment_method?: string | null
+          payment_type?: string
+          processed_at?: string | null
+          receipt_url?: string | null
+          refund_amount?: number | null
+          refund_reason?: string | null
+          refunded_at?: string | null
+          status?: string | null
+          transaction_ref?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agreement_payments_agreement_id_fkey"
+            columns: ["agreement_id"]
+            isOneToOne: false
+            referencedRelation: "agreements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       agreements: {
         Row: {
           add_ons: Json | null
           agreement_date: string
           agreement_no: string | null
+          agreement_type: string | null
           base_vehicle_rate_per_month: number | null
           checkout_datetime: string | null
           checkout_fuel: number | null
           checkout_odometer: number | null
           created_at: string
           created_by: string | null
+          cross_border_allowed: boolean | null
+          cross_border_countries: string[] | null
           customer_id: string
+          darb_account_no: string | null
+          excess_km_rate: number | null
           id: string
+          included_km: number | null
           insurance_package_type: string | null
+          mileage_package: string | null
           monthly_insurance_cost_per_vehicle: number | null
           monthly_maintenance_cost_per_vehicle: number | null
           notes: string | null
           rate_overrides: Json | null
+          rental_purpose: string | null
           replacement_vehicle_cost_monthly: number | null
           reservation_id: string | null
           return_datetime: string | null
           return_fuel: number | null
           return_odometer: number | null
           roadside_assistance_cost_monthly: number | null
+          salik_account_no: string | null
           signed_timestamp: string | null
+          source_id: string | null
+          source_type: string | null
           status: Database["public"]["Enums"]["agreement_status"]
           total_amount: number | null
           updated_at: string
@@ -247,26 +408,37 @@ export type Database = {
           add_ons?: Json | null
           agreement_date?: string
           agreement_no?: string | null
+          agreement_type?: string | null
           base_vehicle_rate_per_month?: number | null
           checkout_datetime?: string | null
           checkout_fuel?: number | null
           checkout_odometer?: number | null
           created_at?: string
           created_by?: string | null
+          cross_border_allowed?: boolean | null
+          cross_border_countries?: string[] | null
           customer_id: string
+          darb_account_no?: string | null
+          excess_km_rate?: number | null
           id?: string
+          included_km?: number | null
           insurance_package_type?: string | null
+          mileage_package?: string | null
           monthly_insurance_cost_per_vehicle?: number | null
           monthly_maintenance_cost_per_vehicle?: number | null
           notes?: string | null
           rate_overrides?: Json | null
+          rental_purpose?: string | null
           replacement_vehicle_cost_monthly?: number | null
           reservation_id?: string | null
           return_datetime?: string | null
           return_fuel?: number | null
           return_odometer?: number | null
           roadside_assistance_cost_monthly?: number | null
+          salik_account_no?: string | null
           signed_timestamp?: string | null
+          source_id?: string | null
+          source_type?: string | null
           status?: Database["public"]["Enums"]["agreement_status"]
           total_amount?: number | null
           updated_at?: string
@@ -278,26 +450,37 @@ export type Database = {
           add_ons?: Json | null
           agreement_date?: string
           agreement_no?: string | null
+          agreement_type?: string | null
           base_vehicle_rate_per_month?: number | null
           checkout_datetime?: string | null
           checkout_fuel?: number | null
           checkout_odometer?: number | null
           created_at?: string
           created_by?: string | null
+          cross_border_allowed?: boolean | null
+          cross_border_countries?: string[] | null
           customer_id?: string
+          darb_account_no?: string | null
+          excess_km_rate?: number | null
           id?: string
+          included_km?: number | null
           insurance_package_type?: string | null
+          mileage_package?: string | null
           monthly_insurance_cost_per_vehicle?: number | null
           monthly_maintenance_cost_per_vehicle?: number | null
           notes?: string | null
           rate_overrides?: Json | null
+          rental_purpose?: string | null
           replacement_vehicle_cost_monthly?: number | null
           reservation_id?: string | null
           return_datetime?: string | null
           return_fuel?: number | null
           return_odometer?: number | null
           roadside_assistance_cost_monthly?: number | null
+          salik_account_no?: string | null
           signed_timestamp?: string | null
+          source_id?: string | null
+          source_type?: string | null
           status?: Database["public"]["Enums"]["agreement_status"]
           total_amount?: number | null
           updated_at?: string
@@ -3204,13 +3387,20 @@ export type Database = {
           created_at: string
           damage_marker_ids: string[] | null
           device_info: string | null
+          fuel_gauge_photo_url: string | null
+          fuel_level: number | null
           id: string
+          inspection_checklist: Json | null
           line_id: string
           location_id: string | null
           media: Json | null
           metrics: Json
+          notes: string | null
+          odometer_photo_url: string | null
+          odometer_reading: number | null
           performed_at: string
           performed_by_user_id: string | null
+          pre_handover_checklist: Json | null
           signature: Json | null
           status: string
           updated_at: string
@@ -3221,13 +3411,20 @@ export type Database = {
           created_at?: string
           damage_marker_ids?: string[] | null
           device_info?: string | null
+          fuel_gauge_photo_url?: string | null
+          fuel_level?: number | null
           id?: string
+          inspection_checklist?: Json | null
           line_id: string
           location_id?: string | null
           media?: Json | null
           metrics?: Json
+          notes?: string | null
+          odometer_photo_url?: string | null
+          odometer_reading?: number | null
           performed_at?: string
           performed_by_user_id?: string | null
+          pre_handover_checklist?: Json | null
           signature?: Json | null
           status?: string
           updated_at?: string
@@ -3238,13 +3435,20 @@ export type Database = {
           created_at?: string
           damage_marker_ids?: string[] | null
           device_info?: string | null
+          fuel_gauge_photo_url?: string | null
+          fuel_level?: number | null
           id?: string
+          inspection_checklist?: Json | null
           line_id?: string
           location_id?: string | null
           media?: Json | null
           metrics?: Json
+          notes?: string | null
+          odometer_photo_url?: string | null
+          odometer_reading?: number | null
           performed_at?: string
           performed_by_user_id?: string | null
+          pre_handover_checklist?: Json | null
           signature?: Json | null
           status?: string
           updated_at?: string
