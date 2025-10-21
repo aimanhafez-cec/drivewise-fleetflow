@@ -1,20 +1,25 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Plus, FileText } from 'lucide-react';
-import { format } from 'date-fns';
-import { formatCurrency } from "@/lib/utils";
+import { AgreementKPIDashboard } from '@/components/agreements/list/AgreementKPIDashboard';
+import { AgreementListFilters, AgreementFilters } from '@/components/agreements/list/AgreementListFilters';
+import { AgreementListTable } from '@/components/agreements/list/AgreementListTable';
+import { AgreementQuickActions } from '@/components/agreements/list/AgreementQuickActions';
 
 const Agreements = () => {
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const fromReservation = searchParams.get('fromReservation');
+  const [filters, setFilters] = useState<AgreementFilters>({
+    search: '',
+    status: [],
+    agreementDateFrom: undefined,
+    agreementDateTo: undefined,
+    checkoutDateFrom: undefined,
+    checkoutDateTo: undefined,
+    returnDateFrom: undefined,
+    returnDateTo: undefined,
+    paymentStatus: 'all',
+    locationType: 'all',
+  });
 
   const { data: agreements, isLoading } = useQuery({
     queryKey: ['agreements:list'],
@@ -40,183 +45,123 @@ const Agreements = () => {
     },
   });
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'active':
-        return 'bg-green-100 text-green-800';
-      case 'completed':
-        return 'bg-blue-100 text-blue-800';
-      case 'terminated':
-        return 'bg-red-100 text-red-800';
-      case 'pending_return':
-        return 'bg-yellow-100 text-yellow-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
+  // Filter agreements based on current filters
+  const filteredAgreements = useMemo(() => {
+    if (!agreements) return [];
 
-  const isNewAgreement = (agreementId: string) => {
-    return fromReservation && new Date().getTime() - new Date().getTime() < 60000; // Within last minute
+    return agreements.filter(agreement => {
+      // Search filter
+      if (filters.search) {
+        const searchLower = filters.search.toLowerCase();
+        const matchesSearch = 
+          agreement.agreement_no?.toLowerCase().includes(searchLower) ||
+          agreement.profiles?.full_name?.toLowerCase().includes(searchLower) ||
+          agreement.profiles?.email?.toLowerCase().includes(searchLower) ||
+          agreement.vehicles?.license_plate?.toLowerCase().includes(searchLower) ||
+          agreement.vehicles?.make?.toLowerCase().includes(searchLower) ||
+          agreement.vehicles?.model?.toLowerCase().includes(searchLower);
+        
+        if (!matchesSearch) return false;
+      }
+
+      // Status filter
+      if (filters.status.length > 0) {
+        // Check for overdue status
+        const isOverdue = agreement.return_datetime && 
+          new Date(agreement.return_datetime) < new Date() && 
+          agreement.status === 'active';
+        
+        if (filters.status.includes('overdue')) {
+          if (!isOverdue) return false;
+        } else {
+          if (!filters.status.includes(agreement.status)) return false;
+        }
+      }
+
+      // Agreement date filter
+      if (filters.agreementDateFrom || filters.agreementDateTo) {
+        const agreementDate = new Date(agreement.agreement_date || agreement.checkout_datetime);
+        if (filters.agreementDateFrom && agreementDate < filters.agreementDateFrom) return false;
+        if (filters.agreementDateTo && agreementDate > filters.agreementDateTo) return false;
+      }
+
+      // Checkout date filter
+      if (filters.checkoutDateFrom || filters.checkoutDateTo) {
+        if (!agreement.checkout_datetime) return false;
+        const checkoutDate = new Date(agreement.checkout_datetime);
+        if (filters.checkoutDateFrom && checkoutDate < filters.checkoutDateFrom) return false;
+        if (filters.checkoutDateTo && checkoutDate > filters.checkoutDateTo) return false;
+      }
+
+      // Return date filter
+      if (filters.returnDateFrom || filters.returnDateTo) {
+        if (!agreement.return_datetime) return false;
+        const returnDate = new Date(agreement.return_datetime);
+        if (filters.returnDateFrom && returnDate < filters.returnDateFrom) return false;
+        if (filters.returnDateTo && returnDate > filters.returnDateTo) return false;
+      }
+
+      return true;
+    });
+  }, [agreements, filters]);
+
+  const resetFilters = () => {
+    setFilters({
+      search: '',
+      status: [],
+      agreementDateFrom: undefined,
+      agreementDateTo: undefined,
+      checkoutDateFrom: undefined,
+      checkoutDateTo: undefined,
+      returnDateFrom: undefined,
+      returnDateTo: undefined,
+      paymentStatus: 'all',
+      locationType: 'all',
+    });
   };
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6 p-6">
         <div className="flex justify-between items-center">
           <Skeleton className="h-8 w-48" />
           <Skeleton className="h-10 w-32" />
         </div>
-        <Card>
-          <CardHeader>
-            <Skeleton className="h-6 w-32" />
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {[...Array(5)].map((_, i) => (
-                <Skeleton key={i} className="h-12 w-full" />
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+          {[...Array(6)].map((_, i) => (
+            <Skeleton key={i} className="h-32" />
+          ))}
+        </div>
+        <Skeleton className="h-64" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6 max-w-full overflow-hidden">
+    <div className="space-y-6 p-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div className="min-w-0 flex-1">
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Agreements</h1>
-          <p className="text-muted-foreground text-sm sm:text-base">
-            Manage rental agreements and contracts
-          </p>
-        </div>
-        <Button onClick={() => navigate('/agreements/new')} className="w-full sm:w-auto">
-          <Plus className="mr-2 h-4 w-4" />
-          <span className="hidden sm:inline">New Agreement</span>
-          <span className="sm:hidden">New</span>
-        </Button>
+      <div className="flex flex-col gap-2">
+        <h1 className="text-3xl font-bold tracking-tight">Agreements Management</h1>
+        <p className="text-muted-foreground">
+          Comprehensive UAE rental agreement management system
+        </p>
       </div>
 
+      {/* KPI Dashboard */}
+      <AgreementKPIDashboard agreements={agreements || []} />
+
+      {/* Quick Actions */}
+      <AgreementQuickActions />
+
+      {/* Filters */}
+      <AgreementListFilters
+        filters={filters}
+        onFiltersChange={setFilters}
+        onReset={resetFilters}
+      />
+
       {/* Agreements Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <FileText className="mr-2 h-5 w-5" />
-            All Agreements
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {agreements && agreements.length > 0 ? (
-            <div className="overflow-x-auto">
-              <Table id="agreements-table" className="min-w-full">
-                <TableHeader>
-                  <TableRow className="bg-muted">
-                    <TableHead className="min-w-[120px]">Agreement No.</TableHead>
-                    <TableHead className="min-w-[150px]">Customer</TableHead>
-                    <TableHead className="min-w-[120px] hidden sm:table-cell">Vehicle</TableHead>
-                    <TableHead className="min-w-[100px]">Status</TableHead>
-                    <TableHead className="min-w-[120px] hidden md:table-cell">Period</TableHead>
-                    <TableHead className="min-w-[100px] hidden lg:table-cell">Total Amount</TableHead>
-                    <TableHead className="min-w-[100px] hidden lg:table-cell">Balance Due</TableHead>
-                    <TableHead className="min-w-[100px] hidden xl:table-cell">Created</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                {agreements.map((agreement) => (
-                  <TableRow 
-                    key={agreement.id}
-                    className="cursor-pointer hover:bg-muted/50"
-                    onClick={() => navigate(`/agreements/${agreement.id}`)}
-                  >
-                    <TableCell className="font-medium">
-                      <div className="flex items-center">
-                        {agreement.agreement_no || `AGR-${agreement.id.slice(0, 8)}`}
-                        {isNewAgreement(agreement.id) && (
-                          <Badge variant="secondary" className="ml-2 text-xs">
-                            NEW
-                          </Badge>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div>
-                        <p className="font-medium">
-                          {agreement.profiles?.full_name || 'Unknown Customer'}
-                        </p>
-                        <p className="text-sm text-card-foreground">
-                          {agreement.profiles?.email}
-                        </p>
-                      </div>
-                    </TableCell>
-                    <TableCell className="hidden sm:table-cell">
-                      {agreement.vehicles ? (
-                        <div>
-                          <p className="font-medium">
-                            {agreement.vehicles.make} {agreement.vehicles.model}
-                          </p>
-                          <p className="text-sm text-card-foreground">
-                            {agreement.vehicles.license_plate}
-                          </p>
-                        </div>
-                      ) : (
-                        <span className="text-card-foreground">No vehicle assigned</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <Badge className={getStatusColor(agreement.status)}>
-                        {agreement.status.replace('_', ' ').toUpperCase()}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="hidden md:table-cell">
-                      <div className="text-sm">
-                        {agreement.checkout_datetime && agreement.return_datetime ? (
-                          <>
-                            <p>
-                              {format(new Date(agreement.checkout_datetime), 'MMM dd, yyyy')}
-                            </p>
-                            <p className="text-card-foreground">
-                              → {format(new Date(agreement.return_datetime), 'MMM dd, yyyy')}
-                            </p>
-                          </>
-                        ) : (
-                          <span className="text-card-foreground">Dates TBD</span>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell className="font-medium hidden lg:table-cell">
-                      {formatCurrency(agreement.total_amount || 0)}
-                    </TableCell>
-                    <TableCell className="font-medium text-destructive hidden lg:table-cell">
-                      {formatCurrency(agreement.total_amount || 0)}
-                    </TableCell>
-                    <TableCell className="text-sm text-card-foreground hidden xl:table-cell">
-                      {format(new Date(agreement.created_at), 'MMM dd, yyyy')}
-                    </TableCell>
-                  </TableRow>
-                ))}
-                </TableBody>
-              </Table>
-            </div>
-          ) : (
-            <div className="text-center py-8">
-              <FileText className="mx-auto h-12 w-12 text-card-foreground" />
-              <h3 className="mt-4 text-lg font-semibold">No agreements found</h3>
-              <p className="text-card-foreground">
-                Create your first agreement to get started.
-              </p>
-              <Button 
-                className="mt-4"
-                onClick={() => navigate('/agreements/new')}
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                Create Agreement
-              </Button>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      <AgreementListTable agreements={filteredAgreements} />
     </div>
   );
 };
