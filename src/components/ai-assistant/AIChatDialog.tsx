@@ -45,22 +45,145 @@ export const AIChatDialog: React.FC<AIChatDialogProps> = ({ open, onOpenChange }
     }
   };
 
-  const quickActions = [
-    'How do I create a new reservation?',
-    'How do I perform a vehicle inspection?',
-    'How do I process a payment?',
-    'How do I manage customer documents?',
-  ];
+  // Context-aware quick actions based on current route
+  const getQuickActions = (): string[] => {
+    const path = location.pathname;
+
+    if (path.startsWith('/dashboard')) {
+      return [
+        'What are the key metrics on this dashboard?',
+        'How do I use the daily planner?',
+        'Show me today\'s critical tasks',
+        'Explain the revenue trends',
+      ];
+    }
+
+    if (path.startsWith('/reservations')) {
+      return [
+        'How do I create a new reservation?',
+        'How do I confirm a pending reservation?',
+        'How do I handle reservation cancellations?',
+        'How do I process down payments?',
+      ];
+    }
+
+    if (path.startsWith('/agreements')) {
+      return [
+        'What\'s the difference between Quick and Enhanced wizard?',
+        'How do I create a rental agreement?',
+        'How do I extend an existing agreement?',
+        'How do I handle agreement modifications?',
+      ];
+    }
+
+    if (path.startsWith('/vehicles')) {
+      return [
+        'How do I add a new vehicle to the fleet?',
+        'How do I update vehicle status?',
+        'How do I track vehicle maintenance?',
+        'How do I manage vehicle documents?',
+      ];
+    }
+
+    if (path.startsWith('/customers')) {
+      return [
+        'How do I add a new customer?',
+        'How do I verify customer documents?',
+        'How do I view customer rental history?',
+        'How do I manage corporate customers?',
+      ];
+    }
+
+    if (path.startsWith('/inspections')) {
+      return [
+        'How do I perform a check-out inspection?',
+        'How do I perform a check-in inspection?',
+        'How do I document vehicle damage?',
+        'How do I lock an inspection?',
+      ];
+    }
+
+    if (path.startsWith('/operations')) {
+      return [
+        'How do I create a custody transaction?',
+        'How do I record tolls and fines?',
+        'How do I handle compliance exceptions?',
+        'How do I manage support tickets?',
+      ];
+    }
+
+    if (path.startsWith('/payments')) {
+      return [
+        'How do I process a payment?',
+        'How do I record a down payment?',
+        'How do I handle refunds?',
+        'How do I generate invoices?',
+      ];
+    }
+
+    if (path.startsWith('/rfqs')) {
+      return [
+        'How do I create a new RFQ?',
+        'How do I convert an RFQ to a quotation?',
+        'How do I track RFQ status?',
+        'How do I manage RFQ responses?',
+      ];
+    }
+
+    if (path.startsWith('/daily-planner')) {
+      return [
+        'How do I use the daily planner?',
+        'What tasks should I prioritize today?',
+        'How do I handle check-ins and check-outs?',
+        'How do I manage overdue tasks?',
+      ];
+    }
+
+    if (path.startsWith('/reports')) {
+      return [
+        'How do I generate revenue reports?',
+        'How do I view utilization reports?',
+        'How do I analyze customer data?',
+        'How do I export reports?',
+      ];
+    }
+
+    if (path.startsWith('/settings')) {
+      return [
+        'How do I configure instant booking settings?',
+        'How do I manage price lists?',
+        'How do I set up locations and branches?',
+        'How do I configure tax settings?',
+      ];
+    }
+
+    // Default actions for other pages
+    return [
+      'How do I create a new reservation?',
+      'How do I perform a vehicle inspection?',
+      'How do I process a payment?',
+      'How do I manage customer documents?',
+    ];
+  };
+
+  const quickActions = getQuickActions();
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-2xl h-[600px] flex flex-col p-0">
         <DialogHeader className="px-6 py-4 border-b bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500">
           <div className="flex items-center justify-between">
-            <DialogTitle className="text-white flex items-center gap-2">
-              <Sparkles className="h-5 w-5" />
-              AI System Assistant
-            </DialogTitle>
+            <div className="flex flex-col gap-1">
+              <DialogTitle className="text-white flex items-center gap-2">
+                <Sparkles className="h-5 w-5" />
+                AI System Assistant
+              </DialogTitle>
+              {location.pathname !== '/' && (
+                <span className="text-xs text-white/80 font-normal">
+                  📍 Context: {location.pathname.split('/')[1]?.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) || 'Home'}
+                </span>
+              )}
+            </div>
             <div className="flex gap-2">
               {messages.length > 0 && (
                 <Button
@@ -98,13 +221,15 @@ export const AIChatDialog: React.FC<AIChatDialogProps> = ({ open, onOpenChange }
                     I'm here to help you navigate and use the car rental management system.
                   </p>
                 </div>
-                <div className="w-full max-w-md space-y-2">
-                  <p className="text-sm font-medium text-muted-foreground mb-2">Quick actions:</p>
+              <div className="w-full max-w-md space-y-2">
+                  <p className="text-sm font-medium text-muted-foreground mb-2">
+                    Quick actions for {location.pathname.split('/')[1] || 'this page'}:
+                  </p>
                   {quickActions.map((action, idx) => (
                     <Button
                       key={idx}
                       variant="outline"
-                      className="w-full justify-start text-left h-auto py-2 px-3"
+                      className="w-full justify-start text-left h-auto py-2 px-3 hover:bg-gradient-to-r hover:from-purple-50 hover:via-pink-50 hover:to-blue-50 transition-all"
                       onClick={() => {
                         setInput(action);
                         setTimeout(() => handleSend(), 100);

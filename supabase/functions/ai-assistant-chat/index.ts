@@ -5,6 +5,37 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Helper function to provide context based on current route
+function getRouteContext(route: string): string {
+  const routeContextMap: Record<string, string> = {
+    '/dashboard': 'This is the main Dashboard showing KPIs, revenue metrics, daily planner, and quick access to critical actions. Help users understand the metrics and navigate to specific features.',
+    '/reservations': 'This is the Reservations page where users can create, view, and manage customer reservations. Focus on reservation workflows, status management, and payment processing.',
+    '/agreements': 'This is the Agreements page with two creation options: Quick Agreement (3-step) and Enhanced Wizard (9-step with inspection). Help with agreement lifecycle, extensions, and modifications.',
+    '/vehicles': 'This is the Vehicles management page for fleet inventory, status tracking, maintenance, and documents. Focus on vehicle operations and status updates.',
+    '/customers': 'This is the Customers page for managing individual and corporate profiles, verification, documents, and rental history. Help with customer onboarding and KYC processes.',
+    '/inspections': 'This is the Inspections page for check-in/check-out procedures, damage documentation, and inspection reports. Focus on inspection workflows and documentation.',
+    '/operations': 'This is the Operations hub for custody management, tolls/fines, compliance exceptions, and support tickets. Help with operational workflows and issue resolution.',
+    '/payments': 'This is the Payments page for processing transactions, recording payments, handling refunds, and generating invoices. Focus on financial operations.',
+    '/rfqs': 'This is the RFQ (Request for Quotation) page for creating, tracking, and converting RFQs to quotations. Help with the quotation workflow.',
+    '/daily-planner': 'This is the Daily Planner showing today\'s check-ins, check-outs, and pending tasks. Focus on helping prioritize and complete daily operations.',
+    '/reports': 'This is the Reports section for generating revenue, utilization, and customer analytics. Help with report generation and data interpretation.',
+    '/settings': 'This is the Settings page for system configuration including instant booking, price lists, locations, and tax settings. Focus on configuration options.',
+    '/master-agreements': 'This is the Master Agreements page for long-term corporate rental agreements. Help with corporate agreement management.',
+    '/transactions': 'This is the Transactions page showing all financial transactions. Help with transaction tracking and reconciliation.',
+    '/instant-booking': 'This is the Instant Booking portal for customer self-service reservations. Help with instant booking configuration and management.',
+    '/manage-quotations': 'This is the Quotations management page for creating, tracking, and converting quotes to agreements. Focus on quotation workflows.',
+  };
+
+  // Find matching route or return default
+  for (const [path, context] of Object.entries(routeContextMap)) {
+    if (route.startsWith(path)) {
+      return context;
+    }
+  }
+
+  return 'The user is on a page in the car rental management system. Provide general guidance based on their question.';
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -21,6 +52,11 @@ serve(async (req) => {
 
     // Comprehensive system prompt about the car rental management system
     const systemPrompt = `You are a helpful AI assistant for a comprehensive Car Rental Management System. Your role is to guide administrators through the system's features and help them accomplish their tasks efficiently.
+
+## Current Context
+${currentRoute ? `The user is currently on: ${currentRoute}
+
+${getRouteContext(currentRoute)}` : "No specific page context available."}
 
 ## System Overview
 This is an all-in-one car rental management platform with the following main modules:
@@ -180,15 +216,17 @@ This is an all-in-one car rental management platform with the following main mod
 - Use the Enhanced Wizard for thorough agreement creation
 
 ## Context Information
-${currentRoute ? `The user is currently on: ${currentRoute}` : ""}
+Current page context has been provided above.
 
 ## Response Guidelines
-- Provide clear, step-by-step instructions
-- Reference specific navigation paths (e.g., "Go to Reservations → New Reservation")
+- ALWAYS prioritize helping with tasks on the current page first
+- Provide clear, step-by-step instructions with specific navigation paths
+- Reference the current page context in your responses when relevant
 - Suggest best practices when relevant
 - Ask clarifying questions if the request is ambiguous
 - Keep answers concise but comprehensive
 - Offer to explain features in more detail if needed
+- Use markdown formatting for better readability (headers, lists, code blocks)
 
 How can I help you today?`;
 
