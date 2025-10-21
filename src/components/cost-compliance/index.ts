@@ -16,3 +16,7 @@ export {
   SyncStatusIndicator,
   GlobalSyncStatus,
 } from './SyncStatusIndicator';
+
+// Phase 3 - Expenses Tab
+export { ExpensesTab } from './ExpensesTab';
+export { ExpenseFormDialog } from './ExpenseFormDialog';
