@@ -107,9 +107,9 @@ export class TollsFinesAPI {
       .from("tolls_fines")
       .select(`
         *,
-        vehicle:vehicles(id, plate_number, make, model),
+        vehicle:vehicles(id, license_plate, make, model),
         driver:drivers(id, full_name),
-        customer:profiles(id, full_name)
+        customer:profiles!tolls_fines_customer_id_fkey(id, full_name)
       `)
       .order("incident_date", { ascending: false });
 
@@ -176,9 +176,9 @@ export class TollsFinesAPI {
       .from("tolls_fines")
       .select(`
         *,
-        vehicle:vehicles(id, plate_number, make, model, vin),
+        vehicle:vehicles(id, license_plate, make, model, vin),
         driver:drivers(id, full_name, license_no),
-        customer:profiles(id, full_name, email)
+        customer:profiles!tolls_fines_customer_id_fkey(id, full_name, email)
       `)
       .eq("id", id)
       .single();

@@ -88,7 +88,7 @@ export class ComplianceExceptionsAPI {
       .from("compliance_exceptions")
       .select(`
         *,
-        vehicle:vehicles(id, plate_number, make, model),
+        vehicle:vehicles(id, license_plate, make, model),
         customer:profiles!compliance_exceptions_customer_id_fkey(id, full_name),
         assigned_user:profiles!compliance_exceptions_assigned_to_fkey(id, full_name),
         flagged_user:profiles!compliance_exceptions_flagged_by_fkey(id, full_name)
@@ -153,7 +153,7 @@ export class ComplianceExceptionsAPI {
       .from("compliance_exceptions")
       .select(`
         *,
-        vehicle:vehicles(id, plate_number, make, model, vin),
+        vehicle:vehicles(id, license_plate, make, model, vin),
         customer:profiles!compliance_exceptions_customer_id_fkey(id, full_name, email),
         assigned_user:profiles!compliance_exceptions_assigned_to_fkey(id, full_name),
         flagged_user:profiles!compliance_exceptions_flagged_by_fkey(id, full_name)
