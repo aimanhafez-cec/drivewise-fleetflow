@@ -175,7 +175,7 @@ function AppSidebar() {
 
   return (
     <Sidebar 
-      className="data-[state=open]:w-72 data-[state=closed]:w-0 md:data-[state=closed]:w-16 border-r"
+      className="data-[state=open]:w-56 data-[state=closed]:w-0 md:data-[state=closed]:w-16 border-r"
       collapsible="icon"
     >
       <SidebarContent className="pt-2">
