@@ -80,6 +80,7 @@ import Custody from "./pages/Custody";
 import NewCustody from "./pages/NewCustody";
 import CustodySettings from "./pages/CustodySettings";
 import CustodyAnalytics from "./pages/CustodyAnalytics";
+import CorporateLeasingHub from "./pages/corporate-leasing/CorporateLeasingHub";
 // Hidden - commented out imports
 // import { CarSubscriptions } from "./pages/CarSubscriptions";
 // import { NewCarSubscription } from "./pages/NewCarSubscription";
@@ -198,12 +199,17 @@ const App = () => {
                 <Route path="view/:id" element={<QuoteView />} />
                 <Route path=":id" element={<QuoteDetails />} />
               </Route>
-              <Route path="/manage-quotations" element={
+              <Route path="/corporate-leasing" element={
                 <ProtectedRoute>
                   <AppLayout />
                 </ProtectedRoute>
               }>
-                <Route index element={<ManageQuotations />} />
+                <Route index element={<CorporateLeasingHub />} />
+                <Route path="quotations" element={<ManageQuotations />} />
+                <Route path="master-agreements" element={<MasterAgreements />} />
+                <Route path="master-agreements/new" element={<NewMasterAgreement />} />
+                <Route path="master-agreements/:id" element={<MasterAgreementDetails />} />
+                <Route path="master-agreements/:id/edit" element={<MasterAgreementEdit />} />
               </Route>
               <Route path="/rfqs" element={
                 <ProtectedRoute>
@@ -247,16 +253,6 @@ const App = () => {
               }>
                 <Route index element={<Reports />} />
               </Route>
-            <Route path="/master-agreements" element={
-              <ProtectedRoute>
-                <AppLayout />
-              </ProtectedRoute>
-            }>
-              <Route index element={<MasterAgreements />} />
-              <Route path="new" element={<NewMasterAgreement />} />
-              <Route path=":id" element={<MasterAgreementDetails />} />
-              <Route path=":id/edit" element={<MasterAgreementEdit />} />
-            </Route>
             <Route path="/transactions" element={
               <ProtectedRoute>
                 <AppLayout />

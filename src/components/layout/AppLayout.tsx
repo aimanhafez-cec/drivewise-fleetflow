@@ -19,6 +19,7 @@ import {
   FileSpreadsheet,
   Receipt,
   Wrench,
+  FolderOpen,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -77,9 +78,9 @@ const navigation = [
     icon: MessageCircleQuestion,
   },
   {
-    title: 'Manage Quotations',
-    url: '/manage-quotations',
-    icon: FileSpreadsheet,
+    title: 'Corporate Leasing',
+    url: '/corporate-leasing',
+    icon: FolderOpen,
   },
   {
     title: 'Inspections',
@@ -95,11 +96,6 @@ const navigation = [
     title: 'Agreements',
     url: '/agreements',
     icon: FileText,
-  },
-  {
-    title: 'Master Agreements',
-    url: '/master-agreements',
-    icon: Building2,
   },
   {
     title: 'Transactions',
