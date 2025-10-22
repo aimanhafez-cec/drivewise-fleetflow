@@ -1,9 +1,6 @@
 // Dashboard Components - Optimized for Performance
 // All exports are memoized for optimal rendering
 
-// Core Dashboard
-export { default as DashboardNew } from '@/pages/DashboardNew';
-
 // Layout Components
 export { DashboardHeader } from './DashboardHeader';
 export { DashboardSection } from './DashboardSection';
