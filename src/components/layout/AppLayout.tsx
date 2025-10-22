@@ -85,7 +85,7 @@ const navigation = [
   {
     title: 'Corporate Leasing',
     url: '/corporate-leasing',
-    icon: FolderOpen,
+    icon: Building2,
   },
   {
     title: 'Inspections',
