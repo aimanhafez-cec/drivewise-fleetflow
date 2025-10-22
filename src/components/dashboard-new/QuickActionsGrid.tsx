@@ -1,3 +1,4 @@
+import { memo, useCallback } from 'react';
 import { 
   Plus, 
   CheckCircle, 
@@ -28,8 +29,15 @@ interface QuickActionsGridProps {
   openWorkOrders?: number;
 }
 
-export function QuickActionsGrid({ pendingReturns = 0, openWorkOrders = 0 }: QuickActionsGridProps) {
+export const QuickActionsGrid = memo(function QuickActionsGrid({ 
+  pendingReturns = 0, 
+  openWorkOrders = 0 
+}: QuickActionsGridProps) {
   const navigate = useNavigate();
+
+  const handleNavigate = useCallback((route: string) => {
+    navigate(route);
+  }, [navigate]);
 
   const actions: QuickAction[] = [
     {
@@ -137,12 +145,21 @@ export function QuickActionsGrid({ pendingReturns = 0, openWorkOrders = 0 }: Qui
           <Card
             key={action.id}
             className={cn(
-              "group p-6 cursor-pointer transition-all duration-200",
+              "group p-6 cursor-pointer transition-all duration-300",
               "hover:shadow-lg hover:-translate-y-1",
-              "border-2",
+              "border-2 animate-fade-in",
               colors.border
             )}
-            onClick={() => navigate(action.route)}
+            onClick={() => handleNavigate(action.route)}
+            role="button"
+            tabIndex={0}
+            aria-label={`${action.title}: ${action.description}`}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                handleNavigate(action.route);
+              }
+            }}
           >
             <div className="flex items-start justify-between mb-3">
               <div className={cn(
@@ -170,4 +187,4 @@ export function QuickActionsGrid({ pendingReturns = 0, openWorkOrders = 0 }: Qui
       })}
     </div>
   );
-}
+});

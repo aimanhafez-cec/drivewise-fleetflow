@@ -18,7 +18,9 @@ interface KPIGridProps {
   isLoading: boolean;
 }
 
-export function KPIGrid({ data, isLoading }: KPIGridProps) {
+import { useMemo, memo } from 'react';
+
+export const KPIGrid = memo(function KPIGrid({ data, isLoading }: KPIGridProps) {
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -46,14 +48,17 @@ export function KPIGrid({ data, isLoading }: KPIGridProps) {
 
   const { fleet, revenue, agreements, customers, maintenance, compliance } = data;
 
-  // Generate sparkline data for trends (mock data for now, will use real trends later)
-  const generateSparkline = (baseValue: number, variation: number = 0.1) => {
-    return Array.from({ length: 30 }, (_, i) => ({
-      value: baseValue * (1 + (Math.random() - 0.5) * variation)
-    }));
-  };
+  // Memoize sparkline generation to prevent recalculation on every render
+  const generateSparkline = useMemo(() => {
+    return (baseValue: number, variation: number = 0.1) => {
+      return Array.from({ length: 30 }, (_, i) => ({
+        value: baseValue * (1 + (Math.random() - 0.5) * variation)
+      }));
+    };
+  }, []);
 
-  const kpiCards = [
+  // Memoize KPI cards to prevent recreation on parent re-renders
+  const kpiCards = useMemo(() => [
     {
       id: 'fleet-size',
       title: 'Total Fleet Size',
@@ -160,7 +165,7 @@ export function KPIGrid({ data, isLoading }: KPIGridProps) {
       subtitle: 'Per agreement',
       chartData: generateSparkline(agreements.averageRentalDuration, 0.2)
     }
-  ];
+  ], [fleet, revenue, agreements, customers, maintenance, data.trends.revenue, generateSparkline]);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -169,4 +174,4 @@ export function KPIGrid({ data, isLoading }: KPIGridProps) {
       ))}
     </div>
   );
-}
+});

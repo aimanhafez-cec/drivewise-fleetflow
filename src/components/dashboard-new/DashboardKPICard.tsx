@@ -23,7 +23,9 @@ interface DashboardKPICardProps {
   subtitle?: string;
 }
 
-export function DashboardKPICard({
+import { memo } from 'react';
+
+export const DashboardKPICard = memo(function DashboardKPICard({
   title,
   value,
   icon: Icon,
@@ -47,7 +49,14 @@ export function DashboardKPICard({
   };
 
   return (
-    <Card className="p-6 hover:shadow-lg transition-all duration-200 border-border">
+    <Card 
+      className={cn(
+        "p-6 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 animate-fade-in",
+        "border-border"
+      )}
+      role="article"
+      aria-label={`${title} KPI card`}
+    >
       <div className="flex items-start justify-between mb-4">
         <div className={cn(
           'p-3 rounded-xl',
@@ -111,7 +120,7 @@ export function DashboardKPICard({
       </div>
     </Card>
   );
-}
+});
 
 interface MiniSparklineProps {
   data: Array<{ value: number }>;
