@@ -85,7 +85,7 @@ export const MasterAgreementWizard: React.FC<MasterAgreementWizardProps> = ({
 
   // Load existing agreement for edit mode
   const { data: existingAgreement } = useQuery({
-    queryKey: ["master-agreement-edit", id || agreementId],
+    queryKey: ["master-agreement", id || agreementId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("corporate_leasing_agreements")
