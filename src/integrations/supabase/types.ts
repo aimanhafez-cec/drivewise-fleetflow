@@ -4623,6 +4623,7 @@ export type Database = {
       quotes: {
         Row: {
           account_name: string | null
+          admin_fee_per_fine_aed: number | null
           admin_fee_per_toll_aed: number | null
           agreement_id: string | null
           agreement_no: string | null
@@ -4723,6 +4724,8 @@ export type Database = {
           roadside_assistance_included: boolean | null
           sales_office_id: string | null
           sales_rep_id: string | null
+          salik_darb_allowance_cap: number | null
+          salik_darb_handling: string | null
           sent_to_customer_at: string | null
           sent_to_customer_by: string | null
           show_maintenance_separate_line: boolean | null
@@ -4731,7 +4734,9 @@ export type Database = {
           submitted_by: string | null
           subtotal: number
           tax_amount: number
+          tolls_admin_fee_model: string | null
           total_amount: number
+          traffic_fines_handling: string | null
           updated_at: string
           valid_until: string | null
           validity_date_to: string | null
@@ -4746,6 +4751,7 @@ export type Database = {
         }
         Insert: {
           account_name?: string | null
+          admin_fee_per_fine_aed?: number | null
           admin_fee_per_toll_aed?: number | null
           agreement_id?: string | null
           agreement_no?: string | null
@@ -4846,6 +4852,8 @@ export type Database = {
           roadside_assistance_included?: boolean | null
           sales_office_id?: string | null
           sales_rep_id?: string | null
+          salik_darb_allowance_cap?: number | null
+          salik_darb_handling?: string | null
           sent_to_customer_at?: string | null
           sent_to_customer_by?: string | null
           show_maintenance_separate_line?: boolean | null
@@ -4854,7 +4862,9 @@ export type Database = {
           submitted_by?: string | null
           subtotal?: number
           tax_amount?: number
+          tolls_admin_fee_model?: string | null
           total_amount?: number
+          traffic_fines_handling?: string | null
           updated_at?: string
           valid_until?: string | null
           validity_date_to?: string | null
@@ -4869,6 +4879,7 @@ export type Database = {
         }
         Update: {
           account_name?: string | null
+          admin_fee_per_fine_aed?: number | null
           admin_fee_per_toll_aed?: number | null
           agreement_id?: string | null
           agreement_no?: string | null
@@ -4969,6 +4980,8 @@ export type Database = {
           roadside_assistance_included?: boolean | null
           sales_office_id?: string | null
           sales_rep_id?: string | null
+          salik_darb_allowance_cap?: number | null
+          salik_darb_handling?: string | null
           sent_to_customer_at?: string | null
           sent_to_customer_by?: string | null
           show_maintenance_separate_line?: boolean | null
@@ -4977,7 +4990,9 @@ export type Database = {
           submitted_by?: string | null
           subtotal?: number
           tax_amount?: number
+          tolls_admin_fee_model?: string | null
           total_amount?: number
+          traffic_fines_handling?: string | null
           updated_at?: string
           valid_until?: string | null
           validity_date_to?: string | null

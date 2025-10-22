@@ -555,6 +555,7 @@ export const QuoteWizard: React.FC<QuoteWizardProps> = ({ viewMode = false, quot
         salik_darb_handling: data.salik_darb_handling,
         salik_darb_allowance_cap: data.salik_darb_allowance_cap,
         tolls_admin_fee_model: data.tolls_admin_fee_model,
+        admin_fee_per_toll_aed: data.admin_fee_per_toll_aed,
         traffic_fines_handling: data.traffic_fines_handling,
         admin_fee_per_fine_aed: data.admin_fee_per_fine_aed,
         
@@ -755,6 +756,7 @@ export const QuoteWizard: React.FC<QuoteWizardProps> = ({ viewMode = false, quot
         salik_darb_handling: data.salik_darb_handling,
         salik_darb_allowance_cap: data.salik_darb_allowance_cap,
         tolls_admin_fee_model: data.tolls_admin_fee_model,
+        admin_fee_per_toll_aed: data.admin_fee_per_toll_aed,
         traffic_fines_handling: data.traffic_fines_handling,
         admin_fee_per_fine_aed: data.admin_fee_per_fine_aed,
         
