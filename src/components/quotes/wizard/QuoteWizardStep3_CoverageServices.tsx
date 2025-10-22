@@ -237,9 +237,9 @@ export const QuoteWizardStep3_CoverageServices: React.FC<QuoteWizardStep3Coverag
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="basic">Basic (Included - 0 AED/mo)</SelectItem>
-                      <SelectItem value="comprehensive">Comprehensive (+300 AED/mo)</SelectItem>
-                      <SelectItem value="full">Full Coverage (+500 AED/mo)</SelectItem>
+                      <SelectItem value="basic">Basic</SelectItem>
+                      <SelectItem value="comprehensive">Comprehensive</SelectItem>
+                      <SelectItem value="full">Full Coverage</SelectItem>
                     </SelectContent>
                   </Select>
                   {errors.insurance_coverage_package && <FormError message={errors.insurance_coverage_package} />}

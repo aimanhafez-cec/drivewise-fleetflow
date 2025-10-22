@@ -143,9 +143,9 @@ export const MasterAgreementStep3: React.FC<MasterAgreementStep3Props> = ({
                       <SelectValue placeholder="Select package" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="cdw">CDW - Collision Damage Waiver (+0 AED/mo)</SelectItem>
-                      <SelectItem value="comprehensive">Comprehensive (+300 AED/mo)</SelectItem>
-                      <SelectItem value="full-zero-excess">Full / Zero Excess (+500 AED/mo)</SelectItem>
+                      <SelectItem value="cdw">CDW - Collision Damage Waiver</SelectItem>
+                      <SelectItem value="comprehensive">Comprehensive</SelectItem>
+                      <SelectItem value="full-zero-excess">Full / Zero Excess</SelectItem>
                     </SelectContent>
                   </Select>
                   {errors.insurance_coverage_package && <FormError message={errors.insurance_coverage_package} />}
