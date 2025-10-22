@@ -354,9 +354,9 @@ export const QuoteWizard: React.FC<QuoteWizardProps> = ({ viewMode = false, quot
   const duplicateId = searchParams.get("duplicate");
   const reviseId = searchParams.get("revise");
   const fromRfqId = searchParams.get("fromRfqId");
-  const editMode = searchParams.get("edit") === "true" || viewMode;
   const quoteIdFromSearch = searchParams.get("id");
   const quoteId = propQuoteId || quoteIdParam || quoteIdFromSearch;
+  const editMode = !!quoteId || viewMode;
 
   const { data: existingQuote } = useQuery({
     queryKey: ["quote", duplicateId || reviseId || quoteId],
