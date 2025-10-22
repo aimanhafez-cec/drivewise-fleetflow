@@ -63,6 +63,11 @@ const navigation = [
     icon: FileText,
   },
   {
+    title: 'RFQs',
+    url: '/rfqs',
+    icon: MessageCircleQuestion,
+  },
+  {
     title: 'Daily Planner',
     url: '/daily-planner',
     icon: CalendarRange,
@@ -76,11 +81,6 @@ const navigation = [
     title: 'Customers',
     url: '/customers',
     icon: Users,
-  },
-  {
-    title: 'RFQs',
-    url: '/rfqs',
-    icon: MessageCircleQuestion,
   },
   {
     title: 'Corporate Leasing',
