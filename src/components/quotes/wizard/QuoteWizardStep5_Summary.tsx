@@ -693,13 +693,19 @@ export const QuoteWizardStep5_Summary: React.FC<QuoteWizardStep4Props> = ({
               <span className="text-muted-foreground">Admin Fee Model:</span>
               <p className="font-medium">{data.tolls_admin_fee_model || 'Per-invoice'}</p>
             </div>
+            {data.admin_fee_per_toll_aed !== undefined && data.tolls_admin_fee_model !== "None" && (
+              <div>
+                <span className="text-muted-foreground">Toll Admin Fee:</span>
+                <p className="font-medium">{formatCurrency(data.admin_fee_per_toll_aed || 1)} per toll</p>
+              </div>
+            )}
             <div>
               <span className="text-muted-foreground">Traffic Fines:</span>
               <p className="font-medium">{data.traffic_fines_handling || 'Auto Rebill + Admin Fee'}</p>
             </div>
             <div>
               <span className="text-muted-foreground">Fine Admin Fee:</span>
-              <p className="font-medium">{formatCurrency(data.admin_fee_per_fine_aed || 25)} per fine</p>
+              <p className="font-medium">{formatCurrency(data.admin_fee_per_fine_aed || 55)} per fine</p>
             </div>
           </div>
             </CardContent>

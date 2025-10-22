@@ -819,7 +819,26 @@ export const QuoteWizardStep3_CoverageServices: React.FC<QuoteWizardStep3Coverag
             </div>
           </div>
 
-          {/* Row 4: Admin Fee per Fine - Always visible since Auto Rebill is the only option */}
+          {/* Row 4: Admin Fee per Toll - Conditional on Admin Fee Model */}
+          {data.salik_darb_handling === "Rebill Actual (monthly)" && data.tolls_admin_fee_model && data.tolls_admin_fee_model !== "None" && (
+            <div className="space-y-1.5">
+              <TooltipLabel 
+                label="Admin Fee per Toll (AED)" 
+                tooltip="Administrative fee charged per toll transaction when using per-event model, or per monthly invoice when using per-invoice model. Typical: AED 1-2."
+              />
+              <Input
+                type="number"
+                min="0"
+                step="0.01"
+                className="h-9"
+                value={data.admin_fee_per_toll_aed ?? 1}
+                onChange={(e) => onChange({ admin_fee_per_toll_aed: parseFloat(e.target.value) || 0 })}
+                placeholder="1.00"
+              />
+            </div>
+          )}
+
+          {/* Row 5: Admin Fee per Fine - Always visible since Auto Rebill is the only option */}
           <div className="space-y-1.5">
             <TooltipLabel 
               label="Admin Fee per Fine (AED)" 
@@ -830,9 +849,9 @@ export const QuoteWizardStep3_CoverageServices: React.FC<QuoteWizardStep3Coverag
               min="0"
               step="5"
               className="h-9"
-              value={data.admin_fee_per_fine_aed ?? 25}
+              value={data.admin_fee_per_fine_aed ?? 55}
               onChange={(e) => onChange({ admin_fee_per_fine_aed: parseFloat(e.target.value) || 0 })}
-              placeholder="25"
+              placeholder="55"
             />
           </div>
 
