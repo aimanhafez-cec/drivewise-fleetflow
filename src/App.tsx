@@ -11,6 +11,7 @@ import PWAInstallPrompt from "@/components/ui/pwa-install-prompt";
 import Auth from "./pages/Auth";
 import { Navigate, useLocation } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
+import DashboardNew from "./pages/DashboardNew";
 import Reservations from "./pages/Reservations";
 import NewReservation from "./pages/NewReservation";
 import NewReservationWizard from "./pages/NewReservationWizard";
@@ -113,6 +114,13 @@ const App = () => {
                 </ProtectedRoute>
               }>
                 <Route index element={<Dashboard />} />
+              </Route>
+              <Route path="/dashboard-new" element={
+                <ProtectedRoute>
+                  <AppLayout />
+                </ProtectedRoute>
+              }>
+                <Route index element={<DashboardNew />} />
               </Route>
               <Route path="/instant-booking" element={
                 <ProtectedRoute>
