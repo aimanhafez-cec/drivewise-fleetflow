@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/select';
 import { RefreshCw, LayoutDashboard } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { GlobalSearchBar } from './GlobalSearchBar';
 import type { DateRangeFilter } from '@/lib/api/admin-dashboard';
 
 interface DashboardHeaderProps {
@@ -46,7 +47,10 @@ export function DashboardHeader({
         </div>
 
         {/* Controls */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
+          {/* Global Search */}
+          <GlobalSearchBar />
+          
           {/* Date Filter */}
           <Select value={dateFilter.type} onValueChange={handleFilterChange}>
             <SelectTrigger className="w-[160px]">

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAdminDashboard } from '@/hooks/useAdminDashboard';
+import { useDashboardRealtime } from '@/hooks/useDashboardRealtime';
 import { DashboardHeader } from '@/components/dashboard-new/DashboardHeader';
 import { KPIGrid } from '@/components/dashboard-new/KPIGrid';
 import { QuickActionsGrid } from '@/components/dashboard-new/QuickActionsGrid';
@@ -34,8 +35,13 @@ export default function DashboardNew() {
     trends
   } = useAdminDashboard(dateFilter);
 
+  // Enable real-time subscriptions with automatic data refresh
+  const { invalidateAllDashboardData } = useDashboardRealtime({
+    enabled: true
+  });
+
   const handleRefresh = () => {
-    window.location.reload();
+    invalidateAllDashboardData();
   };
 
   // Error State
