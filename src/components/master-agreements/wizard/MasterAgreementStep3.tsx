@@ -551,44 +551,50 @@ export const MasterAgreementStep3: React.FC<MasterAgreementStep3Props> = ({
           </div>
         </CardHeader>
         <CardContent className="p-4 space-y-3">
-          <div className="space-y-1.5">
-            <TooltipLabel label="Toll Handling Type *" tooltip="Choose how Salik/Darb toll charges are billed." />
-            <Select
-              value={data.salik_darb_handling || "Rebill Actual (monthly)"}
-              onValueChange={(value) => onChange({ salik_darb_handling: value })}
-            >
-              <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Rebill Actual (monthly)">Rebill Actuals (monthly)</SelectItem>
-                <SelectItem value="Included Allowance">Included Allowance (cap/month)</SelectItem>
-                <SelectItem value="Included in Lease Rate">Included in Lease Rate</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Allowance Cap - Conditional */}
-          {data.salik_darb_handling === "Included Allowance" && (
-            <div className="space-y-1.5 p-3 bg-muted/50 rounded-lg">
-              <TooltipLabel 
-                label="Monthly Allowance Cap (AED) *" 
-                tooltip="Maximum toll charges included per vehicle per month. Any usage above this cap will be rebilled to customer. Typical range: AED 100-300/month for corporate leases."
-              />
-              <Input
-                type="number"
-                min="0"
-                step="10"
-                className="h-9"
-                value={data.salik_darb_allowance_cap ?? 150}
-                onChange={(e) => onChange({ salik_darb_allowance_cap: parseFloat(e.target.value) || 0 })}
-                placeholder="150"
-              />
+          {/* TOLL PROCESSING Section */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 pb-2">
+              <div className="text-sm font-semibold text-foreground">TOLL PROCESSING</div>
+              <div className="flex-1 h-px bg-border" />
             </div>
-          )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <TooltipLabel label="Toll Handling Type *" tooltip="Choose how Salik/Darb toll charges are billed." />
+              <Select
+                value={data.salik_darb_handling || "Rebill Actual (monthly)"}
+                onValueChange={(value) => onChange({ salik_darb_handling: value })}
+              >
+                <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Rebill Actual (monthly)">Rebill Actuals (monthly)</SelectItem>
+                  <SelectItem value="Included Allowance">Included Allowance (cap/month)</SelectItem>
+                  <SelectItem value="Included in Lease Rate">Included in Lease Rate</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Allowance Cap - Conditional */}
+            {data.salik_darb_handling === "Included Allowance" && (
+              <div className="space-y-1.5 ml-4 p-3 bg-muted/50 rounded-lg">
+                <TooltipLabel 
+                  label="Monthly Allowance Cap (AED) *" 
+                  tooltip="Maximum toll charges included per vehicle per month. Any usage above this cap will be rebilled to customer. Typical range: AED 100-300/month for corporate leases."
+                />
+                <Input
+                  type="number"
+                  min="0"
+                  step="10"
+                  className="h-9"
+                  value={data.salik_darb_allowance_cap ?? 150}
+                  onChange={(e) => onChange({ salik_darb_allowance_cap: parseFloat(e.target.value) || 0 })}
+                  placeholder="150"
+                />
+              </div>
+            )}
+
             {/* Admin Fee Model - Only for Rebill Actuals */}
             {data.salik_darb_handling === "Rebill Actual (monthly)" && (
-              <div className="space-y-1.5">
+              <div className="space-y-1.5 ml-4">
                 <TooltipLabel 
                   label="Admin Fee Model" 
                   tooltip="How administrative fees are charged for toll processing. Per-invoice: one admin fee per monthly invoice. Per-event: fee charged per toll transaction."
@@ -607,6 +613,35 @@ export const MasterAgreementStep3: React.FC<MasterAgreementStep3Props> = ({
               </div>
             )}
 
+            {/* Admin Fee per Toll - Conditional */}
+            {data.salik_darb_handling === "Rebill Actual (monthly)" && 
+             data.tolls_admin_fee_model && 
+             data.tolls_admin_fee_model !== "None" && (
+              <div className="space-y-1.5 ml-4">
+                <TooltipLabel 
+                  label="Admin Fee per Toll (AED)" 
+                  tooltip="Administrative fee charged per toll transaction when using per-event model, or per monthly invoice when using per-invoice model. Typical: AED 1-2."
+                />
+                <Input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  className="h-9"
+                  value={data.admin_fee_per_toll_aed ?? 1}
+                  onChange={(e) => onChange({ admin_fee_per_toll_aed: parseFloat(e.target.value) || 0 })}
+                  placeholder="1.00"
+                />
+              </div>
+            )}
+          </div>
+
+          {/* TRAFFIC VIOLATIONS PROCESSING Section */}
+          <div className="space-y-3 pt-3">
+            <div className="flex items-center gap-2 pb-2">
+              <div className="text-sm font-semibold text-foreground">TRAFFIC VIOLATIONS PROCESSING</div>
+              <div className="flex-1 h-px bg-border" />
+            </div>
+
             <div className="space-y-1.5">
               <TooltipLabel label="Traffic Fines Handling *" tooltip="How traffic violations are processed." />
               <Select
@@ -619,19 +654,19 @@ export const MasterAgreementStep3: React.FC<MasterAgreementStep3Props> = ({
                 </SelectContent>
               </Select>
             </div>
-          </div>
 
-          <div className="space-y-1.5">
-            <TooltipLabel label="Admin Fee per Fine (AED)" tooltip="Processing fee charged per traffic violation." />
-            <Input
-              type="number"
-              min="0"
-              step="5"
-              className="h-9"
-              value={data.admin_fee_per_fine_aed ?? 25}
-              onChange={(e) => onChange({ admin_fee_per_fine_aed: parseFloat(e.target.value) || 0 })}
-              placeholder="25"
-            />
+            <div className="space-y-1.5">
+              <TooltipLabel label="Admin Fee per Fine (AED)" tooltip="Processing fee charged per traffic violation." />
+              <Input
+                type="number"
+                min="0"
+                step="5"
+                className="h-9"
+                value={data.admin_fee_per_fine_aed ?? 25}
+                onChange={(e) => onChange({ admin_fee_per_fine_aed: parseFloat(e.target.value) || 0 })}
+                placeholder="25"
+              />
+            </div>
           </div>
         </CardContent>
       </Card>
