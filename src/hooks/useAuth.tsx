@@ -28,9 +28,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
+    // Timeout fallback: force loading to false after 3 seconds
+    // This prevents infinite loading in preview iframes where Supabase might not initialize
+    const timeoutId = setTimeout(() => {
+      console.warn('[useAuth] Loading timeout reached, forcing loading=false');
+      setLoading(false);
+    }, 3000);
+
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        clearTimeout(timeoutId);
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
@@ -39,12 +47,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      clearTimeout(timeoutId);
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      clearTimeout(timeoutId);
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signUp = async (email: string, password: string, fullName: string) => {
