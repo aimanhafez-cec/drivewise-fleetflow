@@ -1117,6 +1117,9 @@ export type Database = {
           agreement_no: string | null
           agreement_type: string | null
           annual_escalation_percentage: number | null
+          approval_notes: string | null
+          approved_at: string | null
+          approved_by: string | null
           approver_customer_email: string | null
           approver_customer_name: string | null
           bill_to_site_id: string | null
@@ -1137,11 +1140,16 @@ export type Database = {
           credit_limit: number | null
           credit_terms: Database["public"]["Enums"]["credit_terms"]
           currency: string
+          customer_acceptance_status: string | null
+          customer_comments: string | null
           customer_id: string
           customer_po_no: string | null
+          customer_rejection_reason: string | null
           customer_segment:
             | Database["public"]["Enums"]["customer_segment"]
             | null
+          customer_signature_data: Json | null
+          customer_signed_at: string | null
           default_addons: Json | null
           default_addons_summary: string | null
           default_advance_rent_months: number | null
@@ -1196,6 +1204,8 @@ export type Database = {
           pricing_display_mode: string | null
           project: string | null
           proration_rule: string | null
+          public_token: string | null
+          public_token_expires_at: string | null
           registration_responsibility: string
           renewal_option: string | null
           rental_type: Database["public"]["Enums"]["rental_type"]
@@ -1211,6 +1221,8 @@ export type Database = {
           security_instrument:
             | Database["public"]["Enums"]["security_instrument"]
             | null
+          sent_to_customer_at: string | null
+          sent_to_customer_by: string | null
           show_maintenance_separate_line: boolean | null
           signed_by_customer: string | null
           signed_by_lessor: string | null
@@ -1220,6 +1232,8 @@ export type Database = {
           source_quote_id: string | null
           source_quote_no: string | null
           status: Database["public"]["Enums"]["corporate_lease_status"]
+          submitted_at: string | null
+          submitted_by: string | null
           telematics_consent: boolean | null
           tolls_admin_fee_model: string
           traffic_fines_handling: string
@@ -1245,6 +1259,9 @@ export type Database = {
           agreement_no?: string | null
           agreement_type?: string | null
           annual_escalation_percentage?: number | null
+          approval_notes?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
           approver_customer_email?: string | null
           approver_customer_name?: string | null
           bill_to_site_id?: string | null
@@ -1265,11 +1282,16 @@ export type Database = {
           credit_limit?: number | null
           credit_terms?: Database["public"]["Enums"]["credit_terms"]
           currency?: string
+          customer_acceptance_status?: string | null
+          customer_comments?: string | null
           customer_id: string
           customer_po_no?: string | null
+          customer_rejection_reason?: string | null
           customer_segment?:
             | Database["public"]["Enums"]["customer_segment"]
             | null
+          customer_signature_data?: Json | null
+          customer_signed_at?: string | null
           default_addons?: Json | null
           default_addons_summary?: string | null
           default_advance_rent_months?: number | null
@@ -1324,6 +1346,8 @@ export type Database = {
           pricing_display_mode?: string | null
           project?: string | null
           proration_rule?: string | null
+          public_token?: string | null
+          public_token_expires_at?: string | null
           registration_responsibility?: string
           renewal_option?: string | null
           rental_type?: Database["public"]["Enums"]["rental_type"]
@@ -1339,6 +1363,8 @@ export type Database = {
           security_instrument?:
             | Database["public"]["Enums"]["security_instrument"]
             | null
+          sent_to_customer_at?: string | null
+          sent_to_customer_by?: string | null
           show_maintenance_separate_line?: boolean | null
           signed_by_customer?: string | null
           signed_by_lessor?: string | null
@@ -1348,6 +1374,8 @@ export type Database = {
           source_quote_id?: string | null
           source_quote_no?: string | null
           status?: Database["public"]["Enums"]["corporate_lease_status"]
+          submitted_at?: string | null
+          submitted_by?: string | null
           telematics_consent?: boolean | null
           tolls_admin_fee_model?: string
           traffic_fines_handling?: string
@@ -1373,6 +1401,9 @@ export type Database = {
           agreement_no?: string | null
           agreement_type?: string | null
           annual_escalation_percentage?: number | null
+          approval_notes?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
           approver_customer_email?: string | null
           approver_customer_name?: string | null
           bill_to_site_id?: string | null
@@ -1393,11 +1424,16 @@ export type Database = {
           credit_limit?: number | null
           credit_terms?: Database["public"]["Enums"]["credit_terms"]
           currency?: string
+          customer_acceptance_status?: string | null
+          customer_comments?: string | null
           customer_id?: string
           customer_po_no?: string | null
+          customer_rejection_reason?: string | null
           customer_segment?:
             | Database["public"]["Enums"]["customer_segment"]
             | null
+          customer_signature_data?: Json | null
+          customer_signed_at?: string | null
           default_addons?: Json | null
           default_addons_summary?: string | null
           default_advance_rent_months?: number | null
@@ -1452,6 +1488,8 @@ export type Database = {
           pricing_display_mode?: string | null
           project?: string | null
           proration_rule?: string | null
+          public_token?: string | null
+          public_token_expires_at?: string | null
           registration_responsibility?: string
           renewal_option?: string | null
           rental_type?: Database["public"]["Enums"]["rental_type"]
@@ -1467,6 +1505,8 @@ export type Database = {
           security_instrument?:
             | Database["public"]["Enums"]["security_instrument"]
             | null
+          sent_to_customer_at?: string | null
+          sent_to_customer_by?: string | null
           show_maintenance_separate_line?: boolean | null
           signed_by_customer?: string | null
           signed_by_lessor?: string | null
@@ -1476,6 +1516,8 @@ export type Database = {
           source_quote_id?: string | null
           source_quote_no?: string | null
           status?: Database["public"]["Enums"]["corporate_lease_status"]
+          submitted_at?: string | null
+          submitted_by?: string | null
           telematics_consent?: boolean | null
           tolls_admin_fee_model?: string
           traffic_fines_handling?: string
@@ -8115,6 +8157,10 @@ export type Database = {
         | "suspended"
         | "terminated"
         | "expired"
+        | "approved"
+        | "sent_to_customer"
+        | "customer_accepted"
+        | "customer_rejected"
       cost_allocation_mode: "Per Vehicle" | "Per Cost Center" | "Project"
       cost_sheet_approval_action: "approved" | "rejected" | "requested_changes"
       cost_sheet_status:
@@ -8452,6 +8498,10 @@ export const Constants = {
         "suspended",
         "terminated",
         "expired",
+        "approved",
+        "sent_to_customer",
+        "customer_accepted",
+        "customer_rejected",
       ],
       cost_allocation_mode: ["Per Vehicle", "Per Cost Center", "Project"],
       cost_sheet_approval_action: ["approved", "rejected", "requested_changes"],

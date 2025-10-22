@@ -26,3 +26,15 @@ verify_jwt = false
 
 [functions.customer-quote-action]
 verify_jwt = false
+
+[functions.submit-master-agreement-approval]
+verify_jwt = true
+
+[functions.send-master-agreement-to-customer]
+verify_jwt = true
+
+[functions.get-public-master-agreement]
+verify_jwt = false
+
+[functions.submit-master-agreement-customer-response]
+verify_jwt = false
