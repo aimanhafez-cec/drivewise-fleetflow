@@ -190,6 +190,7 @@ interface QuoteData {
   salik_darb_handling?: string;
   salik_darb_allowance_cap?: number;
   tolls_admin_fee_model?: string;
+  admin_fee_per_toll_aed?: number;
   traffic_fines_handling?: string;
   admin_fee_per_fine_aed?: number;
 
