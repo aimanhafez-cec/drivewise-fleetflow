@@ -31,7 +31,9 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   
   // Detect Lovable preview hostnames
   const hostname = window.location.hostname;
-  const isLovablePreviewHost = hostname.startsWith('preview--') || hostname.startsWith('id-preview--');
+  const isLovableDomain = hostname.endsWith('.lovable.app') || hostname.endsWith('.lovableproject.com');
+  const isPreviewSubdomain = hostname.startsWith('preview--') || hostname.startsWith('id-preview--');
+  const isLovablePreviewHost = isLovableDomain && isPreviewSubdomain;
   
   // Session-based bypass: if token found, set expiry in sessionStorage
   React.useEffect(() => {
@@ -58,14 +60,17 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     search: location.search,
     hash: location.hash,
     hostname,
+    isLovableDomain,
+    isPreviewSubdomain,
     isLovablePreviewHost,
     tokenFound: hasLovableToken,
     bypassActive,
     hasPreviewAccess,
+    loading,
     user: !!user
   });
 
-  if (loading) {
+  if (loading && !hasPreviewAccess) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="h-8 w-8 animate-spin" />
