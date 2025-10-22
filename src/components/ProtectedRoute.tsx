@@ -29,6 +29,10 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     searchParams.has(key) || hashParams.has(key)
   );
   
+  // Detect Lovable preview hostnames
+  const hostname = window.location.hostname;
+  const isLovablePreviewHost = hostname.startsWith('preview--') || hostname.startsWith('id-preview--');
+  
   // Session-based bypass: if token found, set expiry in sessionStorage
   React.useEffect(() => {
     if (hasLovableToken) {
@@ -46,13 +50,15 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     sessionStorage.removeItem(PREVIEW_BYPASS_KEY);
   }
   
-  const hasPreviewAccess = hasLovableToken || bypassActive;
+  const hasPreviewAccess = hasLovableToken || bypassActive || isLovablePreviewHost;
   
   // Phase 3: Diagnostic logging
   console.debug('[ProtectedRoute]', {
     path: location.pathname,
     search: location.search,
     hash: location.hash,
+    hostname,
+    isLovablePreviewHost,
     tokenFound: hasLovableToken,
     bypassActive,
     hasPreviewAccess,
