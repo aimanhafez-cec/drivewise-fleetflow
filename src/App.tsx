@@ -27,6 +27,7 @@ import NewQuote from "./pages/NewQuote";
 import QuoteDetails from "./pages/QuoteDetails";
 import QuoteView from "./pages/QuoteView";
 import QuoteReview from "./pages/QuoteReview";
+import MasterAgreementReview from "./pages/MasterAgreementReview";
 import ManageQuotations from "./pages/ManageQuotations";
 import Inspections from "./pages/Inspections";
 import NewInspection from "./pages/NewInspection";
@@ -332,6 +333,7 @@ const App = () => {
 
           {/* Public Routes - No Authentication Required */}
               <Route path="/quote-review/:token" element={<QuoteReview />} />
+              <Route path="/master-agreement-review/:token" element={<MasterAgreementReview />} />
 
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />

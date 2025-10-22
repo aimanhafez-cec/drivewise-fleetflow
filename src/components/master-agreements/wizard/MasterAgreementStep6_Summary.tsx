@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { 
   Collapsible, 
@@ -16,9 +18,17 @@ import {
   ChevronUp,
   Calculator,
   Shield,
-  Coins
+  Coins,
+  CheckCircle,
+  Mail,
+  Printer
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/currency";
+import { useSubmitMasterAgreement, useGenerateMasterAgreementPDF } from "@/hooks/useMasterAgreement";
+import { useToast } from "@/hooks/use-toast";
+import { SendMasterAgreementToCustomerDialog } from "../SendMasterAgreementToCustomerDialog";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface MasterAgreementStep6SummaryProps {
   data: any;
@@ -27,6 +37,8 @@ interface MasterAgreementStep6SummaryProps {
 }
 
 export const MasterAgreementStep6Summary: React.FC<MasterAgreementStep6SummaryProps> = ({ data }) => {
+  const { toast } = useToast();
+  const [sendDialogOpen, setSendDialogOpen] = useState(false);
   const [openSections, setOpenSections] = useState({
     header: true,
     vehicleLines: true,
@@ -37,6 +49,81 @@ export const MasterAgreementStep6Summary: React.FC<MasterAgreementStep6SummaryPr
     grandTotal: true,
     terms: false,
   });
+
+  const submitMutation = useSubmitMasterAgreement();
+  const generatePDFMutation = useGenerateMasterAgreementPDF();
+
+  // Fetch customer data
+  const { data: customerData } = useQuery({
+    queryKey: ['customer', data.customer_id],
+    queryFn: async () => {
+      if (!data.customer_id) return null;
+      const { data: customer } = await supabase
+        .from('customers')
+        .select('full_name, email')
+        .eq('id', data.customer_id)
+        .single();
+      return customer;
+    },
+    enabled: !!data.customer_id,
+  });
+
+  // Fetch contact person data
+  const { data: contactPersonData } = useQuery({
+    queryKey: ['contact_person', data.contact_person_id],
+    queryFn: async () => {
+      if (!data.contact_person_id) return null;
+      const { data: contact } = await supabase
+        .from('contact_persons')
+        .select('full_name, email')
+        .eq('id', data.contact_person_id)
+        .single();
+      return contact;
+    },
+    enabled: !!data.contact_person_id,
+  });
+
+  const handleSubmitForApproval = () => {
+    if (!data.id) {
+      toast({
+        title: 'Error',
+        description: 'Please save the master agreement as draft first',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    submitMutation.mutate({
+      agreement_id: data.id,
+      notes: 'Submitted from Master Agreement Wizard Summary',
+    });
+  };
+
+  const handlePrintPDF = () => {
+    generatePDFMutation.mutate(data);
+  };
+
+  const handleSendToCustomer = () => {
+    if (!data.id) {
+      toast({
+        title: 'Error',
+        description: 'Please save the master agreement as draft first',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
+    if (!contactPersonData?.email && !customerData?.email) {
+      toast({
+        title: 'Error',
+        description: 'Customer email is missing',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
+    setSendDialogOpen(true);
+  };
 
   const toggleSection = (section: keyof typeof openSections) => {
     setOpenSections(prev => ({ ...prev, [section]: !prev[section] }));
@@ -130,6 +217,97 @@ export const MasterAgreementStep6Summary: React.FC<MasterAgreementStep6SummaryPr
 
   return (
     <div className="space-y-6">
+      {/* Sticky Action Bar */}
+      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b p-4 -m-6 mb-6 print:hidden">
+        <div className="flex items-center justify-between max-w-7xl mx-auto">
+          <div>
+            <h2 className="text-2xl font-bold">{data.agreement_no || 'New Master Agreement'}</h2>
+            <p className="text-sm text-muted-foreground">
+              {customerData?.full_name || 'Customer'} • {data.agreement_date || 'Draft'}
+            </p>
+          </div>
+          <div className="flex gap-2">
+            {data.status === 'draft' && (
+              <Button 
+                size="lg" 
+                onClick={handleSubmitForApproval}
+                disabled={submitMutation.isPending}
+              >
+                <CheckCircle className="mr-2 h-5 w-5" />
+                Submit for Approval
+              </Button>
+            )}
+            {data.status === 'approved' && (
+              <>
+                <Button size="lg" variant="outline" onClick={handlePrintPDF}>
+                  <Printer className="mr-2 h-5 w-5" />
+                  Print PDF
+                </Button>
+                <Button size="lg" onClick={handleSendToCustomer}>
+                  <Mail className="mr-2 h-5 w-5" />
+                  Send to Customer
+                </Button>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Status Banners */}
+      {data.status === 'approved' && (
+        <Alert className="border-green-500 bg-green-50 dark:bg-green-950">
+          <CheckCircle className="h-4 w-4 text-green-600" />
+          <AlertDescription className="text-green-800 dark:text-green-200">
+            <strong>Master Agreement Approved</strong> - This agreement has been approved and is ready to be sent to the customer.
+            {data.approved_at && ` Approved on ${new Date(data.approved_at).toLocaleDateString()}`}
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {data.status === 'sent_to_customer' && (
+        <Alert className="border-blue-500 bg-blue-50 dark:bg-blue-950">
+          <Mail className="h-4 w-4 text-blue-600" />
+          <AlertDescription className="text-blue-800 dark:text-blue-200">
+            <strong>Sent to Customer</strong> - Master agreement has been sent to the customer for review and signature.
+            {data.sent_to_customer_at && ` Sent on ${new Date(data.sent_to_customer_at).toLocaleDateString()}`}
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {data.status === 'customer_accepted' && data.customer_signature_data && (
+        <Alert className="border-green-500 bg-green-50 dark:bg-green-950">
+          <CheckCircle className="h-4 w-4 text-green-600" />
+          <AlertDescription className="text-green-800 dark:text-green-200">
+            <strong>Customer Accepted</strong> - The customer has digitally signed and accepted this master agreement.
+            {data.customer_signed_at && ` Signed on ${new Date(data.customer_signed_at).toLocaleDateString()}`}
+            {data.customer_signature_data?.signer_name && ` by ${data.customer_signature_data.signer_name}`}
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {data.status === 'customer_rejected' && (
+        <Alert variant="destructive">
+          <AlertDescription>
+            <strong>Customer Rejected</strong> - The customer has rejected this master agreement.
+            {data.customer_rejection_reason && (
+              <span className="block mt-2">Reason: {data.customer_rejection_reason}</span>
+            )}
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {/* Send Dialog */}
+      {sendDialogOpen && (
+        <SendMasterAgreementToCustomerDialog
+          open={sendDialogOpen}
+          onOpenChange={setSendDialogOpen}
+          agreementId={data.id}
+          agreementNumber={data.agreement_no || ''}
+          customerName={customerData?.full_name || contactPersonData?.full_name || 'Customer'}
+          customerEmail={contactPersonData?.email || customerData?.email || ''}
+        />
+      )}
+
       {/* Executive Summary Card */}
       <Card className="bg-gradient-to-br from-primary/5 to-primary/10">
         <CardContent className="pt-6">

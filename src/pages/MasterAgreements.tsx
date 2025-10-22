@@ -8,13 +8,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Plus, FileText, MoreVertical, Eye, Edit, FileSpreadsheet, Copy, Download, Trash2, DollarSign, FileCheck, Users } from 'lucide-react';
+import { Plus, FileText, MoreVertical, Eye, Edit, FileSpreadsheet, Copy, Download, Trash2, DollarSign, FileCheck, Users, Mail, CheckCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { formatCurrency } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import { MasterAgreementSearch } from '@/components/master-agreements/MasterAgreementSearch';
 
-type StatusFilter = 'all' | 'draft' | 'active' | 'suspended' | 'expired' | 'terminated';
+type StatusFilter = 'all' | 'draft' | 'approved' | 'sent_to_customer' | 'customer_accepted' | 'customer_rejected' | 'active' | 'suspended' | 'expired' | 'terminated';
 
 const MasterAgreements = () => {
   const navigate = useNavigate();
@@ -181,6 +181,14 @@ const MasterAgreements = () => {
     switch (status) {
       case 'active':
         return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+      case 'approved':
+        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+      case 'sent_to_customer':
+        return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200';
+      case 'customer_accepted':
+        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+      case 'customer_rejected':
+        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
       case 'draft':
         return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200';
       case 'suspended':
@@ -310,6 +318,27 @@ const MasterAgreements = () => {
           Draft ({agreements?.filter(a => a.status === 'draft').length || 0})
         </Button>
         <Button
+          variant={statusFilter === 'approved' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setStatusFilter('approved')}
+        >
+          Approved ({agreements?.filter(a => a.status === 'approved').length || 0})
+        </Button>
+        <Button
+          variant={statusFilter === 'sent_to_customer' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setStatusFilter('sent_to_customer')}
+        >
+          Sent ({agreements?.filter(a => a.status === 'sent_to_customer').length || 0})
+        </Button>
+        <Button
+          variant={statusFilter === 'customer_accepted' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setStatusFilter('customer_accepted')}
+        >
+          Accepted ({agreements?.filter(a => a.status === 'customer_accepted').length || 0})
+        </Button>
+        <Button
           variant={statusFilter === 'active' ? 'default' : 'outline'}
           size="sm"
           onClick={() => setStatusFilter('active')}
@@ -389,9 +418,23 @@ const MasterAgreements = () => {
                         {agreement.legal_entity?.name || <span className="text-muted-foreground">N/A</span>}
                       </TableCell>
                       <TableCell>
-                        <Badge className={getStatusColor(agreement.status)}>
-                          {getStatusLabel(agreement.status)}
-                        </Badge>
+                        <div className="flex gap-1 flex-wrap">
+                          <Badge className={getStatusColor(agreement.status)}>
+                            {getStatusLabel(agreement.status)}
+                          </Badge>
+                          {agreement.status === 'sent_to_customer' && (
+                            <Badge variant="outline" className="text-xs">
+                              <Mail className="h-3 w-3 mr-1" />
+                              Pending
+                            </Badge>
+                          )}
+                          {agreement.status === 'customer_accepted' && (
+                            <Badge variant="outline" className="text-green-600 text-xs">
+                              <CheckCircle className="h-3 w-3 mr-1" />
+                              Signed
+                            </Badge>
+                          )}
+                        </div>
                       </TableCell>
                       <TableCell className="hidden xl:table-cell">
                         <div className="flex items-center gap-1">

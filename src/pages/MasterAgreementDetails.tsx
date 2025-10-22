@@ -7,6 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
+import { SendMasterAgreementToCustomerDialog } from "@/components/master-agreements/SendMasterAgreementToCustomerDialog";
+import { CustomerAcceptanceMasterAgreementDialog } from "@/components/master-agreements/CustomerAcceptanceMasterAgreementDialog";
 import {
   ArrowLeft,
   FileText,
@@ -59,6 +61,8 @@ const MasterAgreementDetails = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [sendDialogOpen, setSendDialogOpen] = useState(false);
+  const [acceptanceDialogOpen, setAcceptanceDialogOpen] = useState(false);
 
   useEffect(() => {
     document.title = "Master Agreement Details | Core Car Rental";
@@ -190,17 +194,25 @@ const MasterAgreementDetails = () => {
             </Button>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
+            {agreement.status === 'approved' && (
+              <Button size="sm" onClick={() => setSendDialogOpen(true)}>
+                <Mail className="h-4 w-4 mr-1" />
+                Send to Customer
+              </Button>
+            )}
+            {agreement.status === 'sent_to_customer' && (
+              <Button size="sm" onClick={() => setAcceptanceDialogOpen(true)}>
+                <CheckCircle className="h-4 w-4 mr-1" />
+                Mark as Accepted
+              </Button>
+            )}
             <Button variant="outline" size="sm" onClick={() => window.print()}>
               <Printer className="h-4 w-4 mr-1" />
               Print
             </Button>
             <Button variant="outline" size="sm">
-              <Mail className="h-4 w-4 mr-1" />
-              Email
-            </Button>
-            <Button variant="outline" size="sm">
               <Download className="h-4 w-4 mr-1" />
-              Download
+              Download PDF
             </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -237,6 +249,47 @@ const MasterAgreementDetails = () => {
         </div>
       </div>
 
+      {/* Customer Acceptance Status */}
+      {agreement.status === 'customer_accepted' && agreement.customer_signature_data && (
+        <Alert className="border-green-500 bg-green-50 dark:bg-green-950">
+          <CheckCircle className="h-4 w-4 text-green-600" />
+          <AlertDescription className="text-green-800 dark:text-green-200">
+            <div className="flex justify-between items-start">
+              <div>
+                <strong>Customer Accepted & Signed</strong>
+                {agreement.customer_signed_at && (
+                  <p className="text-sm mt-1">
+                    Signed on {format(new Date(agreement.customer_signed_at), 'MMM dd, yyyy')}
+                    {typeof agreement.customer_signature_data === 'object' && agreement.customer_signature_data && 'signer_name' in agreement.customer_signature_data && ` by ${String(agreement.customer_signature_data.signer_name)}`}
+                  </p>
+                )}
+                {typeof agreement.customer_signature_data === 'object' && agreement.customer_signature_data && 'signer_title' in agreement.customer_signature_data && agreement.customer_signature_data.signer_title && (
+                  <p className="text-sm">Title: {String(agreement.customer_signature_data.signer_title)}</p>
+                )}
+              </div>
+              {typeof agreement.customer_signature_data === 'object' && agreement.customer_signature_data && 'signature_image' in agreement.customer_signature_data && agreement.customer_signature_data.signature_image && (
+                <img 
+                  src={agreement.customer_signature_data.signature_image as string} 
+                  alt="Customer Signature" 
+                  className="h-16 border rounded bg-white"
+                />
+              )}
+            </div>
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {agreement.status === 'customer_rejected' && (
+        <Alert variant="destructive">
+          <AlertDescription>
+            <strong>Customer Rejected</strong>
+            {agreement.customer_rejection_reason && (
+              <p className="text-sm mt-2">Reason: {agreement.customer_rejection_reason}</p>
+            )}
+          </AlertDescription>
+        </Alert>
+      )}
+
       {/* Header Info Card */}
       <MasterAgreementHeaderInfo
         agreement={agreement}
@@ -244,6 +297,27 @@ const MasterAgreementDetails = () => {
         customer={agreement.customer}
         billToSite={agreement.bill_to_site}
       />
+
+      {/* Dialogs */}
+      {sendDialogOpen && (
+        <SendMasterAgreementToCustomerDialog
+          open={sendDialogOpen}
+          onOpenChange={setSendDialogOpen}
+          agreementId={agreement.id}
+          agreementNumber={agreement.agreement_no || ''}
+          customerName={agreement.customer?.full_name || 'Customer'}
+          customerEmail={agreement.customer?.email || ''}
+        />
+      )}
+
+      {acceptanceDialogOpen && (
+        <CustomerAcceptanceMasterAgreementDialog
+          open={acceptanceDialogOpen}
+          onOpenChange={setAcceptanceDialogOpen}
+          agreementId={agreement.id}
+          agreementNumber={agreement.agreement_no || ''}
+        />
+      )}
 
       {/* Financial Summary */}
       <MasterAgreementFinancials agreement={agreement} lines={lines} />
