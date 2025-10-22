@@ -58,6 +58,11 @@ const navigation = [
     icon: Calendar,
   },
   {
+    title: 'Agreements',
+    url: '/agreements',
+    icon: FileText,
+  },
+  {
     title: 'Daily Planner',
     url: '/daily-planner',
     icon: CalendarRange,
@@ -91,11 +96,6 @@ const navigation = [
     title: 'Operations',
     url: '/operations',
     icon: Wrench,
-  },
-  {
-    title: 'Agreements',
-    url: '/agreements',
-    icon: FileText,
   },
   {
     title: 'Transactions',
