@@ -19,7 +19,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useCorporateLeasingAgreements } from '@/hooks/useCorporateLeasingLOVs';
+import { useCorporateLeasingAgreements } from '@/hooks/xxUseCorporateLeasingLOVs';
 import { format } from 'date-fns';
 
 const getStatusBadgeVariant = (status: string) => {

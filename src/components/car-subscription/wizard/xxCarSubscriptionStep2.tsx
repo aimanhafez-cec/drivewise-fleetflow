@@ -4,7 +4,7 @@ import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/comp
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { VehicleClassSelect, VehicleSelect } from "@/components/ui/select-components";
-import { SUBSCRIPTION_MODELS } from "@/hooks/useCarSubscriptionLOVs";
+import { SUBSCRIPTION_MODELS } from "@/hooks/xxUseCarSubscriptionLOVs";
 
 interface CarSubscriptionStep2Props {
   form: UseFormReturn<any>;

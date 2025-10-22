@@ -10,7 +10,7 @@ import {
   MINIMUM_COMMITMENTS, 
   CANCELLATION_NOTICES, 
   SWAP_FREQUENCIES 
-} from "@/hooks/useCarSubscriptionLOVs";
+} from "@/hooks/xxUseCarSubscriptionLOVs";
 
 interface CarSubscriptionStep3Props {
   form: UseFormReturn<any>;

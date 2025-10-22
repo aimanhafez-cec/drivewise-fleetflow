@@ -1,5 +1,5 @@
 import React from 'react';
-import { CorporateLeasingWizard } from '@/components/corporate-leasing/CorporateLeasingWizard';
+import { CorporateLeasingWizard } from '@/components/corporate-leasing/xxCorporateLeasingWizard';
 
 const NewCorporateLeasing: React.FC = () => {
   return <CorporateLeasingWizard />;

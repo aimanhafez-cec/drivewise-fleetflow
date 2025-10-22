@@ -11,7 +11,7 @@ import {
   TYRES_POLICIES,
   WORKSHOP_PREFERENCES,
   REGISTRATION_RESPONSIBILITIES
-} from '@/hooks/useCorporateLeasingLOVs';
+} from '@/hooks/xxUseCorporateLeasingLOVs';
 
 interface CorporateLeasingStep4Props {
   form: UseFormReturn<any>;

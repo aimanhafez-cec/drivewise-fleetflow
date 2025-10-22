@@ -10,7 +10,7 @@ import {
   CUSTOMER_SEGMENTS,
   CREDIT_TERMS,
   COST_ALLOCATION_MODES
-} from '@/hooks/useCorporateLeasingLOVs';
+} from '@/hooks/xxUseCorporateLeasingLOVs';
 import { useCustomers } from '@/hooks/useBusinessLOVs';
 
 interface CorporateLeasingStep1Props {

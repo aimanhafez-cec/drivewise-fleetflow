@@ -5,11 +5,11 @@ import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { LOVSelect } from '@/components/ui/lov-select';
 import { RequiredLabel } from '@/components/ui/required-label';
-import { 
+import {
   FRAMEWORK_MODELS,
   CONTRACT_TERMS,
   RENEWAL_OPTIONS
-} from '@/hooks/useCorporateLeasingLOVs';
+} from '@/hooks/xxUseCorporateLeasingLOVs';
 
 interface CorporateLeasingStep2Props {
   form: UseFormReturn<any>;

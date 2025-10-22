@@ -11,16 +11,16 @@ import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 
 // Import wizard steps
-import { CarSubscriptionStep1 } from './wizard/CarSubscriptionStep1';
-import { CarSubscriptionStep2 } from './wizard/CarSubscriptionStep2';
-import { CarSubscriptionStep3 } from './wizard/CarSubscriptionStep3';
-import { CarSubscriptionStep4 } from './wizard/CarSubscriptionStep4';
-import { CarSubscriptionStep5 } from './wizard/CarSubscriptionStep5';
-import { CarSubscriptionStep6 } from './wizard/CarSubscriptionStep6';
-import { CarSubscriptionStep7 } from './wizard/CarSubscriptionStep7';
-import { CarSubscriptionStep8 } from './wizard/CarSubscriptionStep8';
-import { CarSubscriptionStep9 } from './wizard/CarSubscriptionStep9';
-import { CarSubscriptionStep10 } from './wizard/CarSubscriptionStep10';
+import { CarSubscriptionStep1 } from './wizard/xxCarSubscriptionStep1';
+import { CarSubscriptionStep2 } from './wizard/xxCarSubscriptionStep2';
+import { CarSubscriptionStep3 } from './wizard/xxCarSubscriptionStep3';
+import { CarSubscriptionStep4 } from './wizard/xxCarSubscriptionStep4';
+import { CarSubscriptionStep5 } from './wizard/xxCarSubscriptionStep5';
+import { CarSubscriptionStep6 } from './wizard/xxCarSubscriptionStep6';
+import { CarSubscriptionStep7 } from './wizard/xxCarSubscriptionStep7';
+import { CarSubscriptionStep8 } from './wizard/xxCarSubscriptionStep8';
+import { CarSubscriptionStep9 } from './wizard/xxCarSubscriptionStep9';
+import { CarSubscriptionStep10 } from './wizard/xxCarSubscriptionStep10';
 
 const carSubscriptionSchema = z.object({
   // Agreement & Parties

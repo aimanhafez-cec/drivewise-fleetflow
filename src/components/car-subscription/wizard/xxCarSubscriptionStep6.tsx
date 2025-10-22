@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Info } from "lucide-react";
-import { SALIK_HANDLING_OPTIONS } from "@/hooks/useCarSubscriptionLOVs";
+import { SALIK_HANDLING_OPTIONS } from "@/hooks/xxUseCarSubscriptionLOVs";
 
 interface CarSubscriptionStep6Props {
   form: UseFormReturn<any>;

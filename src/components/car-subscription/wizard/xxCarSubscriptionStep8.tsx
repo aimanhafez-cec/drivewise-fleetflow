@@ -7,7 +7,7 @@ import {
   GEO_RESTRICTIONS,
   VEHICLE_SWAP_RULES,
   EARLY_CANCELLATION_FEE_TYPES
-} from "@/hooks/useCarSubscriptionLOVs";
+} from "@/hooks/xxUseCarSubscriptionLOVs";
 
 interface CarSubscriptionStep8Props {
   form: UseFormReturn<any>;

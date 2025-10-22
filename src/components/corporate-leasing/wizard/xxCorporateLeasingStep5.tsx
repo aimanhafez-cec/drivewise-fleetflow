@@ -5,12 +5,12 @@ import { Input } from '@/components/ui/input';
 import { LOVSelect } from '@/components/ui/lov-select';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Info } from 'lucide-react';
-import { 
+import {
   SALIK_DARB_HANDLING,
   TOLLS_ADMIN_FEE_MODELS,
   TRAFFIC_FINES_HANDLING,
   FUEL_HANDLING
-} from '@/hooks/useCorporateLeasingLOVs';
+} from '@/hooks/xxUseCorporateLeasingLOVs';
 
 interface CorporateLeasingStep5Props {
   form: UseFormReturn<any>;

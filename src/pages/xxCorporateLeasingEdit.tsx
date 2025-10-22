@@ -2,7 +2,7 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { CorporateLeasingWizard } from '@/components/corporate-leasing/CorporateLeasingWizard';
+import { CorporateLeasingWizard } from '@/components/corporate-leasing/xxCorporateLeasingWizard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent } from '@/components/ui/card';
 

@@ -11,12 +11,12 @@ import { Form } from '@/components/ui/form';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
-import { CorporateLeasingStep1 } from './wizard/CorporateLeasingStep1';
-import { CorporateLeasingStep2 } from './wizard/CorporateLeasingStep2';
-import { CorporateLeasingStep3 } from './wizard/CorporateLeasingStep3';
-import { CorporateLeasingStep4 } from './wizard/CorporateLeasingStep4';
-import { CorporateLeasingStep5 } from './wizard/CorporateLeasingStep5';
-import { CorporateLeasingStep6 } from './wizard/CorporateLeasingStep6';
+import { CorporateLeasingStep1 } from './wizard/xxCorporateLeasingStep1';
+import { CorporateLeasingStep2 } from './wizard/xxCorporateLeasingStep2';
+import { CorporateLeasingStep3 } from './wizard/xxCorporateLeasingStep3';
+import { CorporateLeasingStep4 } from './wizard/xxCorporateLeasingStep4';
+import { CorporateLeasingStep5 } from './wizard/xxCorporateLeasingStep5';
+import { CorporateLeasingStep6 } from './wizard/xxCorporateLeasingStep6';
 
 // Form schema for corporate leasing agreement
 const corporateLeasingSchema = z.object({

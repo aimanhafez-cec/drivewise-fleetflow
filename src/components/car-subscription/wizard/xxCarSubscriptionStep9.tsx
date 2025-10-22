@@ -8,7 +8,7 @@ import {
   MAINTENANCE_TRIGGERS,
   PREFERRED_WORKSHOPS,
   CONDITION_REPORT_CADENCES
-} from "@/hooks/useCarSubscriptionLOVs";
+} from "@/hooks/xxUseCarSubscriptionLOVs";
 
 interface CarSubscriptionStep9Props {
   form: UseFormReturn<any>;

@@ -7,7 +7,7 @@ import {
   BILLING_DAYS,
   INVOICE_FORMATS,
   LINE_ITEM_GRANULARITIES
-} from '@/hooks/useCorporateLeasingLOVs';
+} from '@/hooks/xxUseCorporateLeasingLOVs';
 
 interface CorporateLeasingStep3Props {
   form: UseFormReturn<any>;
