@@ -179,7 +179,7 @@ const App = () => {
                   <AppLayout />
                 </ProtectedRoute>
               }>
-                <Route index element={<div>Payments - Coming Soon</div>} />
+                <Route index element={<div>Payments - Check configurations and settings</div>} />
               </Route>
               <Route path="/settings" element={
                 <ProtectedRoute>
