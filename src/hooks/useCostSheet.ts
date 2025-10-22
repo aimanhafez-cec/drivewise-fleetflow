@@ -162,7 +162,7 @@ export const useCalculateCostSheet = () => {
       return data;
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['cost-sheets', variables.quote_id] });
+      queryClient.invalidateQueries({ queryKey: ['cost-sheets', 'quote', variables.quote_id] });
       queryClient.invalidateQueries({ queryKey: ['cost-sheet'] });
       toast({
         title: 'Cost Sheet Calculated',
