@@ -20,3 +20,9 @@ verify_jwt = true
 
 [functions.send-quote-to-customer]
 verify_jwt = true
+
+[functions.get-public-quote]
+verify_jwt = false
+
+[functions.customer-quote-action]
+verify_jwt = false
