@@ -44,7 +44,7 @@ import { AIAssistantButton } from '@/components/ai-assistant/AIAssistantButton';
 const navigation = [
   {
     title: 'Dashboard',
-    url: '/dashboard',
+    url: '/dashboard-new',
     icon: LayoutDashboard,
   },
   {
