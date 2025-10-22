@@ -820,7 +820,7 @@ export const QuoteWizardStep3_CoverageServices: React.FC<QuoteWizardStep3Coverag
           </div>
 
           {/* Row 4: Admin Fee per Toll - Conditional on Admin Fee Model */}
-          {data.salik_darb_handling === "Rebill Actual (monthly)" && data.tolls_admin_fee_model && data.tolls_admin_fee_model !== "None" && (
+          {data.salik_darb_handling === "Rebill Actual (monthly)" && (data.tolls_admin_fee_model || "Per-invoice") !== "None" && (
             <div className="space-y-1.5">
               <TooltipLabel 
                 label="Admin Fee per Toll (AED)" 
