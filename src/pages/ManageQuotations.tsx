@@ -501,7 +501,7 @@ const ManageQuotations: React.FC = () => {
                             <Eye className="mr-2 h-4 w-4" />
                             View Details
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => navigate(`/quotes/${quote.id}?edit=true`)}>
+                          <DropdownMenuItem onClick={() => navigate(`/quotes/${quote.id}/edit`)}>
                             <Edit className="mr-2 h-4 w-4" />
                             {quote.status === 'draft' ? 'Continue Editing' : 'Edit Quote'}
                           </DropdownMenuItem>

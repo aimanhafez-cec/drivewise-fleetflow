@@ -626,7 +626,7 @@ export const QuoteWizard: React.FC<QuoteWizardProps> = ({ viewMode = false, quot
       
       // If new quote, silently update URL without navigation
       if (isNew) {
-        const newUrl = `/quotes/new?edit=true&id=${quote.id}`;
+        const newUrl = `/quotes/${quote.id}/edit`;
         window.history.replaceState(null, "", newUrl);
         
         // Update local state with new ID and quote number
