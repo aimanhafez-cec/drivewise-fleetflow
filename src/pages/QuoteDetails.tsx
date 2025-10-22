@@ -622,7 +622,7 @@ const QuoteDetails: React.FC = () => {
                   <Button 
                     variant="link" 
                     className="p-0 h-auto text-blue-600 dark:text-blue-400 font-semibold underline"
-                    onClick={() => navigate(`/master-agreements/${quote.agreement_id}`)}
+                    onClick={() => navigate(`/corporate-leasing/master-agreements/${quote.agreement_id}`)}
                   >
                     {quote.agreement_no}
                   </Button>

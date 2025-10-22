@@ -333,7 +333,7 @@ export const MasterAgreementWizard: React.FC<MasterAgreementWizardProps> = ({
           title: "Success",
           description: isEditMode ? "Master Agreement updated" : "Master Agreement created",
         });
-        navigate(`/master-agreements/${agreementId}`);
+        navigate(`/corporate-leasing/master-agreements/${agreementId}`);
       } else {
         // Draft save - stay in wizard
         toast({
@@ -438,7 +438,7 @@ export const MasterAgreementWizard: React.FC<MasterAgreementWizardProps> = ({
             <Save className="h-4 w-4 mr-2" />
             {isEditMode || agreementData.id ? "Save Changes" : "Save Draft"}
           </Button>
-          <Button variant="outline" onClick={() => navigate("/master-agreements")}>
+          <Button variant="outline" onClick={() => navigate("/corporate-leasing/master-agreements")}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </Button>
@@ -483,7 +483,7 @@ export const MasterAgreementWizard: React.FC<MasterAgreementWizardProps> = ({
             {isEditMode || agreementData.id ? "Save Changes" : "Save Draft"}
           </Button>
 
-          <Button variant="outline" onClick={() => navigate("/master-agreements")} disabled={saveMutation.isPending}>
+          <Button variant="outline" onClick={() => navigate("/corporate-leasing/master-agreements")} disabled={saveMutation.isPending}>
             Cancel
           </Button>
 

@@ -135,7 +135,7 @@ const MasterAgreementDetails = () => {
       <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
         <FileText className="h-16 w-16 text-muted-foreground" />
         <h3 className="text-lg font-semibold">Master Agreement not found</h3>
-        <Button onClick={() => navigate("/master-agreements")}>
+        <Button onClick={() => navigate("/corporate-leasing/master-agreements")}>
           <ArrowLeft className="h-4 w-4 mr-1" />
           Back to Master Agreements
         </Button>
@@ -176,15 +176,15 @@ const MasterAgreementDetails = () => {
 
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-2 flex-wrap">
-            <Button variant="outline" size="sm" onClick={() => navigate("/master-agreements")}>
+            <Button variant="outline" size="sm" onClick={() => navigate("/corporate-leasing/master-agreements")}>
               <ArrowLeft className="h-4 w-4 mr-1" />
               Back
             </Button>
-            <Button size="sm" onClick={() => navigate(`/master-agreements/view/${agreement.id}`)}>
+            <Button size="sm" onClick={() => navigate(`/corporate-leasing/master-agreements/view/${agreement.id}`)}>
               <FileText className="h-4 w-4 mr-1" />
               View Master Agreement
             </Button>
-            <Button size="sm" onClick={() => navigate(`/master-agreements/${agreement.id}/edit`)}>
+            <Button size="sm" onClick={() => navigate(`/corporate-leasing/master-agreements/${agreement.id}/edit`)}>
               <Edit className="h-4 w-4 mr-1" />
               Edit Master Agreement
             </Button>

@@ -233,7 +233,7 @@ const MasterAgreements = () => {
             Corporate leasing master agreements and contract lines
           </p>
         </div>
-        <Button onClick={() => navigate('/master-agreements/new')} className="w-full sm:w-auto">
+        <Button onClick={() => navigate('/corporate-leasing/master-agreements/new')} className="w-full sm:w-auto">
           <Plus className="mr-2 h-4 w-4" />
           <span className="hidden sm:inline">New Master Agreement</span>
           <span className="sm:hidden">New</span>
@@ -370,7 +370,7 @@ const MasterAgreements = () => {
                     <TableRow 
                       key={agreement.id}
                       className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => navigate(`/master-agreements/${agreement.id}`)}
+                      onClick={() => navigate(`/corporate-leasing/master-agreements/${agreement.id}`)}
                     >
                       <TableCell className="font-medium">
                         {agreement.agreement_no || `CLA-${agreement.id.slice(0, 8)}`}
@@ -432,17 +432,17 @@ const MasterAgreements = () => {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => navigate(`/master-agreements/${agreement.id}`)}>
+                            <DropdownMenuItem onClick={() => navigate(`/corporate-leasing/master-agreements/${agreement.id}`)}>
                               <Eye className="mr-2 h-4 w-4" />
                               View Details
                             </DropdownMenuItem>
                             {agreement.status === 'draft' && (
-                              <DropdownMenuItem onClick={() => navigate(`/master-agreements/${agreement.id}/edit`)}>
+                              <DropdownMenuItem onClick={() => navigate(`/corporate-leasing/master-agreements/${agreement.id}/edit`)}>
                                 <Edit className="mr-2 h-4 w-4" />
                                 Edit
                               </DropdownMenuItem>
                             )}
-                            <DropdownMenuItem onClick={() => navigate(`/master-agreements/${agreement.id}#lines`)}>
+                            <DropdownMenuItem onClick={() => navigate(`/corporate-leasing/master-agreements/${agreement.id}#lines`)}>
                               <FileSpreadsheet className="mr-2 h-4 w-4" />
                               View Lines
                             </DropdownMenuItem>
@@ -496,7 +496,7 @@ const MasterAgreements = () => {
               {(!searchFilters && statusFilter === 'all') && (
                 <Button 
                   className="mt-4"
-                  onClick={() => navigate('/master-agreements/new')}
+                  onClick={() => navigate('/corporate-leasing/master-agreements/new')}
                 >
                   <Plus className="mr-2 h-4 w-4" />
                   Create Master Agreement
