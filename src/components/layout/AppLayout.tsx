@@ -175,10 +175,10 @@ function AppSidebar() {
 
   return (
     <Sidebar 
-      className="data-[state=open]:w-64 data-[state=closed]:w-0 md:data-[state=closed]:w-16 border-r"
+      className="data-[state=open]:w-72 data-[state=closed]:w-0 md:data-[state=closed]:w-16 border-r"
       collapsible="icon"
     >
-      <SidebarContent className="pt-2 overflow-visible">
+      <SidebarContent className="pt-2">
         <SidebarGroup className="px-2">
           <SidebarGroupLabel className="px-1 py-2 text-xs font-semibold text-sidebar-foreground/70 group-data-[collapsible=icon]:hidden">
             Core Car Rental
