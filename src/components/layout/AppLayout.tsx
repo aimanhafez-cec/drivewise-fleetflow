@@ -174,8 +174,8 @@ function AppSidebar() {
     
     document.body.removeChild(measureElement);
     
-    // Calculate total: icon(20px) + gap(12px) + text + padding(16px) + extra(16px)
-    const totalWidth = 20 + 12 + maxWidth + 16 + 16;
+    // Calculate total: icon(20px) + gap(12px) + text + padding(32px) + extra(32px)
+    const totalWidth = 20 + 12 + maxWidth + 32 + 32;
     setSidebarWidth(Math.ceil(totalWidth));
   }, []);
 
