@@ -186,7 +186,7 @@ const App = () => {
                   <AppLayout />
                 </ProtectedRoute>
               }>
-                <Route index element={<div>Settings - Coming Soon</div>} />
+                <Route index element={<div>You don't have the privilege to access this screen</div>} />
               </Route>
               <Route path="/quotes" element={
                 <ProtectedRoute>
