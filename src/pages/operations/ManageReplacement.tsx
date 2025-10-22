@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { RefreshCw } from "lucide-react";
+import { Settings } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const ManageReplacement = () => {
@@ -15,24 +15,34 @@ const ManageReplacement = () => {
         </div>
       </div>
 
-      <Card>
-        <CardHeader className="text-center">
+      <Card className="border-dashed">
+        <CardHeader className="text-center pb-4">
           <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-            <RefreshCw className="h-6 w-6 text-primary" />
+            <Settings className="h-6 w-6 text-primary" />
           </div>
-          <CardTitle>Coming Soon</CardTitle>
+          <CardTitle>Configuration Required</CardTitle>
           <CardDescription>
-            This feature will help you manage vehicle replacement requests and track replacement history.
+            Please verify system configurations before accessing this feature
           </CardDescription>
         </CardHeader>
         <CardContent className="text-center">
-          <ul className="text-sm text-muted-foreground space-y-2 mb-6">
-            <li>• Track replacement vehicles assigned to customers</li>
-            <li>• Manage replacement requests and approvals</li>
-            <li>• View complete replacement history and analytics</li>
-            <li>• Generate replacement reports and documentation</li>
+          <p className="text-sm text-muted-foreground mb-4">
+            Before you can manage replacements, please ensure the following configurations are set up:
+          </p>
+          <ul className="text-sm text-muted-foreground space-y-2 mb-6 text-left max-w-md mx-auto">
+            <li>• Configure replacement policies</li>
+            <li>• Set up vehicle eligibility rules</li>
+            <li>• Define approval workflows</li>
+            <li>• Review replacement request types</li>
           </ul>
-          <Button onClick={() => navigate(-1)}>Go Back</Button>
+          <div className="flex justify-center gap-3">
+            <Button onClick={() => navigate('/settings')}>
+              Check Settings
+            </Button>
+            <Button variant="outline" onClick={() => navigate(-1)}>
+              Go Back
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>

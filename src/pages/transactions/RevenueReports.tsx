@@ -1,4 +1,4 @@
-import { TrendingUp } from 'lucide-react';
+import { Settings } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
@@ -20,20 +20,31 @@ const RevenueReports = () => {
       <Card className="border-dashed">
         <CardHeader className="text-center pb-4">
           <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-            <TrendingUp className="h-6 w-6 text-primary" />
+            <Settings className="h-6 w-6 text-primary" />
           </div>
-          <CardTitle>Coming Soon</CardTitle>
+          <CardTitle>Configuration Required</CardTitle>
           <CardDescription>
-            Revenue reporting features are under development
+            Please verify system configurations before accessing this feature
           </CardDescription>
         </CardHeader>
         <CardContent className="text-center">
-          <p className="text-sm text-muted-foreground mb-6">
-            This page will provide detailed revenue analytics, income breakdowns by vehicle class, location-based performance, and trend analysis.
+          <p className="text-sm text-muted-foreground mb-4">
+            Before you can access revenue reports, please ensure the following configurations are set up:
           </p>
-          <Button variant="outline" onClick={() => navigate(-1)}>
-            Go Back
-          </Button>
+          <ul className="text-sm text-muted-foreground space-y-2 mb-6 text-left max-w-md mx-auto">
+            <li>• Configure revenue categories</li>
+            <li>• Set up reporting periods</li>
+            <li>• Define cost allocation rules</li>
+            <li>• Review price lists</li>
+          </ul>
+          <div className="flex justify-center gap-3">
+            <Button onClick={() => navigate('/settings')}>
+              Check Settings
+            </Button>
+            <Button variant="outline" onClick={() => navigate(-1)}>
+              Go Back
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>

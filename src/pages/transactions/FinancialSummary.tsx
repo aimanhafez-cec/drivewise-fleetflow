@@ -1,4 +1,4 @@
-import { DollarSign } from 'lucide-react';
+import { Settings } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
@@ -20,20 +20,31 @@ const FinancialSummary = () => {
       <Card className="border-dashed">
         <CardHeader className="text-center pb-4">
           <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-            <DollarSign className="h-6 w-6 text-primary" />
+            <Settings className="h-6 w-6 text-primary" />
           </div>
-          <CardTitle>Coming Soon</CardTitle>
+          <CardTitle>Configuration Required</CardTitle>
           <CardDescription>
-            Financial summary features are under development
+            Please verify system configurations before accessing this feature
           </CardDescription>
         </CardHeader>
         <CardContent className="text-center">
-          <p className="text-sm text-muted-foreground mb-6">
-            This page will provide a comprehensive financial overview including profit/loss statements, cash flow analysis, and key financial metrics.
+          <p className="text-sm text-muted-foreground mb-4">
+            Before you can access the financial summary, please ensure the following configurations are set up:
           </p>
-          <Button variant="outline" onClick={() => navigate(-1)}>
-            Go Back
-          </Button>
+          <ul className="text-sm text-muted-foreground space-y-2 mb-6 text-left max-w-md mx-auto">
+            <li>• Configure financial metrics</li>
+            <li>• Set up KPI thresholds</li>
+            <li>• Define reporting periods</li>
+            <li>• Review dashboard widgets</li>
+          </ul>
+          <div className="flex justify-center gap-3">
+            <Button onClick={() => navigate('/settings')}>
+              Check Settings
+            </Button>
+            <Button variant="outline" onClick={() => navigate(-1)}>
+              Go Back
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>

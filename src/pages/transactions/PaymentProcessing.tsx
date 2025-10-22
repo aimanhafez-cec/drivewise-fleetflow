@@ -1,4 +1,4 @@
-import { CreditCard } from 'lucide-react';
+import { Settings } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
@@ -20,20 +20,31 @@ const PaymentProcessing = () => {
       <Card className="border-dashed">
         <CardHeader className="text-center pb-4">
           <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-            <CreditCard className="h-6 w-6 text-primary" />
+            <Settings className="h-6 w-6 text-primary" />
           </div>
-          <CardTitle>Coming Soon</CardTitle>
+          <CardTitle>Configuration Required</CardTitle>
           <CardDescription>
-            Payment processing features are under development
+            Please verify system configurations before accessing this feature
           </CardDescription>
         </CardHeader>
         <CardContent className="text-center">
-          <p className="text-sm text-muted-foreground mb-6">
-            This page will allow you to process credit card payments, manage refunds, handle payment disputes, and integrate with payment gateways.
+          <p className="text-sm text-muted-foreground mb-4">
+            Before you can process payments, please ensure the following configurations are set up:
           </p>
-          <Button variant="outline" onClick={() => navigate(-1)}>
-            Go Back
-          </Button>
+          <ul className="text-sm text-muted-foreground space-y-2 mb-6 text-left max-w-md mx-auto">
+            <li>• Configure payment gateways</li>
+            <li>• Set up payment methods</li>
+            <li>• Define payment terms</li>
+            <li>• Review merchant accounts</li>
+          </ul>
+          <div className="flex justify-center gap-3">
+            <Button onClick={() => navigate('/settings')}>
+              Check Settings
+            </Button>
+            <Button variant="outline" onClick={() => navigate(-1)}>
+              Go Back
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>
