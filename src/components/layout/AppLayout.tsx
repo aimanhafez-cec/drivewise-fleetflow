@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -155,6 +155,29 @@ function AppSidebar() {
   const { toast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
+  const { open } = useSidebar();
+  const [sidebarWidth, setSidebarWidth] = useState(224);
+
+  useEffect(() => {
+    const measureElement = document.createElement('span');
+    measureElement.style.cssText = 'position:absolute;visibility:hidden;font-size:0.875rem;font-weight:400;white-space:nowrap;';
+    document.body.appendChild(measureElement);
+    
+    let maxWidth = 0;
+    const allItems = [...navigation, { title: 'Sign Out' }];
+    
+    allItems.forEach(item => {
+      measureElement.textContent = item.title;
+      const textWidth = measureElement.offsetWidth;
+      if (textWidth > maxWidth) maxWidth = textWidth;
+    });
+    
+    document.body.removeChild(measureElement);
+    
+    // Calculate total: icon(20px) + gap(12px) + text + padding(16px) + extra(16px)
+    const totalWidth = 20 + 12 + maxWidth + 16 + 16;
+    setSidebarWidth(Math.ceil(totalWidth));
+  }, []);
 
   const handleSignOut = async () => {
     const { error } = await signOut();
@@ -175,7 +198,8 @@ function AppSidebar() {
 
   return (
     <Sidebar 
-      className="data-[state=open]:w-56 data-[state=closed]:w-0 md:data-[state=closed]:w-16 border-r"
+      style={{ width: open ? `${sidebarWidth}px` : undefined }}
+      className="data-[state=closed]:w-0 md:data-[state=closed]:w-16 border-r transition-[width]"
       collapsible="icon"
     >
       <SidebarContent className="pt-2">
