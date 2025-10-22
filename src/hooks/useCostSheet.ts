@@ -195,8 +195,17 @@ export const useSubmitCostSheet = () => {
       if (error) throw error;
       return data;
     },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['cost-sheets'] });
+    onSuccess: async (data, variables) => {
+      // Fetch cost sheet to get quote_id for specific invalidation
+      const { data: costSheet } = await supabase
+        .from('quote_cost_sheets')
+        .select('quote_id')
+        .eq('id', variables.cost_sheet_id)
+        .single();
+      
+      if (costSheet?.quote_id) {
+        queryClient.invalidateQueries({ queryKey: ['cost-sheets', 'quote', costSheet.quote_id] });
+      }
       queryClient.invalidateQueries({ queryKey: ['cost-sheet'] });
       toast({
         title: 'Cost Sheet Approved',
@@ -231,8 +240,17 @@ export const useApproveCostSheet = () => {
       if (error) throw error;
       return data;
     },
-    onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['cost-sheets'] });
+    onSuccess: async (data, variables) => {
+      // Fetch cost sheet to get quote_id for specific invalidation
+      const { data: costSheet } = await supabase
+        .from('quote_cost_sheets')
+        .select('quote_id')
+        .eq('id', variables.cost_sheet_id)
+        .single();
+      
+      if (costSheet?.quote_id) {
+        queryClient.invalidateQueries({ queryKey: ['cost-sheets', 'quote', costSheet.quote_id] });
+      }
       queryClient.invalidateQueries({ queryKey: ['cost-sheet'] });
       queryClient.invalidateQueries({ queryKey: ['quotes'] });
       
