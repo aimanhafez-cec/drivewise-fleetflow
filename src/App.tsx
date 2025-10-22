@@ -204,6 +204,7 @@ const App = () => {
               }>
                 <Route index element={<Quotes />} />
                 <Route path="new" element={<NewQuote />} />
+                <Route path=":id/edit" element={<NewQuote />} />
                 <Route path="view/:id" element={<QuoteView />} />
                 <Route path=":id" element={<QuoteDetails />} />
               </Route>

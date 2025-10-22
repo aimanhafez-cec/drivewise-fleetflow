@@ -1133,7 +1133,7 @@ export const QuoteWizard: React.FC<QuoteWizardProps> = ({ viewMode = false, quot
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back
               </Button>
-              <Button onClick={() => navigate(`/quotes/new?edit=true&id=${quoteData.id}`)}>
+              <Button onClick={() => navigate(`/quotes/${quoteData.id}/edit`)}>
                 <Edit className="h-4 w-4 mr-2" />
                 Edit Quote
               </Button>

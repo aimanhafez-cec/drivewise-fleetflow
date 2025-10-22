@@ -452,7 +452,7 @@ const QuoteDetails: React.FC = () => {
               <FileText className="h-4 w-4 mr-1" />
               View Quote
             </Button>
-            <Button size="sm" onClick={() => navigate(`/quotes/new?edit=true&id=${quote.id}`)}>
+            <Button size="sm" onClick={() => navigate(`/quotes/${quote.id}/edit`)}>
               <Edit className="h-4 w-4 mr-1" />
               Edit Quote
             </Button>

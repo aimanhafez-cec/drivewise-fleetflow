@@ -9,7 +9,7 @@ const NewQuote: React.FC = () => {
     document.title = id ? "Edit Quote | Core Car Rental" : "New Quote | Core Car Rental";
   }, [id]);
 
-  return <QuoteWizard />;
+  return <QuoteWizard quoteId={id} />;
 };
 
 export default NewQuote;

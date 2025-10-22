@@ -16,7 +16,7 @@ export const useCreateQuoteVersion = () => {
         title: "New Version Created",
         description: "Quote version 2 created. You can now revise the terms.",
       });
-      navigate(`/quotes/new?edit=true&id=${newQuoteId}`);
+      navigate(`/quotes/${newQuoteId}/edit`);
     },
     onError: (error: any) => {
       console.error("Failed to create quote version:", error);
