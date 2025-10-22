@@ -58,6 +58,14 @@ export const QuoteTollsPolicy: React.FC<QuoteTollsPolicyProps> = ({ quote }) => 
                 <p className="font-medium">{quote.tolls_admin_fee_model}</p>
               </div>
             )}
+            {quote.admin_fee_per_toll_aed && (
+              <div>
+                <p className="text-sm text-muted-foreground">Admin Fee per Toll</p>
+                <p className="font-medium">
+                  {formatCurrency(quote.admin_fee_per_toll_aed, quote.currency || "AED")}
+                </p>
+              </div>
+            )}
           </div>
 
           <div className="space-y-4">

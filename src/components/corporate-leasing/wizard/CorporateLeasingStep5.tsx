@@ -85,6 +85,26 @@ export const CorporateLeasingStep5: React.FC<CorporateLeasingStep5Props> = ({ fo
 
         <FormField
           control={form.control}
+          name="admin_fee_per_toll_aed"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Admin Fee per Toll (AED)</FormLabel>
+              <FormControl>
+                <Input 
+                  type="number" 
+                  step="0.01"
+                  {...field} 
+                  onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
+                  placeholder="1.00" 
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
           name="traffic_fines_handling"
           render={({ field }) => (
             <FormItem>

@@ -113,7 +113,11 @@ export const AgreementTollsFinesTab: React.FC<AgreementTollsFinesTabProps> = ({ 
             <span className="font-medium">{formatCurrency(0)}</span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-sm text-muted-foreground">Admin Fees</span>
+            <span className="text-sm text-muted-foreground">Toll Admin Fees</span>
+            <span className="font-medium">{formatCurrency(0)}</span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-muted-foreground">Fine Admin Fees</span>
             <span className="font-medium">{formatCurrency(0)}</span>
           </div>
           <div className="flex justify-between items-center">

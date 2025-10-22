@@ -111,6 +111,27 @@ export const CarSubscriptionStep6: React.FC<CarSubscriptionStep6Props> = ({ form
             </FormItem>
           )}
         />
+
+        <FormField
+          control={form.control}
+          name="admin_fee_per_toll_aed"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Admin Fee per Toll (AED)</FormLabel>
+              <FormControl>
+                <Input
+                  type="number"
+                  step="0.01"
+                  placeholder="1.00"
+                  {...field}
+                  onChange={(e) => field.onChange(Number(e.target.value))}
+                  className='text-muted-foreground'
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
       </div>
 
       <div className="space-y-4">

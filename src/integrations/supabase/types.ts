@@ -364,6 +364,7 @@ export type Database = {
       agreements: {
         Row: {
           add_ons: Json | null
+          admin_fee_per_toll_aed: number | null
           agreement_date: string
           agreement_no: string | null
           agreement_type: string | null
@@ -406,6 +407,7 @@ export type Database = {
         }
         Insert: {
           add_ons?: Json | null
+          admin_fee_per_toll_aed?: number | null
           agreement_date?: string
           agreement_no?: string | null
           agreement_type?: string | null
@@ -448,6 +450,7 @@ export type Database = {
         }
         Update: {
           add_ons?: Json | null
+          admin_fee_per_toll_aed?: number | null
           agreement_date?: string
           agreement_no?: string | null
           agreement_type?: string | null
@@ -598,6 +601,7 @@ export type Database = {
         Row: {
           admin_fee_model: string | null
           admin_fee_per_fine: number | null
+          admin_fee_per_toll_aed: number | null
           auto_charge_retries: number
           auto_create_service_jobs: boolean
           auto_renew: boolean
@@ -681,6 +685,7 @@ export type Database = {
         Insert: {
           admin_fee_model?: string | null
           admin_fee_per_fine?: number | null
+          admin_fee_per_toll_aed?: number | null
           auto_charge_retries?: number
           auto_create_service_jobs?: boolean
           auto_renew?: boolean
@@ -764,6 +769,7 @@ export type Database = {
         Update: {
           admin_fee_model?: string | null
           admin_fee_per_fine?: number | null
+          admin_fee_per_toll_aed?: number | null
           auto_charge_retries?: number
           auto_create_service_jobs?: boolean
           auto_renew?: boolean
@@ -1103,6 +1109,7 @@ export type Database = {
         Row: {
           account_name: string | null
           admin_fee_per_fine_aed: number | null
+          admin_fee_per_toll_aed: number | null
           agreement_date: string | null
           agreement_description: string | null
           agreement_entry_date: string | null
@@ -1230,6 +1237,7 @@ export type Database = {
         Insert: {
           account_name?: string | null
           admin_fee_per_fine_aed?: number | null
+          admin_fee_per_toll_aed?: number | null
           agreement_date?: string | null
           agreement_description?: string | null
           agreement_entry_date?: string | null
@@ -1357,6 +1365,7 @@ export type Database = {
         Update: {
           account_name?: string | null
           admin_fee_per_fine_aed?: number | null
+          admin_fee_per_toll_aed?: number | null
           agreement_date?: string | null
           agreement_description?: string | null
           agreement_entry_date?: string | null
@@ -1943,7 +1952,7 @@ export type Database = {
           custody_id: string
           field_name: string | null
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           metadata: Json | null
           new_value: string | null
           old_value: string | null
@@ -1957,7 +1966,7 @@ export type Database = {
           custody_id: string
           field_name?: string | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           metadata?: Json | null
           new_value?: string | null
           old_value?: string | null
@@ -1971,7 +1980,7 @@ export type Database = {
           custody_id?: string
           field_name?: string | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           metadata?: Json | null
           new_value?: string | null
           old_value?: string | null
@@ -3523,7 +3532,7 @@ export type Database = {
           auto_approve_limit: number | null
           created_at: string
           customer_id: string
-          default_rental_duration: unknown | null
+          default_rental_duration: unknown
           id: string
           notification_preferences: Json | null
           preferred_locations: string[] | null
@@ -3535,7 +3544,7 @@ export type Database = {
           auto_approve_limit?: number | null
           created_at?: string
           customer_id: string
-          default_rental_duration?: unknown | null
+          default_rental_duration?: unknown
           id?: string
           notification_preferences?: Json | null
           preferred_locations?: string[] | null
@@ -3547,7 +3556,7 @@ export type Database = {
           auto_approve_limit?: number | null
           created_at?: string
           customer_id?: string
-          default_rental_duration?: unknown | null
+          default_rental_duration?: unknown
           id?: string
           notification_preferences?: Json | null
           preferred_locations?: string[] | null
@@ -4614,6 +4623,7 @@ export type Database = {
       quotes: {
         Row: {
           account_name: string | null
+          admin_fee_per_toll_aed: number | null
           agreement_id: string | null
           agreement_no: string | null
           annual_escalation_percentage: number | null
@@ -4736,6 +4746,7 @@ export type Database = {
         }
         Insert: {
           account_name?: string | null
+          admin_fee_per_toll_aed?: number | null
           agreement_id?: string | null
           agreement_no?: string | null
           annual_escalation_percentage?: number | null
@@ -4858,6 +4869,7 @@ export type Database = {
         }
         Update: {
           account_name?: string | null
+          admin_fee_per_toll_aed?: number | null
           agreement_id?: string | null
           agreement_no?: string | null
           annual_escalation_percentage?: number | null
@@ -5269,6 +5281,7 @@ export type Database = {
       reservations: {
         Row: {
           add_ons: Json | null
+          admin_fee_per_toll_aed: number | null
           advance_payment: number | null
           airport_info: Json | null
           airport_pickup: boolean | null
@@ -5341,6 +5354,7 @@ export type Database = {
         }
         Insert: {
           add_ons?: Json | null
+          admin_fee_per_toll_aed?: number | null
           advance_payment?: number | null
           airport_info?: Json | null
           airport_pickup?: boolean | null
@@ -5413,6 +5427,7 @@ export type Database = {
         }
         Update: {
           add_ons?: Json | null
+          admin_fee_per_toll_aed?: number | null
           advance_payment?: number | null
           airport_info?: Json | null
           airport_pickup?: boolean | null
@@ -7810,10 +7825,7 @@ export type Database = {
           custody_no: string
         }[]
       }
-      auto_detect_sla_breaches: {
-        Args: Record<PropertyKey, never>
-        Returns: number
-      }
+      auto_detect_sla_breaches: { Args: never; Returns: number }
       calculate_booking_points: {
         Args: {
           p_booking_amount: number
@@ -7828,10 +7840,7 @@ export type Database = {
           total_points: number
         }[]
       }
-      calculate_custody_sla: {
-        Args: { p_custody_id: string }
-        Returns: Json
-      }
+      calculate_custody_sla: { Args: { p_custody_id: string }; Returns: Json }
       calculate_down_payment: {
         Args: { p_total_amount: number }
         Returns: number
@@ -7871,7 +7880,7 @@ export type Database = {
         }[]
       }
       check_tier_anniversary_rewards: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           anniversary_bonus: number
           customer_id: string
@@ -7900,64 +7909,31 @@ export type Database = {
         Returns: boolean
       }
       expire_old_points: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           customer_id: string
           points_expired: number
         }[]
       }
-      generate_agreement_no: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
+      generate_agreement_no: { Args: never; Returns: string }
       generate_contract_no: {
         Args: { p_agreement_no: string; p_line_number: number }
         Returns: string
       }
-      generate_corporate_lease_no: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
+      generate_corporate_lease_no: { Args: never; Returns: string }
       generate_cost_sheet_no: {
         Args: { p_quote_id: string; p_version: number }
         Returns: string
       }
-      generate_custody_no: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      generate_exception_no: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      generate_movement_no: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      generate_referral_code: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      generate_reservation_no: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      generate_rfq_no: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      generate_subscription_id: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      generate_ticket_no: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      generate_toll_fine_no: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
+      generate_custody_no: { Args: never; Returns: string }
+      generate_exception_no: { Args: never; Returns: string }
+      generate_movement_no: { Args: never; Returns: string }
+      generate_referral_code: { Args: never; Returns: string }
+      generate_reservation_no: { Args: never; Returns: string }
+      generate_rfq_no: { Args: never; Returns: string }
+      generate_subscription_id: { Args: never; Returns: string }
+      generate_ticket_no: { Args: never; Returns: string }
+      generate_toll_fine_no: { Args: never; Returns: string }
       generate_vehicle_item_code: {
         Args: {
           p_category: string
@@ -7978,10 +7954,7 @@ export type Database = {
         }
         Returns: string
       }
-      generate_wo_number: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
+      generate_wo_number: { Args: never; Returns: string }
       get_custody_statistics: {
         Args: { p_date_from?: string; p_date_to?: string }
         Returns: Json
@@ -8002,7 +7975,7 @@ export type Database = {
         }[]
       }
       get_overdue_custodies: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           custody_id: string
           custody_no: string
@@ -8025,18 +7998,9 @@ export type Database = {
         }
         Returns: boolean
       }
-      is_staff_or_admin: {
-        Args: { _user_id: string }
-        Returns: boolean
-      }
-      mask_email: {
-        Args: { _user_id: string; email: string }
-        Returns: string
-      }
-      mask_phone: {
-        Args: { _user_id: string; phone: string }
-        Returns: string
-      }
+      is_staff_or_admin: { Args: { _user_id: string }; Returns: boolean }
+      mask_email: { Args: { _user_id: string; email: string }; Returns: string }
+      mask_phone: { Args: { _user_id: string; phone: string }; Returns: string }
       redeem_reward: {
         Args: {
           p_catalog_item_id: string
