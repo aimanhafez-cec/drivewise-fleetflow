@@ -144,7 +144,7 @@ const VehicleLinesTable: React.FC<VehicleLinesTableProps> = ({ onAssignClick, on
                     ) : (
                       <Button
                         variant="default"
-                        size="sm"
+                        size="default"
                         onClick={() => onAssignClick(line)}
                       >
                         <Car className="h-4 w-4 mr-1" />
