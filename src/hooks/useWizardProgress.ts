@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import type { EnhancedWizardData, WizardProgress } from '@/types/agreement-wizard';
+import type { EnhancedWizardData, WizardProgress, StepStatus } from '@/types/agreement-wizard';
 
 interface UseWizardProgressProps {
   storageKey: string;
@@ -18,6 +18,8 @@ export const useWizardProgress = ({
     completedSteps: [],
     canProceed: false,
     lastSaved: undefined,
+    stepValidationStatus: {},
+    visitedSteps: [],
   });
 
   // Load saved progress on mount
@@ -104,6 +106,8 @@ export const useWizardProgress = ({
         completedSteps: [],
         canProceed: false,
         lastSaved: undefined,
+        stepValidationStatus: {},
+        visitedSteps: [],
       });
       console.log('[useWizardProgress] Progress cleared');
     } catch (error) {
@@ -131,12 +135,47 @@ export const useWizardProgress = ({
     return false;
   }, [progress]);
 
+  const markStepIncomplete = useCallback((step: number) => {
+    setProgress(prev => ({
+      ...prev,
+      completedSteps: prev.completedSteps.filter(s => s !== step),
+      visitedSteps: [...new Set([...prev.visitedSteps, step])],
+    }));
+  }, []);
+
+  const updateStepStatus = useCallback((step: number, status: StepStatus) => {
+    setProgress(prev => ({
+      ...prev,
+      stepValidationStatus: {
+        ...prev.stepValidationStatus,
+        [step]: status,
+      },
+      visitedSteps: [...new Set([...prev.visitedSteps, step])],
+    }));
+  }, []);
+
+  const getStepStatus = useCallback((step: number): StepStatus => {
+    if (progress.completedSteps.includes(step)) {
+      return 'complete';
+    }
+    if (progress.stepValidationStatus[step]) {
+      return progress.stepValidationStatus[step];
+    }
+    if (progress.visitedSteps.includes(step)) {
+      return 'incomplete';
+    }
+    return 'not-visited';
+  }, [progress]);
+
   return {
     wizardData,
     progress,
     updateWizardData,
     setCurrentStep,
     markStepComplete,
+    markStepIncomplete,
+    updateStepStatus,
+    getStepStatus,
     setCanProceed,
     clearProgress,
     getProgressPercentage,

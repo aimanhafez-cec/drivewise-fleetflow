@@ -229,6 +229,9 @@ export interface EnhancedWizardData {
   };
 }
 
+// Step status for progress tracking
+export type StepStatus = 'complete' | 'incomplete' | 'has-errors' | 'not-visited';
+
 // Validation schemas for each step
 export interface StepValidation {
   isValid: boolean;
@@ -242,4 +245,6 @@ export interface WizardProgress {
   completedSteps: number[];
   canProceed: boolean;
   lastSaved?: string;
+  stepValidationStatus: Record<number, StepStatus>;
+  visitedSteps: number[];
 }
