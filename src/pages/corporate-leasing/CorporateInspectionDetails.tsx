@@ -4,10 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { ArrowLeft, Edit, Trash2, Printer, CheckCircle2, XCircle, Gauge, FileText, PenTool, Paperclip } from 'lucide-react';
+import { ArrowLeft, Edit, Trash2, Printer, CheckCircle2, XCircle, Gauge, FileText, PenTool, Paperclip, AlertTriangle } from 'lucide-react';
 import { useState } from 'react';
 import { PrintBlankCardModal } from '@/components/inspection/PrintBlankCardModal';
 import { toast } from 'sonner';
+import { DamageMarkersDisplay } from '@/components/inspection/corporate/DamageMarkersDisplay';
 
 export default function CorporateInspectionDetails() {
   const { id } = useParams<{ id: string }>();
@@ -158,6 +159,17 @@ export default function CorporateInspectionDetails() {
           ))}
         </div>
       </Card>
+
+      {/* Vehicle Damage Report */}
+      {inspection.damage_marker_ids && inspection.damage_marker_ids.length > 0 && (
+        <Card className="p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <AlertTriangle className="h-5 w-5 text-orange-500" />
+            <h2 className="text-xl font-semibold">Vehicle Damage Report</h2>
+          </div>
+          <DamageMarkersDisplay damageMarkerIds={inspection.damage_marker_ids} />
+        </Card>
+      )}
 
       {/* Metrics */}
       <Card className="p-6">

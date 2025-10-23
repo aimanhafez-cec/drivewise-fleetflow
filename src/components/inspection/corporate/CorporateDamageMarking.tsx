@@ -236,12 +236,12 @@ export function CorporateDamageMarking({
               
               {/* Tooltip */}
               <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-1 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
-                <div className="bg-popover text-popover-foreground px-3 py-2 rounded-lg text-xs whitespace-nowrap shadow-lg border">
-                  <div className="font-medium">
+                <div className="bg-gray-900 text-white px-3 py-2 rounded-lg text-xs shadow-lg border border-gray-700 min-w-max">
+                  <div className="font-medium whitespace-nowrap">
                     {SEVERITY_OPTIONS.find(s => s.value === marker.severity)?.label} - {marker.damage_type}
                   </div>
                   {marker.notes && (
-                    <div className="text-muted-foreground mt-1 max-w-[200px] whitespace-normal">
+                    <div className="text-gray-300 mt-1 max-w-[200px] whitespace-normal">
                       {marker.notes}
                     </div>
                   )}
