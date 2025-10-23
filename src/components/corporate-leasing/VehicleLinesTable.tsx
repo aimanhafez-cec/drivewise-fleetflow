@@ -73,7 +73,8 @@ const VehicleLinesTable: React.FC<VehicleLinesTableProps> = ({ onAssignClick, on
             <TableRow>
               <TableHead>Agreement No.</TableHead>
               <TableHead>Contract No.</TableHead>
-              <TableHead>Vehicle Specification</TableHead>
+              <TableHead>Item Code</TableHead>
+              <TableHead>Item Description</TableHead>
               <TableHead>Start Date</TableHead>
               <TableHead>Duration</TableHead>
               <TableHead>Monthly Rate</TableHead>
@@ -85,13 +86,13 @@ const VehicleLinesTable: React.FC<VehicleLinesTableProps> = ({ onAssignClick, on
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={10} className="text-center py-8 text-muted-foreground">
                   Loading...
                 </TableCell>
               </TableRow>
             ) : lines.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={10} className="text-center py-8 text-muted-foreground">
                   No vehicle lines found
                 </TableCell>
               </TableRow>
@@ -101,10 +102,10 @@ const VehicleLinesTable: React.FC<VehicleLinesTableProps> = ({ onAssignClick, on
                   <TableCell className="font-medium">{line.agreementNo}</TableCell>
                   <TableCell>{line.contractNo}</TableCell>
                   <TableCell>
-                    <div className="flex flex-col">
-                      <span className="font-mono text-sm font-medium">{line.itemCode}</span>
-                      <span className="text-xs text-muted-foreground">{line.itemDescription}</span>
-                    </div>
+                    <span className="font-mono text-sm font-medium">{line.itemCode}</span>
+                  </TableCell>
+                  <TableCell>
+                    <span className="text-sm">{line.itemDescription}</span>
                   </TableCell>
                   <TableCell>
                     {line.startDate ? format(new Date(line.startDate), 'MMM dd, yyyy') : '-'}
