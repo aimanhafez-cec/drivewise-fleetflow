@@ -81,7 +81,7 @@ export function ContractView({ filters, onSelectFine }: ContractViewProps) {
         <TableBody>
           {fines.map((fine) => {
             const Icon = getViolationIcon(fine.violation_description);
-            const isLinked = fine.agreement_id !== null;
+            const isLinked = !!(fine.agreement_id || fine.contract_no);
             
             return (
               <TableRow 
