@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { AlertTriangle, FileText, MapPin, DollarSign } from 'lucide-react';
+import { AlertTriangle, FileText, MapPin } from 'lucide-react';
 import { useTrafficFinesCorporateStatistics } from '@/hooks/useTrafficFinesCorporate';
 import type { TrafficFineFilters } from '@/lib/api/trafficFinesCorporate';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -14,8 +14,8 @@ export function TrafficFineKPIs({ filters }: TrafficFineKPIsProps) {
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {[1, 2, 3, 4].map(i => (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {[1, 2, 3].map(i => (
           <Card key={i}>
             <CardHeader><Skeleton className="h-4 w-32" /></CardHeader>
             <CardContent><Skeleton className="h-8 w-24" /></CardContent>
@@ -45,25 +45,19 @@ export function TrafficFineKPIs({ filters }: TrafficFineKPIsProps) {
       bgColor: 'bg-blue-50',
     },
     {
-      title: 'Fines by Emirate',
+      title: 'Most Fines Emirate',
       value: stats.by_emirate[0]?.emirate || 'N/A',
-      subtitle: `${stats.by_emirate.length} emirates`,
+      subtitle: stats.by_emirate[0] 
+        ? `${stats.by_emirate[0].count} fines (${Math.round((stats.by_emirate[0].count / stats.total_count) * 100)}%)`
+        : 'No data',
       icon: MapPin,
       color: 'text-purple-600',
       bgColor: 'bg-purple-50',
     },
-    {
-      title: 'Average Fine Amount',
-      value: `AED ${Math.round(stats.average_amount).toLocaleString()}`,
-      subtitle: `Total: AED ${stats.total_amount.toLocaleString()}`,
-      icon: DollarSign,
-      color: 'text-green-600',
-      bgColor: 'bg-green-50',
-    },
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {kpiData.map((kpi) => {
         const Icon = kpi.icon;
         return (
