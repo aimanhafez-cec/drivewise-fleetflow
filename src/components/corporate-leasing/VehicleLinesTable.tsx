@@ -89,7 +89,7 @@ const VehicleLinesTable: React.FC<VehicleLinesTableProps> = ({ onAssignClick, on
               <TableHead>Duration</TableHead>
               <TableHead>Monthly Rate</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Assigned VIN</TableHead>
+              <TableHead className="min-w-[180px]">Assigned VIN</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -129,7 +129,7 @@ const VehicleLinesTable: React.FC<VehicleLinesTableProps> = ({ onAssignClick, on
                       <Badge variant="destructive">Not Assigned</Badge>
                     )}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="min-w-[180px]">
                     {line.assignedVin ? (
                       <div className="flex flex-col">
                         <span className="font-mono text-sm">{line.assignedVin}</span>
