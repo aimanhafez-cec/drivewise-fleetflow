@@ -69,12 +69,15 @@ export function CorporateSignature({ signature, onUpdate }: CorporateSignaturePr
 
   const stopDrawing = () => {
     setIsDrawing(false);
-    saveSignature();
+    // Don't auto-save on stopDrawing - only update signature state locally
+    if (hasSignature) {
+      updateSignatureData();
+    }
   };
 
-  const saveSignature = () => {
+  const updateSignatureData = () => {
     const canvas = canvasRef.current;
-    if (!canvas || !inspectorName) return;
+    if (!canvas) return;
 
     const imageUrl = canvas.toDataURL('image/png');
     onUpdate({
@@ -112,7 +115,11 @@ export function CorporateSignature({ signature, onUpdate }: CorporateSignaturePr
               placeholder="Enter inspector full name"
               value={inspectorName}
               onChange={(e) => setInspectorName(e.target.value)}
-              onBlur={saveSignature}
+              onBlur={() => {
+                if (hasSignature) {
+                  updateSignatureData();
+                }
+              }}
             />
           </div>
 
