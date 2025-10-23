@@ -88,7 +88,6 @@ export function IntegrationView({ filters, onSelectFine }: IntegrationViewProps)
             <TableHead>Authority</TableHead>
             <TableHead>Violation</TableHead>
             <TableHead>Amount</TableHead>
-            <TableHead>Confiscation</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Integration Date</TableHead>
           </TableRow>
@@ -120,13 +119,6 @@ export function IntegrationView({ filters, onSelectFine }: IntegrationViewProps)
                 </TableCell>
                 <TableCell className="font-medium">
                   AED {fine.final_amount?.toLocaleString() || '0'}
-                </TableCell>
-                <TableCell>
-                  {fine.confiscation_days > 0 ? (
-                    <Badge variant="destructive">{fine.confiscation_days} days</Badge>
-                  ) : (
-                    <span className="text-muted-foreground">-</span>
-                  )}
                 </TableCell>
                 <TableCell>
                   <Badge variant={getStatusBadgeVariant(fine.status)} className="capitalize">
