@@ -1,0 +1,272 @@
+/* Print-specific styles for inspection card */
+
+.print-card {
+  background: white;
+  padding: 20mm;
+  max-width: 210mm;
+  margin: 0 auto;
+  font-family: Arial, sans-serif;
+  font-size: 11pt;
+  color: #000;
+}
+
+.print-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 3px solid #000;
+  padding-bottom: 10mm;
+  margin-bottom: 10mm;
+}
+
+.print-logo-area {
+  flex: 1;
+}
+
+.print-logo-placeholder {
+  border: 2px dashed #666;
+  padding: 15mm;
+  text-align: center;
+  font-weight: bold;
+  color: #666;
+}
+
+.print-title-area {
+  flex: 2;
+  text-align: right;
+}
+
+.print-title-area h1 {
+  font-size: 20pt;
+  font-weight: bold;
+  margin: 0 0 5px 0;
+}
+
+.print-title-area p {
+  font-size: 10pt;
+  color: #666;
+  margin: 0;
+}
+
+.print-section {
+  margin-bottom: 8mm;
+  page-break-inside: avoid;
+}
+
+.print-section h2 {
+  font-size: 13pt;
+  font-weight: bold;
+  border-bottom: 2px solid #000;
+  padding-bottom: 2mm;
+  margin-bottom: 4mm;
+}
+
+.print-instructions {
+  font-size: 9pt;
+  color: #666;
+  font-style: italic;
+  margin: 2mm 0;
+}
+
+.print-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4mm;
+}
+
+.print-field {
+  display: flex;
+  align-items: baseline;
+  gap: 2mm;
+}
+
+.print-field.full-width {
+  grid-column: 1 / -1;
+}
+
+.print-field label {
+  font-weight: bold;
+  min-width: 35mm;
+  flex-shrink: 0;
+}
+
+.print-value {
+  flex: 1;
+  border-bottom: 1px solid #000;
+  min-height: 6mm;
+  padding: 0 2mm;
+}
+
+.print-diagrams {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 3mm;
+  margin-top: 5mm;
+}
+
+.print-diagram {
+  text-align: center;
+}
+
+.print-diagram-box {
+  border: 2px solid #000;
+  height: 35mm;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  background: #f9f9f9;
+  margin-bottom: 2mm;
+}
+
+.print-diagram p {
+  font-size: 9pt;
+  margin: 0;
+}
+
+.print-checklist-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 3mm;
+}
+
+.print-checklist-table th,
+.print-checklist-table td {
+  border: 1px solid #000;
+  padding: 2mm;
+  text-align: left;
+}
+
+.print-checklist-table th {
+  background: #e0e0e0;
+  font-weight: bold;
+}
+
+.print-checkbox {
+  text-align: center;
+  font-size: 16pt;
+  width: 15mm;
+}
+
+.print-notes-cell {
+  width: 50mm;
+}
+
+.print-fuel-gauge {
+  display: flex;
+  justify-content: space-between;
+  border: 2px solid #000;
+  padding: 5mm;
+  margin: 4mm 0;
+  background: #f9f9f9;
+}
+
+.print-fuel-marker {
+  font-size: 14pt;
+  font-weight: bold;
+  text-align: center;
+  padding: 3mm;
+  border: 2px solid #000;
+  background: white;
+  min-width: 15mm;
+}
+
+.print-notes-area {
+  margin-top: 3mm;
+}
+
+.print-notes-line {
+  border-bottom: 1px solid #333;
+  height: 8mm;
+  margin-bottom: 3mm;
+}
+
+.print-signature-section {
+  margin-top: 10mm;
+}
+
+.print-signature-line {
+  border-bottom: 2px solid #000;
+}
+
+.print-signature-box {
+  border: 2px solid #000;
+  height: 30mm;
+  margin-top: 2mm;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.print-signature-box img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.print-footer {
+  margin-top: 10mm;
+  padding-top: 5mm;
+  border-top: 2px solid #000;
+  text-align: center;
+  font-size: 9pt;
+  color: #666;
+}
+
+.print-page-break {
+  page-break-after: always;
+  display: none;
+}
+
+/* Print media query */
+@media print {
+  @page {
+    size: A4;
+    margin: 10mm;
+  }
+
+  body * {
+    visibility: hidden;
+  }
+
+  .print-card,
+  .print-card * {
+    visibility: visible;
+  }
+
+  .print-card {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    padding: 0;
+  }
+
+  .print-hide {
+    display: none !important;
+  }
+
+  .print-page-break {
+    display: block;
+  }
+
+  .print-modal-content {
+    max-width: none !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+}
+
+/* Screen preview styles */
+.print-preview {
+  background: #f0f0f0;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+@media screen {
+  .print-card {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+}
