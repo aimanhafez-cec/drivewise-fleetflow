@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useTrafficFineCorporate } from '@/hooks/useTrafficFinesCorporate';
-import { AlertTriangle, Calendar, Clock, FileText, User, Car, Link as LinkIcon } from 'lucide-react';
+import { Calendar, Clock, FileText, User, Car } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
 
@@ -167,56 +167,6 @@ export function FineDetailsPanel({ fineId, onClose }: FineDetailsPanelProps) {
             </div>
           </div>
 
-          <Separator />
-
-          {/* Contract Linkage */}
-          <div>
-            <h3 className="text-sm font-semibold uppercase text-muted-foreground mb-3">Contract Linkage</h3>
-            {fine.agreement_id ? (
-              <div className="space-y-3">
-                <div className="flex items-center gap-3">
-                  <LinkIcon className="h-5 w-5 text-muted-foreground" />
-                  <div>
-                    <p className="text-sm font-medium">Contract No</p>
-                    <p className="text-sm text-primary cursor-pointer hover:underline">
-                      {fine.contract?.agreement_no || 'N/A'}
-                    </p>
-                  </div>
-                </div>
-                {fine.customer && (
-                  <div className="flex items-center gap-3">
-                    <User className="h-5 w-5 text-muted-foreground" />
-                    <div>
-                      <p className="text-sm font-medium">Customer</p>
-                      <p className="text-sm text-primary cursor-pointer hover:underline">
-                        {fine.customer.full_name}
-                      </p>
-                    </div>
-                  </div>
-                )}
-                {fine.driver && (
-                  <div className="flex items-center gap-3">
-                    <User className="h-5 w-5 text-muted-foreground" />
-                    <div>
-                      <p className="text-sm font-medium">Driver</p>
-                      <p className="text-sm text-primary cursor-pointer hover:underline">
-                        {fine.driver.full_name}
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="text-center py-6 bg-orange-50 rounded-lg">
-                <AlertTriangle className="h-8 w-8 mx-auto mb-2 text-orange-500" />
-                <p className="text-sm font-medium">This fine is not linked to a contract</p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Manual linkage may be required
-                </p>
-              </div>
-            )}
-          </div>
-
           {/* Notes */}
           {fine.notes && (
             <div>
@@ -228,16 +178,7 @@ export function FineDetailsPanel({ fineId, onClose }: FineDetailsPanelProps) {
           )}
 
           {/* Actions */}
-          <div className="space-y-2 pt-4">
-            <Button variant="outline" className="w-full" disabled>
-              Mark as Disputed (Demo)
-            </Button>
-            <Button variant="outline" className="w-full" disabled>
-              Link to Contract (Demo)
-            </Button>
-            <Button variant="outline" className="w-full" disabled>
-              Add Note (Demo)
-            </Button>
+          <div className="pt-4">
             <Button variant="default" className="w-full" onClick={onClose}>
               Close
             </Button>
