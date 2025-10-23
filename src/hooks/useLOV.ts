@@ -34,16 +34,13 @@ export const useLOV = <T extends LOVItem>(
   const [debouncedQuery, setDebouncedQuery] = useState('');
 
   // Debounce search query
-  const debounceTimeout = useMemo(() => {
-    return setTimeout(() => {
+  React.useEffect(() => {
+    const debounceTimeout = setTimeout(() => {
       setDebouncedQuery(searchQuery);
     }, 250);
-  }, [searchQuery]);
 
-  // Clear timeout on unmount
-  React.useEffect(() => {
     return () => clearTimeout(debounceTimeout);
-  }, [debounceTimeout]);
+  }, [searchQuery]);
 
   const {
     data,

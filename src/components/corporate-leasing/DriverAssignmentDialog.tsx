@@ -478,7 +478,7 @@ export const DriverAssignmentDialog: React.FC<DriverAssignmentDialogProps> = ({
                                     <div>
                                       <p className="font-semibold text-sm">{driver.full_name}</p>
                                       <p className="text-xs text-muted-foreground">
-                                        {driver.license_number}
+                                        {driver.license_no}
                                       </p>
                                     </div>
                                     <Button
