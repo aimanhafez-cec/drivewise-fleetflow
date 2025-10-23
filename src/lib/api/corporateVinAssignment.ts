@@ -165,9 +165,9 @@ class CorporateVinAssignmentAPI {
           agreementNo: agreement.agreement_no,
           lineNo,
           contractNo,
-          itemCode: item._vehicleMeta?.itemCode || '',
-          itemDescription: item.item_description || '',
-          vehicleClass: item._vehicleMeta?.category || '',
+          itemCode: item._vehicleMeta?.item_code || item.item_code || '',
+          itemDescription: item._vehicleMeta?.item_description || item.item_description || '',
+          vehicleClass: item._vehicleMeta?.category_name || item.category_name || '',
           startDate: item.pickup_at || '',
           endDate: item.return_at || '',
           durationMonths: item.duration_months || 0,
@@ -191,6 +191,7 @@ class CorporateVinAssignmentAPI {
       filteredLines = filteredLines.filter(line =>
         line.agreementNo.toLowerCase().includes(searchLower) ||
         line.contractNo.toLowerCase().includes(searchLower) ||
+        line.itemCode.toLowerCase().includes(searchLower) ||
         line.itemDescription.toLowerCase().includes(searchLower) ||
         line.assignedVin?.toLowerCase().includes(searchLower)
       );
