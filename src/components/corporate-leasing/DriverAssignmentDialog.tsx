@@ -7,6 +7,12 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet';
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -31,14 +37,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Search, Plus, MoreVertical, Star, Edit, Trash, User, Phone, CreditCard } from 'lucide-react';
+import { Search, Plus, MoreVertical, Star, Edit, Trash, User, Phone, CreditCard, UserPlus } from 'lucide-react';
 import type { DriverLine, AssignedDriver } from '@/lib/api/corporateDriverAssignment';
-import { useDrivers, useCreateDriver } from '@/hooks/useDrivers';
+import { useDrivers } from '@/hooks/useDrivers';
 import {
   useAssignDriverToLine,
   useRemoveDriverFromLine,
   useUpdateDriverAssignment,
 } from '@/hooks/useCorporateDriverAssignment';
+import { EnhancedDriverForm } from '@/components/drivers/EnhancedDriverForm';
 import { format } from 'date-fns';
 
 interface DriverAssignmentDialogProps {
@@ -57,6 +64,7 @@ export const DriverAssignmentDialog: React.FC<DriverAssignmentDialogProps> = ({
   const [activeTab, setActiveTab] = useState<'search' | 'create'>('search');
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddDriver, setShowAddDriver] = useState(false);
+  const [isCreateDriverSheetOpen, setIsCreateDriverSheetOpen] = useState(false);
   
   // Edit assignment state
   const [editingAssignment, setEditingAssignment] = useState<AssignedDriver | null>(null);
@@ -66,18 +74,8 @@ export const DriverAssignmentDialog: React.FC<DriverAssignmentDialogProps> = ({
   
   // Remove confirmation state
   const [removingDriver, setRemovingDriver] = useState<AssignedDriver | null>(null);
-  
-  // New driver form
-  const [newDriverForm, setNewDriverForm] = useState({
-    fullName: '',
-    licenseNumber: '',
-    phoneNumber: '',
-    employeeId: '',
-    email: '',
-  });
 
   const driversData = useDrivers(searchTerm);
-  const createDriverMutation = useCreateDriver();
   const assignDriverMutation = useAssignDriverToLine();
   const removeDriverMutation = useRemoveDriverFromLine();
   const updateAssignmentMutation = useUpdateDriverAssignment();
@@ -104,48 +102,10 @@ export const DriverAssignmentDialog: React.FC<DriverAssignmentDialogProps> = ({
     }
   };
 
-  const handleCreateAndAssign = async () => {
-    if (!newDriverForm.fullName || !newDriverForm.licenseNumber || !newDriverForm.phoneNumber) {
-      return;
-    }
-
-    try {
-      // Create driver
-      const newDriver = await createDriverMutation.mutateAsync({
-        full_name: newDriverForm.fullName,
-        license_no: newDriverForm.licenseNumber,
-        phone: newDriverForm.phoneNumber,
-        employment_id: newDriverForm.employeeId || undefined,
-        email: newDriverForm.email || undefined,
-        status: 'active',
-        additional_driver_fee: 0,
-      });
-
-      // Assign to line
-      const isFirstDriver = line.assignedDrivers.length === 0;
-      await assignDriverMutation.mutateAsync({
-        lineId: line.lineId,
-        driverId: newDriver.id,
-        isPrimary: isFirstDriver,
-        assignmentStartDate: defaultAssignmentDate,
-      });
-
-      // Reset form
-      setNewDriverForm({
-        fullName: '',
-        licenseNumber: '',
-        phoneNumber: '',
-        employeeId: '',
-        email: '',
-      });
-
-      if (mode === 'assign') {
-        onClose();
-      } else {
-        setShowAddDriver(false);
-      }
-    } catch (error) {
-      console.error('Error creating and assigning driver:', error);
+  const handleDriverCreated = async (driverId?: string) => {
+    setIsCreateDriverSheetOpen(false);
+    if (driverId) {
+      await handleAssignExistingDriver(driverId);
     }
   };
 
@@ -300,97 +260,17 @@ export const DriverAssignmentDialog: React.FC<DriverAssignmentDialogProps> = ({
               </TabsContent>
 
               <TabsContent value="create" className="space-y-4 mt-4">
-                <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="fullName">
-                        Full Name <span className="text-destructive">*</span>
-                      </Label>
-                      <Input
-                        id="fullName"
-                        placeholder="John Doe"
-                        value={newDriverForm.fullName}
-                        onChange={(e) =>
-                          setNewDriverForm({ ...newDriverForm, fullName: e.target.value })
-                        }
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="licenseNumber">
-                        License Number <span className="text-destructive">*</span>
-                      </Label>
-                      <Input
-                        id="licenseNumber"
-                        placeholder="123456789"
-                        value={newDriverForm.licenseNumber}
-                        onChange={(e) =>
-                          setNewDriverForm({ ...newDriverForm, licenseNumber: e.target.value })
-                        }
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="phoneNumber">
-                        Phone Number <span className="text-destructive">*</span>
-                      </Label>
-                      <Input
-                        id="phoneNumber"
-                        placeholder="+971501234567"
-                        value={newDriverForm.phoneNumber}
-                        onChange={(e) =>
-                          setNewDriverForm({ ...newDriverForm, phoneNumber: e.target.value })
-                        }
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="employeeId">Employee ID (Optional)</Label>
-                      <Input
-                        id="employeeId"
-                        placeholder="EMP001"
-                        value={newDriverForm.employeeId}
-                        onChange={(e) =>
-                          setNewDriverForm({ ...newDriverForm, employeeId: e.target.value })
-                        }
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email (Optional)</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="john.doe@company.com"
-                      value={newDriverForm.email}
-                      onChange={(e) =>
-                        setNewDriverForm({ ...newDriverForm, email: e.target.value })
-                      }
-                    />
-                  </div>
-
-                  <div className="flex justify-end gap-2 pt-4">
-                    <Button variant="outline" onClick={onClose}>
-                      Cancel
-                    </Button>
-                    <Button
-                      onClick={handleCreateAndAssign}
-                      disabled={
-                        !newDriverForm.fullName ||
-                        !newDriverForm.licenseNumber ||
-                        !newDriverForm.phoneNumber ||
-                        createDriverMutation.isPending ||
-                        assignDriverMutation.isPending
-                      }
-                    >
-                      {createDriverMutation.isPending || assignDriverMutation.isPending
-                        ? 'Creating...'
-                        : 'Create & Assign'}
-                    </Button>
-                  </div>
+                <div className="flex flex-col items-center justify-center py-12">
+                  <UserPlus className="h-16 w-16 text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">Create New Driver</h3>
+                  <p className="text-sm text-muted-foreground text-center mb-6 max-w-md">
+                    Use the comprehensive driver form to capture all required information including
+                    identity documents, employment details, and license information.
+                  </p>
+                  <Button onClick={() => setIsCreateDriverSheetOpen(true)} size="lg">
+                    <UserPlus className="mr-2 h-4 w-4" />
+                    Open Driver Form
+                  </Button>
                 </div>
               </TabsContent>
             </Tabs>
@@ -526,74 +406,14 @@ export const DriverAssignmentDialog: React.FC<DriverAssignmentDialogProps> = ({
                       </TabsContent>
 
                       <TabsContent value="create" className="space-y-4 mt-4">
-                        <div className="grid grid-cols-2 gap-3">
-                          <div className="space-y-2">
-                            <Label htmlFor="newFullName">Full Name *</Label>
-                            <Input
-                              id="newFullName"
-                              placeholder="John Doe"
-                              value={newDriverForm.fullName}
-                              onChange={(e) =>
-                                setNewDriverForm({ ...newDriverForm, fullName: e.target.value })
-                              }
-                            />
-                          </div>
-
-                          <div className="space-y-2">
-                            <Label htmlFor="newLicenseNumber">License Number *</Label>
-                            <Input
-                              id="newLicenseNumber"
-                              placeholder="123456789"
-                              value={newDriverForm.licenseNumber}
-                              onChange={(e) =>
-                                setNewDriverForm({ ...newDriverForm, licenseNumber: e.target.value })
-                              }
-                            />
-                          </div>
-
-                          <div className="space-y-2">
-                            <Label htmlFor="newPhoneNumber">Phone Number *</Label>
-                            <Input
-                              id="newPhoneNumber"
-                              placeholder="+971501234567"
-                              value={newDriverForm.phoneNumber}
-                              onChange={(e) =>
-                                setNewDriverForm({ ...newDriverForm, phoneNumber: e.target.value })
-                              }
-                            />
-                          </div>
-
-                          <div className="space-y-2">
-                            <Label htmlFor="newEmployeeId">Employee ID</Label>
-                            <Input
-                              id="newEmployeeId"
-                              placeholder="EMP001"
-                              value={newDriverForm.employeeId}
-                              onChange={(e) =>
-                                setNewDriverForm({ ...newDriverForm, employeeId: e.target.value })
-                              }
-                            />
-                          </div>
-                        </div>
-
-                        <div className="flex gap-2">
-                          <Button
-                            variant="outline"
-                            onClick={() => setShowAddDriver(false)}
-                            className="flex-1"
-                          >
-                            Cancel
-                          </Button>
-                          <Button
-                            onClick={handleCreateAndAssign}
-                            disabled={
-                              !newDriverForm.fullName ||
-                              !newDriverForm.licenseNumber ||
-                              !newDriverForm.phoneNumber
-                            }
-                            className="flex-1"
-                          >
-                            Create & Assign
+                        <div className="flex flex-col items-center justify-center py-8">
+                          <UserPlus className="h-12 w-12 text-muted-foreground mb-3" />
+                          <p className="text-sm text-muted-foreground text-center mb-4">
+                            Use the comprehensive driver form to capture all details
+                          </p>
+                          <Button onClick={() => setIsCreateDriverSheetOpen(true)}>
+                            <UserPlus className="mr-2 h-4 w-4" />
+                            Open Driver Form
                           </Button>
                         </div>
                       </TabsContent>
@@ -605,6 +425,22 @@ export const DriverAssignmentDialog: React.FC<DriverAssignmentDialogProps> = ({
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Enhanced Driver Form Sheet */}
+      <Sheet open={isCreateDriverSheetOpen} onOpenChange={setIsCreateDriverSheetOpen}>
+        <SheetContent side="right" className="w-full sm:max-w-2xl overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle>Create New Driver</SheetTitle>
+          </SheetHeader>
+          <div className="mt-6">
+            <EnhancedDriverForm
+              open={isCreateDriverSheetOpen}
+              onClose={() => setIsCreateDriverSheetOpen(false)}
+              onSave={handleDriverCreated}
+            />
+          </div>
+        </SheetContent>
+      </Sheet>
 
       {/* Edit Assignment Dialog */}
       <Dialog open={!!editingAssignment} onOpenChange={() => setEditingAssignment(null)}>
