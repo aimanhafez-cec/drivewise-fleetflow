@@ -239,8 +239,8 @@ export const InspectionWizard: React.FC<InspectionWizardProps> = ({
         
         return (
           <InspectionChecklist
-            data={checklistData}
-            onUpdate={(data) => handleStepData('checklist', data)}
+            checklist={checklistData.status || {}}
+            onChange={(checklist) => handleStepData('checklist', { ...checklistData, status: checklist })}
           />
         );
       case 'damage':
@@ -253,10 +253,15 @@ export const InspectionWizard: React.FC<InspectionWizardProps> = ({
           />
         );
       case 'metrics':
+        const metricsData = inspectionData.metrics || {};
         return (
           <InspectionMetrics
-            data={inspectionData.metrics || {}}
-            onUpdate={(data) => handleStepData('metrics', data)}
+            metrics={{ 
+              odometer: (metricsData as any).odometer, 
+              fuelLevel: (metricsData as any).fuelLevel 
+            }}
+            media={[]}
+            onChange={(metrics, media) => handleStepData('metrics', metrics)}
           />
         );
       case 'summary':

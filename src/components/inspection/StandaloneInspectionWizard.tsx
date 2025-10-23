@@ -205,17 +205,23 @@ export const StandaloneInspectionWizard: React.FC<StandaloneInspectionWizardProp
           />
         );
       case 'checklist':
+        const checklistData = inspectionData.checklist || {};
         return (
           <InspectionChecklist
-            data={inspectionData.checklist}
-            onUpdate={(data) => handleStepData('checklist', data)}
+            checklist={checklistData as Record<string, 'OK' | 'DAMAGE'>}
+            onChange={(checklist) => handleStepData('checklist', checklist)}
           />
         );
       case 'metrics':
+        const metricsData = inspectionData.metrics || {};
         return (
           <InspectionMetrics
-            data={inspectionData.metrics || {}}
-            onUpdate={(data) => handleStepData('metrics', data)}
+            metrics={{ 
+              odometer: (metricsData as any).odometer, 
+              fuelLevel: (metricsData as any).fuelLevel 
+            }}
+            media={[]}
+            onChange={(metrics, media) => handleStepData('metrics', metrics)}
           />
         );
       case 'summary':

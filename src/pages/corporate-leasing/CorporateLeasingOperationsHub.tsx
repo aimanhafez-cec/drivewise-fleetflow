@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Car, Users } from 'lucide-react';
+import { Car, Users, ClipboardCheck } from 'lucide-react';
 import HubCard from '@/components/navigation/HubCard';
 
 const CorporateLeasingOperationsHub: React.FC = () => {
@@ -21,6 +21,13 @@ const CorporateLeasingOperationsHub: React.FC = () => {
       route: '/corporate-leasing-operations/drivers-assignment',
       gradient: 'from-green-500/10 to-emerald-500/10',
     },
+    {
+      title: 'Manage Inspections',
+      description: 'Create and manage vehicle inspections including check-out, check-in, periodic, and random inspections',
+      icon: ClipboardCheck,
+      route: '/corporate-leasing-operations/manage-inspections',
+      gradient: 'from-purple-500/10 to-pink-500/10',
+    },
   ];
 
   return (
@@ -32,7 +39,7 @@ const CorporateLeasingOperationsHub: React.FC = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
         {operationsCards.map((card) => (
           <HubCard
             key={card.route}
