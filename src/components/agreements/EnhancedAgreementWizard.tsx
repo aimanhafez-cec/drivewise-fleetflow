@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { ArrowLeft, ArrowRight, Save, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Save, AlertTriangle, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useWizardProgress } from '@/hooks/useWizardProgress';
@@ -403,22 +403,39 @@ export const EnhancedAgreementWizard = () => {
             {/* Step Pills */}
             <div className="flex flex-wrap gap-2 mt-4">
               {STEP_CONFIG.map((step) => {
-                const isCompleted = progress.completedSteps.includes(step.id);
+                const status = getStepStatus(step.id);
                 const isCurrent = progress.currentStep === step.id;
+                
+                // Determine styling based on status
+                let buttonStyles = '';
+                let StatusIcon = null;
+                
+                if (status === 'complete') {
+                  buttonStyles = 'bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400';
+                  StatusIcon = CheckCircle2;
+                } else if (isCurrent) {
+                  buttonStyles = 'bg-primary text-primary-foreground';
+                } else if (status === 'has-errors') {
+                  buttonStyles = 'bg-amber-100 text-amber-700 hover:bg-amber-200 dark:bg-amber-900/30 dark:text-amber-400';
+                  StatusIcon = AlertCircle;
+                } else {
+                  // incomplete or not-visited -> amber
+                  buttonStyles = 'bg-amber-100 text-amber-700 hover:bg-amber-200 dark:bg-amber-900/30 dark:text-amber-400';
+                }
 
                 return (
                   <button
                     key={step.id}
                     onClick={() => handleStepClick(step.id)}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      isCurrent
-                        ? 'bg-primary text-primary-foreground'
-                        : isCompleted
-                        ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                        : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                    }`}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${buttonStyles}`}
                   >
-                    {isCompleted && <CheckCircle2 className="h-4 w-4" />}
+                    {StatusIcon ? (
+                      <StatusIcon className="h-4 w-4" />
+                    ) : (
+                      <span className="flex items-center justify-center w-5 h-5 rounded-full bg-current/20 text-xs">
+                        {step.id + 1}
+                      </span>
+                    )}
                     <span>{step.icon}</span>
                     <span className="hidden sm:inline">{step.title}</span>
                   </button>
