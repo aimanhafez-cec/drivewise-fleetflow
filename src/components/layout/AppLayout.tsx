@@ -88,6 +88,11 @@ const navigation = [
     icon: Building2,
   },
   {
+    title: 'Corporate Leasing Operations',
+    url: '/corporate-leasing-operations',
+    icon: FolderOpen,
+  },
+  {
     title: 'Inspections',
     url: '/inspections',
     icon: ClipboardCheck,

@@ -84,6 +84,9 @@ import NewCustody from "./pages/NewCustody";
 import CustodySettings from "./pages/CustodySettings";
 import CustodyAnalytics from "./pages/CustodyAnalytics";
 import CorporateLeasingHub from "./pages/corporate-leasing/CorporateLeasingHub";
+import CorporateLeasingOperationsHub from "./pages/corporate-leasing/CorporateLeasingOperationsHub";
+import VinAssignment from "./pages/corporate-leasing/VinAssignment";
+import DriversAssignment from "./pages/corporate-leasing/DriversAssignment";
 // Hidden - commented out imports
 // import { CarSubscriptions } from "./pages/CarSubscriptions";
 // import { NewCarSubscription } from "./pages/NewCarSubscription";
@@ -222,6 +225,15 @@ const App = () => {
                 <Route path="master-agreements/view/:id" element={<MasterAgreementView />} />
                 <Route path="master-agreements/:id/edit" element={<MasterAgreementEdit />} />
                 <Route path="master-agreements/:id" element={<MasterAgreementDetails />} />
+              </Route>
+              <Route path="/corporate-leasing-operations" element={
+                <ProtectedRoute>
+                  <AppLayout />
+                </ProtectedRoute>
+              }>
+                <Route index element={<CorporateLeasingOperationsHub />} />
+                <Route path="vin-assignment" element={<VinAssignment />} />
+                <Route path="drivers-assignment" element={<DriversAssignment />} />
               </Route>
               <Route path="/rfqs" element={
                 <ProtectedRoute>
