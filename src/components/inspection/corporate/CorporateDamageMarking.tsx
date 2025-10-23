@@ -58,8 +58,8 @@ export function CorporateDamageMarking({
     if (!isAddingMarker) return;
 
     const rect = e.currentTarget.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    const x = (e.clientX - rect.left) / rect.width;
+    const y = (e.clientY - rect.top) / rect.height;
 
     setClickPosition({ x, y, side: currentView });
     setSelectedMarker(null);
@@ -227,7 +227,7 @@ export function CorporateDamageMarking({
             <div
               key={marker.id}
               className="absolute transform -translate-x-1/2 -translate-y-1/2 group"
-              style={{ left: `${marker.x}%`, top: `${marker.y}%` }}
+              style={{ left: `${marker.x * 100}%`, top: `${marker.y * 100}%` }}
               onClick={(e) => handleMarkerClick(marker, e)}
             >
               <div
