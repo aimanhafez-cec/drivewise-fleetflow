@@ -102,8 +102,8 @@ const VehicleLinesTable: React.FC<VehicleLinesTableProps> = ({ onAssignClick, on
                   <TableCell>{line.contractNo}</TableCell>
                   <TableCell>
                     <div className="flex flex-col">
-                      <span className="font-medium">{line.itemDescription}</span>
-                      <span className="text-sm text-muted-foreground">{line.vehicleClass}</span>
+                      <span className="font-mono text-sm font-medium">{line.itemCode}</span>
+                      <span className="text-xs text-muted-foreground">{line.itemDescription}</span>
                     </div>
                   </TableCell>
                   <TableCell>
