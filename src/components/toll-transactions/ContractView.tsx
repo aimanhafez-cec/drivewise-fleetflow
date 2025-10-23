@@ -27,7 +27,7 @@ export function ContractView({ data, onRowClick }: ContractViewProps) {
       header: "Customer",
       render: (item) => (
         <span className="text-sm">
-          {item.customer?.full_name || (
+          {item.customer?.company_name || item.customer?.full_name || (
             <span className="text-muted-foreground italic">Unknown</span>
           )}
         </span>

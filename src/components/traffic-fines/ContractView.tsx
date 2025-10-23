@@ -103,7 +103,7 @@ export function ContractView({ filters, onSelectFine }: ContractViewProps) {
                   )}
                 </TableCell>
                 <TableCell>
-                  {fine.customer?.full_name || (
+                  {fine.customer?.company_name || fine.customer?.full_name || (
                     <span className="text-muted-foreground italic text-sm">Unknown</span>
                   )}
                 </TableCell>

@@ -34,6 +34,7 @@ export interface TollTransactionCorporateRecord {
     id: string;
     full_name: string;
     email?: string;
+    company_name?: string;
   };
   driver?: {
     id: string;
@@ -169,7 +170,7 @@ export class TollTransactionsCorporateAPI {
     // Fetch related data in parallel
     const [customersData, driversData, vehiclesData] = await Promise.all([
       customerIds.length > 0
-        ? supabase.from("profiles").select("id, full_name, email").in("id", customerIds)
+        ? supabase.from("profiles").select("id, full_name, email, company_name").in("id", customerIds)
         : Promise.resolve({ data: [] }),
       driverIds.length > 0
         ? supabase.from("drivers").select("id, full_name, license_no").in("id", driverIds)

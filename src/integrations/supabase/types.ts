@@ -4487,6 +4487,7 @@ export type Database = {
       profiles: {
         Row: {
           address: Json | null
+          company_name: string | null
           created_at: string
           credit_rating: number | null
           date_of_birth: string | null
@@ -4506,6 +4507,7 @@ export type Database = {
         }
         Insert: {
           address?: Json | null
+          company_name?: string | null
           created_at?: string
           credit_rating?: number | null
           date_of_birth?: string | null
@@ -4525,6 +4527,7 @@ export type Database = {
         }
         Update: {
           address?: Json | null
+          company_name?: string | null
           created_at?: string
           credit_rating?: number | null
           date_of_birth?: string | null

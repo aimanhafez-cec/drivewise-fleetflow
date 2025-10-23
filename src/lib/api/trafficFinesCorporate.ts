@@ -76,7 +76,7 @@ export class TrafficFinesCorporateAPI {
       .select(`
         *,
         contract:agreements(id, agreement_no, customer_id),
-        customer:profiles!traffic_fines_corporate_customer_id_fkey(id, full_name, email),
+        customer:profiles!traffic_fines_corporate_customer_id_fkey(id, full_name, email, company_name),
         driver:drivers(id, full_name, license_no),
         vehicle:vehicles(id, license_plate, make, model, vin)
       `)
@@ -149,7 +149,7 @@ export class TrafficFinesCorporateAPI {
       .select(`
         *,
         contract:agreements(id, agreement_no, customer_id),
-        customer:profiles!traffic_fines_corporate_customer_id_fkey(id, full_name, email, phone),
+        customer:profiles!traffic_fines_corporate_customer_id_fkey(id, full_name, email, phone, company_name),
         driver:drivers(id, full_name, license_no, phone),
         vehicle:vehicles(id, license_plate, make, model, vin, year)
       `)
