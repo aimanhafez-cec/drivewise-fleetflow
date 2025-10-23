@@ -69,10 +69,10 @@ const VehicleLinesTable: React.FC<VehicleLinesTableProps> = ({ onAssignClick, on
           className="whitespace-nowrap"
           onClick={() => {
             // Placeholder - will do nothing for now
-            console.log('Assign Automatically clicked');
+            console.log('Auto-Assign clicked');
           }}
         >
-          Assign Automatically
+          Auto-Assign
         </Button>
       </div>
 
