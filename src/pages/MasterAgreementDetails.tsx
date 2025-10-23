@@ -297,7 +297,7 @@ const MasterAgreementDetails = () => {
           <CardHeader>
             <CardTitle>Customer Response</CardTitle>
             <CardDescription>
-              Record customer acceptance or rejection of this master agreement
+              Record customer signature or rejection of this master agreement
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -307,7 +307,7 @@ const MasterAgreementDetails = () => {
                 className="bg-green-600 hover:bg-green-700"
               >
                 <CheckCircle className="mr-2 h-4 w-4" />
-                Customer Accepted
+                Customer Signed
               </Button>
               <Button
                 variant="destructive"

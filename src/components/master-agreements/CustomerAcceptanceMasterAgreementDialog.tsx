@@ -30,7 +30,6 @@ export const CustomerAcceptanceMasterAgreementDialog: React.FC<CustomerAcceptanc
   agreementNumber,
 }) => {
   const [additionalNotes, setAdditionalNotes] = useState("");
-  const [activateNow, setActivateNow] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { toast } = useToast();
@@ -40,14 +39,14 @@ export const CustomerAcceptanceMasterAgreementDialog: React.FC<CustomerAcceptanc
     try {
       setIsSubmitting(true);
 
-      // Update agreement to customer_accepted status
+      // Update agreement to customer_signed status
       const { error: updateError } = await supabase
         .from('corporate_leasing_agreements')
         .update({
           customer_acceptance_status: 'accepted',
           customer_signed_at: new Date().toISOString(),
           customer_comments: additionalNotes.trim() || null,
-          status: activateNow ? 'active' : 'customer_accepted',
+          status: 'customer_accepted',
         })
         .eq('id', agreementId);
 
@@ -57,13 +56,12 @@ export const CustomerAcceptanceMasterAgreementDialog: React.FC<CustomerAcceptanc
       queryClient.invalidateQueries({ queryKey: ['master-agreements:list'] });
 
       toast({
-        title: 'Customer Acceptance Recorded',
-        description: `Master agreement ${agreementNumber} has been marked as accepted${activateNow ? ' and activated' : ''}.`,
+        title: 'Customer Signature Recorded',
+        description: `Master agreement ${agreementNumber} has been marked as signed.`,
       });
 
       onOpenChange(false);
       setAdditionalNotes("");
-      setActivateNow(false);
     } catch (error: any) {
       console.error("Failed to process acceptance:", error);
       toast({
@@ -82,35 +80,24 @@ export const CustomerAcceptanceMasterAgreementDialog: React.FC<CustomerAcceptanc
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <CheckCircle className="h-5 w-5 text-green-600" />
-            Customer Accepted Master Agreement
+            Customer Signed Master Agreement
           </DialogTitle>
           <DialogDescription>
-            Record that customer has accepted master agreement {agreementNumber}
+            Record that customer has signed master agreement {agreementNumber}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
           <div>
-            <Label htmlFor="additional-notes">Additional Notes (Optional)</Label>
+            <Label htmlFor="additional-notes">Signature Notes (Optional)</Label>
             <Textarea
               id="additional-notes"
-              placeholder="Add any additional context about the customer acceptance..."
+              placeholder="Add any notes about the signing process..."
               value={additionalNotes}
               onChange={(e) => setAdditionalNotes(e.target.value)}
               rows={3}
               className="mt-2"
             />
-          </div>
-
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="activate-now"
-              checked={activateNow}
-              onCheckedChange={(checked) => setActivateNow(checked as boolean)}
-            />
-            <Label htmlFor="activate-now" className="cursor-pointer">
-              Activate master agreement now
-            </Label>
           </div>
         </div>
 
@@ -123,7 +110,7 @@ export const CustomerAcceptanceMasterAgreementDialog: React.FC<CustomerAcceptanc
             disabled={isSubmitting}
             className="bg-green-600 hover:bg-green-700"
           >
-            {isSubmitting ? "Saving..." : "Mark as Accepted"}
+            {isSubmitting ? "Saving..." : "Mark as Signed"}
           </Button>
         </DialogFooter>
       </DialogContent>

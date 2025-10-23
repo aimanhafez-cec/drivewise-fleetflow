@@ -278,7 +278,7 @@ export const MasterAgreementStep6Summary: React.FC<MasterAgreementStep6SummaryPr
         <Alert className="border-green-500 bg-green-50 dark:bg-green-950">
           <CheckCircle className="h-4 w-4 text-green-600" />
           <AlertDescription className="text-green-800 dark:text-green-200">
-            <strong>Customer Accepted</strong> - The customer has digitally signed and accepted this master agreement.
+            <strong>Customer Signed</strong> - The customer has digitally signed this master agreement.
             {data.customer_signed_at && ` Signed on ${new Date(data.customer_signed_at).toLocaleDateString()}`}
             {data.customer_signature_data?.signer_name && ` by ${data.customer_signature_data.signer_name}`}
           </AlertDescription>
