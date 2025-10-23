@@ -6,196 +6,336 @@ interface VehicleDiagramSVGProps {
 }
 
 export function VehicleDiagramSVG({ view, className = '' }: VehicleDiagramSVGProps) {
+  const getViewBox = () => {
+    switch (view) {
+      case 'TOP':
+        return '0 0 800 1000';
+      case 'REAR':
+      case 'FRONT':
+        return '0 0 900 600';
+      case 'LEFT':
+      case 'RIGHT':
+        return '0 0 1000 600';
+      default:
+        return '0 0 800 1000';
+    }
+  };
+
   return (
     <svg
-      viewBox="0 0 600 400"
+      viewBox={getViewBox()}
       className={className}
       xmlns="http://www.w3.org/2000/svg"
     >
+      <defs>
+        <style>{`
+          .vehicle-outline { fill: white; stroke: #8B9DC3; stroke-width: 3; }
+          .vehicle-section { fill: none; stroke: #A0AEC0; stroke-width: 2; }
+          .vehicle-wheel { fill: white; stroke: #8B9DC3; stroke-width: 3; }
+          .vehicle-wheel-inner { fill: none; stroke: #A0AEC0; stroke-width: 2; }
+          .vehicle-label { fill: #4A5568; font-family: system-ui, -apple-system, sans-serif; }
+          .vehicle-label-large { font-size: 18px; font-weight: 600; }
+          .vehicle-label-medium { font-size: 14px; font-weight: 500; }
+          .vehicle-label-small { font-size: 11px; font-weight: 600; }
+          .vehicle-label-tiny { font-size: 10px; font-weight: 500; }
+        `}</style>
+      </defs>
+
+      {/* TOP VIEW - Bird's eye view */}
       {view === 'TOP' && (
-        <g>
-          {/* Main body */}
-          <rect x="150" y="50" width="300" height="300" rx="20" fill="none" stroke="currentColor" strokeWidth="3" className="text-muted-foreground" />
+        <g id="top-view">
+          {/* Main vehicle body outline with rounded corners */}
+          <path 
+            d="M 200 100 Q 180 100 180 120 L 180 880 Q 180 900 200 900 L 600 900 Q 620 900 620 880 L 620 120 Q 620 100 600 100 Z"
+            className="vehicle-outline"
+          />
           
           {/* Windscreen */}
-          <rect x="175" y="80" width="250" height="60" rx="8" fill="none" stroke="currentColor" strokeWidth="2" className="text-primary/60" />
-          <text x="300" y="115" textAnchor="middle" className="fill-muted-foreground text-xs font-medium">WINDSCREEN</text>
+          <rect x="220" y="130" width="360" height="80" rx="8" className="vehicle-section"/>
+          <text x="400" y="178" textAnchor="middle" className="vehicle-label vehicle-label-medium">WINDSCREEN</text>
           
-          {/* Bonnet/Hood */}
-          <rect x="175" y="155" width="250" height="50" rx="5" fill="none" stroke="currentColor" strokeWidth="2" className="text-primary/60" />
-          <text x="300" y="185" textAnchor="middle" className="fill-muted-foreground text-xs font-medium">BONNET</text>
+          {/* Bonnet */}
+          <rect x="220" y="220" width="360" height="100" rx="4" className="vehicle-section"/>
+          <text x="400" y="278" textAnchor="middle" className="vehicle-label vehicle-label-large">BONNET</text>
           
-          {/* Roof */}
-          <rect x="175" y="220" width="250" height="60" rx="5" fill="none" stroke="currentColor" strokeWidth="2" className="text-primary/60" />
-          <text x="300" y="255" textAnchor="middle" className="fill-muted-foreground text-xs font-medium">ROOF</text>
+          {/* Roof - center section */}
+          <rect x="220" y="330" width="360" height="240" rx="4" className="vehicle-section"/>
+          <text x="400" y="460" textAnchor="middle" className="vehicle-label vehicle-label-large">ROOF</text>
+          
+          {/* Boot */}
+          <rect x="220" y="580" width="360" height="170" rx="4" className="vehicle-section"/>
+          <text x="400" y="675" textAnchor="middle" className="vehicle-label vehicle-label-large">BOOT</text>
+          
+          {/* Rear window */}
+          <rect x="220" y="760" width="360" height="80" rx="8" className="vehicle-section"/>
+          <text x="400" y="808" textAnchor="middle" className="vehicle-label vehicle-label-medium">REAR WINDOW</text>
+          
+          {/* Left Front Wheel */}
+          <circle cx="200" cy="280" r="45" className="vehicle-wheel"/>
+          <circle cx="200" cy="280" r="30" className="vehicle-wheel-inner"/>
+          <text x="200" y="287" textAnchor="middle" className="vehicle-label vehicle-label-small">CAP</text>
+          
+          {/* Right Front Wheel */}
+          <circle cx="600" cy="280" r="45" className="vehicle-wheel"/>
+          <circle cx="600" cy="280" r="30" className="vehicle-wheel-inner"/>
+          <text x="600" y="287" textAnchor="middle" className="vehicle-label vehicle-label-small">CAP</text>
+          
+          {/* Left Rear Wheel */}
+          <circle cx="200" cy="720" r="45" className="vehicle-wheel"/>
+          <circle cx="200" cy="720" r="30" className="vehicle-wheel-inner"/>
+          <text x="200" y="727" textAnchor="middle" className="vehicle-label vehicle-label-small">CAP</text>
+          
+          {/* Right Rear Wheel */}
+          <circle cx="600" cy="720" r="45" className="vehicle-wheel"/>
+          <circle cx="600" cy="720" r="30" className="vehicle-wheel-inner"/>
+          <text x="600" y="727" textAnchor="middle" className="vehicle-label vehicle-label-small">CAP</text>
+          
+          {/* Left Front Door */}
+          <rect x="165" y="330" width="50" height="120" rx="4" className="vehicle-section"/>
+          <text x="140" y="395" textAnchor="end" className="vehicle-label vehicle-label-medium">DOOR</text>
+          
+          {/* Left Rear Door */}
+          <rect x="165" y="455" width="50" height="120" rx="4" className="vehicle-section"/>
+          <text x="140" y="520" textAnchor="end" className="vehicle-label vehicle-label-medium">DOOR</text>
+          
+          {/* Right Front Door */}
+          <rect x="585" y="330" width="50" height="120" rx="4" className="vehicle-section"/>
+          <text x="660" y="395" textAnchor="start" className="vehicle-label vehicle-label-medium">DOOR</text>
+          
+          {/* Right Rear Door */}
+          <rect x="585" y="455" width="50" height="120" rx="4" className="vehicle-section"/>
+          <text x="660" y="520" textAnchor="start" className="vehicle-label vehicle-label-medium">DOOR</text>
+          
+          {/* Left Wing */}
+          <path d="M 160 240 L 140 240 L 140 320 L 160 320" className="vehicle-section"/>
+          <text x="115" y="285" textAnchor="end" className="vehicle-label vehicle-label-small">WING</text>
+          
+          {/* Right Wing */}
+          <path d="M 640 240 L 660 240 L 660 320 L 640 320" className="vehicle-section"/>
+          <text x="685" y="285" textAnchor="start" className="vehicle-label vehicle-label-small">WING</text>
+          
+          {/* Left Headlight */}
+          <ellipse cx="180" cy="180" rx="25" ry="35" className="vehicle-section"/>
+          <text x="120" y="185" textAnchor="end" className="vehicle-label vehicle-label-tiny">HEADLIGHTS</text>
+          
+          {/* Right Headlight */}
+          <ellipse cx="620" cy="180" rx="25" ry="35" className="vehicle-section"/>
+          <text x="680" y="185" textAnchor="start" className="vehicle-label vehicle-label-tiny">HEADLIGHTS</text>
+          
+          {/* Left Wing Mirror */}
+          <rect x="160" y="310" width="15" height="30" rx="2" className="vehicle-wheel"/>
+          
+          {/* Right Wing Mirror */}
+          <rect x="625" y="310" width="15" height="30" rx="2" className="vehicle-wheel"/>
+        </g>
+      )}
+
+      {/* REAR VIEW */}
+      {view === 'REAR' && (
+        <g id="rear-view">
+          {/* Main body outline */}
+          <path 
+            d="M 150 100 Q 120 100 120 130 L 120 500 Q 120 520 140 520 L 760 520 Q 780 520 780 500 L 780 130 Q 780 100 750 100 Z"
+            className="vehicle-outline"
+          />
+          
+          {/* Rear Window */}
+          <rect x="200" y="130" width="500" height="120" rx="8" className="vehicle-section"/>
+          <text x="450" y="198" textAnchor="middle" className="vehicle-label vehicle-label-large">REAR WINDOW</text>
           
           {/* Boot/Trunk */}
-          <rect x="175" y="295" width="250" height="40" rx="5" fill="none" stroke="currentColor" strokeWidth="2" className="text-primary/60" />
-          <text x="300" y="320" textAnchor="middle" className="fill-muted-foreground text-xs font-medium">BOOT</text>
+          <rect x="200" y="260" width="500" height="180" rx="4" className="vehicle-section"/>
+          <text x="450" y="362" textAnchor="middle" className="vehicle-label vehicle-label-large">BOOT</text>
           
-          {/* Left doors */}
-          <rect x="155" y="155" width="15" height="45" rx="3" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-primary/40" />
-          <rect x="155" y="205" width="15" height="75" rx="3" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-primary/40" />
-          <text x="110" y="180" className="fill-muted-foreground text-[10px] font-medium">L.DOOR</text>
-          <text x="110" y="245" className="fill-muted-foreground text-[10px] font-medium">L.DOOR</text>
+          {/* Bumper */}
+          <rect x="180" y="450" width="540" height="50" rx="6" className="vehicle-section"/>
+          <text x="450" y="482" textAnchor="middle" className="vehicle-label vehicle-label-medium">BUMPER</text>
           
-          {/* Right doors */}
-          <rect x="430" y="155" width="15" height="45" rx="3" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-primary/40" />
-          <rect x="430" y="205" width="15" height="75" rx="3" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-primary/40" />
-          <text x="480" y="180" className="fill-muted-foreground text-[10px] font-medium">R.DOOR</text>
-          <text x="480" y="245" className="fill-muted-foreground text-[10px] font-medium">R.DOOR</text>
+          {/* Left Tail Light */}
+          <rect x="150" y="320" width="40" height="80" rx="4" className="vehicle-section"/>
+          <text x="130" y="365" textAnchor="end" className="vehicle-label vehicle-label-small">TAIL</text>
           
-          {/* Left wing mirror */}
-          <rect x="135" y="135" width="10" height="20" rx="2" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-primary/40" />
+          {/* Right Tail Light */}
+          <rect x="710" y="320" width="40" height="80" rx="4" className="vehicle-section"/>
+          <text x="770" y="365" textAnchor="start" className="vehicle-label vehicle-label-small">TAIL</text>
           
-          {/* Right wing mirror */}
-          <rect x="455" y="135" width="10" height="20" rx="2" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-primary/40" />
+          {/* Left Wheel */}
+          <circle cx="240" cy="520" r="55" className="vehicle-wheel"/>
+          <circle cx="240" cy="520" r="40" className="vehicle-wheel-inner"/>
+          <circle cx="240" cy="520" r="25" className="vehicle-wheel-inner"/>
+          
+          {/* Right Wheel */}
+          <circle cx="660" cy="520" r="55" className="vehicle-wheel"/>
+          <circle cx="660" cy="520" r="40" className="vehicle-wheel-inner"/>
+          <circle cx="660" cy="520" r="25" className="vehicle-wheel-inner"/>
         </g>
       )}
 
+      {/* FRONT VIEW */}
       {view === 'FRONT' && (
-        <g>
-          {/* Main body */}
-          <rect x="100" y="120" width="400" height="200" rx="15" fill="none" stroke="currentColor" strokeWidth="3" className="text-muted-foreground" />
+        <g id="front-view">
+          {/* Main body outline */}
+          <path 
+            d="M 150 180 Q 120 180 120 210 L 120 500 Q 120 520 140 520 L 760 520 Q 780 520 780 500 L 780 210 Q 780 180 750 180 Z"
+            className="vehicle-outline"
+          />
           
-          {/* Windscreen */}
-          <path d="M 150 120 L 150 160 L 450 160 L 450 120" fill="none" stroke="currentColor" strokeWidth="2" className="text-primary/60" />
-          <text x="300" y="145" textAnchor="middle" className="fill-muted-foreground text-xs font-medium">WINDSCREEN</text>
+          {/* Windscreen - angled trapezoid */}
+          <path 
+            d="M 250 100 L 200 180 L 700 180 L 650 100 Z"
+            className="vehicle-section"
+          />
+          <text x="450" y="148" textAnchor="middle" className="vehicle-label vehicle-label-medium">WINDSCREEN</text>
           
-          {/* Headlights */}
-          <ellipse cx="180" cy="280" rx="35" ry="25" fill="none" stroke="currentColor" strokeWidth="2" className="text-primary/60" />
-          <ellipse cx="420" cy="280" rx="35" ry="25" fill="none" stroke="currentColor" strokeWidth="2" className="text-primary/60" />
-          <text x="180" y="285" textAnchor="middle" className="fill-muted-foreground text-[10px] font-medium">LIGHT</text>
-          <text x="420" y="285" textAnchor="middle" className="fill-muted-foreground text-[10px] font-medium">LIGHT</text>
+          {/* Bonnet */}
+          <rect x="200" y="190" width="500" height="140" rx="4" className="vehicle-section"/>
+          <text x="450" y="270" textAnchor="middle" className="vehicle-label vehicle-label-large">BONNET</text>
           
           {/* Grille */}
-          <rect x="220" y="255" width="160" height="50" rx="5" fill="none" stroke="currentColor" strokeWidth="2" className="text-primary/60" />
-          <text x="300" y="285" textAnchor="middle" className="fill-muted-foreground text-xs font-medium">GRILLE</text>
+          <rect x="280" y="340" width="340" height="60" rx="4" className="vehicle-section"/>
+          <text x="450" y="377" textAnchor="middle" className="vehicle-label vehicle-label-medium">GRILLE</text>
           
           {/* Bumper */}
-          <rect x="120" y="310" width="360" height="20" rx="10" fill="none" stroke="currentColor" strokeWidth="2" className="text-primary/60" />
-          <text x="300" y="325" textAnchor="middle" className="fill-muted-foreground text-[10px] font-medium">BUMPER</text>
+          <rect x="180" y="410" width="540" height="60" rx="6" className="vehicle-section"/>
+          <text x="450" y="448" textAnchor="middle" className="vehicle-label vehicle-label-medium">BUMPER</text>
           
-          {/* Left wheel */}
-          <circle cx="180" cy="340" r="30" fill="none" stroke="currentColor" strokeWidth="3" className="text-muted-foreground" />
-          <circle cx="180" cy="340" r="15" fill="none" stroke="currentColor" strokeWidth="2" className="text-primary/60" />
+          {/* Left Headlight */}
+          <ellipse cx="220" cy="360" rx="50" ry="40" className="vehicle-section"/>
+          <text x="150" y="368" textAnchor="end" className="vehicle-label vehicle-label-small">HEADLIGHT</text>
           
-          {/* Right wheel */}
-          <circle cx="420" cy="340" r="30" fill="none" stroke="currentColor" strokeWidth="3" className="text-muted-foreground" />
-          <circle cx="420" cy="340" r="15" fill="none" stroke="currentColor" strokeWidth="2" className="text-primary/60" />
+          {/* Right Headlight */}
+          <ellipse cx="680" cy="360" rx="50" ry="40" className="vehicle-section"/>
+          <text x="750" y="368" textAnchor="start" className="vehicle-label vehicle-label-small">HEADLIGHT</text>
           
-          {/* Wing mirrors */}
-          <rect x="80" y="180" width="15" height="35" rx="3" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-primary/40" />
-          <rect x="505" y="180" width="15" height="35" rx="3" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-primary/40" />
-          <text x="50" y="200" className="fill-muted-foreground text-[9px] font-medium">L.WING</text>
-          <text x="530" y="200" className="fill-muted-foreground text-[9px] font-medium">R.WING</text>
+          {/* Left Wheel */}
+          <circle cx="240" cy="520" r="55" className="vehicle-wheel"/>
+          <circle cx="240" cy="520" r="40" className="vehicle-wheel-inner"/>
+          <circle cx="240" cy="520" r="25" className="vehicle-wheel-inner"/>
+          
+          {/* Right Wheel */}
+          <circle cx="660" cy="520" r="55" className="vehicle-wheel"/>
+          <circle cx="660" cy="520" r="40" className="vehicle-wheel-inner"/>
+          <circle cx="660" cy="520" r="25" className="vehicle-wheel-inner"/>
+          
+          {/* Left Wing Mirror */}
+          <rect x="140" y="240" width="30" height="20" rx="3" className="vehicle-wheel"/>
+          
+          {/* Right Wing Mirror */}
+          <rect x="730" y="240" width="30" height="20" rx="3" className="vehicle-wheel"/>
         </g>
       )}
 
-      {view === 'REAR' && (
-        <g>
-          {/* Main body */}
-          <rect x="100" y="120" width="400" height="200" rx="15" fill="none" stroke="currentColor" strokeWidth="3" className="text-muted-foreground" />
-          
-          {/* Rear windscreen */}
-          <path d="M 150 120 L 150 160 L 450 160 L 450 120" fill="none" stroke="currentColor" strokeWidth="2" className="text-primary/60" />
-          <text x="300" y="145" textAnchor="middle" className="fill-muted-foreground text-xs font-medium">REAR WINDOW</text>
-          
-          {/* Tail lights */}
-          <rect x="140" y="270" width="45" height="30" rx="5" fill="none" stroke="currentColor" strokeWidth="2" className="text-primary/60" />
-          <rect x="415" y="270" width="45" height="30" rx="5" fill="none" stroke="currentColor" strokeWidth="2" className="text-primary/60" />
-          <text x="162" y="290" textAnchor="middle" className="fill-muted-foreground text-[10px] font-medium">TAIL</text>
-          <text x="437" y="290" textAnchor="middle" className="fill-muted-foreground text-[10px] font-medium">TAIL</text>
-          
-          {/* Boot/Trunk area */}
-          <rect x="200" y="240" width="200" height="65" rx="5" fill="none" stroke="currentColor" strokeWidth="2" className="text-primary/60" />
-          <text x="300" y="275" textAnchor="middle" className="fill-muted-foreground text-xs font-medium">BOOT</text>
-          
-          {/* Bumper */}
-          <rect x="120" y="310" width="360" height="20" rx="10" fill="none" stroke="currentColor" strokeWidth="2" className="text-primary/60" />
-          <text x="300" y="325" textAnchor="middle" className="fill-muted-foreground text-[10px] font-medium">BUMPER</text>
-          
-          {/* Left wheel */}
-          <circle cx="180" cy="340" r="30" fill="none" stroke="currentColor" strokeWidth="3" className="text-muted-foreground" />
-          <circle cx="180" cy="340" r="15" fill="none" stroke="currentColor" strokeWidth="2" className="text-primary/60" />
-          
-          {/* Right wheel */}
-          <circle cx="420" cy="340" r="30" fill="none" stroke="currentColor" strokeWidth="3" className="text-muted-foreground" />
-          <circle cx="420" cy="340" r="15" fill="none" stroke="currentColor" strokeWidth="2" className="text-primary/60" />
-        </g>
-      )}
-
+      {/* LEFT SIDE VIEW */}
       {view === 'LEFT' && (
-        <g>
-          {/* Main body */}
-          <path d="M 80 200 L 120 150 L 200 130 L 400 130 L 480 150 L 520 200 L 520 240 L 480 290 L 120 290 L 80 240 Z" 
-            fill="none" stroke="currentColor" strokeWidth="3" className="text-muted-foreground" />
+        <g id="left-view">
+          {/* Main body outline - side profile with curves */}
+          <path 
+            d="M 150 200 Q 120 200 120 230 L 120 280 Q 120 300 140 300 L 200 300 L 200 380 L 850 380 L 850 300 L 900 300 Q 920 300 920 280 L 920 230 Q 920 200 890 200 L 780 200 L 780 150 Q 780 120 750 120 L 350 120 Q 320 120 320 150 L 320 200 Z"
+            className="vehicle-outline"
+          />
           
-          {/* Windows */}
-          <path d="M 130 160 L 160 145 L 240 140 L 240 160" fill="none" stroke="currentColor" strokeWidth="2" className="text-primary/60" />
-          <path d="M 250 140 L 330 140 L 330 160 L 250 160" fill="none" stroke="currentColor" strokeWidth="2" className="text-primary/60" />
-          <text x="190" y="155" className="fill-muted-foreground text-[10px] font-medium">F.WINDOW</text>
-          <text x="270" y="155" className="fill-muted-foreground text-[10px] font-medium">R.WINDOW</text>
+          {/* Windscreen */}
+          <path d="M 320 150 L 290 200 L 380 200 L 350 150 Z" className="vehicle-section"/>
+          <text x="335" y="183" textAnchor="middle" className="vehicle-label vehicle-label-small">WINDSCREEN</text>
           
-          {/* Doors */}
-          <line x1="240" y1="160" x2="240" y2="280" stroke="currentColor" strokeWidth="1.5" className="text-primary/40" strokeDasharray="5,5" />
-          <text x="180" y="230" className="fill-muted-foreground text-xs font-medium">F.DOOR</text>
-          <text x="270" y="230" className="fill-muted-foreground text-xs font-medium">R.DOOR</text>
+          {/* Front Door */}
+          <rect x="390" y="200" width="180" height="180" rx="4" className="vehicle-section"/>
+          <text x="480" y="300" textAnchor="middle" className="vehicle-label vehicle-label-medium">FRONT DOOR</text>
           
-          {/* Front wheel */}
-          <circle cx="180" cy="300" r="35" fill="none" stroke="currentColor" strokeWidth="3" className="text-muted-foreground" />
-          <circle cx="180" cy="300" r="20" fill="none" stroke="currentColor" strokeWidth="2" className="text-primary/60" />
-          <text x="180" y="305" textAnchor="middle" className="fill-muted-foreground text-[10px] font-medium">WHEEL</text>
+          {/* Rear Door */}
+          <rect x="580" y="200" width="180" height="180" rx="4" className="vehicle-section"/>
+          <text x="670" y="300" textAnchor="middle" className="vehicle-label vehicle-label-medium">REAR DOOR</text>
           
-          {/* Rear wheel */}
-          <circle cx="420" cy="300" r="35" fill="none" stroke="currentColor" strokeWidth="3" className="text-muted-foreground" />
-          <circle cx="420" cy="300" r="20" fill="none" stroke="currentColor" strokeWidth="2" className="text-primary/60" />
-          <text x="420" y="305" textAnchor="middle" className="fill-muted-foreground text-[10px] font-medium">WHEEL</text>
+          {/* Roof */}
+          <path d="M 350 130 L 750 130 L 750 200 L 350 200 Z" className="vehicle-section"/>
+          <text x="550" y="173" textAnchor="middle" className="vehicle-label vehicle-label-medium">ROOF</text>
+          
+          {/* Front Window */}
+          <rect x="400" y="150" width="80" height="40" rx="3" className="vehicle-section"/>
+          
+          {/* Rear Window */}
+          <rect x="600" y="150" width="80" height="40" rx="3" className="vehicle-section"/>
+          
+          {/* Back Window */}
+          <path d="M 760 200 L 790 200 L 820 150 L 790 150 Z" className="vehicle-section"/>
           
           {/* Headlight */}
-          <ellipse cx="110" cy="220" rx="15" ry="25" fill="none" stroke="currentColor" strokeWidth="2" className="text-primary/60" />
-          <text x="70" y="225" className="fill-muted-foreground text-[9px] font-medium">LIGHT</text>
+          <ellipse cx="160" cy="250" rx="30" ry="35" className="vehicle-section"/>
+          <text x="100" y="258" textAnchor="end" className="vehicle-label vehicle-label-tiny">HEADLIGHT</text>
           
-          {/* Wing mirror */}
-          <rect x="110" y="175" width="15" height="25" rx="3" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-primary/40" />
-          <text x="90" y="192" className="fill-muted-foreground text-[9px] font-medium">WING</text>
+          {/* Tail Light */}
+          <rect x="870" y="240" width="20" height="50" rx="3" className="vehicle-section"/>
+          <text x="950" y="268" textAnchor="start" className="vehicle-label vehicle-label-tiny">TAIL</text>
+          
+          {/* Wing Mirror */}
+          <rect x="350" y="180" width="25" height="15" rx="2" className="vehicle-wheel"/>
+          
+          {/* Front Wheel */}
+          <circle cx="300" cy="420" r="60" className="vehicle-wheel"/>
+          <circle cx="300" cy="420" r="45" className="vehicle-wheel-inner"/>
+          <circle cx="300" cy="420" r="30" className="vehicle-wheel-inner"/>
+          
+          {/* Rear Wheel */}
+          <circle cx="750" cy="420" r="60" className="vehicle-wheel"/>
+          <circle cx="750" cy="420" r="45" className="vehicle-wheel-inner"/>
+          <circle cx="750" cy="420" r="30" className="vehicle-wheel-inner"/>
         </g>
       )}
 
+      {/* RIGHT SIDE VIEW */}
       {view === 'RIGHT' && (
-        <g>
-          {/* Main body - mirrored */}
-          <path d="M 520 200 L 480 150 L 400 130 L 200 130 L 120 150 L 80 200 L 80 240 L 120 290 L 480 290 L 520 240 Z" 
-            fill="none" stroke="currentColor" strokeWidth="3" className="text-muted-foreground" />
+        <g id="right-view">
+          {/* Main body outline - mirror of left side */}
+          <path 
+            d="M 850 200 Q 880 200 880 230 L 880 280 Q 880 300 860 300 L 800 300 L 800 380 L 150 380 L 150 300 L 100 300 Q 80 300 80 280 L 80 230 Q 80 200 110 200 L 220 200 L 220 150 Q 220 120 250 120 L 650 120 Q 680 120 680 150 L 680 200 Z"
+            className="vehicle-outline"
+          />
           
-          {/* Windows */}
-          <path d="M 470 160 L 440 145 L 360 140 L 360 160" fill="none" stroke="currentColor" strokeWidth="2" className="text-primary/60" />
-          <path d="M 350 140 L 270 140 L 270 160 L 350 160" fill="none" stroke="currentColor" strokeWidth="2" className="text-primary/60" />
-          <text x="410" y="155" className="fill-muted-foreground text-[10px] font-medium">F.WINDOW</text>
-          <text x="295" y="155" className="fill-muted-foreground text-[10px] font-medium">R.WINDOW</text>
+          {/* Windscreen */}
+          <path d="M 680 150 L 710 200 L 620 200 L 650 150 Z" className="vehicle-section"/>
+          <text x="665" y="183" textAnchor="middle" className="vehicle-label vehicle-label-small">WINDSCREEN</text>
           
-          {/* Doors */}
-          <line x1="360" y1="160" x2="360" y2="280" stroke="currentColor" strokeWidth="1.5" className="text-primary/40" strokeDasharray="5,5" />
-          <text x="380" y="230" className="fill-muted-foreground text-xs font-medium">F.DOOR</text>
-          <text x="290" y="230" className="fill-muted-foreground text-xs font-medium">R.DOOR</text>
+          {/* Front Door */}
+          <rect x="430" y="200" width="180" height="180" rx="4" className="vehicle-section"/>
+          <text x="520" y="300" textAnchor="middle" className="vehicle-label vehicle-label-medium">FRONT DOOR</text>
           
-          {/* Front wheel */}
-          <circle cx="420" cy="300" r="35" fill="none" stroke="currentColor" strokeWidth="3" className="text-muted-foreground" />
-          <circle cx="420" cy="300" r="20" fill="none" stroke="currentColor" strokeWidth="2" className="text-primary/60" />
-          <text x="420" y="305" textAnchor="middle" className="fill-muted-foreground text-[10px] font-medium">WHEEL</text>
+          {/* Rear Door */}
+          <rect x="240" y="200" width="180" height="180" rx="4" className="vehicle-section"/>
+          <text x="330" y="300" textAnchor="middle" className="vehicle-label vehicle-label-medium">REAR DOOR</text>
           
-          {/* Rear wheel */}
-          <circle cx="180" cy="300" r="35" fill="none" stroke="currentColor" strokeWidth="3" className="text-muted-foreground" />
-          <circle cx="180" cy="300" r="20" fill="none" stroke="currentColor" strokeWidth="2" className="text-primary/60" />
-          <text x="180" y="305" textAnchor="middle" className="fill-muted-foreground text-[10px] font-medium">WHEEL</text>
+          {/* Roof */}
+          <path d="M 250 130 L 650 130 L 650 200 L 250 200 Z" className="vehicle-section"/>
+          <text x="450" y="173" textAnchor="middle" className="vehicle-label vehicle-label-medium">ROOF</text>
+          
+          {/* Front Window */}
+          <rect x="520" y="150" width="80" height="40" rx="3" className="vehicle-section"/>
+          
+          {/* Rear Window */}
+          <rect x="320" y="150" width="80" height="40" rx="3" className="vehicle-section"/>
+          
+          {/* Back Window */}
+          <path d="M 240 200 L 210 200 L 180 150 L 210 150 Z" className="vehicle-section"/>
           
           {/* Headlight */}
-          <ellipse cx="490" cy="220" rx="15" ry="25" fill="none" stroke="currentColor" strokeWidth="2" className="text-primary/60" />
-          <text x="510" y="225" className="fill-muted-foreground text-[9px] font-medium">LIGHT</text>
+          <ellipse cx="840" cy="250" rx="30" ry="35" className="vehicle-section"/>
+          <text x="900" y="258" textAnchor="start" className="vehicle-label vehicle-label-tiny">HEADLIGHT</text>
           
-          {/* Wing mirror */}
-          <rect x="475" y="175" width="15" height="25" rx="3" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-primary/40" />
-          <text x="495" y="192" className="fill-muted-foreground text-[9px] font-medium">WING</text>
+          {/* Tail Light */}
+          <rect x="110" y="240" width="20" height="50" rx="3" className="vehicle-section"/>
+          <text x="50" y="268" textAnchor="end" className="vehicle-label vehicle-label-tiny">TAIL</text>
+          
+          {/* Wing Mirror */}
+          <rect x="625" y="180" width="25" height="15" rx="2" className="vehicle-wheel"/>
+          
+          {/* Front Wheel */}
+          <circle cx="700" cy="420" r="60" className="vehicle-wheel"/>
+          <circle cx="700" cy="420" r="45" className="vehicle-wheel-inner"/>
+          <circle cx="700" cy="420" r="30" className="vehicle-wheel-inner"/>
+          
+          {/* Rear Wheel */}
+          <circle cx="250" cy="420" r="60" className="vehicle-wheel"/>
+          <circle cx="250" cy="420" r="45" className="vehicle-wheel-inner"/>
+          <circle cx="250" cy="420" r="30" className="vehicle-wheel-inner"/>
         </g>
       )}
     </svg>
