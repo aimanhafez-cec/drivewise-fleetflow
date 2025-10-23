@@ -1598,6 +1598,88 @@ export type Database = {
           },
         ]
       }
+      corporate_leasing_line_assignments: {
+        Row: {
+          agreement_id: string
+          assigned_at: string
+          assigned_by: string | null
+          checkin_location_id: string | null
+          checkout_fuel_level: number | null
+          checkout_location_id: string | null
+          checkout_notes: string | null
+          checkout_odometer: number | null
+          contract_no: string
+          created_at: string
+          id: string
+          item_code: string
+          line_no: number
+          status: string
+          updated_at: string
+          vehicle_id: string
+          vin: string
+        }
+        Insert: {
+          agreement_id: string
+          assigned_at?: string
+          assigned_by?: string | null
+          checkin_location_id?: string | null
+          checkout_fuel_level?: number | null
+          checkout_location_id?: string | null
+          checkout_notes?: string | null
+          checkout_odometer?: number | null
+          contract_no: string
+          created_at?: string
+          id?: string
+          item_code: string
+          line_no: number
+          status?: string
+          updated_at?: string
+          vehicle_id: string
+          vin: string
+        }
+        Update: {
+          agreement_id?: string
+          assigned_at?: string
+          assigned_by?: string | null
+          checkin_location_id?: string | null
+          checkout_fuel_level?: number | null
+          checkout_location_id?: string | null
+          checkout_notes?: string | null
+          checkout_odometer?: number | null
+          contract_no?: string
+          created_at?: string
+          id?: string
+          item_code?: string
+          line_no?: number
+          status?: string
+          updated_at?: string
+          vehicle_id?: string
+          vin?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "corporate_leasing_line_assignments_agreement_id_fkey"
+            columns: ["agreement_id"]
+            isOneToOne: false
+            referencedRelation: "corporate_leasing_agreements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "corporate_leasing_line_assignments_assigned_by_fkey"
+            columns: ["assigned_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "corporate_leasing_line_assignments_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       corporate_leasing_line_drivers: {
         Row: {
           agreement_id: string
