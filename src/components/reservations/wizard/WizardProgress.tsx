@@ -76,7 +76,7 @@ export const WizardProgress: React.FC<WizardProgressProps> = ({
         <div className="mb-6">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium text-muted-foreground">
-              Step {currentStep} of {totalSteps}
+              Step {currentStep + 1} of {totalSteps}
             </span>
             <span className="text-sm font-medium text-muted-foreground">
               {completedCount} of {totalSteps} steps completed
@@ -136,7 +136,7 @@ export const WizardProgress: React.FC<WizardProgressProps> = ({
                           }
                         }}
                       >
-                        {getStepIcon(step.number, status, isCurrent)}
+                        {getStepIcon(step.number + 1, status, isCurrent)}
                       </div>
                       <div className="mt-2 text-center w-full px-1">
                         <p
@@ -169,12 +169,16 @@ export const WizardProgress: React.FC<WizardProgressProps> = ({
         {/* Mobile: Current Step Only */}
         <div className="lg:hidden">
           <div className="text-center">
-            <h3 className="text-lg font-bold text-foreground">
-              {steps[currentStep - 1].title}
-            </h3>
-            <p className="text-sm text-muted-foreground">
-              {steps[currentStep - 1].description}
-            </p>
+            {steps.find(s => s.number === currentStep) && (
+              <>
+                <h3 className="text-lg font-bold text-foreground">
+                  {steps.find(s => s.number === currentStep)?.title}
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  {steps.find(s => s.number === currentStep)?.description}
+                </p>
+              </>
+            )}
           </div>
         </div>
       </div>
