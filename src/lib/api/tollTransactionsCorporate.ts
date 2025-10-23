@@ -14,6 +14,7 @@ export interface TollTransactionCorporateRecord {
   emirate: "Dubai" | "Abu Dhabi";
   payment_status: "charged" | "pending" | "failed" | "exempt";
   contract_id?: string;
+  contract_no?: string;
   vehicle_id?: string;
   customer_id?: string;
   driver_id?: string;
@@ -28,6 +29,24 @@ export interface TollTransactionCorporateRecord {
   created_at: string;
   updated_at: string;
   notes?: string;
+  // Joined relations
+  customer?: {
+    id: string;
+    full_name: string;
+    email?: string;
+  };
+  driver?: {
+    id: string;
+    full_name: string;
+    license_no?: string;
+  };
+  vehicle?: {
+    id: string;
+    license_plate: string;
+    make?: string;
+    model?: string;
+    year?: number;
+  };
 }
 
 export interface TollTransactionFilters {
@@ -139,7 +158,46 @@ export class TollTransactionsCorporateAPI {
       throw error;
     }
 
-    return (data || []) as TollTransactionCorporateRecord[];
+    // Fetch related data for joined records
+    const records = data || [];
+    
+    // Extract unique IDs
+    const customerIds = [...new Set(records.map(r => r.customer_id).filter(Boolean))];
+    const driverIds = [...new Set(records.map(r => r.driver_id).filter(Boolean))];
+    const vehicleIds = [...new Set(records.map(r => r.vehicle_id).filter(Boolean))];
+
+    // Fetch related data in parallel
+    const [customersData, driversData, vehiclesData] = await Promise.all([
+      customerIds.length > 0
+        ? supabase.from("profiles").select("id, full_name, email").in("id", customerIds)
+        : Promise.resolve({ data: [] }),
+      driverIds.length > 0
+        ? supabase.from("drivers").select("id, full_name, license_no").in("id", driverIds)
+        : Promise.resolve({ data: [] }),
+      vehicleIds.length > 0
+        ? supabase.from("vehicles").select("id, license_plate, make, model, year").in("id", vehicleIds)
+        : Promise.resolve({ data: [] }),
+    ]);
+
+    // Create lookup maps
+    const customersMap = new Map<string, any>();
+    customersData.data?.forEach(c => customersMap.set(c.id, c));
+    
+    const driversMap = new Map<string, any>();
+    driversData.data?.forEach(d => driversMap.set(d.id, d));
+    
+    const vehiclesMap = new Map<string, any>();
+    vehiclesData.data?.forEach(v => vehiclesMap.set(v.id, v));
+
+    // Enrich records with joined data
+    const enrichedRecords = records.map(record => ({
+      ...record,
+      customer: record.customer_id ? customersMap.get(record.customer_id) : undefined,
+      driver: record.driver_id ? driversMap.get(record.driver_id) : undefined,
+      vehicle: record.vehicle_id ? vehiclesMap.get(record.vehicle_id) : undefined,
+    }));
+
+    return enrichedRecords as TollTransactionCorporateRecord[];
   }
 
   /**

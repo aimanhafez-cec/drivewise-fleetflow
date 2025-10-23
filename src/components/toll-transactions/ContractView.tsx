@@ -11,12 +11,12 @@ interface ContractViewProps {
 export function ContractView({ data, onRowClick }: ContractViewProps) {
   const columns: Column<TollTransactionCorporateRecord>[] = [
     {
-      key: "contract_id",
+      key: "contract_no",
       header: "Contract",
       sortable: true,
       render: (item) => (
         <span className="font-mono text-sm">
-          {item.contract_id || (
+          {item.contract_no || (
             <span className="text-muted-foreground italic">Not linked</span>
           )}
         </span>
@@ -27,7 +27,7 @@ export function ContractView({ data, onRowClick }: ContractViewProps) {
       header: "Customer",
       render: (item) => (
         <span className="text-sm">
-          {item.customer_id || (
+          {item.customer?.full_name || (
             <span className="text-muted-foreground italic">Unknown</span>
           )}
         </span>
@@ -36,13 +36,19 @@ export function ContractView({ data, onRowClick }: ContractViewProps) {
     {
       key: "vehicle_id",
       header: "Vehicle",
-      render: (item) => (
-        <span className="text-sm">
-          {item.vehicle_id || (
-            <span className="text-muted-foreground italic">Unknown</span>
-          )}
-        </span>
-      ),
+      render: (item) => {
+        if (!item.vehicle) {
+          return <span className="text-muted-foreground italic">Unknown</span>;
+        }
+        return (
+          <div className="text-sm">
+            <div className="font-medium">
+              {item.vehicle.make} {item.vehicle.model}
+            </div>
+            <div className="text-muted-foreground">{item.vehicle.license_plate}</div>
+          </div>
+        );
+      },
     },
     {
       key: "plate_number",
@@ -57,7 +63,7 @@ export function ContractView({ data, onRowClick }: ContractViewProps) {
       header: "Driver",
       render: (item) => (
         <span className="text-sm">
-          {item.driver_id || (
+          {item.driver?.full_name || (
             <span className="text-muted-foreground italic">Unknown</span>
           )}
         </span>
