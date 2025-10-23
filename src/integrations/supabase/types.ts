@@ -6950,6 +6950,108 @@ export type Database = {
         }
         Relationships: []
       }
+      toll_transactions_corporate: {
+        Row: {
+          amount: number
+          billable_to_customer: boolean | null
+          billing_cycle_id: string | null
+          contract_id: string | null
+          created_at: string | null
+          crossing_date: string
+          crossing_time: string
+          customer_id: string | null
+          driver_id: string | null
+          emirate: string
+          gate_id: string
+          gate_name: string
+          id: string
+          integration_batch_id: string | null
+          integration_source: string | null
+          integration_timestamp: string | null
+          notes: string | null
+          payment_status: string
+          plate_number: string
+          reconciled: boolean | null
+          reconciled_at: string | null
+          reconciled_by: string | null
+          toll_authority: string
+          transaction_no: string
+          updated_at: string | null
+          vehicle_id: string | null
+        }
+        Insert: {
+          amount: number
+          billable_to_customer?: boolean | null
+          billing_cycle_id?: string | null
+          contract_id?: string | null
+          created_at?: string | null
+          crossing_date: string
+          crossing_time: string
+          customer_id?: string | null
+          driver_id?: string | null
+          emirate: string
+          gate_id: string
+          gate_name: string
+          id?: string
+          integration_batch_id?: string | null
+          integration_source?: string | null
+          integration_timestamp?: string | null
+          notes?: string | null
+          payment_status?: string
+          plate_number: string
+          reconciled?: boolean | null
+          reconciled_at?: string | null
+          reconciled_by?: string | null
+          toll_authority: string
+          transaction_no: string
+          updated_at?: string | null
+          vehicle_id?: string | null
+        }
+        Update: {
+          amount?: number
+          billable_to_customer?: boolean | null
+          billing_cycle_id?: string | null
+          contract_id?: string | null
+          created_at?: string | null
+          crossing_date?: string
+          crossing_time?: string
+          customer_id?: string | null
+          driver_id?: string | null
+          emirate?: string
+          gate_id?: string
+          gate_name?: string
+          id?: string
+          integration_batch_id?: string | null
+          integration_source?: string | null
+          integration_timestamp?: string | null
+          notes?: string | null
+          payment_status?: string
+          plate_number?: string
+          reconciled?: boolean | null
+          reconciled_at?: string | null
+          reconciled_by?: string | null
+          toll_authority?: string
+          transaction_no?: string
+          updated_at?: string | null
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "toll_transactions_corporate_billing_cycle_id_fkey"
+            columns: ["billing_cycle_id"]
+            isOneToOne: false
+            referencedRelation: "contract_billing_cycles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "toll_transactions_corporate_contract_id_fkey"
+            columns: ["contract_id"]
+            isOneToOne: false
+            referencedRelation: "agreements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tolls_fines: {
         Row: {
           amount: number
