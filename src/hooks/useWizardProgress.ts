@@ -31,7 +31,13 @@ export const useWizardProgress = ({
           const parsed = JSON.parse(saved);
           if (parsed.wizardData && parsed.progress) {
             setWizardData(parsed.wizardData);
-            setProgress(parsed.progress);
+            // Ensure visitedSteps exists for backward compatibility
+            setProgress({
+              ...parsed.progress,
+              visitedSteps: parsed.progress.visitedSteps || [],
+              completedSteps: parsed.progress.completedSteps || [],
+              stepValidationStatus: parsed.progress.stepValidationStatus || {},
+            });
             console.log('[useWizardProgress] Loaded saved progress:', parsed);
           }
         }
@@ -138,8 +144,8 @@ export const useWizardProgress = ({
   const markStepIncomplete = useCallback((step: number) => {
     setProgress(prev => ({
       ...prev,
-      completedSteps: prev.completedSteps.filter(s => s !== step),
-      visitedSteps: [...new Set([...prev.visitedSteps, step])],
+      completedSteps: (prev.completedSteps || []).filter(s => s !== step),
+      visitedSteps: [...new Set([...(prev.visitedSteps || []), step])],
     }));
   }, []);
 
@@ -150,7 +156,7 @@ export const useWizardProgress = ({
         ...prev.stepValidationStatus,
         [step]: status,
       },
-      visitedSteps: [...new Set([...prev.visitedSteps, step])],
+      visitedSteps: [...new Set([...(prev.visitedSteps || []), step])],
     }));
   }, []);
 
@@ -161,7 +167,7 @@ export const useWizardProgress = ({
     if (progress.stepValidationStatus[step]) {
       return progress.stepValidationStatus[step];
     }
-    if (progress.visitedSteps.includes(step)) {
+    if ((progress.visitedSteps || []).includes(step)) {
       return 'incomplete';
     }
     return 'not-visited';
