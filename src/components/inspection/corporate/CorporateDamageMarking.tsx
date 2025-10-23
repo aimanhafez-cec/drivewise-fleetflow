@@ -16,6 +16,7 @@ import { SEVERITY_OPTIONS } from '@/types/damage-marker';
 
 interface CorporateDamageMarkingProps {
   vehicleId: string;
+  lineId: string;
   damageMarkerIds: string[];
   onUpdate: (ids: string[]) => void;
 }
@@ -35,6 +36,7 @@ const getSeverityColor = (severity: string) => {
 
 export function CorporateDamageMarking({
   vehicleId,
+  lineId,
   damageMarkerIds,
   onUpdate
 }: CorporateDamageMarkingProps) {
@@ -90,7 +92,7 @@ export function CorporateDamageMarking({
       } else {
         // Create new marker
         const newMarkerId = await createMarker.mutateAsync({
-          line_id: null,
+          line_id: lineId,
           event: 'OUT',
           side: data.side!,
           x: data.x!,

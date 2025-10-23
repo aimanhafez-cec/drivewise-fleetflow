@@ -242,6 +242,7 @@ export default function NewInspectionForm() {
         >
           <CorporateDamageMarking
             vehicleId={formData.vehicle_id}
+            lineId={formData.line_id}
             damageMarkerIds={formData.damage_marker_ids}
             onUpdate={(ids) => updateFormData({ damage_marker_ids: ids })}
           />
