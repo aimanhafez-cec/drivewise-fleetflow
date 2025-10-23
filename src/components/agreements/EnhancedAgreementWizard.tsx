@@ -176,10 +176,12 @@ export const EnhancedAgreementWizard = () => {
     updateWizardData,
     setCurrentStep,
     markStepComplete,
+    markStepIncomplete,
+    updateStepStatus,
+    getStepStatus,
     setCanProceed,
     clearProgress,
     getProgressPercentage,
-    canNavigateToStep,
   } = useWizardProgress({
     storageKey: 'enhanced-agreement-wizard',
     initialData: INITIAL_WIZARD_DATA,
@@ -194,11 +196,16 @@ export const EnhancedAgreementWizard = () => {
   }, [wizardData, progress.currentStep, setCanProceed]);
 
   const handleNext = () => {
-    if (!validationResult.isValid) {
-      toast.error('Please fix all errors before proceeding');
+    const result = validateStep(progress.currentStep, wizardData);
+    
+    if (!result.isValid) {
+      markStepIncomplete(progress.currentStep);
+      updateStepStatus(progress.currentStep, 'has-errors');
+      toast.error('Please fix errors before marking complete');
       return;
     }
 
+    // Mark current step complete
     markStepComplete(progress.currentStep);
     
     if (progress.currentStep < TOTAL_STEPS - 1) {
@@ -208,6 +215,13 @@ export const EnhancedAgreementWizard = () => {
   };
 
   const handlePrevious = () => {
+    // Validate current step before leaving
+    const result = validateStep(progress.currentStep, wizardData);
+    if (!result.isValid) {
+      markStepIncomplete(progress.currentStep);
+      updateStepStatus(progress.currentStep, 'has-errors');
+    }
+    
     if (progress.currentStep > 0) {
       setCurrentStep(progress.currentStep - 1);
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -234,12 +248,18 @@ export const EnhancedAgreementWizard = () => {
   };
 
   const handleStepClick = (step: number) => {
-    if (canNavigateToStep(step)) {
-      setCurrentStep(step);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Validate current step before leaving
+    const result = validateStep(progress.currentStep, wizardData);
+    if (!result.isValid) {
+      markStepIncomplete(progress.currentStep);
+      updateStepStatus(progress.currentStep, 'has-errors');
     } else {
-      toast.error('Please complete previous steps first');
+      markStepComplete(progress.currentStep);
     }
+    
+    // Allow navigation to ANY step
+    setCurrentStep(step);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleStepDataChange = (stepKey: keyof EnhancedWizardData, field: string, value: any) => {
@@ -385,21 +405,17 @@ export const EnhancedAgreementWizard = () => {
               {STEP_CONFIG.map((step) => {
                 const isCompleted = progress.completedSteps.includes(step.id);
                 const isCurrent = progress.currentStep === step.id;
-                const canNavigate = canNavigateToStep(step.id);
 
                 return (
                   <button
                     key={step.id}
                     onClick={() => handleStepClick(step.id)}
-                    disabled={!canNavigate}
                     className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                       isCurrent
                         ? 'bg-primary text-primary-foreground'
                         : isCompleted
                         ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                        : canNavigate
-                        ? 'bg-muted text-muted-foreground hover:bg-muted/80'
-                        : 'bg-muted/50 text-muted-foreground/50 cursor-not-allowed'
+                        : 'bg-muted text-muted-foreground hover:bg-muted/80'
                     }`}
                   >
                     {isCompleted && <CheckCircle2 className="h-4 w-4" />}
