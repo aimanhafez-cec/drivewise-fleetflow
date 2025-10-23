@@ -6956,6 +6956,7 @@ export type Database = {
           billable_to_customer: boolean | null
           billing_cycle_id: string | null
           contract_id: string | null
+          contract_no: string | null
           created_at: string | null
           crossing_date: string
           crossing_time: string
@@ -6984,6 +6985,7 @@ export type Database = {
           billable_to_customer?: boolean | null
           billing_cycle_id?: string | null
           contract_id?: string | null
+          contract_no?: string | null
           created_at?: string | null
           crossing_date: string
           crossing_time: string
@@ -7012,6 +7014,7 @@ export type Database = {
           billable_to_customer?: boolean | null
           billing_cycle_id?: string | null
           contract_id?: string | null
+          contract_no?: string | null
           created_at?: string | null
           crossing_date?: string
           crossing_time?: string
