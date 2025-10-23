@@ -3513,6 +3513,102 @@ export type Database = {
         }
         Relationships: []
       }
+      inspection_master: {
+        Row: {
+          agreement_id: string | null
+          attachments: Json | null
+          checklist: Json | null
+          completed_date: string | null
+          created_at: string | null
+          damage_marker_ids: string[] | null
+          device_info: string | null
+          entry_date: string | null
+          id: string
+          inspection_no: string
+          inspection_type: string
+          inspector_name: string | null
+          item_code: string | null
+          line_id: string | null
+          location_id: string | null
+          media: Json | null
+          metrics: Json | null
+          notes: string | null
+          performed_by_user_id: string | null
+          signature: Json | null
+          status: string | null
+          updated_at: string | null
+          vehicle_id: string | null
+          vin: string | null
+        }
+        Insert: {
+          agreement_id?: string | null
+          attachments?: Json | null
+          checklist?: Json | null
+          completed_date?: string | null
+          created_at?: string | null
+          damage_marker_ids?: string[] | null
+          device_info?: string | null
+          entry_date?: string | null
+          id?: string
+          inspection_no: string
+          inspection_type: string
+          inspector_name?: string | null
+          item_code?: string | null
+          line_id?: string | null
+          location_id?: string | null
+          media?: Json | null
+          metrics?: Json | null
+          notes?: string | null
+          performed_by_user_id?: string | null
+          signature?: Json | null
+          status?: string | null
+          updated_at?: string | null
+          vehicle_id?: string | null
+          vin?: string | null
+        }
+        Update: {
+          agreement_id?: string | null
+          attachments?: Json | null
+          checklist?: Json | null
+          completed_date?: string | null
+          created_at?: string | null
+          damage_marker_ids?: string[] | null
+          device_info?: string | null
+          entry_date?: string | null
+          id?: string
+          inspection_no?: string
+          inspection_type?: string
+          inspector_name?: string | null
+          item_code?: string | null
+          line_id?: string | null
+          location_id?: string | null
+          media?: Json | null
+          metrics?: Json | null
+          notes?: string | null
+          performed_by_user_id?: string | null
+          signature?: Json | null
+          status?: string | null
+          updated_at?: string | null
+          vehicle_id?: string | null
+          vin?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inspection_master_agreement_id_fkey"
+            columns: ["agreement_id"]
+            isOneToOne: false
+            referencedRelation: "corporate_leasing_agreements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inspection_master_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       inspection_out: {
         Row: {
           agreement_id: string
