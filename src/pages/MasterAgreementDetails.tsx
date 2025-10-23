@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { SendMasterAgreementToCustomerDialog } from "@/components/master-agreements/SendMasterAgreementToCustomerDialog";
 import { CustomerAcceptanceMasterAgreementDialog } from "@/components/master-agreements/CustomerAcceptanceMasterAgreementDialog";
+import { CustomerRejectionMasterAgreementDialog } from "@/components/master-agreements/CustomerRejectionMasterAgreementDialog";
 import {
   ArrowLeft,
   FileText,
@@ -29,6 +30,7 @@ import {
   Paperclip,
   CheckCircle,
   MapPin,
+  XCircle,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/currency";
 import { format } from "date-fns";
@@ -50,6 +52,10 @@ import {
 
 const statusConfig = {
   draft: { label: "Draft", color: "bg-muted text-muted-foreground" },
+  approved: { label: "Approved", color: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200" },
+  sent_to_customer: { label: "Sent to Customer", color: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200" },
+  customer_accepted: { label: "Customer Accepted", color: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200" },
+  customer_rejected: { label: "Customer Rejected", color: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200" },
   active: { label: "Active", color: "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200" },
   suspended: { label: "Suspended", color: "bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200" },
   expired: { label: "Expired", color: "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200" },
@@ -63,6 +69,7 @@ const MasterAgreementDetails = () => {
   const queryClient = useQueryClient();
   const [sendDialogOpen, setSendDialogOpen] = useState(false);
   const [acceptanceDialogOpen, setAcceptanceDialogOpen] = useState(false);
+  const [rejectionDialogOpen, setRejectionDialogOpen] = useState(false);
 
   useEffect(() => {
     document.title = "Master Agreement Details | Core Car Rental";
@@ -200,12 +207,6 @@ const MasterAgreementDetails = () => {
                 Send to Customer
               </Button>
             )}
-            {agreement.status === 'sent_to_customer' && (
-              <Button size="sm" onClick={() => setAcceptanceDialogOpen(true)}>
-                <CheckCircle className="h-4 w-4 mr-1" />
-                Mark as Accepted
-              </Button>
-            )}
             <Button variant="outline" size="sm" onClick={() => window.print()}>
               <Printer className="h-4 w-4 mr-1" />
               Print
@@ -290,6 +291,36 @@ const MasterAgreementDetails = () => {
         </Alert>
       )}
 
+      {/* Customer Response Actions - Show for approved/sent_to_customer agreements */}
+      {['approved', 'sent_to_customer'].includes(agreement.status) && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Customer Response</CardTitle>
+            <CardDescription>
+              Record customer acceptance or rejection of this master agreement
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-3">
+              <Button
+                onClick={() => setAcceptanceDialogOpen(true)}
+                className="bg-green-600 hover:bg-green-700"
+              >
+                <CheckCircle className="mr-2 h-4 w-4" />
+                Customer Accepted
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => setRejectionDialogOpen(true)}
+              >
+                <XCircle className="mr-2 h-4 w-4" />
+                Customer Rejected
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Header Info Card */}
       <MasterAgreementHeaderInfo
         agreement={agreement}
@@ -314,6 +345,15 @@ const MasterAgreementDetails = () => {
         <CustomerAcceptanceMasterAgreementDialog
           open={acceptanceDialogOpen}
           onOpenChange={setAcceptanceDialogOpen}
+          agreementId={agreement.id}
+          agreementNumber={agreement.agreement_no || ''}
+        />
+      )}
+
+      {rejectionDialogOpen && (
+        <CustomerRejectionMasterAgreementDialog
+          open={rejectionDialogOpen}
+          onOpenChange={setRejectionDialogOpen}
           agreementId={agreement.id}
           agreementNumber={agreement.agreement_no || ''}
         />
