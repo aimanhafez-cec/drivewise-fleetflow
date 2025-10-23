@@ -65,7 +65,7 @@ export const WizardProgress: React.FC<WizardProgressProps> = ({
   };
 
   const completedCount = completedSteps.length;
-  const incompleteCount = Object.values(stepValidationStatus).filter(
+  const incompleteCount = Object.values(stepValidationStatus || {}).filter(
     (status) => status === 'has-errors' || status === 'incomplete'
   ).length;
 
