@@ -1,570 +1,104 @@
-/* Vehicle Damage Report Print Styles */
-
+/* Print Damage Report Styles */
 .print-damage-report {
-  background: white;
-  padding: 15mm;
-  max-width: 210mm;
-  margin: 0 auto;
-  font-family: Arial, sans-serif;
-  font-size: 9pt;
-  color: #000;
-  line-height: 1.2;
-}
-
-/* Header */
-.report-header {
-  display: grid;
-  grid-template-columns: 1fr 2fr 1fr;
-  gap: 10mm;
-  align-items: center;
-  border-bottom: 3px solid #000;
-  padding-bottom: 5mm;
-  margin-bottom: 5mm;
-}
-
-.report-logo .logo-box {
-  border: 2px solid #000;
-  padding: 10mm 5mm;
-  text-align: center;
-  font-weight: bold;
-  font-size: 14pt;
-  background: #f5f5f5;
-}
-
-.report-title h1 {
-  font-size: 18pt;
-  font-weight: bold;
-  text-align: center;
-  margin: 0;
-  letter-spacing: 1px;
-}
-
-.report-copy-type {
-  display: flex;
-  flex-direction: column;
-  gap: 3mm;
-}
-
-.copy-checkbox {
-  display: flex;
-  align-items: center;
-  gap: 2mm;
-  font-size: 8pt;
-}
-
-.copy-checkbox input[type="checkbox"] {
-  width: 4mm;
-  height: 4mm;
-}
-
-/* Service Information */
-.service-info {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 5mm;
-  margin-bottom: 5mm;
-  padding: 3mm;
-  background: #f9f9f9;
-  border: 1px solid #000;
-}
-
-.service-field {
-  display: flex;
-  align-items: center;
-  gap: 2mm;
-}
-
-.service-field label {
-  font-weight: bold;
-  font-size: 8pt;
-  white-space: nowrap;
-}
-
-.field-value {
-  border-bottom: 1px solid #000;
-  flex: 1;
-  min-height: 5mm;
-  padding: 0 2mm;
-}
-
-/* Vehicle Information */
-.vehicle-info-section {
-  margin-bottom: 4mm;
-}
-
-.vehicle-field {
-  display: flex;
-  align-items: center;
-  gap: 3mm;
-  margin-bottom: 3mm;
-}
-
-.vehicle-field label {
-  font-weight: bold;
-  font-size: 9pt;
-  min-width: 35mm;
-}
-
-.plate-fields {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 5mm;
-}
-
-.plate-field {
-  display: flex;
-  align-items: center;
-  gap: 2mm;
-}
-
-.plate-field label {
-  font-weight: bold;
-  font-size: 8pt;
-  white-space: nowrap;
-}
-
-/* Registration Options */
-.registration-options {
-  display: flex;
-  align-items: center;
-  gap: 5mm;
-  margin-bottom: 5mm;
-  padding: 2mm;
-  border: 1px solid #000;
-}
-
-.registration-options label:first-child {
-  font-weight: bold;
-  font-size: 9pt;
-}
-
-.reg-checkboxes {
-  display: flex;
-  gap: 5mm;
-}
-
-.reg-checkboxes label {
-  display: flex;
-  align-items: center;
-  gap: 2mm;
-  font-size: 9pt;
-}
-
-.reg-checkboxes input[type="checkbox"] {
-  width: 4mm;
-  height: 4mm;
-}
-
-/* Main Content Grid */
-.main-content-grid {
-  display: grid;
-  grid-template-columns: 1fr 2fr;
-  gap: 5mm;
-  margin-bottom: 5mm;
-}
-
-/* Equipment Section */
-.equipment-section h3 {
-  font-size: 10pt;
-  font-weight: bold;
-  text-align: center;
-  background: #e0e0e0;
-  padding: 2mm;
-  margin: 0 0 2mm 0;
-  border: 1px solid #000;
-}
-
-.equipment-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 8pt;
-}
-
-.equipment-table th,
-.equipment-table td {
-  border: 1px solid #000;
-  padding: 1.5mm;
-  text-align: left;
-}
-
-.equipment-table th {
-  background: #d0d0d0;
-  font-weight: bold;
-  text-align: center;
-  font-size: 8pt;
-}
-
-.checkbox-cell {
-  text-align: center;
-  font-size: 12pt;
-  width: 10mm;
-}
-
-/* Diagrams Section */
-.diagrams-section {
-  display: flex;
-  flex-direction: column;
-  gap: 4mm;
-}
-
-/* Fuel Gauges */
-.fuel-section {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 5mm;
-  margin-bottom: 3mm;
-}
-
-.fuel-gauge h4 {
-  font-size: 9pt;
-  font-weight: bold;
-  text-align: center;
-  margin: 0 0 2mm 0;
-  background: #e0e0e0;
-  padding: 2mm;
-  border: 1px solid #000;
-}
-
-.gauge-circle {
-  border: 2px solid #000;
-  border-radius: 50%;
-  width: 35mm;
-  height: 35mm;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 210mm;
+  height: 297mm;
   position: relative;
-  background: #f9f9f9;
-}
-
-.gauge-markers {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1mm;
-  font-size: 8pt;
-  font-weight: bold;
-}
-
-/* Vehicle Diagrams */
-.vehicle-diagram h4 {
-  font-size: 9pt;
-  font-weight: bold;
-  text-align: center;
-  margin: 0 0 2mm 0;
-  background: #e0e0e0;
-  padding: 2mm;
-  border: 1px solid #000;
-}
-
-.diagram-container {
-  border: 2px solid #000;
-  padding: 3mm;
-  background: #f9f9f9;
-  min-height: 40mm;
-}
-
-.vehicle-outline {
-  display: grid;
-  grid-template-areas:
-    "front front front"
-    "left center right"
-    "rear rear rear";
-  gap: 1mm;
-}
-
-.vehicle-front {
-  grid-area: front;
-  display: flex;
-  justify-content: space-around;
-  border-bottom: 2px solid #000;
-  padding-bottom: 2mm;
-}
-
-.vehicle-left {
-  grid-area: left;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-  border-right: 2px solid #000;
-  padding-right: 2mm;
-}
-
-.vehicle-center {
-  grid-area: center;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-  align-items: center;
-}
-
-.vehicle-right {
-  grid-area: right;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-  border-left: 2px solid #000;
-  padding-left: 2mm;
-}
-
-.vehicle-rear {
-  grid-area: rear;
-  display: flex;
-  justify-content: space-around;
-  border-top: 2px solid #000;
-  padding-top: 2mm;
-}
-
-.part-label {
-  font-size: 7pt;
-  font-weight: bold;
-  text-align: center;
-  padding: 1mm;
-  border: 1px solid #666;
   background: white;
-  min-width: 15mm;
+  margin: 0 auto;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
-.part-label.small {
-  font-size: 6pt;
-  min-width: 10mm;
-  padding: 0.5mm;
-}
-
-.part-label.large {
-  font-size: 9pt;
-  padding: 3mm;
-  min-width: 25mm;
-}
-
-/* Registration Document Section */
-.registration-section {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 5mm;
-  margin-bottom: 5mm;
-}
-
-.reg-doc h4 {
-  font-size: 8pt;
-  font-weight: bold;
-  margin: 0 0 2mm 0;
-  background: #e0e0e0;
-  padding: 2mm;
-  border: 1px solid #000;
-}
-
-.reg-options {
-  display: flex;
-  gap: 5mm;
-  padding: 2mm;
-  border: 1px solid #000;
-  background: white;
-}
-
-.reg-options label {
-  display: flex;
-  align-items: center;
-  gap: 2mm;
-  font-size: 8pt;
-}
-
-.reg-options input[type="checkbox"] {
-  width: 4mm;
-  height: 4mm;
-}
-
-/* Interior Defects */
-.defects-section {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 5mm;
-  margin-bottom: 5mm;
-}
-
-.defect-box h4 {
-  font-size: 8pt;
-  font-weight: bold;
-  margin: 0 0 2mm 0;
-  background: #e0e0e0;
-  padding: 2mm;
-  border: 1px solid #000;
-}
-
-.defect-lines {
-  border: 1px solid #000;
-  padding: 3mm;
-  background: white;
-  min-height: 20mm;
-}
-
-.defect-line {
-  border-bottom: 1px solid #333;
-  height: 5mm;
-  margin-bottom: 2mm;
-}
-
-/* Signature Section */
-.signature-section {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 5mm;
-  margin-bottom: 5mm;
-}
-
-.signature-box h4 {
-  font-size: 8pt;
-  font-weight: bold;
-  margin: 0 0 2mm 0;
-  background: #e0e0e0;
-  padding: 2mm;
-  border: 1px solid #000;
-}
-
-.signature-fields {
-  border: 1px solid #000;
-  padding: 3mm;
-  background: white;
-}
-
-.sig-field {
-  display: flex;
-  align-items: center;
-  gap: 2mm;
-  margin-bottom: 2mm;
-}
-
-.sig-field.full {
-  grid-column: 1 / -1;
-}
-
-.sig-field label {
-  font-weight: bold;
-  font-size: 8pt;
-  min-width: 30mm;
-}
-
-.sig-area {
-  margin-top: 3mm;
-}
-
-.sig-area label {
-  font-weight: bold;
-  font-size: 8pt;
-  display: block;
-  margin-bottom: 2mm;
-}
-
-.signature-space {
-  border: 1px solid #000;
-  min-height: 20mm;
-  background: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.signature-space img {
-  max-width: 100%;
-  max-height: 100%;
+/* Template Image */
+.template-image {
+  width: 100%;
+  height: 100%;
   object-fit: contain;
+  display: block;
 }
 
-/* Notes Section */
-.notes-section {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 5mm;
-  margin-bottom: 5mm;
-}
-
-.note-box {
-  border: 1px solid #000;
-  padding: 3mm;
-  background: #f9f9f9;
-}
-
-.note-text {
-  font-size: 7pt;
-  line-height: 1.4;
+/* Blank Template Mode */
+.blank-template {
+  padding: 0;
   margin: 0;
 }
 
-/* Footer */
-.report-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-top: 2px solid #000;
-  padding-top: 3mm;
-  margin-top: 5mm;
+/* Prefilled Template Mode */
+.prefilled-template {
+  padding: 0;
+  margin: 0;
 }
 
-.checked-by {
-  display: flex;
-  align-items: center;
-  gap: 3mm;
+.template-overlays {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
 }
 
-.checked-by label {
-  font-weight: bold;
-  font-size: 8pt;
+.overlay-field {
+  position: absolute;
+  font-size: 11px;
+  font-weight: 600;
+  color: #000;
+  white-space: nowrap;
+  font-family: Arial, sans-serif;
 }
 
-.footer-logo {
-  font-weight: bold;
-  font-size: 14pt;
-  border: 2px solid #000;
-  padding: 2mm 5mm;
-  background: #f5f5f5;
+.overlay-signature {
+  position: absolute;
 }
 
 /* Print Media Query */
 @media print {
   @page {
-    size: A4;
-    margin: 10mm;
+    size: A4 portrait;
+    margin: 0;
   }
 
-  body * {
-    visibility: hidden;
-  }
-
-  .print-damage-report,
-  .print-damage-report * {
-    visibility: visible;
-  }
-
-  .print-damage-report {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
+  body {
+    margin: 0;
     padding: 0;
   }
 
-  .print-hide {
+  .print-damage-report {
+    width: 210mm;
+    height: 297mm;
+    margin: 0;
+    padding: 0;
+    page-break-after: avoid;
+    page-break-inside: avoid;
+  }
+
+  .template-image {
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Hide non-print elements */
+  .print-hide,
+  .print-modal-content > div:first-child,
+  .print-modal-content > div:last-child {
     display: none !important;
   }
 
-  .print-modal-content {
-    max-width: none !important;
-    max-height: none !important;
-    overflow: visible !important;
-  }
-
-  input[type="checkbox"] {
-    -webkit-appearance: checkbox;
-    appearance: checkbox;
+  .template-overlays {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
 }
 
-/* Screen Preview Styles */
+/* Screen Preview */
 .print-preview {
-  background: #f0f0f0;
+  background: #f5f5f5;
   padding: 20px;
-  border-radius: 8px;
+  overflow: auto;
+  max-height: calc(90vh - 120px);
 }
 
 @media screen {

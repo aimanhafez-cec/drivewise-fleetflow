@@ -232,7 +232,7 @@ export const inspectionMasterApi = {
   async getInspection(id: string): Promise<InspectionMaster | null> {
     const { data, error } = await supabase
       .from('inspection_master')
-      .select('*, vehicles(make, model, year, color, registration_number)')
+      .select('*, vehicles(make, model, year, color, license_plate, item_code, item_description)')
       .eq('id', id)
       .maybeSingle();
 

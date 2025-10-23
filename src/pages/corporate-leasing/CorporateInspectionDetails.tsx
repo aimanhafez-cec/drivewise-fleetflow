@@ -13,7 +13,7 @@ import { DamageMarkersDisplay } from '@/components/inspection/corporate/DamageMa
 export default function CorporateInspectionDetails() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { data: inspection, isLoading } = useInspection(id || '');
+  const { data: inspection, isLoading, isError, error } = useInspection(id || '');
   const deleteInspection = useDeleteInspection();
   const [showPrintModal, setShowPrintModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -37,6 +37,24 @@ export default function CorporateInspectionDetails() {
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
           <p className="text-muted-foreground">Loading inspection details...</p>
         </div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="text-center py-12">
+        <AlertTriangle className="h-12 w-12 text-destructive mx-auto mb-4" />
+        <p className="text-lg font-semibold mb-2">Error loading inspection</p>
+        <p className="text-muted-foreground mb-4">
+          {error instanceof Error ? error.message : 'An unexpected error occurred'}
+        </p>
+        <Button 
+          variant="outline"
+          onClick={() => navigate('/corporate-leasing-operations/manage-inspections')}
+        >
+          Back to List
+        </Button>
       </div>
     );
   }
