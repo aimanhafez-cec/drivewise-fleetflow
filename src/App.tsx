@@ -220,8 +220,8 @@ const App = () => {
                 <Route path="master-agreements" element={<MasterAgreements />} />
                 <Route path="master-agreements/new" element={<NewMasterAgreement />} />
                 <Route path="master-agreements/view/:id" element={<MasterAgreementView />} />
-                <Route path="master-agreements/:id" element={<MasterAgreementDetails />} />
                 <Route path="master-agreements/:id/edit" element={<MasterAgreementEdit />} />
+                <Route path="master-agreements/:id" element={<MasterAgreementDetails />} />
               </Route>
               <Route path="/rfqs" element={
                 <ProtectedRoute>
