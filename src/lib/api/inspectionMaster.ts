@@ -234,9 +234,18 @@ export const inspectionMasterApi = {
       .from('inspection_master')
       .select('*, vehicles(make, model, year, color, registration_number)')
       .eq('id', id)
-      .single();
+      .maybeSingle();
 
-    if (error) throw error;
+    if (error) {
+      console.error('Error fetching inspection:', error);
+      throw error;
+    }
+    
+    if (!data) {
+      console.warn('No inspection found with id:', id);
+      return null;
+    }
+    
     return data as unknown as InspectionMaster;
   },
 
