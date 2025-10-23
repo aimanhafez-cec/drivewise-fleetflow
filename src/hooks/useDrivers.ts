@@ -53,9 +53,12 @@ export const useDrivers = (searchQuery?: string, useEnhanced: boolean = false) =
     orderBy: 'full_name'
   });
   
-  if (searchQuery !== undefined && !useEnhanced) {
-    result.updateSearch(searchQuery);
-  }
+  // Sync external search query with internal LOV search (using useEffect to avoid infinite loop)
+  useEffect(() => {
+    if (searchQuery !== undefined && !useEnhanced) {
+      result.updateSearch(searchQuery);
+    }
+  }, [searchQuery, useEnhanced, result.updateSearch]);
 
   // If using enhanced search and it has results, return those
   if (useEnhanced && enhancedSearch.data) {
