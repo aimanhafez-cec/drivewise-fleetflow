@@ -83,7 +83,7 @@ export default function ManageInspections() {
         ) : (
           searchResults?.data && (
             <InspectionDataTable
-              inspections={searchResults.data}
+              inspections={searchResults.data as any}
               onView={(id) => navigate(`/corporate-leasing-operations/manage-inspections/${id}`)}
               onEdit={(id) => navigate(`/corporate-leasing-operations/manage-inspections/edit/${id}`)}
               onDelete={handleDelete}

@@ -21,14 +21,14 @@ export interface SearchInspectionsParams {
 export const inspectionMasterApi = {
   async getDashboardStats(): Promise<DashboardStats> {
     // Upcoming Checkouts: assigned lines without checkout inspection
-    const { count: checkoutCount } = await supabase
+    const checkoutQuery = await (supabase as any)
       .from('corporate_leasing_line_assignments')
       .select('*', { count: 'exact', head: true })
       .eq('assignment_status', 'assigned')
       .is('inspection_checkout_id', null);
 
     // Upcoming Check-ins: Active assignments that will need check-in
-    const { count: checkinCount } = await supabase
+    const checkinQuery = await (supabase as any)
       .from('corporate_leasing_line_assignments')
       .select('*', { count: 'exact', head: true })
       .eq('assignment_status', 'active')
@@ -37,24 +37,24 @@ export const inspectionMasterApi = {
     // Periodic Inspections count (completed in last 30 days)
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    const { count: periodicCount } = await supabase
+    const periodicQuery = await (supabase as any)
       .from('inspection_master')
       .select('*', { count: 'exact', head: true })
       .eq('inspection_type', 'PERIODIC')
       .gte('entry_date', thirtyDaysAgo.toISOString());
 
     // Random Inspections count (completed in last 30 days)
-    const { count: randomCount } = await supabase
+    const randomQuery = await (supabase as any)
       .from('inspection_master')
       .select('*', { count: 'exact', head: true })
       .eq('inspection_type', 'RANDOM')
       .gte('entry_date', thirtyDaysAgo.toISOString());
 
     return {
-      upcomingCheckouts: checkoutCount || 0,
-      upcomingCheckins: checkinCount || 0,
-      periodicInspections: periodicCount || 0,
-      randomInspections: randomCount || 0
+      upcomingCheckouts: checkoutQuery.count || 0,
+      upcomingCheckins: checkinQuery.count || 0,
+      periodicInspections: periodicQuery.count || 0,
+      randomInspections: randomQuery.count || 0
     };
   },
 
@@ -113,7 +113,7 @@ export const inspectionMasterApi = {
     const results: VehicleOption[] = [];
 
     if (inspectionType === 'RENTAL_CHECKOUT' || inspectionType === 'RENTAL_CHECKIN') {
-      const { data: assignments } = await supabase
+      const { data: assignments } = await (supabase as any)
         .from('corporate_leasing_line_assignments')
         .select(`
           *,
@@ -179,24 +179,24 @@ export const inspectionMasterApi = {
         line_id: data.line_id,
         status: 'DRAFT',
         performed_by_user_id: user?.id
-      })
+      } as any)
       .select()
       .single();
 
     if (error) throw error;
-    return inspection;
+    return inspection as unknown as InspectionMaster;
   },
 
   async updateInspection(id: string, updates: Partial<InspectionMaster>): Promise<InspectionMaster> {
     const { data, error } = await supabase
       .from('inspection_master')
-      .update(updates)
+      .update(updates as any)
       .eq('id', id)
       .select()
       .single();
 
     if (error) throw error;
-    return data;
+    return data as unknown as InspectionMaster;
   },
 
   async completeInspection(id: string, signature: any): Promise<InspectionMaster> {
@@ -206,25 +206,27 @@ export const inspectionMasterApi = {
         status: 'APPROVED',
         signature,
         completed_date: new Date().toISOString()
-      })
+      } as any)
       .eq('id', id)
       .select()
       .single();
 
     if (error) throw error;
 
-    if (data.inspection_type === 'RENTAL_CHECKOUT' && data.agreement_id) {
-      await supabase
+    const inspection = data as unknown as InspectionMaster;
+
+    if (inspection.inspection_type === 'RENTAL_CHECKOUT' && inspection.agreement_id) {
+      await (supabase as any)
         .from('corporate_leasing_line_assignments')
         .update({
           inspection_checkout_completed: true,
           inspection_checkout_id: id
-        })
-        .eq('agreement_id', data.agreement_id)
-        .eq('vin', data.vin);
+        } as any)
+        .eq('agreement_id', inspection.agreement_id)
+        .eq('vin', inspection.vin);
     }
 
-    return data;
+    return inspection;
   },
 
   async getInspection(id: string): Promise<InspectionMaster | null> {
@@ -235,7 +237,7 @@ export const inspectionMasterApi = {
       .single();
 
     if (error) throw error;
-    return data;
+    return data as unknown as InspectionMaster;
   },
 
   async deleteInspection(id: string): Promise<void> {

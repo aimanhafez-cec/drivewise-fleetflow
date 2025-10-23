@@ -1611,6 +1611,10 @@ export type Database = {
           contract_no: string
           created_at: string
           id: string
+          inspection_checkin_completed: boolean | null
+          inspection_checkin_id: string | null
+          inspection_checkout_completed: boolean | null
+          inspection_checkout_id: string | null
           item_code: string
           line_no: number
           status: string
@@ -1630,6 +1634,10 @@ export type Database = {
           contract_no: string
           created_at?: string
           id?: string
+          inspection_checkin_completed?: boolean | null
+          inspection_checkin_id?: string | null
+          inspection_checkout_completed?: boolean | null
+          inspection_checkout_id?: string | null
           item_code: string
           line_no: number
           status?: string
@@ -1649,6 +1657,10 @@ export type Database = {
           contract_no?: string
           created_at?: string
           id?: string
+          inspection_checkin_completed?: boolean | null
+          inspection_checkin_id?: string | null
+          inspection_checkout_completed?: boolean | null
+          inspection_checkout_id?: string | null
           item_code?: string
           line_no?: number
           status?: string
@@ -1669,6 +1681,20 @@ export type Database = {
             columns: ["assigned_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "corporate_leasing_line_assignments_inspection_checkin_id_fkey"
+            columns: ["inspection_checkin_id"]
+            isOneToOne: false
+            referencedRelation: "inspection_master"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "corporate_leasing_line_assignments_inspection_checkout_id_fkey"
+            columns: ["inspection_checkout_id"]
+            isOneToOne: false
+            referencedRelation: "inspection_master"
             referencedColumns: ["id"]
           },
           {
