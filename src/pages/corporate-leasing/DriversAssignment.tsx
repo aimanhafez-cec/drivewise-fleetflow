@@ -56,7 +56,7 @@ const DriversAssignment: React.FC = () => {
               <>
                 <div className="text-2xl font-bold">{stats?.totalLines || 0}</div>
                 <p className="text-xs text-muted-foreground mt-1">
-                  From active agreements
+                  From signed agreements
                 </p>
               </>
             )}

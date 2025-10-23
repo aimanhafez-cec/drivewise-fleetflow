@@ -93,7 +93,7 @@ class CorporateDriverAssignmentAPI {
       const { data: assignments } = await supabase
         .from('corporate_leasing_line_drivers')
         .select('line_id')
-        .is('removed_date', null)
+        .is('removed_at', null)
         .in('line_id', lines?.map(l => l.id) || []);
 
       const assignedLineIds = new Set(assignments?.map(a => a.line_id) || []);
@@ -129,12 +129,21 @@ class CorporateDriverAssignmentAPI {
       // Get customer_accepted agreements first
       const { data: agreements } = await supabase
         .from('corporate_leasing_agreements')
-        .select('id, agreement_no, customer_id, customers(name)')
+        .select('id, agreement_no, customer_id')
         .eq('status', 'customer_accepted');
 
       if (!agreements || agreements.length === 0) {
         return { data: [], totalCount: 0 };
       }
+
+      // Fetch customer names separately
+      const customerIds = Array.from(new Set(agreements.map(a => a.customer_id).filter(Boolean)));
+      const { data: customers } = await supabase
+        .from('customers')
+        .select('id, full_name')
+        .in('id', customerIds);
+      
+      const customerMap = new Map(customers?.map(c => [c.id, c.full_name]) || []);
 
       let agreementIds = agreements.map(a => a.id);
       
@@ -174,7 +183,7 @@ class CorporateDriverAssignmentAPI {
           drivers(full_name, license_number, phone_number)
         `)
         .in('line_id', lineIds)
-        .is('removed_date', null);
+        .is('removed_at', null);
 
       // Build driver lines with assignment info
       const driverLines: DriverLine[] = lines.map(line => {
@@ -199,7 +208,7 @@ class CorporateDriverAssignmentAPI {
           itemCode: line.item_code,
           itemDescription: line.item_description || '',
           agreementNumber: agreement?.agreement_no || '',
-          customerName: (agreement?.customers as any)?.name || '',
+          customerName: customerMap.get(agreement?.customer_id || '') || '',
           contractStartDate: line.lease_start_date,
           contractEndDate: line.lease_end_date,
           assignedDrivers,
@@ -244,7 +253,7 @@ class CorporateDriverAssignmentAPI {
           .from('corporate_leasing_line_drivers')
           .update({ is_primary: false })
           .eq('line_id', lineId)
-          .is('removed_date', null);
+          .is('removed_at', null);
       }
 
       // Get agreement_id from line
@@ -320,7 +329,7 @@ class CorporateDriverAssignmentAPI {
             .from('corporate_leasing_line_drivers')
             .update({ is_primary: false })
             .eq('line_id', assignment.line_id)
-            .is('removed_date', null);
+            .is('removed_at', null);
         }
       }
 
