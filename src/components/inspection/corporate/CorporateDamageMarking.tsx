@@ -135,6 +135,14 @@ export function CorporateDamageMarking({
     );
   }
 
+  if (!lineId) {
+    return (
+      <div className="text-center py-12 text-muted-foreground">
+        Please select an agreement line before adding damage markers
+      </div>
+    );
+  }
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -185,6 +193,7 @@ export function CorporateDamageMarking({
           variant={isAddingMarker ? 'default' : 'outline'}
           size="sm"
           onClick={() => setIsAddingMarker(!isAddingMarker)}
+          disabled={!lineId}
         >
           <Plus className="h-4 w-4 mr-2" />
           {isAddingMarker ? 'Click on vehicle to mark' : 'Add Damage Marker'}

@@ -9,9 +9,14 @@ import type {
 export async function createDamageMarker(
   input: CreateDamageMarkerInput
 ): Promise<string> {
+  if (!input.line_id) {
+    throw new Error('line_id is required');
+  }
+
   const { data, error } = await supabase
     .from('damage_markers')
     .insert({
+      line_id: input.line_id,
       event: input.event,
       side: input.side,
       x: input.x,

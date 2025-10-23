@@ -29,7 +29,7 @@ export interface DamageMarkerPhoto {
 
 export interface DamageMarker {
   id: string;
-  line_id: string | null;
+  line_id: string;
   event: DamageMarkerEvent;
   side: DamageMarkerSide;
   x: number;
@@ -45,7 +45,7 @@ export interface DamageMarker {
 }
 
 export interface CreateDamageMarkerInput {
-  line_id?: string | null;
+  line_id: string;
   event: DamageMarkerEvent;
   side: DamageMarkerSide;
   x: number;
