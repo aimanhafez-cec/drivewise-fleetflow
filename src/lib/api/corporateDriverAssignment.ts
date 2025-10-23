@@ -180,7 +180,7 @@ class CorporateDriverAssignmentAPI {
           assignment_start_date,
           assignment_end_date,
           notes,
-          drivers(full_name, license_number, phone_number)
+          drivers(full_name, license_no, phone)
         `)
         .in('line_id', lineIds)
         .is('removed_at', null);
@@ -194,8 +194,8 @@ class CorporateDriverAssignmentAPI {
           id: a.id,
           driverId: a.driver_id,
           driverName: (a.drivers as any)?.full_name || 'Unknown Driver',
-          licenseNumber: (a.drivers as any)?.license_number || '',
-          phoneNumber: (a.drivers as any)?.phone_number || '',
+          licenseNumber: (a.drivers as any)?.license_no || '',
+          phoneNumber: (a.drivers as any)?.phone || '',
           isPrimary: a.is_primary || false,
           assignmentDate: a.assignment_start_date,
           assignmentEndDate: a.assignment_end_date,
