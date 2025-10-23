@@ -171,7 +171,7 @@ class CorporateVinAssignmentAPI {
           startDate: item.pickup_at || '',
           endDate: item.return_at || '',
           durationMonths: item.duration_months || 0,
-          monthlyRate: item.monthly_line_total || 0,
+          monthlyRate: item.monthly_rate || 0,
           isAssigned: !!assignment,
           assignedVin: assignment?.vin,
           assignedVehicleId: assignment?.vehicle_id,
