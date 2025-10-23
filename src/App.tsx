@@ -52,6 +52,7 @@ import MasterAgreements from "./pages/MasterAgreements";
 import MasterAgreementDetails from "./pages/MasterAgreementDetails";
 import NewMasterAgreement from "./pages/NewMasterAgreement";
 import MasterAgreementEdit from "./pages/MasterAgreementEdit";
+import MasterAgreementView from "./pages/MasterAgreementView";
 import ManageExpenses from "./pages/transactions/ManageExpenses";
 import ManageInvoices from "./pages/transactions/ManageInvoices";
 import PaymentProcessing from "./pages/transactions/PaymentProcessing";
@@ -218,6 +219,7 @@ const App = () => {
                 <Route path="quotations" element={<ManageQuotations />} />
                 <Route path="master-agreements" element={<MasterAgreements />} />
                 <Route path="master-agreements/new" element={<NewMasterAgreement />} />
+                <Route path="master-agreements/view/:id" element={<MasterAgreementView />} />
                 <Route path="master-agreements/:id" element={<MasterAgreementDetails />} />
                 <Route path="master-agreements/:id/edit" element={<MasterAgreementEdit />} />
               </Route>

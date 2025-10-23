@@ -8,7 +8,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { TrainStopStepper } from "@/components/ui/train-stop-stepper";
 import { useToast } from "@/hooks/use-toast";
 import { calculateMonthsDuration } from "@/lib/utils/dateUtils";
-import { ArrowLeft, ArrowRight, Save, AlertCircle } from "lucide-react";
+import { ArrowLeft, ArrowRight, Save, AlertCircle, Edit } from "lucide-react";
 import { MasterAgreementStep1 } from "./wizard/MasterAgreementStep1";
 import { MasterAgreementStep2 } from "./wizard/MasterAgreementStep2";
 import { MasterAgreementStep3 } from "./wizard/MasterAgreementStep3";
@@ -31,12 +31,14 @@ interface MasterAgreementWizardProps {
   agreementId?: string;
   initialData?: any;
   isEditMode?: boolean;
+  viewMode?: boolean;
 }
 
 export const MasterAgreementWizard: React.FC<MasterAgreementWizardProps> = ({
   agreementId,
   initialData,
   isEditMode = false,
+  viewMode = false,
 }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
@@ -95,11 +97,11 @@ export const MasterAgreementWizard: React.FC<MasterAgreementWizardProps> = ({
       if (error) throw error;
       return data;
     },
-    enabled: !!(id || agreementId) && isEditMode,
+    enabled: !!(id || agreementId) && (isEditMode || viewMode),
   });
 
   useEffect(() => {
-    if (!existingAgreement) return;
+    if (!existingAgreement || (!isEditMode && !viewMode)) return;
 
     const loadAgreementWithLines = async () => {
       console.log("[MasterAgreementWizard] Loading existing agreement:", existingAgreement);
@@ -393,7 +395,7 @@ export const MasterAgreementWizard: React.FC<MasterAgreementWizardProps> = ({
   const renderStep = () => {
     const stepProps = {
       data: agreementData,
-      onChange: handleDataChange,
+      onChange: viewMode ? () => {} : handleDataChange,
       errors,
     };
 
@@ -419,31 +421,54 @@ export const MasterAgreementWizard: React.FC<MasterAgreementWizardProps> = ({
 
   return (
     <div className="space-y-6 p-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            {isEditMode ? "Edit Master Agreement" : "New Master Agreement"}
-            {agreementData.agreement_no && ` - ${agreementData.agreement_no}`}
-          </h1>
-          <p className="text-muted-foreground">
-            {isEditMode ? "Update agreement details" : "Create a new corporate leasing agreement"}
-          </p>
+      {!viewMode && (
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">
+              {isEditMode ? "Edit Master Agreement" : "New Master Agreement"}
+              {agreementData.agreement_no && ` - ${agreementData.agreement_no}`}
+            </h1>
+            <p className="text-muted-foreground">
+              {isEditMode ? "Update agreement details" : "Create a new corporate leasing agreement"}
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              onClick={handleSaveDraft} 
+              disabled={saveMutation.isPending}
+            >
+              <Save className="h-4 w-4 mr-2" />
+              {isEditMode || agreementData.id ? "Save Changes" : "Save Draft"}
+            </Button>
+            <Button variant="outline" onClick={() => navigate("/corporate-leasing/master-agreements")}>
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back
+            </Button>
+          </div>
         </div>
-        <div className="flex gap-2">
-          <Button 
-            variant="outline" 
-            onClick={handleSaveDraft} 
-            disabled={saveMutation.isPending}
-          >
-            <Save className="h-4 w-4 mr-2" />
-            {isEditMode || agreementData.id ? "Save Changes" : "Save Draft"}
-          </Button>
-          <Button variant="outline" onClick={() => navigate("/corporate-leasing/master-agreements")}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
-          </Button>
+      )}
+
+      {viewMode && (
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">
+              View Master Agreement {agreementData.agreement_no && `- ${agreementData.agreement_no}`}
+            </h1>
+            <p className="text-muted-foreground">Read-only view of agreement details</p>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => navigate(`/corporate-leasing/master-agreements/${agreementId}`)}>
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Details
+            </Button>
+            <Button onClick={() => navigate(`/corporate-leasing/master-agreements/${agreementId}/edit`)}>
+              <Edit className="h-4 w-4 mr-2" />
+              Edit Agreement
+            </Button>
+          </div>
         </div>
-      </div>
+      )}
 
       <TrainStopStepper 
         steps={steps} 
@@ -478,24 +503,33 @@ export const MasterAgreementWizard: React.FC<MasterAgreementWizardProps> = ({
         </Button>
 
         <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={handleSaveDraft} disabled={saveMutation.isPending}>
-            <Save className="h-4 w-4 mr-1" />
-            {isEditMode || agreementData.id ? "Save Changes" : "Save Draft"}
-          </Button>
+          {!viewMode && (
+            <>
+              <Button variant="outline" onClick={handleSaveDraft} disabled={saveMutation.isPending}>
+                <Save className="h-4 w-4 mr-1" />
+                {isEditMode || agreementData.id ? "Save Changes" : "Save Draft"}
+              </Button>
 
-          <Button variant="outline" onClick={() => navigate("/corporate-leasing/master-agreements")} disabled={saveMutation.isPending}>
-            Cancel
-          </Button>
+              <Button variant="outline" onClick={() => navigate("/corporate-leasing/master-agreements")} disabled={saveMutation.isPending}>
+                Cancel
+              </Button>
+            </>
+          )}
 
           {currentStep < steps.length ? (
-            <Button onClick={handleNext}>
+            <Button onClick={viewMode ? () => {
+              setCurrentStep(prev => Math.min(prev + 1, steps.length));
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            } : handleNext}>
               Next
               <ArrowRight className="h-4 w-4 ml-1" />
             </Button>
           ) : (
-            <Button onClick={handleFinalize} disabled={saveMutation.isPending}>
-              {isEditMode ? "Update Agreement" : "Create Agreement"}
-            </Button>
+            !viewMode && (
+              <Button onClick={handleFinalize} disabled={saveMutation.isPending}>
+                {isEditMode ? "Update Agreement" : "Create Agreement"}
+              </Button>
+            )
           )}
         </div>
       </div>
