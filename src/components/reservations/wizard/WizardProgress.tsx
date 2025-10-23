@@ -115,7 +115,7 @@ export const WizardProgress: React.FC<WizardProgressProps> = ({
             <div className="flex items-center min-w-max px-4">
               {steps.map((step, index) => {
                 const isCurrent = currentStep === step.number;
-                const status = stepValidationStatus[step.number] || 'not-visited';
+                const status = (stepValidationStatus?.[step.number]) ?? 'not-visited';
                 const styles = getStepStyles(step.number, status, isCurrent);
 
                 return (
