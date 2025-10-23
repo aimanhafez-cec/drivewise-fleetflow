@@ -7087,6 +7087,132 @@ export type Database = {
           },
         ]
       }
+      traffic_fines_corporate: {
+        Row: {
+          agreement_id: string | null
+          amount: number
+          authority_source: string
+          black_points: number | null
+          confiscation_days: number | null
+          contract_no: string | null
+          created_at: string | null
+          customer_id: string | null
+          discount_amount: number | null
+          driver_id: string | null
+          emirate: string
+          final_amount: number
+          fine_no: string
+          id: string
+          integration_timestamp: string | null
+          notes: string | null
+          payment_date: string | null
+          payment_reference: string | null
+          plate_number: string
+          reconciled: boolean | null
+          reconciled_at: string | null
+          reconciled_by: string | null
+          status: string
+          updated_at: string | null
+          vehicle_id: string | null
+          violation_date: string
+          violation_description: string
+        }
+        Insert: {
+          agreement_id?: string | null
+          amount: number
+          authority_source: string
+          black_points?: number | null
+          confiscation_days?: number | null
+          contract_no?: string | null
+          created_at?: string | null
+          customer_id?: string | null
+          discount_amount?: number | null
+          driver_id?: string | null
+          emirate: string
+          final_amount: number
+          fine_no: string
+          id?: string
+          integration_timestamp?: string | null
+          notes?: string | null
+          payment_date?: string | null
+          payment_reference?: string | null
+          plate_number: string
+          reconciled?: boolean | null
+          reconciled_at?: string | null
+          reconciled_by?: string | null
+          status?: string
+          updated_at?: string | null
+          vehicle_id?: string | null
+          violation_date: string
+          violation_description: string
+        }
+        Update: {
+          agreement_id?: string | null
+          amount?: number
+          authority_source?: string
+          black_points?: number | null
+          confiscation_days?: number | null
+          contract_no?: string | null
+          created_at?: string | null
+          customer_id?: string | null
+          discount_amount?: number | null
+          driver_id?: string | null
+          emirate?: string
+          final_amount?: number
+          fine_no?: string
+          id?: string
+          integration_timestamp?: string | null
+          notes?: string | null
+          payment_date?: string | null
+          payment_reference?: string | null
+          plate_number?: string
+          reconciled?: boolean | null
+          reconciled_at?: string | null
+          reconciled_by?: string | null
+          status?: string
+          updated_at?: string | null
+          vehicle_id?: string | null
+          violation_date?: string
+          violation_description?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "traffic_fines_corporate_agreement_id_fkey"
+            columns: ["agreement_id"]
+            isOneToOne: false
+            referencedRelation: "agreements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "traffic_fines_corporate_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "traffic_fines_corporate_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "traffic_fines_corporate_reconciled_by_fkey"
+            columns: ["reconciled_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "traffic_fines_corporate_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       traffic_tickets: {
         Row: {
           agreement_id: string | null
