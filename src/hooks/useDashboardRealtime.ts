@@ -187,6 +187,20 @@ export function useDashboardRealtime(options: DashboardRealtimeOptions = {}) {
         }
       )
       
+      // Corporate leasing line assignment changes (inspections)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'corporate_leasing_line_assignments'
+        },
+        (payload) => {
+          console.log('[Dashboard Realtime] Line assignment change:', payload.eventType);
+          queryClient.invalidateQueries({ queryKey: ['inspection-dashboard'] });
+        }
+      )
+      
       // Work orders (maintenance)
       .on(
         'postgres_changes',

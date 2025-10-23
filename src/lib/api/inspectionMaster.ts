@@ -24,14 +24,14 @@ export const inspectionMasterApi = {
     const checkoutQuery = await (supabase as any)
       .from('corporate_leasing_line_assignments')
       .select('*', { count: 'exact', head: true })
-      .eq('assignment_status', 'assigned')
+      .eq('status', 'assigned')
       .is('inspection_checkout_id', null);
 
     // Upcoming Check-ins: Active assignments that will need check-in
     const checkinQuery = await (supabase as any)
       .from('corporate_leasing_line_assignments')
       .select('*', { count: 'exact', head: true })
-      .eq('assignment_status', 'active')
+      .eq('status', 'active')
       .is('inspection_checkin_id', null);
 
     // Periodic Inspections count (completed in last 30 days)
@@ -215,15 +215,14 @@ export const inspectionMasterApi = {
 
     const inspection = data as unknown as InspectionMaster;
 
-    if (inspection.inspection_type === 'RENTAL_CHECKOUT' && inspection.agreement_id) {
+    if (inspection.inspection_type === 'RENTAL_CHECKOUT' && inspection.line_id) {
       await (supabase as any)
         .from('corporate_leasing_line_assignments')
         .update({
           inspection_checkout_completed: true,
           inspection_checkout_id: id
         } as any)
-        .eq('agreement_id', inspection.agreement_id)
-        .eq('vin', inspection.vin);
+        .eq('id', inspection.line_id);
     }
 
     return inspection;
