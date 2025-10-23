@@ -158,24 +158,32 @@ export default function CorporateInspectionDetails() {
         <div className="flex items-center gap-2 mb-4">
           <h2 className="text-xl font-semibold">Inspection Checklist</h2>
         </div>
-        <div className="space-y-2">
-          {Object.entries(inspection.checklist || {}).map(([key, value]) => (
-            <div key={key} className="flex items-center justify-between p-3 rounded-lg border">
-              <span className="capitalize">{key.replace('_', ' ')}</span>
-              {value === 'OK' ? (
-                <div className="flex items-center gap-2 text-green-600">
-                  <CheckCircle2 className="h-5 w-5" />
-                  <span className="font-medium">OK</span>
-                </div>
-              ) : (
-                <div className="flex items-center gap-2 text-red-600">
-                  <XCircle className="h-5 w-5" />
-                  <span className="font-medium">DAMAGE</span>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
+        {Object.keys(inspection.checklist || {}).length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">
+            <AlertTriangle className="h-8 w-8 mx-auto mb-2 opacity-50" />
+            <p>No checklist items recorded</p>
+            <p className="text-sm mt-1">This inspection was completed without checklist data</p>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {Object.entries(inspection.checklist || {}).map(([key, value]) => (
+              <div key={key} className="flex items-center justify-between p-3 rounded-lg border">
+                <span className="capitalize">{key.replace('_', ' ')}</span>
+                {value === 'OK' ? (
+                  <div className="flex items-center gap-2 text-green-600">
+                    <CheckCircle2 className="h-5 w-5" />
+                    <span className="font-medium">OK</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 text-red-600">
+                    <XCircle className="h-5 w-5" />
+                    <span className="font-medium">DAMAGE</span>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </Card>
 
       {/* Vehicle Damage Report */}
@@ -198,11 +206,25 @@ export default function CorporateInspectionDetails() {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <p className="text-sm text-muted-foreground">Odometer</p>
-            <p className="text-2xl font-bold">{inspection.metrics?.odometer || 'N/A'} km</p>
+            {inspection.metrics?.odometer ? (
+              <p className="text-2xl font-bold">{inspection.metrics.odometer} km</p>
+            ) : (
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <AlertTriangle className="h-5 w-5 opacity-50" />
+                <p className="text-lg">No reading recorded</p>
+              </div>
+            )}
           </div>
           <div>
             <p className="text-sm text-muted-foreground">Fuel Level</p>
-            <p className="text-2xl font-bold">{inspection.metrics?.fuelLevel || 'N/A'}</p>
+            {inspection.metrics?.fuelLevel ? (
+              <p className="text-2xl font-bold">{inspection.metrics.fuelLevel}</p>
+            ) : (
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <AlertTriangle className="h-5 w-5 opacity-50" />
+                <p className="text-lg">No level recorded</p>
+              </div>
+            )}
           </div>
         </div>
       </Card>

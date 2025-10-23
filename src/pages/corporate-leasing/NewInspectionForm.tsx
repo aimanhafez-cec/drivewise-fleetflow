@@ -115,6 +115,25 @@ export default function NewInspectionForm() {
       toast.error('Please select a vehicle');
       return;
     }
+    
+    // Phase 2: Validate checklist
+    if (!formData.checklist || formData.checklist.length === 0) {
+      toast.error('Please complete at least one checklist item');
+      return;
+    }
+    
+    // Phase 2: Validate metrics
+    const metrics = formData.metrics as any;
+    if (!metrics.odometer || metrics.odometer <= 0) {
+      toast.error('Please enter a valid odometer reading');
+      return;
+    }
+    
+    if (!metrics.fuelLevel) {
+      toast.error('Please select the fuel level');
+      return;
+    }
+    
     if (!formData.signature) {
       toast.error('Please provide a signature');
       return;
@@ -134,6 +153,26 @@ export default function NewInspectionForm() {
     }
 
     try {
+      // Phase 1: Save all form data FIRST before completing
+      await updateMutation.mutateAsync({
+        id: inspectionId,
+        updates: {
+          vehicle_id: formData.vehicle_id || undefined,
+          vin: formData.vin || undefined,
+          item_code: formData.item_code || undefined,
+          agreement_id: formData.agreement_id || undefined,
+          line_id: formData.line_id || undefined,
+          damage_marker_ids: formData.damage_marker_ids,
+          checklist: formData.checklist,
+          metrics: formData.metrics,
+          media: formData.media,
+          attachments: formData.attachments,
+          notes: formData.notes,
+          status: 'IN_PROGRESS'
+        } as any
+      });
+
+      // THEN: Mark as complete with signature
       await completeMutation.mutateAsync({
         id: inspectionId,
         signature: formData.signature
