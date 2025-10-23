@@ -28,7 +28,6 @@ export const Scene3D: React.FC<Scene3DProps> = ({
         enablePan={false}
         minDistance={3}
         maxDistance={10}
-        maxPolarAngle={Math.PI / 2}
       />
     </>
   );
