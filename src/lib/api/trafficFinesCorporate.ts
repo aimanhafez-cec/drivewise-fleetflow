@@ -78,7 +78,7 @@ export class TrafficFinesCorporateAPI {
    * List traffic fines with optional filtering
    */
   static async list(filters?: TrafficFineFilters): Promise<TrafficFineCorporateRecord[]> {
-    let query = supabase
+    let query = (supabase as any)
       .from("traffic_fines_corporate")
       .select(`
         *,
@@ -151,7 +151,7 @@ export class TrafficFinesCorporateAPI {
    * Get a single traffic fine by ID
    */
   static async get(id: string): Promise<TrafficFineCorporateRecord> {
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from("traffic_fines_corporate")
       .select(`
         *,
@@ -238,7 +238,7 @@ export class TrafficFinesCorporateAPI {
    */
   static async simulateIntegrationRun(): Promise<{ synced: number }> {
     // Update all integration_timestamp fields to now
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from("traffic_fines_corporate")
       .update({ integration_timestamp: new Date().toISOString() })
       .neq("id", "00000000-0000-0000-0000-000000000000") // Update all
