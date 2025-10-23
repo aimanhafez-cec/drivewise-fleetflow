@@ -217,44 +217,16 @@ class CorporateVinAssignmentAPI {
    * Get available VINs for a specific item code
    */
   async getAvailableVins(itemCode: string): Promise<AvailableVin[]> {
-    // Parse item code to extract vehicle specs
-    // Format: "HON-CRV-2023-SIL-SUV" or similar
-    const parts = itemCode.split('-');
-    if (parts.length < 3) {
-      throw new Error('Invalid item code format');
-    }
-
-    // Extract make, model, year from item code
-    const makeCode = parts[0];
-    const modelCode = parts[1];
-    const yearStr = parts[2];
-    const colorCode = parts[3];
-
-    // Map codes to full names (we need to query by actual values)
-    // For now, we'll search by year and try to match
-    const year = parseInt(yearStr);
-
-    // Get all available vehicles and filter
+    // Direct match by item_code - vehicles already have this field populated
     const { data: vehicles, error } = await supabase
       .from('vehicles')
       .select('id, vin, license_plate, make, model, year, color, odometer')
+      .eq('item_code', itemCode)
       .eq('status', 'available')
-      .eq('year', year)
       .order('odometer', { ascending: true });
 
     if (error) throw error;
-    if (!vehicles) return [];
-
-    // Filter by make/model match (case insensitive partial match)
-    const filtered = vehicles.filter(v => {
-      const makeMatch = v.make?.toLowerCase().includes(makeCode.toLowerCase()) || 
-                        makeCode.toLowerCase().includes(v.make?.toLowerCase() || '');
-      const modelMatch = v.model?.toLowerCase().includes(modelCode.toLowerCase()) ||
-                         modelCode.toLowerCase().includes(v.model?.toLowerCase() || '');
-      return makeMatch && modelMatch;
-    });
-
-    return filtered as AvailableVin[];
+    return vehicles || [];
   }
 
   /**
