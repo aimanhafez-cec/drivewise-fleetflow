@@ -5,12 +5,15 @@ import { Badge } from '@/components/ui/badge';
 import { Loader2, Plus, Trash2 } from 'lucide-react';
 import { VehicleDiagramSVG } from './VehicleDiagramSVG';
 import { DamageMarkerDialog } from './DamageMarkerDialog';
+import { DamageMarkersTable } from './DamageMarkersTable';
 import { 
   useDamageMarkers, 
   useCreateDamageMarker, 
   useUpdateDamageMarker, 
-  useDeleteDamageMarker 
+  useDeleteDamageMarker,
+  useUploadDamagePhoto
 } from '@/hooks/useDamageMarkers';
+import { toast } from 'sonner';
 import type { DamageMarker, DamageMarkerSide } from '@/types/damage-marker';
 import { SEVERITY_OPTIONS } from '@/types/damage-marker';
 
@@ -51,6 +54,7 @@ export function CorporateDamageMarking({
   const createMarker = useCreateDamageMarker();
   const updateMarker = useUpdateDamageMarker();
   const deleteMarker = useDeleteDamageMarker();
+  const uploadPhoto = useUploadDamagePhoto();
 
   const currentViewMarkers = markers.filter(m => m.side === currentView);
 
@@ -124,6 +128,24 @@ export function CorporateDamageMarking({
       currentViewMarkers.forEach(marker => {
         handleDeleteMarker(marker.id);
       });
+    }
+  };
+
+  const handleAddPhoto = async (markerId: string, file: File) => {
+    try {
+      const photo = await uploadPhoto.mutateAsync({ file, markerId });
+      const marker = markers.find((m) => m.id === markerId);
+      if (marker) {
+        await updateMarker.mutateAsync({
+          id: markerId,
+          updates: {
+            photos: [...(marker.photos || []), photo],
+          },
+        });
+      }
+      toast.success('Photo added successfully');
+    } catch (error) {
+      toast.error('Failed to add photo');
     }
   };
 
@@ -285,21 +307,31 @@ export function CorporateDamageMarking({
         ))}
       </div>
 
-      {/* Summary */}
+      {/* Summary Table */}
       {markers.length > 0 && (
         <div className="rounded-lg border p-4 bg-muted/30">
-          <p className="text-sm font-medium mb-2">Damage Summary:</p>
-          <div className="flex flex-wrap gap-2">
-            {VIEWS.map((view) => {
-              const count = markers.filter(m => m.side === view.value).length;
-              if (count === 0) return null;
-              return (
-                <Badge key={view.value} variant="outline">
-                  {view.label}: {count} marker{count !== 1 ? 's' : ''}
-                </Badge>
-              );
-            })}
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-sm font-medium">Damage Summary:</p>
+            <div className="flex gap-2 text-xs">
+              <div className="flex items-center gap-1">
+                <Badge className="bg-yellow-500 text-white border-0 w-3 h-3 p-0" />
+                <span>Minor</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Badge className="bg-orange-500 text-white border-0 w-3 h-3 p-0" />
+                <span>Moderate</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Badge className="bg-red-500 text-white border-0 w-3 h-3 p-0" />
+                <span>Major</span>
+              </div>
+            </div>
           </div>
+          <DamageMarkersTable 
+            markers={markers} 
+            onAddPhoto={handleAddPhoto}
+            readOnly={false}
+          />
         </div>
       )}
 
