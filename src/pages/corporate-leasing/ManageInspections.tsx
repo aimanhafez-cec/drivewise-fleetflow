@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, Printer } from 'lucide-react';
 import { InspectionDashboardCards } from '@/components/inspection/InspectionDashboardCards';
 import { InspectionSearchFilters } from '@/components/inspection/InspectionSearchFilters';
 import { InspectionDataTable } from '@/components/inspection/InspectionDataTable';
+import { PrintBlankCardModal } from '@/components/inspection/PrintBlankCardModal';
 import { useInspectionDashboard, useInspectionSearch, useDeleteInspection } from '@/hooks/useInspectionMaster';
 import { toast } from 'sonner';
 
@@ -14,6 +15,7 @@ export default function ManageInspections() {
   const [selectedType, setSelectedType] = useState('all');
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
+  const [showPrintModal, setShowPrintModal] = useState(false);
 
   const { data: dashboardStats, isLoading: statsLoading } = useInspectionDashboard();
   const { data: searchResults, isLoading: searchLoading } = useInspectionSearch({
@@ -55,10 +57,16 @@ export default function ManageInspections() {
             Create and manage vehicle inspections for check-out, check-in, periodic, and random inspections
           </p>
         </div>
-        <Button onClick={() => navigate('/corporate-leasing-operations/manage-inspections/new')}>
-          <Plus className="h-4 w-4 mr-2" />
-          Create New Inspection
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setShowPrintModal(true)}>
+            <Printer className="h-4 w-4 mr-2" />
+            Print Blank Card
+          </Button>
+          <Button onClick={() => navigate('/corporate-leasing-operations/manage-inspections/new')}>
+            <Plus className="h-4 w-4 mr-2" />
+            Create New Inspection
+          </Button>
+        </div>
       </div>
 
       {statsLoading ? (
@@ -91,6 +99,12 @@ export default function ManageInspections() {
           )
         )}
       </div>
+
+      <PrintBlankCardModal
+        open={showPrintModal}
+        onClose={() => setShowPrintModal(false)}
+        mode="blank"
+      />
     </div>
   );
 }

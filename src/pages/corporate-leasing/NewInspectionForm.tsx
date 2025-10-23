@@ -4,13 +4,13 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Card, CardContent } from '@/components/ui/card';
 import { ChevronLeft, ChevronRight, Save } from 'lucide-react';
-import { InspectionBasicInfo } from '@/components/inspection/steps/InspectionBasicInfo';
-import { InspectionVehicleSelection } from '@/components/inspection/steps/InspectionVehicleSelection';
-import { InspectionDamageMarking } from '@/components/inspection/steps/InspectionDamageMarking';
-import { InspectionChecklist } from '@/components/inspection/steps/InspectionChecklist';
-import { InspectionMetrics } from '@/components/inspection/steps/InspectionMetrics';
-import { InspectionNotesAttachments } from '@/components/inspection/steps/InspectionNotesAttachments';
-import { InspectionSignature } from '@/components/inspection/steps/InspectionSignature';
+import { CorporateBasicInfo } from '@/components/inspection/corporate/CorporateBasicInfo';
+import { CorporateVehicleSelection } from '@/components/inspection/corporate/CorporateVehicleSelection';
+import { CorporateDamageMarking } from '@/components/inspection/corporate/CorporateDamageMarking';
+import { CorporateChecklist } from '@/components/inspection/corporate/CorporateChecklist';
+import { CorporateMetrics } from '@/components/inspection/corporate/CorporateMetrics';
+import { CorporateNotesAttachments } from '@/components/inspection/corporate/CorporateNotesAttachments';
+import { CorporateSignature } from '@/components/inspection/corporate/CorporateSignature';
 import { useCreateInspection, useUpdateInspection, useCompleteInspection } from '@/hooks/useInspectionMaster';
 import type { InspectionType, InspectionMaster } from '@/types/inspection';
 import { toast } from 'sonner';
@@ -164,62 +164,55 @@ export default function NewInspectionForm() {
           {/* Step Content */}
           <div className="min-h-[400px]">
             {currentStep === 1 && (
-              <InspectionBasicInfo
-                data={formData}
-                inspectionNo={inspectionId ? 'Auto-generated' : 'Will be generated after save'}
-                onChange={updateFormData}
+              <CorporateBasicInfo
+                inspectionType={formData.inspection_type}
+                entryDate={formData.entry_date}
+                status="DRAFT"
+                onUpdate={(field, value) => updateFormData({ [field]: value })}
               />
             )}
             {currentStep === 2 && (
-              <InspectionVehicleSelection
-                inspectionType={formData.inspection_type}
-                selectedVehicle={formData.vehicle_id ? {
-                  vehicleId: formData.vehicle_id,
-                  vin: formData.vin,
-                  itemCode: formData.item_code,
-                  description: '',
-                  agreementId: formData.agreement_id,
-                  lineId: formData.line_id
-                } : null}
-                onSelect={(vehicle) => updateFormData({
-                  vehicle_id: vehicle.vehicleId,
-                  vin: vehicle.vin,
-                  item_code: vehicle.itemCode,
-                  agreement_id: vehicle.agreementId,
-                  line_id: vehicle.lineId
+              <CorporateVehicleSelection
+                vehicleId={formData.vehicle_id || null}
+                vin={formData.vin || null}
+                onUpdate={(vehicleId, vin, itemCode) => updateFormData({
+                  vehicle_id: vehicleId,
+                  vin: vin,
+                  item_code: itemCode
                 })}
               />
             )}
             {currentStep === 3 && (
-              <InspectionDamageMarking
+              <CorporateDamageMarking
                 vehicleId={formData.vehicle_id}
                 damageMarkerIds={formData.damage_marker_ids}
                 onUpdate={(ids) => updateFormData({ damage_marker_ids: ids })}
               />
             )}
             {currentStep === 4 && (
-              <InspectionChecklist
-                data={{ status: formData.checklist }}
-                onUpdate={(data) => updateFormData({ checklist: data.status })}
+              <CorporateChecklist
+                checklist={formData.checklist as Record<string, 'OK' | 'DAMAGE'>}
+                onChange={(checklist) => updateFormData({ checklist })}
               />
             )}
             {currentStep === 5 && (
-              <InspectionMetrics
-                data={formData.metrics}
-                onUpdate={(data) => updateFormData({ metrics: data })}
+              <CorporateMetrics
+                metrics={formData.metrics}
+                media={formData.media}
+                onChange={(metrics, media) => updateFormData({ metrics, media })}
               />
             )}
             {currentStep === 6 && (
-              <InspectionNotesAttachments
+              <CorporateNotesAttachments
                 notes={formData.notes}
                 attachments={formData.attachments}
-                onChange={(notes, attachments) => updateFormData({ notes, attachments })}
+                onUpdate={(notes, attachments) => updateFormData({ notes, attachments })}
               />
             )}
             {currentStep === 7 && (
-              <InspectionSignature
-                onComplete={handleComplete}
-                isLoading={completeMutation.isPending}
+              <CorporateSignature
+                signature={null}
+                onUpdate={(signature) => signature && handleComplete(signature)}
               />
             )}
           </div>
