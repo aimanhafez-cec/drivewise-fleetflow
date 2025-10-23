@@ -90,6 +90,7 @@ import DriversAssignment from "./pages/corporate-leasing/DriversAssignment";
 import ManageInspections from "./pages/corporate-leasing/ManageInspections";
 import NewInspectionForm from "./pages/corporate-leasing/NewInspectionForm";
 import CorporateInspectionDetails from "./pages/corporate-leasing/CorporateInspectionDetails";
+import TrafficFinesScreen from "./pages/corporate-leasing/TrafficFinesScreen";
 // Hidden - commented out imports
 // import { CarSubscriptions } from "./pages/CarSubscriptions";
 // import { NewCarSubscription } from "./pages/NewCarSubscription";
@@ -241,6 +242,7 @@ const App = () => {
                 <Route path="manage-inspections/new" element={<NewInspectionForm />} />
                 <Route path="manage-inspections/:id" element={<CorporateInspectionDetails />} />
                 <Route path="manage-inspections/edit/:id" element={<NewInspectionForm />} />
+                <Route path="traffic-fines" element={<TrafficFinesScreen />} />
               </Route>
               <Route path="/rfqs" element={
                 <ProtectedRoute>

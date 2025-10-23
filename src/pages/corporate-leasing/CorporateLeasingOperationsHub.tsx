@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Car, Users, ClipboardCheck } from 'lucide-react';
+import { Car, Users, ClipboardCheck, AlertTriangle } from 'lucide-react';
 import HubCard from '@/components/navigation/HubCard';
 
 const CorporateLeasingOperationsHub: React.FC = () => {
@@ -27,6 +27,13 @@ const CorporateLeasingOperationsHub: React.FC = () => {
       icon: ClipboardCheck,
       route: '/corporate-leasing-operations/manage-inspections',
       gradient: 'from-purple-500/10 to-pink-500/10',
+    },
+    {
+      title: 'Traffic Fines',
+      description: 'Monitor and reconcile traffic fines from UAE authorities',
+      icon: AlertTriangle,
+      route: '/corporate-leasing-operations/traffic-fines',
+      gradient: 'from-red-500/10 to-orange-500/10',
     },
   ];
 
