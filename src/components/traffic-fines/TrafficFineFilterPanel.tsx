@@ -3,7 +3,9 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { X } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { X, AlertTriangle } from 'lucide-react';
+import { useTrafficFinesCorporateStatistics } from '@/hooks/useTrafficFinesCorporate';
 import type { TrafficFineFilters } from '@/lib/api/trafficFinesCorporate';
 
 interface TrafficFineFilterPanelProps {
@@ -23,6 +25,8 @@ const AUTHORITIES = [
 ];
 
 export function TrafficFineFilterPanel({ filters, onFiltersChange }: TrafficFineFilterPanelProps) {
+  const { data: stats } = useTrafficFinesCorporateStatistics();
+
   const handleEmirateToggle = (emirate: string) => {
     const current = filters.emirate || [];
     const updated = current.includes(emirate)
@@ -61,111 +65,129 @@ export function TrafficFineFilterPanel({ filters, onFiltersChange }: TrafficFine
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {/* Emirate Filter */}
+      <div className="space-y-6">
+        {/* Status Filter - Priority Section */}
         <div className="space-y-2">
-          <Label>Emirate</Label>
+          <Label className="text-base font-semibold">Status</Label>
           <div className="flex flex-wrap gap-2">
-            {EMIRATES.map(emirate => (
-              <Button
-                key={emirate}
-                variant={filters.emirate?.includes(emirate) ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => handleEmirateToggle(emirate)}
-              >
-                {emirate}
-              </Button>
-            ))}
+            {STATUSES.map(status => {
+              const isSelected = filters.status?.includes(status);
+              const isUnpaid = status === 'unpaid';
+              const statusCount = stats?.by_status.find(s => s.status === status)?.count || 0;
+              
+              return (
+                <Button
+                  key={status}
+                  variant={isSelected ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => handleStatusToggle(status)}
+                  className={`capitalize ${
+                    isUnpaid && !isSelected 
+                      ? 'border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground' 
+                      : ''
+                  }`}
+                >
+                  {isUnpaid && <AlertTriangle className="h-3 w-3 mr-1" />}
+                  {status}
+                  {statusCount > 0 && (
+                    <Badge variant="secondary" className="ml-2 text-xs">
+                      {statusCount}
+                    </Badge>
+                  )}
+                </Button>
+              );
+            })}
           </div>
         </div>
 
-        {/* Status Filter */}
-        <div className="space-y-2">
-          <Label>Status</Label>
-          <div className="flex flex-wrap gap-2">
-            {STATUSES.map(status => (
-              <Button
-                key={status}
-                variant={filters.status?.includes(status) ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => handleStatusToggle(status)}
-                className="capitalize"
-              >
-                {status}
-              </Button>
-            ))}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Emirate Filter */}
+          <div className="space-y-2">
+            <Label>Emirate</Label>
+            <div className="flex flex-wrap gap-2">
+              {EMIRATES.map(emirate => (
+                <Button
+                  key={emirate}
+                  variant={filters.emirate?.includes(emirate) ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => handleEmirateToggle(emirate)}
+                >
+                  {emirate}
+                </Button>
+              ))}
+            </div>
           </div>
-        </div>
 
-        {/* Authority Filter */}
-        <div className="space-y-2">
-          <Label>Authority</Label>
-          <div className="flex flex-wrap gap-2">
-            {AUTHORITIES.map(authority => (
-              <Button
-                key={authority}
-                variant={filters.authority?.includes(authority) ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => handleAuthorityToggle(authority)}
-              >
-                {authority.split(' ')[0]}
-              </Button>
-            ))}
+          {/* Authority Filter */}
+          <div className="space-y-2">
+            <Label>Authority</Label>
+            <div className="flex flex-wrap gap-2">
+              {AUTHORITIES.map(authority => (
+                <Button
+                  key={authority}
+                  variant={filters.authority?.includes(authority) ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => handleAuthorityToggle(authority)}
+                >
+                  {authority.split(' ')[0]}
+                </Button>
+              ))}
+            </div>
           </div>
-        </div>
 
-        {/* Plate Number Search */}
-        <div className="space-y-2">
-          <Label>Plate Number</Label>
-          <Input
-            placeholder="Search plate..."
-            value={filters.plate_number || ''}
-            onChange={(e) => onFiltersChange({ ...filters, plate_number: e.target.value })}
-          />
-        </div>
+          {/* Date Range */}
+          <div className="space-y-2">
+            <Label>Date Range</Label>
+            <div className="flex gap-2">
+              <Input
+                type="date"
+                value={filters.date_from || ''}
+                onChange={(e) => onFiltersChange({ ...filters, date_from: e.target.value })}
+              />
+              <Input
+                type="date"
+                value={filters.date_to || ''}
+                onChange={(e) => onFiltersChange({ ...filters, date_to: e.target.value })}
+              />
+            </div>
+          </div>
 
-        {/* VIN Search */}
-        <div className="space-y-2">
-          <Label>VIN</Label>
-          <Input
-            placeholder="Search VIN..."
-            value={filters.vin || ''}
-            onChange={(e) => onFiltersChange({ ...filters, vin: e.target.value })}
-          />
-        </div>
+          {/* Amount Range */}
+          <div className="space-y-2">
+            <Label>Amount Range (AED)</Label>
+            <div className="flex gap-2">
+              <Input
+                type="number"
+                placeholder="Min"
+                value={filters.amount_min || ''}
+                onChange={(e) => onFiltersChange({ ...filters, amount_min: Number(e.target.value) })}
+              />
+              <Input
+                type="number"
+                placeholder="Max"
+                value={filters.amount_max || ''}
+                onChange={(e) => onFiltersChange({ ...filters, amount_max: Number(e.target.value) })}
+              />
+            </div>
+          </div>
 
-        {/* Date Range */}
-        <div className="space-y-2">
-          <Label>Date Range</Label>
-          <div className="flex gap-2">
+          {/* Plate Number Search */}
+          <div className="space-y-2">
+            <Label>Plate Number</Label>
             <Input
-              type="date"
-              value={filters.date_from || ''}
-              onChange={(e) => onFiltersChange({ ...filters, date_from: e.target.value })}
+              placeholder="Search plate..."
+              value={filters.plate_number || ''}
+              onChange={(e) => onFiltersChange({ ...filters, plate_number: e.target.value })}
             />
-            <Input
-              type="date"
-              value={filters.date_to || ''}
-              onChange={(e) => onFiltersChange({ ...filters, date_to: e.target.value })}
-            />
           </div>
-        </div>
 
-        {/* Amount Range */}
-        <div className="space-y-2">
-          <Label>Amount Range (AED)</Label>
-          <div className="flex gap-2">
+          {/* VIN Search */}
+          <div className="space-y-2">
+            <Label>VIN</Label>
             <Input
-              type="number"
-              placeholder="Min"
-              value={filters.amount_min || ''}
-              onChange={(e) => onFiltersChange({ ...filters, amount_min: Number(e.target.value) })}
-            />
-            <Input
-              type="number"
-              placeholder="Max"
-              value={filters.amount_max || ''}
-              onChange={(e) => onFiltersChange({ ...filters, amount_max: Number(e.target.value) })}
+              placeholder="Search VIN..."
+              value={filters.vin || ''}
+              onChange={(e) => onFiltersChange({ ...filters, vin: e.target.value })}
             />
           </div>
         </div>

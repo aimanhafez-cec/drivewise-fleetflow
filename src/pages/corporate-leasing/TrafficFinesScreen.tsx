@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { RefreshCw, Clock, Filter, Download, BarChart3 } from 'lucide-react';
 import { TrafficFineKPIs } from '@/components/traffic-fines/TrafficFineKPIs';
 import { TrafficFineFilterPanel } from '@/components/traffic-fines/TrafficFineFilterPanel';
+import { QuickFilterBar } from '@/components/traffic-fines/QuickFilterBar';
 import { IntegrationView } from '@/components/traffic-fines/IntegrationView';
 import { ContractView } from '@/components/traffic-fines/ContractView';
 import { ViewToggle } from '@/components/traffic-fines/ViewToggle';
@@ -29,6 +30,12 @@ export default function TrafficFinesScreen() {
   const handleExport = () => {
     toast.success('Export feature - Coming soon');
   };
+
+  // Count active filters
+  const activeFilterCount = Object.keys(filters).filter(key => {
+    const value = filters[key as keyof TrafficFineFilters];
+    return value !== undefined && value !== '' && (Array.isArray(value) ? value.length > 0 : true);
+  }).length;
 
   return (
     <div className="space-y-6 p-6">
@@ -74,6 +81,9 @@ export default function TrafficFinesScreen() {
           >
             <Filter className="h-4 w-4 mr-2" />
             Filters
+            {activeFilterCount > 0 && (
+              <span className="ml-1 text-xs font-bold">({activeFilterCount})</span>
+            )}
           </Button>
           <Button 
             variant="outline" 
@@ -91,6 +101,12 @@ export default function TrafficFinesScreen() {
         <TrafficFineKPIs filters={filters} />
       )}
 
+      {/* Quick Filter Bar */}
+      <QuickFilterBar 
+        filters={filters} 
+        onFiltersChange={setFilters}
+      />
+
       {/* Filters */}
       {showFilters && (
         <TrafficFineFilterPanel 
@@ -100,7 +116,7 @@ export default function TrafficFinesScreen() {
       )}
 
       {/* View Toggle */}
-      <ViewToggle 
+      <ViewToggle
         currentView={currentView} 
         onViewChange={setCurrentView}
       />
