@@ -31,7 +31,7 @@ export function CorporateBasicInfo({
             id="entry-date"
             type="date"
             value={entryDate}
-            onChange={(e) => onUpdate('entryDate', e.target.value)}
+            onChange={(e) => onUpdate('entry_date', e.target.value)}
             disabled={isEditing}
           />
         </div>
@@ -40,7 +40,7 @@ export function CorporateBasicInfo({
           <Label htmlFor="inspection-type">Inspection Type *</Label>
           <Select
             value={inspectionType}
-            onValueChange={(value) => onUpdate('inspectionType', value)}
+            onValueChange={(value) => onUpdate('inspection_type', value)}
             disabled={isEditing}
           >
             <SelectTrigger id="inspection-type">
