@@ -81,7 +81,7 @@ export function ContractView({ filters, onSelectFine }: ContractViewProps) {
         <TableBody>
           {fines.map((fine) => {
             const Icon = getViolationIcon(fine.violation_description);
-            const isLinked = fine.contract_id !== null;
+            const isLinked = fine.agreement_id !== null;
             
             return (
               <TableRow 
@@ -126,7 +126,7 @@ export function ContractView({ filters, onSelectFine }: ContractViewProps) {
                   {fine.violation_description}
                 </TableCell>
                 <TableCell className="font-medium">
-                  AED {fine.total_amount.toLocaleString()}
+                  AED {fine.final_amount?.toLocaleString() || '0'}
                 </TableCell>
                 <TableCell>
                   <Badge variant={getStatusBadgeVariant(fine.status)} className="capitalize">

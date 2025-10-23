@@ -107,7 +107,6 @@ export function IntegrationView({ filters, onSelectFine }: IntegrationViewProps)
                 </TableCell>
                 <TableCell className="font-medium">{fine.fine_no}</TableCell>
                 <TableCell>
-                  {fine.plate_code && <span className="font-semibold">{fine.plate_code} </span>}
                   {fine.plate_number}
                 </TableCell>
                 <TableCell>
@@ -120,7 +119,7 @@ export function IntegrationView({ filters, onSelectFine }: IntegrationViewProps)
                   {fine.violation_description}
                 </TableCell>
                 <TableCell className="font-medium">
-                  AED {fine.total_amount.toLocaleString()}
+                  AED {fine.final_amount?.toLocaleString() || '0'}
                 </TableCell>
                 <TableCell>
                   {fine.confiscation_days > 0 ? (

@@ -3,36 +3,29 @@ import { supabase } from "@/integrations/supabase/client";
 export interface TrafficFineCorporateRecord {
   id: string;
   fine_no: string;
-  external_reference_no?: string;
-  emirate: 'DXB' | 'AUH' | 'SHJ' | 'AJM' | 'RAK' | 'UAQ' | 'FUJ';
+  emirate: string;
   authority_source: string;
-  violation_code?: string;
   violation_description: string;
-  legal_article?: string;
   plate_number: string;
-  plate_code?: string;
-  vin?: string;
   amount: number;
-  penalty_amount: number;
-  total_amount: number;
-  currency: string;
+  discount_amount: number;
+  final_amount: number;
   black_points: number;
   confiscation_days: number;
   violation_date: string;
-  violation_time?: string;
-  due_date?: string;
-  paid_date?: string;
+  payment_date?: string;
   payment_reference?: string;
   status: 'unpaid' | 'paid' | 'disputed' | 'cancelled';
-  contract_id?: string;
+  agreement_id?: string;
+  contract_no?: string;
   customer_id?: string;
   driver_id?: string;
   vehicle_id?: string;
-  integration_source?: string;
   integration_timestamp?: string;
-  sync_status: string;
+  reconciled: boolean;
+  reconciled_at?: string;
+  reconciled_by?: string;
   notes?: string;
-  internal_notes?: string;
   created_at: string;
   updated_at: string;
   
@@ -178,12 +171,12 @@ export class TrafficFinesCorporateAPI {
       unpaid_count: records.filter(r => r.status === 'unpaid').length,
       paid_count: records.filter(r => r.status === 'paid').length,
       disputed_count: records.filter(r => r.status === 'disputed').length,
-      total_amount: records.reduce((sum, r) => sum + r.total_amount, 0),
+      total_amount: records.reduce((sum, r) => sum + r.final_amount, 0),
       unpaid_amount: records
         .filter(r => r.status === 'unpaid')
-        .reduce((sum, r) => sum + r.total_amount, 0),
+        .reduce((sum, r) => sum + r.final_amount, 0),
       average_amount: records.length > 0 
-        ? records.reduce((sum, r) => sum + r.total_amount, 0) / records.length 
+        ? records.reduce((sum, r) => sum + r.final_amount, 0) / records.length 
         : 0,
       by_emirate: [],
       by_authority: [],
@@ -198,7 +191,7 @@ export class TrafficFinesCorporateAPI {
       const existing = byEmirate.get(r.emirate) || { count: 0, amount: 0 };
       byEmirate.set(r.emirate, {
         count: existing.count + 1,
-        amount: existing.amount + r.total_amount,
+        amount: existing.amount + r.final_amount,
       });
     });
     stats.by_emirate = Array.from(byEmirate.entries()).map(([emirate, data]) => ({
@@ -222,7 +215,7 @@ export class TrafficFinesCorporateAPI {
       const existing = byStatus.get(r.status) || { count: 0, amount: 0 };
       byStatus.set(r.status, {
         count: existing.count + 1,
-        amount: existing.amount + r.total_amount,
+        amount: existing.amount + r.final_amount,
       });
     });
     stats.by_status = Array.from(byStatus.entries()).map(([status, data]) => ({

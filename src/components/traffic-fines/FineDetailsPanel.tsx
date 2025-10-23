@@ -80,37 +80,20 @@ export function FineDetailsPanel({ fineId, onClose }: FineDetailsPanelProps) {
             <h3 className="text-sm font-semibold uppercase text-muted-foreground mb-3">Violation Details</h3>
             <div className="bg-muted/50 rounded-lg p-4">
               <p className="text-lg font-medium mb-2">{fine.violation_description}</p>
-              {fine.legal_article && (
-                <p className="text-sm text-muted-foreground">Legal Article: {fine.legal_article}</p>
-              )}
-              {fine.violation_code && (
-                <p className="text-sm text-muted-foreground">Violation Code: {fine.violation_code}</p>
-              )}
             </div>
           </div>
 
           {/* Date & Time */}
           <div>
             <h3 className="text-sm font-semibold uppercase text-muted-foreground mb-3">Date & Time</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex items-start gap-3">
-                <Calendar className="h-5 w-5 text-muted-foreground mt-0.5" />
-                <div>
-                  <p className="text-sm font-medium">Violation Date</p>
-                  <p className="text-sm text-muted-foreground">
-                    {format(new Date(fine.violation_date), 'MMM dd, yyyy')}
-                  </p>
-                </div>
+            <div className="flex items-start gap-3">
+              <Calendar className="h-5 w-5 text-muted-foreground mt-0.5" />
+              <div>
+                <p className="text-sm font-medium">Violation Date</p>
+                <p className="text-sm text-muted-foreground">
+                  {format(new Date(fine.violation_date), 'MMM dd, yyyy')}
+                </p>
               </div>
-              {fine.violation_time && (
-                <div className="flex items-start gap-3">
-                  <Clock className="h-5 w-5 text-muted-foreground mt-0.5" />
-                  <div>
-                    <p className="text-sm font-medium">Time</p>
-                    <p className="text-sm text-muted-foreground">{fine.violation_time}</p>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
 
@@ -122,21 +105,9 @@ export function FineDetailsPanel({ fineId, onClose }: FineDetailsPanelProps) {
                 <Car className="h-5 w-5 text-muted-foreground" />
                 <div>
                   <p className="text-sm font-medium">Plate Number</p>
-                  <p className="text-sm">
-                    {fine.plate_code && <span className="font-semibold">{fine.plate_code} </span>}
-                    {fine.plate_number}
-                  </p>
+                  <p className="text-sm">{fine.plate_number}</p>
                 </div>
               </div>
-              {fine.vin && (
-                <div className="flex items-center gap-3">
-                  <FileText className="h-5 w-5 text-muted-foreground" />
-                  <div>
-                    <p className="text-sm font-medium">VIN</p>
-                    <p className="text-sm text-muted-foreground">{fine.vin}</p>
-                  </div>
-                </div>
-              )}
               {fine.vehicle && (
                 <div className="flex items-center gap-3">
                   <Car className="h-5 w-5 text-muted-foreground" />
@@ -158,18 +129,18 @@ export function FineDetailsPanel({ fineId, onClose }: FineDetailsPanelProps) {
             <h3 className="text-sm font-semibold uppercase text-muted-foreground mb-3">Fine Information</h3>
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm">Fine Amount</span>
-                <span className="text-lg font-bold">AED {fine.amount.toLocaleString()}</span>
+                <span className="text-sm">Base Amount</span>
+                <span className="text-lg font-bold">AED {fine.amount?.toLocaleString() || '0'}</span>
               </div>
-              {fine.penalty_amount > 0 && (
+              {fine.discount_amount > 0 && (
                 <div className="flex items-center justify-between">
-                  <span className="text-sm">Penalty Amount</span>
-                  <span className="text-lg font-bold text-red-600">AED {fine.penalty_amount.toLocaleString()}</span>
+                  <span className="text-sm">Discount</span>
+                  <span className="text-lg font-bold text-green-600">-AED {fine.discount_amount?.toLocaleString() || '0'}</span>
                 </div>
               )}
               <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold">Total Amount</span>
-                <span className="text-xl font-bold">AED {fine.total_amount.toLocaleString()}</span>
+                <span className="text-sm font-semibold">Final Amount</span>
+                <span className="text-xl font-bold">AED {fine.final_amount?.toLocaleString() || '0'}</span>
               </div>
               {fine.confiscation_days > 0 && (
                 <div className="flex items-center justify-between bg-red-50 p-3 rounded-lg">
@@ -185,26 +156,18 @@ export function FineDetailsPanel({ fineId, onClose }: FineDetailsPanelProps) {
                   <Badge variant="secondary">{fine.black_points} points</Badge>
                 </div>
               )}
-              {fine.due_date && (
+              {fine.payment_date && (
                 <div className="flex items-center justify-between">
-                  <span className="text-sm">Due Date</span>
-                  <span className="text-sm font-medium">
-                    {format(new Date(fine.due_date), 'MMM dd, yyyy')}
-                  </span>
-                </div>
-              )}
-              {fine.paid_date && (
-                <div className="flex items-center justify-between">
-                  <span className="text-sm">Paid Date</span>
+                  <span className="text-sm">Payment Date</span>
                   <span className="text-sm font-medium text-green-600">
-                    {format(new Date(fine.paid_date), 'MMM dd, yyyy')}
+                    {format(new Date(fine.payment_date), 'MMM dd, yyyy')}
                   </span>
                 </div>
               )}
               {fine.payment_reference && (
                 <div className="flex items-center justify-between">
                   <span className="text-sm">Payment Reference</span>
-                  <span className="text-sm font-mono">{fine.payment_reference}</span>
+                  <span className="text-sm font-medium">{fine.payment_reference}</span>
                 </div>
               )}
             </div>
@@ -215,7 +178,7 @@ export function FineDetailsPanel({ fineId, onClose }: FineDetailsPanelProps) {
           {/* Contract Linkage */}
           <div>
             <h3 className="text-sm font-semibold uppercase text-muted-foreground mb-3">Contract Linkage</h3>
-            {fine.contract_id ? (
+            {fine.agreement_id ? (
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
                   <LinkIcon className="h-5 w-5 text-muted-foreground" />
