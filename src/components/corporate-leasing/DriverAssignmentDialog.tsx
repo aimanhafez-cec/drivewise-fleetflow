@@ -245,15 +245,37 @@ export const DriverAssignmentDialog: React.FC<DriverAssignmentDialogProps> = ({
                             <div className="flex justify-between items-start">
                               <div className="space-y-1">
                                 <p className="font-semibold">{driver.full_name}</p>
-                                <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                                  <span className="flex items-center gap-1">
-                                    <CreditCard className="h-3 w-3" />
-                                    {driver.license_no}
-                                  </span>
-                                  <span className="flex items-center gap-1">
-                                    <Phone className="h-3 w-3" />
-                                    {driver.phone}
-                                  </span>
+                                <div className="flex items-center gap-2 text-xs text-muted-foreground flex-wrap">
+                                  {driver.nationality && (
+                                    <span className="flex items-center gap-1">
+                                      {driver.nationality === 'Emirati' && '🇦🇪'}
+                                      {driver.nationality}
+                                    </span>
+                                  )}
+                                  {driver.phone && (
+                                    <>
+                                      <span>•</span>
+                                      <span className="flex items-center gap-1">
+                                        <Phone className="h-3 w-3" />
+                                        {driver.phone}
+                                      </span>
+                                    </>
+                                  )}
+                                  {driver.emirates_id && (
+                                    <>
+                                      <span>•</span>
+                                      <span>ID: {driver.emirates_id}</span>
+                                    </>
+                                  )}
+                                  {driver.license_no && (
+                                    <>
+                                      <span>•</span>
+                                      <span className="flex items-center gap-1">
+                                        <CreditCard className="h-3 w-3" />
+                                        {driver.license_no}
+                                      </span>
+                                    </>
+                                  )}
                                 </div>
                                 {driver.employment_id && (
                                   <p className="text-xs text-muted-foreground">
