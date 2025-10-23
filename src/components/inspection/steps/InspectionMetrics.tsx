@@ -14,16 +14,15 @@ const FUEL_LEVELS = [
 ] as const;
 
 interface InspectionMetricsProps {
-  metrics: { odometer?: number; fuelLevel?: string };
-  media: any[];
-  onChange: (metrics: any, media: any[]) => void;
+  data: any;
+  onUpdate: (data: any) => void;
 }
 
-export function InspectionMetrics({ metrics, media, onChange }: InspectionMetricsProps) {
-  const [fuelIndex, setFuelIndex] = useState(FUEL_LEVELS.findIndex(f => f.value === metrics.fuelLevel) || 2);
+export function InspectionMetrics({ data, onUpdate }: InspectionMetricsProps) {
+  const [fuelIndex, setFuelIndex] = useState(FUEL_LEVELS.findIndex(f => f.value === data?.fuelLevel) || 2);
 
-  const updateMetrics = (updates: Partial<typeof metrics>) => {
-    onChange({ ...metrics, ...updates }, media);
+  const updateMetrics = (updates: any) => {
+    onUpdate({ ...data, ...updates });
   };
 
   const handleFuelChange = (value: number[]) => {
@@ -45,7 +44,7 @@ export function InspectionMetrics({ metrics, media, onChange }: InspectionMetric
             <Input
               id="odometer"
               type="number"
-              value={metrics.odometer || ''}
+              value={data?.odometer || ''}
               onChange={(e) => updateMetrics({ odometer: parseInt(e.target.value) || undefined })}
             />
           </div>

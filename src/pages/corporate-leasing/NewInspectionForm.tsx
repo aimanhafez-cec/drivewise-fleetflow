@@ -199,15 +199,14 @@ export default function NewInspectionForm() {
             )}
             {currentStep === 4 && (
               <InspectionChecklist
-                checklist={formData.checklist}
-                onChange={(checklist) => updateFormData({ checklist })}
+                data={{ status: formData.checklist }}
+                onUpdate={(data) => updateFormData({ checklist: data.status })}
               />
             )}
             {currentStep === 5 && (
               <InspectionMetrics
-                metrics={formData.metrics}
-                media={formData.media}
-                onChange={(metrics, media) => updateFormData({ metrics, media })}
+                data={formData.metrics}
+                onUpdate={(data) => updateFormData({ metrics: data })}
               />
             )}
             {currentStep === 6 && (

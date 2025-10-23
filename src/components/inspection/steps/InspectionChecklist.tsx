@@ -12,13 +12,15 @@ const CHECKLIST_ITEMS = [
 ];
 
 interface InspectionChecklistProps {
-  checklist: Record<string, 'OK' | 'DAMAGE'>;
-  onChange: (checklist: Record<string, 'OK' | 'DAMAGE'>) => void;
+  data: any;
+  onUpdate: (data: any) => void;
 }
 
-export function InspectionChecklist({ checklist, onChange }: InspectionChecklistProps) {
+export function InspectionChecklist({ data, onUpdate }: InspectionChecklistProps) {
+  const checklist = data?.status || {};
+  
   const updateItem = (itemId: string, value: 'OK' | 'DAMAGE') => {
-    onChange({ ...checklist, [itemId]: value });
+    onUpdate({ ...data, status: { ...checklist, [itemId]: value } });
   };
 
   return (
