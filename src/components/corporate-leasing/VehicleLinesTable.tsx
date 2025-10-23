@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Search, Car, Eye } from 'lucide-react';
 import { useVehicleLines } from '@/hooks/useCorporateVinAssignment';
 import { VehicleLine } from '@/lib/api/corporateVinAssignment';
@@ -129,10 +130,10 @@ const VehicleLinesTable: React.FC<VehicleLinesTableProps> = ({ onAssignClick, on
                       <Badge variant="destructive">Not Assigned</Badge>
                     )}
                   </TableCell>
-                  <TableCell className="min-w-[180px]">
+                  <TableCell className="min-w-[180px] max-w-[200px]">
                     {line.assignedVin ? (
                       <div className="flex flex-col">
-                        <span className="font-mono text-sm">{line.assignedVin}</span>
+                        <span className="font-mono text-sm break-words">{line.assignedVin}</span>
                         {line.assignedLicensePlate && (
                           <span className="text-xs text-muted-foreground">{line.assignedLicensePlate}</span>
                         )}
@@ -143,14 +144,22 @@ const VehicleLinesTable: React.FC<VehicleLinesTableProps> = ({ onAssignClick, on
                   </TableCell>
                   <TableCell className="whitespace-nowrap">
                     {line.isAssigned ? (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => onViewClick(line)}
-                      >
-                        <Eye className="h-4 w-4 mr-1" />
-                        View
-                      </Button>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              onClick={() => onViewClick(line)}
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>View Assignment</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                     ) : (
                       <Button
                         variant="default"
