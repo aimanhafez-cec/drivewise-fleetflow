@@ -131,7 +131,7 @@ const VehicleLinesTable: React.FC<VehicleLinesTableProps> = ({ onAssignClick, on
                       <span className="text-muted-foreground">-</span>
                     )}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="whitespace-nowrap">
                     {line.isAssigned ? (
                       <Button
                         variant="outline"
@@ -146,8 +146,9 @@ const VehicleLinesTable: React.FC<VehicleLinesTableProps> = ({ onAssignClick, on
                         variant="default"
                         size="default"
                         onClick={() => onAssignClick(line)}
+                        className="whitespace-nowrap min-w-fit shrink-0"
                       >
-                        <Car className="h-4 w-4 mr-1" />
+                        <Car className="h-5 w-5 shrink-0" />
                         Assign VIN
                       </Button>
                     )}
