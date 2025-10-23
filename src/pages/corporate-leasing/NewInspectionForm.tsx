@@ -42,6 +42,7 @@ export default function NewInspectionForm() {
     vin: '',
     item_code: '',
     agreement_id: '',
+    line_no: null as number | null,
     line_id: '',
     damage_marker_ids: [] as string[],
     checklist: [] as any[],
@@ -209,14 +210,15 @@ export default function NewInspectionForm() {
             vin={formData.vin}
             itemCode={formData.item_code}
             agreementId={formData.agreement_id}
-            lineNo={formData.line_id ? Number(formData.line_id) : undefined}
+            lineNo={formData.line_no}
             onUpdate={(data) => {
               updateFormData({
                 vehicle_id: data.vehicleId,
                 vin: data.vin,
                 item_code: data.itemCode,
-                agreement_id: data.agreementId,
-                line_id: data.lineNo?.toString()
+                agreement_id: data.agreementId || '',
+                line_no: data.lineNo || null,
+                line_id: data.lineId || '',
               });
             }}
           />

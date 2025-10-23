@@ -25,6 +25,7 @@ interface VehicleSearchTabsProps {
     itemCode: string;
     agreementId?: string;
     lineNo?: number;
+    lineId?: string;
   }) => void;
   isEditing?: boolean;
 }
@@ -114,6 +115,7 @@ export function VehicleSearchTabs({
         itemCode: selectedLine.itemCode,
         agreementId: selectedLine.agreementId,
         lineNo: selectedLine.lineNo,
+        lineId: selectedLine.assignmentId,
       });
     }
   };
