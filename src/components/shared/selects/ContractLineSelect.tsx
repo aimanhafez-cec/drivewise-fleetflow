@@ -27,7 +27,7 @@ export function ContractLineSelect({
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
 
-  const status = inspectionType === 'RENTAL_CHECKOUT' ? 'not_assigned' : 'assigned';
+  const status = 'all'; // Show all lines regardless of assignment status
 
   const { data: linesData, isLoading } = useVehicleLines({
     agreementId: agreementId || undefined,
