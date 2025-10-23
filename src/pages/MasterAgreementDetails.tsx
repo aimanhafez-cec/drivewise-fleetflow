@@ -54,7 +54,7 @@ const statusConfig = {
   draft: { label: "Draft", color: "bg-muted text-muted-foreground" },
   approved: { label: "Approved", color: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200" },
   sent_to_customer: { label: "Sent to Customer", color: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200" },
-  customer_accepted: { label: "Customer Accepted", color: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200" },
+  customer_accepted: { label: "Customer Signed", color: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200" },
   customer_rejected: { label: "Customer Rejected", color: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200" },
   active: { label: "Active", color: "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200" },
   suspended: { label: "Suspended", color: "bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200" },
