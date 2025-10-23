@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Car, Users, ClipboardCheck, AlertTriangle } from 'lucide-react';
+import { Car, Users, ClipboardCheck, AlertTriangle, Navigation } from 'lucide-react';
 import HubCard from '@/components/navigation/HubCard';
 
 const CorporateLeasingOperationsHub: React.FC = () => {
@@ -34,6 +34,13 @@ const CorporateLeasingOperationsHub: React.FC = () => {
       icon: AlertTriangle,
       route: '/corporate-leasing-operations/traffic-fines',
       gradient: 'from-red-500/10 to-orange-500/10',
+    },
+    {
+      title: 'Toll Transactions',
+      description: 'Track and manage toll crossings from Salik and Darb systems',
+      icon: Navigation,
+      route: '/corporate-leasing-operations/toll-transactions',
+      gradient: 'from-cyan-500/10 to-blue-500/10',
     },
   ];
 
