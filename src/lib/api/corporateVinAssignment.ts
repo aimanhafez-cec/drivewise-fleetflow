@@ -247,8 +247,17 @@ class CorporateVinAssignmentAPI {
       checkoutNotes
     } = request;
 
-    // Get current user
-    const { data: { user } } = await supabase.auth.getUser();
+    // Get current user's profile ID
+    const { data: { user: authUser } } = await supabase.auth.getUser();
+    if (!authUser) throw new Error('User not authenticated');
+
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('email', authUser.email)
+      .single();
+
+    if (profileError) throw new Error('User profile not found');
 
     // Start transaction-like operations
     // 1. Check if vehicle is still available
@@ -284,7 +293,7 @@ class CorporateVinAssignmentAPI {
         vehicle_id: vehicleId,
         vin: vin,
         item_code: itemCode,
-        assigned_by: user?.id,
+        assigned_by: profile.id,
         checkout_location_id: checkoutLocationId,
         checkin_location_id: checkinLocationId,
         checkout_fuel_level: checkoutFuelLevel,
