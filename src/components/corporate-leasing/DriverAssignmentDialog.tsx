@@ -248,16 +248,16 @@ export const DriverAssignmentDialog: React.FC<DriverAssignmentDialogProps> = ({
                                 <div className="flex items-center gap-4 text-sm text-muted-foreground">
                                   <span className="flex items-center gap-1">
                                     <CreditCard className="h-3 w-3" />
-                                    {driver.license_number}
+                                    {driver.license_no}
                                   </span>
                                   <span className="flex items-center gap-1">
                                     <Phone className="h-3 w-3" />
-                                    {driver.phone_number}
+                                    {driver.phone}
                                   </span>
                                 </div>
-                                {driver.employee_id && (
+                                {driver.employment_id && (
                                   <p className="text-xs text-muted-foreground">
-                                    Emp ID: {driver.employee_id}
+                                    Emp ID: {driver.employment_id}
                                   </p>
                                 )}
                               </div>
