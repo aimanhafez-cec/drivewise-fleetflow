@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
-import { VehicleDiagramInteractive } from '@/components/agreements/shared/VehicleDiagramInteractive';
+import { Vehicle3DDamageInspection } from '@/components/agreements/shared/Vehicle3DDamageInspection';
 import { MobilePhotoCapture } from '@/components/agreements/shared/MobilePhotoCapture';
-import type { EnhancedWizardData, VehicleView, DamageMarker } from '@/types/agreement-wizard';
+import type { EnhancedWizardData, DamageMarker } from '@/types/agreement-wizard';
 
 interface VehicleInspectionStepProps {
   data: EnhancedWizardData['step2'];
@@ -18,8 +18,6 @@ export const VehicleInspectionStep: React.FC<VehicleInspectionStepProps> = ({
   onChange,
   errors = [],
 }) => {
-  const [currentView, setCurrentView] = useState<VehicleView>('front');
-
   const updateChecklist = (key: keyof EnhancedWizardData['step2']['preHandoverChecklist'], value: boolean) => {
     onChange('preHandoverChecklist', {
       ...data.preHandoverChecklist,
@@ -159,15 +157,15 @@ export const VehicleInspectionStep: React.FC<VehicleInspectionStepProps> = ({
 
       <Card>
         <CardHeader>
-          <CardTitle>Vehicle Damage Inspection</CardTitle>
+          <CardTitle>Vehicle 3D Damage Inspection</CardTitle>
         </CardHeader>
         <CardContent>
-          <VehicleDiagramInteractive
+          <Vehicle3DDamageInspection
             markers={data.damageMarkers}
-            currentView={currentView}
             onAddMarker={handleAddMarker}
             onRemoveMarker={handleRemoveMarker}
-            onViewChange={setCurrentView}
+            agreementId="temp-agreement-id"
+            lineId="temp-line-id"
           />
         </CardContent>
       </Card>

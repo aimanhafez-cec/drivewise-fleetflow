@@ -21,13 +21,24 @@ export interface PreHandoverChecklist {
 
 export interface DamageMarker {
   id: string;
-  view: VehicleView;
-  x: number; // percentage position
-  y: number;
+  view?: VehicleView; // Optional for backward compatibility
+  x: number; // percentage position (0-1)
+  y: number; // percentage position (0-1)
+  worldPosition?: { // 3D world coordinates
+    x: number;
+    y: number;
+    z: number;
+  };
+  surfaceNormal?: { // Optional: For marker orientation
+    x: number;
+    y: number;
+    z: number;
+  };
   severity: DamageSeverity;
   type: string;
   photos: string[];
   notes: string;
+  side?: string; // For compatibility
 }
 
 export interface InspectionPhotos {
