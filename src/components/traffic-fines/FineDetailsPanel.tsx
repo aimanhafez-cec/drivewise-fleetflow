@@ -150,12 +150,6 @@ export function FineDetailsPanel({ fineId, onClose }: FineDetailsPanelProps) {
                   </Badge>
                 </div>
               )}
-              {fine.black_points > 0 && (
-                <div className="flex items-center justify-between">
-                  <span className="text-sm">Black Points</span>
-                  <Badge variant="secondary">{fine.black_points} points</Badge>
-                </div>
-              )}
               {fine.payment_date && (
                 <div className="flex items-center justify-between">
                   <span className="text-sm">Payment Date</span>

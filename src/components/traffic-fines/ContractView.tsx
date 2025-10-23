@@ -98,7 +98,7 @@ export function ContractView({ filters, onSelectFine }: ContractViewProps) {
                 </TableCell>
                 <TableCell className="font-medium">{fine.fine_no}</TableCell>
                 <TableCell>
-                  {fine.contract?.agreement_no || (
+                  {fine.contract?.agreement_no || fine.contract_no || (
                     <span className="text-muted-foreground italic text-sm">Not linked</span>
                   )}
                 </TableCell>
