@@ -144,11 +144,9 @@ const VehicleLinesTable: React.FC<VehicleLinesTableProps> = ({ onAssignClick, on
                     ) : (
                       <Button
                         variant="default"
-                        size="default"
+                        size="sm"
                         onClick={() => onAssignClick(line)}
-                        className="whitespace-nowrap min-w-fit shrink-0"
                       >
-                        <Car className="h-5 w-5 shrink-0" />
                         Assign VIN
                       </Button>
                     )}
