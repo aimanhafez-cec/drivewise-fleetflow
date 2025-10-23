@@ -233,12 +233,28 @@ export const EnhancedAgreementWizard = () => {
   };
 
   const handleSubmit = async () => {
-    if (!validationResult.isValid) {
-      toast.error('Please fix all errors before submitting');
+    // Validate ALL steps are complete
+    const invalidSteps = [];
+    for (let i = 0; i < TOTAL_STEPS; i++) {
+      const status = getStepStatus(i);
+      if (status !== 'complete') {
+        invalidSteps.push(i);
+      }
+    }
+
+    if (invalidSteps.length > 0) {
+      const stepNames = invalidSteps.map(i => STEP_CONFIG[i].title).join(', ');
+      toast.error(`Please complete all steps before submitting. Incomplete: ${stepNames}`);
+      
+      // Optionally navigate to first incomplete step
+      if (invalidSteps[0] !== progress.currentStep) {
+        setCurrentStep(invalidSteps[0]);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
       return;
     }
 
-    // Here you would submit the agreement to the backend
+    // All steps complete - proceed with submission
     console.log('[EnhancedWizard] Submitting agreement:', wizardData);
     
     // Simulate submission
@@ -496,13 +512,16 @@ export const EnhancedAgreementWizard = () => {
             </div>
 
             {progress.currentStep === TOTAL_STEPS - 1 ? (
-              <Button onClick={handleSubmit} disabled={!validationResult.isValid} size="lg">
+              <Button 
+                onClick={handleSubmit} 
+                size="lg"
+                className="min-w-[180px]"
+              >
                 Issue Agreement
               </Button>
             ) : (
               <Button
                 onClick={handleNext}
-                disabled={!validationResult.isValid}
               >
                 Next
                 <ArrowRight className="ml-2 h-4 w-4" />
