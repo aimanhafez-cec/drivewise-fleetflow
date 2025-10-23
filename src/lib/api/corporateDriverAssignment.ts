@@ -64,11 +64,11 @@ class CorporateDriverAssignmentAPI {
         query = query.eq('agreement_id', agreementId);
       }
 
-      // Only include lines from active agreements
+      // Only include lines from customer_accepted agreements
       const { data: agreements } = await supabase
         .from('corporate_leasing_agreements')
         .select('id')
-        .eq('status', 'active');
+        .eq('status', 'customer_accepted');
 
       const signedAgreementIds = agreements?.map(a => a.id) || [];
       
@@ -126,11 +126,11 @@ class CorporateDriverAssignmentAPI {
     try {
       const { agreementId, search, status = 'all', page = 1, pageSize = 20 } = options || {};
 
-      // Get active agreements first
+      // Get customer_accepted agreements first
       const { data: agreements } = await supabase
         .from('corporate_leasing_agreements')
         .select('id, agreement_no, customer_id, customers(name)')
-        .eq('status', 'active');
+        .eq('status', 'customer_accepted');
 
       if (!agreements || agreements.length === 0) {
         return { data: [], totalCount: 0 };
