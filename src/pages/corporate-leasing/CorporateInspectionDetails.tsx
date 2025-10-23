@@ -10,6 +10,31 @@ import { PrintBlankCardModal } from '@/components/inspection/PrintBlankCardModal
 import { toast } from 'sonner';
 import { DamageMarkersDisplay } from '@/components/inspection/corporate/DamageMarkersDisplay';
 
+// Checklist item labels mapping
+const CHECKLIST_ITEMS_LABELS: Record<string, string> = {
+  'tires_rims': 'Tires & Rims',
+  'lights': 'Lights',
+  'brakes': 'Brakes',
+  'engine': 'Engine',
+  'body': 'Body',
+  'interior': 'Interior',
+  'fuel_tank': 'Fuel Tank',
+  'spare_tire': 'Spare Tire',
+  'tools': 'Tools',
+  'registration': 'Registration Documents'
+};
+
+// Helper function to get rating display with color
+const getRatingDisplay = (rating: string) => {
+  const ratingMap: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
+    'good': { label: 'Good', variant: 'default' },
+    'moderate': { label: 'Moderate', variant: 'secondary' },
+    'needs_repair': { label: 'Needs Repair', variant: 'destructive' },
+    'n_a': { label: 'N/A', variant: 'outline' }
+  };
+  return ratingMap[rating] || { label: rating, variant: 'outline' };
+};
+
 export default function CorporateInspectionDetails() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -158,30 +183,29 @@ export default function CorporateInspectionDetails() {
         <div className="flex items-center gap-2 mb-4">
           <h2 className="text-xl font-semibold">Inspection Checklist</h2>
         </div>
-        {Object.keys(inspection.checklist || {}).length === 0 ? (
+        {Array.isArray(inspection.checklist) && inspection.checklist.length > 0 ? (
+          <div className="space-y-2">
+            {inspection.checklist.map((item: any, index: number) => (
+              <div key={item.itemId || index} className="p-3 rounded-lg border">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-medium">
+                    {CHECKLIST_ITEMS_LABELS[item.itemId] || item.itemId}
+                  </span>
+                  <Badge variant={getRatingDisplay(item.rating).variant}>
+                    {getRatingDisplay(item.rating).label}
+                  </Badge>
+                </div>
+                {item.remarks && (
+                  <p className="text-sm text-muted-foreground">{item.remarks}</p>
+                )}
+              </div>
+            ))}
+          </div>
+        ) : (
           <div className="text-center py-8 text-muted-foreground">
             <AlertTriangle className="h-8 w-8 mx-auto mb-2 opacity-50" />
             <p>No checklist items recorded</p>
             <p className="text-sm mt-1">This inspection was completed without checklist data</p>
-          </div>
-        ) : (
-          <div className="space-y-2">
-            {Object.entries(inspection.checklist || {}).map(([key, value]) => (
-              <div key={key} className="flex items-center justify-between p-3 rounded-lg border">
-                <span className="capitalize">{key.replace('_', ' ')}</span>
-                {value === 'OK' ? (
-                  <div className="flex items-center gap-2 text-green-600">
-                    <CheckCircle2 className="h-5 w-5" />
-                    <span className="font-medium">OK</span>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2 text-red-600">
-                    <XCircle className="h-5 w-5" />
-                    <span className="font-medium">DAMAGE</span>
-                  </div>
-                )}
-              </div>
-            ))}
           </div>
         )}
       </Card>
