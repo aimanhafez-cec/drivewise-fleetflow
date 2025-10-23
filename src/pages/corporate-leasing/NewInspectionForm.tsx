@@ -54,6 +54,17 @@ export default function NewInspectionForm() {
     setFormData(prev => ({ ...prev, ...updates }));
   };
 
+  const canProceedFromCurrentStep = () => {
+    switch (currentStep) {
+      case 1: // Basic Info
+        return !!formData.inspection_type;
+      case 2: // Vehicle Selection
+        return !!formData.vehicle_id;
+      default: // Steps 3-7 are optional
+        return true;
+    }
+  };
+
   const handleSaveDraft = async () => {
     if (!formData.inspection_type || !formData.vehicle_id) {
       toast.error('Please select inspection type and vehicle first');
@@ -131,7 +142,7 @@ export default function NewInspectionForm() {
           <Button variant="outline" onClick={() => navigate('/corporate-leasing-operations/manage-inspections')}>
             Cancel
           </Button>
-          <Button variant="outline" onClick={handleSaveDraft} disabled={!formData.inspection_type || !formData.vehicle_id}>
+          <Button variant="outline" onClick={handleSaveDraft} disabled={!formData.inspection_type}>
             <Save className="h-4 w-4 mr-2" />
             Save Draft
           </Button>
@@ -230,7 +241,7 @@ export default function NewInspectionForm() {
             {currentStep < STEPS.length && (
               <Button
                 onClick={handleNext}
-                disabled={!formData.inspection_type || !formData.vehicle_id}
+                disabled={!canProceedFromCurrentStep()}
               >
                 Next
                 <ChevronRight className="h-4 w-4 ml-2" />
