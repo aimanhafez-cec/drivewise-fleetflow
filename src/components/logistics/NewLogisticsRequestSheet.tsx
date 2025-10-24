@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { X } from "lucide-react";
+import { useState, useEffect } from "react";
+import { FileText, Building2, Car, MapPin, Clock, StickyNote } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -34,37 +34,192 @@ const SUBTYPES = {
   "Maintenance Transfer": ["Maintenance Workshop"],
 };
 
+const EMIRATES = [
+  "Dubai",
+  "Abu Dhabi",
+  "Sharjah",
+  "Ajman",
+  "Ras Al Khaimah",
+  "Fujairah",
+  "Umm Al Quwain"
+];
+
+const BRANCHES_BY_EMIRATE: Record<string, string[]> = {
+  "Dubai": [
+    "Dubai Marina Branch",
+    "Sheikh Zayed Road Branch",
+    "Downtown Dubai Branch",
+    "Business Bay Branch",
+    "JBR Branch",
+    "DIFC Branch",
+    "Deira Branch",
+    "Bur Dubai Branch"
+  ],
+  "Abu Dhabi": [
+    "Corniche Branch",
+    "Al Reem Island Branch",
+    "Yas Island Branch",
+    "Airport Road Branch"
+  ],
+  "Sharjah": [
+    "Al Nahda Branch",
+    "Rolla Branch",
+    "Industrial Area Branch"
+  ],
+  "Ajman": [
+    "City Center Branch",
+    "Al Nuaimiya Branch"
+  ],
+  "Ras Al Khaimah": [
+    "RAK City Branch",
+    "Al Hamra Branch"
+  ],
+  "Fujairah": [
+    "Fujairah City Branch",
+    "Dibba Branch"
+  ],
+  "Umm Al Quwain": [
+    "UAQ City Branch"
+  ]
+};
+
+const DEPARTMENTS = [
+  "Operations",
+  "Sales",
+  "Customer Service",
+  "Fleet Management",
+  "Maintenance",
+  "Admin"
+];
+
+const MOCK_CONTRACT_LINES = [
+  {
+    value: "line1",
+    label: "Line 1 - BMW X5 (DXB-12345) - 12 Months - Expires: 2025-12-31",
+    customer: "ABC Company Ltd.",
+    contractType: "Yearly",
+    contractStatus: "Active",
+    contractPeriod: "2024-06-01 to 2025-12-31",
+    customerType: "Corporate",
+    vehicle: {
+      vin: 'WBADT4305RGZ12345',
+      plate: 'DXB-12345',
+      make: 'BMW',
+      model: 'X5',
+      year: 2024,
+      vehicleClass: 'Luxury SUV',
+      itemCode: 'VH-2024-001',
+      description: '2024 BMW X5 xDrive40i - White',
+      odometer: 1250,
+    }
+  },
+  {
+    value: "line2",
+    label: "Line 2 - Toyota Camry (SHJ-98765) - 6 Months - Expires: 2025-09-15",
+    customer: "XYZ Trading LLC",
+    contractType: "Monthly",
+    contractStatus: "Active",
+    contractPeriod: "2025-03-15 to 2025-09-15",
+    customerType: "Corporate",
+    vehicle: {
+      vin: 'JTDKBRFU5J3123456',
+      plate: 'SHJ-98765',
+      make: 'Toyota',
+      model: 'Camry',
+      year: 2023,
+      vehicleClass: 'Sedan',
+      itemCode: 'VH-2023-045',
+      description: '2023 Toyota Camry SE - Silver',
+      odometer: 8750,
+    }
+  },
+  {
+    value: "line3",
+    label: "Line 3 - Mercedes S-Class (AUH-55555) - 24 Months - Expires: 2026-06-30",
+    customer: "Premium Holdings",
+    contractType: "Long-term",
+    contractStatus: "Active",
+    contractPeriod: "2024-07-01 to 2026-06-30",
+    customerType: "VIP",
+    vehicle: {
+      vin: 'WDDUG8CB8LA123456',
+      plate: 'AUH-55555',
+      make: 'Mercedes-Benz',
+      model: 'S-Class',
+      year: 2024,
+      vehicleClass: 'Luxury Sedan',
+      itemCode: 'VH-2024-012',
+      description: '2024 Mercedes S-Class AMG - Black',
+      odometer: 2100,
+    }
+  }
+];
+
 export function NewLogisticsRequestSheet({
   open,
   onOpenChange,
   onSuccess,
 }: NewLogisticsRequestSheetProps) {
   const [formData, setFormData] = useState({
+    // Form Meta
+    requestReference: "",
+    requestedBy: "",
+    requestorDepartment: "",
+    requestorContact: "",
     type: "Contract-Related",
     subtype: "",
     priority: "Normal",
+    emirate: "",
     owningBranch: "",
+    
+    // Contract
     contractNumber: "",
     contractLine: "",
     customer: "",
+    contractType: "",
+    contractStatus: "",
+    contractPeriod: "",
+    customerType: "",
+    
+    // Location
     deliveryLocationType: "Our Office",
     office: "",
     siteName: "",
     siteAddress: "",
+    customerSiteEmirate: "",
+    customerSiteArea: "",
+    customerSiteBuilding: "",
+    customerSiteLandmark: "",
+    customerSiteFloor: "",
+    customerSiteGPS: "",
+    customerSiteBestAccessTime: "",
+    customerSiteParkingNotes: "",
     siteContactName: "",
     siteContactMobile: "",
     siteAccessNotes: "",
+    
+    // Time
     requestedDate: "",
     windowFrom: "",
     windowTo: "",
     targetTime: "",
     specialInstructions: "",
+    
+    // Notes
     internalNotes: "",
   });
 
   const [vehicleData, setVehicleData] = useState<any>(null);
   const [odometerOverride, setOdometerOverride] = useState(false);
   const [customOdometer, setCustomOdometer] = useState("");
+
+  // Generate request reference on mount
+  useEffect(() => {
+    if (!formData.requestReference) {
+      const refNumber = `LR-2025-${String(Math.floor(Math.random() * 100000)).padStart(5, "0")}`;
+      setFormData(prev => ({ ...prev, requestReference: refNumber }));
+    }
+  }, []);
 
   const handleTypeChange = (value: string) => {
     setFormData({
@@ -75,23 +230,30 @@ export function NewLogisticsRequestSheet({
   };
 
   const handleContractLineChange = (value: string) => {
-    setFormData({ ...formData, contractLine: value });
+    const selectedLine = MOCK_CONTRACT_LINES.find(line => line.value === value);
     
-    // Mock vehicle data when contract line is selected
-    if (value) {
-      const mockVehicle = {
-        vin: 'WBADT4305RGZ12345',
-        plate: 'DXB-12345',
-        make: 'BMW',
-        model: 'X5',
-        year: 2024,
-        vehicleClass: 'Luxury SUV',
-        itemCode: 'VH-2024-001',
-        description: '2024 BMW X5 xDrive40i - White',
-        odometer: 1250,
-      };
-      setVehicleData(mockVehicle);
-      setFormData({ ...formData, contractLine: value, customer: "ABC Company Ltd." });
+    if (selectedLine) {
+      setVehicleData(selectedLine.vehicle);
+      setFormData({ 
+        ...formData, 
+        contractLine: value,
+        customer: selectedLine.customer,
+        contractType: selectedLine.contractType,
+        contractStatus: selectedLine.contractStatus,
+        contractPeriod: selectedLine.contractPeriod,
+        customerType: selectedLine.customerType,
+      });
+    } else {
+      setVehicleData(null);
+      setFormData({
+        ...formData,
+        contractLine: value,
+        customer: "",
+        contractType: "",
+        contractStatus: "",
+        contractPeriod: "",
+        customerType: "",
+      });
     }
   };
 
@@ -112,17 +274,34 @@ export function NewLogisticsRequestSheet({
 
   const handleClose = () => {
     setFormData({
+      requestReference: "",
+      requestedBy: "",
+      requestorDepartment: "",
+      requestorContact: "",
       type: "Contract-Related",
       subtype: "",
       priority: "Normal",
+      emirate: "",
       owningBranch: "",
       contractNumber: "",
       contractLine: "",
       customer: "",
+      contractType: "",
+      contractStatus: "",
+      contractPeriod: "",
+      customerType: "",
       deliveryLocationType: "Our Office",
       office: "",
       siteName: "",
       siteAddress: "",
+      customerSiteEmirate: "",
+      customerSiteArea: "",
+      customerSiteBuilding: "",
+      customerSiteLandmark: "",
+      customerSiteFloor: "",
+      customerSiteGPS: "",
+      customerSiteBestAccessTime: "",
+      customerSiteParkingNotes: "",
       siteContactName: "",
       siteContactMobile: "",
       siteAccessNotes: "",
@@ -138,6 +317,8 @@ export function NewLogisticsRequestSheet({
     setCustomOdometer("");
     onOpenChange(false);
   };
+
+  const availableBranches = formData.emirate ? BRANCHES_BY_EMIRATE[formData.emirate] || [] : [];
 
   const availableSubtypes = SUBTYPES[formData.type as keyof typeof SUBTYPES] || [];
 
@@ -155,9 +336,75 @@ export function NewLogisticsRequestSheet({
           {/* Form Meta Section */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Form Meta</CardTitle>
+              <CardTitle className="text-base flex items-center gap-2">
+                <FileText className="w-4 h-4" />
+                Form Meta
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              {/* Request Reference */}
+              <div className="space-y-2">
+                <Label>Request Reference</Label>
+                <div className="p-2 bg-muted rounded-md text-sm font-mono">
+                  {formData.requestReference}
+                </div>
+              </div>
+
+              {/* Requested By & Department */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="requestedBy">
+                    Requested By <span className="text-destructive">*</span>
+                  </Label>
+                  <Input
+                    id="requestedBy"
+                    value={formData.requestedBy}
+                    onChange={(e) =>
+                      setFormData({ ...formData, requestedBy: e.target.value })
+                    }
+                    placeholder="Enter your name"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="requestorDepartment">
+                    Department <span className="text-destructive">*</span>
+                  </Label>
+                  <Select
+                    value={formData.requestorDepartment}
+                    onValueChange={(value) =>
+                      setFormData({ ...formData, requestorDepartment: value })
+                    }
+                  >
+                    <SelectTrigger id="requestorDepartment">
+                      <SelectValue placeholder="Select department" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {DEPARTMENTS.map((dept) => (
+                        <SelectItem key={dept} value={dept}>
+                          {dept}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              {/* Requestor Contact */}
+              <div className="space-y-2">
+                <Label htmlFor="requestorContact">
+                  Contact Number <span className="text-destructive">*</span>
+                </Label>
+                <Input
+                  id="requestorContact"
+                  value={formData.requestorContact}
+                  onChange={(e) =>
+                    setFormData({ ...formData, requestorContact: e.target.value })
+                  }
+                  placeholder="+971 XX XXX XXXX"
+                />
+              </div>
+
+              <div className="border-t my-4" />
               {/* Type */}
               <div className="space-y-2">
                 <Label>
@@ -241,19 +488,55 @@ export function NewLogisticsRequestSheet({
                 </Select>
               </div>
 
-              {/* Owning Branch */}
-              <div className="space-y-2">
-                <Label htmlFor="owningBranch">
-                  Owning Branch/Office <span className="text-destructive">*</span>
-                </Label>
-                <Input
-                  id="owningBranch"
-                  value={formData.owningBranch}
-                  onChange={(e) =>
-                    setFormData({ ...formData, owningBranch: e.target.value })
-                  }
-                  placeholder="Enter branch or office name"
-                />
+              <div className="border-t my-4" />
+
+              {/* Emirate & Owning Branch */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="emirate">
+                    Emirate <span className="text-destructive">*</span>
+                  </Label>
+                  <Select
+                    value={formData.emirate}
+                    onValueChange={(value) => {
+                      setFormData({ ...formData, emirate: value, owningBranch: "" });
+                    }}
+                  >
+                    <SelectTrigger id="emirate">
+                      <SelectValue placeholder="Select emirate" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {EMIRATES.map((emirate) => (
+                        <SelectItem key={emirate} value={emirate}>
+                          {emirate}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="owningBranch">
+                    Owning Branch/Office <span className="text-destructive">*</span>
+                  </Label>
+                  <Select
+                    value={formData.owningBranch}
+                    onValueChange={(value) =>
+                      setFormData({ ...formData, owningBranch: value })
+                    }
+                    disabled={!formData.emirate}
+                  >
+                    <SelectTrigger id="owningBranch">
+                      <SelectValue placeholder={formData.emirate ? "Select branch" : "Select emirate first"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableBranches.map((branch) => (
+                        <SelectItem key={branch} value={branch}>
+                          {branch}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -264,7 +547,10 @@ export function NewLogisticsRequestSheet({
               {/* Section B: Contract Linkage */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-base">Contract Linkage</CardTitle>
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Building2 className="w-4 h-4" />
+                    Contract Linkage
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
@@ -293,20 +579,60 @@ export function NewLogisticsRequestSheet({
                         <SelectValue placeholder="Select contract line" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Line 1">Line 1</SelectItem>
-                        <SelectItem value="Line 2">Line 2</SelectItem>
-                        <SelectItem value="Line 3">Line 3</SelectItem>
+                        {MOCK_CONTRACT_LINES.map((line) => (
+                          <SelectItem key={line.value} value={line.value}>
+                            {line.label}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>
 
                   {formData.customer && (
-                    <div className="space-y-2">
-                      <Label>Customer</Label>
-                      <div className="p-2 bg-muted rounded-md text-sm">
-                        {formData.customer}
+                    <>
+                      <div className="space-y-2">
+                        <Label>Customer</Label>
+                        <div className="p-2 bg-muted rounded-md text-sm font-medium">
+                          {formData.customer}
+                        </div>
                       </div>
-                    </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label className="text-xs text-muted-foreground">Contract Type</Label>
+                          <Badge variant={
+                            formData.contractType === "Yearly" ? "default" :
+                            formData.contractType === "Long-term" ? "secondary" : "outline"
+                          }>
+                            {formData.contractType}
+                          </Badge>
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-xs text-muted-foreground">Contract Status</Label>
+                          <Badge variant={
+                            formData.contractStatus === "Active" ? "default" :
+                            formData.contractStatus === "Expiring Soon" ? "destructive" : "outline"
+                          }>
+                            {formData.contractStatus}
+                          </Badge>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label className="text-xs text-muted-foreground">Contract Period</Label>
+                        <div className="text-sm">{formData.contractPeriod}</div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label className="text-xs text-muted-foreground">Customer Type</Label>
+                        <Badge variant={
+                          formData.customerType === "VIP" ? "secondary" :
+                          formData.customerType === "Corporate" ? "default" : "outline"
+                        }>
+                          {formData.customerType}
+                        </Badge>
+                      </div>
+                    </>
                   )}
                 </CardContent>
               </Card>
@@ -315,7 +641,10 @@ export function NewLogisticsRequestSheet({
               {vehicleData && (
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-base">Vehicle Details</CardTitle>
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <Car className="w-4 h-4" />
+                      Vehicle Details
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <div className="grid grid-cols-2 gap-4">
@@ -393,7 +722,10 @@ export function NewLogisticsRequestSheet({
               {formData.subtype === "Vehicle Delivery" && (
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-base">Delivery Location</CardTitle>
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <MapPin className="w-4 h-4" />
+                      Delivery Location
+                    </CardTitle>
                   </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
@@ -437,9 +769,15 @@ export function NewLogisticsRequestSheet({
                           <SelectValue placeholder="Select office" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="Marina Office">Marina Office</SelectItem>
-                          <SelectItem value="Downtown Office">Downtown Office</SelectItem>
-                          <SelectItem value="Business Bay Office">Business Bay Office</SelectItem>
+                          {Object.entries(BRANCHES_BY_EMIRATE).map(([emirate, branches]) => (
+                            <optgroup key={emirate} label={emirate}>
+                              {branches.map((branch) => (
+                                <SelectItem key={branch} value={branch}>
+                                  {branch}
+                                </SelectItem>
+                              ))}
+                            </optgroup>
+                          ))}
                         </SelectContent>
                       </Select>
                     </div>
@@ -447,6 +785,44 @@ export function NewLogisticsRequestSheet({
 
                   {formData.deliveryLocationType === "Customer Site" && (
                     <>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="customerSiteEmirate">
+                            Emirate <span className="text-destructive">*</span>
+                          </Label>
+                          <Select
+                            value={formData.customerSiteEmirate}
+                            onValueChange={(value) =>
+                              setFormData({ ...formData, customerSiteEmirate: value })
+                            }
+                          >
+                            <SelectTrigger id="customerSiteEmirate">
+                              <SelectValue placeholder="Select emirate" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {EMIRATES.map((emirate) => (
+                                <SelectItem key={emirate} value={emirate}>
+                                  {emirate}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="customerSiteArea">
+                            Area/District <span className="text-destructive">*</span>
+                          </Label>
+                          <Input
+                            id="customerSiteArea"
+                            value={formData.customerSiteArea}
+                            onChange={(e) =>
+                              setFormData({ ...formData, customerSiteArea: e.target.value })
+                            }
+                            placeholder="e.g., Dubai Marina, Business Bay"
+                          />
+                        </div>
+                      </div>
+
                       <div className="space-y-2">
                         <Label htmlFor="siteName">
                           Site Name <span className="text-destructive">*</span>
@@ -463,7 +839,7 @@ export function NewLogisticsRequestSheet({
 
                       <div className="space-y-2">
                         <Label htmlFor="siteAddress">
-                          Address <span className="text-destructive">*</span>
+                          Street Address <span className="text-destructive">*</span>
                         </Label>
                         <Textarea
                           id="siteAddress"
@@ -471,10 +847,86 @@ export function NewLogisticsRequestSheet({
                           onChange={(e) =>
                             setFormData({ ...formData, siteAddress: e.target.value })
                           }
-                          placeholder="Enter complete address"
-                          rows={3}
+                          placeholder="Enter complete street address"
+                          rows={2}
                         />
                       </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="customerSiteBuilding">Building/Complex Name</Label>
+                          <Input
+                            id="customerSiteBuilding"
+                            value={formData.customerSiteBuilding}
+                            onChange={(e) =>
+                              setFormData({ ...formData, customerSiteBuilding: e.target.value })
+                            }
+                            placeholder="e.g., Marina Plaza Tower"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="customerSiteLandmark">Landmark</Label>
+                          <Input
+                            id="customerSiteLandmark"
+                            value={formData.customerSiteLandmark}
+                            onChange={(e) =>
+                              setFormData({ ...formData, customerSiteLandmark: e.target.value })
+                            }
+                            placeholder="e.g., Near Mall of the Emirates"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="customerSiteFloor">Floor/Office Number</Label>
+                          <Input
+                            id="customerSiteFloor"
+                            value={formData.customerSiteFloor}
+                            onChange={(e) =>
+                              setFormData({ ...formData, customerSiteFloor: e.target.value })
+                            }
+                            placeholder="e.g., 12th Floor, Office 1205"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="customerSiteGPS">GPS Coordinates (Optional)</Label>
+                          <Input
+                            id="customerSiteGPS"
+                            value={formData.customerSiteGPS}
+                            onChange={(e) =>
+                              setFormData({ ...formData, customerSiteGPS: e.target.value })
+                            }
+                            placeholder="25.0760, 55.1328"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="customerSiteBestAccessTime">Best Access Time</Label>
+                        <Input
+                          id="customerSiteBestAccessTime"
+                          value={formData.customerSiteBestAccessTime}
+                          onChange={(e) =>
+                            setFormData({ ...formData, customerSiteBestAccessTime: e.target.value })
+                          }
+                          placeholder="e.g., 8 AM - 6 PM weekdays"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="customerSiteParkingNotes">Parking Notes</Label>
+                        <Input
+                          id="customerSiteParkingNotes"
+                          value={formData.customerSiteParkingNotes}
+                          onChange={(e) =>
+                            setFormData({ ...formData, customerSiteParkingNotes: e.target.value })
+                          }
+                          placeholder="e.g., Basement parking, security clearance needed"
+                        />
+                      </div>
+
+                      <div className="border-t my-4" />
 
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
@@ -502,15 +954,15 @@ export function NewLogisticsRequestSheet({
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="siteAccessNotes">Access Notes</Label>
+                        <Label htmlFor="siteAccessNotes">Access Instructions</Label>
                         <Textarea
                           id="siteAccessNotes"
                           value={formData.siteAccessNotes}
                           onChange={(e) =>
                             setFormData({ ...formData, siteAccessNotes: e.target.value })
                           }
-                          placeholder="Gate pass, parking instructions, landmarks..."
-                          rows={2}
+                          placeholder="Gate pass requirements, security procedures, special access instructions..."
+                          rows={3}
                         />
                       </div>
                     </>
@@ -523,7 +975,10 @@ export function NewLogisticsRequestSheet({
               {formData.subtype === "Vehicle Pick-up" && (
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-base">Pick-up Location</CardTitle>
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <MapPin className="w-4 h-4" />
+                      Pick-up Location
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="space-y-2">
@@ -567,9 +1022,15 @@ export function NewLogisticsRequestSheet({
                             <SelectValue placeholder="Select office" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="Marina Office">Marina Office</SelectItem>
-                            <SelectItem value="Downtown Office">Downtown Office</SelectItem>
-                            <SelectItem value="Business Bay Office">Business Bay Office</SelectItem>
+                            {Object.entries(BRANCHES_BY_EMIRATE).map(([emirate, branches]) => (
+                              <optgroup key={emirate} label={emirate}>
+                                {branches.map((branch) => (
+                                  <SelectItem key={branch} value={branch}>
+                                    {branch}
+                                  </SelectItem>
+                                ))}
+                              </optgroup>
+                            ))}
                           </SelectContent>
                         </Select>
                       </div>
@@ -577,6 +1038,44 @@ export function NewLogisticsRequestSheet({
 
                     {formData.deliveryLocationType === "Customer Site" && (
                       <>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="customerSiteEmirate-pickup">
+                              Emirate <span className="text-destructive">*</span>
+                            </Label>
+                            <Select
+                              value={formData.customerSiteEmirate}
+                              onValueChange={(value) =>
+                                setFormData({ ...formData, customerSiteEmirate: value })
+                              }
+                            >
+                              <SelectTrigger id="customerSiteEmirate-pickup">
+                                <SelectValue placeholder="Select emirate" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {EMIRATES.map((emirate) => (
+                                  <SelectItem key={emirate} value={emirate}>
+                                    {emirate}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="customerSiteArea-pickup">
+                              Area/District <span className="text-destructive">*</span>
+                            </Label>
+                            <Input
+                              id="customerSiteArea-pickup"
+                              value={formData.customerSiteArea}
+                              onChange={(e) =>
+                                setFormData({ ...formData, customerSiteArea: e.target.value })
+                              }
+                              placeholder="e.g., Dubai Marina, Business Bay"
+                            />
+                          </div>
+                        </div>
+
                         <div className="space-y-2">
                           <Label htmlFor="siteName-pickup">
                             Site Name <span className="text-destructive">*</span>
@@ -593,7 +1092,7 @@ export function NewLogisticsRequestSheet({
 
                         <div className="space-y-2">
                           <Label htmlFor="siteAddress-pickup">
-                            Site Address <span className="text-destructive">*</span>
+                            Street Address <span className="text-destructive">*</span>
                           </Label>
                           <Textarea
                             id="siteAddress-pickup"
@@ -601,42 +1100,115 @@ export function NewLogisticsRequestSheet({
                             onChange={(e) =>
                               setFormData({ ...formData, siteAddress: e.target.value })
                             }
-                            placeholder="Enter full address"
-                            rows={3}
+                            placeholder="Enter complete street address"
+                            rows={2}
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="customerSiteBuilding-pickup">Building/Complex Name</Label>
+                            <Input
+                              id="customerSiteBuilding-pickup"
+                              value={formData.customerSiteBuilding}
+                              onChange={(e) =>
+                                setFormData({ ...formData, customerSiteBuilding: e.target.value })
+                              }
+                              placeholder="e.g., Marina Plaza Tower"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="customerSiteLandmark-pickup">Landmark</Label>
+                            <Input
+                              id="customerSiteLandmark-pickup"
+                              value={formData.customerSiteLandmark}
+                              onChange={(e) =>
+                                setFormData({ ...formData, customerSiteLandmark: e.target.value })
+                              }
+                              placeholder="e.g., Near Mall of the Emirates"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="customerSiteFloor-pickup">Floor/Office Number</Label>
+                            <Input
+                              id="customerSiteFloor-pickup"
+                              value={formData.customerSiteFloor}
+                              onChange={(e) =>
+                                setFormData({ ...formData, customerSiteFloor: e.target.value })
+                              }
+                              placeholder="e.g., 12th Floor, Office 1205"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="customerSiteGPS-pickup">GPS Coordinates (Optional)</Label>
+                            <Input
+                              id="customerSiteGPS-pickup"
+                              value={formData.customerSiteGPS}
+                              onChange={(e) =>
+                                setFormData({ ...formData, customerSiteGPS: e.target.value })
+                              }
+                              placeholder="25.0760, 55.1328"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="customerSiteBestAccessTime-pickup">Best Access Time</Label>
+                          <Input
+                            id="customerSiteBestAccessTime-pickup"
+                            value={formData.customerSiteBestAccessTime}
+                            onChange={(e) =>
+                              setFormData({ ...formData, customerSiteBestAccessTime: e.target.value })
+                            }
+                            placeholder="e.g., 8 AM - 6 PM weekdays"
                           />
                         </div>
 
                         <div className="space-y-2">
-                          <Label htmlFor="siteContactName-pickup">
-                            Site Contact Name <span className="text-destructive">*</span>
-                          </Label>
+                          <Label htmlFor="customerSiteParkingNotes-pickup">Parking Notes</Label>
                           <Input
-                            id="siteContactName-pickup"
-                            value={formData.siteContactName}
+                            id="customerSiteParkingNotes-pickup"
+                            value={formData.customerSiteParkingNotes}
                             onChange={(e) =>
-                              setFormData({ ...formData, siteContactName: e.target.value })
+                              setFormData({ ...formData, customerSiteParkingNotes: e.target.value })
                             }
-                            placeholder="Enter contact name"
+                            placeholder="e.g., Basement parking, security clearance needed"
                           />
                         </div>
 
-                        <div className="space-y-2">
-                          <Label htmlFor="siteContactMobile-pickup">
-                            Site Contact Mobile <span className="text-destructive">*</span>
-                          </Label>
-                          <Input
-                            id="siteContactMobile-pickup"
-                            value={formData.siteContactMobile}
-                            onChange={(e) =>
-                              setFormData({ ...formData, siteContactMobile: e.target.value })
-                            }
-                            placeholder="Enter mobile number"
-                          />
+                        <div className="border-t my-4" />
+
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="siteContactName-pickup">Contact Name</Label>
+                            <Input
+                              id="siteContactName-pickup"
+                              value={formData.siteContactName}
+                              onChange={(e) =>
+                                setFormData({ ...formData, siteContactName: e.target.value })
+                              }
+                              placeholder="Contact person"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="siteContactMobile-pickup">Contact Mobile</Label>
+                            <Input
+                              id="siteContactMobile-pickup"
+                              value={formData.siteContactMobile}
+                              onChange={(e) =>
+                                setFormData({ ...formData, siteContactMobile: e.target.value })
+                              }
+                              placeholder="+971 XX XXX XXXX"
+                            />
+                          </div>
                         </div>
 
                         <div className="space-y-2">
                           <Label htmlFor="siteAccessNotes-pickup">
-                            Access Notes
+                            Access Instructions
                           </Label>
                           <Textarea
                             id="siteAccessNotes-pickup"
@@ -644,8 +1216,8 @@ export function NewLogisticsRequestSheet({
                             onChange={(e) =>
                               setFormData({ ...formData, siteAccessNotes: e.target.value })
                             }
-                            placeholder="Parking instructions, gate codes, etc."
-                            rows={2}
+                            placeholder="Gate pass requirements, security procedures, special access instructions..."
+                            rows={3}
                           />
                         </div>
                       </>
@@ -657,7 +1229,10 @@ export function NewLogisticsRequestSheet({
               {/* Section E: Requested Time Window */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-base">Requested Time Window</CardTitle>
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Clock className="w-4 h-4" />
+                    Requested Time Window
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
@@ -733,7 +1308,10 @@ export function NewLogisticsRequestSheet({
               {/* Section F: Notes */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-base">Internal Notes</CardTitle>
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <StickyNote className="w-4 h-4" />
+                    Internal Notes
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <Textarea
@@ -759,7 +1337,15 @@ export function NewLogisticsRequestSheet({
               </Button>
               <Button
                 onClick={handleSave}
-                disabled={!formData.type || !formData.subtype || !formData.owningBranch}
+                disabled={
+                  !formData.type || 
+                  !formData.subtype || 
+                  !formData.requestedBy || 
+                  !formData.requestorDepartment || 
+                  !formData.requestorContact || 
+                  !formData.emirate || 
+                  !formData.owningBranch
+                }
               >
                 Save Request
               </Button>
