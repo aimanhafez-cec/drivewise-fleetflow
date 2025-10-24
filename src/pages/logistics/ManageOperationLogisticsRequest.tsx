@@ -125,10 +125,14 @@ const ManageOperationLogisticsRequest = () => {
         contractPeriod: '2024-06-01 to 2026-06-01',
         vehicleId: 'VEH-LC-5678',
         vehicleDetails: {
+          vin: 'WBADT4305RGZ12345',
+          plate: 'DXB-LC-5678',
           make: 'Toyota',
           model: 'Land Cruiser',
           year: '2024',
           vehicleClass: 'Full-Size SUV',
+          itemCode: 'VH-2024-087',
+          description: '2024 Toyota Land Cruiser VXR - White Pearl',
           odometer: '2,450'
         },
         deliveryLocationType: 'Customer Site',
@@ -164,10 +168,14 @@ const ManageOperationLogisticsRequest = () => {
         associateWithContract: false,
         vehicleId: 'VEH-NP-7893',
         vehicleDetails: {
+          vin: 'JTDKBRFU5J3789302',
+          plate: 'DXB-NP-7893',
           make: 'Nissan',
           model: 'Patrol',
           year: '2024',
           vehicleClass: 'Full-Size SUV',
+          itemCode: 'VH-2024-142',
+          description: '2024 Nissan Patrol Titanium - Desert Storm Grey',
           odometer: '8,750'
         },
         startLocationType: 'Our Office',
@@ -209,10 +217,14 @@ const ManageOperationLogisticsRequest = () => {
         contractPeriod: '2024-10-21 to 2025-10-21',
         vehicleId: 'VEH-HA-4521',
         vehicleDetails: {
+          vin: 'JHMCM56357C123456',
+          plate: 'DXB-HA-4521',
           make: 'Honda',
           model: 'Accord',
           year: '2023',
           vehicleClass: 'Sedan',
+          itemCode: 'VH-2023-284',
+          description: '2023 Honda Accord Sport - Platinum White',
           odometer: '18,340'
         },
         deliveryLocationType: 'Customer Site',
