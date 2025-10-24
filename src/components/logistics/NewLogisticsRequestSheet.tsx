@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -142,13 +142,16 @@ export function NewLogisticsRequestSheet({
   const availableSubtypes = SUBTYPES[formData.type as keyof typeof SUBTYPES] || [];
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="sm:max-w-[600px] overflow-y-auto">
-        <SheetHeader>
-          <SheetTitle>New Logistics Request</SheetTitle>
-        </SheetHeader>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-full h-screen m-0 rounded-none p-0">
+        <div className="h-full overflow-y-auto">
+          <div className="sticky top-0 z-10 bg-background border-b px-6 py-4">
+            <DialogHeader>
+              <DialogTitle>New Logistics Request</DialogTitle>
+            </DialogHeader>
+          </div>
 
-        <div className="space-y-6 py-6">
+          <div className="space-y-6 px-6 py-6">
           {/* Form Meta Section */}
           <Card>
             <CardHeader>
@@ -746,21 +749,24 @@ export function NewLogisticsRequestSheet({
               </Card>
             </>
           )}
-        </div>
+          </div>
 
-        {/* Footer Actions */}
-        <div className="flex justify-end gap-3 pt-4 border-t">
-          <Button variant="outline" onClick={handleClose}>
-            Cancel
-          </Button>
-          <Button
-            onClick={handleSave}
-            disabled={!formData.type || !formData.subtype || !formData.owningBranch}
-          >
-            Save Request
-          </Button>
+          {/* Footer Actions */}
+          <div className="sticky bottom-0 bg-background border-t px-6 py-4">
+            <div className="flex justify-end gap-3">
+              <Button variant="outline" onClick={handleClose}>
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSave}
+                disabled={!formData.type || !formData.subtype || !formData.owningBranch}
+              >
+                Save Request
+              </Button>
+            </div>
+          </div>
         </div>
-      </SheetContent>
-    </Sheet>
+      </DialogContent>
+    </Dialog>
   );
 }
