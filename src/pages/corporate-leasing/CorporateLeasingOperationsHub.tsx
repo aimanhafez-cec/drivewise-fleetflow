@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Car, Users, ClipboardCheck, AlertTriangle, Navigation } from 'lucide-react';
+import { Car, Users, ClipboardCheck, AlertTriangle, Navigation, RefreshCw } from 'lucide-react';
 import HubCard from '@/components/navigation/HubCard';
 
 const CorporateLeasingOperationsHub: React.FC = () => {
@@ -41,6 +41,13 @@ const CorporateLeasingOperationsHub: React.FC = () => {
       icon: Navigation,
       route: '/corporate-leasing-operations/toll-transactions',
       gradient: 'from-cyan-500/10 to-blue-500/10',
+    },
+    {
+      title: 'Manage Replacement Requests',
+      description: 'Handle vehicle replacement requests for corporate leasing agreements due to maintenance, accidents, or upgrades',
+      icon: RefreshCw,
+      route: '/corporate-leasing-operations/replacement-requests',
+      gradient: 'from-amber-500/10 to-yellow-500/10',
     },
   ];
 

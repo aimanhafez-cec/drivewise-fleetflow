@@ -92,6 +92,9 @@ import NewInspectionForm from "./pages/corporate-leasing/NewInspectionForm";
 import CorporateInspectionDetails from "./pages/corporate-leasing/CorporateInspectionDetails";
 import TrafficFinesScreen from "./pages/corporate-leasing/TrafficFinesScreen";
 import TollTransactionsScreen from "./pages/corporate-leasing/TollTransactionsScreen";
+import ManageReplacementRequests from "./pages/corporate-leasing/ManageReplacementRequests";
+import NewReplacementRequest from "./pages/corporate-leasing/NewReplacementRequest";
+import ReplacementRequestDetail from "./pages/corporate-leasing/ReplacementRequestDetail";
 import LogisticsHub from "./pages/logistics/LogisticsHub";
 import ManageOperationLogisticsRequest from "./pages/logistics/ManageOperationLogisticsRequest";
 import ManageBillingEvents from "./pages/transactions/ManageBillingEvents";
@@ -248,6 +251,9 @@ const App = () => {
                 <Route path="manage-inspections/edit/:id" element={<NewInspectionForm />} />
                 <Route path="traffic-fines" element={<TrafficFinesScreen />} />
                 <Route path="toll-transactions" element={<TollTransactionsScreen />} />
+                <Route path="replacement-requests" element={<ManageReplacementRequests />} />
+                <Route path="replacement-requests/new" element={<NewReplacementRequest />} />
+                <Route path="replacement-requests/:id" element={<ReplacementRequestDetail />} />
               </Route>
               <Route path="/logistics" element={
                 <ProtectedRoute>
