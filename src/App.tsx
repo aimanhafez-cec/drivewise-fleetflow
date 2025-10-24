@@ -98,6 +98,7 @@ import ReplacementRequestDetail from "./pages/corporate-leasing/ReplacementReque
 import LogisticsHub from "./pages/logistics/LogisticsHub";
 import ManageOperationLogisticsRequest from "./pages/logistics/ManageOperationLogisticsRequest";
 import ManageBillingEvents from "./pages/transactions/ManageBillingEvents";
+import ManageSettlements from "./pages/transactions/ManageSettlements";
 // Hidden - commented out imports
 // import { CarSubscriptions } from "./pages/CarSubscriptions";
 // import { NewCarSubscription } from "./pages/NewCarSubscription";
@@ -319,6 +320,7 @@ const App = () => {
               <Route path="summary" element={<FinancialSummary />} />
               <Route path="cost-compliance" element={<CostComplianceHub />} />
               <Route path="billing-events" element={<ManageBillingEvents />} />
+              <Route path="settlements" element={<ManageSettlements />} />
             </Route>
             <Route path="/integrations" element={
               <ProtectedRoute>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Receipt, FileText, CreditCard, TrendingUp, Wallet, DollarSign, AlertTriangle, CalendarClock } from 'lucide-react';
+import { Receipt, FileText, CreditCard, TrendingUp, Wallet, DollarSign, AlertTriangle, CalendarClock, Banknote } from 'lucide-react';
 import HubCard from '@/components/navigation/HubCard';
 
 const TransactionsHub: React.FC = () => {
@@ -62,6 +62,13 @@ const TransactionsHub: React.FC = () => {
       icon: CalendarClock,
       route: '/transactions/billing-events',
       gradient: 'from-teal-500/10 to-cyan-500/10',
+    },
+    {
+      title: 'Manage Settlements',
+      description: 'Process and reconcile financial settlements, manage payment batches and settlement reports',
+      icon: Banknote,
+      route: '/transactions/settlements',
+      gradient: 'from-emerald-500/10 to-teal-500/10',
     },
   ];
 
