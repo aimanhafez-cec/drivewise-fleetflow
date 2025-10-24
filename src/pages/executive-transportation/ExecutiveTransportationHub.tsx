@@ -1,46 +1,43 @@
-import { useNavigate } from 'react-router-dom';
 import HubCard from '@/components/navigation/HubCard';
 import { FileText, Plus, Crown, UserCheck, CalendarClock, Receipt } from 'lucide-react';
 
 const ExecutiveTransportationHub = () => {
-  const navigate = useNavigate();
-
   const executiveCards = [
     {
       title: 'Manage Service Contracts',
       icon: FileText,
-      route: '/executive-transportation/manage',
       gradient: 'from-purple-500/10 to-pink-500/10',
+      disabled: true,
     },
     {
       title: 'New Service Contract',
       icon: Plus,
-      route: '/executive-transportation/new',
       gradient: 'from-blue-500/10 to-cyan-500/10',
+      disabled: true,
     },
     {
       title: 'Executive Fleet',
       icon: Crown,
-      route: '/executive-transportation/fleet',
       gradient: 'from-amber-500/10 to-yellow-500/10',
+      disabled: true,
     },
     {
       title: 'Chauffeur Management',
       icon: UserCheck,
-      route: '/executive-transportation/chauffeurs',
       gradient: 'from-emerald-500/10 to-teal-500/10',
+      disabled: true,
     },
     {
       title: 'Service Requests',
       icon: CalendarClock,
-      route: '/executive-transportation/requests',
       gradient: 'from-indigo-500/10 to-violet-500/10',
+      disabled: true,
     },
     {
       title: 'Service Billing',
       icon: Receipt,
-      route: '/executive-transportation/billing',
       gradient: 'from-rose-500/10 to-red-500/10',
+      disabled: true,
     },
   ];
 
@@ -59,8 +56,8 @@ const ExecutiveTransportationHub = () => {
             key={card.title}
             title={card.title}
             icon={card.icon}
-            onClick={() => navigate(card.route)}
             gradient={card.gradient}
+            disabled={card.disabled}
           />
         ))}
       </div>
