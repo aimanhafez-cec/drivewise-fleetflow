@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { FileText, Building2, Car, MapPin, Clock, StickyNote } from "lucide-react";
+import { VehicleSelect } from "@/components/ui/select-components";
 import {
   Dialog,
   DialogContent,
@@ -230,6 +231,17 @@ export function NewLogisticsRequestSheet({
     
     // Notes
     internalNotes: "",
+    
+    // Internal Request Fields
+    associateWithContract: false,
+    vehicleId: "",
+    startLocationType: "Our Office",
+    startOffice: "",
+    startAddress: "",
+    endLocationType: "Our Office",
+    endOffice: "",
+    endAddress: "",
+    locationNotes: "",
   });
 
   const [vehicleData, setVehicleData] = useState<any>(null);
@@ -349,6 +361,15 @@ export function NewLogisticsRequestSheet({
       targetTime: "",
       specialInstructions: "",
       internalNotes: "",
+      associateWithContract: false,
+      vehicleId: "",
+      startLocationType: "Our Office",
+      startOffice: "",
+      startAddress: "",
+      endLocationType: "Our Office",
+      endOffice: "",
+      endAddress: "",
+      locationNotes: "",
     });
     setVehicleData(null);
     setOdometerOverride(false);
@@ -570,8 +591,25 @@ export function NewLogisticsRequestSheet({
             </CardContent>
           </Card>
 
-          {/* Vehicle Delivery & Pick-up Sections */}
-          {formData.type === "Contract-Related" && (formData.subtype === "Vehicle Delivery" || formData.subtype === "Vehicle Pick-up") && (
+          {/* Optional Contract Association Toggle for Internal */}
+          {formData.type === "Internal" && (
+            <div className="flex items-center space-x-2 p-4 bg-muted rounded-lg">
+              <Switch 
+                id="associate-contract"
+                checked={formData.associateWithContract}
+                onCheckedChange={(checked) => 
+                  setFormData({ ...formData, associateWithContract: checked })
+                }
+              />
+              <Label htmlFor="associate-contract" className="cursor-pointer">
+                Associate with Contract? (Optional)
+              </Label>
+            </div>
+          )}
+
+          {/* Vehicle Delivery & Pick-up Sections + Internal Contract Association */}
+          {((formData.type === "Contract-Related" && (formData.subtype === "Vehicle Delivery" || formData.subtype === "Vehicle Pick-up")) ||
+            (formData.type === "Internal" && formData.associateWithContract)) && (
             <>
               {/* Section B: Contract Linkage */}
               <Card>
@@ -666,8 +704,227 @@ export function NewLogisticsRequestSheet({
                 </CardContent>
               </Card>
 
-              {/* Section C: Vehicle Details */}
-              {vehicleData && (
+              {/* Section: Vehicle Selection (Internal Only) */}
+              {formData.type === "Internal" && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <Car className="w-4 h-4" />
+                      Vehicle
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                      <Label>
+                        Vehicle (VIN or Plate) <span className="text-destructive">*</span>
+                      </Label>
+                      <VehicleSelect
+                        value={formData.vehicleId}
+                        onChange={(value) => {
+                          setFormData({ ...formData, vehicleId: value as string });
+                          // TODO: Fetch and set vehicle data when backend is ready
+                        }}
+                        placeholder="Search by VIN or license plate..."
+                      />
+                    </div>
+
+                    {/* Read-only vehicle details (when vehicle is selected) */}
+                    {vehicleData && (
+                      <div className="grid grid-cols-2 gap-4 p-4 bg-muted rounded-lg">
+                        <div>
+                          <Label className="text-xs text-muted-foreground">Make / Model</Label>
+                          <p className="text-sm font-medium">{vehicleData.make} {vehicleData.model}</p>
+                        </div>
+                        <div>
+                          <Label className="text-xs text-muted-foreground">Year</Label>
+                          <p className="text-sm font-medium">{vehicleData.year}</p>
+                        </div>
+                        <div>
+                          <Label className="text-xs text-muted-foreground">Vehicle Class</Label>
+                          <p className="text-sm font-medium">{vehicleData.vehicleClass}</p>
+                        </div>
+                        <div>
+                          <Label className="text-xs text-muted-foreground">Current Odometer</Label>
+                          <p className="text-sm font-medium">{vehicleData.odometer} km</p>
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Section: Start & End Locations (Internal Only - Simplified) */}
+              {formData.type === "Internal" && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <MapPin className="w-4 h-4" />
+                      Start &amp; End Locations
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    {/* START LOCATION */}
+                    <div className="space-y-4">
+                      <h4 className="font-medium">Start Location</h4>
+                      
+                      <RadioGroup
+                        value={formData.startLocationType}
+                        onValueChange={(value) =>
+                          setFormData({ ...formData, startLocationType: value })
+                        }
+                        className="flex gap-4"
+                      >
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="Our Office" id="start-office" />
+                          <Label htmlFor="start-office" className="font-normal cursor-pointer">
+                            Our Office
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="Address" id="start-address" />
+                          <Label htmlFor="start-address" className="font-normal cursor-pointer">
+                            Address
+                          </Label>
+                        </div>
+                      </RadioGroup>
+
+                      {formData.startLocationType === "Our Office" && (
+                        <div className="space-y-2">
+                          <Label>
+                            Office <span className="text-destructive">*</span>
+                          </Label>
+                          <Select
+                            value={formData.startOffice}
+                            onValueChange={(value) =>
+                              setFormData({ ...formData, startOffice: value })
+                            }
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select office" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {Object.entries(BRANCHES_BY_EMIRATE).map(([emirate, branches]) => (
+                                <optgroup key={emirate} label={emirate}>
+                                  {branches.map((branch) => (
+                                    <SelectItem key={branch} value={branch}>
+                                      {branch}
+                                    </SelectItem>
+                                  ))}
+                                </optgroup>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      )}
+
+                      {formData.startLocationType === "Address" && (
+                        <div className="space-y-2">
+                          <Label>
+                            Address <span className="text-destructive">*</span>
+                          </Label>
+                          <Textarea
+                            value={formData.startAddress}
+                            onChange={(e) =>
+                              setFormData({ ...formData, startAddress: e.target.value })
+                            }
+                            placeholder="e.g., Workshop Bay 3, Industrial Area 1, Sharjah"
+                            rows={2}
+                          />
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="border-t" />
+
+                    {/* END LOCATION */}
+                    <div className="space-y-4">
+                      <h4 className="font-medium">End Location</h4>
+                      
+                      <RadioGroup
+                        value={formData.endLocationType}
+                        onValueChange={(value) =>
+                          setFormData({ ...formData, endLocationType: value })
+                        }
+                        className="flex gap-4"
+                      >
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="Our Office" id="end-office" />
+                          <Label htmlFor="end-office" className="font-normal cursor-pointer">
+                            Our Office
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="Address" id="end-address" />
+                          <Label htmlFor="end-address" className="font-normal cursor-pointer">
+                            Address
+                          </Label>
+                        </div>
+                      </RadioGroup>
+
+                      {formData.endLocationType === "Our Office" && (
+                        <div className="space-y-2">
+                          <Label>
+                            Office <span className="text-destructive">*</span>
+                          </Label>
+                          <Select
+                            value={formData.endOffice}
+                            onValueChange={(value) =>
+                              setFormData({ ...formData, endOffice: value })
+                            }
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select office" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {Object.entries(BRANCHES_BY_EMIRATE).map(([emirate, branches]) => (
+                                <optgroup key={emirate} label={emirate}>
+                                  {branches.map((branch) => (
+                                    <SelectItem key={branch} value={branch}>
+                                      {branch}
+                                    </SelectItem>
+                                  ))}
+                                </optgroup>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      )}
+
+                      {formData.endLocationType === "Address" && (
+                        <div className="space-y-2">
+                          <Label>
+                            Address <span className="text-destructive">*</span>
+                          </Label>
+                          <Textarea
+                            value={formData.endAddress}
+                            onChange={(e) =>
+                              setFormData({ ...formData, endAddress: e.target.value })
+                            }
+                            placeholder="e.g., Shell Fuel Station, Sheikh Zayed Road, Dubai"
+                            rows={2}
+                          />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Optional: Location Notes */}
+                    <div className="space-y-2">
+                      <Label>Location Notes (Optional)</Label>
+                      <Textarea
+                        value={formData.locationNotes}
+                        onChange={(e) =>
+                          setFormData({ ...formData, locationNotes: e.target.value })
+                        }
+                        placeholder="Any special instructions for accessing these locations..."
+                        rows={2}
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Section C: Vehicle Details (Contract-Related only) */}
+              {formData.type === "Contract-Related" && vehicleData && (
                 <Card>
                   <CardHeader>
                     <CardTitle className="text-base flex items-center gap-2">
@@ -748,7 +1005,7 @@ export function NewLogisticsRequestSheet({
               )}
 
               {/* Section D: Delivery Location (Vehicle Delivery Only) */}
-              {formData.subtype === "Vehicle Delivery" && (
+              {formData.type === "Contract-Related" && formData.subtype === "Vehicle Delivery" && (
                 <Card>
                   <CardHeader>
                     <CardTitle className="text-base flex items-center gap-2">
@@ -1256,7 +1513,7 @@ export function NewLogisticsRequestSheet({
               )}
 
               {/* Section E: Return Destination (Vehicle Pick-up Only) */}
-              {formData.subtype === "Vehicle Pick-up" && (
+              {formData.type === "Contract-Related" && formData.subtype === "Vehicle Pick-up" && (
                 <Card>
                   <CardHeader>
                     <CardTitle className="text-base flex items-center gap-2">
@@ -1508,6 +1765,12 @@ export function NewLogisticsRequestSheet({
                 </Card>
               )}
 
+            </>
+          )}
+
+          {/* Show Time Window and Internal Notes for all types */}
+          {(formData.type === "Contract-Related" || formData.type === "Internal") && (
+            <>
               {/* Section F: Requested Time Window */}
               <Card>
                 <CardHeader>
