@@ -9,7 +9,8 @@ const ManageOperationLogisticsRequest = () => {
   const [requests] = useState([
     {
       id: 'LR-2024-001',
-      type: 'Vehicle Delivery',
+      type: 'Contract-Related',
+      subtype: 'Vehicle Delivery',
       status: 'pending',
       location: 'Dubai Marina',
       date: '2024-01-20',
@@ -18,6 +19,7 @@ const ManageOperationLogisticsRequest = () => {
     {
       id: 'LR-2024-002',
       type: 'Maintenance Transfer',
+      subtype: 'Maintenance Workshop',
       status: 'in-transit',
       location: 'Business Bay',
       date: '2024-01-19',
@@ -25,7 +27,8 @@ const ManageOperationLogisticsRequest = () => {
     },
     {
       id: 'LR-2024-003',
-      type: 'Customer Return',
+      type: 'Contract-Related',
+      subtype: 'Vehicle Pick-up',
       status: 'completed',
       location: 'Downtown Dubai',
       date: '2024-01-18',
@@ -33,7 +36,8 @@ const ManageOperationLogisticsRequest = () => {
     },
     {
       id: 'LR-2024-004',
-      type: 'Fleet Relocation',
+      type: 'Internal',
+      subtype: 'Wash',
       status: 'pending',
       location: 'Palm Jumeirah',
       date: '2024-01-20',
@@ -41,7 +45,8 @@ const ManageOperationLogisticsRequest = () => {
     },
     {
       id: 'LR-2024-005',
-      type: 'Emergency Pickup',
+      type: 'Internal',
+      subtype: 'Refuel',
       status: 'in-transit',
       location: 'Jumeirah Beach',
       date: '2024-01-19',
@@ -80,6 +85,19 @@ const ManageOperationLogisticsRequest = () => {
       case 'medium':
         return 'secondary';
       case 'low':
+        return 'outline';
+      default:
+        return 'outline';
+    }
+  };
+
+  const getTypeColor = (type: string) => {
+    switch (type) {
+      case 'Contract-Related':
+        return 'default';
+      case 'Internal':
+        return 'secondary';
+      case 'Maintenance Transfer':
         return 'outline';
       default:
         return 'outline';
@@ -137,6 +155,7 @@ const ManageOperationLogisticsRequest = () => {
               <TableRow>
                 <TableHead>Request ID</TableHead>
                 <TableHead>Type</TableHead>
+                <TableHead>Subtype</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Location</TableHead>
                 <TableHead>Date</TableHead>
@@ -147,7 +166,12 @@ const ManageOperationLogisticsRequest = () => {
               {requests.map((request) => (
                 <TableRow key={request.id} className="cursor-pointer hover:bg-muted/50">
                   <TableCell className="font-medium">{request.id}</TableCell>
-                  <TableCell>{request.type}</TableCell>
+                  <TableCell>
+                    <Badge variant={getTypeColor(request.type)}>
+                      {request.type}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>{request.subtype}</TableCell>
                   <TableCell>
                     <Badge variant={getStatusColor(request.status)}>
                       {request.status}
