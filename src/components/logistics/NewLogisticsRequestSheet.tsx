@@ -27,6 +27,8 @@ interface NewLogisticsRequestSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess?: (newRequest: any) => void;
+  mode?: "create" | "view";
+  requestData?: any;
 }
 
 const REQUEST_TYPES = [
@@ -189,6 +191,8 @@ export function NewLogisticsRequestSheet({
   open,
   onOpenChange,
   onSuccess,
+  mode = "create",
+  requestData = null,
 }: NewLogisticsRequestSheetProps) {
   const [formData, setFormData] = useState({
     // Form Meta
@@ -312,11 +316,21 @@ export function NewLogisticsRequestSheet({
 
   // Generate request reference on mount
   useEffect(() => {
-    if (!formData.requestReference) {
+    if (!formData.requestReference && mode === "create") {
       const refNumber = `LR-2025-${String(Math.floor(Math.random() * 100000)).padStart(5, "0")}`;
       setFormData(prev => ({ ...prev, requestReference: refNumber }));
     }
-  }, []);
+  }, [mode]);
+
+  // Populate form data from requestData in view mode
+  useEffect(() => {
+    if (mode === "view" && requestData && open) {
+      setFormData(requestData);
+      if (requestData.vehicleDetails) {
+        setVehicleData(requestData.vehicleDetails);
+      }
+    }
+  }, [mode, requestData, open]);
 
   const handleTypeChange = (value: string) => {
     setFormData({
@@ -541,7 +555,9 @@ export function NewLogisticsRequestSheet({
         <div className="h-full overflow-y-auto">
           <div className="sticky top-0 z-10 bg-background border-b px-6 py-4">
             <DialogHeader>
-              <DialogTitle>New Logistics Request</DialogTitle>
+              <DialogTitle>
+                {mode === "view" ? `View Logistics Request - ${formData.requestReference || 'Loading...'}` : "New Logistics Request"}
+              </DialogTitle>
             </DialogHeader>
           </div>
 
@@ -576,6 +592,7 @@ export function NewLogisticsRequestSheet({
                       setFormData({ ...formData, requestedBy: e.target.value })
                     }
                     placeholder="Enter your name"
+                    disabled={mode === "view"}
                   />
                 </div>
                 <div className="space-y-2">
@@ -587,6 +604,7 @@ export function NewLogisticsRequestSheet({
                     onValueChange={(value) =>
                       setFormData({ ...formData, requestorDepartment: value })
                     }
+                    disabled={mode === "view"}
                   >
                     <SelectTrigger id="requestorDepartment">
                       <SelectValue placeholder="Select department" />
@@ -614,6 +632,7 @@ export function NewLogisticsRequestSheet({
                     setFormData({ ...formData, requestorContact: e.target.value })
                   }
                   placeholder="+971 XX XXX XXXX"
+                  disabled={mode === "view"}
                 />
               </div>
 
@@ -626,6 +645,7 @@ export function NewLogisticsRequestSheet({
                 <Select
                   value={formData.type}
                   onValueChange={handleTypeChange}
+                  disabled={mode === "view"}
                 >
                   <SelectTrigger id="type">
                     <SelectValue placeholder="Select request type" />
@@ -650,6 +670,7 @@ export function NewLogisticsRequestSheet({
                   onValueChange={(value) =>
                     setFormData({ ...formData, subtype: value })
                   }
+                  disabled={mode === "view"}
                 >
                   <SelectTrigger id="subtype">
                     <SelectValue placeholder="Select subtype" />
@@ -680,6 +701,7 @@ export function NewLogisticsRequestSheet({
                   onValueChange={(value) =>
                     setFormData({ ...formData, priority: value })
                   }
+                  disabled={mode === "view"}
                 >
                   <SelectTrigger id="priority">
                     <SelectValue />
@@ -705,6 +727,7 @@ export function NewLogisticsRequestSheet({
                     onValueChange={(value) => {
                       setFormData({ ...formData, emirate: value, owningBranch: "" });
                     }}
+                    disabled={mode === "view"}
                   >
                     <SelectTrigger id="emirate">
                       <SelectValue placeholder="Select emirate" />
@@ -727,7 +750,7 @@ export function NewLogisticsRequestSheet({
                     onValueChange={(value) =>
                       setFormData({ ...formData, owningBranch: value })
                     }
-                    disabled={!formData.emirate}
+                    disabled={!formData.emirate || mode === "view"}
                   >
                     <SelectTrigger id="owningBranch">
                       <SelectValue placeholder={formData.emirate ? "Select branch" : "Select emirate first"} />
@@ -754,6 +777,7 @@ export function NewLogisticsRequestSheet({
                 onCheckedChange={(checked) => 
                   setFormData({ ...formData, associateWithContract: checked })
                 }
+                disabled={mode === "view"}
               />
               <Label htmlFor="associate-contract" className="cursor-pointer">
                 Associate with Contract? (Optional)
@@ -785,6 +809,7 @@ export function NewLogisticsRequestSheet({
                         setFormData({ ...formData, contractNumber: e.target.value })
                       }
                       placeholder="Enter contract number"
+                      disabled={mode === "view"}
                     />
                   </div>
 
@@ -795,6 +820,7 @@ export function NewLogisticsRequestSheet({
                     <Select
                       value={formData.contractLine}
                       onValueChange={handleContractLineChange}
+                      disabled={mode === "view"}
                     >
                       <SelectTrigger id="contractLine">
                         <SelectValue placeholder="Select contract line" />
@@ -879,6 +905,7 @@ export function NewLogisticsRequestSheet({
                           // TODO: Fetch and set vehicle data when backend is ready
                         }}
                         placeholder="Search by VIN or license plate..."
+                        disabled={mode === "view"}
                       />
                     </div>
 
@@ -2364,6 +2391,7 @@ export function NewLogisticsRequestSheet({
                       onChange={(e) =>
                         setFormData({ ...formData, requestedDate: e.target.value })
                       }
+                      disabled={mode === "view"}
                     />
                   </div>
 
@@ -2379,6 +2407,7 @@ export function NewLogisticsRequestSheet({
                         onChange={(e) =>
                           setFormData({ ...formData, windowFrom: e.target.value })
                         }
+                        disabled={mode === "view"}
                       />
                     </div>
                     <div className="space-y-2">
@@ -2392,6 +2421,7 @@ export function NewLogisticsRequestSheet({
                         onChange={(e) =>
                           setFormData({ ...formData, windowTo: e.target.value })
                         }
+                        disabled={mode === "view"}
                       />
                     </div>
                   </div>
@@ -2405,6 +2435,7 @@ export function NewLogisticsRequestSheet({
                       onChange={(e) =>
                         setFormData({ ...formData, targetTime: e.target.value })
                       }
+                      disabled={mode === "view"}
                     />
                   </div>
 
@@ -2418,6 +2449,7 @@ export function NewLogisticsRequestSheet({
                       }
                       placeholder="e.g., Wait max 15 minutes"
                       rows={2}
+                      disabled={mode === "view"}
                     />
                   </div>
                 </CardContent>
@@ -2440,6 +2472,7 @@ export function NewLogisticsRequestSheet({
                     }
                     placeholder="Add internal notes or special instructions..."
                     rows={3}
+                    disabled={mode === "view"}
                   />
                 </CardContent>
               </Card>
@@ -2450,23 +2483,29 @@ export function NewLogisticsRequestSheet({
           {/* Footer Actions */}
           <div className="sticky bottom-0 bg-background border-t px-6 py-4">
             <div className="flex justify-end gap-3">
-              <Button variant="outline" onClick={handleClose}>
-                Cancel
-              </Button>
-              <Button
-                onClick={handleSave}
-                disabled={
-                  !formData.type || 
-                  !formData.subtype || 
-                  !formData.requestedBy || 
-                  !formData.requestorDepartment || 
-                  !formData.requestorContact || 
-                  !formData.emirate || 
-                  !formData.owningBranch
-                }
-              >
-                Save Request
-              </Button>
+              {mode === "create" ? (
+                <>
+                  <Button variant="outline" onClick={handleClose}>
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={handleSave}
+                    disabled={
+                      !formData.type || 
+                      !formData.subtype || 
+                      !formData.requestedBy || 
+                      !formData.requestorDepartment || 
+                      !formData.requestorContact || 
+                      !formData.emirate || 
+                      !formData.owningBranch
+                    }
+                  >
+                    Save Request
+                  </Button>
+                </>
+              ) : (
+                <Button onClick={handleClose}>Close</Button>
+              )}
             </div>
           </div>
         </div>
