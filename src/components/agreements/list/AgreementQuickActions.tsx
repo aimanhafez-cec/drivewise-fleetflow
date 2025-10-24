@@ -101,11 +101,11 @@ export const AgreementQuickActions: React.FC = () => {
         return (
           <Card 
             key={action.title}
-            className="cursor-pointer hover:shadow-md transition-shadow"
+            className="cursor-pointer hover:shadow-md transition-shadow flex flex-col"
             onClick={action.onClick}
           >
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <div className="space-y-1">
+            <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2 min-h-[80px]">
+              <div className="space-y-1 flex-1">
                 <CardTitle className="text-sm font-medium">
                   {action.title}
                 </CardTitle>
@@ -114,16 +114,15 @@ export const AgreementQuickActions: React.FC = () => {
                 </CardDescription>
               </div>
               {action.badge !== undefined && action.badge > 0 && (
-                <Badge variant={action.variant === 'destructive' ? 'destructive' : 'secondary'}>
+                <Badge variant={action.variant === 'destructive' ? 'destructive' : 'secondary'} className="flex-shrink-0">
                   {action.badge}
                 </Badge>
               )}
             </CardHeader>
-            <CardContent>
+            <CardContent className="mt-auto">
               <Button 
                 variant={action.variant}
-                size="sm" 
-                className="w-full"
+                className="w-full h-9"
                 onClick={(e) => {
                   e.stopPropagation();
                   action.onClick();
@@ -138,9 +137,9 @@ export const AgreementQuickActions: React.FC = () => {
       })}
 
       {/* Export Reports Card */}
-      <Card className="cursor-pointer hover:shadow-md transition-shadow">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <div className="space-y-1">
+      <Card className="cursor-pointer hover:shadow-md transition-shadow flex flex-col">
+        <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2 min-h-[80px]">
+          <div className="space-y-1 flex-1">
             <CardTitle className="text-sm font-medium">
               Export Reports
             </CardTitle>
@@ -149,8 +148,8 @@ export const AgreementQuickActions: React.FC = () => {
             </CardDescription>
           </div>
         </CardHeader>
-        <CardContent>
-          <Button variant="outline" size="sm" className="w-full">
+        <CardContent className="mt-auto">
+          <Button variant="outline" className="w-full h-9">
             <Download className="mr-2 h-4 w-4" />
             Export
           </Button>
