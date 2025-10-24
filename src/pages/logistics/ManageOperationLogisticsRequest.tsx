@@ -124,6 +124,13 @@ const ManageOperationLogisticsRequest = () => {
         contractStatus: 'Active',
         contractPeriod: '2024-06-01 to 2026-06-01',
         vehicleId: 'VEH-LC-5678',
+        vehicleDetails: {
+          make: 'Toyota',
+          model: 'Land Cruiser',
+          year: '2024',
+          vehicleClass: 'Full-Size SUV',
+          odometer: '2,450'
+        },
         deliveryLocationType: 'Customer Site',
         siteName: 'Ocean Heights Tower',
         siteAddress: 'Unit 2304, Ocean Heights Tower, Dubai Marina, Dubai',
@@ -156,6 +163,13 @@ const ManageOperationLogisticsRequest = () => {
         owningBranch: 'Dubai Marina Branch',
         associateWithContract: false,
         vehicleId: 'VEH-NP-7893',
+        vehicleDetails: {
+          make: 'Nissan',
+          model: 'Patrol',
+          year: '2024',
+          vehicleClass: 'Full-Size SUV',
+          odometer: '8,750'
+        },
         startLocationType: 'Our Office',
         startOffice: 'Dubai Marina Branch',
         endLocationType: 'Address',
@@ -194,6 +208,13 @@ const ManageOperationLogisticsRequest = () => {
         contractStatus: 'Completed',
         contractPeriod: '2024-10-21 to 2025-10-21',
         vehicleId: 'VEH-HA-4521',
+        vehicleDetails: {
+          make: 'Honda',
+          model: 'Accord',
+          year: '2023',
+          vehicleClass: 'Sedan',
+          odometer: '18,340'
+        },
         deliveryLocationType: 'Customer Site',
         siteName: 'Burj Plaza',
         siteAddress: 'Tower B, Office 1507, Burj Plaza, Downtown Dubai, Dubai',

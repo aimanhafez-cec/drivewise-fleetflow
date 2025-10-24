@@ -324,13 +324,16 @@ export function NewLogisticsRequestSheet({
 
   // Populate form data from requestData in view mode
   useEffect(() => {
-    if (mode === "view" && requestData && open) {
-      setFormData(requestData);
+    if (mode === "view" && requestData) {
+      setFormData(prev => ({
+        ...prev,
+        ...requestData
+      }));
       if (requestData.vehicleDetails) {
         setVehicleData(requestData.vehicleDetails);
       }
     }
-  }, [mode, requestData, open]);
+  }, [mode, requestData]);
 
   const handleTypeChange = (value: string) => {
     setFormData({
@@ -954,6 +957,7 @@ export function NewLogisticsRequestSheet({
                           setFormData({ ...formData, startLocationType: value })
                         }
                         className="flex gap-4"
+                        disabled={mode === "view"}
                       >
                         <div className="flex items-center space-x-2">
                           <RadioGroupItem value="Our Office" id="start-office" />
@@ -979,6 +983,7 @@ export function NewLogisticsRequestSheet({
                             onValueChange={(value) =>
                               setFormData({ ...formData, startOffice: value })
                             }
+                            disabled={mode === "view"}
                           >
                             <SelectTrigger>
                               <SelectValue placeholder="Select office" />
@@ -1010,6 +1015,7 @@ export function NewLogisticsRequestSheet({
                             }
                             placeholder="e.g., Workshop Bay 3, Industrial Area 1, Sharjah"
                             rows={2}
+                            disabled={mode === "view"}
                           />
                         </div>
                       )}
@@ -1027,6 +1033,7 @@ export function NewLogisticsRequestSheet({
                           setFormData({ ...formData, endLocationType: value })
                         }
                         className="flex gap-4"
+                        disabled={mode === "view"}
                       >
                         <div className="flex items-center space-x-2">
                           <RadioGroupItem value="Our Office" id="end-office" />
@@ -1052,6 +1059,7 @@ export function NewLogisticsRequestSheet({
                             onValueChange={(value) =>
                               setFormData({ ...formData, endOffice: value })
                             }
+                            disabled={mode === "view"}
                           >
                             <SelectTrigger>
                               <SelectValue placeholder="Select office" />
@@ -1083,6 +1091,7 @@ export function NewLogisticsRequestSheet({
                             }
                             placeholder="e.g., Shell Fuel Station, Sheikh Zayed Road, Dubai"
                             rows={2}
+                            disabled={mode === "view"}
                           />
                         </div>
                       )}
@@ -1098,6 +1107,7 @@ export function NewLogisticsRequestSheet({
                         }
                         placeholder="Any special instructions for accessing these locations..."
                         rows={2}
+                        disabled={mode === "view"}
                       />
                     </div>
                   </CardContent>
@@ -1205,6 +1215,7 @@ export function NewLogisticsRequestSheet({
                         setFormData({ ...formData, deliveryLocationType: value })
                       }
                       className="flex gap-4"
+                      disabled={mode === "view"}
                     >
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="Our Office" id="office" />
@@ -1231,6 +1242,7 @@ export function NewLogisticsRequestSheet({
                         onValueChange={(value) =>
                           setFormData({ ...formData, office: value })
                         }
+                        disabled={mode === "view"}
                       >
                         <SelectTrigger id="office">
                           <SelectValue placeholder="Select office" />
@@ -1262,6 +1274,7 @@ export function NewLogisticsRequestSheet({
                             onValueChange={(value) =>
                               setFormData({ ...formData, customerSiteEmirate: value })
                             }
+                            disabled={mode === "view"}
                           >
                             <SelectTrigger id="customerSiteEmirate">
                               <SelectValue placeholder="Select emirate" />
@@ -1286,6 +1299,7 @@ export function NewLogisticsRequestSheet({
                               setFormData({ ...formData, customerSiteArea: e.target.value })
                             }
                             placeholder="e.g., Dubai Marina, Business Bay"
+                            disabled={mode === "view"}
                           />
                         </div>
                       </div>
@@ -1301,6 +1315,7 @@ export function NewLogisticsRequestSheet({
                             setFormData({ ...formData, siteName: e.target.value })
                           }
                           placeholder="Enter site name"
+                          disabled={mode === "view"}
                         />
                       </div>
 
@@ -1316,6 +1331,7 @@ export function NewLogisticsRequestSheet({
                           }
                           placeholder="Enter complete street address"
                           rows={2}
+                          disabled={mode === "view"}
                         />
                       </div>
 
@@ -1329,6 +1345,7 @@ export function NewLogisticsRequestSheet({
                               setFormData({ ...formData, customerSiteBuilding: e.target.value })
                             }
                             placeholder="e.g., Marina Plaza Tower"
+                            disabled={mode === "view"}
                           />
                         </div>
                         <div className="space-y-2">
@@ -1340,6 +1357,7 @@ export function NewLogisticsRequestSheet({
                               setFormData({ ...formData, customerSiteLandmark: e.target.value })
                             }
                             placeholder="e.g., Near Mall of the Emirates"
+                            disabled={mode === "view"}
                           />
                         </div>
                       </div>
@@ -1354,6 +1372,7 @@ export function NewLogisticsRequestSheet({
                               setFormData({ ...formData, customerSiteFloor: e.target.value })
                             }
                             placeholder="e.g., 12th Floor, Office 1205"
+                            disabled={mode === "view"}
                           />
                         </div>
                         <div className="space-y-2">
@@ -1365,6 +1384,7 @@ export function NewLogisticsRequestSheet({
                               setFormData({ ...formData, customerSiteGPS: e.target.value })
                             }
                             placeholder="25.0760, 55.1328"
+                            disabled={mode === "view"}
                           />
                         </div>
                       </div>
@@ -1378,6 +1398,7 @@ export function NewLogisticsRequestSheet({
                             setFormData({ ...formData, customerSiteBestAccessTime: e.target.value })
                           }
                           placeholder="e.g., 8 AM - 6 PM weekdays"
+                          disabled={mode === "view"}
                         />
                       </div>
 
@@ -1390,6 +1411,7 @@ export function NewLogisticsRequestSheet({
                             setFormData({ ...formData, customerSiteParkingNotes: e.target.value })
                           }
                           placeholder="e.g., Basement parking, security clearance needed"
+                          disabled={mode === "view"}
                         />
                       </div>
 
@@ -1405,6 +1427,7 @@ export function NewLogisticsRequestSheet({
                               setFormData({ ...formData, siteContactName: e.target.value })
                             }
                             placeholder="Contact person"
+                            disabled={mode === "view"}
                           />
                         </div>
                         <div className="space-y-2">
@@ -1416,6 +1439,7 @@ export function NewLogisticsRequestSheet({
                               setFormData({ ...formData, siteContactMobile: e.target.value })
                             }
                             placeholder="+971 XX XXX XXXX"
+                            disabled={mode === "view"}
                           />
                         </div>
                       </div>
@@ -1430,6 +1454,7 @@ export function NewLogisticsRequestSheet({
                           }
                           placeholder="Gate pass requirements, security procedures, special access instructions..."
                           rows={3}
+                          disabled={mode === "view"}
                         />
                       </div>
                     </>
@@ -1458,6 +1483,7 @@ export function NewLogisticsRequestSheet({
                           setFormData({ ...formData, deliveryLocationType: value })
                         }
                         className="flex gap-4"
+                        disabled={mode === "view"}
                       >
                         <div className="flex items-center space-x-2">
                           <RadioGroupItem value="Our Office" id="office-pickup" />
@@ -1484,6 +1510,7 @@ export function NewLogisticsRequestSheet({
                           onValueChange={(value) =>
                             setFormData({ ...formData, office: value })
                           }
+                          disabled={mode === "view"}
                         >
                           <SelectTrigger id="office-pickup-select">
                             <SelectValue placeholder="Select office" />
@@ -1515,6 +1542,7 @@ export function NewLogisticsRequestSheet({
                               onValueChange={(value) =>
                                 setFormData({ ...formData, customerSiteEmirate: value })
                               }
+                              disabled={mode === "view"}
                             >
                               <SelectTrigger id="customerSiteEmirate-pickup">
                                 <SelectValue placeholder="Select emirate" />
@@ -1539,6 +1567,7 @@ export function NewLogisticsRequestSheet({
                                 setFormData({ ...formData, customerSiteArea: e.target.value })
                               }
                               placeholder="e.g., Dubai Marina, Business Bay"
+                              disabled={mode === "view"}
                             />
                           </div>
                         </div>
@@ -1554,6 +1583,7 @@ export function NewLogisticsRequestSheet({
                               setFormData({ ...formData, siteName: e.target.value })
                             }
                             placeholder="Enter site name"
+                            disabled={mode === "view"}
                           />
                         </div>
 
@@ -1569,6 +1599,7 @@ export function NewLogisticsRequestSheet({
                             }
                             placeholder="Enter complete street address"
                             rows={2}
+                            disabled={mode === "view"}
                           />
                         </div>
 
@@ -1582,6 +1613,7 @@ export function NewLogisticsRequestSheet({
                                 setFormData({ ...formData, customerSiteBuilding: e.target.value })
                               }
                               placeholder="e.g., Marina Plaza Tower"
+                              disabled={mode === "view"}
                             />
                           </div>
                           <div className="space-y-2">
@@ -1593,6 +1625,7 @@ export function NewLogisticsRequestSheet({
                                 setFormData({ ...formData, customerSiteLandmark: e.target.value })
                               }
                               placeholder="e.g., Near Mall of the Emirates"
+                              disabled={mode === "view"}
                             />
                           </div>
                         </div>
@@ -1607,6 +1640,7 @@ export function NewLogisticsRequestSheet({
                                 setFormData({ ...formData, customerSiteFloor: e.target.value })
                               }
                               placeholder="e.g., 12th Floor, Office 1205"
+                              disabled={mode === "view"}
                             />
                           </div>
                           <div className="space-y-2">
@@ -1618,6 +1652,7 @@ export function NewLogisticsRequestSheet({
                                 setFormData({ ...formData, customerSiteGPS: e.target.value })
                               }
                               placeholder="25.0760, 55.1328"
+                              disabled={mode === "view"}
                             />
                           </div>
                         </div>
@@ -1631,6 +1666,7 @@ export function NewLogisticsRequestSheet({
                               setFormData({ ...formData, customerSiteBestAccessTime: e.target.value })
                             }
                             placeholder="e.g., 8 AM - 6 PM weekdays"
+                            disabled={mode === "view"}
                           />
                         </div>
 
@@ -1643,6 +1679,7 @@ export function NewLogisticsRequestSheet({
                               setFormData({ ...formData, customerSiteParkingNotes: e.target.value })
                             }
                             placeholder="e.g., Basement parking, security clearance needed"
+                            disabled={mode === "view"}
                           />
                         </div>
 
@@ -1658,6 +1695,7 @@ export function NewLogisticsRequestSheet({
                                 setFormData({ ...formData, siteContactName: e.target.value })
                               }
                               placeholder="Contact person"
+                              disabled={mode === "view"}
                             />
                           </div>
                           <div className="space-y-2">
@@ -1669,6 +1707,7 @@ export function NewLogisticsRequestSheet({
                                 setFormData({ ...formData, siteContactMobile: e.target.value })
                               }
                               placeholder="+971 XX XXX XXXX"
+                              disabled={mode === "view"}
                             />
                           </div>
                         </div>
@@ -1685,6 +1724,7 @@ export function NewLogisticsRequestSheet({
                             }
                             placeholder="Gate pass requirements, security procedures, special access instructions..."
                             rows={3}
+                            disabled={mode === "view"}
                           />
                         </div>
                       </>
@@ -1713,6 +1753,7 @@ export function NewLogisticsRequestSheet({
                           setFormData({ ...formData, returnDestType: value })
                         }
                         className="flex gap-4"
+                        disabled={mode === "view"}
                       >
                         <div className="flex items-center space-x-2">
                           <RadioGroupItem value="Our Office" id="return-office" />
@@ -1739,6 +1780,7 @@ export function NewLogisticsRequestSheet({
                           onValueChange={(value) =>
                             setFormData({ ...formData, returnOffice: value })
                           }
+                          disabled={mode === "view"}
                         >
                           <SelectTrigger id="return-office-select">
                             <SelectValue placeholder="Select office" />
@@ -1770,6 +1812,7 @@ export function NewLogisticsRequestSheet({
                               onValueChange={(value) =>
                                 setFormData({ ...formData, returnSiteEmirate: value })
                               }
+                              disabled={mode === "view"}
                             >
                               <SelectTrigger id="returnSiteEmirate">
                                 <SelectValue placeholder="Select emirate" />
@@ -1794,6 +1837,7 @@ export function NewLogisticsRequestSheet({
                                 setFormData({ ...formData, returnSiteArea: e.target.value })
                               }
                               placeholder="e.g., Dubai Marina, Business Bay"
+                              disabled={mode === "view"}
                             />
                           </div>
                         </div>
@@ -1809,6 +1853,7 @@ export function NewLogisticsRequestSheet({
                               setFormData({ ...formData, returnSiteName: e.target.value })
                             }
                             placeholder="Enter site name"
+                            disabled={mode === "view"}
                           />
                         </div>
 
@@ -1824,6 +1869,7 @@ export function NewLogisticsRequestSheet({
                             }
                             placeholder="Enter complete street address"
                             rows={2}
+                            disabled={mode === "view"}
                           />
                         </div>
 
@@ -1837,6 +1883,7 @@ export function NewLogisticsRequestSheet({
                                 setFormData({ ...formData, returnSiteBuilding: e.target.value })
                               }
                               placeholder="e.g., Marina Plaza Tower"
+                              disabled={mode === "view"}
                             />
                           </div>
                           <div className="space-y-2">
@@ -1848,6 +1895,7 @@ export function NewLogisticsRequestSheet({
                                 setFormData({ ...formData, returnSiteLandmark: e.target.value })
                               }
                               placeholder="e.g., Near Mall of the Emirates"
+                              disabled={mode === "view"}
                             />
                           </div>
                         </div>
@@ -1862,6 +1910,7 @@ export function NewLogisticsRequestSheet({
                                 setFormData({ ...formData, returnSiteFloor: e.target.value })
                               }
                               placeholder="e.g., 12th Floor, Office 1205"
+                              disabled={mode === "view"}
                             />
                           </div>
                           <div className="space-y-2">
@@ -1873,6 +1922,7 @@ export function NewLogisticsRequestSheet({
                                 setFormData({ ...formData, returnSiteGPS: e.target.value })
                               }
                               placeholder="25.0760, 55.1328"
+                              disabled={mode === "view"}
                             />
                           </div>
                         </div>
@@ -1886,6 +1936,7 @@ export function NewLogisticsRequestSheet({
                               setFormData({ ...formData, returnSiteBestAccessTime: e.target.value })
                             }
                             placeholder="e.g., 8 AM - 6 PM weekdays"
+                            disabled={mode === "view"}
                           />
                         </div>
 
@@ -1898,6 +1949,7 @@ export function NewLogisticsRequestSheet({
                               setFormData({ ...formData, returnSiteParkingNotes: e.target.value })
                             }
                             placeholder="e.g., Basement parking, security clearance needed"
+                            disabled={mode === "view"}
                           />
                         </div>
 
@@ -1913,6 +1965,7 @@ export function NewLogisticsRequestSheet({
                                 setFormData({ ...formData, returnSiteContactName: e.target.value })
                               }
                               placeholder="Contact person"
+                              disabled={mode === "view"}
                             />
                           </div>
                           <div className="space-y-2">
@@ -1924,6 +1977,7 @@ export function NewLogisticsRequestSheet({
                                 setFormData({ ...formData, returnSiteContactMobile: e.target.value })
                               }
                               placeholder="+971 XX XXX XXXX"
+                              disabled={mode === "view"}
                             />
                           </div>
                         </div>
@@ -1938,6 +1992,7 @@ export function NewLogisticsRequestSheet({
                             }
                             placeholder="Gate pass requirements, security procedures, special access instructions..."
                             rows={3}
+                            disabled={mode === "view"}
                           />
                         </div>
                       </>
