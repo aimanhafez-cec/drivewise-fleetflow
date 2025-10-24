@@ -111,7 +111,7 @@ const queryClient = new QueryClient();
 // Phase 1: Root redirect component that preserves query strings (including __lovable_token)
 const RootRedirect = () => {
   const location = useLocation();
-  return <Navigate to={{ pathname: '/dashboard', search: location.search }} replace />;
+  return <Navigate to={{ pathname: '/dashboard-new', search: location.search }} replace />;
 };
 
 const App = () => {
