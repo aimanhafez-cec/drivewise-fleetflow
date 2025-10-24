@@ -224,7 +224,7 @@ export const useSalesReps = (salesOfficeId?: string) => {
 
 // Hook to fetch legal entities
 export const useLegalEntities = () => {
-  return useQuery({
+  const result = useQuery({
     queryKey: ["legal_entities"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -241,4 +241,10 @@ export const useLegalEntities = () => {
     },
     staleTime: 10 * 60 * 1000,
   });
+
+  return {
+    items: result.data || [],
+    isLoading: result.isLoading,
+    error: result.error,
+  };
 };
