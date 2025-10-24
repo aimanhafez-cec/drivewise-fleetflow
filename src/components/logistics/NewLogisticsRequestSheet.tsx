@@ -255,8 +255,8 @@ export function NewLogisticsRequestSheet({
             </CardContent>
           </Card>
 
-          {/* Vehicle Delivery Sections */}
-          {formData.type === "Contract-Related" && formData.subtype === "Vehicle Delivery" && (
+          {/* Vehicle Delivery & Pick-up Sections */}
+          {formData.type === "Contract-Related" && (formData.subtype === "Vehicle Delivery" || formData.subtype === "Vehicle Pick-up") && (
             <>
               {/* Section B: Contract Linkage */}
               <Card>
@@ -386,11 +386,12 @@ export function NewLogisticsRequestSheet({
                 </Card>
               )}
 
-              {/* Section D: Delivery Location */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base">Delivery Location</CardTitle>
-                </CardHeader>
+              {/* Section D: Delivery Location (Vehicle Delivery Only) */}
+              {formData.subtype === "Vehicle Delivery" && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">Delivery Location</CardTitle>
+                  </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
                     <Label>
@@ -513,6 +514,142 @@ export function NewLogisticsRequestSheet({
                   )}
                 </CardContent>
               </Card>
+              )}
+
+              {/* Section D: Pick-up Location (Vehicle Pick-up Only) */}
+              {formData.subtype === "Vehicle Pick-up" && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">Pick-up Location</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                      <Label>
+                        Location Type <span className="text-destructive">*</span>
+                      </Label>
+                      <RadioGroup
+                        value={formData.deliveryLocationType}
+                        onValueChange={(value) =>
+                          setFormData({ ...formData, deliveryLocationType: value })
+                        }
+                        className="flex gap-4"
+                      >
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="Our Office" id="office-pickup" />
+                          <Label htmlFor="office-pickup" className="font-normal cursor-pointer">
+                            Our Office
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="Customer Site" id="customer-site-pickup" />
+                          <Label htmlFor="customer-site-pickup" className="font-normal cursor-pointer">
+                            Customer Site
+                          </Label>
+                        </div>
+                      </RadioGroup>
+                    </div>
+
+                    {formData.deliveryLocationType === "Our Office" && (
+                      <div className="space-y-2">
+                        <Label htmlFor="office-pickup-select">
+                          Office <span className="text-destructive">*</span>
+                        </Label>
+                        <Select
+                          value={formData.office}
+                          onValueChange={(value) =>
+                            setFormData({ ...formData, office: value })
+                          }
+                        >
+                          <SelectTrigger id="office-pickup-select">
+                            <SelectValue placeholder="Select office" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Marina Office">Marina Office</SelectItem>
+                            <SelectItem value="Downtown Office">Downtown Office</SelectItem>
+                            <SelectItem value="Business Bay Office">Business Bay Office</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
+
+                    {formData.deliveryLocationType === "Customer Site" && (
+                      <>
+                        <div className="space-y-2">
+                          <Label htmlFor="siteName-pickup">
+                            Site Name <span className="text-destructive">*</span>
+                          </Label>
+                          <Input
+                            id="siteName-pickup"
+                            value={formData.siteName}
+                            onChange={(e) =>
+                              setFormData({ ...formData, siteName: e.target.value })
+                            }
+                            placeholder="Enter site name"
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="siteAddress-pickup">
+                            Site Address <span className="text-destructive">*</span>
+                          </Label>
+                          <Textarea
+                            id="siteAddress-pickup"
+                            value={formData.siteAddress}
+                            onChange={(e) =>
+                              setFormData({ ...formData, siteAddress: e.target.value })
+                            }
+                            placeholder="Enter full address"
+                            rows={3}
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="siteContactName-pickup">
+                            Site Contact Name <span className="text-destructive">*</span>
+                          </Label>
+                          <Input
+                            id="siteContactName-pickup"
+                            value={formData.siteContactName}
+                            onChange={(e) =>
+                              setFormData({ ...formData, siteContactName: e.target.value })
+                            }
+                            placeholder="Enter contact name"
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="siteContactMobile-pickup">
+                            Site Contact Mobile <span className="text-destructive">*</span>
+                          </Label>
+                          <Input
+                            id="siteContactMobile-pickup"
+                            value={formData.siteContactMobile}
+                            onChange={(e) =>
+                              setFormData({ ...formData, siteContactMobile: e.target.value })
+                            }
+                            placeholder="Enter mobile number"
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="siteAccessNotes-pickup">
+                            Access Notes
+                          </Label>
+                          <Textarea
+                            id="siteAccessNotes-pickup"
+                            value={formData.siteAccessNotes}
+                            onChange={(e) =>
+                              setFormData({ ...formData, siteAccessNotes: e.target.value })
+                            }
+                            placeholder="Parking instructions, gate codes, etc."
+                            rows={2}
+                          />
+                        </div>
+                      </>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
 
               {/* Section E: Requested Time Window */}
               <Card>
