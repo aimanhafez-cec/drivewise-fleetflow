@@ -165,14 +165,28 @@ const MasterAgreements = () => {
 
   // Calculate KPIs
   const kpis = useMemo(() => {
-    if (!agreements) return { total: 0, active: 0, draft: 0, monthlyValue: 0 };
+    if (!agreements) return { 
+      total: 0, 
+      active: 0, 
+      signed: 0,
+      awaitingApproval: 0,
+      draft: 0, 
+      committedMRR: 0 
+    };
+    
+    const activeStatuses = ['active'];
+    const signedStatuses = ['customer_accepted', 'approved', 'signed'];
+    const awaitingStatuses = ['sent_to_customer', 'pending_approval'];
+    const revenueStatuses = [...activeStatuses, ...signedStatuses]; // Active + Signed
     
     return {
       total: agreements.length,
-      active: agreements.filter(a => a.status === 'active').length,
+      active: agreements.filter(a => activeStatuses.includes(a.status)).length,
+      signed: agreements.filter(a => signedStatuses.includes(a.status)).length,
+      awaitingApproval: agreements.filter(a => awaitingStatuses.includes(a.status)).length,
       draft: agreements.filter(a => a.status === 'draft').length,
-      monthlyValue: agreements
-        .filter(a => a.status === 'active')
+      committedMRR: agreements
+        .filter(a => revenueStatuses.includes(a.status))
         .reduce((sum, a) => sum + (a.monthlyValue || 0), 0)
     };
   }, [agreements]);
@@ -249,48 +263,70 @@ const MasterAgreements = () => {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Agreements</CardTitle>
+            <CardTitle className="text-sm font-medium">Total</CardTitle>
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{kpis.total}</div>
-            <p className="text-xs text-muted-foreground">All master agreements</p>
+            <p className="text-xs text-muted-foreground">All agreements</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Active</CardTitle>
-            <FileCheck className="h-4 w-4 text-muted-foreground" />
+            <FileCheck className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{kpis.active}</div>
-            <p className="text-xs text-muted-foreground">Currently active</p>
+            <p className="text-xs text-muted-foreground">Running now</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Signed</CardTitle>
+            <CheckCircle className="h-4 w-4 text-blue-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{kpis.signed}</div>
+            <p className="text-xs text-muted-foreground">Pending start</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Awaiting</CardTitle>
+            <Mail className="h-4 w-4 text-purple-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{kpis.awaitingApproval}</div>
+            <p className="text-xs text-muted-foreground">For approval</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Draft</CardTitle>
-            <FileSpreadsheet className="h-4 w-4 text-muted-foreground" />
+            <FileSpreadsheet className="h-4 w-4 text-gray-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{kpis.draft}</div>
-            <p className="text-xs text-muted-foreground">Pending activation</p>
+            <p className="text-xs text-muted-foreground">In creation</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Monthly Value</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Committed MRR</CardTitle>
+            <DollarSign className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(kpis.monthlyValue)}</div>
-            <p className="text-xs text-muted-foreground">Active agreements MRR</p>
+            <div className="text-2xl font-bold">{formatCurrency(kpis.committedMRR)}</div>
+            <p className="text-xs text-muted-foreground">Active + Signed</p>
           </CardContent>
         </Card>
       </div>
