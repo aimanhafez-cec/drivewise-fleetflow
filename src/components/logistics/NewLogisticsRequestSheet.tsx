@@ -371,13 +371,13 @@ export function NewLogisticsRequestSheet({
           </div>
 
           <div className="space-y-6 px-6 py-6">
-          {/* Form Meta Section */}
+          {/* Request Information Section */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                <FileText className="w-4 h-4" />
-                Form Meta
-              </CardTitle>
+            <CardTitle className="text-base flex items-center gap-2">
+              <FileText className="w-4 h-4" />
+              Request Information
+            </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Request Reference */}
