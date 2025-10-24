@@ -3,20 +3,22 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Label } from '@/components/ui/label';
-import { Plus, Filter, Download, Truck, Clock, Navigation, CheckCircle, Eye } from 'lucide-react';
+import { Plus, Download, Truck, Clock, Navigation, CheckCircle, Eye } from 'lucide-react';
 import { NewLogisticsRequestSheet } from '@/components/logistics/NewLogisticsRequestSheet';
+import { LogisticsRequestSearch, LogisticsSearchFilters } from '@/components/logistics/LogisticsRequestSearch';
 import { toast } from '@/hooks/use-toast';
 
 const ManageOperationLogisticsRequest = () => {
   const [isNewRequestSheetOpen, setIsNewRequestSheetOpen] = useState(false);
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState<LogisticsSearchFilters>({
+    requestId: '',
     type: 'all',
+    subtype: 'all',
     status: 'all',
     priority: 'all',
+    dateFrom: '',
+    dateTo: '',
+    location: '',
   });
   const [isViewMode, setIsViewMode] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState<any>(null);
@@ -58,11 +60,33 @@ const ManageOperationLogisticsRequest = () => {
   ];
 
   const filteredRequests = requests.filter(request => {
-    if (filters.type !== 'all' && request.type !== filters.type) return false;
-    if (filters.status !== 'all' && request.status !== filters.status) return false;
-    if (filters.priority !== 'all' && request.priority !== filters.priority) return false;
+    if (filters.requestId && !request.id.toLowerCase().includes(filters.requestId.toLowerCase())) return false;
+    if (filters.type !== 'all' && filters.type !== '' && request.type !== filters.type) return false;
+    if (filters.subtype !== 'all' && filters.subtype !== '' && request.subtype !== filters.subtype) return false;
+    if (filters.status !== 'all' && filters.status !== '' && request.status !== filters.status) return false;
+    if (filters.priority !== 'all' && filters.priority !== '' && request.priority !== filters.priority) return false;
+    if (filters.location && !request.location.toLowerCase().includes(filters.location.toLowerCase())) return false;
+    if (filters.dateFrom && request.date < filters.dateFrom) return false;
+    if (filters.dateTo && request.date > filters.dateTo) return false;
     return true;
   });
+
+  const handleSearch = (searchFilters: LogisticsSearchFilters) => {
+    setFilters(searchFilters);
+  };
+
+  const handleReset = () => {
+    setFilters({
+      requestId: '',
+      type: 'all',
+      subtype: 'all',
+      status: 'all',
+      priority: 'all',
+      dateFrom: '',
+      dateTo: '',
+      location: '',
+    });
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -267,10 +291,6 @@ const ManageOperationLogisticsRequest = () => {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={() => setIsFilterOpen(true)}>
-            <Filter className="mr-2 h-4 w-4" />
-            Filter
-          </Button>
           <Button variant="outline" size="sm">
             <Download className="mr-2 h-4 w-4" />
             Export
@@ -295,6 +315,11 @@ const ManageOperationLogisticsRequest = () => {
           </Card>
         ))}
       </div>
+
+      <LogisticsRequestSearch 
+        onSearch={handleSearch}
+        onReset={handleReset}
+      />
 
       <Card>
         <CardHeader>
@@ -354,71 +379,6 @@ const ManageOperationLogisticsRequest = () => {
           </Table>
         </CardContent>
       </Card>
-
-      <Dialog open={isFilterOpen} onOpenChange={setIsFilterOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Filter Logistics Requests</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label>Type</Label>
-              <Select value={filters.type} onValueChange={(value) => setFilters({ ...filters, type: value })}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All types" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Types</SelectItem>
-                  <SelectItem value="Contract-Related">Contract-Related</SelectItem>
-                  <SelectItem value="Internal">Internal</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="space-y-2">
-              <Label>Status</Label>
-              <Select value={filters.status} onValueChange={(value) => setFilters({ ...filters, status: value })}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All statuses" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="in-transit">In Transit</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="space-y-2">
-              <Label>Priority</Label>
-              <Select value={filters.priority} onValueChange={(value) => setFilters({ ...filters, priority: value })}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All priorities" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Priorities</SelectItem>
-                  <SelectItem value="high">High</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="normal">Normal</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          
-          <DialogFooter>
-            <Button variant="outline" onClick={() => {
-              setFilters({ type: 'all', status: 'all', priority: 'all' });
-              setIsFilterOpen(false);
-            }}>
-              Clear Filters
-            </Button>
-            <Button onClick={() => setIsFilterOpen(false)}>
-              Apply Filters
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       <NewLogisticsRequestSheet
         open={isViewMode}
