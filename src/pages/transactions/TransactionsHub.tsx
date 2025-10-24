@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Receipt, FileText, CreditCard, TrendingUp, Wallet, DollarSign, AlertTriangle } from 'lucide-react';
+import { Receipt, FileText, CreditCard, TrendingUp, Wallet, DollarSign, AlertTriangle, CalendarClock } from 'lucide-react';
 import HubCard from '@/components/navigation/HubCard';
 
 const TransactionsHub: React.FC = () => {
@@ -55,6 +55,13 @@ const TransactionsHub: React.FC = () => {
       icon: AlertTriangle,
       route: '/transactions/cost-compliance',
       gradient: 'from-yellow-500/10 to-orange-500/10',
+    },
+    {
+      title: 'Manage Billing Events',
+      description: 'Schedule and manage recurring billing events, automated charges, and billing cycles',
+      icon: CalendarClock,
+      route: '/transactions/billing-events',
+      gradient: 'from-teal-500/10 to-cyan-500/10',
     },
   ];
 

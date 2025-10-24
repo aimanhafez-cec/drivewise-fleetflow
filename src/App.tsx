@@ -94,6 +94,7 @@ import TrafficFinesScreen from "./pages/corporate-leasing/TrafficFinesScreen";
 import TollTransactionsScreen from "./pages/corporate-leasing/TollTransactionsScreen";
 import LogisticsHub from "./pages/logistics/LogisticsHub";
 import ManageOperationLogisticsRequest from "./pages/logistics/ManageOperationLogisticsRequest";
+import ManageBillingEvents from "./pages/transactions/ManageBillingEvents";
 // Hidden - commented out imports
 // import { CarSubscriptions } from "./pages/CarSubscriptions";
 // import { NewCarSubscription } from "./pages/NewCarSubscription";
@@ -311,6 +312,7 @@ const App = () => {
               <Route path="ledger" element={<AccountLedger />} />
               <Route path="summary" element={<FinancialSummary />} />
               <Route path="cost-compliance" element={<CostComplianceHub />} />
+              <Route path="billing-events" element={<ManageBillingEvents />} />
             </Route>
             <Route path="/integrations" element={
               <ProtectedRoute>
