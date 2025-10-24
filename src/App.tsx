@@ -97,6 +97,7 @@ import NewReplacementRequest from "./pages/corporate-leasing/NewReplacementReque
 import ReplacementRequestDetail from "./pages/corporate-leasing/ReplacementRequestDetail";
 import LogisticsHub from "./pages/logistics/LogisticsHub";
 import ManageOperationLogisticsRequest from "./pages/logistics/ManageOperationLogisticsRequest";
+import ManageLogisticsTransactions from "./pages/logistics/ManageLogisticsTransactions";
 import ManageBillingEvents from "./pages/transactions/ManageBillingEvents";
 import ManageSettlements from "./pages/transactions/ManageSettlements";
 import ManageClaims from "./pages/transactions/ManageClaims";
@@ -264,6 +265,7 @@ const App = () => {
               }>
                 <Route index element={<LogisticsHub />} />
                 <Route path="manage-requests" element={<ManageOperationLogisticsRequest />} />
+                <Route path="transactions" element={<ManageLogisticsTransactions />} />
               </Route>
               <Route path="/rfqs" element={
                 <ProtectedRoute>

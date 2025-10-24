@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import HubCard from '@/components/navigation/HubCard';
-import { Truck } from 'lucide-react';
+import { Truck, Package } from 'lucide-react';
 
 const LogisticsHub = () => {
   const navigate = useNavigate();
@@ -12,6 +12,13 @@ const LogisticsHub = () => {
       icon: Truck,
       route: '/logistics/manage-requests',
       gradient: 'from-blue-500/10 to-cyan-500/10',
+    },
+    {
+      title: 'Manage Logistics Transactions',
+      description: 'Track shipping costs, delivery fees, carrier payments, and transportation-related financial transactions',
+      icon: Package,
+      route: '/logistics/transactions',
+      gradient: 'from-purple-500/10 to-indigo-500/10',
     },
   ];
 
