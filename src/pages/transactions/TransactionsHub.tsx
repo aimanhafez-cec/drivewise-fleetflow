@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Receipt, FileText, CreditCard, TrendingUp, Wallet, DollarSign, AlertTriangle, CalendarClock, Banknote } from 'lucide-react';
+import { Receipt, FileText, CreditCard, TrendingUp, Wallet, DollarSign, AlertTriangle, CalendarClock, Banknote, ShieldAlert } from 'lucide-react';
 import HubCard from '@/components/navigation/HubCard';
 
 const TransactionsHub: React.FC = () => {
@@ -69,6 +69,13 @@ const TransactionsHub: React.FC = () => {
       icon: Banknote,
       route: '/transactions/settlements',
       gradient: 'from-emerald-500/10 to-teal-500/10',
+    },
+    {
+      title: 'Manage Claims',
+      description: 'Process insurance claims, vehicle damage reports, customer disputes, and claim settlements',
+      icon: ShieldAlert,
+      route: '/transactions/claims',
+      gradient: 'from-red-500/10 to-orange-500/10',
     },
   ];
 
