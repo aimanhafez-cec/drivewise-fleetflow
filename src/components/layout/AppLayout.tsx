@@ -65,8 +65,8 @@ const navigation = [
     icon: FileText,
   },
   {
-    title: 'Limousine Agreements',
-    url: '/limousine-agreements',
+    title: 'Executive Transportation',
+    url: '/executive-transportation',
     icon: Crown,
   },
   {
