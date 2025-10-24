@@ -28,6 +28,12 @@ interface NewLogisticsRequestSheetProps {
   onSuccess?: (newRequest: any) => void;
 }
 
+const REQUEST_TYPES = [
+  "Contract-Related",
+  "Internal",
+  "Maintenance Transfer"
+];
+
 const SUBTYPES = {
   "Contract-Related": ["Vehicle Delivery", "Vehicle Pick-up"],
   "Internal": ["Wash", "Tires and Batteries", "Refuel"],
@@ -407,33 +413,24 @@ export function NewLogisticsRequestSheet({
               <div className="border-t my-4" />
               {/* Type */}
               <div className="space-y-2">
-                <Label>
+                <Label htmlFor="type">
                   Type <span className="text-destructive">*</span>
                 </Label>
-                <RadioGroup
+                <Select
                   value={formData.type}
                   onValueChange={handleTypeChange}
-                  className="flex flex-col space-y-2"
                 >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="Contract-Related" id="type-contract" />
-                    <Label htmlFor="type-contract" className="font-normal cursor-pointer">
-                      Contract-Related
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="Internal" id="type-internal" />
-                    <Label htmlFor="type-internal" className="font-normal cursor-pointer">
-                      Internal
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="Maintenance Transfer" id="type-maintenance" />
-                    <Label htmlFor="type-maintenance" className="font-normal cursor-pointer">
-                      Maintenance Transfer
-                    </Label>
-                  </div>
-                </RadioGroup>
+                  <SelectTrigger id="type">
+                    <SelectValue placeholder="Select request type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {REQUEST_TYPES.map((type) => (
+                      <SelectItem key={type} value={type}>
+                        {type}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               {/* Subtype */}
