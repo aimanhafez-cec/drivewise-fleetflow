@@ -270,6 +270,9 @@ export const OpportunitySelect: React.FC<BaseSelectProps> = (props) => {
 export const LegalEntitySelect: React.FC<BaseSelectProps> = (props) => {
   const { items, isLoading } = useLegalEntities();
 
+  console.log('🔍 LegalEntitySelect: Received items:', items);
+  console.log('🔍 LegalEntitySelect: isLoading:', isLoading);
+
   return (
     <LOVSelect
       {...props}

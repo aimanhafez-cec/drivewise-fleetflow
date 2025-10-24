@@ -227,19 +227,34 @@ export const useLegalEntities = () => {
   const result = useQuery({
     queryKey: ["legal_entities"],
     queryFn: async () => {
+      console.log('🔍 useLegalEntities: Fetching data...');
       const { data, error } = await supabase
         .from("legal_entities")
         .select("*")
         .eq("is_active", true)
         .order("name");
+      
+      console.log('🔍 useLegalEntities: Raw data:', data);
+      console.log('🔍 useLegalEntities: Error:', error);
+      
       if (error) throw error;
 
-      return (data || []).map((item: any) => ({
+      const mapped = (data || []).map((item: any) => ({
         ...item,
         label: item.name,
       })) as LegalEntity[];
+      
+      console.log('🔍 useLegalEntities: Mapped data:', mapped);
+      
+      return mapped;
     },
     staleTime: 10 * 60 * 1000,
+  });
+
+  console.log('🔍 useLegalEntities: Result:', {
+    items: result.data || [],
+    isLoading: result.isLoading,
+    error: result.error
   });
 
   return {
