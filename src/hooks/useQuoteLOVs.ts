@@ -61,7 +61,7 @@ export interface LegalEntity {
   name: string;
   code: string;
   is_active: boolean;
-  label?: string;
+  label: string;
 }
 
 // Hook to fetch opportunities

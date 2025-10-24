@@ -14,6 +14,7 @@ import {
   useCustomerSites,
   usePriceLists
 } from '@/hooks/useBusinessLOVs';
+import { useLegalEntities } from '@/hooks/useQuoteLOVs';
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -267,28 +268,12 @@ export const OpportunitySelect: React.FC<BaseSelectProps> = (props) => {
 };
 
 export const LegalEntitySelect: React.FC<BaseSelectProps> = (props) => {
-  const { data: legalEntities = [], isLoading } = useQuery({
-    queryKey: ["legal_entities"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("legal_entities")
-        .select("*")
-        .eq("is_active", true)
-        .order("name");
-      if (error) throw error;
-
-      return (data || []).map((item: any) => ({
-        id: item.id,
-        label: item.name,
-      }));
-    },
-    staleTime: 10 * 60 * 1000,
-  });
+  const { data: items = [], isLoading } = useLegalEntities();
 
   return (
     <LOVSelect
       {...props}
-      items={legalEntities}
+      items={items}
       isLoading={isLoading}
       placeholder={props.placeholder || "Select legal entity..."}
     />
