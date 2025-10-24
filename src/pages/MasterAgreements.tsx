@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Plus, FileText, MoreVertical, Eye, Edit, FileSpreadsheet, Copy, Download, Trash2, DollarSign, FileCheck, Users, Mail, CheckCircle } from 'lucide-react';
+import { Plus, FileText, MoreVertical, Eye, Edit, FileSpreadsheet, Copy, Download, Trash2, DollarSign, FileCheck, Users, Mail, CheckCircle, FilePenLine } from 'lucide-react';
 import { format } from 'date-fns';
 import { formatCurrency } from "@/lib/utils";
 import { cn } from "@/lib/utils";
@@ -495,6 +495,10 @@ const MasterAgreements = () => {
                                 View Source Quote
                               </DropdownMenuItem>
                             )}
+                            <DropdownMenuItem onClick={() => navigate(`/corporate-leasing/master-agreements/${agreement.id}/amendment`)}>
+                              <FilePenLine className="mr-2 h-4 w-4" />
+                              Amendment
+                            </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem>
                               <Copy className="mr-2 h-4 w-4" />
