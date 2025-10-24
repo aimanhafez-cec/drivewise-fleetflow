@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { FileText, Building2, Car, MapPin, Clock, StickyNote } from "lucide-react";
+import { FileText, Building2, Car, MapPin, Clock, StickyNote, Droplets, Fuel, Wrench, Users, DollarSign, Paperclip } from "lucide-react";
 import { VehicleSelect } from "@/components/ui/select-components";
 import {
   Dialog,
@@ -98,6 +98,29 @@ const DEPARTMENTS = [
   "Maintenance",
   "Admin"
 ];
+
+// Phase 2: Subtype-specific constants
+const WASH_TYPES = ["Exterior", "Interior", "Full", "Detailing"];
+const WASH_PROVIDERS = ["In-house", "External Vendor"];
+const PREP_ITEMS = ["Floor mats", "Perfume", "Wipes", "Windows"];
+
+const REFUEL_TARGETS = ["Full Tank", "Half Tank", "Specific Liters"];
+const FUEL_TYPES = ["E-Plus 91", "Special 95", "Super 98", "Diesel"];
+const PAYMENT_METHODS = ["Fleet Card", "Cash", "Other"];
+
+const TB_ACTION_TYPES = [
+  "Tire Change",
+  "Tire Repair",
+  "Tire Rotation",
+  "Battery Replace",
+  "Battery Jumpstart",
+  "Battery Test"
+];
+const WORKSHOP_PROVIDERS = ["In-house Bay", "External Vendor"];
+const TIRE_POSITIONS = ["FL", "FR", "RL", "RR", "Spare"];
+
+// Phase 3: Operational constants
+const ASSIGNMENT_MODES = ["Auto-Assign", "Specific Driver", "Specific Origin Branch"];
 
 const MOCK_CONTRACT_LINES = [
   {
@@ -242,6 +265,45 @@ export function NewLogisticsRequestSheet({
     endOffice: "",
     endAddress: "",
     locationNotes: "",
+    
+    // Phase 2: Wash fields
+    washType: "",
+    washProvider: "",
+    washVendorName: "",
+    washPrepItems: [] as string[],
+    washNotes: "",
+    
+    // Phase 2: Refuel fields
+    refuelTarget: "",
+    targetLiters: "",
+    fuelType: "",
+    fuelStation: "",
+    paymentMethod: "",
+    refuelNotes: "",
+    
+    // Phase 2: Tires & Batteries fields
+    tbActionType: "",
+    tbWorkshopProvider: "",
+    tbVendorName: "",
+    tireQuantity: "",
+    tireSize: "",
+    tireBrandModel: "",
+    tirePositions: [] as string[],
+    tireOldNotes: "",
+    batteryTypeCapacity: "",
+    batteryBrandModel: "",
+    batterySerial: "",
+    batteryWarranty: "",
+    batteryOldNotes: "",
+    tbNotes: "",
+    
+    // Phase 3: Operational fields
+    assignmentMode: "Auto-Assign",
+    preferredDriverId: "",
+    preferredOriginBranch: "",
+    internalRunFee: "",
+    partsMaterialsEst: "",
+    attachments: [] as File[],
   });
 
   const [vehicleData, setVehicleData] = useState<any>(null);
@@ -293,6 +355,67 @@ export function NewLogisticsRequestSheet({
   };
 
   const handleSave = () => {
+    // Validate Internal requests
+    if (formData.type === "Internal") {
+      // Validate vehicle selection
+      if (!formData.vehicleId) {
+        alert("Please select a vehicle for Internal request");
+        return;
+      }
+      
+      // Validate start location
+      if (formData.startLocationType === "Our Office" && !formData.startOffice) {
+        alert("Please select start office location");
+        return;
+      }
+      if (formData.startLocationType === "Address" && !formData.startAddress) {
+        alert("Please enter start address");
+        return;
+      }
+      
+      // Validate end location
+      if (formData.endLocationType === "Our Office" && !formData.endOffice) {
+        alert("Please select end office location");
+        return;
+      }
+      if (formData.endLocationType === "Address" && !formData.endAddress) {
+        alert("Please enter end address");
+        return;
+      }
+      
+      // Validate time window
+      if (!formData.requestedDate || !formData.windowFrom || !formData.windowTo) {
+        alert("Please complete the requested time window");
+        return;
+      }
+      
+      // Validate subtype-specific fields
+      if (formData.subtype === "Wash") {
+        if (!formData.washType) {
+          alert("Please select a wash type");
+          return;
+        }
+      }
+      
+      if (formData.subtype === "Refuel") {
+        if (!formData.refuelTarget || !formData.fuelType) {
+          alert("Please complete refuel target and fuel type");
+          return;
+        }
+        if (formData.refuelTarget === "Specific Liters" && !formData.targetLiters) {
+          alert("Please enter target liters for refueling");
+          return;
+        }
+      }
+      
+      if (formData.subtype === "Tires and Batteries") {
+        if (!formData.tbActionType) {
+          alert("Please select an action type");
+          return;
+        }
+      }
+    }
+    
     const newRequest = {
       id: `LR-2025-${String(Math.floor(Math.random() * 1000)).padStart(5, "0")}`,
       type: formData.type,
@@ -370,6 +493,37 @@ export function NewLogisticsRequestSheet({
       endOffice: "",
       endAddress: "",
       locationNotes: "",
+      washType: "",
+      washProvider: "",
+      washVendorName: "",
+      washPrepItems: [],
+      washNotes: "",
+      refuelTarget: "",
+      targetLiters: "",
+      fuelType: "",
+      fuelStation: "",
+      paymentMethod: "",
+      refuelNotes: "",
+      tbActionType: "",
+      tbWorkshopProvider: "",
+      tbVendorName: "",
+      tireQuantity: "",
+      tireSize: "",
+      tireBrandModel: "",
+      tirePositions: [],
+      tireOldNotes: "",
+      batteryTypeCapacity: "",
+      batteryBrandModel: "",
+      batterySerial: "",
+      batteryWarranty: "",
+      batteryOldNotes: "",
+      tbNotes: "",
+      assignmentMode: "Auto-Assign",
+      preferredDriverId: "",
+      preferredOriginBranch: "",
+      internalRunFee: "",
+      partsMaterialsEst: "",
+      attachments: [],
     });
     setVehicleData(null);
     setOdometerOverride(false);
@@ -1766,6 +1920,425 @@ export function NewLogisticsRequestSheet({
               )}
 
             </>
+          )}
+
+          {/* Phase 2: Subtype-Specific Sections for Internal Requests */}
+          
+          {/* Wash Details Section */}
+          {formData.type === "Internal" && formData.subtype === "Wash" && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Droplets className="w-4 h-4" />
+                  Wash Details
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Wash Type - Required */}
+                <div className="space-y-2">
+                  <Label>Wash Type <span className="text-destructive">*</span></Label>
+                  <Select value={formData.washType} onValueChange={(value) => setFormData({ ...formData, washType: value })}>
+                    <SelectTrigger><SelectValue placeholder="Select wash type" /></SelectTrigger>
+                    <SelectContent>
+                      {WASH_TYPES.map(type => <SelectItem key={type} value={type}>{type}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Wash Provider */}
+                <div className="space-y-2">
+                  <Label>Wash Provider</Label>
+                  <Select value={formData.washProvider} onValueChange={(value) => setFormData({ ...formData, washProvider: value })}>
+                    <SelectTrigger><SelectValue placeholder="Select provider" /></SelectTrigger>
+                    <SelectContent>
+                      {WASH_PROVIDERS.map(provider => <SelectItem key={provider} value={provider}>{provider}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* External Vendor Name - conditional */}
+                {formData.washProvider === "External Vendor" && (
+                  <div className="space-y-2">
+                    <Label>External Vendor Name</Label>
+                    <Input value={formData.washVendorName} onChange={(e) => setFormData({ ...formData, washVendorName: e.target.value })} placeholder="Enter vendor name" />
+                  </div>
+                )}
+
+                {/* Customer-Facing Prep - Multi-select checkboxes */}
+                <div className="space-y-2">
+                  <Label>Customer-Facing Prep (Optional)</Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {PREP_ITEMS.map(item => (
+                      <div key={item} className="flex items-center space-x-2">
+                        <input 
+                          type="checkbox" 
+                          id={`prep-${item}`} 
+                          checked={formData.washPrepItems.includes(item)} 
+                          onChange={(e) => {
+                            const newItems = e.target.checked ? [...formData.washPrepItems, item] : formData.washPrepItems.filter(i => i !== item);
+                            setFormData({ ...formData, washPrepItems: newItems });
+                          }} 
+                        />
+                        <Label htmlFor={`prep-${item}`} className="font-normal cursor-pointer">{item}</Label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Notes */}
+                <div className="space-y-2">
+                  <Label>Notes</Label>
+                  <Textarea value={formData.washNotes} onChange={(e) => setFormData({ ...formData, washNotes: e.target.value })} placeholder="Any additional wash instructions..." rows={3} />
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Refuel Details Section */}
+          {formData.type === "Internal" && formData.subtype === "Refuel" && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Fuel className="w-4 h-4" />
+                  Refuel Details
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Refuel Target - Required */}
+                <div className="space-y-2">
+                  <Label>Refuel Target <span className="text-destructive">*</span></Label>
+                  <Select value={formData.refuelTarget} onValueChange={(value) => setFormData({ ...formData, refuelTarget: value })}>
+                    <SelectTrigger><SelectValue placeholder="Select target" /></SelectTrigger>
+                    <SelectContent>
+                      {REFUEL_TARGETS.map(target => <SelectItem key={target} value={target}>{target}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Target Liters - conditional & required */}
+                {formData.refuelTarget === "Specific Liters" && (
+                  <div className="space-y-2">
+                    <Label>Target Liters <span className="text-destructive">*</span></Label>
+                    <Input type="number" value={formData.targetLiters} onChange={(e) => setFormData({ ...formData, targetLiters: e.target.value })} placeholder="Enter liters" />
+                  </div>
+                )}
+
+                {/* Fuel Type - Required */}
+                <div className="space-y-2">
+                  <Label>Fuel Type <span className="text-destructive">*</span></Label>
+                  <Select value={formData.fuelType} onValueChange={(value) => setFormData({ ...formData, fuelType: value })}>
+                    <SelectTrigger><SelectValue placeholder="Select fuel type" /></SelectTrigger>
+                    <SelectContent>
+                      {FUEL_TYPES.map(type => <SelectItem key={type} value={type}>{type}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Fuel Station */}
+                <div className="space-y-2">
+                  <Label>Fuel Station (Optional)</Label>
+                  <Input value={formData.fuelStation} onChange={(e) => setFormData({ ...formData, fuelStation: e.target.value })} placeholder="e.g., ENOC Sheikh Zayed Road" />
+                </div>
+
+                {/* Payment Method */}
+                <div className="space-y-2">
+                  <Label>Payment Method</Label>
+                  <Select value={formData.paymentMethod} onValueChange={(value) => setFormData({ ...formData, paymentMethod: value })}>
+                    <SelectTrigger><SelectValue placeholder="Select payment method" /></SelectTrigger>
+                    <SelectContent>
+                      {PAYMENT_METHODS.map(method => <SelectItem key={method} value={method}>{method}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Notes */}
+                <div className="space-y-2">
+                  <Label>Notes</Label>
+                  <Textarea value={formData.refuelNotes} onChange={(e) => setFormData({ ...formData, refuelNotes: e.target.value })} placeholder="Any additional refueling instructions..." rows={3} />
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Tires & Batteries Details Section */}
+          {formData.type === "Internal" && formData.subtype === "Tires and Batteries" && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Wrench className="w-4 h-4" />
+                  Tires & Batteries Details
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Action Type - Required */}
+                <div className="space-y-2">
+                  <Label>Action Type <span className="text-destructive">*</span></Label>
+                  <Select value={formData.tbActionType} onValueChange={(value) => setFormData({ ...formData, tbActionType: value })}>
+                    <SelectTrigger><SelectValue placeholder="Select action" /></SelectTrigger>
+                    <SelectContent>
+                      {TB_ACTION_TYPES.map(action => <SelectItem key={action} value={action}>{action}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Workshop/Provider */}
+                <div className="space-y-2">
+                  <Label>Workshop/Provider</Label>
+                  <Select value={formData.tbWorkshopProvider} onValueChange={(value) => setFormData({ ...formData, tbWorkshopProvider: value })}>
+                    <SelectTrigger><SelectValue placeholder="Select workshop" /></SelectTrigger>
+                    <SelectContent>
+                      {WORKSHOP_PROVIDERS.map(provider => <SelectItem key={provider} value={provider}>{provider}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* External Vendor Name - conditional */}
+                {formData.tbWorkshopProvider === "External Vendor" && (
+                  <div className="space-y-2">
+                    <Label>External Vendor Name</Label>
+                    <Input value={formData.tbVendorName} onChange={(e) => setFormData({ ...formData, tbVendorName: e.target.value })} placeholder="Enter vendor name" />
+                  </div>
+                )}
+
+                {/* Tire Details Section - show if action contains "Tire" */}
+                {formData.tbActionType && formData.tbActionType.includes("Tire") && (
+                  <div className="space-y-4 p-4 bg-muted rounded-lg">
+                    <h4 className="font-medium">Tire Details</h4>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label>Quantity</Label>
+                        <Input type="number" value={formData.tireQuantity} onChange={(e) => setFormData({ ...formData, tireQuantity: e.target.value })} placeholder="e.g., 4" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Size</Label>
+                        <Input value={formData.tireSize} onChange={(e) => setFormData({ ...formData, tireSize: e.target.value })} placeholder="e.g., 235/55 R18" />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Brand/Model</Label>
+                      <Input value={formData.tireBrandModel} onChange={(e) => setFormData({ ...formData, tireBrandModel: e.target.value })} placeholder="e.g., Michelin Primacy 4" />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Position Map (Optional)</Label>
+                      <div className="flex gap-2">
+                        {TIRE_POSITIONS.map(pos => (
+                          <div key={pos} className="flex items-center space-x-2">
+                            <input 
+                              type="checkbox" 
+                              id={`tire-pos-${pos}`} 
+                              checked={formData.tirePositions.includes(pos)} 
+                              onChange={(e) => {
+                                const newPositions = e.target.checked ? [...formData.tirePositions, pos] : formData.tirePositions.filter(p => p !== pos);
+                                setFormData({ ...formData, tirePositions: newPositions });
+                              }} 
+                            />
+                            <Label htmlFor={`tire-pos-${pos}`} className="font-normal cursor-pointer">{pos}</Label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Old Tire Notes</Label>
+                      <Textarea value={formData.tireOldNotes} onChange={(e) => setFormData({ ...formData, tireOldNotes: e.target.value })} placeholder="Notes about old tires being removed..." rows={2} />
+                    </div>
+                  </div>
+                )}
+
+                {/* Battery Details Section - show if action contains "Battery" */}
+                {formData.tbActionType && formData.tbActionType.includes("Battery") && (
+                  <div className="space-y-4 p-4 bg-muted rounded-lg">
+                    <h4 className="font-medium">Battery Details</h4>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label>Type/Capacity</Label>
+                        <Input value={formData.batteryTypeCapacity} onChange={(e) => setFormData({ ...formData, batteryTypeCapacity: e.target.value })} placeholder="e.g., 70Ah AGM" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Brand/Model</Label>
+                        <Input value={formData.batteryBrandModel} onChange={(e) => setFormData({ ...formData, batteryBrandModel: e.target.value })} placeholder="e.g., Bosch S4" />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label>Serial No.</Label>
+                        <Input value={formData.batterySerial} onChange={(e) => setFormData({ ...formData, batterySerial: e.target.value })} placeholder="Battery serial number" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Warranty Info</Label>
+                        <Input value={formData.batteryWarranty} onChange={(e) => setFormData({ ...formData, batteryWarranty: e.target.value })} placeholder="e.g., 2 years" />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Old Battery Notes</Label>
+                      <Textarea value={formData.batteryOldNotes} onChange={(e) => setFormData({ ...formData, batteryOldNotes: e.target.value })} placeholder="Notes about old battery being removed..." rows={2} />
+                    </div>
+                  </div>
+                )}
+
+                {/* Notes */}
+                <div className="space-y-2">
+                  <Label>Notes</Label>
+                  <Textarea value={formData.tbNotes} onChange={(e) => setFormData({ ...formData, tbNotes: e.target.value })} placeholder="Any additional instructions..." rows={3} />
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Phase 3: Operational Details for Internal Requests */}
+          
+          {/* Driver Assignment Preference Section */}
+          {formData.type === "Internal" && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Users className="w-4 h-4" />
+                  Driver Assignment Preference (Optional)
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Assignment Mode</Label>
+                  <Select value={formData.assignmentMode} onValueChange={(value) => setFormData({ ...formData, assignmentMode: value })}>
+                    <SelectTrigger><SelectValue placeholder="Select assignment mode" /></SelectTrigger>
+                    <SelectContent>
+                      {ASSIGNMENT_MODES.map(mode => <SelectItem key={mode} value={mode}>{mode}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {formData.assignmentMode === "Specific Driver" && (
+                  <div className="space-y-2">
+                    <Label>Preferred Driver ID</Label>
+                    <Input 
+                      value={formData.preferredDriverId} 
+                      onChange={(e) => setFormData({ ...formData, preferredDriverId: e.target.value })} 
+                      placeholder="Enter driver ID or name" 
+                    />
+                  </div>
+                )}
+
+                {formData.assignmentMode === "Specific Origin Branch" && (
+                  <div className="space-y-2">
+                    <Label>Preferred Origin Branch</Label>
+                    <Select 
+                      value={formData.preferredOriginBranch} 
+                      onValueChange={(value) => setFormData({ ...formData, preferredOriginBranch: value })}
+                    >
+                      <SelectTrigger><SelectValue placeholder="Select branch" /></SelectTrigger>
+                      <SelectContent>
+                        {Object.entries(BRANCHES_BY_EMIRATE).map(([emirate, branches]) => (
+                          <optgroup key={emirate} label={emirate}>
+                            {branches.map((branch) => (
+                              <SelectItem key={branch} value={branch}>
+                                {branch}
+                              </SelectItem>
+                            ))}
+                          </optgroup>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Fees Section (Optional, Informational) */}
+          {formData.type === "Internal" && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <DollarSign className="w-4 h-4" />
+                  Fees (Optional, Informational)
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Internal Run Fee (AED)</Label>
+                    <Input 
+                      type="number" 
+                      value={formData.internalRunFee} 
+                      onChange={(e) => setFormData({ ...formData, internalRunFee: e.target.value })} 
+                      placeholder="0.00" 
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Parts/Materials Est. (AED)</Label>
+                    <Input 
+                      type="number" 
+                      value={formData.partsMaterialsEst} 
+                      onChange={(e) => setFormData({ ...formData, partsMaterialsEst: e.target.value })} 
+                      placeholder="0.00" 
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Estimated Total (AED)</Label>
+                  <div className="p-2 bg-muted rounded-md text-sm font-medium">
+                    {(parseFloat(formData.internalRunFee || "0") + parseFloat(formData.partsMaterialsEst || "0")).toFixed(2)}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Attachments Section (Optional) */}
+          {formData.type === "Internal" && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Paperclip className="w-4 h-4" />
+                  Attachments (Optional)
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Upload Files</Label>
+                  <Input 
+                    type="file" 
+                    multiple 
+                    onChange={(e) => {
+                      const files = Array.from(e.target.files || []);
+                      const validFiles = files.filter(f => f.size <= 10 * 1024 * 1024); // 10MB limit
+                      setFormData({ ...formData, attachments: [...formData.attachments, ...validFiles] });
+                    }} 
+                  />
+                  <p className="text-xs text-muted-foreground">Max 10MB per file</p>
+                </div>
+
+                {formData.attachments.length > 0 && (
+                  <div className="space-y-2">
+                    <Label>Attached Files</Label>
+                    <div className="space-y-1">
+                      {formData.attachments.map((file, index) => (
+                        <div key={index} className="flex items-center justify-between p-2 bg-muted rounded-md text-sm">
+                          <span>{file.name} ({(file.size / 1024).toFixed(2)} KB)</span>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => {
+                              const newAttachments = formData.attachments.filter((_, i) => i !== index);
+                              setFormData({ ...formData, attachments: newAttachments });
+                            }}
+                          >
+                            Remove
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           )}
 
           {/* Show Time Window and Internal Notes for all types */}
