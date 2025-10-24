@@ -20,6 +20,7 @@ import {
   Receipt,
   Wrench,
   FolderOpen,
+  Truck,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -101,6 +102,11 @@ const navigation = [
     title: 'Operations',
     url: '/operations',
     icon: Wrench,
+  },
+  {
+    title: 'Logistics',
+    url: '/logistics',
+    icon: Truck,
   },
   {
     title: 'Transactions',
