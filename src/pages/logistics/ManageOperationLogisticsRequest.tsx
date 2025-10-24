@@ -4,9 +4,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Filter, Download } from 'lucide-react';
+import { NewLogisticsRequestSheet } from '@/components/logistics/NewLogisticsRequestSheet';
+import { toast } from '@/hooks/use-toast';
 
 const ManageOperationLogisticsRequest = () => {
-  const [requests] = useState([
+  const [isNewRequestSheetOpen, setIsNewRequestSheetOpen] = useState(false);
+  const [requests, setRequests] = useState([
     {
       id: 'LR-2024-001',
       type: 'Contract-Related',
@@ -122,7 +125,7 @@ const ManageOperationLogisticsRequest = () => {
             <Download className="mr-2 h-4 w-4" />
             Export
           </Button>
-          <Button size="sm">
+          <Button size="sm" onClick={() => setIsNewRequestSheetOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
             New Request
           </Button>
@@ -190,6 +193,18 @@ const ManageOperationLogisticsRequest = () => {
           </Table>
         </CardContent>
       </Card>
+
+      <NewLogisticsRequestSheet
+        open={isNewRequestSheetOpen}
+        onOpenChange={setIsNewRequestSheetOpen}
+        onSuccess={(newRequest) => {
+          setRequests((prev) => [newRequest, ...prev]);
+          toast({
+            title: "Success",
+            description: "Logistics request created successfully",
+          });
+        }}
+      />
     </div>
   );
 };
