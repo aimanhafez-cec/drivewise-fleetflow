@@ -21,6 +21,7 @@ import {
   Wrench,
   FolderOpen,
   Truck,
+  Crown,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -62,6 +63,11 @@ const navigation = [
     title: 'Agreements',
     url: '/agreements',
     icon: FileText,
+  },
+  {
+    title: 'Limousine Agreements',
+    url: '/limousine-agreements',
+    icon: Crown,
   },
   {
     title: 'RFQs',
