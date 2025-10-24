@@ -125,12 +125,12 @@ export const SourceSelection = ({
               className={`relative border-2 rounded-lg p-4 cursor-pointer transition-colors ${
                 source === 'instant_booking'
                   ? 'border-primary bg-primary/5'
-                  : 'border-input hover:border-primary/50 opacity-60'
+                  : 'border-input hover:border-primary/50'
               }`}
               onClick={() => handleSourceChange('instant_booking')}
             >
               <div className="flex items-start space-x-3">
-                <RadioGroupItem value="instant_booking" id="source-booking" disabled />
+                <RadioGroupItem value="instant_booking" id="source-booking" />
                 <div className="space-y-1 flex-1">
                   <Label htmlFor="source-booking" className="cursor-pointer flex items-center gap-2">
                     <FileText className="h-5 w-5" />
@@ -139,9 +139,6 @@ export const SourceSelection = ({
                   <p className="text-xs text-muted-foreground">
                     Convert a paid instant booking
                   </p>
-                  <Badge variant="outline" className="mt-2">
-                    Coming Soon
-                  </Badge>
                 </div>
               </div>
             </div>
