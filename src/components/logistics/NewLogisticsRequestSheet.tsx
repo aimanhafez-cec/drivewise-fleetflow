@@ -204,6 +204,23 @@ export function NewLogisticsRequestSheet({
     siteContactMobile: "",
     siteAccessNotes: "",
     
+    // Return Destination (Vehicle Pick-up)
+    returnDestType: "Our Office",
+    returnOffice: "",
+    returnSiteEmirate: "",
+    returnSiteArea: "",
+    returnSiteName: "",
+    returnSiteAddress: "",
+    returnSiteBuilding: "",
+    returnSiteLandmark: "",
+    returnSiteFloor: "",
+    returnSiteGPS: "",
+    returnSiteBestAccessTime: "",
+    returnSiteParkingNotes: "",
+    returnSiteContactName: "",
+    returnSiteContactMobile: "",
+    returnSiteAccessNotes: "",
+    
     // Time
     requestedDate: "",
     windowFrom: "",
@@ -311,6 +328,21 @@ export function NewLogisticsRequestSheet({
       siteContactName: "",
       siteContactMobile: "",
       siteAccessNotes: "",
+      returnDestType: "Our Office",
+      returnOffice: "",
+      returnSiteEmirate: "",
+      returnSiteArea: "",
+      returnSiteName: "",
+      returnSiteAddress: "",
+      returnSiteBuilding: "",
+      returnSiteLandmark: "",
+      returnSiteFloor: "",
+      returnSiteGPS: "",
+      returnSiteBestAccessTime: "",
+      returnSiteParkingNotes: "",
+      returnSiteContactName: "",
+      returnSiteContactMobile: "",
+      returnSiteAccessNotes: "",
       requestedDate: "",
       windowFrom: "",
       windowTo: "",
@@ -1223,7 +1255,260 @@ export function NewLogisticsRequestSheet({
                 </Card>
               )}
 
-              {/* Section E: Requested Time Window */}
+              {/* Section E: Return Destination (Vehicle Pick-up Only) */}
+              {formData.subtype === "Vehicle Pick-up" && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <MapPin className="w-4 h-4" />
+                      Return Destination
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                      <Label>
+                        Destination Type <span className="text-destructive">*</span>
+                      </Label>
+                      <RadioGroup
+                        value={formData.returnDestType}
+                        onValueChange={(value) =>
+                          setFormData({ ...formData, returnDestType: value })
+                        }
+                        className="flex gap-4"
+                      >
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="Our Office" id="return-office" />
+                          <Label htmlFor="return-office" className="font-normal cursor-pointer">
+                            Our Office
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="Customer Site" id="return-customer-site" />
+                          <Label htmlFor="return-customer-site" className="font-normal cursor-pointer">
+                            Customer Site
+                          </Label>
+                        </div>
+                      </RadioGroup>
+                    </div>
+
+                    {formData.returnDestType === "Our Office" && (
+                      <div className="space-y-2">
+                        <Label htmlFor="return-office-select">
+                          Office <span className="text-destructive">*</span>
+                        </Label>
+                        <Select
+                          value={formData.returnOffice}
+                          onValueChange={(value) =>
+                            setFormData({ ...formData, returnOffice: value })
+                          }
+                        >
+                          <SelectTrigger id="return-office-select">
+                            <SelectValue placeholder="Select office" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {Object.entries(BRANCHES_BY_EMIRATE).map(([emirate, branches]) => (
+                              <optgroup key={emirate} label={emirate}>
+                                {branches.map((branch) => (
+                                  <SelectItem key={branch} value={branch}>
+                                    {branch}
+                                  </SelectItem>
+                                ))}
+                              </optgroup>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
+
+                    {formData.returnDestType === "Customer Site" && (
+                      <>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="returnSiteEmirate">
+                              Emirate <span className="text-destructive">*</span>
+                            </Label>
+                            <Select
+                              value={formData.returnSiteEmirate}
+                              onValueChange={(value) =>
+                                setFormData({ ...formData, returnSiteEmirate: value })
+                              }
+                            >
+                              <SelectTrigger id="returnSiteEmirate">
+                                <SelectValue placeholder="Select emirate" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {EMIRATES.map((emirate) => (
+                                  <SelectItem key={emirate} value={emirate}>
+                                    {emirate}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="returnSiteArea">
+                              Area/District <span className="text-destructive">*</span>
+                            </Label>
+                            <Input
+                              id="returnSiteArea"
+                              value={formData.returnSiteArea}
+                              onChange={(e) =>
+                                setFormData({ ...formData, returnSiteArea: e.target.value })
+                              }
+                              placeholder="e.g., Dubai Marina, Business Bay"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="returnSiteName">
+                            Site Name <span className="text-destructive">*</span>
+                          </Label>
+                          <Input
+                            id="returnSiteName"
+                            value={formData.returnSiteName}
+                            onChange={(e) =>
+                              setFormData({ ...formData, returnSiteName: e.target.value })
+                            }
+                            placeholder="Enter site name"
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="returnSiteAddress">
+                            Street Address <span className="text-destructive">*</span>
+                          </Label>
+                          <Textarea
+                            id="returnSiteAddress"
+                            value={formData.returnSiteAddress}
+                            onChange={(e) =>
+                              setFormData({ ...formData, returnSiteAddress: e.target.value })
+                            }
+                            placeholder="Enter complete street address"
+                            rows={2}
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="returnSiteBuilding">Building/Complex Name</Label>
+                            <Input
+                              id="returnSiteBuilding"
+                              value={formData.returnSiteBuilding}
+                              onChange={(e) =>
+                                setFormData({ ...formData, returnSiteBuilding: e.target.value })
+                              }
+                              placeholder="e.g., Marina Plaza Tower"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="returnSiteLandmark">Landmark</Label>
+                            <Input
+                              id="returnSiteLandmark"
+                              value={formData.returnSiteLandmark}
+                              onChange={(e) =>
+                                setFormData({ ...formData, returnSiteLandmark: e.target.value })
+                              }
+                              placeholder="e.g., Near Mall of the Emirates"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="returnSiteFloor">Floor/Office Number</Label>
+                            <Input
+                              id="returnSiteFloor"
+                              value={formData.returnSiteFloor}
+                              onChange={(e) =>
+                                setFormData({ ...formData, returnSiteFloor: e.target.value })
+                              }
+                              placeholder="e.g., 12th Floor, Office 1205"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="returnSiteGPS">GPS Coordinates (Optional)</Label>
+                            <Input
+                              id="returnSiteGPS"
+                              value={formData.returnSiteGPS}
+                              onChange={(e) =>
+                                setFormData({ ...formData, returnSiteGPS: e.target.value })
+                              }
+                              placeholder="25.0760, 55.1328"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="returnSiteBestAccessTime">Best Access Time</Label>
+                          <Input
+                            id="returnSiteBestAccessTime"
+                            value={formData.returnSiteBestAccessTime}
+                            onChange={(e) =>
+                              setFormData({ ...formData, returnSiteBestAccessTime: e.target.value })
+                            }
+                            placeholder="e.g., 8 AM - 6 PM weekdays"
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="returnSiteParkingNotes">Parking Notes</Label>
+                          <Input
+                            id="returnSiteParkingNotes"
+                            value={formData.returnSiteParkingNotes}
+                            onChange={(e) =>
+                              setFormData({ ...formData, returnSiteParkingNotes: e.target.value })
+                            }
+                            placeholder="e.g., Basement parking, security clearance needed"
+                          />
+                        </div>
+
+                        <div className="border-t my-4" />
+
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="returnSiteContactName">Contact Name</Label>
+                            <Input
+                              id="returnSiteContactName"
+                              value={formData.returnSiteContactName}
+                              onChange={(e) =>
+                                setFormData({ ...formData, returnSiteContactName: e.target.value })
+                              }
+                              placeholder="Contact person"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="returnSiteContactMobile">Contact Mobile</Label>
+                            <Input
+                              id="returnSiteContactMobile"
+                              value={formData.returnSiteContactMobile}
+                              onChange={(e) =>
+                                setFormData({ ...formData, returnSiteContactMobile: e.target.value })
+                              }
+                              placeholder="+971 XX XXX XXXX"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="returnSiteAccessNotes">Access Instructions</Label>
+                          <Textarea
+                            id="returnSiteAccessNotes"
+                            value={formData.returnSiteAccessNotes}
+                            onChange={(e) =>
+                              setFormData({ ...formData, returnSiteAccessNotes: e.target.value })
+                            }
+                            placeholder="Gate pass requirements, security procedures, special access instructions..."
+                            rows={3}
+                          />
+                        </div>
+                      </>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Section F: Requested Time Window */}
               <Card>
                 <CardHeader>
                   <CardTitle className="text-base flex items-center gap-2">
@@ -1302,7 +1587,7 @@ export function NewLogisticsRequestSheet({
                 </CardContent>
               </Card>
 
-              {/* Section F: Notes */}
+              {/* Section G: Notes */}
               <Card>
                 <CardHeader>
                   <CardTitle className="text-base flex items-center gap-2">
