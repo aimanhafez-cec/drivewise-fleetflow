@@ -8,14 +8,12 @@ const LogisticsHub = () => {
   const logisticsCards = [
     {
       title: 'Manage Logistics Requests',
-      description: 'Track and manage operational logistics requests, delivery schedules, and transportation coordination',
       icon: Truck,
       route: '/logistics/manage-requests',
       gradient: 'from-blue-500/10 to-cyan-500/10',
     },
     {
       title: 'Manage Logistics Transactions',
-      description: 'Track shipping costs, delivery fees, carrier payments, and transportation-related financial transactions',
       icon: Package,
       route: '/logistics/transactions',
       gradient: 'from-purple-500/10 to-indigo-500/10',
@@ -36,7 +34,6 @@ const LogisticsHub = () => {
           <HubCard
             key={card.title}
             title={card.title}
-            description={card.description}
             icon={card.icon}
             onClick={() => navigate(card.route)}
             gradient={card.gradient}
