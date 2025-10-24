@@ -222,44 +222,55 @@ export const useSalesReps = (salesOfficeId?: string) => {
   });
 };
 
-// Hook to fetch legal entities
-export const useLegalEntities = () => {
-  const result = useQuery({
-    queryKey: ["legal_entities"],
+// Hook to fetch legal entities with search and pagination
+export const useLegalEntities = (searchQuery?: string, selectedId?: string) => {
+  return useQuery({
+    queryKey: ["legal_entities", searchQuery],
     queryFn: async () => {
       console.log('🔍 useLegalEntities: Fetching data...');
-      const { data, error } = await supabase
+      
+      let query = supabase
         .from("legal_entities")
         .select("*")
         .eq("is_active", true)
         .order("name");
+
+      // Apply search filter if provided
+      if (searchQuery) {
+        query = query.or(`name.ilike.%${searchQuery}%,code.ilike.%${searchQuery}%`);
+      }
+
+      const { data, error } = await query.limit(50);
       
       console.log('🔍 useLegalEntities: Raw data:', data);
       console.log('🔍 useLegalEntities: Error:', error);
       
       if (error) throw error;
 
-      const mapped = (data || []).map((item: any) => ({
+      let items = (data || []).map((item: any) => ({
         ...item,
         label: item.name,
       })) as LegalEntity[];
+
+      // Hydrate by ID if selectedId is provided and not in results
+      if (selectedId && !items.find(item => item.id === selectedId)) {
+        const { data: selectedItem, error: selectedError } = await supabase
+          .from("legal_entities")
+          .select("*")
+          .eq("id", selectedId)
+          .single();
+        
+        if (!selectedError && selectedItem) {
+          items = [{ ...selectedItem, label: selectedItem.name }, ...items];
+        }
+      }
       
-      console.log('🔍 useLegalEntities: Mapped data:', mapped);
+      console.log('🔍 useLegalEntities: Mapped data:', items);
       
-      return mapped;
+      return items;
     },
-    staleTime: 10 * 60 * 1000,
+    staleTime: 5 * 60 * 1000, // 5 minutes cache
+    refetchOnMount: 'always',
+    retry: 1,
   });
-
-  console.log('🔍 useLegalEntities: Result:', {
-    items: result.data || [],
-    isLoading: result.isLoading,
-    error: result.error
-  });
-
-  return {
-    items: result.data || [],
-    isLoading: result.isLoading,
-    error: result.error,
-  };
 };

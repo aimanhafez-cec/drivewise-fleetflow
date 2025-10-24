@@ -268,7 +268,9 @@ export const OpportunitySelect: React.FC<BaseSelectProps> = (props) => {
 };
 
 export const LegalEntitySelect: React.FC<BaseSelectProps> = (props) => {
-  const { items, isLoading } = useLegalEntities();
+  const [searchQuery, setSearchQuery] = React.useState("");
+  const selectedId = typeof props.value === 'string' ? props.value : undefined;
+  const { data: items = [], isLoading } = useLegalEntities(searchQuery, selectedId);
 
   console.log('🔍 LegalEntitySelect: Received items:', items);
   console.log('🔍 LegalEntitySelect: isLoading:', isLoading);
@@ -278,6 +280,7 @@ export const LegalEntitySelect: React.FC<BaseSelectProps> = (props) => {
       {...props}
       items={items}
       isLoading={isLoading}
+      onSearch={setSearchQuery}
       placeholder={props.placeholder || "Select legal entity..."}
     />
   );
