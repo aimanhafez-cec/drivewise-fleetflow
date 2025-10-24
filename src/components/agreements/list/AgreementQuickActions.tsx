@@ -56,7 +56,7 @@ export const AgreementQuickActions: React.FC = () => {
 
   const quickActions = [
     {
-      title: 'Enhanced Wizard',
+      title: 'New Agreement',
       description: '9-step wizard with inspection & verification',
       icon: Sparkles,
       variant: 'default' as const,
