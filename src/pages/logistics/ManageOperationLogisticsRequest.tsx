@@ -3,12 +3,21 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Filter, Download } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
+import { Plus, Filter, Download, Truck, Clock, Navigation, CheckCircle } from 'lucide-react';
 import { NewLogisticsRequestSheet } from '@/components/logistics/NewLogisticsRequestSheet';
 import { toast } from '@/hooks/use-toast';
 
 const ManageOperationLogisticsRequest = () => {
   const [isNewRequestSheetOpen, setIsNewRequestSheetOpen] = useState(false);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [filters, setFilters] = useState({
+    type: 'all',
+    status: 'all',
+    priority: 'all',
+  });
   const [requests, setRequests] = useState([
     {
       id: 'LR-2024-001',
@@ -21,48 +30,37 @@ const ManageOperationLogisticsRequest = () => {
     },
     {
       id: 'LR-2024-002',
-      type: 'Maintenance Transfer',
-      subtype: 'Maintenance Workshop',
-      status: 'in-transit',
-      location: 'Business Bay',
-      date: '2024-01-19',
-      priority: 'medium',
-    },
-    {
-      id: 'LR-2024-003',
       type: 'Contract-Related',
       subtype: 'Vehicle Pick-up',
       status: 'completed',
       location: 'Downtown Dubai',
       date: '2024-01-18',
-      priority: 'low',
+      priority: 'medium',
     },
     {
-      id: 'LR-2024-004',
-      type: 'Internal',
-      subtype: 'Wash',
-      status: 'pending',
-      location: 'Palm Jumeirah',
-      date: '2024-01-20',
-      priority: 'high',
-    },
-    {
-      id: 'LR-2024-005',
+      id: 'LR-2024-003',
       type: 'Internal',
       subtype: 'Refuel',
       status: 'in-transit',
       location: 'Jumeirah Beach',
       date: '2024-01-19',
-      priority: 'urgent',
+      priority: 'normal',
     },
   ]);
 
   const stats = [
-    { title: 'Total Requests', value: '156', change: '+12%' },
-    { title: 'Pending', value: '23', change: '+5%' },
-    { title: 'In Transit', value: '45', change: '+8%' },
-    { title: 'Completed', value: '88', change: '+15%' },
+    { title: 'Total Requests', value: '3', icon: Truck },
+    { title: 'Pending', value: '1', icon: Clock },
+    { title: 'In Transit', value: '1', icon: Navigation },
+    { title: 'Completed', value: '1', icon: CheckCircle },
   ];
+
+  const filteredRequests = requests.filter(request => {
+    if (filters.type !== 'all' && request.type !== filters.type) return false;
+    if (filters.status !== 'all' && request.status !== filters.status) return false;
+    if (filters.priority !== 'all' && request.priority !== filters.priority) return false;
+    return true;
+  });
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -117,7 +115,7 @@ const ManageOperationLogisticsRequest = () => {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" onClick={() => setIsFilterOpen(true)}>
             <Filter className="mr-2 h-4 w-4" />
             Filter
           </Button>
@@ -137,12 +135,10 @@ const ManageOperationLogisticsRequest = () => {
           <Card key={stat.title}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
+              <stat.icon className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stat.value}</div>
-              <p className="text-xs text-muted-foreground">
-                <span className="text-green-600">{stat.change}</span> from last month
-              </p>
             </CardContent>
           </Card>
         ))}
@@ -166,7 +162,7 @@ const ManageOperationLogisticsRequest = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {requests.map((request) => (
+              {filteredRequests.map((request) => (
                 <TableRow key={request.id} className="cursor-pointer hover:bg-muted/50">
                   <TableCell className="font-medium">{request.id}</TableCell>
                   <TableCell>
@@ -193,6 +189,71 @@ const ManageOperationLogisticsRequest = () => {
           </Table>
         </CardContent>
       </Card>
+
+      <Dialog open={isFilterOpen} onOpenChange={setIsFilterOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Filter Logistics Requests</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Type</Label>
+              <Select value={filters.type} onValueChange={(value) => setFilters({ ...filters, type: value })}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All types" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Types</SelectItem>
+                  <SelectItem value="Contract-Related">Contract-Related</SelectItem>
+                  <SelectItem value="Internal">Internal</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <Label>Status</Label>
+              <Select value={filters.status} onValueChange={(value) => setFilters({ ...filters, status: value })}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All statuses" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Statuses</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="in-transit">In Transit</SelectItem>
+                  <SelectItem value="completed">Completed</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <Label>Priority</Label>
+              <Select value={filters.priority} onValueChange={(value) => setFilters({ ...filters, priority: value })}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All priorities" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Priorities</SelectItem>
+                  <SelectItem value="high">High</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                  <SelectItem value="normal">Normal</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => {
+              setFilters({ type: 'all', status: 'all', priority: 'all' });
+              setIsFilterOpen(false);
+            }}>
+              Clear Filters
+            </Button>
+            <Button onClick={() => setIsFilterOpen(false)}>
+              Apply Filters
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <NewLogisticsRequestSheet
         open={isNewRequestSheetOpen}
