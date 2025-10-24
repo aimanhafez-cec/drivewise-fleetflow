@@ -90,7 +90,7 @@ const ManageOperationLogisticsRequest = () => {
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Manage Operation Logistics Request</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Manage Logistics Requests</h1>
           <p className="text-muted-foreground mt-1">
             Track and coordinate all logistics operations and transportation requests
           </p>

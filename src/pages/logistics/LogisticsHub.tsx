@@ -7,7 +7,7 @@ const LogisticsHub = () => {
 
   const logisticsCards = [
     {
-      title: 'Manage Operation Logistics Request',
+      title: 'Manage Logistics Requests',
       description: 'Track and manage operational logistics requests, delivery schedules, and transportation coordination',
       icon: Truck,
       route: '/logistics/manage-requests',
