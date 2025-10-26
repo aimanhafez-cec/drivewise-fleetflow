@@ -7,13 +7,10 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { ArrowLeft, ArrowRight, CheckCircle, Zap, Keyboard } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import ReservationTypeSelector from '@/components/instant-booking/wizard/ReservationTypeSelector';
-import CustomerIdentification from '@/components/instant-booking/wizard/CustomerIdentification';
+import CustomerAndType from '@/components/instant-booking/wizard/CustomerAndType';
 import DatesLocations from '@/components/instant-booking/wizard/DatesLocations';
 import VehicleSelection from '@/components/instant-booking/wizard/VehicleSelection';
-import ServicesAddOns from '@/components/instant-booking/wizard/ServicesAddOns';
-import PricingSummary from '@/components/instant-booking/wizard/PricingSummary';
-import DemoPayment from '@/components/instant-booking/DemoPayment';
+import AddOnsWithPricing from '@/components/instant-booking/wizard/AddOnsWithPricing';
 import WizardBookingConfirmation from '@/components/instant-booking/wizard/WizardBookingConfirmation';
 import { useInstantBooking } from '@/hooks/useInstantBooking';
 
@@ -88,16 +85,13 @@ const NewInstantBooking = () => {
     paymentMethod: 'card',
   });
 
-  const totalSteps = 8;
+  const totalSteps = 5; // Reduced from 8 to 5
 
   const stepTitles = [
-    'Reservation Type',
-    'Customer Details',
+    'Customer & Type',
     'Dates & Locations',
     'Vehicle Selection',
-    'Services & Add-ons',
-    'Pricing Summary',
-    'Down Payment',
+    'Add-ons & Pricing',
     'Confirmation'
   ];
 
@@ -108,14 +102,12 @@ const NewInstantBooking = () => {
   const canProceed = () => {
     switch (currentStep) {
       case 1:
-        return bookingData.reservationType !== null;
+        return bookingData.reservationType !== null && bookingData.customerId !== '';
       case 2:
-        return bookingData.customerId !== '';
-      case 3:
         return bookingData.pickupDate && bookingData.pickupTime && 
                bookingData.returnDate && bookingData.returnTime &&
                bookingData.pickupLocation && bookingData.returnLocation;
-      case 4:
+      case 3:
         if (bookingData.reservationType === 'vehicle_class') {
           return !!bookingData.vehicleClassId;
         } else if (bookingData.reservationType === 'make_model') {
@@ -124,12 +116,8 @@ const NewInstantBooking = () => {
           return !!bookingData.specificVehicleId;
         }
         return false;
-      case 5:
-        return true; // Add-ons are optional
-      case 6:
+      case 4:
         return bookingData.pricing !== null && bookingData.pricing.totalAmount > 0;
-      case 7:
-        return !!bookingData.paymentTransactionId;
       default:
         return true;
     }
@@ -137,9 +125,10 @@ const NewInstantBooking = () => {
 
   const handleNext = () => {
     if (canProceed() && currentStep < totalSteps) {
-      // Skip add-ons step (step 5) if in express mode
-      if (expressMode && currentStep === 4) {
-        setCurrentStep(6); // Jump to pricing summary
+      // Skip add-ons step (step 4) if in express mode
+      if (expressMode && currentStep === 3) {
+        // Move directly to payment after vehicle selection
+        handlePaymentDirect();
       } else {
         setCurrentStep(currentStep + 1);
       }
@@ -148,12 +137,39 @@ const NewInstantBooking = () => {
 
   const handleBack = () => {
     if (currentStep > 1) {
-      // Skip add-ons step (step 5) when going back if in express mode
-      if (expressMode && currentStep === 6) {
-        setCurrentStep(4); // Jump back to vehicle selection
-      } else {
-        setCurrentStep(currentStep - 1);
-      }
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const handlePaymentDirect = async () => {
+    // For express mode, calculate pricing quickly and move to confirmation
+    setIsCreatingBooking(true);
+    
+    try {
+      const result = await createInstantBooking({
+        pickupDate: `${bookingData.pickupDate}T${bookingData.pickupTime}`,
+        returnDate: `${bookingData.returnDate}T${bookingData.returnTime}`,
+        pickupLocation: bookingData.pickupLocation,
+        returnLocation: bookingData.returnLocation,
+        vehicleId: bookingData.specificVehicleId || '',
+        customerId: bookingData.customerId,
+        customerType: bookingData.customerType,
+        selectedAddOns: bookingData.selectedAddOns,
+        addOnCharges: bookingData.addOnCharges,
+        pricing: bookingData.pricing,
+      });
+
+      updateBookingData({
+        agreementNo: result.agreementNo,
+        agreementId: result.agreement.id,
+        paymentTransactionId: 'express-mode',
+      });
+
+      setCurrentStep(5);
+    } catch (error) {
+      console.error('Express booking creation failed:', error);
+    } finally {
+      setIsCreatingBooking(false);
     }
   };
 
@@ -176,13 +192,13 @@ const NewInstantBooking = () => {
       }
 
       // Enter key - proceed to next step
-      if (e.key === 'Enter' && canProceed() && currentStep < 8) {
+      if (e.key === 'Enter' && canProceed() && currentStep < 5) {
         e.preventDefault();
         handleNext();
       }
 
       // Escape key - go back
-      if (e.key === 'Escape' && currentStep > 1 && currentStep < 8) {
+      if (e.key === 'Escape' && currentStep > 1 && currentStep < 5) {
         e.preventDefault();
         handleBack();
       }
@@ -198,7 +214,7 @@ const NewInstantBooking = () => {
     toast({
       title: checked ? "Express Mode Enabled ⚡" : "Express Mode Disabled",
       description: checked 
-        ? "Add-ons step will be skipped for faster booking" 
+        ? "Add-ons & pricing step will be skipped for faster booking" 
         : "All steps will be shown",
     });
   };
@@ -228,7 +244,7 @@ const NewInstantBooking = () => {
       });
 
       // Move to confirmation step
-      setCurrentStep(8);
+      setCurrentStep(5);
     } catch (error) {
       console.error('Booking creation failed:', error);
     } finally {
@@ -250,7 +266,7 @@ const NewInstantBooking = () => {
             </div>
             <div className="flex items-center gap-4">
               {/* Express Mode Toggle */}
-              {currentStep <= 4 && (
+              {currentStep <= 3 && (
                 <div className="flex items-center gap-3 px-4 py-2 rounded-lg bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-950/30 dark:to-yellow-950/30 border border-amber-200 dark:border-amber-800">
                   <Zap className="h-4 w-4 text-amber-600 dark:text-amber-400" />
                   <Label htmlFor="express-mode" className="text-sm font-medium cursor-pointer flex items-center gap-2">
@@ -265,7 +281,7 @@ const NewInstantBooking = () => {
               )}
               
               {/* Keyboard Shortcuts Hint */}
-              {currentStep < 8 && (
+              {currentStep < 5 && (
                 <div className="hidden md:flex items-center gap-2 text-xs text-muted-foreground bg-muted/50 px-3 py-2 rounded-lg">
                   <Keyboard className="h-3 w-3" />
                   <span className="font-mono">Enter</span> to continue
@@ -305,21 +321,16 @@ const NewInstantBooking = () => {
         </div>
 
         {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Step Content */}
-          <div className="lg:col-span-2">
+        <div className="grid grid-cols-1 gap-6">
+          {/* Step Content - Full Width for merged steps */}
+          <div className={currentStep === 4 ? 'w-full' : 'lg:max-w-5xl lg:mx-auto w-full'}>
             <Card className="border-border/50 shadow-lg">
               <CardContent className="p-6">
                 {currentStep === 1 && (
-                  <ReservationTypeSelector
-                    selectedType={bookingData.reservationType}
-                    onTypeSelect={(type) => updateBookingData({ reservationType: type })}
-                  />
-                )}
-                
-                {currentStep === 2 && (
-                  <CustomerIdentification
+                  <CustomerAndType
                     selectedCustomerId={bookingData.customerId}
+                    customerName={bookingData.customerName}
+                    reservationType={bookingData.reservationType}
                     onCustomerSelect={(customer) => 
                       updateBookingData({ 
                         customerId: customer.id,
@@ -327,10 +338,12 @@ const NewInstantBooking = () => {
                         customerName: customer.full_name 
                       })
                     }
+                    onTypeSelect={(type) => updateBookingData({ reservationType: type })}
+                    onAutoAdvance={handleNext}
                   />
                 )}
                 
-                {currentStep === 3 && (
+                {currentStep === 2 && (
                   <DatesLocations
                     data={{
                       pickupDate: bookingData.pickupDate,
@@ -344,7 +357,7 @@ const NewInstantBooking = () => {
                   />
                 )}
                 
-                {currentStep === 4 && (
+                {currentStep === 3 && (
                   <VehicleSelection
                     reservationType={bookingData.reservationType!}
                     pickupDate={`${bookingData.pickupDate}T${bookingData.pickupTime}`}
@@ -356,35 +369,10 @@ const NewInstantBooking = () => {
                   />
                 )}
                 
-                {currentStep === 5 && (
-                  <ServicesAddOns
-                    selectedAddOns={bookingData.selectedAddOns}
-                    addOnCharges={bookingData.addOnCharges}
-                    rentalDays={
-                      bookingData.pickupDate && bookingData.returnDate
-                        ? Math.ceil(
-                            (new Date(`${bookingData.returnDate}T${bookingData.returnTime}`).getTime() -
-                              new Date(`${bookingData.pickupDate}T${bookingData.pickupTime}`).getTime()) /
-                              (1000 * 60 * 60 * 24)
-                          )
-                        : 1
-                    }
-                    onUpdate={updateBookingData}
-                  />
-                )}
-                
-                {currentStep === 6 && (
-                  <PricingSummary
+                {currentStep === 4 && (
+                  <AddOnsWithPricing
                     bookingData={bookingData}
-                    onPricingCalculated={(pricing) => updateBookingData({ pricing })}
-                  />
-                )}
-                
-                {currentStep === 7 && bookingData.pricing && !isCreatingBooking && (
-                  <DemoPayment
-                    amount={bookingData.pricing.downPaymentRequired}
-                    agreementNo="Pending..."
-                    onPaymentComplete={handlePaymentComplete}
+                    onUpdate={updateBookingData}
                   />
                 )}
                 
@@ -396,7 +384,7 @@ const NewInstantBooking = () => {
                   </div>
                 )}
                 
-                {currentStep === 8 && (
+                {currentStep === 5 && !isCreatingBooking && (
                   <WizardBookingConfirmation
                     bookingData={bookingData}
                     onComplete={() => navigate('/instant-booking')}
@@ -405,88 +393,16 @@ const NewInstantBooking = () => {
               </CardContent>
             </Card>
           </div>
-
-          {/* Sidebar Summary */}
-          <div className="space-y-4">
-            <Card className="border-border/50 sticky top-6">
-              <CardContent className="p-6 space-y-4">
-                <h3 className="font-semibold text-foreground">Booking Summary</h3>
-                
-                {bookingData.reservationType && (
-                  <div className="text-sm space-y-1">
-                    <p className="text-muted-foreground">Reservation Type</p>
-                    <p className="font-medium text-foreground capitalize">
-                      {bookingData.reservationType.replace('_', ' ')}
-                    </p>
-                  </div>
-                )}
-                
-                {bookingData.customerName && (
-                  <div className="text-sm space-y-1">
-                    <p className="text-muted-foreground">Customer</p>
-                    <p className="font-medium text-foreground">{bookingData.customerName}</p>
-                  </div>
-                )}
-                
-                {bookingData.pickupDate && bookingData.returnDate && (
-                  <div className="text-sm space-y-1">
-                    <p className="text-muted-foreground">Duration</p>
-                    <p className="font-medium text-foreground">
-                      {Math.ceil(
-                        (new Date(`${bookingData.returnDate}T${bookingData.returnTime || '12:00'}`).getTime() -
-                          new Date(`${bookingData.pickupDate}T${bookingData.pickupTime || '12:00'}`).getTime()) /
-                          (1000 * 60 * 60 * 24)
-                      )}{' '}
-                      days
-                    </p>
-                  </div>
-                )}
-                
-                {bookingData.pickupLocation && (
-                  <div className="text-sm space-y-1">
-                    <p className="text-muted-foreground">Pickup Location</p>
-                    <p className="font-medium text-foreground">{bookingData.pickupLocation}</p>
-                  </div>
-                )}
-                
-                {bookingData.pricing && (
-                  <div className="pt-4 border-t space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Base Amount</span>
-                      <span className="font-medium">AED {bookingData.pricing.baseAmount.toFixed(2)}</span>
-                    </div>
-                    {bookingData.pricing.addOnsTotal > 0 && (
-                      <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Add-ons</span>
-                        <span className="font-medium">AED {bookingData.pricing.addOnsTotal.toFixed(2)}</span>
-                      </div>
-                    )}
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">VAT (5%)</span>
-                      <span className="font-medium">AED {bookingData.pricing.taxAmount.toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between text-base font-bold pt-2 border-t">
-                      <span>Total</span>
-                      <span className="text-primary">AED {bookingData.pricing.totalAmount.toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between text-sm text-amber-600">
-                      <span>Down Payment Required</span>
-                      <span className="font-semibold">AED {bookingData.pricing.downPaymentRequired.toFixed(2)}</span>
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
         </div>
 
+
         {/* Navigation Buttons */}
-        {currentStep < 8 && (
-          <div className="flex justify-between mt-6 max-w-7xl mx-auto lg:max-w-[calc(66.666%-1.5rem)]">
+        {currentStep < 5 && (
+          <div className="flex justify-between mt-6 max-w-7xl mx-auto">
             <Button
               variant="outline"
               onClick={handleBack}
-              disabled={currentStep === 1}
+              disabled={currentStep === 1 || isCreatingBooking}
               className="gap-2"
             >
               <ArrowLeft className="h-4 w-4" />
@@ -494,12 +410,21 @@ const NewInstantBooking = () => {
             </Button>
             
             <Button
-              onClick={handleNext}
-              disabled={!canProceed()}
+              onClick={currentStep === 4 ? handlePaymentComplete : handleNext}
+              disabled={!canProceed() || isCreatingBooking}
               className="gap-2"
             >
-              {currentStep === totalSteps - 1 ? 'Complete Booking' : 'Continue'}
-              <ArrowRight className="h-4 w-4" />
+              {currentStep === 4 ? (
+                <>
+                  Complete Booking
+                  <CheckCircle className="h-4 w-4" />
+                </>
+              ) : (
+                <>
+                  Continue
+                  <ArrowRight className="h-4 w-4" />
+                </>
+              )}
             </Button>
           </div>
         )}
