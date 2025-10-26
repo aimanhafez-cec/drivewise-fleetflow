@@ -444,7 +444,6 @@ const NewInstantBooking = () => {
                     pickupDate={`${bookingData.pickupDate}T${bookingData.pickupTime}`}
                     returnDate={`${bookingData.returnDate}T${bookingData.returnTime}`}
                     selectedVehicleClassId={bookingData.vehicleClassId}
-                    selectedMakeModel={bookingData.makeModel}
                     selectedVehicleId={bookingData.specificVehicleId}
                     onSelect={updateBookingData}
                   />

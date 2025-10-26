@@ -13,7 +13,6 @@ interface VehicleSelectionProps {
   pickupDate: string;
   returnDate: string;
   selectedVehicleClassId?: string;
-  selectedMakeModel?: string;
   selectedVehicleId?: string;
   onSelect: (updates: any) => void;
 }
@@ -23,7 +22,6 @@ const VehicleSelection = ({
   pickupDate,
   returnDate,
   selectedVehicleClassId,
-  selectedMakeModel,
   selectedVehicleId,
   onSelect,
 }: VehicleSelectionProps) => {
@@ -213,10 +211,8 @@ const VehicleSelection = ({
   const handleQuickSelectVehicle = () => {
     if (vehicles && vehicles.length > 0) {
       const firstVehicle = vehicles[0];
-      const firstMakeModel = `${firstVehicle.make} ${firstVehicle.model}`;
       onSelect({ 
-        specificVehicleId: firstVehicle.id,
-        makeModel: firstMakeModel
+        specificVehicleId: firstVehicle.id
       });
     }
   };
@@ -230,7 +226,7 @@ const VehicleSelection = ({
             Search by make, model, VIN, or license plate. Select any available vehicle for this booking.
           </p>
         </div>
-        {(!selectedVehicleId && !selectedMakeModel) && vehicles && vehicles.length > 0 && (
+        {!selectedVehicleId && vehicles && vehicles.length > 0 && (
           <Button 
             onClick={handleQuickSelectVehicle}
             variant="outline"
@@ -261,8 +257,7 @@ const VehicleSelection = ({
       ) : vehicles && vehicles.length > 0 ? (
         <div className="space-y-3">
           {vehicles.map((vehicle) => {
-            const makeModel = `${vehicle.make} ${vehicle.model}`;
-            const isSelected = selectedVehicleId === vehicle.id || selectedMakeModel === makeModel;
+            const isSelected = selectedVehicleId === vehicle.id;
             
             return (
               <Card
@@ -271,8 +266,7 @@ const VehicleSelection = ({
                   isSelected ? 'ring-2 ring-primary' : ''
                 }`}
                 onClick={() => onSelect({ 
-                  specificVehicleId: vehicle.id,
-                  makeModel: makeModel
+                  specificVehicleId: vehicle.id
                 })}
               >
                 <CardContent className="p-4">
