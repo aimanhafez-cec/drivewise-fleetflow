@@ -81,13 +81,17 @@ const VehicleSelection = ({
   }, {});
 
   if (reservationType === 'vehicle_class') {
-    // Quick select for first vehicle class
+    // Quick select for first vehicle class (and auto-assign first vehicle for instant booking)
     const handleQuickSelect = () => {
       if (vehicleClasses && vehicleClasses.length > 0) {
         const firstClass = vehicleClasses[0];
+        const firstAvailableVehicle = firstClass.vehicles?.find((v: any) => v.status === 'available');
+        
         onSelect({ 
           vehicleClassId: firstClass.id,
-          vehicleClassName: firstClass.name
+          vehicleClassName: firstClass.name,
+          // Auto-assign first available vehicle for instant booking
+          specificVehicleId: firstAvailableVehicle?.id,
         });
       }
     };
@@ -98,7 +102,7 @@ const VehicleSelection = ({
           <div>
             <h2 className="text-2xl font-bold text-foreground mb-2">Select Vehicle Class</h2>
             <p className="text-muted-foreground">
-              Choose a vehicle category. Any available vehicle in this class will be assigned.
+              Choose a vehicle category. The first available vehicle from this class will be automatically assigned.
             </p>
           </div>
           {!selectedVehicleClassId && vehicleClasses && vehicleClasses.length > 0 && (
@@ -136,10 +140,17 @@ const VehicleSelection = ({
                   className={`cursor-pointer transition-all hover:shadow-lg ${
                     isSelected ? 'ring-2 ring-primary shadow-lg' : ''
                   } ${availableCount === 0 ? 'opacity-50' : ''}`}
-                  onClick={() => availableCount > 0 && onSelect({ 
-                    vehicleClassId: category.id,
-                    vehicleClassName: category.name
-                  })}
+                  onClick={() => {
+                    if (availableCount > 0) {
+                      const firstAvailableVehicle = category.vehicles?.find((v: any) => v.status === 'available');
+                      onSelect({ 
+                        vehicleClassId: category.id,
+                        vehicleClassName: category.name,
+                        // Auto-assign first available vehicle for instant booking
+                        specificVehicleId: firstAvailableVehicle?.id,
+                      });
+                    }
+                  }}
                 >
                   <CardContent className="p-6">
                     <div className="flex items-start justify-between mb-4">

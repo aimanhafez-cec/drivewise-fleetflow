@@ -34,10 +34,12 @@ export interface BookingWizardData {
   returnLocation: string;
   
   // Step 4: Vehicle Selection
+  // For 'vehicle_class': only vehicleClassId and vehicleClassName are set
+  // For 'specific_vehicle': both specificVehicleId and makeModel are set (from unified search)
   vehicleClassId?: string;
   vehicleClassName?: string;
-  makeModel?: string;
-  specificVehicleId?: string;
+  makeModel?: string; // Display name for specific vehicle (e.g., "Toyota Camry")
+  specificVehicleId?: string; // Required for instant booking creation
   
   // Step 5: Services & Add-ons
   selectedAddOns: string[];
@@ -114,10 +116,14 @@ const NewInstantBooking = () => {
                bookingData.returnDate && bookingData.returnTime &&
                bookingData.pickupLocation && bookingData.returnLocation;
       case 3:
+        // Vehicle selection validation
         if (bookingData.reservationType === 'vehicle_class') {
-          return !!bookingData.vehicleClassId;
+          // For instant booking, vehicle class requires auto-assignment of a specific vehicle
+          // TODO: Implement auto-assignment or convert to reservation flow
+          return !!bookingData.vehicleClassId && !!bookingData.specificVehicleId;
         } else if (bookingData.reservationType === 'specific_vehicle') {
-          return !!bookingData.specificVehicleId || !!bookingData.makeModel;
+          // Specific vehicle requires vehicle ID for instant booking
+          return !!bookingData.specificVehicleId;
         }
         return false;
       case 4:
@@ -150,12 +156,23 @@ const NewInstantBooking = () => {
     setIsCreatingBooking(true);
     
     try {
+      // Validate that we have a specific vehicle for instant booking
+      if (!bookingData.specificVehicleId) {
+        toast({
+          title: "Vehicle Required",
+          description: "Please select a specific vehicle to proceed with instant booking",
+          variant: "destructive",
+        });
+        setIsCreatingBooking(false);
+        return;
+      }
+
       const result = await createInstantBooking({
         pickupDate: `${bookingData.pickupDate}T${bookingData.pickupTime}`,
         returnDate: `${bookingData.returnDate}T${bookingData.returnTime}`,
         pickupLocation: bookingData.pickupLocation,
         returnLocation: bookingData.returnLocation,
-        vehicleId: bookingData.specificVehicleId || '',
+        vehicleId: bookingData.specificVehicleId,
         customerId: bookingData.customerId,
         customerType: bookingData.customerType,
         selectedAddOns: bookingData.selectedAddOns,
@@ -265,13 +282,24 @@ const NewInstantBooking = () => {
     setIsCreatingBooking(true);
     
     try {
+      // Validate that we have a specific vehicle for instant booking
+      if (!bookingData.specificVehicleId) {
+        toast({
+          title: "Vehicle Required",
+          description: "Please select a specific vehicle to proceed with instant booking",
+          variant: "destructive",
+        });
+        setIsCreatingBooking(false);
+        return;
+      }
+
       // Create the booking and agreement
       const result = await createInstantBooking({
         pickupDate: `${bookingData.pickupDate}T${bookingData.pickupTime}`,
         returnDate: `${bookingData.returnDate}T${bookingData.returnTime}`,
         pickupLocation: bookingData.pickupLocation,
         returnLocation: bookingData.returnLocation,
-        vehicleId: bookingData.specificVehicleId || '',
+        vehicleId: bookingData.specificVehicleId,
         customerId: bookingData.customerId,
         customerType: bookingData.customerType,
         selectedAddOns: bookingData.selectedAddOns,
