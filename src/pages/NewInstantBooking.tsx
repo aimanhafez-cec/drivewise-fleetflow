@@ -18,7 +18,7 @@ import { useLastBooking } from '@/hooks/useLastBooking';
 
 export interface BookingWizardData {
   // Step 1: Reservation Type
-  reservationType: 'vehicle_class' | 'make_model' | 'specific_vin' | null;
+  reservationType: 'vehicle_class' | 'specific_vehicle' | null;
   
   // Step 2: Customer
   customerId: string;
@@ -116,10 +116,8 @@ const NewInstantBooking = () => {
       case 3:
         if (bookingData.reservationType === 'vehicle_class') {
           return !!bookingData.vehicleClassId;
-        } else if (bookingData.reservationType === 'make_model') {
-          return !!bookingData.makeModel;
-        } else if (bookingData.reservationType === 'specific_vin') {
-          return !!bookingData.specificVehicleId;
+        } else if (bookingData.reservationType === 'specific_vehicle') {
+          return !!bookingData.specificVehicleId || !!bookingData.makeModel;
         }
         return false;
       case 4:
@@ -239,7 +237,7 @@ const NewInstantBooking = () => {
     returnDate.setDate(today.getDate() + 2);
 
     updateBookingData({
-      reservationType: lastBooking.reservationType,
+      reservationType: lastBooking.reservationType === 'make_model' || lastBooking.reservationType === 'specific_vin' ? 'specific_vehicle' : lastBooking.reservationType,
       vehicleClassId: lastBooking.vehicleClassId,
       vehicleClassName: lastBooking.vehicleClassName,
       makeModel: lastBooking.makeModel,

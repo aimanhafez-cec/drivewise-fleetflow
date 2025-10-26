@@ -9,7 +9,7 @@ import { Car, Users, Briefcase, Gauge, CheckCircle, Package, Zap, AlertTriangle,
 import { useState } from 'react';
 
 interface VehicleSelectionProps {
-  reservationType: 'vehicle_class' | 'make_model' | 'specific_vin';
+  reservationType: 'vehicle_class' | 'specific_vehicle';
   pickupDate: string;
   returnDate: string;
   selectedVehicleClassId?: string;
@@ -67,7 +67,7 @@ const VehicleSelection = ({
       if (error) throw error;
       return data || [];
     },
-    enabled: reservationType === 'make_model' || reservationType === 'specific_vin',
+    enabled: reservationType === 'specific_vehicle',
   });
 
   // Group vehicles by make+model for "make_model" type
@@ -197,7 +197,7 @@ const VehicleSelection = ({
     );
   }
 
-  if (reservationType === 'make_model') {
+  if (reservationType === 'specific_vehicle') {
     // Quick select for first make/model
     const handleQuickSelect = () => {
       if (groupedVehicles && Object.keys(groupedVehicles).length > 0) {
@@ -305,7 +305,7 @@ const VehicleSelection = ({
     );
   }
 
-  // Specific VIN
+  // Specific Vehicle Selection - Show individual vehicles with details
   // Quick select for first specific vehicle
   const handleQuickSelectVehicle = () => {
     if (vehicles && vehicles.length > 0) {

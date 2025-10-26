@@ -5,9 +5,9 @@ import ReservationTypeSelector from './ReservationTypeSelector';
 interface CustomerAndTypeProps {
   selectedCustomerId: string;
   customerName: string;
-  reservationType: 'vehicle_class' | 'make_model' | 'specific_vin' | null;
+  reservationType: 'vehicle_class' | 'specific_vehicle' | null;
   onCustomerSelect: (customer: any) => void;
-  onTypeSelect: (type: 'vehicle_class' | 'make_model' | 'specific_vin') => void;
+  onTypeSelect: (type: 'vehicle_class' | 'specific_vehicle') => void;
   onAutoAdvance?: () => void;
   onBookAgain?: () => void;
   hasLastBooking?: boolean;

@@ -188,15 +188,14 @@ export const WizardDebugPanel: React.FC = () => {
                         {wizardData.reservationType === 'vehicle_class' && (
                           <span>Class: {line.vehicleClassId || 'Not set'}</span>
                         )}
-                        {wizardData.reservationType === 'make_model' && (
+                        {wizardData.reservationType === 'specific_vehicle' && (
                           <span>
-                            {line.vehicleData?.make && line.vehicleData?.model
+                            {line.vehicleId 
+                              ? `VIN: ${line.vehicleId}` 
+                              : line.vehicleData?.make && line.vehicleData?.model
                               ? `${line.vehicleData.make} ${line.vehicleData.model}`
                               : 'Not set'}
                           </span>
-                        )}
-                        {wizardData.reservationType === 'specific_vin' && (
-                          <span>VIN: {line.vehicleId || 'Not set'}</span>
                         )}
                       </div>
                     </div>

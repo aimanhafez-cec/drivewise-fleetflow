@@ -338,13 +338,9 @@ const ReservationWizardContent: React.FC = () => {
               if (!line.vehicleClassId) {
                 errors[`line${index}_vehicle`] = `Line ${index + 1}: Vehicle class selection is required`;
               }
-            } else if (wizardData.reservationType === 'specific_vin') {
-              if (!line.vehicleId) {
-                errors[`line${index}_vehicle`] = `Line ${index + 1}: Specific vehicle (VIN) selection is required`;
-              }
-            } else if (wizardData.reservationType === 'make_model') {
-              if (!line.vehicleData?.make || !line.vehicleData?.model) {
-                errors[`line${index}_vehicle`] = `Line ${index + 1}: Make and model selection is required`;
+            } else if (wizardData.reservationType === 'specific_vehicle') {
+              if (!line.vehicleId && !line.vehicleData?.make) {
+                errors[`line${index}_vehicle`] = `Line ${index + 1}: Specific vehicle selection is required`;
               }
             }
           });
@@ -471,8 +467,7 @@ const ReservationWizardContent: React.FC = () => {
       }
       case 5: return !!(wizardData.reservationLines?.length && wizardData.reservationLines.every(line => {
         if (wizardData.reservationType === 'vehicle_class') return !!line.vehicleClassId;
-        if (wizardData.reservationType === 'specific_vin') return !!line.vehicleId;
-        if (wizardData.reservationType === 'make_model') return !!(line.vehicleData?.make && line.vehicleData?.model);
+        if (wizardData.reservationType === 'specific_vehicle') return !!line.vehicleId || !!(line.vehicleData?.make && line.vehicleData?.model);
         return false;
       }));
       case 6: return !!(wizardData.priceListId && (

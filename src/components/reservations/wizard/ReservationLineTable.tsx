@@ -9,7 +9,7 @@ import type { ReservationLine } from './ReservationWizardContext';
 
 interface ReservationLineTableProps {
   lines: ReservationLine[];
-  reservationType: 'vehicle_class' | 'make_model' | 'specific_vin' | null;
+  reservationType: 'vehicle_class' | 'specific_vehicle' | null;
   onEdit: (lineId: string) => void;
   onDelete: (lineId: string) => void;
   onDuplicate: (lineId: string) => void;
@@ -25,11 +25,12 @@ export const ReservationLineTable: React.FC<ReservationLineTableProps> = ({
   const getVehicleDisplay = (line: ReservationLine) => {
     if (reservationType === 'vehicle_class' && line.vehicleClassId) {
       return line.vehicleData?.name || `Class: ${line.vehicleClassId}`;
-    } else if (reservationType === 'make_model') {
+    } else if (reservationType === 'specific_vehicle') {
+      if (line.vehicleId) {
+        const vehicle = line.vehicleData;
+        return vehicle ? `${vehicle.make} ${vehicle.model} (${vehicle.license_plate})` : 'Vehicle';
+      }
       return line.vehicleData?.makeModel || 'Make/Model';
-    } else if (reservationType === 'specific_vin' && line.vehicleId) {
-      const vehicle = line.vehicleData;
-      return vehicle ? `${vehicle.make} ${vehicle.model} (${vehicle.license_plate})` : 'Vehicle';
     }
     return 'Not Selected';
   };
@@ -66,12 +67,7 @@ export const ReservationLineTable: React.FC<ReservationLineTableProps> = ({
               <TableCell>
                 <div className="space-y-1">
                   <div className="font-medium">{getVehicleDisplay(line)}</div>
-                  {!line.vehicleId && !line.vehicleClassId && reservationType !== 'make_model' && (
-                    <Badge variant="outline" className="text-xs">
-                      Not Selected
-                    </Badge>
-                  )}
-                  {reservationType === 'make_model' && !line.vehicleData?.makeModel && (
+                  {!line.vehicleId && !line.vehicleClassId && reservationType === 'specific_vehicle' && !line.vehicleData?.makeModel && (
                     <Badge variant="outline" className="text-xs">
                       Not Selected
                     </Badge>

@@ -19,7 +19,7 @@ interface LineEditorModalProps {
   onClose: () => void;
   onSave: (line: ReservationLine) => void;
   line?: ReservationLine;
-  reservationType: 'vehicle_class' | 'make_model' | 'specific_vin' | null;
+  reservationType: 'vehicle_class' | 'specific_vehicle' | null;
   defaultDates: {
     checkOutDate: string;
     checkOutTime: string;
@@ -72,13 +72,11 @@ export const LineEditorModal: React.FC<LineEditorModalProps> = ({
       id: line?.id || crypto.randomUUID(),
       lineNo: line?.lineNo || 1,
       vehicleClassId: reservationType === 'vehicle_class' ? vehicleClassId : undefined,
-      vehicleId: reservationType === 'specific_vin' ? vehicleId : undefined,
+      vehicleId: reservationType === 'specific_vehicle' ? vehicleId : undefined,
       vehicleData: reservationType === 'vehicle_class' 
         ? vehicleClasses.find(c => c.id === vehicleClassId)
-        : reservationType === 'specific_vin'
-        ? vehicles.find(v => v.id === vehicleId)
-        : reservationType === 'make_model' && selectedMake && selectedModel
-        ? { make: selectedMake, model: selectedModel, makeModel: `${selectedMake} ${selectedModel}` }
+        : reservationType === 'specific_vehicle'
+        ? vehicles.find(v => v.id === vehicleId) || (selectedMake && selectedModel ? { make: selectedMake, model: selectedModel, makeModel: `${selectedMake} ${selectedModel}` } : undefined)
         : undefined,
       drivers: selectedDrivers.map((driver, index) => ({
         driverId: driver.id,
@@ -116,8 +114,7 @@ export const LineEditorModal: React.FC<LineEditorModalProps> = ({
 
   const isValid = () => {
     if (reservationType === 'vehicle_class') return !!vehicleClassId;
-    if (reservationType === 'specific_vin') return !!vehicleId;
-    if (reservationType === 'make_model') return !!selectedMake && !!selectedModel;
+    if (reservationType === 'specific_vehicle') return !!vehicleId || (!!selectedMake && !!selectedModel);
     return true;
   };
 
@@ -167,7 +164,7 @@ export const LineEditorModal: React.FC<LineEditorModalProps> = ({
               </div>
             )}
 
-            {reservationType === 'specific_vin' && (
+            {reservationType === 'specific_vehicle' && (
               <div className="space-y-2">
                 <Label>Vehicle <span className="text-destructive">*</span></Label>
                 <LOVSelect
@@ -182,7 +179,7 @@ export const LineEditorModal: React.FC<LineEditorModalProps> = ({
               </div>
             )}
 
-            {reservationType === 'make_model' && (
+            {reservationType === 'specific_vehicle' && (
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label>Vehicle Make <span className="text-destructive">*</span></Label>

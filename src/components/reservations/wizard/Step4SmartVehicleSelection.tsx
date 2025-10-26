@@ -54,8 +54,7 @@ export const Step4SmartVehicleSelection: React.FC = () => {
       return data || [];
     },
     enabled:
-      wizardData.reservationType === 'make_model' ||
-      wizardData.reservationType === 'specific_vin',
+      wizardData.reservationType === 'specific_vehicle',
   });
 
   // Group vehicles by make and model for make_model type
@@ -163,16 +162,13 @@ export const Step4SmartVehicleSelection: React.FC = () => {
       <div>
         <h2 className="text-2xl font-bold text-foreground mb-2">
           {wizardData.reservationType === 'vehicle_class' && 'Select Vehicle Class'}
-          {wizardData.reservationType === 'make_model' && 'Select Make & Model'}
-          {wizardData.reservationType === 'specific_vin' && 'Select Specific Vehicle'}
+          {wizardData.reservationType === 'specific_vehicle' && 'Select Vehicle'}
         </h2>
         <p className="text-muted-foreground">
           {wizardData.reservationType === 'vehicle_class' &&
             'Choose the vehicle category for this reservation'}
-          {wizardData.reservationType === 'make_model' &&
-            'Select the make and model combination'}
-          {wizardData.reservationType === 'specific_vin' &&
-            'Choose a specific vehicle by VIN or license plate'}
+          {wizardData.reservationType === 'specific_vehicle' &&
+            'Search and select a specific vehicle by make, model, VIN, or license plate'}
         </p>
       </div>
 
@@ -208,8 +204,8 @@ export const Step4SmartVehicleSelection: React.FC = () => {
         </div>
       )}
 
-      {/* Make + Model Selection */}
-      {wizardData.reservationType === 'make_model' && (
+      {/* Specific Vehicle Selection */}
+      {wizardData.reservationType === 'specific_vehicle' && (
         <>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -256,69 +252,9 @@ export const Step4SmartVehicleSelection: React.FC = () => {
         </>
       )}
 
-      {/* Specific VIN Selection */}
-      {wizardData.reservationType === 'specific_vin' && (
-        <>
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-            <Input
-              placeholder="Search by VIN, license plate, make, or model..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-
-          <div className="space-y-3">
-            {vehicles?.map((vehicle) => (
-              <Card
-                key={vehicle.id}
-                className={`cursor-pointer transition-all hover:shadow-lg ${
-                  wizardData.reservationLines[0]?.vehicleId === vehicle.id
-                    ? 'ring-2 ring-primary shadow-lg'
-                    : ''
-                }`}
-                onClick={() => handleSpecificVehicleSelect(vehicle.id)}
-              >
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-start gap-3 flex-1">
-                      <div className="p-2 rounded-lg bg-primary/10 shrink-0">
-                        <Hash className="h-5 w-5 text-primary" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-bold text-base">
-                          {vehicle.make} {vehicle.model} ({vehicle.year})
-                        </h3>
-                        <div className="flex flex-wrap gap-2 mt-2">
-                          <Badge variant="outline">
-                            Plate: {vehicle.license_plate}
-                          </Badge>
-                          <Badge variant="outline">VIN: {vehicle.vin}</Badge>
-                          <Badge
-                            className="bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
-                          >
-                            {vehicle.status}
-                          </Badge>
-                        </div>
-                      </div>
-                    </div>
-                    {wizardData.reservationLines[0]?.vehicleId === vehicle.id && (
-                      <Check className="h-5 w-5 text-primary shrink-0 ml-2" />
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </>
-      )}
-
       {/* No Results */}
-      {((wizardData.reservationType === 'make_model' &&
-        Object.keys(makeModelOptions).length === 0) ||
-        (wizardData.reservationType === 'specific_vin' &&
-          vehicles?.length === 0)) && (
+      {wizardData.reservationType === 'specific_vehicle' &&
+        (Object.keys(makeModelOptions).length === 0 || vehicles?.length === 0) && (
         <Card className="border-dashed">
           <CardContent className="p-12 text-center">
             <Car className="h-12 w-12 text-muted-foreground mx-auto mb-4" />

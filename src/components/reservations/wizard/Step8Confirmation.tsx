@@ -109,18 +109,15 @@ export const Step8Confirmation: React.FC = () => {
 
   const reservationTypeLabels = {
     vehicle_class: 'Vehicle Class',
-    make_model: 'Make + Model',
-    specific_vin: 'Specific VIN',
-  };
+    specific_vehicle: 'Specific Vehicle',
+  } as const;
 
   const getReservationTypeIcon = () => {
     switch (wizardData.reservationType) {
       case 'vehicle_class':
         return <Package className="h-5 w-5" />;
-      case 'make_model':
+      case 'specific_vehicle':
         return <Car className="h-5 w-5" />;
-      case 'specific_vin':
-        return <Hash className="h-5 w-5" />;
       default:
         return <Car className="h-5 w-5" />;
     }
@@ -189,10 +186,9 @@ export const Step8Confirmation: React.FC = () => {
                 <span className="font-medium">
                   {wizardData.reservationType === 'vehicle_class' &&
                     wizardData.reservationLines[0]?.vehicleData?.name}
-                  {wizardData.reservationType === 'make_model' &&
-                    wizardData.reservationLines[0]?.vehicleData?.makeModel}
-                  {wizardData.reservationType === 'specific_vin' &&
-                    `${wizardData.reservationLines[0]?.vehicleData?.make} ${wizardData.reservationLines[0]?.vehicleData?.model}`}
+                  {wizardData.reservationType === 'specific_vehicle' &&
+                    (wizardData.reservationLines[0]?.vehicleData?.makeModel || 
+                     `${wizardData.reservationLines[0]?.vehicleData?.make} ${wizardData.reservationLines[0]?.vehicleData?.model}`)}
                 </span>
               </div>
             </div>

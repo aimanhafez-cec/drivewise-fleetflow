@@ -36,7 +36,7 @@ export interface BillToMeta {
 
 export interface ReservationWizardData {
   // Step 1: Reservation Type
-  reservationType: 'vehicle_class' | 'make_model' | 'specific_vin' | null;
+  reservationType: 'vehicle_class' | 'specific_vehicle' | null;
   
   // Step 1.5: Business Configuration
   reservationMethodId: string;
