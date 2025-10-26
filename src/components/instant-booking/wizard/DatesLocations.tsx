@@ -8,9 +8,11 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
-import { Calendar, MapPin, Clock, ArrowRight } from 'lucide-react';
+import { Calendar, MapPin, Clock, ArrowRight, ChevronDown } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
 
 interface DatesLocationsProps {
@@ -27,6 +29,7 @@ interface DatesLocationsProps {
 
 const DatesLocations = ({ data, onUpdate }: DatesLocationsProps) => {
   const [sameLocation, setSameLocation] = useState(true); // Default to true
+  const [advancedOptionsOpen, setAdvancedOptionsOpen] = useState(false);
 
   // Smart defaults - pre-fill dates and times on mount if empty
   useEffect(() => {
@@ -276,6 +279,64 @@ const DatesLocations = ({ data, onUpdate }: DatesLocationsProps) => {
           </CardContent>
         </Card>
       )}
+
+      {/* Collapsible Advanced Date Options */}
+      <Collapsible open={advancedOptionsOpen} onOpenChange={setAdvancedOptionsOpen}>
+        <Card className="border-dashed">
+          <CollapsibleTrigger asChild>
+            <Button
+              variant="ghost"
+              className="w-full p-4 flex items-center justify-between hover:bg-accent/50"
+            >
+              <span className="font-medium text-sm">Advanced Date Options</span>
+              <ChevronDown
+                className={`h-4 w-4 transition-transform ${advancedOptionsOpen ? 'rotate-180' : ''}`}
+              />
+            </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <CardContent className="pt-0 pb-4 px-4 space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="grace-period" className="text-sm">Grace Period (minutes)</Label>
+                  <Input
+                    id="grace-period"
+                    type="number"
+                    placeholder="30"
+                    className="mt-1"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Extra time before late fees apply
+                  </p>
+                </div>
+                <div>
+                  <Label htmlFor="billing-cycle" className="text-sm">Billing Cycle</Label>
+                  <Select defaultValue="daily">
+                    <SelectTrigger id="billing-cycle" className="mt-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-popover z-50">
+                      <SelectItem value="hourly">Hourly</SelectItem>
+                      <SelectItem value="daily">Daily</SelectItem>
+                      <SelectItem value="weekly">Weekly</SelectItem>
+                      <SelectItem value="monthly">Monthly</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox id="after-hours" />
+                <label
+                  htmlFor="after-hours"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                >
+                  Allow after-hours pickup/return (+AED 50)
+                </label>
+              </div>
+            </CardContent>
+          </CollapsibleContent>
+        </Card>
+      </Collapsible>
     </div>
   );
 };

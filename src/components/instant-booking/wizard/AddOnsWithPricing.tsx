@@ -5,6 +5,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import {
   Shield,
   UserPlus,
@@ -22,6 +23,7 @@ import {
   Briefcase,
   TrendingUp,
   DollarSign,
+  ChevronDown,
 } from 'lucide-react';
 import { BookingWizardData } from '@/pages/NewInstantBooking';
 
@@ -32,6 +34,7 @@ interface AddOnsWithPricingProps {
 
 const AddOnsWithPricing = ({ bookingData, onUpdate }: AddOnsWithPricingProps) => {
   const [pricing, setPricing] = useState<any>(null);
+  const [showAllAddOns, setShowAllAddOns] = useState(false);
   
   const rentalDays = bookingData.pickupDate && bookingData.returnDate
     ? Math.ceil(
@@ -276,14 +279,18 @@ const AddOnsWithPricing = ({ bookingData, onUpdate }: AddOnsWithPricingProps) =>
             </div>
           </div>
 
-          {/* Individual Add-ons */}
-          {categories.map((category) => (
-            <div key={category}>
-              <h3 className="font-semibold text-foreground mb-3">{category}</h3>
-              <div className="grid grid-cols-1 gap-3">
-                {addOns
-                  .filter(a => a.category === category)
-                  .map((addOn) => {
+          {/* Individual Add-ons with Progressive Disclosure */}
+          {categories.map((category, categoryIndex) => {
+            const categoryAddOns = addOns.filter(a => a.category === category);
+            const topThree = categoryAddOns.slice(0, 3);
+            const remaining = categoryAddOns.slice(3);
+
+            return (
+              <div key={category}>
+                <h3 className="font-semibold text-foreground mb-3">{category}</h3>
+                <div className="space-y-3">
+                  {/* Always show top 3 add-ons */}
+                  {topThree.map((addOn) => {
                     const IconComponent = addOn.icon;
                     const isSelected = bookingData.selectedAddOns.includes(addOn.id);
                     const cost = addOn.perDay ? addOn.rate * rentalDays : addOn.rate;
@@ -327,9 +334,73 @@ const AddOnsWithPricing = ({ bookingData, onUpdate }: AddOnsWithPricingProps) =>
                       </Card>
                     );
                   })}
+
+                  {/* Collapsible section for remaining add-ons */}
+                  {remaining.length > 0 && (
+                    <Collapsible open={showAllAddOns} onOpenChange={setShowAllAddOns}>
+                      <CollapsibleContent className="space-y-3">
+                        {remaining.map((addOn) => {
+                          const IconComponent = addOn.icon;
+                          const isSelected = bookingData.selectedAddOns.includes(addOn.id);
+                          const cost = addOn.perDay ? addOn.rate * rentalDays : addOn.rate;
+
+                          return (
+                            <Card
+                              key={addOn.id}
+                              className={`transition-all ${
+                                isSelected ? 'ring-2 ring-primary shadow-md' : ''
+                              }`}
+                            >
+                              <CardContent className="p-4">
+                                <div className="flex items-start justify-between gap-3">
+                                  <div className="flex items-start gap-3 flex-1">
+                                    <div className={`p-2 rounded-lg ${addOn.bg}`}>
+                                      <IconComponent className={`h-5 w-5 ${addOn.color}`} />
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                      <Label
+                                        htmlFor={addOn.id}
+                                        className="font-semibold text-foreground cursor-pointer text-sm"
+                                      >
+                                        {addOn.name}
+                                      </Label>
+                                      <p className="text-xs text-muted-foreground mt-1">
+                                        {addOn.description}
+                                      </p>
+                                      <Badge variant="outline" className="text-xs mt-2">
+                                        AED {addOn.rate}{addOn.perDay ? '/day' : ' flat'}
+                                        {isSelected && addOn.perDay && ` × ${rentalDays} = AED ${cost}`}
+                                      </Badge>
+                                    </div>
+                                  </div>
+                                  <Switch
+                                    id={addOn.id}
+                                    checked={isSelected}
+                                    onCheckedChange={() => handleToggle(addOn.id)}
+                                  />
+                                </div>
+                              </CardContent>
+                            </Card>
+                          );
+                        })}
+                      </CollapsibleContent>
+                      <CollapsibleTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          className="w-full mt-2 gap-2"
+                        >
+                          {showAllAddOns ? 'Show Less' : `Show ${remaining.length} More Add-ons`}
+                          <ChevronDown
+                            className={`h-4 w-4 transition-transform ${showAllAddOns ? 'rotate-180' : ''}`}
+                          />
+                        </Button>
+                      </CollapsibleTrigger>
+                    </Collapsible>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Right: Live Pricing Summary (1/3 width - sticky) */}

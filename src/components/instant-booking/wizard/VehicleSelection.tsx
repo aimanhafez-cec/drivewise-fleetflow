@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Car, Users, Briefcase, Gauge, CheckCircle, Package, Zap } from 'lucide-react';
+import { Car, Users, Briefcase, Gauge, CheckCircle, Package, Zap, AlertTriangle, TrendingUp } from 'lucide-react';
 import { useState } from 'react';
 
 interface VehicleSelectionProps {
@@ -29,17 +29,22 @@ const VehicleSelection = ({
 }: VehicleSelectionProps) => {
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Fetch vehicle classes for "vehicle_class" type
+  // Fetch vehicle classes for "vehicle_class" type with availability count
   const { data: vehicleClasses, isLoading: loadingClasses } = useQuery({
     queryKey: ['vehicle-classes'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('categories')
-        .select('*')
+        .select('*, vehicles(id, status)')
         .order('name');
       
       if (error) throw error;
-      return data || [];
+      
+      // Add availability count to each class
+      return (data || []).map(category => ({
+        ...category,
+        availableCount: category.vehicles?.filter((v: any) => v.status === 'available').length || 0,
+      }));
     },
     enabled: reservationType === 'vehicle_class',
   });
@@ -122,33 +127,49 @@ const VehicleSelection = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {vehicleClasses?.map((category) => {
               const isSelected = selectedVehicleClassId === category.id;
+              const availableCount = category.availableCount || 0;
+              const isLowAvailability = availableCount > 0 && availableCount <= 3;
               
               return (
                 <Card
                   key={category.id}
                   className={`cursor-pointer transition-all hover:shadow-lg ${
                     isSelected ? 'ring-2 ring-primary shadow-lg' : ''
-                  }`}
-                  onClick={() => onSelect({ 
+                  } ${availableCount === 0 ? 'opacity-50' : ''}`}
+                  onClick={() => availableCount > 0 && onSelect({ 
                     vehicleClassId: category.id,
                     vehicleClassName: category.name
                   })}
                 >
                   <CardContent className="p-6">
                     <div className="flex items-start justify-between mb-4">
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-3 flex-1">
                         <div className="p-3 rounded-lg bg-[hsl(var(--chart-1))]/10">
                           <Package className="h-6 w-6 text-[hsl(var(--chart-1))]" />
                         </div>
-                        <div>
-                          <h3 className="font-bold text-lg text-foreground">
-                            {category.name}
-                          </h3>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="font-bold text-lg text-foreground">
+                              {category.name}
+                            </h3>
+                            {isLowAvailability && (
+                              <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-300 flex items-center gap-1">
+                                <AlertTriangle className="h-3 w-3" />
+                                Low Stock
+                              </Badge>
+                            )}
+                          </div>
                           {category.description && (
                             <p className="text-sm text-muted-foreground">
                               {category.description}
                             </p>
                           )}
+                          <div className="flex items-center gap-2 mt-2">
+                            <Badge variant={availableCount > 3 ? 'outline' : availableCount > 0 ? 'secondary' : 'destructive'} className="text-xs">
+                              <TrendingUp className="h-3 w-3 mr-1" />
+                              {availableCount} available
+                            </Badge>
+                          </div>
                         </div>
                       </div>
                       {isSelected && (
@@ -227,6 +248,8 @@ const VehicleSelection = ({
             {Object.entries(groupedVehicles).map(([makeModel, vehicleList]: [string, any]) => {
               const isSelected = selectedMakeModel === makeModel;
               const sample = vehicleList[0];
+              const availableCount = vehicleList.length;
+              const isLowAvailability = availableCount <= 3;
               
               return (
                 <Card
@@ -238,19 +261,31 @@ const VehicleSelection = ({
                 >
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-4 flex-1">
                         <div className="p-3 rounded-lg bg-[hsl(var(--chart-2))]/10">
                           <Car className="h-6 w-6 text-[hsl(var(--chart-2))]" />
                         </div>
-                        <div>
-                          <h3 className="font-bold text-foreground">{makeModel}</h3>
-                          <p className="text-sm text-muted-foreground">
-                            {vehicleList.length} vehicle{vehicleList.length !== 1 ? 's' : ''} available • {sample.year}
-                          </p>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="font-bold text-foreground">{makeModel}</h3>
+                            {isLowAvailability && (
+                              <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-300 flex items-center gap-1">
+                                <AlertTriangle className="h-3 w-3" />
+                                Low Stock
+                              </Badge>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Badge variant={availableCount > 3 ? 'outline' : 'secondary'} className="text-xs">
+                              <TrendingUp className="h-3 w-3 mr-1" />
+                              {availableCount} available
+                            </Badge>
+                            <span className="text-sm text-muted-foreground">• {sample.year}</span>
+                          </div>
                         </div>
                       </div>
                       {isSelected && (
-                        <CheckCircle className="h-6 w-6 text-primary" />
+                        <CheckCircle className="h-6 w-6 text-primary flex-shrink-0" />
                       )}
                     </div>
                   </CardContent>

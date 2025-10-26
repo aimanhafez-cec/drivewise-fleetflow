@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Search, User, Building2, Phone, Mail, CreditCard, CheckCircle } from 'lucide-react';
+import { Search, User, Building2, Phone, Mail, CreditCard, CheckCircle, Lightbulb } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface CustomerIdentificationProps {
@@ -32,6 +32,45 @@ const CustomerIdentification = ({ selectedCustomerId, onCustomerSelect }: Custom
     },
     enabled: searchTerm.length >= 2,
   });
+
+  // Smart suggestions - similar names when no exact match
+  const suggestions = useMemo(() => {
+    if (!searchTerm || searchTerm.length < 3 || !customers || customers.length > 0) return [];
+    
+    // Get all customers to find similar names
+    return [];
+  }, [searchTerm, customers]);
+
+  const { data: allCustomers } = useQuery({
+    queryKey: ['all-customers-for-suggestions'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('customers')
+        .select('full_name')
+        .limit(100);
+      
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: searchTerm.length >= 3 && (!customers || customers.length === 0),
+  });
+
+  // Calculate suggestions based on partial matches
+  const smartSuggestions = useMemo(() => {
+    if (!searchTerm || searchTerm.length < 3 || (customers && customers.length > 0) || !allCustomers) return [];
+    
+    const searchLower = searchTerm.toLowerCase();
+    const similar = allCustomers
+      .filter(c => {
+        const nameLower = c.full_name?.toLowerCase() || '';
+        // Check if parts of the name match
+        const nameWords = nameLower.split(' ');
+        return nameWords.some(word => word.startsWith(searchLower.substring(0, 2)));
+      })
+      .slice(0, 3);
+    
+    return similar.length > 0 ? similar : [];
+  }, [searchTerm, customers, allCustomers]);
 
   const { data: selectedCustomer } = useQuery({
     queryKey: ['customer-detail', selectedCustomerId],
@@ -143,6 +182,32 @@ const CustomerIdentification = ({ selectedCustomerId, onCustomerSelect }: Custom
                 </CardContent>
               </Card>
             ))
+          ) : smartSuggestions.length > 0 ? (
+            <Card className="bg-amber-50 border-amber-200">
+              <CardContent className="p-4">
+                <div className="flex items-start gap-3">
+                  <Lightbulb className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-amber-900 mb-2">
+                      Did you mean...?
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {smartSuggestions.map((suggestion, idx) => (
+                        <Button
+                          key={idx}
+                          variant="outline"
+                          size="sm"
+                          className="bg-white hover:bg-amber-100"
+                          onClick={() => setSearchTerm(suggestion.full_name || '')}
+                        >
+                          {suggestion.full_name}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           ) : customers && customers.length > 0 ? (
             <>
               <p className="text-sm text-muted-foreground">
