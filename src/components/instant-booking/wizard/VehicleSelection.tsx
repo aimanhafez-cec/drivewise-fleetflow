@@ -2,9 +2,10 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Car, Users, Briefcase, Gauge, CheckCircle, Package } from 'lucide-react';
+import { Car, Users, Briefcase, Gauge, CheckCircle, Package, Zap } from 'lucide-react';
 import { useState } from 'react';
 
 interface VehicleSelectionProps {
@@ -75,13 +76,36 @@ const VehicleSelection = ({
   }, {});
 
   if (reservationType === 'vehicle_class') {
+    // Quick select for first vehicle class
+    const handleQuickSelect = () => {
+      if (vehicleClasses && vehicleClasses.length > 0) {
+        const firstClass = vehicleClasses[0];
+        onSelect({ 
+          vehicleClassId: firstClass.id,
+          vehicleClassName: firstClass.name
+        });
+      }
+    };
+
     return (
       <div className="space-y-6">
-        <div>
-          <h2 className="text-2xl font-bold text-foreground mb-2">Select Vehicle Class</h2>
-          <p className="text-muted-foreground">
-            Choose a vehicle category. Any available vehicle in this class will be assigned.
-          </p>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h2 className="text-2xl font-bold text-foreground mb-2">Select Vehicle Class</h2>
+            <p className="text-muted-foreground">
+              Choose a vehicle category. Any available vehicle in this class will be assigned.
+            </p>
+          </div>
+          {!selectedVehicleClassId && vehicleClasses && vehicleClasses.length > 0 && (
+            <Button 
+              onClick={handleQuickSelect}
+              variant="outline"
+              className="gap-2 bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-950/30 dark:to-yellow-950/30 border-amber-200 dark:border-amber-800"
+            >
+              <Zap className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+              Quick Select First
+            </Button>
+          )}
         </div>
 
         {loadingClasses ? (
@@ -153,13 +177,33 @@ const VehicleSelection = ({
   }
 
   if (reservationType === 'make_model') {
+    // Quick select for first make/model
+    const handleQuickSelect = () => {
+      if (groupedVehicles && Object.keys(groupedVehicles).length > 0) {
+        const firstMakeModel = Object.keys(groupedVehicles)[0];
+        onSelect({ makeModel: firstMakeModel });
+      }
+    };
+
     return (
       <div className="space-y-6">
-        <div>
-          <h2 className="text-2xl font-bold text-foreground mb-2">Select Make & Model</h2>
-          <p className="text-muted-foreground">
-            Choose a specific make and model. Any available vehicle of this type will be assigned.
-          </p>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h2 className="text-2xl font-bold text-foreground mb-2">Select Make & Model</h2>
+            <p className="text-muted-foreground">
+              Choose a specific make and model. Any available vehicle of this type will be assigned.
+            </p>
+          </div>
+          {!selectedMakeModel && groupedVehicles && Object.keys(groupedVehicles).length > 0 && (
+            <Button 
+              onClick={handleQuickSelect}
+              variant="outline"
+              className="gap-2 bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-950/30 dark:to-yellow-950/30 border-amber-200 dark:border-amber-800"
+            >
+              <Zap className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+              Quick Select First
+            </Button>
+          )}
         </div>
 
         <Input
@@ -227,13 +271,33 @@ const VehicleSelection = ({
   }
 
   // Specific VIN
+  // Quick select for first specific vehicle
+  const handleQuickSelectVehicle = () => {
+    if (vehicles && vehicles.length > 0) {
+      const firstVehicle = vehicles[0];
+      onSelect({ specificVehicleId: firstVehicle.id });
+    }
+  };
+
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold text-foreground mb-2">Select Specific Vehicle</h2>
-        <p className="text-muted-foreground">
-          Search and select a specific vehicle by license plate or VIN
-        </p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-bold text-foreground mb-2">Select Specific Vehicle</h2>
+          <p className="text-muted-foreground">
+            Search and select a specific vehicle by license plate or VIN
+          </p>
+        </div>
+        {!selectedVehicleId && vehicles && vehicles.length > 0 && (
+          <Button 
+            onClick={handleQuickSelectVehicle}
+            variant="outline"
+            className="gap-2 bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-950/30 dark:to-yellow-950/30 border-amber-200 dark:border-amber-800"
+          >
+            <Zap className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+            Quick Select First
+          </Button>
+        )}
       </div>
 
       <Input
