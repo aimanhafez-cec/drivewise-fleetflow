@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import CustomerIdentification from './CustomerIdentification';
 import ReservationTypeSelector from './ReservationTypeSelector';
@@ -24,15 +23,7 @@ const CustomerAndType = ({
   onBookAgain,
   hasLastBooking,
 }: CustomerAndTypeProps) => {
-  // Auto-advance when both customer and type are selected
-  useEffect(() => {
-    if (selectedCustomerId && reservationType && onAutoAdvance) {
-      const timer = setTimeout(() => {
-        onAutoAdvance();
-      }, 500);
-      return () => clearTimeout(timer);
-    }
-  }, [selectedCustomerId, reservationType, onAutoAdvance]);
+  // Auto-advance removed - allow users to use "Book Again" before proceeding
 
   const bothSelected = selectedCustomerId && reservationType;
 
@@ -80,7 +71,7 @@ const CustomerAndType = ({
                 Customer: {customerName} • Type: {reservationType?.replace('_', ' ')}
               </p>
             </div>
-            <p className="text-xs text-muted-foreground">Auto-advancing...</p>
+            <p className="text-xs text-muted-foreground">Click "Continue" when ready</p>
           </div>
         </div>
       )}
