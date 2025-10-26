@@ -212,10 +212,15 @@ const NewInstantBooking = () => {
         return;
       }
 
-      // Enter key - proceed to next step
+      // Enter key - proceed to next step or complete booking
       if (e.key === 'Enter' && canProceed() && currentStep < 5) {
         e.preventDefault();
-        handleNext();
+        // On step 4, create the booking instead of just moving to next step
+        if (currentStep === 4) {
+          handlePaymentComplete();
+        } else {
+          handleNext();
+        }
       }
 
       // Escape key - go back
