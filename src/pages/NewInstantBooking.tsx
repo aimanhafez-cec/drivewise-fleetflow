@@ -1,9 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { ArrowLeft, ArrowRight, CheckCircle } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { ArrowLeft, ArrowRight, CheckCircle, Zap, Keyboard } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 import ReservationTypeSelector from '@/components/instant-booking/wizard/ReservationTypeSelector';
 import CustomerIdentification from '@/components/instant-booking/wizard/CustomerIdentification';
 import DatesLocations from '@/components/instant-booking/wizard/DatesLocations';
@@ -63,7 +66,9 @@ export interface BookingWizardData {
 
 const NewInstantBooking = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState(1);
+  const [expressMode, setExpressMode] = useState(false);
   const { createInstantBooking } = useInstantBooking();
   const [isCreatingBooking, setIsCreatingBooking] = useState(false);
   const [bookingData, setBookingData] = useState<BookingWizardData>({
@@ -132,13 +137,23 @@ const NewInstantBooking = () => {
 
   const handleNext = () => {
     if (canProceed() && currentStep < totalSteps) {
-      setCurrentStep(currentStep + 1);
+      // Skip add-ons step (step 5) if in express mode
+      if (expressMode && currentStep === 4) {
+        setCurrentStep(6); // Jump to pricing summary
+      } else {
+        setCurrentStep(currentStep + 1);
+      }
     }
   };
 
   const handleBack = () => {
     if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
+      // Skip add-ons step (step 5) when going back if in express mode
+      if (expressMode && currentStep === 6) {
+        setCurrentStep(4); // Jump back to vehicle selection
+      } else {
+        setCurrentStep(currentStep - 1);
+      }
     }
   };
 
@@ -146,6 +161,46 @@ const NewInstantBooking = () => {
     if (window.confirm('Are you sure you want to cancel? All progress will be lost.')) {
       navigate('/instant-booking');
     }
+  };
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't trigger if user is typing in an input field
+      if (
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement ||
+        e.target instanceof HTMLSelectElement
+      ) {
+        return;
+      }
+
+      // Enter key - proceed to next step
+      if (e.key === 'Enter' && canProceed() && currentStep < 8) {
+        e.preventDefault();
+        handleNext();
+      }
+
+      // Escape key - go back
+      if (e.key === 'Escape' && currentStep > 1 && currentStep < 8) {
+        e.preventDefault();
+        handleBack();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [currentStep, bookingData, expressMode]);
+
+  // Handle express mode toggle
+  const handleExpressModeToggle = (checked: boolean) => {
+    setExpressMode(checked);
+    toast({
+      title: checked ? "Express Mode Enabled ⚡" : "Express Mode Disabled",
+      description: checked 
+        ? "Add-ons step will be skipped for faster booking" 
+        : "All steps will be shown",
+    });
   };
 
   const handlePaymentComplete = async () => {
@@ -193,9 +248,36 @@ const NewInstantBooking = () => {
                 Step {currentStep} of {totalSteps}: {stepTitles[currentStep - 1]}
               </p>
             </div>
-            <Button variant="outline" onClick={handleCancel}>
-              Cancel
-            </Button>
+            <div className="flex items-center gap-4">
+              {/* Express Mode Toggle */}
+              {currentStep <= 4 && (
+                <div className="flex items-center gap-3 px-4 py-2 rounded-lg bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-950/30 dark:to-yellow-950/30 border border-amber-200 dark:border-amber-800">
+                  <Zap className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                  <Label htmlFor="express-mode" className="text-sm font-medium cursor-pointer flex items-center gap-2">
+                    Express Mode
+                  </Label>
+                  <Switch
+                    id="express-mode"
+                    checked={expressMode}
+                    onCheckedChange={handleExpressModeToggle}
+                  />
+                </div>
+              )}
+              
+              {/* Keyboard Shortcuts Hint */}
+              {currentStep < 8 && (
+                <div className="hidden md:flex items-center gap-2 text-xs text-muted-foreground bg-muted/50 px-3 py-2 rounded-lg">
+                  <Keyboard className="h-3 w-3" />
+                  <span className="font-mono">Enter</span> to continue
+                  <span className="mx-1">•</span>
+                  <span className="font-mono">Esc</span> to go back
+                </div>
+              )}
+              
+              <Button variant="outline" onClick={handleCancel}>
+                Cancel
+              </Button>
+            </div>
           </div>
           
           {/* Progress Bar */}
