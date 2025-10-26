@@ -10,6 +10,8 @@ interface CustomerAndTypeProps {
   onCustomerSelect: (customer: any) => void;
   onTypeSelect: (type: 'vehicle_class' | 'make_model' | 'specific_vin') => void;
   onAutoAdvance?: () => void;
+  onBookAgain?: () => void;
+  hasLastBooking?: boolean;
 }
 
 const CustomerAndType = ({
@@ -19,6 +21,8 @@ const CustomerAndType = ({
   onCustomerSelect,
   onTypeSelect,
   onAutoAdvance,
+  onBookAgain,
+  hasLastBooking,
 }: CustomerAndTypeProps) => {
   // Auto-advance when both customer and type are selected
   useEffect(() => {
@@ -48,6 +52,8 @@ const CustomerAndType = ({
             <CustomerIdentification
               selectedCustomerId={selectedCustomerId}
               onCustomerSelect={onCustomerSelect}
+              onBookAgain={onBookAgain}
+              hasLastBooking={hasLastBooking}
             />
           </CardContent>
         </Card>

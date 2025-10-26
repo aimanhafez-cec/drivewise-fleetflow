@@ -5,15 +5,17 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Search, User, Building2, Phone, Mail, CreditCard, CheckCircle, Lightbulb } from 'lucide-react';
+import { Search, User, Building2, Phone, Mail, CreditCard, CheckCircle, Lightbulb, History, Zap } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface CustomerIdentificationProps {
   selectedCustomerId: string;
   onCustomerSelect: (customer: any) => void;
+  onBookAgain?: () => void;
+  hasLastBooking?: boolean;
 }
 
-const CustomerIdentification = ({ selectedCustomerId, onCustomerSelect }: CustomerIdentificationProps) => {
+const CustomerIdentification = ({ selectedCustomerId, onCustomerSelect, onBookAgain, hasLastBooking }: CustomerIdentificationProps) => {
   const [searchTerm, setSearchTerm] = useState('');
 
   const { data: customers, isLoading } = useQuery({
@@ -111,58 +113,88 @@ const CustomerIdentification = ({ selectedCustomerId, onCustomerSelect }: Custom
 
       {/* Selected Customer Display */}
       {selectedCustomer && (
-        <Card className="border-primary bg-primary/5">
-          <CardContent className="p-4">
-            <div className="flex items-start justify-between">
-              <div className="space-y-3 flex-1">
-                <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-lg ${
-                    selectedCustomer.customer_type === 'Company' 
-                      ? 'bg-blue-100 text-blue-700' 
-                      : 'bg-green-100 text-green-700'
-                  }`}>
-                    {selectedCustomer.customer_type === 'Company' ? (
-                      <Building2 className="h-5 w-5" />
-                    ) : (
-                      <User className="h-5 w-5" />
-                    )}
+        <div className="space-y-3">
+          <Card className="border-primary bg-primary/5">
+            <CardContent className="p-4">
+              <div className="flex items-start justify-between">
+                <div className="space-y-3 flex-1">
+                  <div className="flex items-center gap-3">
+                    <div className={`p-2 rounded-lg ${
+                      selectedCustomer.customer_type === 'Company' 
+                        ? 'bg-blue-100 text-blue-700' 
+                        : 'bg-green-100 text-green-700'
+                    }`}>
+                      {selectedCustomer.customer_type === 'Company' ? (
+                        <Building2 className="h-5 w-5" />
+                      ) : (
+                        <User className="h-5 w-5" />
+                      )}
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-foreground text-lg">
+                        {selectedCustomer.full_name}
+                      </h3>
+                      <Badge variant={selectedCustomer.customer_type === 'Company' ? 'default' : 'secondary'}>
+                        {selectedCustomer.customer_type}
+                      </Badge>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-bold text-foreground text-lg">
-                      {selectedCustomer.full_name}
-                    </h3>
-                    <Badge variant={selectedCustomer.customer_type === 'Company' ? 'default' : 'secondary'}>
-                      {selectedCustomer.customer_type}
-                    </Badge>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                    {selectedCustomer.phone && (
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <Phone className="h-4 w-4" />
+                        <span>{selectedCustomer.phone}</span>
+                      </div>
+                    )}
+                    {selectedCustomer.email && (
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <Mail className="h-4 w-4" />
+                        <span>{selectedCustomer.email}</span>
+                      </div>
+                    )}
+                    {selectedCustomer.credit_limit && (
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <CreditCard className="h-4 w-4" />
+                        <span>Credit Limit: AED {selectedCustomer.credit_limit.toLocaleString()}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                  {selectedCustomer.phone && (
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <Phone className="h-4 w-4" />
-                      <span>{selectedCustomer.phone}</span>
-                    </div>
-                  )}
-                  {selectedCustomer.email && (
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <Mail className="h-4 w-4" />
-                      <span>{selectedCustomer.email}</span>
-                    </div>
-                  )}
-                  {selectedCustomer.credit_limit && (
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <CreditCard className="h-4 w-4" />
-                      <span>Credit Limit: AED {selectedCustomer.credit_limit.toLocaleString()}</span>
-                    </div>
-                  )}
-                </div>
+                <CheckCircle className="h-6 w-6 text-primary flex-shrink-0" />
               </div>
-              
-              <CheckCircle className="h-6 w-6 text-primary flex-shrink-0" />
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+
+          {/* Book Again Quick Action */}
+          {hasLastBooking && onBookAgain && (
+            <Card className="border-2 border-amber-200 bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-950/30 dark:to-yellow-950/30">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex items-start gap-3 flex-1">
+                    <div className="p-2 rounded-lg bg-amber-100 dark:bg-amber-900">
+                      <History className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-bold text-foreground mb-1">Repeat Customer</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Pre-fill booking with last reservation preferences
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    onClick={onBookAgain}
+                    className="gap-2 bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-700 hover:to-yellow-700"
+                  >
+                    <Zap className="h-4 w-4" />
+                    Book Again
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
       )}
 
       {/* Search Results */}

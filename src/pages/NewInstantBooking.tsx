@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, ArrowRight, CheckCircle, Zap, Keyboard } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { ArrowLeft, ArrowRight, CheckCircle, Zap, Keyboard, History } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import CustomerAndType from '@/components/instant-booking/wizard/CustomerAndType';
 import DatesLocations from '@/components/instant-booking/wizard/DatesLocations';
@@ -13,6 +14,7 @@ import VehicleSelection from '@/components/instant-booking/wizard/VehicleSelecti
 import AddOnsWithPricing from '@/components/instant-booking/wizard/AddOnsWithPricing';
 import WizardBookingConfirmation from '@/components/instant-booking/wizard/WizardBookingConfirmation';
 import { useInstantBooking } from '@/hooks/useInstantBooking';
+import { useLastBooking } from '@/hooks/useLastBooking';
 
 export interface BookingWizardData {
   // Step 1: Reservation Type
@@ -66,6 +68,7 @@ const NewInstantBooking = () => {
   const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState(1);
   const [expressMode, setExpressMode] = useState(false);
+  const [isRepeatBooking, setIsRepeatBooking] = useState(false);
   const { createInstantBooking } = useInstantBooking();
   const [isCreatingBooking, setIsCreatingBooking] = useState(false);
   const [bookingData, setBookingData] = useState<BookingWizardData>({
@@ -84,6 +87,9 @@ const NewInstantBooking = () => {
     pricing: null,
     paymentMethod: 'card',
   });
+
+  // Fetch last booking data for the selected customer
+  const { data: lastBooking, isLoading: loadingLastBooking } = useLastBooking(bookingData.customerId || null);
 
   const totalSteps = 5; // Reduced from 8 to 5
 
@@ -219,6 +225,44 @@ const NewInstantBooking = () => {
     });
   };
 
+  // Handle "Book Again" - pre-fill from last booking
+  const handleBookAgain = () => {
+    if (!lastBooking) return;
+
+    setIsRepeatBooking(true);
+    
+    // Calculate new dates (tomorrow and day after)
+    const today = new Date();
+    const pickupDate = new Date(today);
+    pickupDate.setDate(today.getDate() + 1);
+    const returnDate = new Date(today);
+    returnDate.setDate(today.getDate() + 2);
+
+    updateBookingData({
+      reservationType: lastBooking.reservationType,
+      vehicleClassId: lastBooking.vehicleClassId,
+      vehicleClassName: lastBooking.vehicleClassName,
+      makeModel: lastBooking.makeModel,
+      specificVehicleId: lastBooking.specificVehicleId,
+      pickupLocation: lastBooking.pickupLocation,
+      returnLocation: lastBooking.returnLocation,
+      pickupDate: pickupDate.toISOString().split('T')[0],
+      pickupTime: '09:00',
+      returnDate: returnDate.toISOString().split('T')[0],
+      returnTime: '18:00',
+      selectedAddOns: lastBooking.selectedAddOns,
+      addOnCharges: lastBooking.addOnCharges,
+    });
+
+    toast({
+      title: "Booking Pre-filled! 🎉",
+      description: "All preferences from your last booking have been applied. Just confirm dates and finalize!",
+    });
+
+    // Auto-advance to next step
+    setCurrentStep(2);
+  };
+
   const handlePaymentComplete = async () => {
     setIsCreatingBooking(true);
     
@@ -259,9 +303,18 @@ const NewInstantBooking = () => {
         <div className="mb-6">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h1 className="text-3xl font-bold text-foreground">New Instant Booking</h1>
+              <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
+                New Instant Booking
+                {isRepeatBooking && (
+                  <Badge className="gap-2 bg-gradient-to-r from-amber-600 to-yellow-600">
+                    <History className="h-3 w-3" />
+                    Repeat Booking
+                  </Badge>
+                )}
+              </h1>
               <p className="text-muted-foreground mt-1">
                 Step {currentStep} of {totalSteps}: {stepTitles[currentStep - 1]}
+                {isRepeatBooking && ' • Pre-filled from last booking'}
               </p>
             </div>
             <div className="flex items-center gap-4">
@@ -340,6 +393,8 @@ const NewInstantBooking = () => {
                     }
                     onTypeSelect={(type) => updateBookingData({ reservationType: type })}
                     onAutoAdvance={handleNext}
+                    onBookAgain={handleBookAgain}
+                    hasLastBooking={!!lastBooking}
                   />
                 )}
                 
