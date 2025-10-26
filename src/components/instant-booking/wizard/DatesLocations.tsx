@@ -95,7 +95,12 @@ const DatesLocations = ({ data, onUpdate }: DatesLocationsProps) => {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-foreground mb-2">Dates & Locations</h2>
+        <div className="flex items-center gap-3 mb-2">
+          <h2 className="text-2xl font-bold text-foreground">Dates & Locations</h2>
+          <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950 dark:text-emerald-400 dark:border-emerald-800">
+            Auto Default
+          </Badge>
+        </div>
         <p className="text-muted-foreground">
           Select pickup and return dates, times, and locations
         </p>
