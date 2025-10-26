@@ -147,38 +147,67 @@ const BookingStatsCards = () => {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-      {stats.map((stat, index) => (
-        <Card key={index} className="border-border/50 shadow-sm hover:shadow-md transition-shadow">
-          <CardContent className="p-6">
-            {stat.loading ? (
-              <div className="space-y-3">
-                <Skeleton className="h-4 w-24" />
-                <Skeleton className="h-8 w-16" />
-                <Skeleton className="h-3 w-32" />
-              </div>
-            ) : (
-              <>
-                <div className="flex items-center justify-between mb-3">
-                  <p className="text-sm font-medium text-muted-foreground">
-                    {stat.title}
-                  </p>
-                  <div className={`p-2 rounded-lg ${stat.bgColor}`}>
-                    <stat.icon className={`h-4 w-4 ${stat.color}`} />
+      {stats.map((stat, index) => {
+        // Special styling for Average Booking Time card
+        const isBookingTimeCard = stat.title === "Average Booking Time";
+        
+        return (
+          <Card 
+            key={index} 
+            className={
+              isBookingTimeCard 
+                ? "border-2 border-purple-200 bg-gradient-to-br from-purple-50 via-blue-50 to-cyan-50 dark:from-purple-950/30 dark:via-blue-950/30 dark:to-cyan-950/30 dark:border-purple-800 shadow-lg hover:shadow-xl transition-all duration-300" 
+                : "border-border/50 shadow-sm hover:shadow-md transition-shadow"
+            }
+          >
+            <CardContent className="p-6">
+              {stat.loading ? (
+                <div className="space-y-3">
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-8 w-16" />
+                  <Skeleton className="h-3 w-32" />
+                </div>
+              ) : (
+                <>
+                  <div className="flex items-center justify-between mb-3">
+                    <p className={`text-sm font-medium ${isBookingTimeCard ? 'text-purple-700 dark:text-purple-300' : 'text-muted-foreground'}`}>
+                      {stat.title}
+                    </p>
+                    <div className={`p-2 rounded-lg ${stat.bgColor} ${isBookingTimeCard ? 'relative' : ''}`}>
+                      {isBookingTimeCard && (
+                        <div className="absolute inset-0 bg-purple-400 dark:bg-purple-500 blur-xl opacity-30 animate-pulse rounded-lg" />
+                      )}
+                      <stat.icon className={`h-4 w-4 ${stat.color} relative z-10`} />
+                    </div>
                   </div>
-                </div>
-                <div className="space-y-1">
-                  <h3 className="text-2xl font-bold text-foreground">
-                    {stat.value}
-                  </h3>
-                  <p className="text-xs text-muted-foreground">
-                    {stat.subtitle}
-                  </p>
-                </div>
-              </>
-            )}
-          </CardContent>
-        </Card>
-      ))}
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <h3 className={
+                        isBookingTimeCard 
+                          ? "text-3xl font-bold bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-600 dark:from-purple-400 dark:via-blue-400 dark:to-cyan-400 bg-clip-text text-transparent"
+                          : "text-2xl font-bold text-foreground"
+                      }>
+                        {stat.value}
+                      </h3>
+                      {isBookingTimeCard && (
+                        <Zap className="h-5 w-5 text-yellow-500 dark:text-yellow-400 animate-bounce" />
+                      )}
+                    </div>
+                    <p className={
+                      isBookingTimeCard
+                        ? "text-sm font-medium text-purple-600 dark:text-purple-400 flex items-center gap-1"
+                        : "text-xs text-muted-foreground"
+                    }>
+                      {isBookingTimeCard && <span>⚡</span>}
+                      {stat.subtitle}
+                    </p>
+                  </div>
+                </>
+              )}
+            </CardContent>
+          </Card>
+        );
+      })}
     </div>
   );
 };
