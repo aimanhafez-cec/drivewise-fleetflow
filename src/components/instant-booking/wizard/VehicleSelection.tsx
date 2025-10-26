@@ -197,120 +197,16 @@ const VehicleSelection = ({
     );
   }
 
-  if (reservationType === 'specific_vehicle') {
-    // Quick select for first make/model
-    const handleQuickSelect = () => {
-      if (groupedVehicles && Object.keys(groupedVehicles).length > 0) {
-        const firstMakeModel = Object.keys(groupedVehicles)[0];
-        onSelect({ makeModel: firstMakeModel });
-      }
-    };
-
-    return (
-      <div className="space-y-6">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h2 className="text-2xl font-bold text-foreground mb-2">Select Make & Model</h2>
-            <p className="text-muted-foreground">
-              Choose a specific make and model. Any available vehicle of this type will be assigned.
-            </p>
-          </div>
-          {!selectedMakeModel && groupedVehicles && Object.keys(groupedVehicles).length > 0 && (
-            <Button 
-              onClick={handleQuickSelect}
-              variant="outline"
-              className="gap-2 bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-950/30 dark:to-yellow-950/30 border-amber-200 dark:border-amber-800"
-            >
-              <Zap className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-              Quick Select First
-            </Button>
-          )}
-        </div>
-
-        <Input
-          placeholder="Search make or model..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-
-        {loadingVehicles ? (
-          <div className="space-y-3">
-            {[...Array(3)].map((_, i) => (
-              <Card key={i}>
-                <CardContent className="p-4">
-                  <Skeleton className="h-16 w-full" />
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        ) : groupedVehicles && Object.keys(groupedVehicles).length > 0 ? (
-          <div className="space-y-3">
-            {Object.entries(groupedVehicles).map(([makeModel, vehicleList]: [string, any]) => {
-              const isSelected = selectedMakeModel === makeModel;
-              const sample = vehicleList[0];
-              const availableCount = vehicleList.length;
-              const isLowAvailability = availableCount <= 3;
-              
-              return (
-                <Card
-                  key={makeModel}
-                  className={`cursor-pointer transition-all hover:shadow-md ${
-                    isSelected ? 'ring-2 ring-primary' : ''
-                  }`}
-                  onClick={() => onSelect({ makeModel })}
-                >
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4 flex-1">
-                        <div className="p-3 rounded-lg bg-[hsl(var(--chart-2))]/10">
-                          <Car className="h-6 w-6 text-[hsl(var(--chart-2))]" />
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <h3 className="font-bold text-foreground">{makeModel}</h3>
-                            {isLowAvailability && (
-                              <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-300 flex items-center gap-1">
-                                <AlertTriangle className="h-3 w-3" />
-                                Low Stock
-                              </Badge>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Badge variant={availableCount > 3 ? 'outline' : 'secondary'} className="text-xs">
-                              <TrendingUp className="h-3 w-3 mr-1" />
-                              {availableCount} available
-                            </Badge>
-                            <span className="text-sm text-muted-foreground">• {sample.year}</span>
-                          </div>
-                        </div>
-                      </div>
-                      {isSelected && (
-                        <CheckCircle className="h-6 w-6 text-primary flex-shrink-0" />
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        ) : (
-          <Card className="border-dashed">
-            <CardContent className="p-12 text-center">
-              <Car className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">No vehicles found</p>
-            </CardContent>
-          </Card>
-        )}
-      </div>
-    );
-  }
-
-  // Specific Vehicle Selection - Show individual vehicles with details
-  // Quick select for first specific vehicle
+  // Unified Vehicle Search - Search by make, model, VIN, or license plate
+  // Quick select for first vehicle
   const handleQuickSelectVehicle = () => {
     if (vehicles && vehicles.length > 0) {
       const firstVehicle = vehicles[0];
-      onSelect({ specificVehicleId: firstVehicle.id });
+      const firstMakeModel = `${firstVehicle.make} ${firstVehicle.model}`;
+      onSelect({ 
+        specificVehicleId: firstVehicle.id,
+        makeModel: firstMakeModel
+      });
     }
   };
 
@@ -318,12 +214,12 @@ const VehicleSelection = ({
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-foreground mb-2">Select Specific Vehicle</h2>
+          <h2 className="text-2xl font-bold text-foreground mb-2">Search & Select Vehicle</h2>
           <p className="text-muted-foreground">
-            Search and select a specific vehicle by license plate or VIN
+            Search by make, model, VIN, or license plate. Select any available vehicle for this booking.
           </p>
         </div>
-        {!selectedVehicleId && vehicles && vehicles.length > 0 && (
+        {(!selectedVehicleId && !selectedMakeModel) && vehicles && vehicles.length > 0 && (
           <Button 
             onClick={handleQuickSelectVehicle}
             variant="outline"
@@ -336,7 +232,7 @@ const VehicleSelection = ({
       </div>
 
       <Input
-        placeholder="Search by license plate or VIN..."
+        placeholder="Search by make, model, VIN, or license plate..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
@@ -354,7 +250,8 @@ const VehicleSelection = ({
       ) : vehicles && vehicles.length > 0 ? (
         <div className="space-y-3">
           {vehicles.map((vehicle) => {
-            const isSelected = selectedVehicleId === vehicle.id;
+            const makeModel = `${vehicle.make} ${vehicle.model}`;
+            const isSelected = selectedVehicleId === vehicle.id || selectedMakeModel === makeModel;
             
             return (
               <Card
@@ -362,27 +259,34 @@ const VehicleSelection = ({
                 className={`cursor-pointer transition-all hover:shadow-md ${
                   isSelected ? 'ring-2 ring-primary' : ''
                 }`}
-                onClick={() => onSelect({ specificVehicleId: vehicle.id })}
+                onClick={() => onSelect({ 
+                  specificVehicleId: vehicle.id,
+                  makeModel: makeModel
+                })}
               >
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex items-start gap-4 flex-1">
-                      <div className="p-3 rounded-lg bg-[hsl(var(--chart-3))]/10">
-                        <Car className="h-6 w-6 text-[hsl(var(--chart-3))]" />
+                      <div className="p-3 rounded-lg bg-[hsl(var(--chart-2))]/10">
+                        <Car className="h-6 w-6 text-[hsl(var(--chart-2))]" />
                       </div>
                       <div className="flex-1">
-                        <h3 className="font-bold text-foreground">
-                          {vehicle.make} {vehicle.model}
-                        </h3>
+                        <div className="flex items-center gap-2 mb-1">
+                          <h3 className="font-bold text-foreground">
+                            {vehicle.make} {vehicle.model}
+                          </h3>
+                          <Badge variant="outline" className="text-xs">{vehicle.year}</Badge>
+                        </div>
                         <div className="flex flex-wrap gap-2 mt-2">
-                          <Badge variant="outline">{vehicle.year}</Badge>
-                          <Badge variant="outline">{vehicle.license_plate}</Badge>
+                          <Badge variant="secondary" className="font-mono">
+                            {vehicle.license_plate}
+                          </Badge>
                           {vehicle.color && (
                             <Badge variant="outline">{vehicle.color}</Badge>
                           )}
                         </div>
                         {vehicle.vin && (
-                          <p className="text-xs text-muted-foreground mt-2">
+                          <p className="text-xs text-muted-foreground mt-2 font-mono">
                             VIN: {vehicle.vin}
                           </p>
                         )}
