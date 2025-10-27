@@ -13,7 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Button } from '@/components/ui/button';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 interface DatesLocationsProps {
   data: {
@@ -31,31 +31,8 @@ const DatesLocations = ({ data, onUpdate }: DatesLocationsProps) => {
   const [sameLocation, setSameLocation] = useState(true); // Default to true
   const [advancedOptionsOpen, setAdvancedOptionsOpen] = useState(false);
 
-  // Smart defaults - pre-fill dates and times on mount if empty
-  useEffect(() => {
-    const hasData = data.pickupDate || data.pickupTime || data.returnDate || data.returnTime;
-    
-    if (!hasData) {
-      const today = new Date();
-      
-      // Pickup: Tomorrow
-      const pickupDate = new Date(today);
-      pickupDate.setDate(today.getDate() + 1);
-      const pickupDateStr = pickupDate.toISOString().split('T')[0];
-      
-      // Return: Day after tomorrow
-      const returnDate = new Date(today);
-      returnDate.setDate(today.getDate() + 2);
-      const returnDateStr = returnDate.toISOString().split('T')[0];
-      
-      onUpdate({
-        pickupDate: pickupDateStr,
-        pickupTime: '09:00',
-        returnDate: returnDateStr,
-        returnTime: '18:00',
-      });
-    }
-  }, []); // Only run on mount
+  // Note: Default dates/times are now handled by useSmartDefaults hook in ReservationWizardMain
+  // This ensures customer history preferences are respected and applied consistently
 
   const locations = [
     { value: 'Dubai Airport Terminal 1', label: 'Dubai Airport T1' },
