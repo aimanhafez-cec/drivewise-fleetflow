@@ -111,16 +111,16 @@ export const LeadDataTable = ({ leads }: LeadDataTableProps) => {
   return (
     <Card>
       <div className="overflow-x-auto">
-        <Table>
+        <Table className="table-fixed w-full">
           <TableHeader>
             <TableRow>
-              <TableHead>Lead ID</TableHead>
-              <TableHead>Source</TableHead>
-              <TableHead>Customer</TableHead>
-              <TableHead>Vehicle</TableHead>
-              <TableHead>Dates</TableHead>
+              <TableHead className="w-[120px]">Lead ID</TableHead>
+              <TableHead className="w-[180px]">Source</TableHead>
+              <TableHead className="min-w-[220px]">Customer</TableHead>
+              <TableHead className="w-[140px]">Vehicle</TableHead>
+              <TableHead className="w-[190px]">Dates</TableHead>
               <TableHead 
-                className="cursor-pointer hover:bg-muted/50"
+                className="w-[80px] cursor-pointer hover:bg-muted/50"
                 onClick={() => handleSort('duration_days')}
               >
                 <div className="flex items-center gap-1">
@@ -129,16 +129,16 @@ export const LeadDataTable = ({ leads }: LeadDataTableProps) => {
                 </div>
               </TableHead>
               <TableHead 
-                className="cursor-pointer hover:bg-muted/50"
+                className="w-[120px] cursor-pointer hover:bg-muted/50 text-right"
                 onClick={() => handleSort('estimated_value')}
               >
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1 justify-end">
                   Est. Value
                   <ArrowUpDown className="h-3 w-3" />
                 </div>
               </TableHead>
               <TableHead 
-                className="cursor-pointer hover:bg-muted/50"
+                className="w-[110px] cursor-pointer hover:bg-muted/50"
                 onClick={() => handleSort('priority')}
               >
                 <div className="flex items-center gap-1">
@@ -146,9 +146,9 @@ export const LeadDataTable = ({ leads }: LeadDataTableProps) => {
                   <ArrowUpDown className="h-3 w-3" />
                 </div>
               </TableHead>
-              <TableHead>Status</TableHead>
+              <TableHead className="w-[110px]">Status</TableHead>
               <TableHead 
-                className="cursor-pointer hover:bg-muted/50"
+                className="w-[120px] cursor-pointer hover:bg-muted/50"
                 onClick={() => handleSort('created_at')}
               >
                 <div className="flex items-center gap-1">
@@ -156,7 +156,7 @@ export const LeadDataTable = ({ leads }: LeadDataTableProps) => {
                   <ArrowUpDown className="h-3 w-3" />
                 </div>
               </TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead className="w-[120px] text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -166,22 +166,22 @@ export const LeadDataTable = ({ leads }: LeadDataTableProps) => {
                 className="cursor-pointer hover:bg-muted/50"
                 onClick={() => navigate(`/leads-intake/${lead.id}`)}
               >
-                <TableCell className="font-mono text-sm">
+                <TableCell className="font-mono text-sm whitespace-nowrap w-[120px]">
                   {lead.lead_no}
                 </TableCell>
-            <TableCell>
-              <div className="min-w-[140px]">
+                <TableCell>
+              <div className="min-w-[180px]">
                 <LeadSourceBadge sourceId={lead.source_name} />
               </div>
             </TableCell>
-                <TableCell>
+                <TableCell className="min-w-[220px]">
                   <div className="space-y-1">
                     <p className="font-medium">{lead.customer_name}</p>
                     <p className="text-xs text-muted-foreground">{lead.customer_email}</p>
                     <p className="text-xs text-muted-foreground">{lead.customer_phone}</p>
                   </div>
                 </TableCell>
-                <TableCell>
+                <TableCell className="w-[140px] whitespace-nowrap">
                   <div className="space-y-1">
                     <p className="font-medium text-sm">{lead.vehicle_category}</p>
                     {lead.alternative_categories && (
@@ -191,7 +191,7 @@ export const LeadDataTable = ({ leads }: LeadDataTableProps) => {
                     )}
                   </div>
                 </TableCell>
-                <TableCell>
+                <TableCell className="w-[190px]">
                   <div className="space-y-1 text-xs">
                     <div className="flex items-center gap-1">
                       <Calendar className="h-3 w-3" />
@@ -202,20 +202,20 @@ export const LeadDataTable = ({ leads }: LeadDataTableProps) => {
                     </p>
                   </div>
                 </TableCell>
-                <TableCell>
+                <TableCell className="w-[80px]">
                   <Badge variant="outline">{lead.duration_days}d</Badge>
                 </TableCell>
-                <TableCell className="font-semibold">
+                <TableCell className="font-semibold text-right tabular-nums w-[120px]">
                   AED {lead.estimated_value.toLocaleString()}
                 </TableCell>
                 <TableCell>{getPriorityBadge(lead.priority)}</TableCell>
                 <TableCell>{getStatusBadge(lead.status)}</TableCell>
-                <TableCell>
+                <TableCell className="w-[110px]">
                   <p className="text-xs">
                     {formatDistanceToNow(new Date(lead.created_at), { addSuffix: true })}
                   </p>
                 </TableCell>
-                <TableCell className="text-right">
+                <TableCell className="w-[120px] text-right">
                   <div className="flex items-center justify-end gap-2">
                     {(lead.status === 'new' || lead.status === 'contacted' || lead.status === 'quoted') && (
                       <Button
