@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { ArrowLeft, ArrowRight, Save, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Save, AlertTriangle, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useWizardProgress } from '@/hooks/useWizardProgress';
 import { useWizardKeyboardShortcuts } from '@/hooks/useWizardKeyboardShortcuts';
+import { useAgreementSmartDefaults, useApplyAgreementSmartDefaults } from '@/hooks/useAgreementSmartDefaults';
 import { validateStep } from '@/lib/wizard/validation';
 import { WizardProgress } from '@/components/reservations/wizard/WizardProgress';
 import { SourceSelection } from './wizard/SourceSelection';
@@ -189,12 +190,67 @@ export const EnhancedAgreementWizard = () => {
     totalSteps: TOTAL_STEPS,
   });
 
+  // Smart defaults for customer history
+  const customerId = wizardData.step1?.customerId;
+  const { smartDefaults, hasHistory, isLoading: loadingDefaults } = useAgreementSmartDefaults(customerId);
+  const { applyDefaults } = useApplyAgreementSmartDefaults();
+
+  // Apply smart defaults when customer is selected
+  useEffect(() => {
+    if (customerId && smartDefaults && !loadingDefaults) {
+      const updates = applyDefaults(wizardData, smartDefaults, {
+        overwriteExisting: false, // Don't overwrite user-entered data
+      });
+      
+      if (Object.keys(updates).length > 0) {
+        console.log('[AgreementSmartDefaults] Applying smart defaults:', updates);
+        
+        // Apply updates to wizard data
+        Object.keys(updates).forEach(key => {
+          updateWizardData(key as keyof EnhancedWizardData, updates[key]);
+        });
+        
+        if (smartDefaults.hasHistory) {
+          toast.success('Smart Defaults Applied', {
+            description: 'Pre-filled with customer\'s preferences from previous agreements',
+          });
+        }
+      }
+    }
+  }, [customerId, smartDefaults, loadingDefaults]);
+
   // Validate current step whenever data changes
   useEffect(() => {
     const result = validateStep(progress.currentStep, wizardData);
     setValidationResult(result);
     setCanProceed(result.isValid);
   }, [wizardData, progress.currentStep, setCanProceed]);
+
+  // Handler for "Apply Smart Defaults" quick action
+  const handleApplySmartDefaults = () => {
+    if (!smartDefaults) return;
+    
+    const updates = applyDefaults(wizardData, smartDefaults, {
+      overwriteExisting: true, // Force overwrite for manual apply
+    });
+    
+    if (Object.keys(updates).length > 0) {
+      console.log('[AgreementSmartDefaults] Manually applying smart defaults:', updates);
+      
+      // Apply updates to wizard data
+      Object.keys(updates).forEach(key => {
+        updateWizardData(key as keyof EnhancedWizardData, updates[key]);
+      });
+      
+      toast.success('Smart Defaults Applied', {
+        description: `Applied preferences from ${smartDefaults.appliedFrom === 'history' ? 'customer history' : 'system defaults'}`,
+      });
+    } else {
+      toast.info('No defaults to apply', {
+        description: 'All fields are already filled',
+      });
+    }
+  };
 
   const handleNext = () => {
     const result = validateStep(progress.currentStep, wizardData);
@@ -431,6 +487,17 @@ export const EnhancedAgreementWizard = () => {
                 </p>
               </div>
               <div className="flex gap-2">
+                {customerId && hasHistory && smartDefaults && (
+                  <Button 
+                    variant="secondary" 
+                    size="sm" 
+                    onClick={handleApplySmartDefaults}
+                    disabled={loadingDefaults}
+                  >
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    Apply Smart Defaults
+                  </Button>
+                )}
                 <Button variant="outline" size="sm" onClick={handleSaveDraft}>
                   <Save className="h-4 w-4 mr-2" />
                   Save Draft
