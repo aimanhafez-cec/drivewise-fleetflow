@@ -28,7 +28,7 @@ import { Step8Confirmation } from './Step8Confirmation';
 import { useReservationDataConsistency } from '@/hooks/useReservationDataConsistency';
 import { validateReservation, validateHeader } from '@/lib/validation/reservationSchema';
 import { ValidationErrorBanner } from '@/components/ui/validation-error-banner';
-import { WizardDebugPanel } from './WizardDebugPanel';
+import { ReservationProgressionCard } from './ReservationProgressionCard';
 import { useSmartDefaults, useApplySmartDefaults } from '@/hooks/useSmartDefaults';
 import {
   getStepGroups,
@@ -695,7 +695,7 @@ const ReservationWizardContent: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background" ref={swipeRef as any}>
-      <WizardDebugPanel />
+      <ReservationProgressionCard />
       <WizardProgress
         currentStep={currentStep} 
         totalSteps={14} 
