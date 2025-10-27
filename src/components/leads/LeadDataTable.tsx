@@ -115,7 +115,7 @@ export const LeadDataTable = ({ leads }: LeadDataTableProps) => {
           <TableHeader>
             <TableRow>
               <TableHead>Lead ID</TableHead>
-              <TableHead className="min-w-[150px]">Source</TableHead>
+              <TableHead>Source</TableHead>
               <TableHead>Customer</TableHead>
               <TableHead>Vehicle</TableHead>
               <TableHead>Dates</TableHead>
@@ -169,9 +169,11 @@ export const LeadDataTable = ({ leads }: LeadDataTableProps) => {
                 <TableCell className="font-mono text-sm">
                   {lead.lead_no}
                 </TableCell>
-                <TableCell>
-                  <LeadSourceBadge sourceId={lead.source_name} />
-                </TableCell>
+            <TableCell>
+              <div className="min-w-[140px]">
+                <LeadSourceBadge sourceId={lead.source_name} />
+              </div>
+            </TableCell>
                 <TableCell>
                   <div className="space-y-1">
                     <p className="font-medium">{lead.customer_name}</p>
