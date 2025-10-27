@@ -20,7 +20,7 @@ export function MockDataLoader({ onLoadData }: MockDataLoaderProps) {
     onLoadData({
       step2: {
         inspectionMode: 'checkout_checkin',
-        activeTab: 'comparison',
+        activeTab: 'checkout', // Start at checkout to allow review
         preHandoverChecklist: mockCheckOutInspection.preHandoverChecklist,
         inspectionChecklist: mockCheckOutInspection.inspectionChecklist,
         fuelLevel: mockCheckOutInspection.fuelLevel,
@@ -37,7 +37,7 @@ export function MockDataLoader({ onLoadData }: MockDataLoaderProps) {
     onLoadData({
       step2: {
         inspectionMode: 'checkout_checkin',
-        activeTab: 'comparison',
+        activeTab: 'checkout', // Start at checkout to allow review
         preHandoverChecklist: mockCheckOutInspection.preHandoverChecklist,
         inspectionChecklist: mockCheckOutInspection.inspectionChecklist,
         fuelLevel: mockCheckOutInspection.fuelLevel,
@@ -54,7 +54,7 @@ export function MockDataLoader({ onLoadData }: MockDataLoaderProps) {
     onLoadData({
       step2: {
         inspectionMode: 'checkout_checkin',
-        activeTab: 'comparison',
+        activeTab: 'checkout', // Start at checkout to allow review
         preHandoverChecklist: mockCheckOutInspection.preHandoverChecklist,
         inspectionChecklist: mockCheckOutInspection.inspectionChecklist,
         fuelLevel: mockCheckOutInspection.fuelLevel,
