@@ -81,7 +81,7 @@ export interface DamageComparisonItem {
 
 // Additional charges beyond damages
 export interface AdditionalCharge {
-  type: 'fuel' | 'excess_km' | 'cleaning' | 'late_return' | 'salik' | 'smoke_penalty' | 'traffic_fine' | 'other';
+  type: 'fuel' | 'excess_km' | 'cleaning' | 'late_return' | 'salik' | 'other';
   description: string;
   calculation?: string;
   amount: number;
@@ -330,9 +330,6 @@ export interface EnhancedWizardData {
     lateReturnCharge?: number;
     salikTrips?: number;
     salikCharge?: number;
-    smokePenalty?: number;
-    trafficFineAmount?: number;
-    trafficFineCount?: number;
     paymentMethod?: 'card' | 'cash' | 'transfer' | '';
     disputeRaised?: boolean;
     overrideReason?: string;
