@@ -170,14 +170,14 @@ export function CheckInInspectionTab({
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in" role="region" aria-label="Check-out inspection form">
       {/* Comparison Alert */}
       <Alert className="border-primary bg-primary/5">
-        <Info className="h-4 w-4" />
+        <Info className="h-4 w-4" aria-hidden="true" />
         <AlertDescription>
           <div className="flex flex-col gap-2">
             <p className="font-semibold">Comparing against Check-Out inspection</p>
-            <div className="grid grid-cols-3 gap-4 text-sm">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
               <div>
                 <span className="text-muted-foreground">Check-Out Fuel:</span>
                 <Badge variant="outline" className="ml-2">{checkOutData.fuelLevel}%</Badge>
@@ -217,15 +217,15 @@ export function CheckInInspectionTab({
       <Accordion type="multiple" defaultValue={['checklist', 'metrics', 'damage']} className="w-full">
         {/* Return Checklist */}
         <AccordionItem value="checklist">
-          <AccordionTrigger>
+          <AccordionTrigger className="hover:no-underline transition-all">
             <div className="flex items-center gap-3">
               <span className="font-semibold">Return Checklist</span>
-              <Badge variant="outline">
+              <Badge variant="outline" className="transition-colors">
                 {returnChecklistProgress}/{RETURN_CHECKLIST_ITEMS.length} Complete
               </Badge>
             </div>
           </AccordionTrigger>
-          <AccordionContent>
+          <AccordionContent className="animate-fade-in">
             <Card>
               <CardContent className="pt-6 space-y-4">
                 {RETURN_CHECKLIST_ITEMS.map((item) => (
@@ -236,6 +236,7 @@ export function CheckInInspectionTab({
                       onCheckedChange={(checked) => 
                         handleChecklistChange(item.id, checked as boolean)
                       }
+                      aria-label={item.label}
                     />
                     <Label htmlFor={item.id} className="cursor-pointer">
                       {item.label}

@@ -22,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import {
   AlertTriangle,
   CheckCircle2,
@@ -86,15 +87,18 @@ export function InspectionComparisonTab({
   const [severityFilter, setSeverityFilter] = useState<string>('all');
   const [chargeableFilter, setChargeableFilter] = useState<string>('all');
   const [managerOverride, setManagerOverride] = useState(false);
+  const [isCalculating, setIsCalculating] = useState(false);
 
   // Calculate damages
   const damages = useMemo<DamageItem[]>(() => {
+    setIsCalculating(true);
+    
     const checkoutDamages = checkOutData.damageMarkers.map(m => m.id);
     const newDamages = checkInData.damageMarkers.filter(
       m => !checkoutDamages.includes(m.id)
     );
 
-    return newDamages.map((marker) => {
+    const result = newDamages.map((marker) => {
       const cost = calculateDamageCost(marker.type, marker.severity);
       const requiresInsurance = marker.severity === 'major' && cost > 2000;
       
@@ -111,6 +115,9 @@ export function InspectionComparisonTab({
         requiresInsurance
       };
     });
+    
+    setTimeout(() => setIsCalculating(false), 300);
+    return result;
   }, [checkOutData, checkInData]);
 
   // Calculate additional charges
@@ -163,24 +170,31 @@ export function InspectionComparisonTab({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 print:space-y-4 animate-fade-in" role="region" aria-label="Damage comparison report">
+      {/* Loading state */}
+      {isCalculating && (
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
+          <LoadingSpinner size="lg" text="Calculating costs..." />
+        </div>
+      )}
+
       {/* Header Summary Card */}
-      <Card className="border-primary">
+      <Card className="border-primary animate-scale-in print-break-inside-avoid">
         <CardHeader>
-          <div className="flex items-start justify-between">
-            <div>
-              <CardTitle className="text-2xl">Damage & Charges Report</CardTitle>
+          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+            <div className="flex-1">
+              <CardTitle className="text-xl lg:text-2xl">Damage & Charges Report</CardTitle>
               <CardDescription className="mt-2">
                 Comprehensive comparison between check-out and check-in inspections
               </CardDescription>
             </div>
-            <Badge variant="outline" className="text-lg px-4 py-2">
+            <Badge variant="outline" className="text-base lg:text-lg px-4 py-2 w-fit" aria-label="Agreement number">
               AGR-000123
             </Badge>
           </div>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
               <p className="text-sm text-muted-foreground">Customer</p>
               <p className="font-semibold">Ahmed Al Mansoori</p>
@@ -202,27 +216,30 @@ export function InspectionComparisonTab({
             </div>
           </div>
           <Separator className="my-4" />
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Badge variant="outline" className="text-base">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge variant="outline" className="text-sm lg:text-base">
                 {Math.ceil((new Date(checkInData.timestamp).getTime() - new Date(checkOutData.timestamp).getTime()) / (1000 * 60 * 60 * 24))} Days Rental
               </Badge>
-              <Badge variant="outline" className="text-base">
+              <Badge variant="outline" className="text-sm lg:text-base">
                 {kmDriven} km Driven
               </Badge>
             </div>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={handleExportPDF}>
-                <Download className="w-4 h-4 mr-2" />
-                Export PDF
+            <div className="flex flex-wrap gap-2 print:hidden">
+              <Button variant="outline" size="sm" onClick={handleExportPDF} aria-label="Export report as PDF">
+                <Download className="w-4 h-4 mr-2" aria-hidden="true" />
+                <span className="hidden sm:inline">Export PDF</span>
+                <span className="sm:hidden">PDF</span>
               </Button>
-              <Button variant="outline" size="sm" onClick={handleEmailReport}>
-                <Mail className="w-4 h-4 mr-2" />
-                Email
+              <Button variant="outline" size="sm" onClick={handleEmailReport} aria-label="Email report">
+                <Mail className="w-4 h-4 mr-2" aria-hidden="true" />
+                <span className="hidden sm:inline">Email</span>
+                <span className="sm:hidden">Mail</span>
               </Button>
-              <Button variant="outline" size="sm" onClick={handlePrint}>
-                <Printer className="w-4 h-4 mr-2" />
-                Print
+              <Button variant="outline" size="sm" onClick={handlePrint} aria-label="Print report">
+                <Printer className="w-4 h-4 mr-2" aria-hidden="true" />
+                <span className="hidden sm:inline">Print</span>
+                <span className="sm:hidden">Print</span>
               </Button>
             </div>
           </div>

@@ -155,19 +155,19 @@ export function CheckOutInspectionTab({ data, lineId, onUpdate }: CheckOutInspec
   ).length;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in" role="region" aria-label="Check-out inspection form">
       <Accordion type="multiple" defaultValue={['checklist', 'metrics', 'damage']} className="w-full">
         {/* Pre-Handover Checklist */}
         <AccordionItem value="checklist">
-          <AccordionTrigger>
+          <AccordionTrigger className="hover:no-underline transition-all">
             <div className="flex items-center gap-3">
               <span className="font-semibold">Pre-Handover Checklist</span>
-              <Badge variant="outline">
+              <Badge variant="outline" className="transition-colors">
                 {preHandoverProgress}/{PRE_HANDOVER_ITEMS.length} Complete
               </Badge>
             </div>
           </AccordionTrigger>
-          <AccordionContent>
+          <AccordionContent className="animate-fade-in">
             <Card>
               <CardContent className="pt-6 space-y-4">
                 {PRE_HANDOVER_ITEMS.map((item) => (
@@ -178,6 +178,7 @@ export function CheckOutInspectionTab({ data, lineId, onUpdate }: CheckOutInspec
                       onCheckedChange={(checked) => 
                         handleChecklistChange(item.id, checked as boolean)
                       }
+                      aria-label={item.label}
                     />
                     <Label htmlFor={item.id} className="cursor-pointer">
                       {item.label}
