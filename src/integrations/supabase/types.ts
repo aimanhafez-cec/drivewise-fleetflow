@@ -424,6 +424,56 @@ export type Database = {
           },
         ]
       }
+      agreement_split_payments: {
+        Row: {
+          agreement_id: string | null
+          amount: number
+          created_at: string | null
+          id: string
+          loyalty_points_used: number | null
+          metadata: Json | null
+          payment_method: string
+          processed_at: string | null
+          status: string | null
+          transaction_ref: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          agreement_id?: string | null
+          amount: number
+          created_at?: string | null
+          id?: string
+          loyalty_points_used?: number | null
+          metadata?: Json | null
+          payment_method: string
+          processed_at?: string | null
+          status?: string | null
+          transaction_ref?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          agreement_id?: string | null
+          amount?: number
+          created_at?: string | null
+          id?: string
+          loyalty_points_used?: number | null
+          metadata?: Json | null
+          payment_method?: string
+          processed_at?: string | null
+          status?: string | null
+          transaction_ref?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agreement_split_payments_agreement_id_fkey"
+            columns: ["agreement_id"]
+            isOneToOne: false
+            referencedRelation: "agreements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       agreements: {
         Row: {
           add_ons: Json | null
@@ -5411,6 +5461,66 @@ export type Database = {
           },
         ]
       }
+      payment_links: {
+        Row: {
+          agreement_id: string | null
+          amount: number
+          created_at: string | null
+          customer_id: string | null
+          expires_at: string | null
+          id: string
+          link_token: string
+          paid_at: string | null
+          payment_method: string | null
+          status: string | null
+          transaction_ref: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          agreement_id?: string | null
+          amount: number
+          created_at?: string | null
+          customer_id?: string | null
+          expires_at?: string | null
+          id?: string
+          link_token: string
+          paid_at?: string | null
+          payment_method?: string | null
+          status?: string | null
+          transaction_ref?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          agreement_id?: string | null
+          amount?: number
+          created_at?: string | null
+          customer_id?: string | null
+          expires_at?: string | null
+          id?: string
+          link_token?: string
+          paid_at?: string | null
+          payment_method?: string | null
+          status?: string | null
+          transaction_ref?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_links_agreement_id_fkey"
+            columns: ["agreement_id"]
+            isOneToOne: false
+            referencedRelation: "agreements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_links_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payments: {
         Row: {
           amount: number
@@ -5546,6 +5656,7 @@ export type Database = {
           total_spent: number | null
           updated_at: string
           user_id: string
+          wallet_balance: number | null
         }
         Insert: {
           address?: Json | null
@@ -5566,6 +5677,7 @@ export type Database = {
           total_spent?: number | null
           updated_at?: string
           user_id: string
+          wallet_balance?: number | null
         }
         Update: {
           address?: Json | null
@@ -5586,6 +5698,7 @@ export type Database = {
           total_spent?: number | null
           updated_at?: string
           user_id?: string
+          wallet_balance?: number | null
         }
         Relationships: []
       }
