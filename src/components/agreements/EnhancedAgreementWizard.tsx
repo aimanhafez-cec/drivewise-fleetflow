@@ -89,6 +89,12 @@ const INITIAL_WIZARD_DATA: EnhancedWizardData = {
       documents: [],
       damages: [],
     },
+    notes: undefined,
+    inspectionMode: 'single', // Default to single inspection mode
+    activeTab: undefined,
+    checkOutInspection: undefined,
+    checkInInspection: undefined,
+    comparisonReport: undefined,
   },
   step3: {
     baseRate: 0,

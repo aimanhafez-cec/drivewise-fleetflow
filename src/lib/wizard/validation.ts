@@ -99,24 +99,26 @@ export const validateStep2 = (data: EnhancedWizardData): StepValidation => {
   const warnings: string[] = [];
   const step2 = data.step2;
 
-  // Pre-handover checklist
+  // Check if using enhanced inspection mode
+  if (step2.inspectionMode === 'checkout_checkin') {
+    return validateEnhancedInspection(step2);
+  }
+
+  // Legacy validation for single inspection mode
   const checklist = step2.preHandoverChecklist;
   if (!checklist.vehicleCleaned || !checklist.vehicleFueled || !checklist.documentsReady || 
       !checklist.keysAvailable || !checklist.warningLightsOk) {
     warnings.push('Pre-handover checklist not fully completed');
   }
 
-  // Fuel level validation
   if (step2.fuelLevel === undefined || step2.fuelLevel < 0 || step2.fuelLevel > 1) {
     errors.push('Please set fuel level (0-100%)');
   }
 
-  // Odometer validation
   if (!step2.odometerReading || step2.odometerReading <= 0) {
     errors.push('Please enter a valid odometer reading');
   }
 
-  // Photo requirements
   if (!step2.odometerPhoto) {
     warnings.push('Odometer photo not captured');
   }
@@ -133,19 +135,125 @@ export const validateStep2 = (data: EnhancedWizardData): StepValidation => {
     warnings.push(`Only ${step2.photos.interior.length} interior photos captured (recommended: 4)`);
   }
 
-  // Inspection checklist
   const completedChecks = Object.values(step2.inspectionChecklist).filter(Boolean).length;
   if (completedChecks < 23) {
     warnings.push(`${completedChecks}/23 inspection points completed`);
   }
 
-  // Damage markers
   if (step2.damageMarkers.length > 0) {
     step2.damageMarkers.forEach((marker, index) => {
       if (marker.photos.length === 0) {
         warnings.push(`Damage marker #${index + 1} has no photos`);
       }
     });
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+    warnings,
+  };
+};
+
+// Enhanced validation for checkout/checkin inspection mode
+const validateEnhancedInspection = (step2: any): StepValidation => {
+  const errors: string[] = [];
+  const warnings: string[] = [];
+
+  // Validate checkout inspection
+  if (!step2.checkOutInspection) {
+    errors.push('Check-out inspection is required');
+    return { isValid: false, errors, warnings };
+  }
+
+  const checkout = step2.checkOutInspection;
+  
+  // Checkout validation
+  if (!checkout.inspectorName) {
+    errors.push('Checkout inspector name is required');
+  }
+  
+  if (checkout.fuelLevel === undefined || checkout.fuelLevel < 0 || checkout.fuelLevel > 1) {
+    errors.push('Checkout fuel level must be between 0 and 100%');
+  }
+  
+  if (!checkout.odometerReading || checkout.odometerReading <= 0) {
+    errors.push('Checkout odometer reading is required');
+  }
+
+  if (!checkout.odometerPhoto) {
+    warnings.push('Checkout odometer photo not captured');
+  }
+
+  if (!checkout.fuelGaugePhoto) {
+    warnings.push('Checkout fuel gauge photo not captured');
+  }
+
+  if (checkout.photos.exterior.length < 4) {
+    warnings.push(`Only ${checkout.photos.exterior.length} checkout exterior photos (recommended: 8)`);
+  }
+
+  // Checkin validation (only if checkin is started)
+  if (step2.checkInInspection) {
+    const checkin = step2.checkInInspection;
+    
+    if (!checkin.inspectorName) {
+      errors.push('Checkin inspector name is required');
+    }
+    
+    if (checkin.fuelLevel === undefined || checkin.fuelLevel < 0 || checkin.fuelLevel > 1) {
+      errors.push('Checkin fuel level must be between 0 and 100%');
+    }
+    
+    if (!checkin.odometerReading || checkin.odometerReading <= 0) {
+      errors.push('Checkin odometer reading is required');
+    }
+
+    if (checkin.odometerReading < checkout.odometerReading) {
+      errors.push('Checkin odometer cannot be less than checkout odometer');
+    }
+
+    if (!checkin.odometerPhoto) {
+      warnings.push('Checkin odometer photo not captured');
+    }
+
+    if (!checkin.fuelGaugePhoto) {
+      warnings.push('Checkin fuel gauge photo not captured');
+    }
+
+    if (checkin.photos.exterior.length < 4) {
+      warnings.push(`Only ${checkin.photos.exterior.length} checkin exterior photos (recommended: 8)`);
+    }
+
+    // Validate comparison report
+    if (step2.comparisonReport) {
+      const report = step2.comparisonReport;
+      
+      if (report.grandTotal < 0) {
+        errors.push('Total charges cannot be negative');
+      }
+
+      if (report.newDamages.length > 0) {
+        report.newDamages.forEach((damage, idx) => {
+          if (damage.chargeable && damage.chargeableAmount <= 0) {
+            warnings.push(`Damage #${idx + 1} marked chargeable but amount is 0`);
+          }
+          if (damage.photos.checkin.length === 0) {
+            warnings.push(`Damage #${idx + 1} has no photos`);
+          }
+        });
+      }
+
+      if (report.grandTotal > 5000 && !report.managerApprovedBy) {
+        warnings.push('Charges exceed AED 5,000 - manager approval recommended');
+      }
+
+      if (!report.customerAcknowledged) {
+        warnings.push('Customer has not acknowledged the damage report');
+      }
+    } else {
+      warnings.push('Comparison report not generated yet');
+    }
   }
 
   return {

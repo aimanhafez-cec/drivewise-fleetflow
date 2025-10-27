@@ -39,6 +39,80 @@ export interface DamageMarker {
   photos: string[];
   notes: string;
   side?: string; // For compatibility
+  event?: 'checkout' | 'checkin'; // Track when damage was recorded
+  estimatedCost?: number; // Cost to repair this damage
+  repairDescription?: string; // What repair is needed
+}
+
+// Enhanced inspection data structure for checkout/checkin
+export interface InspectionData {
+  timestamp: string;
+  inspectorId?: string;
+  inspectorName: string;
+  preHandoverChecklist: PreHandoverChecklist;
+  fuelLevel: number;
+  odometerReading: number;
+  odometerPhoto?: string;
+  fuelGaugePhoto?: string;
+  damageMarkers: DamageMarker[];
+  photos: InspectionPhotos;
+  inspectionChecklist: Record<string, boolean>;
+  notes?: string;
+}
+
+// Comparison of damages between checkout and checkin
+export interface DamageComparisonItem {
+  id: string;
+  damageType: string;
+  severity: DamageSeverity;
+  location: string;
+  side: VehicleView;
+  existedAtCheckout: boolean;
+  photos: {
+    checkout?: string[];
+    checkin: string[];
+  };
+  estimatedCost: number;
+  repairDescription: string;
+  chargeable: boolean;
+  chargeableAmount: number;
+  notes: string;
+}
+
+// Additional charges beyond damages
+export interface AdditionalCharge {
+  type: 'fuel' | 'excess_km' | 'cleaning' | 'late_return' | 'salik' | 'other';
+  description: string;
+  calculation?: string;
+  amount: number;
+}
+
+// Comprehensive comparison report
+export interface ComparisonReport {
+  newDamages: DamageComparisonItem[];
+  totalNewDamages: number;
+  totalEstimatedCost: number;
+  totalChargeableAmount: number;
+  fuelDifference: number;
+  fuelCharge: number;
+  odometerDifference: number;
+  excessKmCharge: number;
+  cleaningRequired: boolean;
+  cleaningCharge: number;
+  additionalCharges: AdditionalCharge[];
+  subtotal: number;
+  vatRate: number;
+  vatAmount: number;
+  grandTotal: number;
+  securityDepositHeld: number;
+  additionalPaymentRequired: number;
+  reportGeneratedAt: string;
+  reportGeneratedBy: string;
+  managerApprovalRequired: boolean;
+  managerApprovedBy?: string;
+  managerApprovedAt?: string;
+  customerAcknowledged: boolean;
+  customerAcknowledgedAt?: string;
 }
 
 export interface InspectionPhotos {
@@ -153,16 +227,25 @@ export interface EnhancedWizardData {
     internalNotes?: string;
   };
   
-  // Step 2: Inspection
+  // Step 2: Vehicle Condition & Inspection (Enhanced with checkout/checkin)
   step2: {
+    // Legacy single inspection (for backward compatibility)
     preHandoverChecklist: PreHandoverChecklist;
-    damageMarkers: DamageMarker[];
-    inspectionChecklist: Record<string, boolean>; // 23 checkpoints
-    fuelLevel: number; // 0-1 (percentage)
+    inspectionChecklist: Record<string, boolean>;
+    fuelLevel: number;
     odometerReading: number;
     odometerPhoto?: string;
     fuelGaugePhoto?: string;
+    damageMarkers: DamageMarker[];
     photos: InspectionPhotos;
+    notes?: string;
+    
+    // New enhanced inspection structure
+    inspectionMode: 'single' | 'checkout_checkin'; // Toggle between legacy and new mode
+    activeTab?: 'checkout' | 'checkin' | 'comparison'; // Current active tab
+    checkOutInspection?: InspectionData; // Inspection when vehicle leaves
+    checkInInspection?: InspectionData; // Inspection when vehicle returns
+    comparisonReport?: ComparisonReport; // Calculated comparison and charges
   };
   
   // Step 3: Pricing
