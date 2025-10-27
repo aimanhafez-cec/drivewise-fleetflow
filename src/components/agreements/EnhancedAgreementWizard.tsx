@@ -15,6 +15,7 @@ import { getAgreementStepGroups } from '@/lib/wizardLogic/agreementStepGroups';
 import { getNextAgreementRequiredStep, getPreviousAgreementRequiredStep } from '@/lib/wizardLogic/agreementConditionalSteps';
 import { AgreementWizardSection } from './wizard/AgreementWizardSection';
 import { AgreementLivePriceWidget } from './wizard/AgreementLivePriceWidget';
+import { ProgressDebugPanel } from './wizard/ProgressDebugPanel';
 import { WizardProgress } from '@/components/reservations/wizard/WizardProgress';
 import { AgreementProgressionCard } from './wizard/AgreementProgressionCard';
 import { SourceSelection } from './wizard/SourceSelection';
@@ -179,6 +180,7 @@ export const EnhancedAgreementWizard = () => {
     warnings: string[];
   }>({ isValid: true, errors: [], warnings: [] });
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
+  const [showDebugPanel, setShowDebugPanel] = useState(false); // Toggle with Ctrl+Shift+D
 
   const {
     wizardData,
@@ -189,6 +191,11 @@ export const EnhancedAgreementWizard = () => {
     markStepIncomplete,
     updateStepStatus,
     getStepStatus,
+    getAllStepsStatus,
+    getProgressSummary,
+    validateAllSteps,
+    clearStepData,
+    resetStepStatus,
     setCanProceed,
     clearProgress,
     getProgressPercentage,
@@ -221,6 +228,18 @@ export const EnhancedAgreementWizard = () => {
       }));
     }
   }, [progress.currentStep, stepGroups]);
+
+  // Debug panel toggle (Ctrl+Shift+D)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.shiftKey && e.key === 'D') {
+        e.preventDefault();
+        setShowDebugPanel(prev => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // Apply smart defaults when customer is selected
   useEffect(() => {
@@ -341,22 +360,19 @@ export const EnhancedAgreementWizard = () => {
   };
 
   const handleSubmit = async () => {
-    // Validate ALL steps are complete
-    const invalidSteps = [];
-    for (let i = 0; i < TOTAL_STEPS; i++) {
-      const status = getStepStatus(i);
-      if (status !== 'complete') {
-        invalidSteps.push(i);
-      }
-    }
+    // Use enhanced validation
+    const allStepsValidation = validateAllSteps((step, data) => {
+      const result = validateStep(step, data);
+      return result.isValid;
+    });
 
-    if (invalidSteps.length > 0) {
-      const stepNames = invalidSteps.map(i => STEP_CONFIG[i].title).join(', ');
+    if (!allStepsValidation.isValid) {
+      const stepNames = allStepsValidation.invalidSteps.map(i => STEP_CONFIG[i].title).join(', ');
       toast.error(`Please complete all steps before submitting. Incomplete: ${stepNames}`);
       
-      // Optionally navigate to first incomplete step
-      if (invalidSteps[0] !== progress.currentStep) {
-        setCurrentStep(invalidSteps[0]);
+      // Navigate to first incomplete step
+      if (allStepsValidation.invalidSteps[0] !== progress.currentStep) {
+        setCurrentStep(allStepsValidation.invalidSteps[0]);
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
       return;
@@ -364,6 +380,10 @@ export const EnhancedAgreementWizard = () => {
 
     // All steps complete - proceed with submission
     console.log('[EnhancedWizard] Submitting agreement:', wizardData);
+    
+    // Get progress summary for logging
+    const summary = getProgressSummary();
+    console.log('[EnhancedWizard] Progress summary:', summary);
     
     // Simulate submission
     toast.success('Agreement created successfully!');
@@ -755,6 +775,17 @@ export const EnhancedAgreementWizard = () => {
         onStepClick={handleStepClick}
         onStepSkip={handleStepSkip}
       />
+
+      {/* Debug Panel (Development Only) */}
+      {showDebugPanel && (
+        <ProgressDebugPanel
+          progress={progress}
+          progressSummary={getProgressSummary()}
+          allStepsStatus={getAllStepsStatus()}
+          onClearProgress={clearProgress}
+          onResetStep={resetStepStatus}
+        />
+      )}
     </div>
   );
 };

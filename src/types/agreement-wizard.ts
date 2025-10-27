@@ -259,4 +259,6 @@ export interface WizardProgress {
   stepValidationStatus: Record<number, StepStatus>;
   visitedSteps: number[];
   skippedSteps: number[];
+  lastModifiedStep?: number;
+  lastModifiedAt?: string;
 }
