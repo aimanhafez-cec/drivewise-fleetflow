@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { CheckCircle2, Circle, AlertCircle, ArrowRight, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CheckOutInspectionTab } from './CheckOutInspectionTab';
@@ -277,11 +278,9 @@ export const EnhancedInspectionStep: React.FC<EnhancedInspectionStepProps> = ({
           <TabsTrigger 
             value="checkin" 
             className="flex items-center justify-center py-3 px-4 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all duration-200"
-            disabled={!checkoutComplete}
             role="tab"
             aria-selected={activeTab === 'checkin'}
             aria-controls="checkin-panel"
-            aria-disabled={!checkoutComplete}
           >
             <div className="flex flex-col items-center gap-1 w-full">
               <span className="font-semibold text-sm md:text-base">Check-In Inspection</span>
@@ -293,11 +292,9 @@ export const EnhancedInspectionStep: React.FC<EnhancedInspectionStepProps> = ({
           <TabsTrigger 
             value="comparison" 
             className="flex items-center justify-center py-3 px-4 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all duration-200"
-            disabled={!checkoutComplete || !checkinComplete}
             role="tab"
             aria-selected={activeTab === 'comparison'}
             aria-controls="comparison-panel"
-            aria-disabled={!checkoutComplete || !checkinComplete}
           >
             <div className="flex flex-col items-center gap-1 w-full">
               <span className="font-semibold text-sm md:text-base">Comparison & Report</span>
@@ -316,23 +313,13 @@ export const EnhancedInspectionStep: React.FC<EnhancedInspectionStepProps> = ({
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {checkoutComplete ? (
-                <div className="text-center py-12 animate-fade-in">
-                  <CheckCircle2 className="w-16 h-16 text-success mx-auto mb-4" aria-hidden="true" />
-                  <p className="text-lg font-medium">Check-Out Inspection Complete</p>
-                  <p className="text-sm text-muted-foreground mt-2">
-                    Vehicle handed over to customer
-                  </p>
-                </div>
-              ) : (
-                <CheckOutInspectionTab
-                  data={data.checkOutInspection}
-                  lineId={`temp-line-${Date.now()}`}
-                  onUpdate={(inspectionData: InspectionData) => {
-                    onChange('checkOutInspection', inspectionData);
-                  }}
-                />
-              )}
+              <CheckOutInspectionTab
+                data={data.checkOutInspection}
+                lineId={`temp-line-${Date.now()}`}
+                onUpdate={(inspectionData: InspectionData) => {
+                  onChange('checkOutInspection', inspectionData);
+                }}
+              />
             </CardContent>
           </Card>
         </TabsContent>
@@ -346,30 +333,22 @@ export const EnhancedInspectionStep: React.FC<EnhancedInspectionStepProps> = ({
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {!checkoutComplete ? (
-                <div className="text-center py-12 text-muted-foreground animate-fade-in">
-                  <AlertCircle className="h-12 w-12 mx-auto mb-4 opacity-50" aria-hidden="true" />
-                  <p className="text-lg font-medium mb-2">Complete Check-Out First</p>
-                  <p className="text-sm">You must complete the check-out inspection before starting check-in</p>
-                </div>
-              ) : checkinComplete ? (
-                <div className="text-center py-12 animate-fade-in">
-                  <CheckCircle2 className="w-16 h-16 text-success mx-auto mb-4" aria-hidden="true" />
-                  <p className="text-lg font-medium">Check-In Inspection Complete</p>
-                  <p className="text-sm text-muted-foreground mt-2">
-                    Vehicle returned by customer
-                  </p>
-                </div>
-              ) : (
-                <CheckInInspectionTab
-                  checkOutData={data.checkOutInspection}
-                  checkInData={data.checkInInspection}
-                  lineId={`temp-line-${Date.now()}`}
-                  onUpdate={(inspectionData: InspectionData) => {
-                    onChange('checkInInspection', inspectionData);
-                  }}
-                />
+              {!checkoutComplete && (
+                <Alert className="mb-4">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>
+                    <strong>Note:</strong> It's recommended to complete check-out inspection first, but you can start here if needed.
+                  </AlertDescription>
+                </Alert>
               )}
+              <CheckInInspectionTab
+                checkOutData={data.checkOutInspection}
+                checkInData={data.checkInInspection}
+                lineId={`temp-line-${Date.now()}`}
+                onUpdate={(inspectionData: InspectionData) => {
+                  onChange('checkInInspection', inspectionData);
+                }}
+              />
             </CardContent>
           </Card>
         </TabsContent>
@@ -383,29 +362,21 @@ export const EnhancedInspectionStep: React.FC<EnhancedInspectionStepProps> = ({
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {!checkoutComplete || !checkinComplete ? (
-                <div className="text-center py-12 text-muted-foreground animate-fade-in">
-                  <AlertCircle className="h-12 w-12 mx-auto mb-4 opacity-50" aria-hidden="true" />
-                  <p className="text-lg font-medium mb-2">Complete Both Inspections First</p>
-                  <p className="text-sm">
+              {(!checkoutComplete || !checkinComplete) && (
+                <Alert className="mb-4">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>
                     {!checkoutComplete && !checkinComplete 
-                      ? 'Complete check-out and check-in inspections to generate comparison report'
+                      ? 'Complete check-out and check-in inspections for accurate comparison'
                       : !checkoutComplete 
-                        ? 'Complete check-out inspection first'
-                        : 'Complete check-in inspection to generate report'
+                        ? 'Complete check-out inspection for baseline comparison'
+                        : 'Complete check-in inspection to see changes'
                     }
-                  </p>
-                </div>
-              ) : comparisonComplete ? (
-                <InspectionComparisonTab
-                  checkOutData={data.checkOutInspection}
-                  checkInData={data.checkInInspection}
-                  comparisonReport={data.comparisonReport}
-                  onUpdate={(report: ComparisonReport) => {
-                    onChange('comparisonReport', report);
-                  }}
-                />
-              ) : (
+                  </AlertDescription>
+                </Alert>
+              )}
+              
+              {!comparisonComplete ? (
                 <div className="text-center py-12 animate-fade-in">
                   <Button
                     size="lg"
@@ -442,6 +413,15 @@ export const EnhancedInspectionStep: React.FC<EnhancedInspectionStepProps> = ({
                     Generate Comparison Report
                   </Button>
                 </div>
+              ) : (
+                <InspectionComparisonTab
+                  checkOutData={data.checkOutInspection}
+                  checkInData={data.checkInInspection}
+                  comparisonReport={data.comparisonReport}
+                  onUpdate={(report: ComparisonReport) => {
+                    onChange('comparisonReport', report);
+                  }}
+                />
               )}
             </CardContent>
           </Card>
