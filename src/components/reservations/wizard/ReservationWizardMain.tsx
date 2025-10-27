@@ -30,6 +30,14 @@ import { validateReservation, validateHeader } from '@/lib/validation/reservatio
 import { ValidationErrorBanner } from '@/components/ui/validation-error-banner';
 import { WizardDebugPanel } from './WizardDebugPanel';
 import { useSmartDefaults, useApplySmartDefaults } from '@/hooks/useSmartDefaults';
+import {
+  getStepGroups,
+  getNextRequiredStep,
+  getPreviousRequiredStep,
+  isStepRequired,
+} from '@/lib/wizardLogic/conditionalSteps';
+import { WizardSection } from './WizardSection';
+import { LivePriceWidget } from './LivePriceWidget';
 
 const wizardSteps = [
   { number: 1, title: 'Reservation Type', description: 'Select booking type' },
@@ -69,10 +77,14 @@ const ReservationWizardContent: React.FC = () => {
   } = useReservationWizard();
   const { validateBeforeSubmission, ensureDataIntegrity, checkDataConsistency } = useReservationDataConsistency();
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  const [expandedGroups, setExpandedGroups] = useState<string[]>(['basics']); // Start with first group expanded
   
   // Smart defaults for customer history
   const { smartDefaults, hasHistory, isLoading: loadingDefaults } = useSmartDefaults(wizardData.customerId);
   const { applyDefaults } = useApplySmartDefaults();
+  
+  // Get step groups for sectioned layout
+  const stepGroups = getStepGroups();
 
   // Apply smart defaults when customer is selected
   useEffect(() => {
@@ -544,7 +556,16 @@ const ReservationWizardContent: React.FC = () => {
     if (Object.keys(errors).length === 0) {
       setValidationErrors({});
       markStepComplete(currentStep);
-      nextStep();
+      
+      // Use smart navigation to skip optional steps
+      const nextStep = getNextRequiredStep(currentStep, wizardData, 14);
+      goToStep(nextStep);
+      
+      // Expand the group containing the next step
+      const nextGroup = stepGroups.find(g => g.steps.includes(nextStep));
+      if (nextGroup && !expandedGroups.includes(nextGroup.id)) {
+        setExpandedGroups([...expandedGroups, nextGroup.id]);
+      }
     } else {
       setValidationErrors(errors);
       // Mark as has-errors if there are validation errors, otherwise incomplete
@@ -646,6 +667,14 @@ const ReservationWizardContent: React.FC = () => {
     }
   };
 
+  const handleToggleGroup = (groupId: string) => {
+    setExpandedGroups(prev =>
+      prev.includes(groupId)
+        ? prev.filter(id => id !== groupId)
+        : [...prev, groupId]
+    );
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <WizardDebugPanel />
@@ -657,54 +686,101 @@ const ReservationWizardContent: React.FC = () => {
         stepValidationStatus={stepValidationStatus}
         onStepClick={handleStepClick}
       />
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        {Object.keys(validationErrors).length > 0 && (
-          <ValidationErrorBanner
-            errors={validationErrors}
-            onDismiss={() => setValidationErrors({})}
-            onFieldFocus={handleFieldFocus}
-          />
-        )}
-        <div className="mb-8">{renderStep()}</div>
-        <div className="flex items-center justify-between mt-8 pt-6 border-t">
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={() => { if (confirm('Cancel reservation?')) { resetWizard(); navigate('/reservations'); } }}><X className="mr-2 h-4 w-4" />Cancel</Button>
-            {currentStep > 1 && currentStep < 14 && (
-              <Button 
-                variant="outline" 
-                onClick={() => {
-                  // Save validation status of current step before going back
-                  const errors = validateCurrentStep();
-                  if (Object.keys(errors).length > 0) {
-                    markStepIncomplete(currentStep);
-                  }
-                  prevStep();
-                }}
-              >
-                <ArrowLeft className="mr-2 h-4 w-4" />Previous
-              </Button>
+      
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Main Content */}
+          <div className="lg:col-span-2 space-y-4">
+            {Object.keys(validationErrors).length > 0 && (
+              <ValidationErrorBanner
+                errors={validationErrors}
+                onDismiss={() => setValidationErrors({})}
+                onFieldFocus={handleFieldFocus}
+              />
             )}
-          </div>
-          <div className="flex gap-2">
-            {currentStep < 14 && (
-              <Button onClick={handleNext} disabled={!canProceed()}>
-                Next<ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            )}
-            {currentStep === 14 && (
-              <>
-                <Button 
-                  onClick={() => createReservationMutation.mutate()} 
-                  disabled={createReservationMutation.isPending}
+            
+            {/* Grouped Steps with Sections */}
+            {stepGroups.map(group => {
+              const isCurrentGroup = group.steps.includes(currentStep);
+              
+              return (
+                <WizardSection
+                  key={group.id}
+                  group={group}
+                  steps={wizardSteps}
+                  currentStep={currentStep}
+                  completedSteps={completedSteps}
+                  stepValidationStatus={stepValidationStatus}
+                  onStepClick={handleStepClick}
+                  isExpanded={expandedGroups.includes(group.id) || isCurrentGroup}
+                  onToggleExpand={() => handleToggleGroup(group.id)}
                 >
-                  <Save className="mr-2 h-4 w-4" />
-                  {createReservationMutation.isPending ? 'Creating...' : 'Create Reservation'}
+                  {isCurrentGroup && renderStep()}
+                </WizardSection>
+              );
+            })}
+            
+            {/* Navigation Buttons */}
+            <div className="flex items-center justify-between pt-6 border-t">
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline" 
+                  onClick={() => { 
+                    if (confirm('Cancel reservation?')) { 
+                      resetWizard(); 
+                      navigate('/reservations'); 
+                    } 
+                  }}
+                >
+                  <X className="mr-2 h-4 w-4" />
+                  Cancel
                 </Button>
-                <Button variant="outline" onClick={() => navigate('/reservations')}>
-                  Cancel & View All
-                </Button>
-              </>
-            )}
+                {currentStep > 1 && currentStep < 14 && (
+                  <Button 
+                    variant="outline" 
+                    onClick={() => {
+                      // Save validation status of current step before going back
+                      const errors = validateCurrentStep();
+                      if (Object.keys(errors).length > 0) {
+                        markStepIncomplete(currentStep);
+                      }
+                      const prevStep = getPreviousRequiredStep(currentStep, wizardData);
+                      goToStep(prevStep);
+                    }}
+                  >
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Previous
+                  </Button>
+                )}
+              </div>
+              <div className="flex gap-2">
+                {currentStep < 14 && (
+                  <Button onClick={handleNext} disabled={!canProceed()}>
+                    Next
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                )}
+                {currentStep === 14 && (
+                  <>
+                    <Button 
+                      onClick={() => createReservationMutation.mutate()} 
+                      disabled={createReservationMutation.isPending}
+                    >
+                      <Save className="mr-2 h-4 w-4" />
+                      {createReservationMutation.isPending ? 'Creating...' : 'Create Reservation'}
+                    </Button>
+                    <Button variant="outline" onClick={() => navigate('/reservations')}>
+                      Cancel & View All
+                    </Button>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+          
+          {/* Live Price Widget - Sticky Sidebar */}
+          <div className="lg:col-span-1">
+            <LivePriceWidget wizardData={wizardData} />
           </div>
         </div>
       </div>
