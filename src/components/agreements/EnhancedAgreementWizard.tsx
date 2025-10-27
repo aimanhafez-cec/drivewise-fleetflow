@@ -6,6 +6,7 @@ import { ArrowLeft, ArrowRight, Save, AlertTriangle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useWizardProgress } from '@/hooks/useWizardProgress';
+import { useWizardKeyboardShortcuts } from '@/hooks/useWizardKeyboardShortcuts';
 import { validateStep } from '@/lib/wizard/validation';
 import { WizardProgress } from '@/components/reservations/wizard/WizardProgress';
 import { SourceSelection } from './wizard/SourceSelection';
@@ -209,8 +210,18 @@ export const EnhancedAgreementWizard = () => {
     markStepComplete(progress.currentStep);
     
     if (progress.currentStep < TOTAL_STEPS - 1) {
-      setCurrentStep(progress.currentStep + 1);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      const nextStep = progress.currentStep + 1;
+      setCurrentStep(nextStep);
+      
+      // Auto-scroll to next step with delay for rendering
+      setTimeout(() => {
+        const stepElement = document.querySelector(`[data-step="${nextStep}"]`);
+        if (stepElement) {
+          stepElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      }, 200);
     }
   };
 
@@ -223,8 +234,18 @@ export const EnhancedAgreementWizard = () => {
     }
     
     if (progress.currentStep > 0) {
-      setCurrentStep(progress.currentStep - 1);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      const prevStep = progress.currentStep - 1;
+      setCurrentStep(prevStep);
+      
+      // Auto-scroll to previous step with delay for rendering
+      setTimeout(() => {
+        const stepElement = document.querySelector(`[data-step="${prevStep}"]`);
+        if (stepElement) {
+          stepElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      }, 200);
     }
   };
 
@@ -262,6 +283,15 @@ export const EnhancedAgreementWizard = () => {
     clearProgress();
     navigate('/agreements');
   };
+
+  // Keyboard shortcuts - ENTER to advance, ESC to go back
+  useWizardKeyboardShortcuts({
+    handleNext,
+    handlePrevious,
+    currentStep: progress.currentStep,
+    isLoading: false,
+    onSubmit: progress.currentStep === TOTAL_STEPS - 1 ? handleSubmit : undefined,
+  });
 
   const handleStepClick = (step: number) => {
     // Validate current step before leaving
@@ -443,7 +473,9 @@ export const EnhancedAgreementWizard = () => {
         )}
 
         {/* Step Content */}
-        {renderStepContent()}
+        <div data-step={progress.currentStep}>
+          {renderStepContent()}
+        </div>
 
         {/* Navigation */}
         <Card>
