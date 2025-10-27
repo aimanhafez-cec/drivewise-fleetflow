@@ -177,8 +177,32 @@ export const LeadDataTable = ({ leads }: LeadDataTableProps) => {
                 <TableCell>
                   <div className="space-y-1">
                     <p className="font-medium">{lead.customer_name}</p>
-                    <p className="text-xs text-muted-foreground">{lead.customer_email}</p>
-                    <p className="text-xs text-muted-foreground">{lead.customer_phone}</p>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          window.location.href = `mailto:${lead.customer_email}`;
+                        }}
+                        title={lead.customer_email}
+                      >
+                        <Mail className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          window.location.href = `tel:${lead.customer_phone}`;
+                        }}
+                        title={lead.customer_phone}
+                      >
+                        <Phone className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
                   </div>
                 </TableCell>
                 <TableCell>
