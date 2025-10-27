@@ -43,6 +43,7 @@ import { useToast } from '@/hooks/use-toast';
 import { NavLink } from 'react-router-dom';
 import QuickSearch from "@/components/search/QuickSearch";
 import { AIAssistantButton } from '@/components/ai-assistant/AIAssistantButton';
+import { LocaleSwitcher } from '@/components/localization/LocaleSwitcher';
 
 const navigation = [
   {
@@ -154,6 +155,7 @@ const AppLayout = () => {
               <div className="hidden sm:block">
                 <QuickSearch />
               </div>
+              <LocaleSwitcher />
               <AIAssistantButton />
               <Button variant="ghost" size="icon" aria-label="Notifications" className="h-9 w-9 sm:h-8 sm:w-8">
                 <Bell className="h-5 w-5 sm:h-4 sm:w-4" />
