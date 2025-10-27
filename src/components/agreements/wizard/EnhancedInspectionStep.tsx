@@ -123,7 +123,7 @@ export const EnhancedInspectionStep: React.FC<EnhancedInspectionStepProps> = ({
 
   const handleLoadMockData = () => {
     if (onFullUpdate) {
-      toast.loading('Loading...');
+      const loadingToast = toast.loading('Loading...');
       
       onFullUpdate({
         step2: {
@@ -139,6 +139,11 @@ export const EnhancedInspectionStep: React.FC<EnhancedInspectionStepProps> = ({
           checkInInspection: mockCheckInInspection,
         }
       });
+      
+      // Dismiss the loading toast after a brief moment
+      setTimeout(() => {
+        toast.dismiss(loadingToast);
+      }, 500);
     }
   };
 
