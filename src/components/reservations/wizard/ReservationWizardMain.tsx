@@ -10,7 +10,6 @@ import {
   useReservationWizard,
   ReservationWizardProvider,
 } from './ReservationWizardContext';
-import { WizardProgress } from './WizardProgress';
 import ReservationTypeSelector from '@/components/instant-booking/wizard/ReservationTypeSelector';
 import CustomerIdentification from '@/components/instant-booking/wizard/CustomerIdentification';
 import DatesLocations from '@/components/instant-booking/wizard/DatesLocations';
@@ -706,14 +705,6 @@ const ReservationWizardContent: React.FC = () => {
   return (
     <div className="min-h-screen bg-background" ref={swipeRef as any}>
       <ReservationProgressionCard />
-      <WizardProgress
-        currentStep={currentStep} 
-        totalSteps={14} 
-        steps={wizardSteps}
-        completedSteps={completedSteps}
-        stepValidationStatus={stepValidationStatus}
-        onStepClick={handleStepClick}
-      />
       
       {/* Mobile Swipe Hint */}
       {isTouchDevice && (
