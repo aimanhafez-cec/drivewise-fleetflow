@@ -177,13 +177,27 @@ const INITIAL_WIZARD_DATA: EnhancedWizardData = {
 
 export const EnhancedAgreementWizard = () => {
   const navigate = useNavigate();
-  const [validationResult, setValidationResult] = useState<{
-    isValid: boolean;
-    errors: string[];
-    warnings: string[];
-  }>({ isValid: true, errors: [], warnings: [] });
+  const [validationResult, setValidationResult] = useState<ValidationResult>({ 
+    isValid: true, 
+    errors: [], 
+    warnings: [] 
+  });
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
   const [showDebugPanel, setShowDebugPanel] = useState(false); // Toggle with Ctrl+Shift+D
+  
+  // Data consistency hook
+  const { 
+    checkDataConsistency, 
+    validateBeforeSubmission, 
+    ensureDataIntegrity,
+    validateStepData 
+  } = useAgreementDataConsistency();
+
+  // Helper to get step data
+  const getStepData = (step: number) => {
+    if (step === 0) return { source: wizardData.source, sourceId: wizardData.sourceId };
+    return wizardData[`step${step}` as keyof EnhancedWizardData];
+  };
 
   const {
     wizardData,
@@ -270,10 +284,18 @@ export const EnhancedAgreementWizard = () => {
 
   // Validate current step whenever data changes
   useEffect(() => {
-    const result = validateStep(progress.currentStep, wizardData);
+    const stepData = getStepData(progress.currentStep);
+    const result = validateStepData(progress.currentStep, stepData);
     setValidationResult(result);
     setCanProceed(result.isValid);
-  }, [wizardData, progress.currentStep, setCanProceed]);
+    
+    // Update step status based on validation
+    if (result.errors.length > 0) {
+      updateStepStatus(progress.currentStep, 'has-errors');
+    } else if (result.isValid) {
+      updateStepStatus(progress.currentStep, 'complete');
+    }
+  }, [wizardData, progress.currentStep, setCanProceed, validateStepData, updateStepStatus]);
 
   // Handler for "Apply Smart Defaults" quick action
   const handleApplySmartDefaults = () => {
@@ -334,7 +356,8 @@ export const EnhancedAgreementWizard = () => {
 
   const handlePrevious = () => {
     // Validate current step before leaving
-    const result = validateStep(progress.currentStep, wizardData);
+    const stepData = getStepData(progress.currentStep);
+    const result = validateStepData(progress.currentStep, stepData);
     if (!result.isValid) {
       markStepIncomplete(progress.currentStep);
       updateStepStatus(progress.currentStep, 'has-errors');
@@ -363,20 +386,25 @@ export const EnhancedAgreementWizard = () => {
   };
 
   const handleSubmit = async () => {
-    // Use enhanced validation
-    const allStepsValidation = validateAllSteps((step, data) => {
-      const result = validateStep(step, data);
-      return result.isValid;
-    });
+    // Ensure data integrity before validation
+    const sanitizedData = ensureDataIntegrity(wizardData);
+    
+    // Use comprehensive validation
+    const validationResult = validateBeforeSubmission(sanitizedData);
 
-    if (!allStepsValidation.isValid) {
-      const stepNames = allStepsValidation.invalidSteps.map(i => STEP_CONFIG[i].title).join(', ');
-      toast.error(`Please complete all steps before submitting. Incomplete: ${stepNames}`);
+    if (!validationResult.isValid) {
+      setValidationResult(validationResult);
+      toast.error(`Please fix ${validationResult.errors.length} error(s) before submitting`);
       
-      // Navigate to first incomplete step
-      if (allStepsValidation.invalidSteps[0] !== progress.currentStep) {
-        setCurrentStep(allStepsValidation.invalidSteps[0]);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+      // Navigate to first step with errors
+      const firstErrorPath = validationResult.errors[0]?.path || '';
+      const stepMatch = firstErrorPath.match(/step(\d+)/);
+      if (stepMatch) {
+        const stepNum = parseInt(stepMatch[1]);
+        if (stepNum !== progress.currentStep) {
+          setCurrentStep(stepNum);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
       }
       return;
     }
@@ -436,7 +464,8 @@ export const EnhancedAgreementWizard = () => {
 
   const handleStepClick = (step: number) => {
     // Validate current step before leaving
-    const result = validateStep(progress.currentStep, wizardData);
+    const stepData = getStepData(progress.currentStep);
+    const result = validateStepData(progress.currentStep, stepData);
     if (!result.isValid) {
       markStepIncomplete(progress.currentStep);
       updateStepStatus(progress.currentStep, 'has-errors');
@@ -498,6 +527,9 @@ export const EnhancedAgreementWizard = () => {
   const total = calculateTotalAmount();
 
   const renderStepContent = () => {
+    // Convert errors to string[] for step components
+    const errorMessages = validationResult.errors.map(e => e.message);
+    
     switch (progress.currentStep) {
       case 0:
         return (
@@ -515,7 +547,7 @@ export const EnhancedAgreementWizard = () => {
           <AgreementTermsStep
             data={wizardData.step1}
             onChange={(field, value) => handleStepDataChange('step1', field, value)}
-            errors={validationResult.errors}
+            errors={errorMessages}
           />
         );
       case 2:
@@ -523,7 +555,7 @@ export const EnhancedAgreementWizard = () => {
           <VehicleInspectionStep
             data={wizardData.step2}
             onChange={(field, value) => handleStepDataChange('step2', field, value)}
-            errors={validationResult.errors}
+            errors={errorMessages}
           />
         );
       case 3:
@@ -531,7 +563,7 @@ export const EnhancedAgreementWizard = () => {
           <PricingConfigurationStep
             data={wizardData.step3}
             onChange={(field, value) => handleStepDataChange('step3', field, value)}
-            errors={validationResult.errors}
+            errors={errorMessages}
           />
         );
       case 4:
@@ -539,7 +571,7 @@ export const EnhancedAgreementWizard = () => {
           <AddonsSelectionStep
             data={wizardData.step4}
             onChange={(field, value) => handleStepDataChange('step4', field, value)}
-            errors={validationResult.errors}
+            errors={errorMessages}
           />
         );
       case 5:
@@ -548,7 +580,7 @@ export const EnhancedAgreementWizard = () => {
             data={wizardData.step5}
             totalAmount={calculateTotalAmount()}
             onChange={(field, value) => handleStepDataChange('step5', field, value)}
-            errors={validationResult.errors}
+            errors={errorMessages}
           />
         );
       case 6:
@@ -556,7 +588,7 @@ export const EnhancedAgreementWizard = () => {
           <DocumentsVerificationStep
             data={wizardData.step6}
             onChange={(field, value) => handleStepDataChange('step6', field, value)}
-            errors={validationResult.errors}
+            errors={errorMessages}
           />
         );
       case 7:
@@ -564,7 +596,7 @@ export const EnhancedAgreementWizard = () => {
           <TermsSignatureStep
             data={wizardData.step7}
             onChange={(field, value) => handleStepDataChange('step7', field, value)}
-            errors={validationResult.errors}
+            errors={errorMessages}
           />
         );
       case 8:
@@ -572,7 +604,7 @@ export const EnhancedAgreementWizard = () => {
           <FinalReviewStep
             wizardData={wizardData}
             onChange={(field, value) => handleStepDataChange('step8', field, value)}
-            errors={validationResult.errors}
+            errors={errorMessages}
           />
         );
       default:
@@ -644,33 +676,21 @@ export const EnhancedAgreementWizard = () => {
               </CardHeader>
             </Card>
 
-            {/* Validation Alerts */}
-            {validationResult.errors.length > 0 && (
-              <Alert variant="destructive">
-                <AlertTriangle className="h-4 w-4" />
-                <AlertDescription>
-                  <p className="font-semibold mb-2">Please fix the following errors:</p>
-                  <ul className="list-disc list-inside space-y-1">
-                    {validationResult.errors.map((error, index) => (
-                      <li key={index}>{error}</li>
-                    ))}
-                  </ul>
-                </AlertDescription>
-              </Alert>
-            )}
-
-            {validationResult.warnings.length > 0 && (
-              <Alert>
-                <AlertTriangle className="h-4 w-4" />
-                <AlertDescription>
-                  <p className="font-semibold mb-2">Warnings:</p>
-                  <ul className="list-disc list-inside space-y-1">
-                    {validationResult.warnings.map((warning, index) => (
-                      <li key={index}>{warning}</li>
-                    ))}
-                  </ul>
-                </AlertDescription>
-              </Alert>
+            {/* Validation Banner */}
+            {(validationResult.errors.length > 0 || validationResult.warnings.length > 0) && (
+              <ValidationErrorBanner
+                validationResult={validationResult}
+                onDismiss={() => setValidationResult({ isValid: true, errors: [], warnings: [] })}
+                onNavigateToError={(path) => {
+                  // Extract step number from path (e.g., "step1.customerId" -> 1)
+                  const stepMatch = path.match(/step(\d+)/);
+                  if (stepMatch) {
+                    const stepNum = parseInt(stepMatch[1]);
+                    setCurrentStep(stepNum);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }
+                }}
+              />
             )}
 
             {/* Step Content with Sectioned Layout */}
