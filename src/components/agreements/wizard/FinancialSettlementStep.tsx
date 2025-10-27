@@ -44,10 +44,34 @@ export const FinancialSettlementStep: React.FC<FinancialSettlementStepProps> = (
 }) => {
   const [managerOverride, setManagerOverride] = useState(false);
 
+  // Safety check: provide default values if data is undefined
+  const safeData = data || {
+    cleaningRequired: false,
+    cleaningCharge: undefined,
+    lateReturnHours: undefined,
+    lateReturnCharge: undefined,
+    salikTrips: undefined,
+    salikCharge: undefined,
+    paymentMethod: undefined,
+    disputeRaised: false,
+    overrideReason: undefined,
+    overrideNotes: undefined,
+    managerAuthCode: undefined,
+    overrideApplied: false,
+    inspectorName: undefined,
+    inspectorDate: undefined,
+    managerName: undefined,
+    managerDate: undefined,
+    customerName: undefined,
+    customerDate: undefined,
+    securityDepositHeld: 1500,
+    settlementCompleted: false,
+  };
+
   // Get inspection data
-  const checkOutData = inspectionData.checkOutInspection;
-  const checkInData = inspectionData.checkInInspection;
-  const comparisonReport = inspectionData.comparisonReport;
+  const checkOutData = inspectionData?.checkOutInspection;
+  const checkInData = inspectionData?.checkInInspection;
+  const comparisonReport = inspectionData?.comparisonReport;
 
   if (!checkOutData || !checkInData) {
     return (
@@ -75,13 +99,13 @@ export const FinancialSettlementStep: React.FC<FinancialSettlementStepProps> = (
   const excessKm = Math.max(0, kmDriven - includedKm);
   const excessKmCharge = excessKm * 2.0;
 
-  const cleaningRequired = data.cleaningRequired || false;
+  const cleaningRequired = safeData.cleaningRequired || false;
   const cleaningCharge = cleaningRequired ? 150 : 0;
 
-  const lateReturnHours = data.lateReturnHours || 0;
+  const lateReturnHours = safeData.lateReturnHours || 0;
   const lateReturnCharge = lateReturnHours > 0 ? Math.ceil(lateReturnHours) * 50 : 0;
 
-  const salikTrips = data.salikTrips || 0;
+  const salikTrips = safeData.salikTrips || 0;
   const salikCharge = salikTrips * 8;
 
   // Calculate totals
@@ -89,7 +113,7 @@ export const FinancialSettlementStep: React.FC<FinancialSettlementStepProps> = (
   const subtotal = totalDamageCharges + totalAdditionalCharges;
   const vatAmount = subtotal * VAT_RATE;
   const grandTotal = subtotal + vatAmount;
-  const securityDeposit = data.securityDepositHeld || 1500;
+  const securityDeposit = safeData.securityDepositHeld || 1500;
   const additionalPayment = Math.max(0, grandTotal - securityDeposit);
 
   const handleExportPDF = () => {
@@ -351,7 +375,7 @@ export const FinancialSettlementStep: React.FC<FinancialSettlementStepProps> = (
           <div className="flex items-center space-x-2">
             <Checkbox 
               id="card" 
-              checked={data.paymentMethod === 'card'}
+              checked={safeData.paymentMethod === 'card'}
               onCheckedChange={(checked) => onChange('paymentMethod', checked ? 'card' : '')}
             />
             <Label htmlFor="card" className="cursor-pointer">Charge to card on file</Label>
@@ -359,7 +383,7 @@ export const FinancialSettlementStep: React.FC<FinancialSettlementStepProps> = (
           <div className="flex items-center space-x-2">
             <Checkbox 
               id="cash"
-              checked={data.paymentMethod === 'cash'}
+              checked={safeData.paymentMethod === 'cash'}
               onCheckedChange={(checked) => onChange('paymentMethod', checked ? 'cash' : '')}
             />
             <Label htmlFor="cash" className="cursor-pointer">Cash payment</Label>
@@ -367,7 +391,7 @@ export const FinancialSettlementStep: React.FC<FinancialSettlementStepProps> = (
           <div className="flex items-center space-x-2">
             <Checkbox 
               id="transfer"
-              checked={data.paymentMethod === 'transfer'}
+              checked={safeData.paymentMethod === 'transfer'}
               onCheckedChange={(checked) => onChange('paymentMethod', checked ? 'transfer' : '')}
             />
             <Label htmlFor="transfer" className="cursor-pointer">Bank transfer</Label>
@@ -375,7 +399,7 @@ export const FinancialSettlementStep: React.FC<FinancialSettlementStepProps> = (
           <div className="flex items-center space-x-2">
             <Checkbox 
               id="dispute"
-              checked={data.disputeRaised || false}
+              checked={safeData.disputeRaised || false}
               onCheckedChange={(checked) => onChange('disputeRaised', checked as boolean)}
             />
             <Label htmlFor="dispute" className="cursor-pointer text-destructive">
@@ -414,7 +438,7 @@ export const FinancialSettlementStep: React.FC<FinancialSettlementStepProps> = (
             <div className="space-y-2">
               <Label>Adjustment Reason</Label>
               <Select 
-                value={data.overrideReason || ''}
+                value={safeData.overrideReason || ''}
                 onValueChange={(value) => onChange('overrideReason', value)}
               >
                 <SelectTrigger>
@@ -435,7 +459,7 @@ export const FinancialSettlementStep: React.FC<FinancialSettlementStepProps> = (
               <Textarea 
                 placeholder="Explain the reason for this adjustment..." 
                 rows={3}
-                value={data.overrideNotes || ''}
+                value={safeData.overrideNotes || ''}
                 onChange={(e) => onChange('overrideNotes', e.target.value)}
               />
             </div>
@@ -445,7 +469,7 @@ export const FinancialSettlementStep: React.FC<FinancialSettlementStepProps> = (
               <Input 
                 type="password" 
                 placeholder="Enter manager code"
-                value={data.managerAuthCode || ''}
+                value={safeData.managerAuthCode || ''}
                 onChange={(e) => onChange('managerAuthCode', e.target.value)}
               />
             </div>
@@ -472,12 +496,12 @@ export const FinancialSettlementStep: React.FC<FinancialSettlementStepProps> = (
               <Label>Inspector</Label>
               <Input 
                 placeholder="Name"
-                value={data.inspectorName || checkInData.inspectorName}
+                value={safeData.inspectorName || checkInData?.inspectorName || ''}
                 onChange={(e) => onChange('inspectorName', e.target.value)}
               />
               <Input 
                 type="date"
-                value={data.inspectorDate || ''}
+                value={safeData.inspectorDate || ''}
                 onChange={(e) => onChange('inspectorDate', e.target.value)}
               />
             </div>
@@ -485,12 +509,12 @@ export const FinancialSettlementStep: React.FC<FinancialSettlementStepProps> = (
               <Label>Manager</Label>
               <Input 
                 placeholder="Name"
-                value={data.managerName || ''}
+                value={safeData.managerName || ''}
                 onChange={(e) => onChange('managerName', e.target.value)}
               />
               <Input 
                 type="date"
-                value={data.managerDate || ''}
+                value={safeData.managerDate || ''}
                 onChange={(e) => onChange('managerDate', e.target.value)}
               />
             </div>
@@ -498,12 +522,12 @@ export const FinancialSettlementStep: React.FC<FinancialSettlementStepProps> = (
               <Label>Customer</Label>
               <Input 
                 placeholder="Name"
-                value={data.customerName || ''}
+                value={safeData.customerName || ''}
                 onChange={(e) => onChange('customerName', e.target.value)}
               />
               <Input 
                 type="date"
-                value={data.customerDate || ''}
+                value={safeData.customerDate || ''}
                 onChange={(e) => onChange('customerDate', e.target.value)}
               />
             </div>
