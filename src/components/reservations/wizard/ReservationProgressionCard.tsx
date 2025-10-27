@@ -7,6 +7,20 @@ import { useReservationWizard } from './ReservationWizardContext';
 import { getStepGroups } from '@/lib/wizardLogic/conditionalSteps';
 import { ProgressionSection } from './ProgressionSection';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import ReservationTypeSelector from '@/components/instant-booking/wizard/ReservationTypeSelector';
+import CustomerIdentification from '@/components/instant-booking/wizard/CustomerIdentification';
+import DatesLocations from '@/components/instant-booking/wizard/DatesLocations';
+import { Step1_5BusinessConfig } from './Step1_5BusinessConfig';
+import { Step2_5PriceList } from './Step2_5PriceList';
+import { Step4MultiLineBuilder } from './Step4MultiLineBuilder';
+import { Step5ServicesAddOns } from './Step5ServicesAddOns';
+import { Step5_5AirportInfo } from './Step5_5AirportInfo';
+import { Step5_6Insurance } from './Step5_6Insurance';
+import { Step5_7BillingConfig } from './Step5_7BillingConfig';
+import { Step6PricingSummary } from './Step6PricingSummary';
+import { Step7DownPayment } from './Step7DownPayment';
+import { Step7_5ReferralNotes } from './Step7_5ReferralNotes';
+import { Step8Confirmation } from './Step8Confirmation';
 
 const wizardSteps = [
   { number: 1, title: 'Reservation Type', description: 'Select booking type' },
@@ -31,7 +45,9 @@ export const ReservationProgressionCard: React.FC = () => {
     currentStep, 
     completedSteps, 
     stepValidationStatus, 
-    goToStep 
+    goToStep,
+    wizardData,
+    updateWizardData,
   } = useReservationWizard();
 
   const stepGroups = getStepGroups();
@@ -41,6 +57,69 @@ export const ReservationProgressionCard: React.FC = () => {
 
   const handleStepClick = (step: number) => {
     goToStep(step);
+  };
+
+  // Render form content for each step
+  const renderStepContent = (stepNumber: number): React.ReactNode => {
+    switch (stepNumber) {
+      case 1:
+        return (
+          <ReservationTypeSelector
+            selectedType={wizardData.reservationType}
+            onTypeSelect={(type) => updateWizardData({ reservationType: type })}
+          />
+        );
+      case 2:
+        return <Step1_5BusinessConfig />;
+      case 3:
+        return (
+          <CustomerIdentification
+            selectedCustomerId={wizardData.customerId || ''}
+            onCustomerSelect={(customer) => 
+              updateWizardData({ 
+                customerId: customer.id, 
+                customerData: customer 
+              })
+            }
+          />
+        );
+      case 4:
+        return (
+          <DatesLocations
+            data={{
+              pickupDate: wizardData.pickupDate || '',
+              pickupTime: wizardData.pickupTime || '',
+              returnDate: wizardData.returnDate || '',
+              returnTime: wizardData.returnTime || '',
+              pickupLocation: wizardData.pickupLocation || '',
+              returnLocation: wizardData.returnLocation || '',
+            }}
+            onUpdate={(updates) => updateWizardData(updates)}
+          />
+        );
+      case 5:
+        return <Step4MultiLineBuilder />;
+      case 6:
+        return <Step2_5PriceList />;
+      case 7:
+        return <Step6PricingSummary />;
+      case 8:
+        return <Step5ServicesAddOns />;
+      case 9:
+        return <Step5_5AirportInfo />;
+      case 10:
+        return <Step5_6Insurance />;
+      case 11:
+        return <Step5_7BillingConfig />;
+      case 12:
+        return <Step7DownPayment />;
+      case 13:
+        return <Step7_5ReferralNotes />;
+      case 14:
+        return <Step8Confirmation />;
+      default:
+        return null;
+    }
   };
 
   return (
@@ -99,7 +178,7 @@ export const ReservationProgressionCard: React.FC = () => {
 
           {/* Expandable Content */}
           <CollapsibleContent>
-            <CardContent className="p-4 pt-0 max-h-[60vh] overflow-y-auto space-y-3">
+            <CardContent className="p-4 pt-0 max-h-[75vh] overflow-y-auto space-y-3">
               {stepGroups.map(group => (
                 <ProgressionSection
                   key={group.id}
@@ -110,6 +189,7 @@ export const ReservationProgressionCard: React.FC = () => {
                   stepValidationStatus={stepValidationStatus}
                   onStepClick={handleStepClick}
                   isExpanded={group.steps.includes(currentStep)}
+                  renderStepContent={renderStepContent}
                 />
               ))}
             </CardContent>
