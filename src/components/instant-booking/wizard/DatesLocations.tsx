@@ -77,6 +77,20 @@ const DatesLocations = ({ data, onUpdate }: DatesLocationsProps) => {
     }
   };
 
+  // Quick duration handlers
+  const handleQuickDuration = (durationDays: number) => {
+    if (!data.pickupDate || !data.pickupTime) return;
+    
+    const pickup = new Date(`${data.pickupDate}T${data.pickupTime}`);
+    const returnDateTime = new Date(pickup);
+    returnDateTime.setDate(returnDateTime.getDate() + durationDays);
+    
+    onUpdate({
+      returnDate: returnDateTime.toISOString().split('T')[0],
+      returnTime: data.pickupTime, // Same time as pickup
+    });
+  };
+
   const calculateDuration = () => {
     if (data.pickupDate && data.pickupTime && data.returnDate && data.returnTime) {
       const pickup = new Date(`${data.pickupDate}T${data.pickupTime}`);
@@ -172,11 +186,63 @@ const DatesLocations = ({ data, onUpdate }: DatesLocationsProps) => {
                   onChange={(e) => onUpdate({ returnTime: e.target.value })}
                   className="mt-1"
                 />
-              </div>
+               </div>
             </div>
           </CardContent>
         </Card>
       </div>
+
+      {/* Quick Duration Buttons */}
+      {data.pickupDate && data.pickupTime && (
+        <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 border-blue-200 dark:border-blue-800">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between gap-4 flex-wrap">
+              <div className="flex items-center gap-2">
+                <Clock className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                <span className="text-sm font-medium text-foreground">Quick Duration:</span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleQuickDuration(1)}
+                  className="bg-white dark:bg-gray-800"
+                >
+                  1 Day
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleQuickDuration(3)}
+                  className="bg-white dark:bg-gray-800"
+                >
+                  Weekend (3d)
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleQuickDuration(7)}
+                  className="bg-white dark:bg-gray-800"
+                >
+                  1 Week
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleQuickDuration(30)}
+                  className="bg-white dark:bg-gray-800"
+                >
+                  1 Month
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Duration Display */}
       {duration && (

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, ArrowRight, Save, X, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -29,6 +29,7 @@ import { useReservationDataConsistency } from '@/hooks/useReservationDataConsist
 import { validateReservation, validateHeader } from '@/lib/validation/reservationSchema';
 import { ValidationErrorBanner } from '@/components/ui/validation-error-banner';
 import { WizardDebugPanel } from './WizardDebugPanel';
+import { useSmartDefaults, useApplySmartDefaults } from '@/hooks/useSmartDefaults';
 
 const wizardSteps = [
   { number: 1, title: 'Reservation Type', description: 'Select booking type' },
@@ -68,6 +69,50 @@ const ReservationWizardContent: React.FC = () => {
   } = useReservationWizard();
   const { validateBeforeSubmission, ensureDataIntegrity, checkDataConsistency } = useReservationDataConsistency();
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  
+  // Smart defaults for customer history
+  const { smartDefaults, hasHistory, isLoading: loadingDefaults } = useSmartDefaults(wizardData.customerId);
+  const { applyDefaults } = useApplySmartDefaults();
+
+  // Apply smart defaults when customer is selected
+  useEffect(() => {
+    if (wizardData.customerId && smartDefaults && !loadingDefaults) {
+      const updates = applyDefaults(wizardData, smartDefaults, {
+        overwriteExisting: false, // Don't overwrite user-entered data
+      });
+      
+      if (Object.keys(updates).length > 0) {
+        console.log('[SmartDefaults] Applying smart defaults:', updates);
+        updateWizardData(updates);
+        
+        if (smartDefaults.hasHistory) {
+          toast({
+            title: 'Smart Defaults Applied',
+            description: 'Pre-filled with customer\'s preferences from previous bookings',
+          });
+        }
+      }
+    }
+  }, [wizardData.customerId, smartDefaults, loadingDefaults]);
+
+  // Handler for "Book Again" quick action
+  const handleBookAgain = () => {
+    if (!smartDefaults) return;
+    
+    const updates = applyDefaults(wizardData, smartDefaults, {
+      overwriteExisting: true, // Force overwrite for "Book Again"
+    });
+    
+    if (Object.keys(updates).length > 0) {
+      updateWizardData(updates);
+      toast({
+        title: 'Booking Pre-filled',
+        description: 'All details copied from last booking. Review and adjust as needed.',
+      });
+      // Skip to vehicle selection step
+      goToStep(5);
+    }
+  };
 
   const createReservationMutation = useMutation({
     mutationFn: async () => {
@@ -578,7 +623,14 @@ const ReservationWizardContent: React.FC = () => {
     switch (currentStep) {
       case 1: return <ReservationTypeSelector selectedType={wizardData.reservationType} onTypeSelect={(type) => updateWizardData({ reservationType: type })} />;
       case 2: return <Step1_5BusinessConfig />;
-      case 3: return <CustomerIdentification selectedCustomerId={wizardData.customerId} onCustomerSelect={(c) => updateWizardData({ customerId: c.id, customerData: c })} />;
+      case 3: return (
+        <CustomerIdentification 
+          selectedCustomerId={wizardData.customerId} 
+          onCustomerSelect={(c) => updateWizardData({ customerId: c.id, customerData: c })} 
+          onBookAgain={hasHistory ? handleBookAgain : undefined}
+          hasLastBooking={hasHistory}
+        />
+      );
       case 4: return <DatesLocations data={{ pickupDate: wizardData.pickupDate, pickupTime: wizardData.pickupTime, returnDate: wizardData.returnDate, returnTime: wizardData.returnTime, pickupLocation: wizardData.pickupLocation, returnLocation: wizardData.returnLocation }} onUpdate={(u) => updateWizardData(u)} />;
       case 5: return <Step4MultiLineBuilder />;
       case 6: return <Step2_5PriceList />;
