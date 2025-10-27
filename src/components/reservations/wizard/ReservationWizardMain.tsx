@@ -609,6 +609,15 @@ const ReservationWizardContent: React.FC = () => {
     handlePrevious: () => {
       const prevStep = getPreviousRequiredStep(currentStep, wizardData);
       goToStep(prevStep);
+      
+      // Auto-scroll to the previous step's section
+      setTimeout(() => {
+        const prevGroup = stepGroups.find(g => g.steps.includes(prevStep));
+        const targetElement = document.querySelector(`[data-step="${prevGroup?.steps[0] || prevStep}"]`);
+        if (targetElement) {
+          targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 200);
     },
     currentStep,
     isLoading: createReservationMutation.isPending,
