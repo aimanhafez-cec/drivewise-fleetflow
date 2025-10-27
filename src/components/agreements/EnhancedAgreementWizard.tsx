@@ -9,6 +9,7 @@ import { formatCurrency } from '@/lib/utils/currency';
 import { useWizardProgress } from '@/hooks/useWizardProgress';
 import { useWizardKeyboardShortcuts } from '@/hooks/useWizardKeyboardShortcuts';
 import { useAgreementSmartDefaults, useApplyAgreementSmartDefaults } from '@/hooks/useAgreementSmartDefaults';
+import { useTouchGestures, useIsTouchDevice } from '@/hooks/useTouchGestures';
 import { validateStep } from '@/lib/wizard/validation';
 import { getAgreementStepGroups } from '@/lib/wizardLogic/agreementStepGroups';
 import { getNextAgreementRequiredStep, getPreviousAgreementRequiredStep } from '@/lib/wizardLogic/agreementConditionalSteps';
@@ -207,6 +208,9 @@ export const EnhancedAgreementWizard = () => {
   // Get step groups for sectioned layout
   const stepGroups = getAgreementStepGroups();
 
+  // Touch device detection
+  const isTouchDevice = useIsTouchDevice();
+
   // Initialize expanded sections based on current step
   useEffect(() => {
     const currentGroup = stepGroups.find(group => group.steps.includes(progress.currentStep));
@@ -376,6 +380,37 @@ export const EnhancedAgreementWizard = () => {
     onSubmit: progress.currentStep === TOTAL_STEPS - 1 ? handleSubmit : undefined,
   });
 
+  // Touch gesture handlers for mobile navigation
+  const handleSwipeLeft = () => {
+    // Swipe left = Next step
+    if (progress.currentStep < TOTAL_STEPS - 1) {
+      handleNext();
+      toast.info('Swipe detected', {
+        description: 'Moving to next step',
+        duration: 1500,
+      });
+    }
+  };
+
+  const handleSwipeRight = () => {
+    // Swipe right = Previous step
+    if (progress.currentStep > 0) {
+      handlePrevious();
+      toast.info('Swipe detected', {
+        description: 'Returning to previous step',
+        duration: 1500,
+      });
+    }
+  };
+
+  // Touch gestures hook (only active on touch devices)
+  const { ref: swipeRef, isSwiping } = useTouchGestures({
+    onSwipeLeft: isTouchDevice ? handleSwipeLeft : undefined,
+    onSwipeRight: isTouchDevice ? handleSwipeRight : undefined,
+    threshold: 75, // Require 75px minimum swipe
+    velocityThreshold: 0.3,
+  });
+
   const handleStepClick = (step: number) => {
     // Validate current step before leaving
     const result = validateStep(progress.currentStep, wizardData);
@@ -525,7 +560,18 @@ export const EnhancedAgreementWizard = () => {
   const progressPercentage = getProgressPercentage();
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background" ref={swipeRef}>
+      {/* Touch Swipe Indicator */}
+      {isTouchDevice && isSwiping && (
+        <div className="fixed inset-0 bg-primary/5 pointer-events-none z-50 flex items-center justify-center">
+          <div className="bg-background/90 backdrop-blur-sm px-6 py-3 rounded-full shadow-lg border-2 border-primary">
+            <p className="text-sm font-medium text-primary">
+              Swipe to navigate
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Wizard Progress Header */}
       <WizardProgress
         currentStep={progress.currentStep}
@@ -669,8 +715,8 @@ export const EnhancedAgreementWizard = () => {
         </div>
 
         {/* Mobile Price Summary - Bottom Fixed */}
-        {total > 0 && (
-          <div className="fixed bottom-0 left-0 right-0 bg-background border-t shadow-lg p-4 lg:hidden z-40">
+        {isTouchDevice && total > 0 && (
+          <div className="fixed bottom-0 left-0 right-0 bg-background border-t shadow-lg p-4 lg:hidden z-40 animate-slide-in-bottom">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs text-muted-foreground">Total Amount</p>
@@ -688,6 +734,13 @@ export const EnhancedAgreementWizard = () => {
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               )}
+            </div>
+            
+            {/* Swipe Hint */}
+            <div className="mt-2 text-center">
+              <p className="text-xs text-muted-foreground">
+                💡 Swipe left or right to navigate steps
+              </p>
             </div>
           </div>
         )}
