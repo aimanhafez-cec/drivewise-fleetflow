@@ -169,11 +169,11 @@ const validateEnhancedInspection = (step2: any): StepValidation => {
   const checkout = step2.checkOutInspection;
   
   // Checkout validation
-  if (!checkout.inspectorName) {
+  if (!checkout.inspectorName || checkout.inspectorName.trim() === '') {
     errors.push('Checkout inspector name is required');
   }
   
-  if (checkout.fuelLevel === undefined || checkout.fuelLevel < 0 || checkout.fuelLevel > 1) {
+  if (checkout.fuelLevel === undefined || checkout.fuelLevel < 0 || checkout.fuelLevel > 100) {
     errors.push('Checkout fuel level must be between 0 and 100%');
   }
   
@@ -193,15 +193,19 @@ const validateEnhancedInspection = (step2: any): StepValidation => {
     warnings.push(`Only ${checkout.photos.exterior.length} checkout exterior photos (recommended: 8)`);
   }
 
+  if (checkout.damageMarkers.length === 0) {
+    warnings.push('No pre-existing damages documented - ensure vehicle is thoroughly inspected');
+  }
+
   // Checkin validation (only if checkin is started)
   if (step2.checkInInspection) {
     const checkin = step2.checkInInspection;
     
-    if (!checkin.inspectorName) {
+    if (!checkin.inspectorName || checkin.inspectorName.trim() === '') {
       errors.push('Checkin inspector name is required');
     }
     
-    if (checkin.fuelLevel === undefined || checkin.fuelLevel < 0 || checkin.fuelLevel > 1) {
+    if (checkin.fuelLevel === undefined || checkin.fuelLevel < 0 || checkin.fuelLevel > 100) {
       errors.push('Checkin fuel level must be between 0 and 100%');
     }
     
@@ -221,38 +225,28 @@ const validateEnhancedInspection = (step2: any): StepValidation => {
       warnings.push('Checkin fuel gauge photo not captured');
     }
 
-    if (checkin.photos.exterior.length < 4) {
-      warnings.push(`Only ${checkin.photos.exterior.length} checkin exterior photos (recommended: 8)`);
-    }
-
-    // Validate comparison report
+    // Comparison report validation
     if (step2.comparisonReport) {
       const report = step2.comparisonReport;
       
       if (report.grandTotal < 0) {
-        errors.push('Total charges cannot be negative');
+        errors.push('Invalid total amount calculated');
+      }
+      
+      // Warn if charges seem unusually high
+      if (report.totalChargeableAmount > 10000) {
+        warnings.push('Total charges exceed AED 10,000 - manager approval required');
+      }
+      
+      // Warn about fuel shortage
+      if (report.fuelCharge > 300) {
+        warnings.push('Significant fuel shortage detected (AED ' + report.fuelCharge.toFixed(2) + ')');
       }
 
-      if (report.newDamages.length > 0) {
-        report.newDamages.forEach((damage, idx) => {
-          if (damage.chargeable && damage.chargeableAmount <= 0) {
-            warnings.push(`Damage #${idx + 1} marked chargeable but amount is 0`);
-          }
-          if (damage.photos.checkin.length === 0) {
-            warnings.push(`Damage #${idx + 1} has no photos`);
-          }
-        });
+      // Warn about excess km
+      if (report.excessKmCharge > 500) {
+        warnings.push('Significant excess kilometers detected (AED ' + report.excessKmCharge.toFixed(2) + ')');
       }
-
-      if (report.grandTotal > 5000 && !report.managerApprovedBy) {
-        warnings.push('Charges exceed AED 5,000 - manager approval recommended');
-      }
-
-      if (!report.customerAcknowledged) {
-        warnings.push('Customer has not acknowledged the damage report');
-      }
-    } else {
-      warnings.push('Comparison report not generated yet');
     }
   }
 

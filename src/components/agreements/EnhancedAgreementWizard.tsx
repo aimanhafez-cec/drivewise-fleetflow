@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { setupAutoSave, saveInspectionDraft } from '@/lib/wizard/inspectionPersistence';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -294,6 +295,17 @@ export const EnhancedAgreementWizard = () => {
       }
     }
   }, [customerId, smartDefaults, loadingDefaults]);
+
+  // Auto-save functionality
+  useEffect(() => {
+    const cleanup = setupAutoSave(() => wizardData, 30000); // Save every 30 seconds
+    return cleanup;
+  }, [wizardData]);
+
+  // Manual save on step change
+  useEffect(() => {
+    saveInspectionDraft(wizardData);
+  }, [progress.currentStep]);
 
   // Validate current step whenever data changes
   useEffect(() => {
