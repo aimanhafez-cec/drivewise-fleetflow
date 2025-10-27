@@ -344,6 +344,22 @@ export interface EnhancedWizardData {
     customerDate?: string;
     securityDepositHeld?: number;
     settlementCompleted?: boolean;
+    // Split payment support
+    splitPayments?: Array<{
+      id?: string;
+      method: string;
+      amount: number;
+      loyaltyPointsUsed?: number;
+      pointsValue?: number;
+      transactionRef?: string;
+      status?: string;
+      metadata?: Record<string, any>;
+    }>;
+    paymentAllocation?: {
+      totalAmount: number;
+      allocatedAmount: number;
+      remainingAmount: number;
+    };
   };
 
   // Phase 10: Business Configuration (Optional)

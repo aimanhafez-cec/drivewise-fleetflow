@@ -26,3 +26,18 @@ export {
   getDamageMarkers,
   uploadDamagePhoto,
 } from './damage-markers';
+
+// Agreement Payments API
+export {
+  AgreementPaymentsAPI,
+  type PaymentType,
+  type PaymentMethod,
+  type PaymentStatus,
+  type AgreementPayment,
+  type CreatePaymentData,
+  type ProcessPaymentData,
+  type AuthorizeDepositData,
+  type SplitPaymentItem,
+  type PaymentAllocation,
+  type CustomerPaymentProfile,
+} from './agreement-payments';

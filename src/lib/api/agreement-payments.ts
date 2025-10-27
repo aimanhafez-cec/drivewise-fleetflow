@@ -1,7 +1,18 @@
 import { supabase } from '@/integrations/supabase/client';
 
 export type PaymentType = 'advance' | 'security_deposit' | 'monthly' | 'final' | 'refund';
-export type PaymentMethod = 'credit_card' | 'debit_card' | 'cash' | 'bank_transfer' | 'cheque' | 'corporate_account' | 'digital_wallet';
+export type PaymentMethod = 
+  | 'credit_card' 
+  | 'debit_card' 
+  | 'cash' 
+  | 'bank_transfer' 
+  | 'cheque' 
+  | 'corporate_account' 
+  | 'digital_wallet'
+  | 'credit'           // Account credit
+  | 'payment_link'     // Payment link
+  | 'customer_wallet'  // Customer wallet balance
+  | 'loyalty_points';  // Loyalty points redemption
 export type PaymentStatus = 'pending' | 'processing' | 'completed' | 'failed' | 'refunded' | 'cancelled';
 
 export interface AgreementPayment {
@@ -45,6 +56,42 @@ export interface ProcessPaymentData {
 export interface AuthorizeDepositData {
   authorization_ref: string;
   card_token?: string;
+}
+
+// Split Payment Interfaces
+export interface SplitPaymentItem {
+  id?: string;
+  method: PaymentMethod;
+  amount: number;
+  loyaltyPointsUsed?: number;
+  pointsValue?: number; // AED value of points
+  transactionRef?: string;
+  status: 'pending' | 'completed' | 'failed';
+  metadata?: {
+    cardLast4?: string;
+    linkToken?: string;
+    walletBalanceBefore?: number;
+    walletBalanceAfter?: number;
+    [key: string]: any;
+  };
+}
+
+export interface PaymentAllocation {
+  totalAmount: number;
+  allocatedAmount: number;
+  remainingAmount: number;
+  payments: SplitPaymentItem[];
+}
+
+// Customer Payment Profile
+export interface CustomerPaymentProfile {
+  customerId: string;
+  walletBalance: number;
+  loyaltyPoints: number;
+  loyaltyTier?: string;
+  creditLimit: number;
+  creditUsed: number;
+  creditAvailable: number;
 }
 
 export const AgreementPaymentsAPI = {
