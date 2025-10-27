@@ -307,20 +307,23 @@ export const EnhancedAgreementWizard = () => {
     saveInspectionDraft(wizardData);
   }, [progress.currentStep]);
 
-  // Validate current step whenever data changes
+  // Validate current step whenever data changes - DISABLED FOR NOW
   useEffect(() => {
-    const stepData = getStepData(progress.currentStep);
-    const result = validateStepData(progress.currentStep, stepData);
-    setValidationResult(result);
-    setCanProceed(result.isValid);
+    // const stepData = getStepData(progress.currentStep);
+    // const result = validateStepData(progress.currentStep, stepData);
+    // setValidationResult(result);
+    // setCanProceed(result.isValid);
     
-    // Update step status based on validation
-    if (result.errors.length > 0) {
-      updateStepStatus(progress.currentStep, 'has-errors');
-    } else if (result.isValid) {
-      updateStepStatus(progress.currentStep, 'complete');
-    }
-  }, [wizardData, progress.currentStep, setCanProceed, validateStepData, updateStepStatus]);
+    // Always allow proceeding (validation disabled)
+    setCanProceed(true);
+    
+    // // Update step status based on validation
+    // if (result.errors.length > 0) {
+    //   updateStepStatus(progress.currentStep, 'has-errors');
+    // } else if (result.isValid) {
+    //   updateStepStatus(progress.currentStep, 'complete');
+    // }
+  }, [wizardData, progress.currentStep, setCanProceed]);
 
   // Handler for "Apply Smart Defaults" quick action
   const handleApplySmartDefaults = () => {
@@ -349,14 +352,15 @@ export const EnhancedAgreementWizard = () => {
   };
 
   const handleNext = () => {
-    const result = validateStep(progress.currentStep, wizardData);
+    // VALIDATION DISABLED FOR NOW
+    // const result = validateStep(progress.currentStep, wizardData);
     
-    if (!result.isValid) {
-      markStepIncomplete(progress.currentStep);
-      updateStepStatus(progress.currentStep, 'has-errors');
-      toast.error('Please fix errors before marking complete');
-      return;
-    }
+    // if (!result.isValid) {
+    //   markStepIncomplete(progress.currentStep);
+    //   updateStepStatus(progress.currentStep, 'has-errors');
+    //   toast.error('Please fix errors before marking complete');
+    //   return;
+    // }
 
     // Mark current step complete
     markStepComplete(progress.currentStep);
@@ -380,13 +384,14 @@ export const EnhancedAgreementWizard = () => {
   };
 
   const handlePrevious = () => {
+    // VALIDATION DISABLED FOR NOW
     // Validate current step before leaving
-    const stepData = getStepData(progress.currentStep);
-    const result = validateStepData(progress.currentStep, stepData);
-    if (!result.isValid) {
-      markStepIncomplete(progress.currentStep);
-      updateStepStatus(progress.currentStep, 'has-errors');
-    }
+    // const stepData = getStepData(progress.currentStep);
+    // const result = validateStepData(progress.currentStep, stepData);
+    // if (!result.isValid) {
+    //   markStepIncomplete(progress.currentStep);
+    //   updateStepStatus(progress.currentStep, 'has-errors');
+    // }
     
     // Use conditional navigation to skip non-required steps
     const prevStep = getPreviousAgreementRequiredStep(progress.currentStep, wizardData);
@@ -439,28 +444,29 @@ export const EnhancedAgreementWizard = () => {
   const hasDraft = progress.lastSaved !== undefined && progress.visitedSteps.length > 1;
 
   const handleSubmit = async () => {
+    // VALIDATION DISABLED FOR NOW
     // Ensure data integrity before validation
-    const sanitizedData = ensureDataIntegrity(wizardData);
+    // const sanitizedData = ensureDataIntegrity(wizardData);
     
     // Use comprehensive validation
-    const validationResult = validateBeforeSubmission(sanitizedData);
+    // const validationResult = validateBeforeSubmission(sanitizedData);
 
-    if (!validationResult.isValid) {
-      setValidationResult(validationResult);
-      toast.error(`Please fix ${validationResult.errors.length} error(s) before submitting`);
-      
-      // Navigate to first step with errors
-      const firstErrorPath = validationResult.errors[0]?.path || '';
-      const stepMatch = firstErrorPath.match(/step(\d+)/);
-      if (stepMatch) {
-        const stepNum = parseInt(stepMatch[1]);
-        if (stepNum !== progress.currentStep) {
-          setCurrentStep(stepNum);
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-      }
-      return;
-    }
+    // if (!validationResult.isValid) {
+    //   setValidationResult(validationResult);
+    //   toast.error(`Please fix ${validationResult.errors.length} error(s) before submitting`);
+    //   
+    //   // Navigate to first step with errors
+    //   const firstErrorPath = validationResult.errors[0]?.path || '';
+    //   const stepMatch = firstErrorPath.match(/step(\d+)/);
+    //   if (stepMatch) {
+    //     const stepNum = parseInt(stepMatch[1]);
+    //     if (stepNum !== progress.currentStep) {
+    //       setCurrentStep(stepNum);
+    //       window.scrollTo({ top: 0, behavior: 'smooth' });
+    //     }
+    //   }
+    //   return;
+    // }
 
     // All steps complete - proceed with submission
     console.log('[EnhancedWizard] Submitting agreement:', wizardData);
@@ -516,15 +522,16 @@ export const EnhancedAgreementWizard = () => {
   });
 
   const handleStepClick = (step: number) => {
+    // VALIDATION DISABLED FOR NOW
     // Validate current step before leaving
-    const stepData = getStepData(progress.currentStep);
-    const result = validateStepData(progress.currentStep, stepData);
-    if (!result.isValid) {
-      markStepIncomplete(progress.currentStep);
-      updateStepStatus(progress.currentStep, 'has-errors');
-    } else {
-      markStepComplete(progress.currentStep);
-    }
+    // const stepData = getStepData(progress.currentStep);
+    // const result = validateStepData(progress.currentStep, stepData);
+    // if (!result.isValid) {
+    //   markStepIncomplete(progress.currentStep);
+    //   updateStepStatus(progress.currentStep, 'has-errors');
+    // } else {
+    //   markStepComplete(progress.currentStep);
+    // }
     
     // Allow navigation to ANY step
     setCurrentStep(step);
@@ -744,8 +751,8 @@ export const EnhancedAgreementWizard = () => {
               />
             )}
 
-            {/* Validation Banner */}
-            {(validationResult.errors.length > 0 || validationResult.warnings.length > 0) && (
+            {/* Validation Banner - DISABLED FOR NOW */}
+            {/* {(validationResult.errors.length > 0 || validationResult.warnings.length > 0) && (
               <ValidationErrorBanner
                 validationResult={validationResult}
                 onDismiss={() => setValidationResult({ isValid: true, errors: [], warnings: [] })}
@@ -759,7 +766,7 @@ export const EnhancedAgreementWizard = () => {
                   }
                 }}
               />
-            )}
+            )} */}
 
             {/* Step Content with Sectioned Layout */}
             <div className="space-y-6">
