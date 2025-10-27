@@ -7,12 +7,14 @@ import { Button } from '@/components/ui/button';
 import { CheckOutInspectionTab } from './CheckOutInspectionTab';
 import { CheckInInspectionTab } from './CheckInInspectionTab';
 import { InspectionComparisonTab } from './InspectionComparisonTab';
+import { MockDataLoader } from './MockDataLoader';
 import type { EnhancedWizardData, InspectionData, ComparisonReport } from '@/types/agreement-wizard';
 
 interface EnhancedInspectionStepProps {
   data: EnhancedWizardData['step2'];
   fullData: EnhancedWizardData;
   onChange: (field: keyof EnhancedWizardData['step2'], value: any) => void;
+  onFullUpdate?: (data: Partial<EnhancedWizardData>) => void;
   errors?: string[];
 }
 
@@ -20,6 +22,7 @@ export const EnhancedInspectionStep: React.FC<EnhancedInspectionStepProps> = ({
   data,
   fullData,
   onChange,
+  onFullUpdate,
   errors = [],
 }) => {
   // Initialize inspection mode if not set
@@ -127,6 +130,11 @@ export const EnhancedInspectionStep: React.FC<EnhancedInspectionStepProps> = ({
 
   return (
     <div className="space-y-6 animate-fade-in">
+      {/* Mock Data Loader - Development Only */}
+      {onFullUpdate && (
+        <MockDataLoader onLoadData={onFullUpdate} />
+      )}
+
       {/* Header Card */}
       <Card>
         <CardHeader>

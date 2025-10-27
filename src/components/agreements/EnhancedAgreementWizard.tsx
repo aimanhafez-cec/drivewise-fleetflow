@@ -605,6 +605,11 @@ export const EnhancedAgreementWizard = () => {
             data={wizardData.step2}
             fullData={wizardData}
             onChange={(field, value) => handleStepDataChange('step2', field, value)}
+            onFullUpdate={(updates) => {
+              if (updates.step2) {
+                updateWizardData('step2', updates.step2 as any);
+              }
+            }}
             errors={errorMessages}
           />
         );
