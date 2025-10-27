@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Separator } from '@/components/ui/separator';
 import { DollarSign } from 'lucide-react';
-import { Lead } from '@/data/mockLeads';
+import { Lead } from '@/hooks/useLeadsRealtime';
 
 interface LeadPricingEstimationProps {
   lead: Lead;

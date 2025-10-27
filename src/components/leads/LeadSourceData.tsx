@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Info, Percent, Hash, Star, FileText } from 'lucide-react';
-import { Lead } from '@/data/mockLeads';
+import { Lead } from '@/hooks/useLeadsRealtime';
 import { leadSources } from '@/data/leadSources';
 
 interface LeadSourceDataProps {
@@ -8,7 +8,7 @@ interface LeadSourceDataProps {
 }
 
 export const LeadSourceData = ({ lead }: LeadSourceDataProps) => {
-  const source = leadSources[lead.source_id];
+  const source = leadSources[lead.source_name];
   
   if (!source) return null;
 

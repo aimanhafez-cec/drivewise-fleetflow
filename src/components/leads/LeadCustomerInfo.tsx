@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { User, Mail, Phone, Globe, Languages, Calendar } from 'lucide-react';
-import { Lead } from '@/data/mockLeads';
+import { Lead } from '@/hooks/useLeadsRealtime';
 
 interface LeadCustomerInfoProps {
   lead: Lead;

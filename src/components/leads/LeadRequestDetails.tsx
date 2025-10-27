@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Car, Calendar, MapPin, Clock, FileText } from 'lucide-react';
-import { Lead } from '@/data/mockLeads';
+import { Lead } from '@/hooks/useLeadsRealtime';
 import { format, differenceInDays } from 'date-fns';
 
 interface LeadRequestDetailsProps {

@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { MessageSquare, Mail, Phone, MessageCircle, User, Clock } from 'lucide-react';
-import { Lead } from '@/data/mockLeads';
+import { Lead } from '@/hooks/useLeadsRealtime';
 import { formatDistanceToNow, format } from 'date-fns';
 
 interface LeadCommunicationTimelineProps {
@@ -25,7 +25,7 @@ const generateMockCommunications = (lead: Lead): Communication[] => {
       id: '1',
       type: 'status_change',
       direction: 'system',
-      content: `Lead created from ${lead.source_id}`,
+      content: `Lead created from ${lead.source_name}`,
       timestamp: lead.created_at,
     },
   ];
@@ -48,7 +48,7 @@ const generateMockCommunications = (lead: Lead): Communication[] => {
       type: 'call',
       direction: 'outbound',
       content: 'Called customer to discuss rental requirements and pricing options.',
-      timestamp: lead.last_activity,
+      timestamp: lead.updated_at,
       user: lead.assigned_to || 'Agent',
     });
   }
@@ -60,7 +60,7 @@ const generateMockCommunications = (lead: Lead): Communication[] => {
       direction: 'outbound',
       subject: 'Your Custom Quote',
       content: `Sent detailed quote for ${lead.vehicle_category}. Quote expires in 48 hours.`,
-      timestamp: lead.last_activity,
+      timestamp: lead.updated_at,
       user: lead.assigned_to || 'Agent',
     });
   }
@@ -71,7 +71,7 @@ const generateMockCommunications = (lead: Lead): Communication[] => {
       type: 'whatsapp',
       direction: 'outbound',
       content: 'Booking confirmation sent with agreement number and pickup instructions.',
-      timestamp: lead.last_activity,
+      timestamp: lead.updated_at,
       user: lead.assigned_to || 'Agent',
     });
   }

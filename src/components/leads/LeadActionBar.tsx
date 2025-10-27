@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { CheckCircle2, FileText, X, UserPlus, Mail, Phone, MessageCircle } from 'lucide-react';
-import { Lead } from '@/data/mockLeads';
+import { Lead } from '@/hooks/useLeadsRealtime';
 
 interface LeadActionBarProps {
   lead: Lead;
@@ -21,7 +21,7 @@ export const LeadActionBar = ({
 }: LeadActionBarProps) => {
   const canConfirm = ['new', 'contacted', 'quoted'].includes(lead.status);
   const canSendQuote = lead.status !== 'confirmed' && lead.status !== 'rejected';
-  const isUAEPhone = lead.customer_phone.startsWith('+971');
+  const isUAEPhone = lead.customer_phone?.startsWith('+971') || false;
 
   return (
     <div className="flex flex-wrap gap-2">

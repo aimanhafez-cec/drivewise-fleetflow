@@ -1,8 +1,9 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft } from 'lucide-react';
-import { mockLeads } from '@/data/mockLeads';
+import { Card } from '@/components/ui/card';
+import { ArrowLeft, Loader2 } from 'lucide-react';
+import { useLead } from '@/hooks/useLead';
 import { LeadSourceBadge } from '@/components/leads/LeadSourceBadge';
 import { LeadActionBar } from '@/components/leads/LeadActionBar';
 import { LeadCustomerInfo } from '@/components/leads/LeadCustomerInfo';
@@ -17,9 +18,22 @@ const LeadDetail = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   
-  const lead = mockLeads.find(l => l.id === id);
+  const { lead, loading, error } = useLead(id);
 
-  if (!lead) {
+  // Loading state
+  if (loading) {
+    return (
+      <div className="container mx-auto py-6">
+        <Card className="p-12 flex flex-col items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
+          <p className="text-muted-foreground">Loading lead details...</p>
+        </Card>
+      </div>
+    );
+  }
+
+  // Error or not found state
+  if (error || !lead) {
     return (
       <div className="container mx-auto py-6">
         <div className="text-center">
@@ -115,7 +129,7 @@ const LeadDetail = () => {
             <h1 className="text-2xl font-bold">{lead.lead_no}</h1>
             {getStatusBadge(lead.status)}
             {getPriorityBadge(lead.priority)}
-            <LeadSourceBadge sourceId={lead.source_id} />
+            <LeadSourceBadge sourceId={lead.source_name} />
           </div>
         </div>
       </div>
