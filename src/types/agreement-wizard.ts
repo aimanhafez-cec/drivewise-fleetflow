@@ -238,6 +238,52 @@ export interface EnhancedWizardData {
     distributionMethods: DistributionMethods;
     finalNotes?: string;
   };
+
+  // Phase 10: Business Configuration (Optional)
+  businessConfig?: {
+    businessUnitId?: string;
+    paymentTermsId?: string;
+    reservationMethodId?: string;
+  };
+
+  // Phase 10: Enhanced Pricing (Optional)
+  enhancedPricing?: {
+    priceListId?: string;
+    insuranceConfig?: {
+      levelId?: string;
+      groupId?: string;
+      providerId?: string;
+      coverageType?: string;
+      excess?: number;
+      additionalCoverages?: string[];
+    };
+    maintenancePackageId?: string;
+    discountConfig?: {
+      code?: string;
+      amount?: number;
+      percentage?: number;
+      reason?: string;
+    };
+  };
+
+  // Phase 10: Enhanced Billing (Optional)
+  enhancedBilling?: {
+    billToType?: 'customer' | 'corporate' | 'insurance' | 'agency';
+    billToDetails?: {
+      customerId?: string;
+      corporateId?: string;
+      insuranceId?: string;
+      agencyId?: string;
+      poNumber?: string;
+      claimNumber?: string;
+      policyNumber?: string;
+      voucherNumber?: string;
+    };
+    taxConfig?: {
+      taxLevelId?: string;
+      taxCodeId?: string;
+    };
+  };
 }
 
 // Step status for progress tracking

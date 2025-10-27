@@ -30,6 +30,7 @@ import { BillingPaymentStep } from './wizard/BillingPaymentStep';
 import { DocumentsVerificationStep } from './wizard/DocumentsVerificationStep';
 import { TermsSignatureStep } from './wizard/TermsSignatureStep';
 import { FinalReviewStep } from './wizard/FinalReviewStep';
+import { DraftManagementBanner } from './wizard/DraftManagementBanner';
 import type { EnhancedWizardData, AgreementSource } from '@/types/agreement-wizard';
 
 const TOTAL_STEPS = 9; // 0-8
@@ -173,6 +174,10 @@ const INITIAL_WIZARD_DATA: EnhancedWizardData = {
     },
     finalNotes: undefined,
   },
+  // Phase 10: Optional business configuration fields
+  businessConfig: undefined,
+  enhancedPricing: undefined,
+  enhancedBilling: undefined,
 };
 
 export const EnhancedAgreementWizard = () => {
@@ -184,6 +189,8 @@ export const EnhancedAgreementWizard = () => {
   });
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
   const [showDebugPanel, setShowDebugPanel] = useState(false); // Toggle with Ctrl+Shift+D
+  const [showResumePrompt, setShowResumePrompt] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
   
   // Data consistency hook
   const { 
@@ -382,8 +389,36 @@ export const EnhancedAgreementWizard = () => {
   };
 
   const handleSaveDraft = () => {
-    toast.success('Draft saved successfully');
+    setIsSaving(true);
+    // The useWizardProgress hook already handles auto-saving with debouncing
+    // This manual save is instant
+    setTimeout(() => {
+      setIsSaving(false);
+      toast.success('Draft saved successfully', {
+        description: 'Your progress has been saved and can be resumed later',
+      });
+    }, 500);
   };
+
+  const handleResumeDraft = () => {
+    setShowResumePrompt(false);
+    toast.success('Resuming from draft', {
+      description: 'Your previous progress has been loaded',
+    });
+  };
+
+  const handleDiscardDraft = () => {
+    if (window.confirm('Are you sure you want to discard your draft? This cannot be undone.')) {
+      clearProgress();
+      setShowResumePrompt(false);
+      toast.success('Draft discarded', {
+        description: 'Starting with a fresh agreement',
+      });
+    }
+  };
+
+  // Check if we have a draft on mount
+  const hasDraft = progress.lastSaved !== undefined && progress.visitedSteps.length > 1;
 
   const handleSubmit = async () => {
     // Ensure data integrity before validation
@@ -676,6 +711,17 @@ export const EnhancedAgreementWizard = () => {
               </CardHeader>
             </Card>
 
+            {/* Draft Management Banner */}
+            {showResumePrompt && hasDraft && (
+              <DraftManagementBanner
+                lastSaved={progress.lastSaved}
+                hasDraft={hasDraft}
+                showResumePrompt={true}
+                onResumeDraft={handleResumeDraft}
+                onDiscardDraft={handleDiscardDraft}
+              />
+            )}
+
             {/* Validation Banner */}
             {(validationResult.errors.length > 0 || validationResult.warnings.length > 0) && (
               <ValidationErrorBanner
@@ -726,8 +772,14 @@ export const EnhancedAgreementWizard = () => {
                     Previous
                   </Button>
 
-                  <div className="text-sm text-muted-foreground">
-                    {progress.lastSaved && `Last saved: ${new Date(progress.lastSaved).toLocaleTimeString()}`}
+                  <div className="flex-1 px-4">
+                    <DraftManagementBanner
+                      lastSaved={progress.lastSaved}
+                      isSaving={isSaving}
+                      hasDraft={hasDraft}
+                      onSaveDraft={handleSaveDraft}
+                      showResumePrompt={false}
+                    />
                   </div>
 
                   {progress.currentStep === TOTAL_STEPS - 1 ? (
