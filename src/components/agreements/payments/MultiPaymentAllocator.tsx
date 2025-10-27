@@ -24,6 +24,7 @@ import {
   Award 
 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { validatePaymentAllocation, formatValidationErrors } from '@/lib/api/payment-validation';
 import type { 
   PaymentAllocation, 
   SplitPaymentItem, 
@@ -78,45 +79,15 @@ export const MultiPaymentAllocator: React.FC<MultiPaymentAllocatorProps> = ({
       payments,
     };
     onAllocationChange(newAllocation);
-    validateAllocation(payments);
-  }, [payments, totalAmount, allocatedAmount, remainingAmount, onAllocationChange]);
+    
+    // Validate using comprehensive validator
+    const validationResult = validatePaymentAllocation(newAllocation, customerProfile || undefined);
+    setErrors(validationResult.errors);
+  }, [payments, totalAmount, allocatedAmount, remainingAmount, onAllocationChange, customerProfile]);
 
   const validateAllocation = (currentPayments: SplitPaymentItem[]) => {
-    const validationErrors: string[] = [];
-    const currentAllocated = currentPayments.reduce((sum, p) => sum + p.amount, 0);
-
-    if (currentAllocated > totalAmount) {
-      validationErrors.push('Total allocated amount exceeds the amount due');
-    }
-
-    currentPayments.forEach((payment, index) => {
-      if (payment.amount <= 0) {
-        validationErrors.push(`Payment ${index + 1}: Amount must be greater than 0`);
-      }
-
-      if (payment.method === 'loyalty_points' && payment.loyaltyPointsUsed) {
-        if (payment.loyaltyPointsUsed < MIN_LOYALTY_POINTS) {
-          validationErrors.push(`Minimum ${MIN_LOYALTY_POINTS} loyalty points required`);
-        }
-        if (customerProfile && payment.loyaltyPointsUsed > customerProfile.loyaltyPoints) {
-          validationErrors.push('Insufficient loyalty points');
-        }
-      }
-
-      if (payment.method === 'customer_wallet') {
-        if (customerProfile && payment.amount > customerProfile.walletBalance) {
-          validationErrors.push('Insufficient wallet balance');
-        }
-      }
-
-      if (payment.method === 'credit') {
-        if (customerProfile && payment.amount > customerProfile.creditAvailable) {
-          validationErrors.push('Insufficient credit available');
-        }
-      }
-    });
-
-    setErrors(validationErrors);
+    // Validation is now handled by useEffect with comprehensive validator
+    // This function is kept for backward compatibility
   };
 
   const addPaymentMethod = () => {

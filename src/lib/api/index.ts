@@ -57,3 +57,13 @@ export {
   SplitPaymentsAPI,
   type ProcessSplitPaymentResult,
 } from './split-payments';
+
+// Payment Validation
+export {
+  PaymentValidator,
+  validatePaymentAllocation,
+  requiresProfile,
+  formatValidationErrors,
+  type ValidationResult,
+  type PaymentValidationRules,
+} from './payment-validation';
