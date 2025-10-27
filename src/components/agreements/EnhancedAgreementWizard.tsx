@@ -662,16 +662,6 @@ export const EnhancedAgreementWizard = () => {
         </div>
       )}
 
-      {/* Wizard Progress Header */}
-      <WizardProgress
-        currentStep={progress.currentStep}
-        totalSteps={TOTAL_STEPS}
-        steps={STEP_CONFIG.map(s => ({ number: s.number, title: s.title, description: s.description }))}
-        completedSteps={progress.completedSteps}
-        stepValidationStatus={progress.stepValidationStatus}
-        onStepClick={handleStepClick}
-      />
-
       <div className="max-w-7xl mx-auto space-y-6 p-4">
         {/* Grid Layout: Content + Sidebar */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
