@@ -44,10 +44,10 @@ const STEP_CONFIG = [
   { id: 3, number: 3, title: 'Pricing', description: 'Rates & charges', icon: '💰' },
   { id: 4, number: 4, title: 'Add-ons', description: 'Additional services', icon: '🛠️' },
   { id: 5, number: 5, title: 'Billing', description: 'Payment details', icon: '💳' },
-  { id: 6, number: 6, title: 'Documents', description: 'Upload & verify', icon: '📄' },
-  { id: 7, number: 7, title: 'Signature', description: 'Terms & sign', icon: '✍️' },
-  { id: 8, number: 8, title: 'Review', description: 'Final check', icon: '✅' },
-  { id: 9, number: 9, title: 'Settlement', description: 'Financial closure', icon: '💵' },
+  { id: 6, number: 6, title: 'Settlement', description: 'Financial closure', icon: '💵' },
+  { id: 7, number: 7, title: 'Documents', description: 'Upload & verify', icon: '📄' },
+  { id: 8, number: 8, title: 'Signature', description: 'Terms & sign', icon: '✍️' },
+  { id: 9, number: 9, title: 'Review', description: 'Final check', icon: '✅' },
 ];
 
 const INITIAL_WIZARD_DATA: EnhancedWizardData = {
@@ -683,13 +683,22 @@ export const EnhancedAgreementWizard = () => {
         );
       case 6:
         return (
+          <FinancialSettlementStep
+            data={wizardData.step9}
+            inspectionData={wizardData.step2}
+            onChange={(field, value) => handleStepDataChange('step9', field, value)}
+            errors={errorMessages}
+          />
+        );
+      case 7:
+        return (
           <DocumentsVerificationStep
             data={wizardData.step6}
             onChange={(field, value) => handleStepDataChange('step6', field, value)}
             errors={errorMessages}
           />
         );
-      case 7:
+      case 8:
         return (
           <TermsSignatureStep
             data={wizardData.step7}
@@ -697,20 +706,11 @@ export const EnhancedAgreementWizard = () => {
             errors={errorMessages}
           />
         );
-      case 8:
+      case 9:
         return (
           <FinalReviewStep
             wizardData={wizardData}
             onChange={(field, value) => handleStepDataChange('step8', field, value)}
-            errors={errorMessages}
-          />
-        );
-      case 9:
-        return (
-          <FinancialSettlementStep
-            data={wizardData.step9}
-            inspectionData={wizardData.step2}
-            onChange={(field, value) => handleStepDataChange('step9', field, value)}
             errors={errorMessages}
           />
         );

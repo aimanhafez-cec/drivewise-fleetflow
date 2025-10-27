@@ -34,7 +34,7 @@ export function getAgreementStepGroups(): AgreementStepGroup[] {
       id: 'services',
       title: 'Services & Payment',
       description: 'Add-ons, billing setup, and financial settlement',
-      steps: [4, 5, 9], // Add-ons, Billing/Payment, Financial Settlement
+      steps: [4, 5, 6], // Add-ons, Billing/Payment, Financial Settlement
       icon: '💳',
       color: 'from-green-500 to-green-600',
     },
@@ -42,7 +42,7 @@ export function getAgreementStepGroups(): AgreementStepGroup[] {
       id: 'verification',
       title: 'Documents & Signature',
       description: 'Verify documents and sign agreement',
-      steps: [6, 7], // Documents, Signature
+      steps: [7, 8], // Documents, Signature
       icon: '✍️',
       color: 'from-amber-500 to-amber-600',
     },
@@ -50,7 +50,7 @@ export function getAgreementStepGroups(): AgreementStepGroup[] {
       id: 'finalization',
       title: 'Final Review',
       description: 'Complete and issue agreement',
-      steps: [8], // Final Review (Step 9 moved to Services & Payment)
+      steps: [9], // Final Review
       icon: '✅',
       color: 'from-emerald-500 to-emerald-600',
     },

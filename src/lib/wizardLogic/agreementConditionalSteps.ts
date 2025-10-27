@@ -13,7 +13,7 @@ export function getAgreementSkippedSteps(wizardData: EnhancedWizardData): number
     // Don't auto-skip, but could be marked as optional
   }
 
-  // Skip document verification (step 6) for instant bookings
+  // Skip document verification (step 7) for instant bookings
   // where customer is pre-verified
   if (wizardData.source === 'instant_booking' && wizardData.step6?.emiratesIdVerified) {
     // Already verified, but still show for review
@@ -93,8 +93,8 @@ export function isAgreementStepOptional(
   // Add-ons are always optional
   if (stepNumber === 4) return true;
   
-  // Documents can be optional for pre-verified customers
-  if (stepNumber === 6 && wizardData.source === 'instant_booking') {
+  // Documents can be optional for pre-verified customers (now step 7)
+  if (stepNumber === 7 && wizardData.source === 'instant_booking') {
     return true;
   }
   
