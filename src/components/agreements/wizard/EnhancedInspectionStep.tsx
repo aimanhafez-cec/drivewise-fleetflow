@@ -123,6 +123,8 @@ export const EnhancedInspectionStep: React.FC<EnhancedInspectionStepProps> = ({
 
   const handleLoadMockData = () => {
     if (onFullUpdate) {
+      toast.loading('Loading...');
+      
       onFullUpdate({
         step2: {
           inspectionMode: 'checkout_checkin',
@@ -136,9 +138,6 @@ export const EnhancedInspectionStep: React.FC<EnhancedInspectionStepProps> = ({
           checkOutInspection: mockCheckOutInspection,
           checkInInspection: mockCheckInInspection,
         }
-      });
-      toast.success('Mock data loaded', {
-        description: 'Standard scenario with 5 damages, fuel shortage, and excess km'
       });
     }
   };
