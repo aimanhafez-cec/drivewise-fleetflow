@@ -26,6 +26,31 @@ export const EnhancedInspectionStep: React.FC<EnhancedInspectionStepProps> = ({
       onChange('inspectionMode', 'checkout_checkin');
       onChange('activeTab', 'checkout');
     }
+    // Initialize checkOutInspection with default values if undefined
+    if (!data.checkOutInspection) {
+      onChange('checkOutInspection', {
+        timestamp: new Date().toISOString(),
+        inspectorName: '',
+        preHandoverChecklist: {
+          vehicleCleaned: false,
+          vehicleFueled: false,
+          documentsReady: false,
+          keysAvailable: false,
+          warningLightsOk: false,
+        },
+        fuelLevel: 100,
+        odometerReading: 0,
+        damageMarkers: [],
+        photos: {
+          exterior: [],
+          interior: [],
+          documents: [],
+          damages: [],
+        },
+        inspectionChecklist: {},
+        notes: '',
+      });
+    }
   }, []);
 
   const activeTab = data.activeTab || 'checkout';

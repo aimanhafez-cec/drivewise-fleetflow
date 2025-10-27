@@ -72,13 +72,25 @@ interface CheckOutInspectionTabProps {
 }
 
 export function CheckOutInspectionTab({ data, lineId, onUpdate }: CheckOutInspectionTabProps) {
-  const [fuelIndex, setFuelIndex] = useState(
-    FUEL_LEVELS.findIndex(f => f.percentage === data.fuelLevel) || 4
-  );
+  const [fuelIndex, setFuelIndex] = useState(() => {
+    if (!data || data.fuelLevel === undefined) return 4;
+    return FUEL_LEVELS.findIndex(f => f.percentage === data.fuelLevel) || 4;
+  });
   const [currentView, setCurrentView] = useState<VehicleView>('top');
   const [showDamageDialog, setShowDamageDialog] = useState(false);
   const [selectedMarker, setSelectedMarker] = useState<DamageMarker | null>(null);
   const [clickPosition, setClickPosition] = useState<{ x: number; y: number; view: VehicleView } | null>(null);
+
+  // Return loading state if data is not yet initialized
+  if (!data) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-center text-muted-foreground">
+          <p>Initializing inspection form...</p>
+        </div>
+      </div>
+    );
+  }
 
   const updateData = (updates: Partial<InspectionData>) => {
     onUpdate({ ...data, ...updates });
