@@ -331,8 +331,8 @@ export interface EnhancedWizardData {
     salikTrips?: number;
     salikCharge?: number;
     smokePenalty?: number;
-    trafficFineAmount?: number;
     trafficFineCount?: number;
+    trafficFineAmount?: number;
     paymentMethod?: 'card' | 'cash' | 'transfer' | '';
     disputeRaised?: boolean;
     overrideReason?: string;
