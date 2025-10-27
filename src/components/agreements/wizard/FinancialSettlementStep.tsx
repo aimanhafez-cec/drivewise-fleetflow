@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { MultiPaymentAllocator } from '@/components/agreements/payments/MultiPaymentAllocator';
+import { PaymentReceiptDialog } from '@/components/agreements/payments/PaymentReceiptDialog';
 import { useCustomerPaymentProfile } from '@/hooks/useCustomerPaymentProfile';
 import type { EnhancedWizardData } from '@/types/agreement-wizard';
 import type { 
@@ -51,6 +52,7 @@ export const FinancialSettlementStep: React.FC<FinancialSettlementStepProps> = (
   customerId,
 }) => {
   const [managerOverride, setManagerOverride] = useState(false);
+  const [showReceipt, setShowReceipt] = useState(false);
   const { profile: customerProfile, isLoading: loadingProfile } = useCustomerPaymentProfile(customerId);
   const [paymentAllocation, setPaymentAllocation] = useState<PaymentAllocation>({
     totalAmount: 0,
@@ -159,6 +161,7 @@ export const FinancialSettlementStep: React.FC<FinancialSettlementStepProps> = (
   const handlePaymentComplete = (payments: SplitPaymentItem[]) => {
     onChange('splitPayments', payments);
     onChange('settlementCompleted', true);
+    setShowReceipt(true);
   };
 
   // Update payment allocation total when additional payment changes
@@ -607,6 +610,29 @@ export const FinancialSettlementStep: React.FC<FinancialSettlementStepProps> = (
           ))}
         </div>
       )}
+
+      {/* Payment Receipt Dialog */}
+      <PaymentReceiptDialog
+        open={showReceipt}
+        onOpenChange={setShowReceipt}
+        agreementNo="AGR-000123"
+        customerName="Ahmed Al Mansoori"
+        customerEmail="ahmed@example.com"
+        customerPhone="+971501234567"
+        totalAmount={additionalPayment}
+        splitPayments={(safeData.splitPayments || []) as SplitPaymentItem[]}
+        securityDepositHeld={securityDeposit}
+        securityDepositRefund={Math.max(0, securityDeposit - grandTotal)}
+        chargesBreakdown={[
+          { label: 'Damage Charges', amount: totalDamageCharges },
+          { label: 'Fuel Shortage', amount: fuelCharge },
+          { label: 'Excess Kilometers', amount: excessKmCharge },
+          ...(cleaningCharge > 0 ? [{ label: 'Cleaning Fee', amount: cleaningCharge }] : []),
+          ...(lateReturnCharge > 0 ? [{ label: 'Late Return Fee', amount: lateReturnCharge }] : []),
+          ...(salikCharge > 0 ? [{ label: 'Salik/Toll Charges', amount: salikCharge }] : []),
+        ]}
+        completedAt={new Date().toISOString()}
+      />
     </div>
   );
 };
