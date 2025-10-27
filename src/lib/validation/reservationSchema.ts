@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { getValidationSuggestion } from '@/components/ui/SmartValidationMessage';
 
 export const headerValidationSchema = z.object({
   entryDate: z.date(),
@@ -227,6 +228,7 @@ export type ValidationResult = {
     path: string;
     message: string;
     code?: string;
+    suggestion?: string;
   }>;
 };
 
@@ -236,11 +238,18 @@ export const validateReservation = (data: any): ValidationResult => {
     return { success: true, errors: [] };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const errors = error.issues.map(err => ({
-        path: err.path.join('.'),
-        message: err.message,
-        code: err.code
-      }));
+      const errors = error.issues.map(err => {
+        const path = err.path.join('.');
+        const fieldName = err.path[err.path.length - 1]?.toString() || 'field';
+        const suggestion = getValidationSuggestion(fieldName, err.message);
+        
+        return {
+          path,
+          message: err.message,
+          code: err.code,
+          suggestion,
+        };
+      });
       return { success: false, errors };
     }
     return { 
@@ -256,11 +265,18 @@ export const validateHeader = (data: any): ValidationResult => {
     return { success: true, errors: [] };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const errors = error.issues.map(err => ({
-        path: `header.${err.path.join('.')}`,
-        message: err.message,
-        code: err.code
-      }));
+      const errors = error.issues.map(err => {
+        const path = `header.${err.path.join('.')}`;
+        const fieldName = err.path[err.path.length - 1]?.toString() || 'field';
+        const suggestion = getValidationSuggestion(fieldName, err.message);
+        
+        return {
+          path,
+          message: err.message,
+          code: err.code,
+          suggestion,
+        };
+      });
       return { success: false, errors };
     }
     return { 

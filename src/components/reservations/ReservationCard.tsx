@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -30,6 +30,10 @@ import { formatCurrency } from '@/lib/utils/currency';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { QuickActionButtons } from './QuickActionButtons';
+import { InlineEditableField } from '@/components/ui/InlineEditableField';
+import { useToast } from '@/hooks/use-toast';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ReservationCardProps {
   reservation: any;
@@ -37,6 +41,7 @@ interface ReservationCardProps {
   onCollectPayment?: (reservation: any) => void;
   isSelected?: boolean;
   onToggleSelect?: () => void;
+  enableInlineEdit?: boolean;
 }
 
 const getReservationTypeIcon = (type?: string) => {
@@ -91,11 +96,45 @@ export const ReservationCard: React.FC<ReservationCardProps> = ({
   onCollectPayment,
   isSelected = false,
   onToggleSelect,
+  enableInlineEdit = true,
 }) => {
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [isEditingNotes, setIsEditingNotes] = useState(false);
+
+  // Mutation for updating reservation fields
+  const updateFieldMutation = useMutation({
+    mutationFn: async ({ field, value }: { field: string; value: any }) => {
+      const { error } = await supabase
+        .from('reservations')
+        .update({ [field]: value })
+        .eq('id', reservation.id);
+
+      if (error) throw error;
+    },
+    onSuccess: (_, { field }) => {
+      queryClient.invalidateQueries({ queryKey: ['reservations'] });
+      toast({
+        title: 'Updated',
+        description: `${field} has been updated successfully`,
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: 'Update Failed',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
 
   const handleCardClick = () => {
     navigate(`/reservations/${reservation.id}`);
+  };
+
+  const handleUpdateField = async (field: string, value: string) => {
+    await updateFieldMutation.mutateAsync({ field, value });
   };
 
   return (
@@ -143,7 +182,16 @@ export const ReservationCard: React.FC<ReservationCardProps> = ({
                   </Badge>
                 </div>
                 <h3 className="font-semibold text-base truncate">
-                  {reservation.profiles?.full_name || 'Unknown Customer'}
+                  {enableInlineEdit ? (
+                    <InlineEditableField
+                      value={reservation.profiles?.full_name || 'Unknown Customer'}
+                      onSave={(value) => handleUpdateField('customer_name', value)}
+                      displayClassName="font-semibold text-base"
+                      placeholder="Customer name"
+                    />
+                  ) : (
+                    reservation.profiles?.full_name || 'Unknown Customer'
+                  )}
                 </h3>
                 <p className="text-sm text-muted-foreground truncate">
                   {reservation.profiles?.email || 'No email'}
@@ -239,7 +287,17 @@ export const ReservationCard: React.FC<ReservationCardProps> = ({
           <div className="space-y-1">
             <div className="flex items-baseline gap-2">
               <span className="text-2xl font-bold">
-                {formatCurrency(reservation.total_amount || 0)}
+                {enableInlineEdit ? (
+                  <InlineEditableField
+                    value={reservation.total_amount || 0}
+                    onSave={(value) => handleUpdateField('total_amount', value)}
+                    type="number"
+                    formatter={(val) => formatCurrency(Number(val))}
+                    displayClassName="text-2xl font-bold"
+                  />
+                ) : (
+                  formatCurrency(reservation.total_amount || 0)
+                )}
               </span>
               {reservation.down_payment_status && (
                 <Badge className={cn('text-xs', getPaymentStatusColor(reservation.down_payment_status))}>

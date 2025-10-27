@@ -38,6 +38,8 @@ import {
 } from '@/lib/wizardLogic/conditionalSteps';
 import { WizardSection } from './WizardSection';
 import { LivePriceWidget } from './LivePriceWidget';
+import { useTouchGestures, useIsTouchDevice } from '@/hooks/useTouchGestures';
+import { formatCurrency } from '@/lib/utils/currency';
 
 const wizardSteps = [
   { number: 1, title: 'Reservation Type', description: 'Select booking type' },
@@ -85,6 +87,22 @@ const ReservationWizardContent: React.FC = () => {
   
   // Get step groups for sectioned layout
   const stepGroups = getStepGroups();
+  
+  // Touch gesture support for mobile navigation
+  const isTouchDevice = useIsTouchDevice();
+  const { ref: swipeRef } = useTouchGestures({
+    onSwipeLeft: () => {
+      if (isTouchDevice && currentStep < 14 && canProceed()) {
+        handleNext();
+      }
+    },
+    onSwipeRight: () => {
+      if (isTouchDevice && currentStep > 1) {
+        const prevStep = getPreviousRequiredStep(currentStep, wizardData);
+        goToStep(prevStep);
+      }
+    },
+  });
 
   // Apply smart defaults when customer is selected
   useEffect(() => {
@@ -676,7 +694,7 @@ const ReservationWizardContent: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background" ref={swipeRef as any}>
       <WizardDebugPanel />
       <WizardProgress
         currentStep={currentStep} 
@@ -686,6 +704,13 @@ const ReservationWizardContent: React.FC = () => {
         stepValidationStatus={stepValidationStatus}
         onStepClick={handleStepClick}
       />
+      
+      {/* Mobile Swipe Hint */}
+      {isTouchDevice && (
+        <div className="block lg:hidden bg-blue-50 dark:bg-blue-950/30 text-center py-2 text-xs text-muted-foreground border-b">
+          👆 Swipe left/right to navigate steps
+        </div>
+      )}
       
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -778,10 +803,47 @@ const ReservationWizardContent: React.FC = () => {
             </div>
           </div>
           
-          {/* Live Price Widget - Sticky Sidebar */}
-          <div className="lg:col-span-1">
+          {/* Live Price Widget - Sticky Sidebar (Hidden on Mobile) */}
+          <div className="hidden lg:block lg:col-span-1">
             <LivePriceWidget wizardData={wizardData} />
           </div>
+          
+          {/* Mobile Price Summary - Bottom Fixed */}
+          {isTouchDevice && wizardData.totalAmount > 0 && (
+            <div className="fixed bottom-0 left-0 right-0 bg-background border-t shadow-lg p-4 lg:hidden z-40">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-muted-foreground">Total Amount</p>
+                  <p className="text-2xl font-bold text-primary">
+                    {formatCurrency(wizardData.totalAmount || 0)}
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  {currentStep > 1 && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const prevStep = getPreviousRequiredStep(currentStep, wizardData);
+                        goToStep(prevStep);
+                      }}
+                    >
+                      ← Back
+                    </Button>
+                  )}
+                  {currentStep < 14 && (
+                    <Button
+                      size="sm"
+                      onClick={handleNext}
+                      disabled={!canProceed()}
+                    >
+                      Next →
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
