@@ -29,9 +29,12 @@ export const ReservationProgressionCard: React.FC = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const { 
     currentStep, 
-    completedSteps, 
+    completedSteps,
+    skippedSteps,
     stepValidationStatus, 
     goToStep,
+    skipStep,
+    unskipStep,
   } = useReservationWizard();
 
   const stepGroups = getStepGroups();
@@ -41,6 +44,14 @@ export const ReservationProgressionCard: React.FC = () => {
 
   const handleStepClick = (step: number) => {
     goToStep(step);
+  };
+
+  const handleStepSkip = (step: number) => {
+    if (skippedSteps.includes(step)) {
+      unskipStep(step);
+    } else {
+      skipStep(step);
+    }
   };
 
   return (
@@ -107,8 +118,10 @@ export const ReservationProgressionCard: React.FC = () => {
                   steps={wizardSteps}
                   currentStep={currentStep}
                   completedSteps={completedSteps}
+                  skippedSteps={skippedSteps}
                   stepValidationStatus={stepValidationStatus}
                   onStepClick={handleStepClick}
+                  onStepSkip={handleStepSkip}
                   isExpanded={group.steps.includes(currentStep)}
                 />
               ))}

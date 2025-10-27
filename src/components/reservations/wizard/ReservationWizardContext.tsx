@@ -156,6 +156,7 @@ interface ReservationWizardContextType {
   wizardData: ReservationWizardData;
   completedSteps: number[];
   visitedSteps: number[];
+  skippedSteps: number[];
   stepValidationStatus: Record<number, StepStatus>;
   updateWizardData: (updates: Partial<ReservationWizardData>) => void;
   nextStep: () => void;
@@ -163,6 +164,8 @@ interface ReservationWizardContextType {
   goToStep: (step: number) => void;
   markStepComplete: (stepNumber: number) => void;
   markStepIncomplete: (stepNumber: number) => void;
+  skipStep: (stepNumber: number) => void;
+  unskipStep: (stepNumber: number) => void;
   getStepStatus: (stepNumber: number) => StepStatus;
   resetWizard: () => void;
 }
@@ -273,6 +276,7 @@ export const ReservationWizardProvider: React.FC<{ children: ReactNode }> = ({
   const [wizardData, setWizardData] = useState<ReservationWizardData>(initialWizardData);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [visitedSteps, setVisitedSteps] = useState<number[]>([1]); // Step 1 is visited by default
+  const [skippedSteps, setSkippedSteps] = useState<number[]>([]);
   const [stepValidationStatus, setStepValidationStatus] = useState<Record<number, StepStatus>>({});
 
   const updateWizardData = (updates: Partial<ReservationWizardData>) => {
@@ -298,6 +302,21 @@ export const ReservationWizardProvider: React.FC<{ children: ReactNode }> = ({
       ...prev,
       [stepNumber]: 'incomplete',
     }));
+  };
+
+  const skipStep = (stepNumber: number) => {
+    setSkippedSteps((prev) => {
+      if (!prev.includes(stepNumber)) {
+        return [...prev, stepNumber];
+      }
+      return prev;
+    });
+    // Remove from completed if it was marked as complete
+    setCompletedSteps((prev) => prev.filter((step) => step !== stepNumber));
+  };
+
+  const unskipStep = (stepNumber: number) => {
+    setSkippedSteps((prev) => prev.filter((step) => step !== stepNumber));
   };
 
   const getStepStatus = (stepNumber: number): StepStatus => {
@@ -348,6 +367,7 @@ export const ReservationWizardProvider: React.FC<{ children: ReactNode }> = ({
     setWizardData(initialWizardData);
     setCompletedSteps([]);
     setVisitedSteps([1]);
+    setSkippedSteps([]);
     setStepValidationStatus({});
   };
 
@@ -358,6 +378,7 @@ export const ReservationWizardProvider: React.FC<{ children: ReactNode }> = ({
         wizardData,
         completedSteps,
         visitedSteps,
+        skippedSteps,
         stepValidationStatus,
         updateWizardData,
         nextStep,
@@ -365,6 +386,8 @@ export const ReservationWizardProvider: React.FC<{ children: ReactNode }> = ({
         goToStep,
         markStepComplete,
         markStepIncomplete,
+        skipStep,
+        unskipStep,
         getStepStatus,
         resetWizard,
       }}

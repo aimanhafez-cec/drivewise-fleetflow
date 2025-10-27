@@ -12,8 +12,10 @@ interface ProgressionSectionProps {
   steps: Array<{ number: number; title: string; description: string }>;
   currentStep: number;
   completedSteps: number[];
+  skippedSteps: number[];
   stepValidationStatus: Record<number, StepStatus>;
   onStepClick: (step: number) => void;
+  onStepSkip: (step: number) => void;
   isExpanded: boolean;
 }
 
@@ -22,8 +24,10 @@ export const ProgressionSection: React.FC<ProgressionSectionProps> = ({
   steps,
   currentStep,
   completedSteps,
+  skippedSteps,
   stepValidationStatus,
   onStepClick,
+  onStepSkip,
   isExpanded: initialExpanded,
 }) => {
   const [isOpen, setIsOpen] = useState(initialExpanded);
@@ -160,7 +164,12 @@ export const ProgressionSection: React.FC<ProgressionSectionProps> = ({
                   description={step.description}
                   status={getStepStatus(step.number)}
                   isCurrentStep={currentStep === step.number}
+                  isSkipped={skippedSteps.includes(step.number)}
                   onClick={() => onStepClick(step.number)}
+                  onSkip={(e) => {
+                    e.stopPropagation();
+                    onStepSkip(step.number);
+                  }}
                 />
               ))}
           </div>
