@@ -8,10 +8,9 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { VehicleDiagramInteractive } from '@/components/agreements/shared/VehicleDiagramInteractive';
-import { DamageMarkerDialog } from '@/components/inspection/corporate/DamageMarkerDialog';
+import { Vehicle3DDamageInspection } from '@/components/agreements/shared/Vehicle3DDamageInspection';
 import { Camera, Upload, CheckCircle2 } from 'lucide-react';
-import type { InspectionData, DamageMarker, VehicleView, InspectionPhotos } from '@/types/agreement-wizard';
+import type { InspectionData, DamageMarker, InspectionPhotos } from '@/types/agreement-wizard';
 
 const FUEL_LEVELS = [
   { value: 'E', label: 'Empty', percentage: 0 },
@@ -76,10 +75,6 @@ export function CheckOutInspectionTab({ data, lineId, onUpdate }: CheckOutInspec
     if (!data || data.fuelLevel === undefined) return 4;
     return FUEL_LEVELS.findIndex(f => f.percentage === data.fuelLevel) || 4;
   });
-  const [currentView, setCurrentView] = useState<VehicleView>('top');
-  const [showDamageDialog, setShowDamageDialog] = useState(false);
-  const [selectedMarker, setSelectedMarker] = useState<DamageMarker | null>(null);
-  const [clickPosition, setClickPosition] = useState<{ x: number; y: number; view: VehicleView } | null>(null);
 
   // Return loading state if data is not yet initialized
   if (!data) {
@@ -292,24 +287,22 @@ export function CheckOutInspectionTab({ data, lineId, onUpdate }: CheckOutInspec
         <AccordionItem value="damage">
           <AccordionTrigger>
             <div className="flex items-center gap-3">
-              <span className="font-semibold">Damage Inspection</span>
+              <span className="font-semibold">3D Damage Inspection</span>
               <Badge variant="outline">
                 {data.damageMarkers?.length || 0} Markers
               </Badge>
             </div>
           </AccordionTrigger>
           <AccordionContent>
-            <Card>
-              <CardContent className="pt-6">
-                <VehicleDiagramInteractive
-                  markers={data.damageMarkers}
-                  currentView={currentView}
-                  onAddMarker={handleAddMarker}
-                  onRemoveMarker={handleRemoveMarker}
-                  onViewChange={setCurrentView}
-                />
-              </CardContent>
-            </Card>
+            <div className="h-[600px]">
+              <Vehicle3DDamageInspection
+                markers={data.damageMarkers}
+                onAddMarker={handleAddMarker}
+                onRemoveMarker={handleRemoveMarker}
+                agreementId="temp-checkout"
+                lineId={lineId}
+              />
+            </div>
           </AccordionContent>
         </AccordionItem>
 

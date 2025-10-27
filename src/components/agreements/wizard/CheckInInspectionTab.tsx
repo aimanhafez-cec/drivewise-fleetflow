@@ -8,10 +8,10 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { VehicleDiagramInteractive } from '@/components/agreements/shared/VehicleDiagramInteractive';
+import { Vehicle3DDamageInspection } from '@/components/agreements/shared/Vehicle3DDamageInspection';
 import { Camera, AlertTriangle, CheckCircle2, Info } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import type { InspectionData, DamageMarker, VehicleView, InspectionPhotos } from '@/types/agreement-wizard';
+import type { InspectionData, DamageMarker, InspectionPhotos } from '@/types/agreement-wizard';
 
 const FUEL_LEVELS = [
   { value: 'E', label: 'Empty', percentage: 0 },
@@ -77,7 +77,6 @@ export function CheckInInspectionTab({
     if (!checkInData || checkInData.fuelLevel === undefined) return 4;
     return FUEL_LEVELS.findIndex(f => f.percentage === checkInData.fuelLevel) || 4;
   });
-  const [currentView, setCurrentView] = useState<VehicleView>('top');
 
   // Return loading state if data is not yet initialized
   if (!checkInData) {
@@ -365,11 +364,11 @@ export function CheckInInspectionTab({
           </AccordionContent>
         </AccordionItem>
 
-        {/* Damage Inspection (Comparison Mode) */}
+        {/* 3D Damage Inspection (Comparison Mode) */}
         <AccordionItem value="damage">
           <AccordionTrigger>
             <div className="flex items-center gap-3">
-              <span className="font-semibold">Damage Inspection (Comparison)</span>
+              <span className="font-semibold">3D Damage Inspection (Comparison)</span>
               <div className="flex gap-2">
                 <Badge variant="outline" className="bg-muted">
                   {existingDamagesCount} From Check-Out
@@ -383,23 +382,22 @@ export function CheckInInspectionTab({
             </div>
           </AccordionTrigger>
           <AccordionContent>
-            <Card>
-              <CardContent className="pt-6 space-y-4">
-                <Alert>
-                  <Info className="h-4 w-4" />
-                  <AlertDescription>
-                    <p className="font-semibold mb-2">Comparison Mode Active</p>
-                    <ul className="text-sm space-y-1">
-                      <li>• <span className="text-muted-foreground">Gray markers</span> = Existing damages from check-out (read-only)</li>
-                      <li>• <span className="text-destructive">Red markers</span> = New damages found during check-in</li>
-                      <li>• Click on the diagram to mark new damages</li>
-                    </ul>
-                  </AlertDescription>
-                </Alert>
+            <div className="space-y-4">
+              <Alert>
+                <Info className="h-4 w-4" />
+                <AlertDescription>
+                  <p className="font-semibold mb-2">Comparison Mode Active</p>
+                  <ul className="text-sm space-y-1">
+                    <li>• <span className="text-muted-foreground">Gray markers</span> = Existing damages from check-out (read-only)</li>
+                    <li>• <span className="text-destructive">Red markers</span> = New damages found during check-in</li>
+                    <li>• Click "Mark Damage" and click on the 3D model to add new damages</li>
+                  </ul>
+                </AlertDescription>
+              </Alert>
 
-                <VehicleDiagramInteractive
+              <div className="h-[600px]">
+                <Vehicle3DDamageInspection
                   markers={allMarkers}
-                  currentView={currentView}
                   onAddMarker={handleAddMarker}
                   onRemoveMarker={(id) => {
                     // Only allow removing new check-in markers
@@ -408,10 +406,11 @@ export function CheckInInspectionTab({
                       handleRemoveMarker(id);
                     }
                   }}
-                  onViewChange={setCurrentView}
+                  agreementId="temp-checkin"
+                  lineId={lineId}
                 />
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </AccordionContent>
         </AccordionItem>
 
