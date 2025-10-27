@@ -6,6 +6,7 @@ import { useLead } from '@/hooks/useLead';
 import { LeadHeader } from '@/components/leads/LeadHeader';
 import { LeadActionBar } from '@/components/leads/LeadActionBar';
 import { LeadCustomerInfo } from '@/components/leads/LeadCustomerInfo';
+import { LeadVehicleCard } from '@/components/leads/LeadVehicleCard';
 import { LeadRequestDetails } from '@/components/leads/LeadRequestDetails';
 import { LeadPricingEstimation } from '@/components/leads/LeadPricingEstimation';
 import { LeadCommunicationTimeline } from '@/components/leads/LeadCommunicationTimeline';
@@ -107,7 +108,10 @@ const LeadDetail = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column - Main Info */}
         <div className="lg:col-span-2 space-y-6">
-          <LeadCustomerInfo lead={lead} />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <LeadCustomerInfo lead={lead} />
+            <LeadVehicleCard lead={lead} />
+          </div>
           <LeadRequestDetails lead={lead} />
           <LeadPricingEstimation lead={lead} />
         </div>
