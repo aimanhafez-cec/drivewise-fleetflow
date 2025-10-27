@@ -1,10 +1,9 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
-import { ArrowLeft, Loader2 } from 'lucide-react';
+import { Loader2, ArrowLeft } from 'lucide-react';
 import { useLead } from '@/hooks/useLead';
-import { LeadSourceBadge } from '@/components/leads/LeadSourceBadge';
+import { LeadHeader } from '@/components/leads/LeadHeader';
 import { LeadActionBar } from '@/components/leads/LeadActionBar';
 import { LeadCustomerInfo } from '@/components/leads/LeadCustomerInfo';
 import { LeadRequestDetails } from '@/components/leads/LeadRequestDetails';
@@ -18,7 +17,7 @@ const LeadDetail = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   
-  const { lead, loading, error } = useLead(id);
+  const { lead, loading, error, refetch } = useLead(id);
 
   // Loading state
   if (loading) {
@@ -47,29 +46,6 @@ const LeadDetail = () => {
       </div>
     );
   }
-
-  const getStatusBadge = (status: typeof lead.status) => {
-    const statusConfig = {
-      new: { label: 'New', className: 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300' },
-      contacted: { label: 'Contacted', className: 'bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300' },
-      quoted: { label: 'Quoted', className: 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300' },
-      confirmed: { label: 'Confirmed', className: 'bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-300' },
-      rejected: { label: 'Rejected', className: 'bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300' },
-      expired: { label: 'Expired', className: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300' },
-    };
-    const config = statusConfig[status];
-    return <Badge className={`${config.className} border-0`}>{config.label}</Badge>;
-  };
-
-  const getPriorityBadge = (priority: typeof lead.priority) => {
-    const priorityConfig = {
-      high: { label: 'High Priority', className: 'bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300' },
-      medium: { label: 'Medium Priority', className: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300' },
-      low: { label: 'Low Priority', className: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300' },
-    };
-    const config = priorityConfig[priority];
-    return <Badge variant="outline" className={config.className}>{config.label}</Badge>;
-  };
 
   const handleConfirm = () => {
     toast({
@@ -114,25 +90,8 @@ const LeadDetail = () => {
 
   return (
     <div className="container mx-auto py-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center gap-4">
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => navigate('/leads-intake')}
-        >
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
-        
-        <div className="flex-1">
-          <div className="flex items-center gap-3 flex-wrap">
-            <h1 className="text-2xl font-bold">{lead.lead_no}</h1>
-            {getStatusBadge(lead.status)}
-            {getPriorityBadge(lead.priority)}
-            <LeadSourceBadge sourceId={lead.source_name} />
-          </div>
-        </div>
-      </div>
+      {/* Header with Status Management */}
+      <LeadHeader lead={lead} onUpdate={refetch} />
 
       {/* Action Bar */}
       <LeadActionBar
