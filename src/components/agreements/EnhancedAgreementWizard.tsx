@@ -31,10 +31,11 @@ import { BillingPaymentStep } from './wizard/BillingPaymentStep';
 import { DocumentsVerificationStep } from './wizard/DocumentsVerificationStep';
 import { TermsSignatureStep } from './wizard/TermsSignatureStep';
 import { FinalReviewStep } from './wizard/FinalReviewStep';
+import { FinancialSettlementStep } from './wizard/FinancialSettlementStep';
 import { DraftManagementBanner } from './wizard/DraftManagementBanner';
 import type { EnhancedWizardData, AgreementSource } from '@/types/agreement-wizard';
 
-const TOTAL_STEPS = 9; // 0-8
+const TOTAL_STEPS = 10; // 0-9
 
 const STEP_CONFIG = [
   { id: 0, number: 0, title: 'Source', description: 'Select source', icon: '📋' },
@@ -46,6 +47,7 @@ const STEP_CONFIG = [
   { id: 6, number: 6, title: 'Documents', description: 'Upload & verify', icon: '📄' },
   { id: 7, number: 7, title: 'Signature', description: 'Terms & sign', icon: '✍️' },
   { id: 8, number: 8, title: 'Review', description: 'Final check', icon: '✅' },
+  { id: 9, number: 9, title: 'Settlement', description: 'Financial closure', icon: '💵' },
 ];
 
 const INITIAL_WIZARD_DATA: EnhancedWizardData = {
@@ -180,6 +182,28 @@ const INITIAL_WIZARD_DATA: EnhancedWizardData = {
       print: false,
     },
     finalNotes: undefined,
+  },
+  step9: {
+    cleaningRequired: false,
+    cleaningCharge: undefined,
+    lateReturnHours: undefined,
+    lateReturnCharge: undefined,
+    salikTrips: undefined,
+    salikCharge: undefined,
+    paymentMethod: undefined,
+    disputeRaised: false,
+    overrideReason: undefined,
+    overrideNotes: undefined,
+    managerAuthCode: undefined,
+    overrideApplied: false,
+    inspectorName: undefined,
+    inspectorDate: undefined,
+    managerName: undefined,
+    managerDate: undefined,
+    customerName: undefined,
+    customerDate: undefined,
+    securityDepositHeld: 1500,
+    settlementCompleted: false,
   },
   // Phase 10: Optional business configuration fields
   businessConfig: undefined,
@@ -678,6 +702,15 @@ export const EnhancedAgreementWizard = () => {
           <FinalReviewStep
             wizardData={wizardData}
             onChange={(field, value) => handleStepDataChange('step8', field, value)}
+            errors={errorMessages}
+          />
+        );
+      case 9:
+        return (
+          <FinancialSettlementStep
+            data={wizardData.step9}
+            inspectionData={wizardData.step2}
+            onChange={(field, value) => handleStepDataChange('step9', field, value)}
             errors={errorMessages}
           />
         );

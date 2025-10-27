@@ -322,6 +322,30 @@ export interface EnhancedWizardData {
     finalNotes?: string;
   };
 
+  // Step 9: Financial Settlement
+  step9: {
+    cleaningRequired: boolean;
+    cleaningCharge?: number;
+    lateReturnHours?: number;
+    lateReturnCharge?: number;
+    salikTrips?: number;
+    salikCharge?: number;
+    paymentMethod?: 'card' | 'cash' | 'transfer' | '';
+    disputeRaised?: boolean;
+    overrideReason?: string;
+    overrideNotes?: string;
+    managerAuthCode?: string;
+    overrideApplied?: boolean;
+    inspectorName?: string;
+    inspectorDate?: string;
+    managerName?: string;
+    managerDate?: string;
+    customerName?: string;
+    customerDate?: string;
+    securityDepositHeld?: number;
+    settlementCompleted?: boolean;
+  };
+
   // Phase 10: Business Configuration (Optional)
   businessConfig?: {
     businessUnitId?: string;

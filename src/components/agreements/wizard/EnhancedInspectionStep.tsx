@@ -191,7 +191,7 @@ export const EnhancedInspectionStep: React.FC<EnhancedInspectionStepProps> = ({
                 </Badge>
               </div>
               <CardDescription>
-                Complete check-out inspection when vehicle leaves, check-in when it returns, and review the comparison report
+                Complete check-out inspection when vehicle leaves, check-in when it returns, and review the damage comparison report
               </CardDescription>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -323,8 +323,8 @@ export const EnhancedInspectionStep: React.FC<EnhancedInspectionStepProps> = ({
             aria-controls="comparison-panel"
           >
             <div className="flex flex-col items-center gap-1 w-full">
-              <span className="font-semibold text-sm md:text-base">Comparison & Report</span>
-              <span className="text-xs opacity-80 hidden sm:inline">Damage & cost analysis</span>
+              <span className="font-semibold text-sm md:text-base">Damage Report</span>
+              <span className="text-xs opacity-80 hidden sm:inline">Damage comparison analysis</span>
             </div>
             {getTabBadge(comparisonComplete, activeTab === 'comparison')}
           </TabsTrigger>
@@ -382,9 +382,9 @@ export const EnhancedInspectionStep: React.FC<EnhancedInspectionStepProps> = ({
         <TabsContent value="comparison" className="mt-6 animate-fade-in transition-opacity duration-300" id="comparison-panel" role="tabpanel">
           <Card className="animate-scale-in">
             <CardHeader>
-              <CardTitle className="text-lg">Comparison & Damage Report</CardTitle>
+              <CardTitle className="text-lg">Damage Report</CardTitle>
               <CardDescription>
-                Side-by-side analysis with full cost breakdown
+                Side-by-side comparison of vehicle condition (financial settlement in next step)
               </CardDescription>
             </CardHeader>
             <CardContent>
