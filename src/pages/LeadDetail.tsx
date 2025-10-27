@@ -9,7 +9,8 @@ import { LeadCustomerInfo } from '@/components/leads/LeadCustomerInfo';
 import { LeadVehicleCard } from '@/components/leads/LeadVehicleCard';
 import { LeadRentalPeriod } from '@/components/leads/LeadRentalPeriod';
 import { LeadPricingEstimation } from '@/components/leads/LeadPricingEstimation';
-import { LeadCommunicationTimeline } from '@/components/leads/LeadCommunicationTimeline';
+import { LeadConversionActions } from '@/components/leads/LeadConversionActions';
+import { LeadNotesTimeline } from '@/components/leads/LeadNotesTimeline';
 import { LeadSourceData } from '@/components/leads/LeadSourceData';
 import { useToast } from '@/hooks/use-toast';
 
@@ -118,7 +119,8 @@ const LeadDetail = () => {
 
         {/* Right Column - Timeline & Source Data */}
         <div className="space-y-6">
-          <LeadCommunicationTimeline lead={lead} />
+          <LeadConversionActions lead={lead} onUpdate={refetch} />
+          <LeadNotesTimeline lead={lead} />
           <LeadSourceData lead={lead} />
         </div>
       </div>
