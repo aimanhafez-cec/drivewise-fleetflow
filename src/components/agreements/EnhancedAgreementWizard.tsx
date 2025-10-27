@@ -9,6 +9,9 @@ import { useWizardProgress } from '@/hooks/useWizardProgress';
 import { useWizardKeyboardShortcuts } from '@/hooks/useWizardKeyboardShortcuts';
 import { useAgreementSmartDefaults, useApplyAgreementSmartDefaults } from '@/hooks/useAgreementSmartDefaults';
 import { validateStep } from '@/lib/wizard/validation';
+import { getAgreementStepGroups } from '@/lib/wizardLogic/agreementStepGroups';
+import { getNextAgreementRequiredStep, getPreviousAgreementRequiredStep } from '@/lib/wizardLogic/agreementConditionalSteps';
+import { AgreementWizardSection } from './wizard/AgreementWizardSection';
 import { WizardProgress } from '@/components/reservations/wizard/WizardProgress';
 import { AgreementProgressionCard } from './wizard/AgreementProgressionCard';
 import { SourceSelection } from './wizard/SourceSelection';
@@ -172,6 +175,7 @@ export const EnhancedAgreementWizard = () => {
     errors: string[];
     warnings: string[];
   }>({ isValid: true, errors: [], warnings: [] });
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
 
   const {
     wizardData,
@@ -197,6 +201,20 @@ export const EnhancedAgreementWizard = () => {
   const customerId = wizardData.step1?.customerId;
   const { smartDefaults, hasHistory, isLoading: loadingDefaults } = useAgreementSmartDefaults(customerId);
   const { applyDefaults } = useApplyAgreementSmartDefaults();
+
+  // Get step groups for sectioned layout
+  const stepGroups = getAgreementStepGroups();
+
+  // Initialize expanded sections based on current step
+  useEffect(() => {
+    const currentGroup = stepGroups.find(group => group.steps.includes(progress.currentStep));
+    if (currentGroup) {
+      setExpandedSections(prev => ({
+        ...prev,
+        [currentGroup.id]: true,
+      }));
+    }
+  }, [progress.currentStep, stepGroups]);
 
   // Apply smart defaults when customer is selected
   useEffect(() => {
@@ -268,8 +286,10 @@ export const EnhancedAgreementWizard = () => {
     // Mark current step complete
     markStepComplete(progress.currentStep);
     
-    if (progress.currentStep < TOTAL_STEPS - 1) {
-      const nextStep = progress.currentStep + 1;
+    // Use conditional navigation to skip non-required steps
+    const nextStep = getNextAgreementRequiredStep(progress.currentStep, wizardData, TOTAL_STEPS);
+    
+    if (nextStep !== progress.currentStep) {
       setCurrentStep(nextStep);
       
       // Auto-scroll to next step with delay for rendering
@@ -292,8 +312,10 @@ export const EnhancedAgreementWizard = () => {
       updateStepStatus(progress.currentStep, 'has-errors');
     }
     
-    if (progress.currentStep > 0) {
-      const prevStep = progress.currentStep - 1;
+    // Use conditional navigation to skip non-required steps
+    const prevStep = getPreviousAgreementRequiredStep(progress.currentStep, wizardData);
+    
+    if (prevStep !== progress.currentStep) {
       setCurrentStep(prevStep);
       
       // Auto-scroll to previous step with delay for rendering
@@ -364,7 +386,24 @@ export const EnhancedAgreementWizard = () => {
     
     // Allow navigation to ANY step
     setCurrentStep(step);
+    
+    // Expand the section containing the target step
+    const targetGroup = stepGroups.find(group => group.steps.includes(step));
+    if (targetGroup) {
+      setExpandedSections(prev => ({
+        ...prev,
+        [targetGroup.id]: true,
+      }));
+    }
+    
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const toggleSectionExpand = (groupId: string) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [groupId]: !prev[groupId],
+    }));
   };
 
   const handleStepSkip = (step: number) => {
@@ -557,9 +596,24 @@ export const EnhancedAgreementWizard = () => {
           </Alert>
         )}
 
-        {/* Step Content */}
-        <div data-step={progress.currentStep}>
-          {renderStepContent()}
+        {/* Step Content with Sectioned Layout */}
+        <div className="space-y-6">
+          {stepGroups.map(group => (
+            <AgreementWizardSection
+              key={group.id}
+              group={group}
+              steps={STEP_CONFIG}
+              currentStep={progress.currentStep}
+              completedSteps={progress.completedSteps}
+              skippedSteps={progress.skippedSteps || []}
+              stepValidationStatus={progress.stepValidationStatus}
+              onStepClick={handleStepClick}
+              isExpanded={expandedSections[group.id] ?? group.steps.includes(progress.currentStep)}
+              onToggleExpand={() => toggleSectionExpand(group.id)}
+            >
+              {renderStepContent()}
+            </AgreementWizardSection>
+          ))}
         </div>
 
         {/* Navigation */}
