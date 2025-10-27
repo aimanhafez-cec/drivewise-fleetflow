@@ -15,7 +15,6 @@ interface ProgressionSectionProps {
   stepValidationStatus: Record<number, StepStatus>;
   onStepClick: (step: number) => void;
   isExpanded: boolean;
-  renderStepContent?: (stepNumber: number) => React.ReactNode;
 }
 
 export const ProgressionSection: React.FC<ProgressionSectionProps> = ({
@@ -26,7 +25,6 @@ export const ProgressionSection: React.FC<ProgressionSectionProps> = ({
   stepValidationStatus,
   onStepClick,
   isExpanded: initialExpanded,
-  renderStepContent,
 }) => {
   const [isOpen, setIsOpen] = useState(initialExpanded);
   const [prevStep, setPrevStep] = useState(currentStep);
@@ -155,23 +153,15 @@ export const ProgressionSection: React.FC<ProgressionSectionProps> = ({
             {steps
               .filter(step => group.steps.includes(step.number))
               .map(step => (
-                <React.Fragment key={step.number}>
-                  <ProgressionStepItem
-                    stepNumber={step.number}
-                    title={step.title}
-                    description={step.description}
-                    status={getStepStatus(step.number)}
-                    isCurrentStep={currentStep === step.number}
-                    onClick={() => onStepClick(step.number)}
-                  />
-                  
-                  {/* Inline Form Content */}
-                  {renderStepContent && currentStep === step.number && (
-                    <div className="ml-6 mt-2 mb-3 p-4 rounded-lg border bg-muted/30 animate-fade-in">
-                      {renderStepContent(step.number)}
-                    </div>
-                  )}
-                </React.Fragment>
+                <ProgressionStepItem
+                  key={step.number}
+                  stepNumber={step.number}
+                  title={step.title}
+                  description={step.description}
+                  status={getStepStatus(step.number)}
+                  isCurrentStep={currentStep === step.number}
+                  onClick={() => onStepClick(step.number)}
+                />
               ))}
           </div>
         </CollapsibleContent>
