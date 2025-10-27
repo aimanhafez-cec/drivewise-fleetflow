@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { CheckCircle2, Circle, AlertCircle, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CheckOutInspectionTab } from './CheckOutInspectionTab';
+import { CheckInInspectionTab } from './CheckInInspectionTab';
 import type { EnhancedWizardData, InspectionData } from '@/types/agreement-wizard';
 
 interface EnhancedInspectionStepProps {
@@ -51,7 +52,32 @@ export const EnhancedInspectionStep: React.FC<EnhancedInspectionStepProps> = ({
         notes: '',
       });
     }
-  }, []);
+    // Initialize checkInInspection when checkout is complete
+    if (data.checkOutInspection && !data.checkInInspection) {
+      onChange('checkInInspection', {
+        timestamp: new Date().toISOString(),
+        inspectorName: '',
+        preHandoverChecklist: {
+          vehicleCleaned: false,
+          vehicleFueled: false,
+          documentsReady: false,
+          keysAvailable: false,
+          warningLightsOk: false,
+        },
+        fuelLevel: 100,
+        odometerReading: data.checkOutInspection.odometerReading,
+        damageMarkers: [],
+        photos: {
+          exterior: [],
+          interior: [],
+          documents: [],
+          damages: [],
+        },
+        inspectionChecklist: {},
+        notes: '',
+      });
+    }
+  }, [data.checkOutInspection]);
 
   const activeTab = data.activeTab || 'checkout';
   
@@ -276,12 +302,23 @@ export const EnhancedInspectionStep: React.FC<EnhancedInspectionStepProps> = ({
                   <p className="text-lg font-medium mb-2">Complete Check-Out First</p>
                   <p className="text-sm">You must complete the check-out inspection before starting check-in</p>
                 </div>
-              ) : (
-                <div className="text-center py-12 text-muted-foreground">
-                  <AlertCircle className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p className="text-lg font-medium mb-2">Check-In Inspection Form</p>
-                  <p className="text-sm">This will be implemented in Phase 4</p>
+              ) : checkinComplete ? (
+                <div className="text-center py-12">
+                  <CheckCircle2 className="w-16 h-16 text-success mx-auto mb-4" />
+                  <p className="text-lg font-medium">Check-In Inspection Complete</p>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Vehicle returned by customer
+                  </p>
                 </div>
+              ) : (
+                <CheckInInspectionTab
+                  checkOutData={data.checkOutInspection}
+                  checkInData={data.checkInInspection}
+                  lineId={`temp-line-${Date.now()}`}
+                  onUpdate={(inspectionData: InspectionData) => {
+                    onChange('checkInInspection', inspectionData);
+                  }}
+                />
               )}
             </CardContent>
           </Card>
