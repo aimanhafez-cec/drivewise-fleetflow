@@ -170,7 +170,9 @@ export const LeadDataTable = ({ leads }: LeadDataTableProps) => {
                   {lead.lead_no}
                 </TableCell>
             <TableCell>
-              <LeadSourceBadge sourceId={lead.source_name} />
+              <div className="min-w-[140px]">
+                <LeadSourceBadge sourceId={lead.source_name} />
+              </div>
             </TableCell>
                 <TableCell>
                   <div className="space-y-1">

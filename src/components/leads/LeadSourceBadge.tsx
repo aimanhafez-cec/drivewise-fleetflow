@@ -15,7 +15,7 @@ export const LeadSourceBadge = ({ sourceId, showIcon = true }: LeadSourceBadgePr
 
   return (
     <Badge 
-      className={`${source.bgColor} ${source.textColor} border-0 font-medium`}
+      className={`${source.bgColor} ${source.textColor} border-0 font-medium whitespace-nowrap`}
     >
       {showIcon && <span className="mr-1.5">{source.icon}</span>}
       {source.name}
