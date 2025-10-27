@@ -2,11 +2,12 @@ import React, { useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle2, Circle, AlertCircle, ArrowRight } from 'lucide-react';
+import { CheckCircle2, Circle, AlertCircle, ArrowRight, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CheckOutInspectionTab } from './CheckOutInspectionTab';
 import { CheckInInspectionTab } from './CheckInInspectionTab';
-import type { EnhancedWizardData, InspectionData } from '@/types/agreement-wizard';
+import { InspectionComparisonTab } from './InspectionComparisonTab';
+import type { EnhancedWizardData, InspectionData, ComparisonReport } from '@/types/agreement-wizard';
 
 interface EnhancedInspectionStepProps {
   data: EnhancedWizardData['step2'];
@@ -346,11 +347,49 @@ export const EnhancedInspectionStep: React.FC<EnhancedInspectionStepProps> = ({
                     }
                   </p>
                 </div>
+              ) : comparisonComplete ? (
+                <InspectionComparisonTab
+                  checkOutData={data.checkOutInspection}
+                  checkInData={data.checkInInspection}
+                  comparisonReport={data.comparisonReport}
+                  onUpdate={(report: ComparisonReport) => {
+                    onChange('comparisonReport', report);
+                  }}
+                />
               ) : (
-                <div className="text-center py-12 text-muted-foreground">
-                  <AlertCircle className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p className="text-lg font-medium mb-2">Comparison Report</p>
-                  <p className="text-sm">This will be implemented in Phase 5</p>
+                <div className="text-center py-12">
+                  <Button
+                    size="lg"
+                    onClick={() => {
+                      // Auto-generate comparison report
+                      onChange('comparisonReport', {
+                        newDamages: [],
+                        totalNewDamages: 0,
+                        totalEstimatedCost: 0,
+                        totalChargeableAmount: 0,
+                        fuelDifference: 0,
+                        fuelCharge: 0,
+                        odometerDifference: 0,
+                        excessKmCharge: 0,
+                        cleaningRequired: false,
+                        cleaningCharge: 0,
+                        additionalCharges: [],
+                        subtotal: 0,
+                        vatRate: 0.05,
+                        vatAmount: 0,
+                        grandTotal: 0,
+                        securityDepositHeld: 1500,
+                        additionalPaymentRequired: 0,
+                        reportGeneratedAt: new Date().toISOString(),
+                        reportGeneratedBy: 'System',
+                        managerApprovalRequired: false,
+                        customerAcknowledged: false
+                      });
+                    }}
+                  >
+                    <FileText className="w-4 h-4 mr-2" />
+                    Generate Comparison Report
+                  </Button>
                 </div>
               )}
             </CardContent>
