@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -168,6 +168,60 @@ export function InspectionComparisonTab({
   const handlePrint = () => {
     window.print();
   };
+
+  // Update comparison report whenever damages or charges change
+  useEffect(() => {
+    const report: ComparisonReport = {
+      newDamages: damages.map(d => {
+        const marker = checkInData.damageMarkers.find(m => m.id === d.id);
+        return {
+          id: d.id,
+          damageType: d.damageType,
+          location: d.location,
+          severity: d.severity as any,
+          side: (marker?.view || marker?.side || 'front') as any,
+          existedAtCheckout: d.existedAtCheckout,
+          photos: {
+            checkout: undefined,
+            checkin: marker?.photos || [],
+          },
+          estimatedCost: d.repairCost,
+          repairDescription: marker?.repairDescription || `${d.damageType} repair required`,
+          chargeable: d.chargeable,
+          chargeableAmount: d.chargeableAmount,
+          notes: d.notes,
+        };
+      }),
+      totalNewDamages: damages.length,
+      totalEstimatedCost: damages.reduce((sum, d) => sum + d.repairCost, 0),
+      totalChargeableAmount: totalDamageCharges,
+      fuelDifference,
+      fuelCharge,
+      odometerDifference: kmDriven,
+      excessKmCharge,
+      cleaningRequired,
+      cleaningCharge,
+      additionalCharges: [
+        { type: 'fuel', description: 'Fuel shortage', amount: fuelCharge, calculation: `${fuelDifference}% × 60L × AED 4.5/L` },
+        { type: 'excess_km', description: 'Excess kilometers', amount: excessKmCharge, calculation: `${excessKm} km × AED 2/km` },
+        { type: 'cleaning', description: 'Deep cleaning', amount: cleaningCharge },
+        { type: 'late_return', description: 'Late return fee', amount: lateReturnCharge, calculation: `${Math.ceil(lateReturnHours)} hours × AED 50/hour` },
+        { type: 'salik', description: 'Salik/toll charges', amount: salikCharge, calculation: `${salikTrips} trips × AED 8/trip` },
+      ],
+      subtotal,
+      vatRate: VAT_RATE,
+      vatAmount,
+      grandTotal,
+      securityDepositHeld: securityDeposit,
+      additionalPaymentRequired: additionalPayment,
+      reportGeneratedAt: new Date().toISOString(),
+      reportGeneratedBy: checkInData.inspectorName || 'System',
+      managerApprovalRequired: grandTotal > 5000, // Require approval for high amounts
+      customerAcknowledged: false,
+    };
+
+    onUpdate(report);
+  }, [damages, totalDamageCharges, fuelCharge, excessKmCharge, cleaningCharge, lateReturnCharge, salikCharge, subtotal, vatAmount, grandTotal, securityDeposit, additionalPayment, fuelDifference, kmDriven, cleaningRequired, lateReturnHours, salikTrips, checkInData, onUpdate]);
 
   return (
     <div className="space-y-6 print:space-y-4 animate-fade-in" role="region" aria-label="Damage comparison report">
