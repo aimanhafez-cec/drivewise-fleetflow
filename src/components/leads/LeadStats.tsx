@@ -1,6 +1,6 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { ArrowUp, ArrowDown, Clock, CheckCircle2, TrendingUp } from 'lucide-react';
-import { Lead } from '@/data/mockLeads';
+import { Lead } from '@/hooks/useLeadsRealtime';
 
 interface LeadStatsProps {
   leads: Lead[];

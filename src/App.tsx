@@ -103,6 +103,8 @@ import ManageSettlements from "./pages/transactions/ManageSettlements";
 import ManageClaims from "./pages/transactions/ManageClaims";
 import ExecutiveTransportationHub from "./pages/executive-transportation/ExecutiveTransportationHub";
 import LeadsIntakeCenter from "./pages/LeadsIntakeCenter";
+import LeadsAnalytics from "./pages/LeadsAnalytics";
+import LeadDetail from "./pages/LeadDetail";
 // Hidden - commented out imports
 // import { CarSubscriptions } from "./pages/CarSubscriptions";
 // import { NewCarSubscription } from "./pages/NewCarSubscription";
@@ -394,6 +396,8 @@ const App = () => {
               </ProtectedRoute>
             }>
               <Route index element={<LeadsIntakeCenter />} />
+              <Route path="analytics" element={<LeadsAnalytics />} />
+              <Route path=":id" element={<LeadDetail />} />
             </Route>
 
           {/* Public Routes - No Authentication Required */}

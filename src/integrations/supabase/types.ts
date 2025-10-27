@@ -122,6 +122,69 @@ export type Database = {
         }
         Relationships: []
       }
+      agents: {
+        Row: {
+          avg_response_time_minutes: number | null
+          conversion_rate: number | null
+          created_at: string
+          current_lead_count: number | null
+          email: string
+          full_name: string
+          id: string
+          languages: string[] | null
+          last_activity_at: string | null
+          max_concurrent_leads: number | null
+          phone: string | null
+          regions: string[] | null
+          status: string
+          total_conversions: number | null
+          total_leads_handled: number | null
+          updated_at: string
+          user_id: string
+          vehicle_expertise: string[] | null
+        }
+        Insert: {
+          avg_response_time_minutes?: number | null
+          conversion_rate?: number | null
+          created_at?: string
+          current_lead_count?: number | null
+          email: string
+          full_name: string
+          id?: string
+          languages?: string[] | null
+          last_activity_at?: string | null
+          max_concurrent_leads?: number | null
+          phone?: string | null
+          regions?: string[] | null
+          status?: string
+          total_conversions?: number | null
+          total_leads_handled?: number | null
+          updated_at?: string
+          user_id: string
+          vehicle_expertise?: string[] | null
+        }
+        Update: {
+          avg_response_time_minutes?: number | null
+          conversion_rate?: number | null
+          created_at?: string
+          current_lead_count?: number | null
+          email?: string
+          full_name?: string
+          id?: string
+          languages?: string[] | null
+          last_activity_at?: string | null
+          max_concurrent_leads?: number | null
+          phone?: string | null
+          regions?: string[] | null
+          status?: string
+          total_conversions?: number | null
+          total_leads_handled?: number | null
+          updated_at?: string
+          user_id?: string
+          vehicle_expertise?: string[] | null
+        }
+        Relationships: []
+      }
       agreement_documents: {
         Row: {
           agreement_id: string
@@ -4060,6 +4123,200 @@ export type Database = {
           },
         ]
       }
+      lead_assignments: {
+        Row: {
+          agent_id: string
+          assigned_at: string
+          assignment_method: string
+          id: string
+          lead_id: string
+          unassigned_at: string | null
+        }
+        Insert: {
+          agent_id: string
+          assigned_at?: string
+          assignment_method: string
+          id?: string
+          lead_id: string
+          unassigned_at?: string | null
+        }
+        Update: {
+          agent_id?: string
+          assigned_at?: string
+          assignment_method?: string
+          id?: string
+          lead_id?: string
+          unassigned_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_assignments_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lead_assignments_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lead_communications: {
+        Row: {
+          communication_type: string
+          content: string
+          created_at: string
+          direction: string
+          id: string
+          lead_id: string
+          sent_by: string | null
+          subject: string | null
+        }
+        Insert: {
+          communication_type: string
+          content: string
+          created_at?: string
+          direction: string
+          id?: string
+          lead_id: string
+          sent_by?: string | null
+          subject?: string | null
+        }
+        Update: {
+          communication_type?: string
+          content?: string
+          created_at?: string
+          direction?: string
+          id?: string
+          lead_id?: string
+          sent_by?: string | null
+          subject?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_communications_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      leads: {
+        Row: {
+          alternative_categories: string[] | null
+          assigned_at: string | null
+          assigned_to: string | null
+          confirmed_at: string | null
+          conversion_rate_applied: number | null
+          converted_to_reservation_id: string | null
+          created_at: string
+          created_by: string | null
+          customer_email: string | null
+          customer_name: string
+          customer_nationality: string | null
+          customer_phone: string | null
+          duration_days: number | null
+          estimated_value: number
+          id: string
+          language_preference: string | null
+          lead_no: string
+          pickup_datetime: string
+          pickup_location: string
+          priority: string
+          rejected_at: string | null
+          rejection_reason: string | null
+          responded_at: string | null
+          return_datetime: string
+          return_location: string
+          sla_breached: boolean | null
+          sla_response_deadline: string | null
+          source_metadata: Json | null
+          source_name: string
+          source_type: string
+          special_requests: string | null
+          status: string
+          updated_at: string
+          vehicle_category: string
+        }
+        Insert: {
+          alternative_categories?: string[] | null
+          assigned_at?: string | null
+          assigned_to?: string | null
+          confirmed_at?: string | null
+          conversion_rate_applied?: number | null
+          converted_to_reservation_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_email?: string | null
+          customer_name: string
+          customer_nationality?: string | null
+          customer_phone?: string | null
+          duration_days?: number | null
+          estimated_value: number
+          id?: string
+          language_preference?: string | null
+          lead_no: string
+          pickup_datetime: string
+          pickup_location: string
+          priority?: string
+          rejected_at?: string | null
+          rejection_reason?: string | null
+          responded_at?: string | null
+          return_datetime: string
+          return_location: string
+          sla_breached?: boolean | null
+          sla_response_deadline?: string | null
+          source_metadata?: Json | null
+          source_name: string
+          source_type: string
+          special_requests?: string | null
+          status?: string
+          updated_at?: string
+          vehicle_category: string
+        }
+        Update: {
+          alternative_categories?: string[] | null
+          assigned_at?: string | null
+          assigned_to?: string | null
+          confirmed_at?: string | null
+          conversion_rate_applied?: number | null
+          converted_to_reservation_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_email?: string | null
+          customer_name?: string
+          customer_nationality?: string | null
+          customer_phone?: string | null
+          duration_days?: number | null
+          estimated_value?: number
+          id?: string
+          language_preference?: string | null
+          lead_no?: string
+          pickup_datetime?: string
+          pickup_location?: string
+          priority?: string
+          rejected_at?: string | null
+          rejection_reason?: string | null
+          responded_at?: string | null
+          return_datetime?: string
+          return_location?: string
+          sla_breached?: boolean | null
+          sla_response_deadline?: string | null
+          source_metadata?: Json | null
+          source_name?: string
+          source_type?: string
+          special_requests?: string | null
+          status?: string
+          updated_at?: string
+          vehicle_category?: string
+        }
+        Relationships: []
+      }
       legal_entities: {
         Row: {
           code: string
@@ -4098,6 +4355,791 @@ export type Database = {
           vat_rate?: number | null
         }
         Relationships: []
+      }
+      limousine_booking_details: {
+        Row: {
+          actual_distance_km: number | null
+          actual_dropoff_datetime: string | null
+          actual_duration_hours: number | null
+          actual_pickup_datetime: string | null
+          additional_charges: Json | null
+          base_rate: number | null
+          booking_id: string
+          created_at: string | null
+          distance_km: number | null
+          dropoff_datetime: string | null
+          dropoff_location: string | null
+          duration_hours: number | null
+          estimated_duration_minutes: number | null
+          estimated_end_datetime: string | null
+          id: string
+          itinerary: Json | null
+          pickup_datetime: string
+          pickup_location: string
+          pricing_policy_id: string | null
+          rental_days: number | null
+          return_datetime: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          actual_distance_km?: number | null
+          actual_dropoff_datetime?: string | null
+          actual_duration_hours?: number | null
+          actual_pickup_datetime?: string | null
+          additional_charges?: Json | null
+          base_rate?: number | null
+          booking_id: string
+          created_at?: string | null
+          distance_km?: number | null
+          dropoff_datetime?: string | null
+          dropoff_location?: string | null
+          duration_hours?: number | null
+          estimated_duration_minutes?: number | null
+          estimated_end_datetime?: string | null
+          id?: string
+          itinerary?: Json | null
+          pickup_datetime: string
+          pickup_location: string
+          pricing_policy_id?: string | null
+          rental_days?: number | null
+          return_datetime?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          actual_distance_km?: number | null
+          actual_dropoff_datetime?: string | null
+          actual_duration_hours?: number | null
+          actual_pickup_datetime?: string | null
+          additional_charges?: Json | null
+          base_rate?: number | null
+          booking_id?: string
+          created_at?: string | null
+          distance_km?: number | null
+          dropoff_datetime?: string | null
+          dropoff_location?: string | null
+          duration_hours?: number | null
+          estimated_duration_minutes?: number | null
+          estimated_end_datetime?: string | null
+          id?: string
+          itinerary?: Json | null
+          pickup_datetime?: string
+          pickup_location?: string
+          pricing_policy_id?: string | null
+          rental_days?: number | null
+          return_datetime?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_limousine_booking_details_pricing_policy"
+            columns: ["pricing_policy_id"]
+            isOneToOne: false
+            referencedRelation: "limousine_pricing_policies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "limousine_booking_details_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "limousine_bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      limousine_booking_status_log: {
+        Row: {
+          booking_id: string
+          changed_at: string | null
+          changed_by: string | null
+          from_status: string | null
+          id: string
+          notes: string | null
+          reason: string | null
+          to_status: string
+        }
+        Insert: {
+          booking_id: string
+          changed_at?: string | null
+          changed_by?: string | null
+          from_status?: string | null
+          id?: string
+          notes?: string | null
+          reason?: string | null
+          to_status: string
+        }
+        Update: {
+          booking_id?: string
+          changed_at?: string | null
+          changed_by?: string | null
+          from_status?: string | null
+          id?: string
+          notes?: string | null
+          reason?: string | null
+          to_status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "limousine_booking_status_log_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "limousine_bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      limousine_bookings: {
+        Row: {
+          booking_date: string
+          booking_no: string
+          chauffeur_id: string | null
+          created_at: string | null
+          created_by: string | null
+          customer_id: string
+          id: string
+          internal_notes: string | null
+          lead_id: string | null
+          passenger_count: number | null
+          payment_method: string | null
+          payment_status: string | null
+          pickup_datetime: string
+          primary_passenger_name: string | null
+          primary_passenger_phone: string | null
+          service_type: string
+          special_requests: string | null
+          status: string
+          subtotal: number | null
+          tax_amount: number | null
+          total_amount: number
+          updated_at: string | null
+          vehicle_class_id: string | null
+          vehicle_id: string | null
+        }
+        Insert: {
+          booking_date?: string
+          booking_no: string
+          chauffeur_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          customer_id: string
+          id?: string
+          internal_notes?: string | null
+          lead_id?: string | null
+          passenger_count?: number | null
+          payment_method?: string | null
+          payment_status?: string | null
+          pickup_datetime: string
+          primary_passenger_name?: string | null
+          primary_passenger_phone?: string | null
+          service_type: string
+          special_requests?: string | null
+          status?: string
+          subtotal?: number | null
+          tax_amount?: number | null
+          total_amount: number
+          updated_at?: string | null
+          vehicle_class_id?: string | null
+          vehicle_id?: string | null
+        }
+        Update: {
+          booking_date?: string
+          booking_no?: string
+          chauffeur_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          customer_id?: string
+          id?: string
+          internal_notes?: string | null
+          lead_id?: string | null
+          passenger_count?: number | null
+          payment_method?: string | null
+          payment_status?: string | null
+          pickup_datetime?: string
+          primary_passenger_name?: string | null
+          primary_passenger_phone?: string | null
+          service_type?: string
+          special_requests?: string | null
+          status?: string
+          subtotal?: number | null
+          tax_amount?: number | null
+          total_amount?: number
+          updated_at?: string | null
+          vehicle_class_id?: string | null
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "limousine_bookings_chauffeur_id_fkey"
+            columns: ["chauffeur_id"]
+            isOneToOne: false
+            referencedRelation: "limousine_chauffeurs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "limousine_bookings_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "limousine_bookings_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "limousine_leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "limousine_bookings_vehicle_class_id_fkey"
+            columns: ["vehicle_class_id"]
+            isOneToOne: false
+            referencedRelation: "limousine_vehicle_classes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "limousine_bookings_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "limousine_vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      limousine_chauffeur_assignments: {
+        Row: {
+          assigned_at: string | null
+          assigned_by: string | null
+          booking_id: string
+          chauffeur_id: string
+          id: string
+          unassigned_at: string | null
+          unassignment_reason: string | null
+        }
+        Insert: {
+          assigned_at?: string | null
+          assigned_by?: string | null
+          booking_id: string
+          chauffeur_id: string
+          id?: string
+          unassigned_at?: string | null
+          unassignment_reason?: string | null
+        }
+        Update: {
+          assigned_at?: string | null
+          assigned_by?: string | null
+          booking_id?: string
+          chauffeur_id?: string
+          id?: string
+          unassigned_at?: string | null
+          unassignment_reason?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "limousine_chauffeur_assignments_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "limousine_bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "limousine_chauffeur_assignments_chauffeur_id_fkey"
+            columns: ["chauffeur_id"]
+            isOneToOne: false
+            referencedRelation: "limousine_chauffeurs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      limousine_chauffeurs: {
+        Row: {
+          created_at: string
+          current_status: string | null
+          date_of_birth: string | null
+          email: string | null
+          employee_id: string | null
+          full_name: string
+          hire_date: string | null
+          id: string
+          is_active: boolean | null
+          labor_card_expiry: string | null
+          languages: string[] | null
+          license_expiry: string
+          license_number: string
+          license_type: string | null
+          nationality: string | null
+          notes: string | null
+          phone: string
+          photo_url: string | null
+          rating: number | null
+          safety_training_date: string | null
+          shift_end: string | null
+          shift_start: string | null
+          status: string
+          total_trips: number | null
+          uniform_size: string | null
+          updated_at: string
+          visa_expiry: string | null
+        }
+        Insert: {
+          created_at?: string
+          current_status?: string | null
+          date_of_birth?: string | null
+          email?: string | null
+          employee_id?: string | null
+          full_name: string
+          hire_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          labor_card_expiry?: string | null
+          languages?: string[] | null
+          license_expiry: string
+          license_number: string
+          license_type?: string | null
+          nationality?: string | null
+          notes?: string | null
+          phone: string
+          photo_url?: string | null
+          rating?: number | null
+          safety_training_date?: string | null
+          shift_end?: string | null
+          shift_start?: string | null
+          status?: string
+          total_trips?: number | null
+          uniform_size?: string | null
+          updated_at?: string
+          visa_expiry?: string | null
+        }
+        Update: {
+          created_at?: string
+          current_status?: string | null
+          date_of_birth?: string | null
+          email?: string | null
+          employee_id?: string | null
+          full_name?: string
+          hire_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          labor_card_expiry?: string | null
+          languages?: string[] | null
+          license_expiry?: string
+          license_number?: string
+          license_type?: string | null
+          nationality?: string | null
+          notes?: string | null
+          phone?: string
+          photo_url?: string | null
+          rating?: number | null
+          safety_training_date?: string | null
+          shift_end?: string | null
+          shift_start?: string | null
+          status?: string
+          total_trips?: number | null
+          uniform_size?: string | null
+          updated_at?: string
+          visa_expiry?: string | null
+        }
+        Relationships: []
+      }
+      limousine_close_lost_reasons: {
+        Row: {
+          category: string | null
+          code: string
+          created_at: string | null
+          display_order: number | null
+          id: string
+          is_active: boolean | null
+          name: string
+        }
+        Insert: {
+          category?: string | null
+          code: string
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+        }
+        Update: {
+          category?: string | null
+          code?: string
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+        }
+        Relationships: []
+      }
+      limousine_leads: {
+        Row: {
+          assigned_to: string | null
+          close_lost_notes: string | null
+          close_lost_reason_id: string | null
+          closed_at: string | null
+          company_name: string | null
+          converted_at: string | null
+          converted_to_booking_id: string | null
+          created_at: string | null
+          customer_id: string | null
+          dropoff_location: string | null
+          email: string | null
+          full_name: string
+          id: string
+          lead_no: string
+          notes: string | null
+          passengers: number | null
+          phone: string
+          pickup_datetime: string | null
+          pickup_location: string | null
+          preferred_vehicle_class_id: string | null
+          priority: string | null
+          service_type: string | null
+          source: string | null
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          assigned_to?: string | null
+          close_lost_notes?: string | null
+          close_lost_reason_id?: string | null
+          closed_at?: string | null
+          company_name?: string | null
+          converted_at?: string | null
+          converted_to_booking_id?: string | null
+          created_at?: string | null
+          customer_id?: string | null
+          dropoff_location?: string | null
+          email?: string | null
+          full_name: string
+          id?: string
+          lead_no: string
+          notes?: string | null
+          passengers?: number | null
+          phone: string
+          pickup_datetime?: string | null
+          pickup_location?: string | null
+          preferred_vehicle_class_id?: string | null
+          priority?: string | null
+          service_type?: string | null
+          source?: string | null
+          status?: string
+          updated_at?: string | null
+        }
+        Update: {
+          assigned_to?: string | null
+          close_lost_notes?: string | null
+          close_lost_reason_id?: string | null
+          closed_at?: string | null
+          company_name?: string | null
+          converted_at?: string | null
+          converted_to_booking_id?: string | null
+          created_at?: string | null
+          customer_id?: string | null
+          dropoff_location?: string | null
+          email?: string | null
+          full_name?: string
+          id?: string
+          lead_no?: string
+          notes?: string | null
+          passengers?: number | null
+          phone?: string
+          pickup_datetime?: string | null
+          pickup_location?: string | null
+          preferred_vehicle_class_id?: string | null
+          priority?: string | null
+          service_type?: string | null
+          source?: string | null
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_limousine_leads_converted_booking"
+            columns: ["converted_to_booking_id"]
+            isOneToOne: false
+            referencedRelation: "limousine_bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "limousine_leads_close_lost_reason_id_fkey"
+            columns: ["close_lost_reason_id"]
+            isOneToOne: false
+            referencedRelation: "limousine_close_lost_reasons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "limousine_leads_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "limousine_leads_preferred_vehicle_class_id_fkey"
+            columns: ["preferred_vehicle_class_id"]
+            isOneToOne: false
+            referencedRelation: "limousine_vehicle_classes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      limousine_pricing_policies: {
+        Row: {
+          airport_dropoff_fee: number | null
+          airport_pickup_fee: number | null
+          applies_on_days: string[] | null
+          applies_time_from: string | null
+          applies_time_to: string | null
+          base_daily_rate: number | null
+          base_hourly_rate: number | null
+          base_per_km_rate: number | null
+          billing_increment_minutes: number | null
+          cancellation_fee: number | null
+          created_at: string | null
+          free_waiting_minutes: number | null
+          id: string
+          is_active: boolean | null
+          meet_greet_fee: number | null
+          minimum_charge: number | null
+          minimum_hours: number | null
+          name: string
+          notes: string | null
+          peak_hour_multiplier: number | null
+          policy_no: string
+          priority: number | null
+          service_type: string
+          surge_multiplier: number | null
+          updated_at: string | null
+          valid_from: string
+          valid_to: string | null
+          vehicle_class_id: string | null
+          waiting_charge_per_minute: number | null
+          weekend_multiplier: number | null
+        }
+        Insert: {
+          airport_dropoff_fee?: number | null
+          airport_pickup_fee?: number | null
+          applies_on_days?: string[] | null
+          applies_time_from?: string | null
+          applies_time_to?: string | null
+          base_daily_rate?: number | null
+          base_hourly_rate?: number | null
+          base_per_km_rate?: number | null
+          billing_increment_minutes?: number | null
+          cancellation_fee?: number | null
+          created_at?: string | null
+          free_waiting_minutes?: number | null
+          id?: string
+          is_active?: boolean | null
+          meet_greet_fee?: number | null
+          minimum_charge?: number | null
+          minimum_hours?: number | null
+          name: string
+          notes?: string | null
+          peak_hour_multiplier?: number | null
+          policy_no: string
+          priority?: number | null
+          service_type: string
+          surge_multiplier?: number | null
+          updated_at?: string | null
+          valid_from: string
+          valid_to?: string | null
+          vehicle_class_id?: string | null
+          waiting_charge_per_minute?: number | null
+          weekend_multiplier?: number | null
+        }
+        Update: {
+          airport_dropoff_fee?: number | null
+          airport_pickup_fee?: number | null
+          applies_on_days?: string[] | null
+          applies_time_from?: string | null
+          applies_time_to?: string | null
+          base_daily_rate?: number | null
+          base_hourly_rate?: number | null
+          base_per_km_rate?: number | null
+          billing_increment_minutes?: number | null
+          cancellation_fee?: number | null
+          created_at?: string | null
+          free_waiting_minutes?: number | null
+          id?: string
+          is_active?: boolean | null
+          meet_greet_fee?: number | null
+          minimum_charge?: number | null
+          minimum_hours?: number | null
+          name?: string
+          notes?: string | null
+          peak_hour_multiplier?: number | null
+          policy_no?: string
+          priority?: number | null
+          service_type?: string
+          surge_multiplier?: number | null
+          updated_at?: string | null
+          valid_from?: string
+          valid_to?: string | null
+          vehicle_class_id?: string | null
+          waiting_charge_per_minute?: number | null
+          weekend_multiplier?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "limousine_pricing_policies_vehicle_class_id_fkey"
+            columns: ["vehicle_class_id"]
+            isOneToOne: false
+            referencedRelation: "limousine_vehicle_classes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      limousine_vehicle_classes: {
+        Row: {
+          amenities: Json | null
+          base_daily_rate: number | null
+          base_hourly_rate: number | null
+          category: string | null
+          code: string
+          created_at: string
+          description: string | null
+          display_order: number | null
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          luggage_capacity: number | null
+          name: string
+          passenger_capacity: number | null
+          updated_at: string
+        }
+        Insert: {
+          amenities?: Json | null
+          base_daily_rate?: number | null
+          base_hourly_rate?: number | null
+          category?: string | null
+          code: string
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          luggage_capacity?: number | null
+          name: string
+          passenger_capacity?: number | null
+          updated_at?: string
+        }
+        Update: {
+          amenities?: Json | null
+          base_daily_rate?: number | null
+          base_hourly_rate?: number | null
+          category?: string | null
+          code?: string
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          luggage_capacity?: number | null
+          name?: string
+          passenger_capacity?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      limousine_vehicles: {
+        Row: {
+          color: string | null
+          created_at: string
+          current_location: string | null
+          features: Json | null
+          fuel_type: string | null
+          id: string
+          insurance_expiry: string | null
+          is_active: boolean | null
+          item_code: string | null
+          item_description: string | null
+          last_service_date: string | null
+          luggage_capacity: number | null
+          make: string
+          model: string
+          mulkiya_expiry: string | null
+          next_service_due: string | null
+          odometer: number | null
+          passenger_capacity: number | null
+          photos: Json | null
+          plate_number: string
+          registration_expiry: string | null
+          registration_status: string | null
+          status: string
+          updated_at: string
+          vehicle_class_id: string | null
+          vin: string | null
+          year: number
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          current_location?: string | null
+          features?: Json | null
+          fuel_type?: string | null
+          id?: string
+          insurance_expiry?: string | null
+          is_active?: boolean | null
+          item_code?: string | null
+          item_description?: string | null
+          last_service_date?: string | null
+          luggage_capacity?: number | null
+          make: string
+          model: string
+          mulkiya_expiry?: string | null
+          next_service_due?: string | null
+          odometer?: number | null
+          passenger_capacity?: number | null
+          photos?: Json | null
+          plate_number: string
+          registration_expiry?: string | null
+          registration_status?: string | null
+          status?: string
+          updated_at?: string
+          vehicle_class_id?: string | null
+          vin?: string | null
+          year: number
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          current_location?: string | null
+          features?: Json | null
+          fuel_type?: string | null
+          id?: string
+          insurance_expiry?: string | null
+          is_active?: boolean | null
+          item_code?: string | null
+          item_description?: string | null
+          last_service_date?: string | null
+          luggage_capacity?: number | null
+          make?: string
+          model?: string
+          mulkiya_expiry?: string | null
+          next_service_due?: string | null
+          odometer?: number | null
+          passenger_capacity?: number | null
+          photos?: Json | null
+          plate_number?: string
+          registration_expiry?: string | null
+          registration_status?: string | null
+          status?: string
+          updated_at?: string
+          vehicle_class_id?: string | null
+          vin?: string | null
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "limousine_vehicles_vehicle_class_id_fkey"
+            columns: ["vehicle_class_id"]
+            isOneToOne: false
+            referencedRelation: "limousine_vehicle_classes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       location_lov: {
         Row: {
@@ -7830,6 +8872,8 @@ export type Database = {
         Row: {
           acquisition_cost: number | null
           acquisition_date: string | null
+          active_transaction_ref: string | null
+          active_transaction_type: string | null
           asset_id: string | null
           book_value: number | null
           branch_id: string | null
@@ -7837,6 +8881,9 @@ export type Database = {
           color: string | null
           cost_center: string | null
           created_at: string
+          current_custody: string | null
+          custodian_id: string | null
+          custodian_name: string | null
           daily_rate: number | null
           department: string | null
           depreciation_bucket: string | null
@@ -7850,9 +8897,12 @@ export type Database = {
           item_code: string | null
           item_description: string | null
           last_status_change: string | null
+          lessor_company: string | null
           license_expiry: string | null
           license_plate: string
           location: string | null
+          location_id: string | null
+          location_type: string | null
           make: string
           model: string
           monthly_rate: number | null
@@ -7863,6 +8913,10 @@ export type Database = {
           ownership_entity: string | null
           ownership_type: string | null
           photo_url: string | null
+          registration_emirate: string | null
+          registration_expiry: string | null
+          registration_number: string | null
+          registration_status: string | null
           rented_to_company: string | null
           status: Database["public"]["Enums"]["vehicle_status"]
           subtype: string | null
@@ -7875,6 +8929,8 @@ export type Database = {
         Insert: {
           acquisition_cost?: number | null
           acquisition_date?: string | null
+          active_transaction_ref?: string | null
+          active_transaction_type?: string | null
           asset_id?: string | null
           book_value?: number | null
           branch_id?: string | null
@@ -7882,6 +8938,9 @@ export type Database = {
           color?: string | null
           cost_center?: string | null
           created_at?: string
+          current_custody?: string | null
+          custodian_id?: string | null
+          custodian_name?: string | null
           daily_rate?: number | null
           department?: string | null
           depreciation_bucket?: string | null
@@ -7895,9 +8954,12 @@ export type Database = {
           item_code?: string | null
           item_description?: string | null
           last_status_change?: string | null
+          lessor_company?: string | null
           license_expiry?: string | null
           license_plate: string
           location?: string | null
+          location_id?: string | null
+          location_type?: string | null
           make: string
           model: string
           monthly_rate?: number | null
@@ -7908,6 +8970,10 @@ export type Database = {
           ownership_entity?: string | null
           ownership_type?: string | null
           photo_url?: string | null
+          registration_emirate?: string | null
+          registration_expiry?: string | null
+          registration_number?: string | null
+          registration_status?: string | null
           rented_to_company?: string | null
           status?: Database["public"]["Enums"]["vehicle_status"]
           subtype?: string | null
@@ -7920,6 +8986,8 @@ export type Database = {
         Update: {
           acquisition_cost?: number | null
           acquisition_date?: string | null
+          active_transaction_ref?: string | null
+          active_transaction_type?: string | null
           asset_id?: string | null
           book_value?: number | null
           branch_id?: string | null
@@ -7927,6 +8995,9 @@ export type Database = {
           color?: string | null
           cost_center?: string | null
           created_at?: string
+          current_custody?: string | null
+          custodian_id?: string | null
+          custodian_name?: string | null
           daily_rate?: number | null
           department?: string | null
           depreciation_bucket?: string | null
@@ -7940,9 +9011,12 @@ export type Database = {
           item_code?: string | null
           item_description?: string | null
           last_status_change?: string | null
+          lessor_company?: string | null
           license_expiry?: string | null
           license_plate?: string
           location?: string | null
+          location_id?: string | null
+          location_type?: string | null
           make?: string
           model?: string
           monthly_rate?: number | null
@@ -7953,6 +9027,10 @@ export type Database = {
           ownership_entity?: string | null
           ownership_type?: string | null
           photo_url?: string | null
+          registration_emirate?: string | null
+          registration_expiry?: string | null
+          registration_number?: string | null
+          registration_status?: string | null
           rented_to_company?: string | null
           status?: Database["public"]["Enums"]["vehicle_status"]
           subtype?: string | null
@@ -7975,6 +9053,13 @@ export type Database = {
             columns: ["category_id"]
             isOneToOne: false
             referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicles_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "location_lov"
             referencedColumns: ["id"]
           },
         ]
@@ -8312,6 +9397,7 @@ export type Database = {
         Args: { agreement_id_param: string }
         Returns: boolean
       }
+      assign_lead_round_robin: { Args: { p_lead_id: string }; Returns: string }
       auto_close_expired_custodies: {
         Args: { p_days_overdue?: number }
         Returns: {
@@ -8422,6 +9508,17 @@ export type Database = {
       }
       generate_custody_no: { Args: never; Returns: string }
       generate_exception_no: { Args: never; Returns: string }
+      generate_lead_no: { Args: never; Returns: string }
+      generate_limousine_item_code: {
+        Args: {
+          p_color?: string
+          p_make: string
+          p_model: string
+          p_vehicle_class_id?: string
+          p_year: number
+        }
+        Returns: string
+      }
       generate_movement_no: { Args: never; Returns: string }
       generate_referral_code: { Args: never; Returns: string }
       generate_reservation_no: { Args: never; Returns: string }
@@ -8429,16 +9526,27 @@ export type Database = {
       generate_subscription_id: { Args: never; Returns: string }
       generate_ticket_no: { Args: never; Returns: string }
       generate_toll_fine_no: { Args: never; Returns: string }
-      generate_vehicle_item_code: {
-        Args: {
-          p_category: string
-          p_color: string
-          p_make: string
-          p_model: string
-          p_year: number
-        }
-        Returns: string
-      }
+      generate_vehicle_item_code:
+        | {
+            Args: {
+              p_category_id?: string
+              p_color?: string
+              p_make: string
+              p_model: string
+              p_year: number
+            }
+            Returns: string
+          }
+        | {
+            Args: {
+              p_category: string
+              p_color: string
+              p_make: string
+              p_model: string
+              p_year: number
+            }
+            Returns: string
+          }
       generate_vehicle_item_description: {
         Args: {
           p_category: string
@@ -8469,6 +9577,10 @@ export type Database = {
           status: Database["public"]["Enums"]["custody_status"]
         }[]
       }
+      get_lead_statistics: {
+        Args: { p_date_from?: string; p_date_to?: string }
+        Returns: Json
+      }
       get_overdue_custodies: {
         Args: never
         Returns: {
@@ -8496,6 +9608,13 @@ export type Database = {
       is_staff_or_admin: { Args: { _user_id: string }; Returns: boolean }
       mask_email: { Args: { _user_id: string; email: string }; Returns: string }
       mask_phone: { Args: { _user_id: string; phone: string }; Returns: string }
+      populate_missing_vehicle_subtypes: {
+        Args: never
+        Returns: {
+          message: string
+          vehicles_updated: number
+        }[]
+      }
       redeem_reward: {
         Args: {
           p_catalog_item_id: string
@@ -8542,6 +9661,20 @@ export type Database = {
       update_engagement_streak: {
         Args: { p_customer_id: string }
         Returns: boolean
+      }
+      update_rented_vehicle_custodians: {
+        Args: never
+        Returns: {
+          message: string
+          vehicles_updated: number
+        }[]
+      }
+      update_rented_vehicle_custodians_v2: {
+        Args: never
+        Returns: {
+          message: string
+          vehicles_updated: number
+        }[]
       }
       validate_custody_status_change: {
         Args: {

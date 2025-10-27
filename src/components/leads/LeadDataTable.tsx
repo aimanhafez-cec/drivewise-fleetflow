@@ -18,7 +18,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Card } from '@/components/ui/card';
 import { LeadSourceBadge } from './LeadSourceBadge';
-import { Lead } from '@/data/mockLeads';
+import { Lead } from '@/hooks/useLeadsRealtime';
 import { leadSources } from '@/data/leadSources';
 import { 
   MoreVertical, 
@@ -169,9 +169,9 @@ export const LeadDataTable = ({ leads }: LeadDataTableProps) => {
                 <TableCell className="font-mono text-sm">
                   {lead.lead_no}
                 </TableCell>
-                <TableCell>
-                  <LeadSourceBadge sourceId={lead.source_id} />
-                </TableCell>
+            <TableCell>
+              <LeadSourceBadge sourceId={lead.source_name} />
+            </TableCell>
                 <TableCell>
                   <div className="space-y-1">
                     <p className="font-medium">{lead.customer_name}</p>
@@ -209,16 +209,9 @@ export const LeadDataTable = ({ leads }: LeadDataTableProps) => {
                 <TableCell>{getPriorityBadge(lead.priority)}</TableCell>
                 <TableCell>{getStatusBadge(lead.status)}</TableCell>
                 <TableCell>
-                  <div className="space-y-1">
-                    <p className="text-xs">
-                      {formatDistanceToNow(new Date(lead.created_at), { addSuffix: true })}
-                    </p>
-                    {lead.assigned_to && (
-                      <p className="text-xs text-muted-foreground">
-                        👤 {lead.assigned_to}
-                      </p>
-                    )}
-                  </div>
+                  <p className="text-xs">
+                    {formatDistanceToNow(new Date(lead.created_at), { addSuffix: true })}
+                  </p>
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex items-center justify-end gap-2">
