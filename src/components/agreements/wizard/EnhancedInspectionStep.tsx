@@ -5,7 +5,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { CheckCircle2, Circle, AlertCircle, ArrowRight, FileText, PlusCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
 import { CheckOutInspectionTab } from './CheckOutInspectionTab';
 import { CheckInInspectionTab } from './CheckInInspectionTab';
 import { InspectionComparisonTab } from './InspectionComparisonTab';
@@ -123,8 +122,6 @@ export const EnhancedInspectionStep: React.FC<EnhancedInspectionStepProps> = ({
 
   const handleLoadMockData = () => {
     if (onFullUpdate) {
-      const loadingToast = toast.loading('Loading...');
-      
       onFullUpdate({
         step2: {
           inspectionMode: 'checkout_checkin',
@@ -139,11 +136,6 @@ export const EnhancedInspectionStep: React.FC<EnhancedInspectionStepProps> = ({
           checkInInspection: mockCheckInInspection,
         }
       });
-      
-      // Dismiss the loading toast after a brief moment
-      setTimeout(() => {
-        toast.dismiss(loadingToast);
-      }, 500);
     }
   };
 
