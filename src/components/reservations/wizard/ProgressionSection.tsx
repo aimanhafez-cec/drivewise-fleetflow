@@ -27,13 +27,19 @@ export const ProgressionSection: React.FC<ProgressionSectionProps> = ({
   isExpanded: initialExpanded,
 }) => {
   const [isOpen, setIsOpen] = useState(initialExpanded);
+  const [prevStep, setPrevStep] = useState(currentStep);
 
-  // Auto-expand when current step is in this section
+  // Auto-expand only when navigating TO a step in this section (not continuously)
   useEffect(() => {
     const containsCurrentStep = group.steps.includes(currentStep);
-    if (containsCurrentStep) {
+    const containedPrevStep = group.steps.includes(prevStep);
+    
+    // Only auto-expand if we just navigated INTO this section
+    if (containsCurrentStep && !containedPrevStep) {
       setIsOpen(true);
     }
+    
+    setPrevStep(currentStep);
   }, [currentStep, group.steps]);
 
   // Calculate section progress
