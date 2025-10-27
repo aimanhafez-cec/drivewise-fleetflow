@@ -686,6 +686,7 @@ export const EnhancedAgreementWizard = () => {
           <FinancialSettlementStep
             data={wizardData.step9}
             inspectionData={wizardData.step2}
+            customerId={wizardData.step1?.customerId}
             onChange={(field, value) => handleStepDataChange('step9', field, value)}
             errors={errorMessages}
           />

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -25,7 +25,13 @@ import {
   Shield
 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { MultiPaymentAllocator } from '@/components/agreements/payments/MultiPaymentAllocator';
+import { useCustomerPaymentProfile } from '@/hooks/useCustomerPaymentProfile';
 import type { EnhancedWizardData } from '@/types/agreement-wizard';
+import type { 
+  PaymentAllocation, 
+  SplitPaymentItem
+} from '@/lib/api/agreement-payments';
 
 const VAT_RATE = 0.05; // 5% UAE VAT
 
@@ -34,6 +40,7 @@ interface FinancialSettlementStepProps {
   inspectionData: EnhancedWizardData['step2'];
   onChange: (field: keyof EnhancedWizardData['step9'], value: any) => void;
   errors?: string[];
+  customerId?: string; // Added for fetching customer profile
 }
 
 export const FinancialSettlementStep: React.FC<FinancialSettlementStepProps> = ({
@@ -41,8 +48,16 @@ export const FinancialSettlementStep: React.FC<FinancialSettlementStepProps> = (
   inspectionData,
   onChange,
   errors = [],
+  customerId,
 }) => {
   const [managerOverride, setManagerOverride] = useState(false);
+  const { profile: customerProfile, isLoading: loadingProfile } = useCustomerPaymentProfile(customerId);
+  const [paymentAllocation, setPaymentAllocation] = useState<PaymentAllocation>({
+    totalAmount: 0,
+    allocatedAmount: 0,
+    remainingAmount: 0,
+    payments: [],
+  });
 
   // Safety check: provide default values if data is undefined
   const safeData = data || {
@@ -66,6 +81,8 @@ export const FinancialSettlementStep: React.FC<FinancialSettlementStepProps> = (
     customerDate: undefined,
     securityDepositHeld: 1500,
     settlementCompleted: false,
+    splitPayments: [],
+    paymentAllocation: undefined,
   };
 
   // Get inspection data
@@ -127,6 +144,31 @@ export const FinancialSettlementStep: React.FC<FinancialSettlementStepProps> = (
   const handlePrint = () => {
     window.print();
   };
+
+  // Handle payment allocation change
+  const handleAllocationChange = (allocation: PaymentAllocation) => {
+    setPaymentAllocation(allocation);
+    onChange('paymentAllocation', {
+      totalAmount: allocation.totalAmount,
+      allocatedAmount: allocation.allocatedAmount,
+      remainingAmount: allocation.remainingAmount,
+    });
+  };
+
+  // Handle payment completion
+  const handlePaymentComplete = (payments: SplitPaymentItem[]) => {
+    onChange('splitPayments', payments);
+    onChange('settlementCompleted', true);
+  };
+
+  // Update payment allocation total when additional payment changes
+  useEffect(() => {
+    setPaymentAllocation(prev => ({
+      ...prev,
+      totalAmount: additionalPayment,
+      remainingAmount: additionalPayment - prev.allocatedAmount,
+    }));
+  }, [additionalPayment]);
 
   return (
     <div className="space-y-6 print:space-y-4 animate-fade-in" role="region" aria-label="Financial settlement">
@@ -366,48 +408,68 @@ export const FinancialSettlementStep: React.FC<FinancialSettlementStepProps> = (
         </CardContent>
       </Card>
 
-      {/* Payment Options */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Payment Options</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="flex items-center space-x-2">
-            <Checkbox 
-              id="card" 
-              checked={safeData.paymentMethod === 'card'}
-              onCheckedChange={(checked) => onChange('paymentMethod', checked ? 'card' : '')}
-            />
-            <Label htmlFor="card" className="cursor-pointer">Charge to card on file</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Checkbox 
-              id="cash"
-              checked={safeData.paymentMethod === 'cash'}
-              onCheckedChange={(checked) => onChange('paymentMethod', checked ? 'cash' : '')}
-            />
-            <Label htmlFor="cash" className="cursor-pointer">Cash payment</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Checkbox 
-              id="transfer"
-              checked={safeData.paymentMethod === 'transfer'}
-              onCheckedChange={(checked) => onChange('paymentMethod', checked ? 'transfer' : '')}
-            />
-            <Label htmlFor="transfer" className="cursor-pointer">Bank transfer</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Checkbox 
-              id="dispute"
-              checked={safeData.disputeRaised || false}
-              onCheckedChange={(checked) => onChange('disputeRaised', checked as boolean)}
-            />
-            <Label htmlFor="dispute" className="cursor-pointer text-destructive">
-              Dispute charges (requires manager approval)
-            </Label>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Multi-Payment Options */}
+      {additionalPayment > 0 ? (
+        loadingProfile ? (
+          <Card>
+            <CardContent className="py-12 text-center">
+              <p className="text-muted-foreground">Loading payment options...</p>
+            </CardContent>
+          </Card>
+        ) : (
+          <MultiPaymentAllocator
+            totalAmount={additionalPayment}
+            customerProfile={customerProfile}
+            allocation={paymentAllocation}
+            onAllocationChange={handleAllocationChange}
+            onPaymentComplete={handlePaymentComplete}
+            disabled={safeData.settlementCompleted}
+          />
+        )
+      ) : (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <CheckCircle2 className="h-5 w-5 text-green-600" />
+              No Additional Payment Required
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Alert className="border-green-500 bg-green-500/10">
+              <CheckCircle2 className="h-4 w-4 text-green-600" />
+              <AlertDescription className="text-green-600 dark:text-green-400">
+                The security deposit covers all charges. Remaining balance will be refunded to the customer.
+              </AlertDescription>
+            </Alert>
+            <div className="mt-4 p-4 bg-muted/30 rounded-lg">
+              <div className="flex items-center justify-between text-lg">
+                <span className="font-medium">Refund Amount:</span>
+                <span className="text-2xl font-bold text-green-600 dark:text-green-400">
+                  {(securityDeposit - grandTotal).toFixed(2)} AED
+                </span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Dispute Option */}
+      {additionalPayment > 0 && (
+        <Card className="border-amber-500">
+          <CardContent className="pt-6">
+            <div className="flex items-center space-x-2">
+              <Checkbox 
+                id="dispute"
+                checked={safeData.disputeRaised || false}
+                onCheckedChange={(checked) => onChange('disputeRaised', checked as boolean)}
+              />
+              <Label htmlFor="dispute" className="cursor-pointer text-destructive">
+                Dispute charges (requires manager approval)
+              </Label>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Manager Override Section */}
       <Card className="border-amber-500">
