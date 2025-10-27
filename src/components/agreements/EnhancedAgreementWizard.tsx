@@ -520,7 +520,15 @@ export const EnhancedAgreementWizard = () => {
       }));
     }
     
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Scroll to the specific step with a delay for section expansion
+    setTimeout(() => {
+      const stepElement = document.querySelector(`[data-step="${step}"]`);
+      if (stepElement) {
+        stepElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }, 200);
   };
 
   const toggleSectionExpand = (groupId: string) => {
