@@ -67,11 +67,11 @@ export const FinancialSettlementStep: React.FC<FinancialSettlementStepProps> = (
     cleaningCharge: undefined,
     lateReturnHours: undefined,
     lateReturnCharge: undefined,
-    salikTrips: undefined,
+    salikTrips: 8.75, // 8.75 trips × 8 AED = 70 AED
     salikCharge: undefined,
-    smokePenalty: undefined,
-    trafficFineAmount: undefined,
-    trafficFineCount: undefined,
+    smokePenalty: 750, // Smoking penalty in AED
+    trafficFineAmount: 150, // Traffic fine amount in AED
+    trafficFineCount: 1, // Number of traffic violations
     paymentMethod: undefined,
     disputeRaised: false,
     overrideReason: undefined,
