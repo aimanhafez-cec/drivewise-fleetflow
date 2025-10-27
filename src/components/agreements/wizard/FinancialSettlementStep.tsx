@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -154,14 +154,14 @@ export const FinancialSettlementStep: React.FC<FinancialSettlementStepProps> = (
   };
 
   // Handle payment allocation change
-  const handleAllocationChange = (allocation: PaymentAllocation) => {
+  const handleAllocationChange = useCallback((allocation: PaymentAllocation) => {
     setPaymentAllocation(allocation);
     onChange('paymentAllocation', {
       totalAmount: allocation.totalAmount,
       allocatedAmount: allocation.allocatedAmount,
       remainingAmount: allocation.remainingAmount,
     });
-  };
+  }, [onChange]);
 
   // Handle payment completion
   const handlePaymentComplete = (payments: SplitPaymentItem[]) => {
@@ -172,11 +172,17 @@ export const FinancialSettlementStep: React.FC<FinancialSettlementStepProps> = (
 
   // Update payment allocation total when additional payment changes
   useEffect(() => {
-    setPaymentAllocation(prev => ({
-      ...prev,
-      totalAmount: additionalPayment,
-      remainingAmount: additionalPayment - prev.allocatedAmount,
-    }));
+    setPaymentAllocation(prev => {
+      // Only update if totalAmount actually changed
+      if (prev.totalAmount !== additionalPayment) {
+        return {
+          ...prev,
+          totalAmount: additionalPayment,
+          remainingAmount: additionalPayment - prev.allocatedAmount,
+        };
+      }
+      return prev;
+    });
   }, [additionalPayment]);
 
   return (
