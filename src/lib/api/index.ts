@@ -41,3 +41,19 @@ export {
   type PaymentAllocation,
   type CustomerPaymentProfile,
 } from './agreement-payments';
+
+// Customer Payment Profile API
+export { CustomerPaymentAPI } from './customer-payment-profile';
+
+// Payment Links API
+export { 
+  PaymentLinksAPI,
+  type PaymentLink,
+  type CreatePaymentLinkData,
+} from './payment-links';
+
+// Split Payments API
+export { 
+  SplitPaymentsAPI,
+  type ProcessSplitPaymentResult,
+} from './split-payments';
