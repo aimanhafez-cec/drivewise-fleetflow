@@ -603,6 +603,7 @@ export const EnhancedAgreementWizard = () => {
         return (
           <EnhancedInspectionStep
             data={wizardData.step2}
+            fullData={wizardData}
             onChange={(field, value) => handleStepDataChange('step2', field, value)}
             errors={errorMessages}
           />

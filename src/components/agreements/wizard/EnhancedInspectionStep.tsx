@@ -4,16 +4,19 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle2, Circle, AlertCircle, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import type { EnhancedWizardData } from '@/types/agreement-wizard';
+import { CheckOutInspectionTab } from './CheckOutInspectionTab';
+import type { EnhancedWizardData, InspectionData } from '@/types/agreement-wizard';
 
 interface EnhancedInspectionStepProps {
   data: EnhancedWizardData['step2'];
+  fullData: EnhancedWizardData;
   onChange: (field: keyof EnhancedWizardData['step2'], value: any) => void;
   errors?: string[];
 }
 
 export const EnhancedInspectionStep: React.FC<EnhancedInspectionStepProps> = ({
   data,
+  fullData,
   onChange,
   errors = [],
 }) => {
@@ -212,11 +215,23 @@ export const EnhancedInspectionStep: React.FC<EnhancedInspectionStepProps> = ({
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-12 text-muted-foreground">
-                <AlertCircle className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p className="text-lg font-medium mb-2">Check-Out Inspection Form</p>
-                <p className="text-sm">This will be implemented in Phase 3</p>
-              </div>
+              {checkoutComplete ? (
+                <div className="text-center py-12">
+                  <CheckCircle2 className="w-16 h-16 text-success mx-auto mb-4" />
+                  <p className="text-lg font-medium">Check-Out Inspection Complete</p>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Vehicle handed over to customer
+                  </p>
+                </div>
+              ) : (
+                <CheckOutInspectionTab
+                  data={data.checkOutInspection}
+                  lineId={`temp-line-${Date.now()}`}
+                  onUpdate={(inspectionData: InspectionData) => {
+                    onChange('checkOutInspection', inspectionData);
+                  }}
+                />
+              )}
             </CardContent>
           </Card>
         </TabsContent>
