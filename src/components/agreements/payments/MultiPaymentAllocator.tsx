@@ -70,7 +70,17 @@ export const MultiPaymentAllocator: React.FC<MultiPaymentAllocatorProps> = ({
   const allocatedAmount = payments.reduce((sum, p) => sum + p.amount, 0);
   const remainingAmount = totalAmount - allocatedAmount;
 
-  // Update parent when payments change
+  const paymentsEqual = (a: SplitPaymentItem[], b: SplitPaymentItem[]) => {
+    if (a.length !== b.length) return false;
+    for (let i = 0; i < a.length; i++) {
+      const pa = a[i];
+      const pb = b[i];
+      if (pa.method !== pb.method || pa.amount !== pb.amount || pa.status !== pb.status) return false;
+    }
+    return true;
+  };
+
+  // Update parent when payments/total change (avoid loops)
   useEffect(() => {
     const newAllocation: PaymentAllocation = {
       totalAmount,
@@ -78,12 +88,22 @@ export const MultiPaymentAllocator: React.FC<MultiPaymentAllocatorProps> = ({
       remainingAmount,
       payments,
     };
-    onAllocationChange(newAllocation);
-    
+
+    const prev = allocation;
+    const equal =
+      prev.totalAmount === newAllocation.totalAmount &&
+      prev.allocatedAmount === newAllocation.allocatedAmount &&
+      prev.remainingAmount === newAllocation.remainingAmount &&
+      paymentsEqual(prev.payments || [], newAllocation.payments || []);
+
+    if (!equal) {
+      onAllocationChange(newAllocation);
+    }
+
     // Validate using comprehensive validator
     const validationResult = validatePaymentAllocation(newAllocation, customerProfile || undefined);
     setErrors(validationResult.errors);
-  }, [payments, totalAmount, allocatedAmount, remainingAmount, onAllocationChange, customerProfile]);
+  }, [payments, totalAmount, customerProfile]);
 
   const validateAllocation = (currentPayments: SplitPaymentItem[]) => {
     // Validation is now handled by useEffect with comprehensive validator

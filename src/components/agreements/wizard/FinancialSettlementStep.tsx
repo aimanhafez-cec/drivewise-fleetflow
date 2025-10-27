@@ -61,8 +61,8 @@ export const FinancialSettlementStep: React.FC<FinancialSettlementStepProps> = (
     payments: [],
   });
 
-  // Safety check: provide default values if data is undefined
-  const safeData = data || {
+  // Safety check: provide default values and merge with existing data
+  const defaults: EnhancedWizardData['step9'] = {
     cleaningRequired: false,
     cleaningCharge: undefined,
     lateReturnHours: undefined,
@@ -88,7 +88,9 @@ export const FinancialSettlementStep: React.FC<FinancialSettlementStepProps> = (
     settlementCompleted: false,
     splitPayments: [],
     paymentAllocation: undefined,
-  };
+  } as any;
+
+  const safeData = { ...defaults, ...(data || {}) };
 
   // Get inspection data
   const checkOutData = inspectionData?.checkOutInspection;
