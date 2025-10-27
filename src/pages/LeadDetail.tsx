@@ -7,7 +7,7 @@ import { LeadHeader } from '@/components/leads/LeadHeader';
 import { LeadActionBar } from '@/components/leads/LeadActionBar';
 import { LeadCustomerInfo } from '@/components/leads/LeadCustomerInfo';
 import { LeadVehicleCard } from '@/components/leads/LeadVehicleCard';
-import { LeadRequestDetails } from '@/components/leads/LeadRequestDetails';
+import { LeadRentalPeriod } from '@/components/leads/LeadRentalPeriod';
 import { LeadPricingEstimation } from '@/components/leads/LeadPricingEstimation';
 import { LeadCommunicationTimeline } from '@/components/leads/LeadCommunicationTimeline';
 import { LeadSourceData } from '@/components/leads/LeadSourceData';
@@ -112,7 +112,7 @@ const LeadDetail = () => {
             <LeadCustomerInfo lead={lead} />
             <LeadVehicleCard lead={lead} />
           </div>
-          <LeadRequestDetails lead={lead} />
+          <LeadRentalPeriod lead={lead} />
           <LeadPricingEstimation lead={lead} />
         </div>
 
