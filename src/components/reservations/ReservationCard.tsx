@@ -2,6 +2,7 @@ import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,6 +35,8 @@ interface ReservationCardProps {
   reservation: any;
   onConvertToAgreement: (reservation: any) => void;
   onCollectPayment?: (reservation: any) => void;
+  isSelected?: boolean;
+  onToggleSelect?: () => void;
 }
 
 const getReservationTypeIcon = (type?: string) => {
@@ -86,6 +89,8 @@ export const ReservationCard: React.FC<ReservationCardProps> = ({
   reservation,
   onConvertToAgreement,
   onCollectPayment,
+  isSelected = false,
+  onToggleSelect,
 }) => {
   const navigate = useNavigate();
 
@@ -94,15 +99,33 @@ export const ReservationCard: React.FC<ReservationCardProps> = ({
   };
 
   return (
-    <Card className="border-border/50 hover:shadow-md transition-all group">
+    <Card className={cn(
+      "border-border/50 hover:shadow-md transition-all group relative",
+      isSelected && "ring-2 ring-primary shadow-lg"
+    )}>
       <CardContent className="p-0">
+        {/* Selection Checkbox */}
+        {onToggleSelect && (
+          <div className="absolute top-2 left-2 z-10">
+            <Checkbox
+              checked={isSelected}
+              onCheckedChange={onToggleSelect}
+              onClick={(e) => e.stopPropagation()}
+              className="h-5 w-5 bg-background"
+            />
+          </div>
+        )}
+
         {/* Header Section */}
         <div
           className="p-4 cursor-pointer bg-gradient-to-r from-primary/5 to-primary/10 dark:from-primary/10 dark:to-primary/20 border-b"
           onClick={handleCardClick}
         >
           <div className="flex items-start justify-between gap-3">
-            <div className="flex items-start gap-3 flex-1 min-w-0">
+            <div className={cn(
+              "flex items-start gap-3 flex-1 min-w-0",
+              onToggleSelect && "ml-8"
+            )}>
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 shrink-0">
                 <User className="h-5 w-5 text-primary" />
               </div>

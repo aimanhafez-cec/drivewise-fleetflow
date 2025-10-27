@@ -12,6 +12,7 @@ import {
 import { Card, CardContent } from '@/components/ui/card';
 import { Search, X, Package, Car, Hash, Calendar } from 'lucide-react';
 import { DatePicker } from '@/components/ui/date-picker';
+import { SavedViewsManager } from './SavedViewsManager';
 
 export interface ReservationFilterState {
   search?: string;
@@ -26,18 +27,31 @@ interface ReservationFiltersProps {
   filters: ReservationFilterState;
   onFiltersChange: (filters: ReservationFilterState) => void;
   onClear: () => void;
+  activeViewId?: string;
 }
 
 export const ReservationFilters: React.FC<ReservationFiltersProps> = ({
   filters,
   onFiltersChange,
   onClear,
+  activeViewId,
 }) => {
   const hasActiveFilters = Object.values(filters).some(value => value !== undefined && value !== '');
 
   return (
     <Card className="border-border/50">
       <CardContent className="p-4 space-y-4">
+        {/* Saved Views Manager */}
+        <div className="flex items-center justify-between">
+          <div className="text-sm text-muted-foreground">
+            Apply filters and save them for quick access
+          </div>
+          <SavedViewsManager
+            currentFilters={filters}
+            onApplyView={onFiltersChange}
+            activeViewId={activeViewId}
+          />
+        </div>
         {/* Search Bar */}
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="flex-1 relative">
