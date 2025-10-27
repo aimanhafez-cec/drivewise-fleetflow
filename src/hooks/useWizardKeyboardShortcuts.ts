@@ -4,7 +4,6 @@ import { useToast } from '@/hooks/use-toast';
 interface UseWizardKeyboardShortcutsOptions {
   handleNext: () => void;
   handlePrevious: () => void;
-  canProceed: () => boolean;
   currentStep: number;
   isLoading?: boolean;
   onSubmit?: () => void;
@@ -25,7 +24,7 @@ export function useWizardKeyboardShortcuts(options: UseWizardKeyboardShortcutsOp
       target.tagName === 'TEXTAREA' || 
       target.isContentEditable;
 
-    // ENTER: Advance step (but not in inputs)
+    // ENTER: Advance step (but not in inputs) - allows advancing even with validation errors
     if (event.key === 'Enter' && !isInInput) {
       event.preventDefault();
       
@@ -37,20 +36,8 @@ export function useWizardKeyboardShortcuts(options: UseWizardKeyboardShortcutsOp
         return;
       }
       
-      // Check if can proceed
-      if (options.canProceed()) {
-        options.handleNext();
-        toast({
-          title: 'Step Advanced',
-          description: `Moving to step ${options.currentStep + 1}`,
-        });
-      } else {
-        toast({
-          title: 'Cannot Proceed',
-          description: 'Please complete all required fields',
-          variant: 'destructive',
-        });
-      }
+      // Always advance, let handleNext show validation warnings
+      options.handleNext();
     }
 
     // ESC: Go back (works everywhere, even in inputs)

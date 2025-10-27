@@ -575,27 +575,24 @@ const ReservationWizardContent: React.FC = () => {
     if (Object.keys(errors).length === 0) {
       setValidationErrors({});
       markStepComplete(currentStep);
-      
-      // Use smart navigation to skip optional steps
-      const nextStep = getNextRequiredStep(currentStep, wizardData, 14);
-      goToStep(nextStep);
-      
-      // Expand the group containing the next step
-      const nextGroup = stepGroups.find(g => g.steps.includes(nextStep));
-      if (nextGroup && !expandedGroups.includes(nextGroup.id)) {
-        setExpandedGroups([...expandedGroups, nextGroup.id]);
-      }
     } else {
       setValidationErrors(errors);
-      // Mark as has-errors if there are validation errors, otherwise incomplete
-      updateWizardData({ 
-        [`step${currentStep}ValidationStatus`]: 'has-errors' as any 
-      });
+      markStepIncomplete(currentStep);
       toast({
-        title: 'Validation Failed',
-        description: 'Please correct the errors before proceeding',
-        variant: 'destructive',
+        title: 'Step Has Validation Issues',
+        description: 'You can continue, but please fix these issues before final submission.',
+        variant: 'default',
       });
+    }
+    
+    // Always advance to next step regardless of validation
+    const nextStep = getNextRequiredStep(currentStep, wizardData, 14);
+    goToStep(nextStep);
+    
+    // Expand the group containing the next step
+    const nextGroup = stepGroups.find(g => g.steps.includes(nextStep));
+    if (nextGroup && !expandedGroups.includes(nextGroup.id)) {
+      setExpandedGroups([...expandedGroups, nextGroup.id]);
     }
   };
 
@@ -606,7 +603,6 @@ const ReservationWizardContent: React.FC = () => {
       const prevStep = getPreviousRequiredStep(currentStep, wizardData);
       goToStep(prevStep);
     },
-    canProceed,
     currentStep,
     isLoading: createReservationMutation.isPending,
     onSubmit: () => createReservationMutation.mutate(),
