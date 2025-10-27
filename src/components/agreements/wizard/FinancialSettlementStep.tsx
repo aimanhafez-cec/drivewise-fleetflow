@@ -67,8 +67,8 @@ export const FinancialSettlementStep: React.FC<FinancialSettlementStepProps> = (
     cleaningCharge: undefined,
     lateReturnHours: undefined,
     lateReturnCharge: undefined,
-    salikTrips: 8.75,
-    salikCharge: undefined,
+    salikTrips: undefined,
+    salikCharge: 70,
     smokePenalty: 750,
     trafficFineCount: 1,
     trafficFineAmount: 150,
@@ -127,8 +127,7 @@ export const FinancialSettlementStep: React.FC<FinancialSettlementStepProps> = (
   const lateReturnHours = safeData.lateReturnHours || 0;
   const lateReturnCharge = lateReturnHours > 0 ? Math.ceil(lateReturnHours) * 50 : 0;
 
-  const salikTrips = safeData.salikTrips || 0;
-  const salikCharge = salikTrips * 8;
+  const salikCharge = safeData.salikCharge ?? ((safeData.salikTrips || 0) * 8);
 
   const smokePenalty = safeData.smokePenalty || 0;
   const trafficFineCount = safeData.trafficFineCount || 0;
@@ -354,7 +353,7 @@ export const FinancialSettlementStep: React.FC<FinancialSettlementStepProps> = (
                 <div className="flex-1">
                   <h4 className="font-semibold mb-2">Salik/Toll Charges</h4>
                   <p className="text-sm text-muted-foreground">
-                    Trips recorded: {salikTrips} trips × AED 8.00
+                    Provided charge: {salikCharge.toFixed(2)} AED
                   </p>
                 </div>
                 <div className="text-right">
@@ -373,7 +372,7 @@ export const FinancialSettlementStep: React.FC<FinancialSettlementStepProps> = (
                     <h4 className="font-semibold">Smoking Penalty</h4>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    Smoking detected in vehicle - deep cleaning and odor removal required
+                    Provided charge: {smokePenalty.toFixed(2)} AED
                   </p>
                 </div>
                 <div className="text-right">
@@ -392,7 +391,7 @@ export const FinancialSettlementStep: React.FC<FinancialSettlementStepProps> = (
                     <h4 className="font-semibold">Traffic Fines</h4>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    {trafficFineCount} traffic violation(s) recorded during rental period
+                    Provided charge: {trafficFineAmount.toFixed(2)} AED ({trafficFineCount} violation{trafficFineCount !== 1 ? 's' : ''})
                   </p>
                 </div>
                 <div className="text-right">
@@ -401,94 +400,6 @@ export const FinancialSettlementStep: React.FC<FinancialSettlementStepProps> = (
                 </div>
               </div>
             )}
-
-            {/* Manual Adjustments */}
-            <div className="mt-4 p-4 bg-card border rounded-lg">
-              <h4 className="font-semibold mb-4">Manual Charge Adjustments</h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <Label>Cleaning Required</Label>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox 
-                      id="cleaning"
-                      checked={safeData.cleaningRequired || false}
-                      onCheckedChange={(checked) => onChange('cleaningRequired', checked as boolean)}
-                    />
-                    <Label htmlFor="cleaning" className="cursor-pointer font-normal">
-                      Deep Cleaning (150 AED)
-                    </Label>
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="lateHours">Late Return (Hours)</Label>
-                  <Input 
-                    id="lateHours"
-                    type="number"
-                    min="0"
-                    step="0.5"
-                    placeholder="0"
-                    value={safeData.lateReturnHours || ''}
-                    onChange={(e) => onChange('lateReturnHours', parseFloat(e.target.value) || 0)}
-                  />
-                  <p className="text-xs text-muted-foreground">50 AED/hour</p>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="salikTrips">Salik Trips</Label>
-                  <Input 
-                    id="salikTrips"
-                    type="number"
-                    min="0"
-                    placeholder="0"
-                    value={safeData.salikTrips || ''}
-                    onChange={(e) => onChange('salikTrips', parseInt(e.target.value) || 0)}
-                  />
-                  <p className="text-xs text-muted-foreground">8 AED/trip</p>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="smokePenalty">Smoke Penalty (AED)</Label>
-                  <Input 
-                    id="smokePenalty"
-                    type="number"
-                    min="0"
-                    step="50"
-                    placeholder="0"
-                    value={safeData.smokePenalty || ''}
-                    onChange={(e) => onChange('smokePenalty', parseFloat(e.target.value) || 0)}
-                  />
-                  <p className="text-xs text-muted-foreground">Typical: 500-1000 AED</p>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="trafficFineCount">Traffic Fines Count</Label>
-                  <Input 
-                    id="trafficFineCount"
-                    type="number"
-                    min="0"
-                    placeholder="0"
-                    value={safeData.trafficFineCount || ''}
-                    onChange={(e) => onChange('trafficFineCount', parseInt(e.target.value) || 0)}
-                  />
-                  <p className="text-xs text-muted-foreground">Number of violations</p>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="trafficFineAmount">Traffic Fine Amount (AED)</Label>
-                  <Input 
-                    id="trafficFineAmount"
-                    type="number"
-                    min="0"
-                    step="50"
-                    placeholder="0"
-                    value={safeData.trafficFineAmount || ''}
-                    onChange={(e) => onChange('trafficFineAmount', parseFloat(e.target.value) || 0)}
-                  />
-                  <p className="text-xs text-muted-foreground">Total fine amount</p>
-                </div>
-              </div>
-            </div>
 
             <Separator />
             <div className="flex items-center justify-between text-lg font-semibold">
