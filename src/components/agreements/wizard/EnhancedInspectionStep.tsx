@@ -3,12 +3,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { CheckCircle2, Circle, AlertCircle, ArrowRight, FileText } from 'lucide-react';
+import { CheckCircle2, Circle, AlertCircle, ArrowRight, FileText, PlusCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 import { CheckOutInspectionTab } from './CheckOutInspectionTab';
 import { CheckInInspectionTab } from './CheckInInspectionTab';
 import { InspectionComparisonTab } from './InspectionComparisonTab';
-import { MockDataLoader } from './MockDataLoader';
+import { 
+  mockCheckOutInspection, 
+  mockCheckInInspection
+} from '@/lib/mock/inspectionMockData';
 import type { EnhancedWizardData, InspectionData, ComparisonReport } from '@/types/agreement-wizard';
 
 interface EnhancedInspectionStepProps {
@@ -117,6 +121,28 @@ export const EnhancedInspectionStep: React.FC<EnhancedInspectionStepProps> = ({
     onChange('activeTab', 'comparison');
   };
 
+  const handleLoadMockData = () => {
+    if (onFullUpdate) {
+      onFullUpdate({
+        step2: {
+          inspectionMode: 'checkout_checkin',
+          activeTab: 'checkout',
+          preHandoverChecklist: mockCheckOutInspection.preHandoverChecklist,
+          inspectionChecklist: mockCheckOutInspection.inspectionChecklist,
+          fuelLevel: mockCheckOutInspection.fuelLevel,
+          odometerReading: mockCheckOutInspection.odometerReading,
+          damageMarkers: mockCheckOutInspection.damageMarkers,
+          photos: mockCheckOutInspection.photos,
+          checkOutInspection: mockCheckOutInspection,
+          checkInInspection: mockCheckInInspection,
+        }
+      });
+      toast.success('Mock data loaded', {
+        description: 'Standard scenario with 5 damages, fuel shortage, and excess km'
+      });
+    }
+  };
+
   // Get tab status badge
   const getTabBadge = (isComplete: boolean, isActive: boolean) => {
     if (isComplete) {
@@ -138,13 +164,6 @@ export const EnhancedInspectionStep: React.FC<EnhancedInspectionStepProps> = ({
 
   return (
     <div className="space-y-6 animate-fade-in" role="region" aria-label="Vehicle Inspection">
-      {/* Mock Data Loader - Development Only */}
-      {onFullUpdate && (
-        <div className="animate-fade-in">
-          <MockDataLoader onLoadData={onFullUpdate} />
-        </div>
-      )}
-
       {/* Header Card */}
       <Card className="animate-fade-in">
         <CardHeader>
@@ -152,6 +171,17 @@ export const EnhancedInspectionStep: React.FC<EnhancedInspectionStepProps> = ({
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-2">
                 <CardTitle>Vehicle Inspection (Enhanced)</CardTitle>
+                {onFullUpdate && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 w-8 p-0 rounded-full hover:bg-primary/10"
+                    onClick={handleLoadMockData}
+                    title="Load mock inspection data"
+                  >
+                    <PlusCircle className="h-5 w-5 text-primary" />
+                  </Button>
+                )}
                 <Badge 
                   variant="outline" 
                   className={`
