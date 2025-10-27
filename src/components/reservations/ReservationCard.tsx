@@ -28,6 +28,7 @@ import { format } from 'date-fns';
 import { formatCurrency } from '@/lib/utils/currency';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
+import { QuickActionButtons } from './QuickActionButtons';
 
 interface ReservationCardProps {
   reservation: any;
@@ -125,6 +126,11 @@ export const ReservationCard: React.FC<ReservationCardProps> = ({
                   {reservation.profiles?.email || 'No email'}
                 </p>
               </div>
+            </div>
+
+            {/* Quick Action Buttons */}
+            <div onClick={(e) => e.stopPropagation()}>
+              <QuickActionButtons reservation={reservation} />
             </div>
 
             {/* Quick Actions Menu */}

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Plus, Calendar, FileText, Download } from 'lucide-react';
+import { Plus, Calendar, FileText, Download, Zap } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -10,11 +10,15 @@ import { ConvertToAgreementModal } from '@/components/reservation/ConvertToAgree
 import { ReservationFilters, ReservationFilterState } from '@/components/reservations/ReservationFilters';
 import { ReservationKPICards } from '@/components/reservations/ReservationKPICards';
 import { ReservationCard } from '@/components/reservations/ReservationCard';
+import { ExpressReservationModal } from '@/components/reservations/express/ExpressReservationModal';
+import { QuickFilterPills } from '@/components/reservations/QuickFilterPills';
 import { startOfDay, endOfDay, startOfWeek, endOfWeek } from 'date-fns';
 
 const Reservations = () => {
   const navigate = useNavigate();
   const [filters, setFilters] = useState<ReservationFilterState>({});
+  const [activeQuickFilter, setActiveQuickFilter] = useState<string>();
+  const [expressModalOpen, setExpressModalOpen] = useState(false);
   const [convertModal, setConvertModal] = useState<{ open: boolean; reservation?: any }>({ 
     open: false 
   });
@@ -141,6 +145,15 @@ const Reservations = () => {
 
   const handleClearFilters = () => {
     setFilters({});
+    setActiveQuickFilter(undefined);
+  };
+
+  const handleQuickFilterApply = (filter: any) => {
+    setActiveQuickFilter(filter.filterId);
+    setFilters({
+      ...filter,
+      filterId: undefined, // Remove the filterId from actual filters
+    });
   };
 
   if (isLoading) {
@@ -168,7 +181,11 @@ const Reservations = () => {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button onClick={() => navigate('/reservations/new')} size="sm">
+          <Button onClick={() => setExpressModalOpen(true)} size="sm" className="bg-gradient-to-r from-primary to-primary/80">
+            <Zap className="mr-2 h-4 w-4" />
+            Quick Book
+          </Button>
+          <Button onClick={() => navigate('/reservations/new')} variant="outline" size="sm">
             <Plus className="mr-2 h-4 w-4" />
             New Reservation
           </Button>
@@ -201,6 +218,12 @@ const Reservations = () => {
           avgDaysToConfirm: 0
         }}
         isLoading={!kpiData}
+      />
+
+      {/* Quick Filter Pills */}
+      <QuickFilterPills
+        onFilterApply={handleQuickFilterApply}
+        activeFilter={activeQuickFilter}
       />
 
       {/* Filters */}
@@ -250,6 +273,12 @@ const Reservations = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* Express Reservation Modal */}
+      <ExpressReservationModal
+        open={expressModalOpen}
+        onOpenChange={setExpressModalOpen}
+      />
 
       {/* Convert to Agreement Modal */}
       {convertModal.reservation && (
