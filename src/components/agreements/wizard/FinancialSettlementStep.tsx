@@ -69,6 +69,9 @@ export const FinancialSettlementStep: React.FC<FinancialSettlementStepProps> = (
     lateReturnCharge: undefined,
     salikTrips: undefined,
     salikCharge: undefined,
+    smokePenalty: undefined,
+    trafficFineAmount: undefined,
+    trafficFineCount: undefined,
     paymentMethod: undefined,
     disputeRaised: false,
     overrideReason: undefined,
@@ -127,8 +130,13 @@ export const FinancialSettlementStep: React.FC<FinancialSettlementStepProps> = (
   const salikTrips = safeData.salikTrips || 0;
   const salikCharge = salikTrips * 8;
 
+  const smokePenalty = safeData.smokePenalty || 0;
+  
+  const trafficFineCount = safeData.trafficFineCount || 0;
+  const trafficFineAmount = safeData.trafficFineAmount || 0;
+
   // Calculate totals
-  const totalAdditionalCharges = fuelCharge + excessKmCharge + cleaningCharge + lateReturnCharge + salikCharge;
+  const totalAdditionalCharges = fuelCharge + excessKmCharge + cleaningCharge + lateReturnCharge + salikCharge + smokePenalty + trafficFineAmount;
   const subtotal = totalDamageCharges + totalAdditionalCharges;
   const vatAmount = subtotal * VAT_RATE;
   const grandTotal = subtotal + vatAmount;
@@ -357,6 +365,45 @@ export const FinancialSettlementStep: React.FC<FinancialSettlementStepProps> = (
               </div>
             )}
 
+            {/* Smoke Penalty */}
+            {smokePenalty > 0 && (
+              <div className="flex items-start justify-between p-4 bg-muted/50 rounded-lg">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <AlertTriangle className="w-4 h-4 text-destructive" />
+                    <h4 className="font-semibold">Smoking Penalty</h4>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Smoking detected in vehicle interior - deep cleaning and odor removal required
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-2xl font-bold">{smokePenalty.toFixed(2)}</p>
+                  <p className="text-sm text-muted-foreground">AED</p>
+                </div>
+              </div>
+            )}
+
+            {/* Traffic Fine */}
+            {trafficFineAmount > 0 && (
+              <div className="flex items-start justify-between p-4 bg-muted/50 rounded-lg">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <AlertCircle className="w-4 h-4 text-destructive" />
+                    <h4 className="font-semibold">Traffic Fine</h4>
+                  </div>
+                  <div className="text-sm text-muted-foreground space-y-1">
+                    <p>Number of violations: {trafficFineCount}</p>
+                    <p>Total fine amount as per authorities</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-2xl font-bold">{trafficFineAmount.toFixed(2)}</p>
+                  <p className="text-sm text-muted-foreground">AED</p>
+                </div>
+              </div>
+            )}
+
             <Separator />
             <div className="flex items-center justify-between text-lg font-semibold">
               <span>Subtotal - Additional Charges:</span>
@@ -455,6 +502,106 @@ export const FinancialSettlementStep: React.FC<FinancialSettlementStepProps> = (
           </CardContent>
         </Card>
       )}
+
+      {/* Manual Charge Inputs */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Manual Charge Adjustments</CardTitle>
+          <CardDescription>
+            Enter additional charges that were identified during check-in
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Cleaning Checkbox */}
+            <div className="space-y-4 md:col-span-2">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="cleaningRequired"
+                  checked={safeData.cleaningRequired}
+                  onCheckedChange={(checked) => onChange('cleaningRequired', checked as boolean)}
+                />
+                <Label htmlFor="cleaningRequired" className="cursor-pointer">
+                  Deep cleaning required (AED 150.00)
+                </Label>
+              </div>
+            </div>
+
+            {/* Late Return Hours */}
+            <div className="space-y-2">
+              <Label htmlFor="lateReturnHours">Late Return (Hours)</Label>
+              <Input
+                id="lateReturnHours"
+                type="number"
+                min="0"
+                step="0.5"
+                placeholder="0"
+                value={safeData.lateReturnHours || ''}
+                onChange={(e) => onChange('lateReturnHours', e.target.value ? parseFloat(e.target.value) : undefined)}
+              />
+              <p className="text-xs text-muted-foreground">AED 50.00 per hour (rounded up)</p>
+            </div>
+
+            {/* Salik Trips */}
+            <div className="space-y-2">
+              <Label htmlFor="salikTrips">Salik/Toll Trips</Label>
+              <Input
+                id="salikTrips"
+                type="number"
+                min="0"
+                placeholder="0"
+                value={safeData.salikTrips || ''}
+                onChange={(e) => onChange('salikTrips', e.target.value ? parseInt(e.target.value) : undefined)}
+              />
+              <p className="text-xs text-muted-foreground">AED 8.00 per trip</p>
+            </div>
+
+            {/* Smoke Penalty */}
+            <div className="space-y-2">
+              <Label htmlFor="smokePenalty">Smoking Penalty (AED)</Label>
+              <Input
+                id="smokePenalty"
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="0.00"
+                value={safeData.smokePenalty || ''}
+                onChange={(e) => onChange('smokePenalty', e.target.value ? parseFloat(e.target.value) : undefined)}
+              />
+              <p className="text-xs text-muted-foreground">Standard penalty: AED 500.00</p>
+            </div>
+
+            {/* Traffic Fine Count */}
+            <div className="space-y-2">
+              <Label htmlFor="trafficFineCount">Traffic Violations Count</Label>
+              <Input
+                id="trafficFineCount"
+                type="number"
+                min="0"
+                placeholder="0"
+                value={safeData.trafficFineCount || ''}
+                onChange={(e) => onChange('trafficFineCount', e.target.value ? parseInt(e.target.value) : undefined)}
+              />
+              <p className="text-xs text-muted-foreground">Number of traffic fines</p>
+            </div>
+
+            {/* Traffic Fine Amount */}
+            <div className="space-y-2 md:col-span-2">
+              <Label htmlFor="trafficFineAmount">Total Traffic Fine Amount (AED)</Label>
+              <Input
+                id="trafficFineAmount"
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="0.00"
+                value={safeData.trafficFineAmount || ''}
+                onChange={(e) => onChange('trafficFineAmount', e.target.value ? parseFloat(e.target.value) : undefined)}
+              />
+              <p className="text-xs text-muted-foreground">Total amount as per RTA/Police records</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Dispute Option */}
       {additionalPayment > 0 && (
@@ -630,6 +777,8 @@ export const FinancialSettlementStep: React.FC<FinancialSettlementStepProps> = (
           ...(cleaningCharge > 0 ? [{ label: 'Cleaning Fee', amount: cleaningCharge }] : []),
           ...(lateReturnCharge > 0 ? [{ label: 'Late Return Fee', amount: lateReturnCharge }] : []),
           ...(salikCharge > 0 ? [{ label: 'Salik/Toll Charges', amount: salikCharge }] : []),
+          ...(smokePenalty > 0 ? [{ label: 'Smoking Penalty', amount: smokePenalty }] : []),
+          ...(trafficFineAmount > 0 ? [{ label: 'Traffic Fines', amount: trafficFineAmount }] : []),
         ]}
         completedAt={new Date().toISOString()}
       />
