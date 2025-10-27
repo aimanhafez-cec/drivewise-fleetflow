@@ -23,7 +23,7 @@ import { WizardProgress } from '@/components/reservations/wizard/WizardProgress'
 import { AgreementProgressionCard } from './wizard/AgreementProgressionCard';
 import { SourceSelection } from './wizard/SourceSelection';
 import { AgreementTermsStep } from './wizard/AgreementTermsStep';
-import { VehicleInspectionStep } from './wizard/VehicleInspectionStep';
+import { EnhancedInspectionStep } from './wizard/EnhancedInspectionStep';
 import { PricingConfigurationStep } from './wizard/PricingConfigurationStep';
 import { AddonsSelectionStep } from './wizard/AddonsSelectionStep';
 import { BillingPaymentStep } from './wizard/BillingPaymentStep';
@@ -601,7 +601,7 @@ export const EnhancedAgreementWizard = () => {
         );
       case 2:
         return (
-          <VehicleInspectionStep
+          <EnhancedInspectionStep
             data={wizardData.step2}
             onChange={(field, value) => handleStepDataChange('step2', field, value)}
             errors={errorMessages}
