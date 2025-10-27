@@ -22,6 +22,7 @@ import {
   FolderOpen,
   Truck,
   Crown,
+  Inbox,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -53,6 +54,11 @@ const navigation = [
     title: 'Instant Booking',
     url: '/instant-booking',
     icon: Zap,
+  },
+  {
+    title: 'Leads Intake Center',
+    url: '/leads-intake',
+    icon: Inbox,
   },
   {
     title: 'Reservations',

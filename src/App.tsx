@@ -102,6 +102,7 @@ import ManageBillingEvents from "./pages/transactions/ManageBillingEvents";
 import ManageSettlements from "./pages/transactions/ManageSettlements";
 import ManageClaims from "./pages/transactions/ManageClaims";
 import ExecutiveTransportationHub from "./pages/executive-transportation/ExecutiveTransportationHub";
+import LeadsIntakeCenter from "./pages/LeadsIntakeCenter";
 // Hidden - commented out imports
 // import { CarSubscriptions } from "./pages/CarSubscriptions";
 // import { NewCarSubscription } from "./pages/NewCarSubscription";
@@ -386,6 +387,13 @@ const App = () => {
               <Route path="settings" element={<CustodySettings />} />
               <Route path="analytics" element={<CustodyAnalytics />} />
               <Route path=":id" element={<CustodyDetail />} />
+            </Route>
+            <Route path="/leads-intake" element={
+              <ProtectedRoute>
+                <AppLayout />
+              </ProtectedRoute>
+            }>
+              <Route index element={<LeadsIntakeCenter />} />
             </Route>
 
           {/* Public Routes - No Authentication Required */}
