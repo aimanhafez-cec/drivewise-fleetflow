@@ -5,6 +5,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { ArrowLeft, ArrowRight, Save, AlertTriangle, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { formatCurrency } from '@/lib/utils/currency';
 import { useWizardProgress } from '@/hooks/useWizardProgress';
 import { useWizardKeyboardShortcuts } from '@/hooks/useWizardKeyboardShortcuts';
 import { useAgreementSmartDefaults, useApplyAgreementSmartDefaults } from '@/hooks/useAgreementSmartDefaults';
@@ -12,6 +13,7 @@ import { validateStep } from '@/lib/wizard/validation';
 import { getAgreementStepGroups } from '@/lib/wizardLogic/agreementStepGroups';
 import { getNextAgreementRequiredStep, getPreviousAgreementRequiredStep } from '@/lib/wizardLogic/agreementConditionalSteps';
 import { AgreementWizardSection } from './wizard/AgreementWizardSection';
+import { AgreementLivePriceWidget } from './wizard/AgreementLivePriceWidget';
 import { WizardProgress } from '@/components/reservations/wizard/WizardProgress';
 import { AgreementProgressionCard } from './wizard/AgreementProgressionCard';
 import { SourceSelection } from './wizard/SourceSelection';
@@ -435,6 +437,8 @@ export const EnhancedAgreementWizard = () => {
     return pricing?.total || 0;
   };
 
+  const total = calculateTotalAmount();
+
   const renderStepContent = () => {
     switch (progress.currentStep) {
       case 0:
@@ -533,125 +537,160 @@ export const EnhancedAgreementWizard = () => {
       />
 
       <div className="max-w-7xl mx-auto space-y-6 p-4">
-        {/* Header */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="text-2xl">Create Agreement</CardTitle>
-                <p className="text-muted-foreground mt-1">
-                  Enhanced wizard with source selection and comprehensive validation
-                </p>
-              </div>
-              <div className="flex gap-2">
-                {customerId && hasHistory && smartDefaults && (
-                  <Button 
-                    variant="secondary" 
-                    size="sm" 
-                    onClick={handleApplySmartDefaults}
-                    disabled={loadingDefaults}
-                  >
-                    <Sparkles className="h-4 w-4 mr-2" />
-                    Apply Smart Defaults
-                  </Button>
-                )}
-                <Button variant="outline" size="sm" onClick={handleSaveDraft}>
-                  <Save className="h-4 w-4 mr-2" />
-                  Save Draft
-                </Button>
-                <Button variant="outline" onClick={() => navigate('/agreements')}>
-                  Cancel
-                </Button>
-              </div>
+        {/* Grid Layout: Content + Sidebar */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Main Content Area */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Header */}
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-2xl">Create Agreement</CardTitle>
+                    <p className="text-muted-foreground mt-1">
+                      Enhanced wizard with source selection and comprehensive validation
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    {customerId && hasHistory && smartDefaults && (
+                      <Button 
+                        variant="secondary" 
+                        size="sm" 
+                        onClick={handleApplySmartDefaults}
+                        disabled={loadingDefaults}
+                      >
+                        <Sparkles className="h-4 w-4 mr-2" />
+                        Apply Smart Defaults
+                      </Button>
+                    )}
+                    <Button variant="outline" size="sm" onClick={handleSaveDraft}>
+                      <Save className="h-4 w-4 mr-2" />
+                      Save Draft
+                    </Button>
+                    <Button variant="outline" onClick={() => navigate('/agreements')}>
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              </CardHeader>
+            </Card>
+
+            {/* Validation Alerts */}
+            {validationResult.errors.length > 0 && (
+              <Alert variant="destructive">
+                <AlertTriangle className="h-4 w-4" />
+                <AlertDescription>
+                  <p className="font-semibold mb-2">Please fix the following errors:</p>
+                  <ul className="list-disc list-inside space-y-1">
+                    {validationResult.errors.map((error, index) => (
+                      <li key={index}>{error}</li>
+                    ))}
+                  </ul>
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {validationResult.warnings.length > 0 && (
+              <Alert>
+                <AlertTriangle className="h-4 w-4" />
+                <AlertDescription>
+                  <p className="font-semibold mb-2">Warnings:</p>
+                  <ul className="list-disc list-inside space-y-1">
+                    {validationResult.warnings.map((warning, index) => (
+                      <li key={index}>{warning}</li>
+                    ))}
+                  </ul>
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {/* Step Content with Sectioned Layout */}
+            <div className="space-y-6">
+              {stepGroups.map(group => (
+                <AgreementWizardSection
+                  key={group.id}
+                  group={group}
+                  steps={STEP_CONFIG}
+                  currentStep={progress.currentStep}
+                  completedSteps={progress.completedSteps}
+                  skippedSteps={progress.skippedSteps || []}
+                  stepValidationStatus={progress.stepValidationStatus}
+                  onStepClick={handleStepClick}
+                  isExpanded={expandedSections[group.id] ?? group.steps.includes(progress.currentStep)}
+                  onToggleExpand={() => toggleSectionExpand(group.id)}
+                >
+                  {renderStepContent()}
+                </AgreementWizardSection>
+              ))}
             </div>
-          </CardHeader>
-        </Card>
 
-        {/* Validation Alerts */}
-        {validationResult.errors.length > 0 && (
-          <Alert variant="destructive">
-            <AlertTriangle className="h-4 w-4" />
-            <AlertDescription>
-              <p className="font-semibold mb-2">Please fix the following errors:</p>
-              <ul className="list-disc list-inside space-y-1">
-                {validationResult.errors.map((error, index) => (
-                  <li key={index}>{error}</li>
-                ))}
-              </ul>
-            </AlertDescription>
-          </Alert>
-        )}
+            {/* Navigation */}
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex justify-between items-center">
+                  <Button
+                    variant="outline"
+                    onClick={handlePrevious}
+                    disabled={progress.currentStep === 0}
+                  >
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Previous
+                  </Button>
 
-        {validationResult.warnings.length > 0 && (
-          <Alert>
-            <AlertTriangle className="h-4 w-4" />
-            <AlertDescription>
-              <p className="font-semibold mb-2">Warnings:</p>
-              <ul className="list-disc list-inside space-y-1">
-                {validationResult.warnings.map((warning, index) => (
-                  <li key={index}>{warning}</li>
-                ))}
-              </ul>
-            </AlertDescription>
-          </Alert>
-        )}
+                  <div className="text-sm text-muted-foreground">
+                    {progress.lastSaved && `Last saved: ${new Date(progress.lastSaved).toLocaleTimeString()}`}
+                  </div>
 
-        {/* Step Content with Sectioned Layout */}
-        <div className="space-y-6">
-          {stepGroups.map(group => (
-            <AgreementWizardSection
-              key={group.id}
-              group={group}
-              steps={STEP_CONFIG}
-              currentStep={progress.currentStep}
-              completedSteps={progress.completedSteps}
-              skippedSteps={progress.skippedSteps || []}
-              stepValidationStatus={progress.stepValidationStatus}
-              onStepClick={handleStepClick}
-              isExpanded={expandedSections[group.id] ?? group.steps.includes(progress.currentStep)}
-              onToggleExpand={() => toggleSectionExpand(group.id)}
-            >
-              {renderStepContent()}
-            </AgreementWizardSection>
-          ))}
+                  {progress.currentStep === TOTAL_STEPS - 1 ? (
+                    <Button 
+                      onClick={handleSubmit} 
+                      size="lg"
+                      className="min-w-[180px]"
+                    >
+                      Issue Agreement
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={handleNext}
+                    >
+                      Next
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Live Price Widget - Sticky Sidebar (Desktop Only) */}
+          <div className="hidden lg:block lg:col-span-1">
+            <AgreementLivePriceWidget wizardData={wizardData} />
+          </div>
         </div>
 
-        {/* Navigation */}
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex justify-between items-center">
-              <Button
-                variant="outline"
-                onClick={handlePrevious}
-                disabled={progress.currentStep === 0}
-              >
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Previous
-              </Button>
-
-              <div className="text-sm text-muted-foreground">
-                {progress.lastSaved && `Last saved: ${new Date(progress.lastSaved).toLocaleTimeString()}`}
+        {/* Mobile Price Summary - Bottom Fixed */}
+        {total > 0 && (
+          <div className="fixed bottom-0 left-0 right-0 bg-background border-t shadow-lg p-4 lg:hidden z-40">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs text-muted-foreground">Total Amount</p>
+                <p className="text-2xl font-bold text-primary">
+                  {formatCurrency(total)}
+                </p>
               </div>
-
               {progress.currentStep === TOTAL_STEPS - 1 ? (
-                <Button 
-                  onClick={handleSubmit} 
-                  size="lg"
-                  className="min-w-[180px]"
-                >
+                <Button onClick={handleSubmit} size="lg">
                   Issue Agreement
                 </Button>
               ) : (
-                <Button
-                  onClick={handleNext}
-                >
-                  Next
+                <Button onClick={handleNext} size="lg">
+                  Continue
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               )}
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        )}
       </div>
 
       {/* Floating Progress Panel */}
