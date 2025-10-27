@@ -40,6 +40,7 @@ import { WizardSection } from './WizardSection';
 import { LivePriceWidget } from './LivePriceWidget';
 import { useTouchGestures, useIsTouchDevice } from '@/hooks/useTouchGestures';
 import { formatCurrency } from '@/lib/utils/currency';
+import { useWizardKeyboardShortcuts } from '@/hooks/useWizardKeyboardShortcuts';
 
 const wizardSteps = [
   { number: 1, title: 'Reservation Type', description: 'Select booking type' },
@@ -598,6 +599,19 @@ const ReservationWizardContent: React.FC = () => {
     }
   };
 
+  // Keyboard shortcuts for wizard navigation
+  useWizardKeyboardShortcuts({
+    handleNext,
+    handlePrevious: () => {
+      const prevStep = getPreviousRequiredStep(currentStep, wizardData);
+      goToStep(prevStep);
+    },
+    canProceed,
+    currentStep,
+    isLoading: createReservationMutation.isPending,
+    onSubmit: () => createReservationMutation.mutate(),
+  });
+
   const handleStepClick = (stepNumber: number) => {
     // Already on this step - no action needed
     if (stepNumber === currentStep) {
@@ -775,6 +789,11 @@ const ReservationWizardContent: React.FC = () => {
                   >
                     <ArrowLeft className="mr-2 h-4 w-4" />
                     Previous
+                    {!isTouchDevice && (
+                      <span className="ml-2 text-xs opacity-50 hidden sm:inline">
+                        [Esc]
+                      </span>
+                    )}
                   </Button>
                 )}
               </div>
@@ -783,6 +802,11 @@ const ReservationWizardContent: React.FC = () => {
                   <Button onClick={handleNext} disabled={!canProceed()}>
                     Next
                     <ArrowRight className="ml-2 h-4 w-4" />
+                    {!isTouchDevice && (
+                      <span className="ml-2 text-xs opacity-50 hidden sm:inline">
+                        [Enter]
+                      </span>
+                    )}
                   </Button>
                 )}
                 {currentStep === 14 && (
