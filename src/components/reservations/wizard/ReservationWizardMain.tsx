@@ -593,6 +593,14 @@ const ReservationWizardContent: React.FC = () => {
     if (nextGroup && !expandedGroups.includes(nextGroup.id)) {
       setExpandedGroups([...expandedGroups, nextGroup.id]);
     }
+    
+    // Auto-scroll to the next step's section
+    setTimeout(() => {
+      const targetElement = document.querySelector(`[data-step="${nextGroup?.steps[0] || nextStep}"]`);
+      if (targetElement) {
+        targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 200);
   };
 
   // Keyboard shortcuts for wizard navigation

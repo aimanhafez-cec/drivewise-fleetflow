@@ -40,6 +40,7 @@ export const WizardSection: React.FC<WizardSectionProps> = ({
 
   return (
     <Card
+      data-step={group.steps[0]}
       className={cn(
         'border-2 transition-all',
         isCurrentGroupActive
