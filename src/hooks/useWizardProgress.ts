@@ -20,6 +20,7 @@ export const useWizardProgress = ({
     lastSaved: undefined,
     stepValidationStatus: {},
     visitedSteps: [],
+    skippedSteps: [],
   });
 
   // Load saved progress on mount
@@ -37,6 +38,7 @@ export const useWizardProgress = ({
               visitedSteps: parsed.progress.visitedSteps || [],
               completedSteps: parsed.progress.completedSteps || [],
               stepValidationStatus: parsed.progress.stepValidationStatus || {},
+              skippedSteps: parsed.progress.skippedSteps || [],
             });
             console.log('[useWizardProgress] Loaded saved progress:', parsed);
           }
@@ -114,12 +116,28 @@ export const useWizardProgress = ({
         lastSaved: undefined,
         stepValidationStatus: {},
         visitedSteps: [],
+        skippedSteps: [],
       });
       console.log('[useWizardProgress] Progress cleared');
     } catch (error) {
       console.error('[useWizardProgress] Failed to clear progress:', error);
     }
   }, [storageKey, initialData]);
+
+  const skipStep = useCallback((step: number) => {
+    setProgress(prev => ({
+      ...prev,
+      skippedSteps: [...new Set([...prev.skippedSteps || [], step])],
+      completedSteps: (prev.completedSteps || []).filter(s => s !== step),
+    }));
+  }, []);
+
+  const unskipStep = useCallback((step: number) => {
+    setProgress(prev => ({
+      ...prev,
+      skippedSteps: (prev.skippedSteps || []).filter(s => s !== step),
+    }));
+  }, []);
 
   const getProgressPercentage = useCallback(() => {
     return Math.round((progress.completedSteps.length / totalSteps) * 100);
@@ -186,5 +204,7 @@ export const useWizardProgress = ({
     clearProgress,
     getProgressPercentage,
     canNavigateToStep,
+    skipStep,
+    unskipStep,
   };
 };

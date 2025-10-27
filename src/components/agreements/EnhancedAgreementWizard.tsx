@@ -10,6 +10,7 @@ import { useWizardKeyboardShortcuts } from '@/hooks/useWizardKeyboardShortcuts';
 import { useAgreementSmartDefaults, useApplyAgreementSmartDefaults } from '@/hooks/useAgreementSmartDefaults';
 import { validateStep } from '@/lib/wizard/validation';
 import { WizardProgress } from '@/components/reservations/wizard/WizardProgress';
+import { AgreementProgressionCard } from './wizard/AgreementProgressionCard';
 import { SourceSelection } from './wizard/SourceSelection';
 import { AgreementTermsStep } from './wizard/AgreementTermsStep';
 import { VehicleInspectionStep } from './wizard/VehicleInspectionStep';
@@ -184,6 +185,8 @@ export const EnhancedAgreementWizard = () => {
     setCanProceed,
     clearProgress,
     getProgressPercentage,
+    skipStep,
+    unskipStep,
   } = useWizardProgress({
     storageKey: 'enhanced-agreement-wizard',
     initialData: INITIAL_WIZARD_DATA,
@@ -362,6 +365,21 @@ export const EnhancedAgreementWizard = () => {
     // Allow navigation to ANY step
     setCurrentStep(step);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleStepSkip = (step: number) => {
+    const isSkipped = progress.skippedSteps?.includes(step);
+    if (isSkipped) {
+      unskipStep(step);
+      toast.info('Step Unskipped', {
+        description: `Step ${step} has been unskipped`,
+      });
+    } else {
+      skipStep(step);
+      toast.success('Step Skipped', {
+        description: `Step ${step} has been skipped`,
+      });
+    }
   };
 
   const handleStepDataChange = (stepKey: keyof EnhancedWizardData, field: string, value: any) => {
@@ -581,6 +599,16 @@ export const EnhancedAgreementWizard = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Floating Progress Panel */}
+      <AgreementProgressionCard
+        currentStep={progress.currentStep}
+        completedSteps={progress.completedSteps}
+        skippedSteps={progress.skippedSteps || []}
+        stepValidationStatus={progress.stepValidationStatus}
+        onStepClick={handleStepClick}
+        onStepSkip={handleStepSkip}
+      />
     </div>
   );
 };
