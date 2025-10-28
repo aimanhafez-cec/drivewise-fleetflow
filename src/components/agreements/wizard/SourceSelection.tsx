@@ -237,8 +237,11 @@ export const SourceSelection = ({
             </div>
 
             {loadingReservations ? (
-              <div className="text-center py-8 text-muted-foreground">
-                Loading reservations...
+              <div className="text-center py-12 text-muted-foreground space-y-3">
+                <div className="flex justify-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                </div>
+                <p className="text-sm">Loading available reservations...</p>
               </div>
             ) : filteredReservations.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
@@ -297,8 +300,11 @@ export const SourceSelection = ({
             </div>
 
             {loadingBookings ? (
-              <div className="text-center py-8 text-muted-foreground">
-                Loading instant bookings...
+              <div className="text-center py-12 text-muted-foreground space-y-3">
+                <div className="flex justify-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                </div>
+                <p className="text-sm">Loading instant bookings...</p>
               </div>
             ) : filteredInstantBookings.length === 0 ? (
               <div className="border border-amber-200 bg-amber-50 rounded-lg p-4 flex gap-3">

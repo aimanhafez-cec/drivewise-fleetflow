@@ -3,7 +3,7 @@ import { setupAutoSave, saveInspectionDraft } from '@/lib/wizard/inspectionPersi
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { ArrowLeft, ArrowRight, Save, AlertTriangle, Sparkles } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Save, AlertTriangle, Sparkles, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { formatCurrency } from '@/lib/utils/currency';
@@ -37,6 +37,7 @@ import { FinancialSettlementStep } from './wizard/FinancialSettlementStep';
 import { DraftManagementBanner } from './wizard/DraftManagementBanner';
 import { InstantBookingSummary } from './wizard/InstantBookingSummary';
 import { AgreementSubmissionSummary } from './wizard/AgreementSubmissionSummary';
+import { InstantBookingLoadingState } from './wizard/InstantBookingLoadingState';
 import type { EnhancedWizardData, AgreementSource } from '@/types/agreement-wizard';
 
 const TOTAL_STEPS = 10; // 0-9
@@ -337,38 +338,52 @@ export const EnhancedAgreementWizard = () => {
     }
   }, [customerId, smartDefaults, loadingDefaults]);
 
-  // Populate wizard data from instant booking when selected
+  // Populate wizard data from instant booking when selected with better error handling
   useEffect(() => {
-    if (wizardData.source === 'instant_booking' && wizardData.sourceId && instantBooking && !loadingInstantBooking) {
-      console.log('[EnhancedWizard] Instant booking loaded, mapping to wizard data');
-      
-      const mappedData = mapToWizardData(wizardData);
-      
-      if (mappedData) {
-        // Apply mapped data to wizard
-        Object.keys(mappedData).forEach(key => {
-          if (key !== 'source' && key !== 'sourceId') {
-            updateWizardData(key as keyof EnhancedWizardData, mappedData[key as keyof typeof mappedData]);
-          }
+    if (wizardData.source === 'instant_booking' && wizardData.sourceId) {
+      if (loadingInstantBooking) {
+        console.log('[EnhancedWizard] Loading instant booking data...');
+        return;
+      }
+
+      if (instantBookingError) {
+        console.error('[EnhancedWizard] Error loading instant booking:', instantBookingError);
+        toast.error('Failed to Load Instant Booking', {
+          description: 'Unable to fetch instant booking data. Please try selecting again.',
+          duration: 5000,
         });
+        return;
+      }
+
+      if (instantBooking) {
+        console.log('[EnhancedWizard] Instant booking loaded, mapping to wizard data');
         
-        toast.success('Instant Booking Loaded', {
-          description: `RO# ${instantBooking.ro_number} - ${instantBooking.profiles?.full_name || 'Customer'}`,
-          duration: 4000,
-        });
+        try {
+          const mappedData = mapToWizardData(wizardData);
+          
+          if (mappedData) {
+            // Apply mapped data to wizard
+            Object.keys(mappedData).forEach(key => {
+              if (key !== 'source' && key !== 'sourceId') {
+                updateWizardData(key as keyof EnhancedWizardData, mappedData[key as keyof typeof mappedData]);
+              }
+            });
+            
+            toast.success('Instant Booking Data Loaded', {
+              description: `Pre-filled with data from RO #${instantBooking.ro_number}`,
+              duration: 3000,
+            });
+          }
+        } catch (error) {
+          console.error('[EnhancedWizard] Error mapping instant booking data:', error);
+          toast.error('Data Mapping Error', {
+            description: 'Could not populate wizard with instant booking data. Please fill manually.',
+            duration: 5000,
+          });
+        }
       }
     }
-  }, [wizardData.source, wizardData.sourceId, instantBooking, loadingInstantBooking]);
-
-  // Handle instant booking loading error
-  useEffect(() => {
-    if (instantBookingError) {
-      console.error('[EnhancedWizard] Error loading instant booking:', instantBookingError);
-      toast.error('Failed to Load Instant Booking', {
-        description: 'Could not retrieve instant booking data. Please try again.',
-      });
-    }
-  }, [instantBookingError]);
+  }, [wizardData.source, wizardData.sourceId, instantBooking, loadingInstantBooking, instantBookingError]);
 
   // Auto-save functionality
   useEffect(() => {
@@ -518,34 +533,49 @@ export const EnhancedAgreementWizard = () => {
   const hasDraft = progress.lastSaved !== undefined && progress.visitedSteps.length > 1;
 
   const handleSubmit = async () => {
+    console.log('[EnhancedWizard] Submitting agreement...');
+    
+    // Disable navigation during submission
+    setIsSaving(true);
+
     try {
-      // Validate instant booking if applicable
+      // Pre-submission validation for instant bookings
       if (wizardData.source === 'instant_booking' && wizardData.sourceId) {
-        toast.info('Validating instant booking...', {
+        console.log('[EnhancedWizard] Validating instant booking conversion eligibility...');
+        
+        const validationToast = toast.loading('Validating instant booking...', {
           description: 'Checking conversion eligibility',
         });
-
+        
         const validation = await validateInstantBookingForConversion(wizardData.sourceId);
+        toast.dismiss(validationToast);
+        
         if (!validation.valid) {
-          toast.error('Instant Booking Validation Failed', {
+          setIsSaving(false);
+          toast.error('Cannot Convert Instant Booking', {
             description: validation.error,
             duration: 5000,
           });
           return;
         }
+
+        toast.success('Validation Passed', {
+          description: 'Instant booking is eligible for conversion',
+          duration: 2000,
+        });
       }
 
-      // Show loading toast
-      const loadingToast = toast.loading('Creating Agreement', {
-        description: 'Please wait while we process your agreement...',
-      });
-
-      console.log('[EnhancedWizard] Submitting agreement:', wizardData);
-      
       // Get progress summary for logging
       const summary = getProgressSummary();
       console.log('[EnhancedWizard] Progress summary:', summary);
-      
+
+      // Show loading toast
+      const loadingToast = toast.loading('Creating agreement...', {
+        description: wizardData.source === 'instant_booking' 
+          ? 'Converting instant booking to agreement' 
+          : 'Processing your request',
+      });
+
       // Create the agreement
       const result = await createAgreementFromWizard(wizardData);
 
@@ -553,9 +583,14 @@ export const EnhancedAgreementWizard = () => {
       toast.dismiss(loadingToast);
 
       if (!result.success) {
+        setIsSaving(false);
         toast.error('Agreement Creation Failed', {
-          description: result.error || 'An unexpected error occurred',
-          duration: 5000,
+          description: result.error || 'An unexpected error occurred. Please try again.',
+          duration: 6000,
+          action: {
+            label: 'Retry',
+            onClick: () => handleSubmit(),
+          },
         });
         return;
       }
@@ -564,10 +599,15 @@ export const EnhancedAgreementWizard = () => {
       console.log('[EnhancedWizard] Agreement created successfully:', {
         agreementId: result.agreementId,
         agreementNo: result.agreementNo,
+        source: wizardData.source,
       });
 
-      toast.success('Agreement Created Successfully!', {
-        description: `Agreement ${result.agreementNo || result.agreementId} has been created`,
+      const successMessage = wizardData.source === 'instant_booking'
+        ? `Instant booking converted to Agreement ${result.agreementNo || result.agreementId}`
+        : `Agreement ${result.agreementNo || result.agreementId} created successfully`;
+
+      toast.success('Agreement Created!', {
+        description: successMessage,
         duration: 5000,
       });
 
@@ -581,13 +621,18 @@ export const EnhancedAgreementWizard = () => {
         } else {
           navigate('/agreements');
         }
-      }, 1000);
+      }, 1500);
 
     } catch (error) {
+      setIsSaving(false);
       console.error('[EnhancedWizard] Unexpected error during submission:', error);
       toast.error('Unexpected Error', {
         description: error instanceof Error ? error.message : 'Failed to create agreement',
         duration: 5000,
+        action: {
+          label: 'Retry',
+          onClick: () => handleSubmit(),
+        },
       });
     }
   };
@@ -891,9 +936,39 @@ export const EnhancedAgreementWizard = () => {
               />
             )}
 
-            {/* Instant Booking Summary */}
-            {wizardData.source === 'instant_booking' && instantBooking && (
-              <InstantBookingSummary instantBooking={instantBooking} />
+            {/* Instant Booking Loading/Summary */}
+            {wizardData.source === 'instant_booking' && wizardData.sourceId && (
+              loadingInstantBooking ? (
+                <InstantBookingLoadingState />
+              ) : instantBooking ? (
+                <InstantBookingSummary instantBooking={instantBooking} />
+              ) : instantBookingError ? (
+                <Card className="border-red-200 bg-red-50/50">
+                  <CardContent className="pt-6">
+                    <div className="flex items-start gap-3">
+                      <AlertTriangle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <h3 className="font-semibold text-red-900">Failed to Load Instant Booking</h3>
+                        <p className="text-sm text-red-700 mt-1">
+                          Unable to fetch instant booking data. Please try selecting a different booking or proceed with a direct agreement.
+                        </p>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="mt-3"
+                          onClick={() => {
+                            updateWizardData('source', 'direct');
+                            updateWizardData('sourceId', undefined);
+                            setCurrentStep(0);
+                          }}
+                        >
+                          Switch to Direct Agreement
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ) : null
             )}
 
             {/* Validation Banner - DISABLED FOR NOW */}
@@ -956,13 +1031,21 @@ export const EnhancedAgreementWizard = () => {
                     />
                   </div>
 
-                  {progress.currentStep === TOTAL_STEPS - 1 ? (
+                   {progress.currentStep === TOTAL_STEPS - 1 ? (
                     <Button 
                       onClick={handleSubmit} 
                       size="lg"
                       className="min-w-[180px]"
+                      disabled={isSaving}
                     >
-                      Issue Agreement
+                      {isSaving ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Creating...
+                        </>
+                      ) : (
+                        'Issue Agreement'
+                      )}
                     </Button>
                   ) : (
                     <Button
@@ -993,9 +1076,16 @@ export const EnhancedAgreementWizard = () => {
                   {formatCurrency(total)}
                 </p>
               </div>
-              {progress.currentStep === TOTAL_STEPS - 1 ? (
-                <Button onClick={handleSubmit} size="lg">
-                  Issue Agreement
+               {progress.currentStep === TOTAL_STEPS - 1 ? (
+                <Button onClick={handleSubmit} size="lg" disabled={isSaving}>
+                  {isSaving ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Creating...
+                    </>
+                  ) : (
+                    'Issue Agreement'
+                  )}
                 </Button>
               ) : (
                 <Button onClick={handleNext} size="lg">
