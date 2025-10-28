@@ -202,20 +202,27 @@ const NewInstantBooking = () => {
     }
   };
 
-  // Keyboard shortcuts
+  // Keyboard shortcuts - work everywhere, even inside inputs
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Don't trigger if user is typing in an input field
-      if (
-        e.target instanceof HTMLInputElement ||
-        e.target instanceof HTMLTextAreaElement ||
-        e.target instanceof HTMLSelectElement
-      ) {
+      const target = e.target as HTMLElement;
+      const isTextArea = target instanceof HTMLTextAreaElement;
+      const isContentEditable = !!target.isContentEditable;
+
+      // ESC always goes back (except from step 1)
+      if (e.key === 'Escape' && currentStep > 1) {
+        e.preventDefault();
+        handleBack();
         return;
       }
 
-      // Enter key - proceed to next step or complete booking
+      // ENTER advances (except from step 5), but allow Shift+Enter for newlines in textareas
       if (e.key === 'Enter' && currentStep < 5) {
+        // Allow Shift+Enter for newline in textarea/contenteditable
+        if ((isTextArea || isContentEditable) && e.shiftKey) {
+          return;
+        }
+        
         e.preventDefault();
         // On step 4, create the booking instead of just moving to next step
         if (currentStep === 4) {
@@ -224,16 +231,11 @@ const NewInstantBooking = () => {
           handleNext();
         }
       }
-
-      // Escape key - go back
-      if (e.key === 'Escape' && currentStep > 1) {
-        e.preventDefault();
-        handleBack();
-      }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    // Use capture phase to ensure it works even with nested components
+    document.addEventListener('keydown', handleKeyDown, true);
+    return () => document.removeEventListener('keydown', handleKeyDown, true);
   }, [currentStep, bookingData, expressMode]);
 
   // Update wizard context for AI Assistant
