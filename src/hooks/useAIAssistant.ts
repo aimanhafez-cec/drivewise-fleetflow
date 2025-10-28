@@ -42,33 +42,62 @@ export const useAIAssistant = (options?: AIAssistantOptions) => {
             const { name } = JSON.parse(call.function.arguments);
             console.log(`[AIAssistant] Searching for customer: "${name}"`);
             
-            const customer = await findBestCustomerMatch(name);
+            // Get all matches to check for ambiguity
+            const allMatches = await searchCustomerByName(name);
             
-            if (customer) {
-              setCurrentCustomerId(customer.id);
-              return {
-                tool_call_id: call.id,
-                role: 'tool' as const,
-                content: JSON.stringify({
-                  success: true,
-                  customer: {
-                    id: customer.id,
-                    name: customer.full_name,
-                    phone: customer.phone,
-                    email: customer.email,
-                  }
-                })
-              };
-            } else {
+            if (allMatches.length === 0) {
+              console.log(`[AIAssistant] No customer found for: "${name}"`);
               return {
                 tool_call_id: call.id,
                 role: 'tool' as const,
                 content: JSON.stringify({
                   success: false,
-                  error: 'No customer found with that name'
+                  error: 'customer_not_found',
+                  message: `I couldn't find a customer named "${name}". Would you like to create a new customer?`
                 })
               };
             }
+            
+            // Check for ambiguous matches (multiple high-scoring results)
+            const highScoreMatches = allMatches.filter(m => m.match_score >= 70);
+            
+            if (highScoreMatches.length > 1) {
+              console.log(`[AIAssistant] Multiple customers found for: "${name}"`, highScoreMatches.map(m => m.full_name));
+              return {
+                tool_call_id: call.id,
+                role: 'tool' as const,
+                content: JSON.stringify({
+                  success: false,
+                  error: 'ambiguous_customer',
+                  message: `I found ${highScoreMatches.length} customers matching "${name}". Which one do you mean?`,
+                  options: highScoreMatches.map(m => ({
+                    id: m.id,
+                    name: m.full_name,
+                    phone: m.phone,
+                    email: m.email,
+                  }))
+                })
+              };
+            }
+            
+            // Single clear match
+            const customer = highScoreMatches[0] || allMatches[0];
+            setCurrentCustomerId(customer.id);
+            console.log(`[AIAssistant] Found customer: ${customer.full_name} (score: ${customer.match_score})`);
+            
+            return {
+              tool_call_id: call.id,
+              role: 'tool' as const,
+              content: JSON.stringify({
+                success: true,
+                customer: {
+                  id: customer.id,
+                  name: customer.full_name,
+                  phone: customer.phone,
+                  email: customer.email,
+                }
+              })
+            };
           }
           
           if (call.function.name === 'create_quick_booking') {
