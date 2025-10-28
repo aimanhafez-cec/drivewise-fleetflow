@@ -93,11 +93,17 @@ const CustomerIdentification = ({ selectedCustomerId, onCustomerSelect, onBookAg
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold text-foreground mb-2">Customer Identification</h2>
-        <p className="text-muted-foreground">
-          Search for an existing customer or create a new one
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-foreground mb-2">Customer Identification</h2>
+          <p className="text-muted-foreground">
+            Search for an existing customer or create a new one
+          </p>
+        </div>
+        <Button variant="outline" className="gap-2">
+          <User className="h-4 w-4" />
+          New Customer
+        </Button>
       </div>
 
       {/* Search Bar */}
