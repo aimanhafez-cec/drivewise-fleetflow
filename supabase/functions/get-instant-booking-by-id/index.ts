@@ -17,10 +17,22 @@ Deno.serve(async (req) => {
       }
     );
 
-    // Verify user is authenticated
-    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+    // Extract and verify JWT token
+    const authHeader = req.headers.get('Authorization') ?? req.headers.get('authorization') ?? '';
+    const jwt = authHeader.replace('Bearer ', '').trim();
+    
+    if (!jwt) {
+      console.error('[get-instant-booking-by-id] Missing Authorization header');
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized - Missing token' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Verify user is authenticated with explicit JWT
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser(jwt);
     if (authError || !user) {
-      console.error('Authentication error:', authError);
+      console.error('[get-instant-booking-by-id] Authentication error:', authError);
       return new Response(
         JSON.stringify({ error: 'Unauthorized' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -39,12 +51,12 @@ Deno.serve(async (req) => {
 
     console.log(`[get-instant-booking-by-id] User: ${user.id}, Booking ID: ${bookingId}`);
 
-    // Fetch detailed booking data
+    // Fetch detailed booking data with UI-compatible relation syntax
     const { data, error } = await supabaseClient
       .from('reservations')
       .select(`
         *,
-        profiles!customer_id(
+        profiles:customer_id(
           id,
           full_name,
           email,

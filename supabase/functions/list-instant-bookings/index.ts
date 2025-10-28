@@ -23,10 +23,22 @@ Deno.serve(async (req) => {
       }
     );
 
-    // Verify user is authenticated
-    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+    // Extract and verify JWT token
+    const authHeader = req.headers.get('Authorization') ?? req.headers.get('authorization') ?? '';
+    const jwt = authHeader.replace('Bearer ', '').trim();
+    
+    if (!jwt) {
+      console.error('[list-instant-bookings] Missing Authorization header');
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized - Missing token' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Verify user is authenticated with explicit JWT
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser(jwt);
     if (authError || !user) {
-      console.error('Authentication error:', authError);
+      console.error('[list-instant-bookings] Authentication error:', authError);
       return new Response(
         JSON.stringify({ error: 'Unauthorized' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -38,15 +50,15 @@ Deno.serve(async (req) => {
 
     console.log(`[list-instant-bookings] User: ${user.id}, Query: "${q}", Page: ${page}, PageSize: ${pageSize}`);
 
-    // Build base query
+    // Build base query with UI-compatible field names
     let query = supabaseClient
       .from('reservations')
       .select(`
         id,
         ro_number,
         created_at,
-        pickup_datetime,
-        return_datetime,
+        pickup_datetime:start_datetime,
+        return_datetime:end_datetime,
         pickup_location,
         return_location,
         status,
@@ -55,7 +67,7 @@ Deno.serve(async (req) => {
         total_amount,
         customer_id,
         vehicle_id,
-        profiles!customer_id(
+        profiles:customer_id(
           id,
           full_name,
           email,
@@ -64,7 +76,10 @@ Deno.serve(async (req) => {
         vehicles(
           id,
           registration_no,
-          make_model
+          make_model,
+          make,
+          model,
+          year
         )
       `, { count: 'exact' })
       .eq('booking_type', 'INSTANT')
