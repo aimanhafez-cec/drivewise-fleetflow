@@ -70,13 +70,13 @@ Deno.serve(async (req) => {
         vehicles(
           id,
           registration_number,
-          make_model,
+          make,
+          model,
           year,
           color,
           fuel_type,
-          transmission_type,
-          odometer_reading,
-          vehicle_class_id
+          odometer,
+          category_id
         ),
         reservation_addons(
           id,

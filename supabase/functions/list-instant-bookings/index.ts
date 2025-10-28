@@ -76,7 +76,6 @@ Deno.serve(async (req) => {
         vehicles(
           id,
           registration_number,
-          make_model,
           make,
           model,
           year
@@ -88,7 +87,7 @@ Deno.serve(async (req) => {
     // Apply search filter if provided
     if (q && q.trim()) {
       const searchTerm = q.trim();
-      query = query.or(`ro_number.ilike.%${searchTerm}%,profiles.full_name.ilike.%${searchTerm}%,profiles.email.ilike.%${searchTerm}%,profiles.phone.ilike.%${searchTerm}%,vehicles.registration_number.ilike.%${searchTerm}%,vehicles.make_model.ilike.%${searchTerm}%`);
+      query = query.or(`ro_number.ilike.%${searchTerm}%,profiles.full_name.ilike.%${searchTerm}%,profiles.email.ilike.%${searchTerm}%,profiles.phone.ilike.%${searchTerm}%,vehicles.registration_number.ilike.%${searchTerm}%,vehicles.make.ilike.%${searchTerm}%,vehicles.model.ilike.%${searchTerm}%`);
     }
 
     // Apply pagination
