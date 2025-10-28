@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,6 +9,7 @@ import { Calendar, FileText, Users, Search, Car, CheckCircle2, AlertCircle, User
 import type { AgreementSource } from '@/types/agreement-wizard';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface SourceSelectionProps {
   selectedSource?: AgreementSource;
@@ -25,9 +26,10 @@ export const SourceSelection = ({
   const [searchQuery, setSearchQuery] = useState('');
 
   // Fetch available reservations
-  const { data: reservations = [], isLoading: loadingReservations } = useQuery({
+  const { data: reservations = [], isLoading: loadingReservations, error: reservationsError } = useQuery({
     queryKey: ['reservations-for-conversion'],
     queryFn: async () => {
+      console.log('[SourceSelection] Fetching reservations for conversion...');
       const { data, error } = await supabase
         .from('reservations')
         .select(`
@@ -47,15 +49,21 @@ export const SourceSelection = ({
         .order('created_at', { ascending: false })
         .limit(20);
 
-      if (error) throw error;
+      if (error) {
+        console.error('[SourceSelection] Error fetching reservations:', error);
+        throw error;
+      }
+      
+      console.log('[SourceSelection] Reservations fetched:', data?.length || 0, 'reservations');
       return data || [];
     },
   });
 
   // Fetch available instant bookings
-  const { data: instantBookings = [], isLoading: loadingBookings } = useQuery({
+  const { data: instantBookings = [], isLoading: loadingBookings, error: bookingsError } = useQuery({
     queryKey: ['instant-bookings-for-conversion'],
     queryFn: async () => {
+      console.log('[SourceSelection] Fetching instant bookings for conversion...');
       const { data, error } = await supabase
         .from('reservations')
         .select(`
@@ -92,10 +100,36 @@ export const SourceSelection = ({
         .order('created_at', { ascending: false })
         .limit(20);
 
-      if (error) throw error;
+      if (error) {
+        console.error('[SourceSelection] Error fetching instant bookings:', error);
+        throw error;
+      }
+      
+      console.log('[SourceSelection] Instant bookings fetched:', data?.length || 0, 'bookings');
       return data || [];
     },
   });
+
+  // Show error toast if fetching fails
+  useEffect(() => {
+    if (reservationsError) {
+      console.error('[SourceSelection] Reservations query error:', reservationsError);
+      toast.error('Failed to Load Reservations', {
+        description: 'Unable to fetch reservations. Please refresh the page.',
+        duration: 5000,
+      });
+    }
+  }, [reservationsError]);
+
+  useEffect(() => {
+    if (bookingsError) {
+      console.error('[SourceSelection] Instant bookings query error:', bookingsError);
+      toast.error('Failed to Load Instant Bookings', {
+        description: 'Unable to fetch instant bookings. Please refresh the page.',
+        duration: 5000,
+      });
+    }
+  }, [bookingsError]);
 
   const handleSourceChange = (newSource: AgreementSource) => {
     setSource(newSource);
@@ -309,13 +343,21 @@ export const SourceSelection = ({
             ) : filteredInstantBookings.length === 0 ? (
               <div className="border border-amber-200 bg-amber-50 rounded-lg p-4 flex gap-3">
                 <AlertCircle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
-                <div>
+                <div className="flex-1">
                   <p className="font-medium text-amber-900">No Instant Bookings Available</p>
                   <p className="text-sm text-amber-700 mt-1">
                     {searchQuery 
                       ? 'No instant bookings match your search criteria.'
-                      : 'There are no confirmed instant bookings available for conversion.'}
+                      : 'There are no confirmed instant bookings available for conversion. Instant bookings must be confirmed, not already converted, and have booking_type = "INSTANT".'}
                   </p>
+                  <div className="mt-3 text-xs text-amber-600">
+                    <p className="font-medium">Looking for instant bookings with:</p>
+                    <ul className="list-disc list-inside mt-1 space-y-1">
+                      <li>Status: confirmed</li>
+                      <li>Booking Type: INSTANT</li>
+                      <li>Not already converted to agreement</li>
+                    </ul>
+                  </div>
                 </div>
               </div>
             ) : (

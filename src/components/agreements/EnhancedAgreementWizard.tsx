@@ -219,7 +219,12 @@ const INITIAL_WIZARD_DATA: EnhancedWizardData = {
   enhancedBilling: undefined,
 };
 
-export const EnhancedAgreementWizard = () => {
+interface EnhancedAgreementWizardProps {
+  initialSource?: AgreementSource;
+  initialSourceId?: string;
+}
+
+export const EnhancedAgreementWizard = ({ initialSource, initialSourceId }: EnhancedAgreementWizardProps = {}) => {
   const navigate = useNavigate();
   const [validationResult, setValidationResult] = useState<ValidationResult>({ 
     isValid: true, 
@@ -266,9 +271,24 @@ export const EnhancedAgreementWizard = () => {
     unskipStep,
   } = useWizardProgress({
     storageKey: 'enhanced-agreement-wizard',
-    initialData: INITIAL_WIZARD_DATA,
+    initialData: {
+      ...INITIAL_WIZARD_DATA,
+      source: initialSource || INITIAL_WIZARD_DATA.source,
+      sourceId: initialSourceId || INITIAL_WIZARD_DATA.sourceId,
+    },
     totalSteps: TOTAL_STEPS,
   });
+
+  // Initialize from URL parameters if provided
+  useEffect(() => {
+    if (initialSource && initialSource !== wizardData.source) {
+      console.log('[EnhancedWizard] Initializing from URL params:', { initialSource, initialSourceId });
+      updateWizardData('source', initialSource);
+      if (initialSourceId) {
+        updateWizardData('sourceId', initialSourceId);
+      }
+    }
+  }, [initialSource, initialSourceId]);
 
   // Smart defaults for customer history
   const customerId = wizardData.step1?.customerId;
