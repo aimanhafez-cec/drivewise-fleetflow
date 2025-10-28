@@ -3,13 +3,16 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Info } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Info, Link, ShoppingCart } from 'lucide-react';
 import type { EnhancedWizardData } from '@/types/agreement-wizard';
 
 interface AddonsSelectionStepProps {
   data: EnhancedWizardData['step4'];
   onChange: (field: keyof EnhancedWizardData['step4'], value: any) => void;
   errors?: string[];
+  source?: 'reservation' | 'instant_booking' | 'direct';
+  instantBookingAddons?: string[]; // Array of addon IDs from instant booking
 }
 
 // Mock addons data - in production, fetch from API
@@ -84,7 +87,12 @@ export const AddonsSelectionStep: React.FC<AddonsSelectionStepProps> = ({
   data,
   onChange,
   errors = [],
+  source,
+  instantBookingAddons = [],
 }) => {
+  const isFromInstantBooking = source === 'instant_booking';
+  const isFromInstantBookingAddon = (addonId: string) => 
+    isFromInstantBooking && instantBookingAddons.includes(addonId);
   const toggleAddon = (addonId: string) => {
     const addon = AVAILABLE_ADDONS.find((a) => a.id === addonId);
     if (!addon) return;
@@ -122,6 +130,25 @@ export const AddonsSelectionStep: React.FC<AddonsSelectionStepProps> = ({
 
   return (
     <div className="space-y-6">
+      {isFromInstantBooking && instantBookingAddons.length > 0 && (
+        <Alert className="bg-blue-50 border-blue-200">
+          <Link className="h-4 w-4 text-blue-600" />
+          <AlertDescription className="text-blue-800">
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="font-semibold">Pre-selected from Instant Booking</span>
+                <p className="text-sm mt-1">
+                  {instantBookingAddons.length} add-on(s) already selected from your instant booking
+                </p>
+              </div>
+              <Badge variant="secondary" className="ml-4 flex items-center gap-1">
+                <ShoppingCart className="h-3 w-3" />
+                {instantBookingAddons.length} Items
+              </Badge>
+            </div>
+          </AlertDescription>
+        </Alert>
+      )}
       {recommendedAddons.length > 0 && (
         <Card className="border-primary">
           <CardHeader>
@@ -149,6 +176,12 @@ export const AddonsSelectionStep: React.FC<AddonsSelectionStepProps> = ({
                       className="flex items-center gap-2 cursor-pointer"
                     >
                       {addon.name}
+                      {isFromInstantBookingAddon(addon.id) && (
+                        <Badge variant="default" className="text-xs bg-blue-500">
+                          <Link className="h-3 w-3 mr-1" />
+                          From Booking
+                        </Badge>
+                      )}
                       <Badge variant="secondary" className="text-xs">
                         Recommended
                       </Badge>
@@ -182,8 +215,14 @@ export const AddonsSelectionStep: React.FC<AddonsSelectionStepProps> = ({
                     onCheckedChange={() => toggleAddon(addon.id)}
                   />
                   <div className="flex-1">
-                    <Label htmlFor={`addon-${addon.id}`} className="cursor-pointer">
+                    <Label htmlFor={`addon-${addon.id}`} className="cursor-pointer flex items-center gap-2">
                       {addon.name}
+                      {isFromInstantBookingAddon(addon.id) && (
+                        <Badge variant="default" className="text-xs bg-blue-500">
+                          <Link className="h-3 w-3 mr-1" />
+                          From Booking
+                        </Badge>
+                      )}
                     </Label>
                     <p className="text-sm text-muted-foreground mt-1">{addon.description}</p>
                     <p className="text-sm font-medium mt-2">

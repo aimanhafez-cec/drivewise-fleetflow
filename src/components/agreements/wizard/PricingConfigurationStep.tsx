@@ -5,19 +5,32 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { TrendingUp, TrendingDown, Link, DollarSign } from 'lucide-react';
 import type { EnhancedWizardData } from '@/types/agreement-wizard';
 
 interface PricingConfigurationStepProps {
   data: EnhancedWizardData['step3'];
   onChange: (field: keyof EnhancedWizardData['step3'], value: any) => void;
   errors?: string[];
+  source?: 'reservation' | 'instant_booking' | 'direct';
+  originalInstantBookingPrice?: number;
 }
 
 export const PricingConfigurationStep: React.FC<PricingConfigurationStepProps> = ({
   data,
   onChange,
   errors = [],
+  source,
+  originalInstantBookingPrice,
 }) => {
+  const isFromInstantBooking = source === 'instant_booking';
+  const currentTotal = data.pricingBreakdown.total;
+  const priceDifference = originalInstantBookingPrice 
+    ? currentTotal - originalInstantBookingPrice 
+    : 0;
+  const hasPriceChange = isFromInstantBooking && Math.abs(priceDifference) > 0.01;
   // Calculate pricing breakdown
   useEffect(() => {
     const baseRate = data.rateOverride ? data.rateOverride.amount : data.baseRate;
@@ -52,6 +65,36 @@ export const PricingConfigurationStep: React.FC<PricingConfigurationStepProps> =
 
   return (
     <div className="space-y-6">
+      {isFromInstantBooking && (
+        <Alert className="bg-blue-50 border-blue-200">
+          <Link className="h-4 w-4 text-blue-600" />
+          <AlertDescription className="text-blue-800">
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="font-semibold">Instant Booking Pricing</span>
+                <p className="text-sm mt-1">
+                  Original booking amount: <span className="font-medium">AED {originalInstantBookingPrice?.toFixed(2)}</span>
+                </p>
+              </div>
+              {hasPriceChange && (
+                <Badge variant={priceDifference > 0 ? "destructive" : "secondary"} className="ml-4 flex items-center gap-1">
+                  {priceDifference > 0 ? (
+                    <>
+                      <TrendingUp className="h-3 w-3" />
+                      +AED {priceDifference.toFixed(2)}
+                    </>
+                  ) : (
+                    <>
+                      <TrendingDown className="h-3 w-3" />
+                      AED {priceDifference.toFixed(2)}
+                    </>
+                  )}
+                </Badge>
+              )}
+            </div>
+          </AlertDescription>
+        </Alert>
+      )}
       <Card>
         <CardHeader>
           <CardTitle>Base Rate</CardTitle>
@@ -202,9 +245,26 @@ export const PricingConfigurationStep: React.FC<PricingConfigurationStepProps> =
 
       <Card className="border-primary">
         <CardHeader>
-          <CardTitle>Pricing Summary</CardTitle>
+          <CardTitle className="flex items-center justify-between">
+            <span>Pricing Summary</span>
+            {hasPriceChange && (
+              <Badge variant="outline" className="flex items-center gap-1">
+                <DollarSign className="h-3 w-3" />
+                Price Adjusted
+              </Badge>
+            )}
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
+          {isFromInstantBooking && originalInstantBookingPrice && (
+            <>
+              <div className="flex justify-between text-sm text-muted-foreground">
+                <span>Original Instant Booking:</span>
+                <span>AED {originalInstantBookingPrice.toFixed(2)}</span>
+              </div>
+              <Separator />
+            </>
+          )}
           <div className="flex justify-between text-sm">
             <span>Base Rate:</span>
             <span className="font-medium">AED {data.pricingBreakdown.baseRate.toFixed(2)}</span>

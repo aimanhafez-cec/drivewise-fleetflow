@@ -688,6 +688,8 @@ export const EnhancedAgreementWizard = () => {
             data={wizardData.step1}
             onChange={(field, value) => handleStepDataChange('step1', field, value)}
             errors={errorMessages}
+            source={wizardData.source}
+            instantBookingScore={instantBooking?.instant_booking_score}
           />
         );
       case 2:
@@ -710,6 +712,8 @@ export const EnhancedAgreementWizard = () => {
             data={wizardData.step3}
             onChange={(field, value) => handleStepDataChange('step3', field, value)}
             errors={errorMessages}
+            source={wizardData.source}
+            originalInstantBookingPrice={instantBooking?.total_amount}
           />
         );
       case 4:
@@ -718,6 +722,8 @@ export const EnhancedAgreementWizard = () => {
             data={wizardData.step4}
             onChange={(field, value) => handleStepDataChange('step4', field, value)}
             errors={errorMessages}
+            source={wizardData.source}
+            instantBookingAddons={instantBooking?.add_ons?.map((addon: any) => addon.id || addon.addonId) || []}
           />
         );
       case 5:
@@ -727,6 +733,13 @@ export const EnhancedAgreementWizard = () => {
             totalAmount={calculateTotalAmount()}
             onChange={(field, value) => handleStepDataChange('step5', field, value)}
             errors={errorMessages}
+            source={wizardData.source}
+            instantBookingPayment={instantBooking ? {
+              advancePaymentCollected: instantBooking.advance_payment || instantBooking.down_payment_amount || 0,
+              securityDepositHeld: instantBooking.security_deposit_paid || 0,
+              paymentMethod: instantBooking.down_payment_method || 'card',
+              transactionRef: instantBooking.down_payment_transaction_id,
+            } : undefined}
           />
         );
       case 6:
