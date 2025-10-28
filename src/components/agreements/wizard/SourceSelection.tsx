@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Calendar, FileText, Users, Search } from 'lucide-react';
+import { Calendar, FileText, Users, Search, Car, CheckCircle2, AlertCircle, User } from 'lucide-react';
 import type { AgreementSource } from '@/types/agreement-wizard';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -43,6 +43,7 @@ export const SourceSelection = ({
           )
         `)
         .eq('status', 'confirmed')
+        .eq('booking_type', 'STANDARD')
         .order('created_at', { ascending: false })
         .limit(20);
 
@@ -51,14 +52,50 @@ export const SourceSelection = ({
     },
   });
 
-  // Fetch available instant bookings (if you have this table)
-  // const { data: instantBookings = [], isLoading: loadingBookings } = useQuery({
-  //   queryKey: ['instant-bookings-for-conversion'],
-  //   queryFn: async () => {
-  //     // Fetch instant bookings logic
-  //     return [];
-  //   },
-  // });
+  // Fetch available instant bookings
+  const { data: instantBookings = [], isLoading: loadingBookings } = useQuery({
+    queryKey: ['instant-bookings-for-conversion'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('reservations')
+        .select(`
+          id,
+          ro_number,
+          booking_type,
+          instant_booking_score,
+          auto_approved,
+          start_datetime,
+          end_datetime,
+          pickup_location,
+          return_location,
+          total_amount,
+          status,
+          vehicle_id,
+          vehicle_class_id,
+          make_model,
+          profiles:customer_id (
+            full_name,
+            email,
+            phone
+          ),
+          vehicles:vehicle_id (
+            registration_no,
+            make,
+            model,
+            year,
+            color
+          )
+        `)
+        .eq('booking_type', 'INSTANT')
+        .eq('status', 'confirmed')
+        .is('converted_agreement_id', null)
+        .order('created_at', { ascending: false })
+        .limit(20);
+
+      if (error) throw error;
+      return data || [];
+    },
+  });
 
   const handleSourceChange = (newSource: AgreementSource) => {
     setSource(newSource);
@@ -77,6 +114,17 @@ export const SourceSelection = ({
       res.ro_number?.toLowerCase().includes(searchLower) ||
       res.profiles?.full_name?.toLowerCase().includes(searchLower) ||
       res.profiles?.email?.toLowerCase().includes(searchLower)
+    );
+  });
+
+  const filteredInstantBookings = instantBookings.filter((booking: any) => {
+    const searchLower = searchQuery.toLowerCase();
+    const vehicleInfo = `${booking.make_model || ''} ${booking.vehicles?.registration_no || ''}`.toLowerCase();
+    return (
+      booking.ro_number?.toLowerCase().includes(searchLower) ||
+      booking.profiles?.full_name?.toLowerCase().includes(searchLower) ||
+      booking.profiles?.email?.toLowerCase().includes(searchLower) ||
+      vehicleInfo.includes(searchLower)
     );
   });
 
@@ -139,6 +187,11 @@ export const SourceSelection = ({
                   <p className="text-xs text-muted-foreground">
                     Convert a paid instant booking
                   </p>
+                  {instantBookings.length > 0 && (
+                    <Badge variant="secondary" className="mt-2">
+                      {instantBookings.length} available
+                    </Badge>
+                  )}
                 </div>
               </div>
             </div>
@@ -221,6 +274,120 @@ export const SourceSelection = ({
                         <p className="font-semibold">AED {Number(reservation.total_amount).toFixed(2)}</p>
                       </div>
                     </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Instant Booking Selection */}
+        {source === 'instant_booking' && (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search by RO#, customer name, or vehicle..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </div>
+
+            {loadingBookings ? (
+              <div className="text-center py-8 text-muted-foreground">
+                Loading instant bookings...
+              </div>
+            ) : filteredInstantBookings.length === 0 ? (
+              <div className="border border-amber-200 bg-amber-50 rounded-lg p-4 flex gap-3">
+                <AlertCircle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium text-amber-900">No Instant Bookings Available</p>
+                  <p className="text-sm text-amber-700 mt-1">
+                    {searchQuery 
+                      ? 'No instant bookings match your search criteria.'
+                      : 'There are no confirmed instant bookings available for conversion.'}
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-2 max-h-96 overflow-y-auto">
+                {filteredInstantBookings.map((booking: any) => (
+                  <div
+                    key={booking.id}
+                    className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
+                      selectedSourceId === booking.id
+                        ? 'border-primary bg-primary/5'
+                        : 'border-input hover:border-primary/50'
+                    }`}
+                    onClick={() => handleReservationSelect(booking.id)}
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 space-y-2">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-semibold text-base">
+                            {booking.ro_number || 'N/A'}
+                          </span>
+                          <Badge className="bg-blue-500 hover:bg-blue-600">
+                            Instant Booking
+                          </Badge>
+                          {booking.auto_approved && (
+                            <Badge className="bg-green-500 hover:bg-green-600">
+                              Auto-Approved
+                            </Badge>
+                          )}
+                          {booking.instant_booking_score && (
+                            <Badge variant="outline">
+                              Score: {booking.instant_booking_score}
+                            </Badge>
+                          )}
+                        </div>
+                        
+                        <div className="space-y-1.5 text-sm">
+                          <div className="flex items-center gap-2 text-muted-foreground">
+                            <User className="h-4 w-4 flex-shrink-0" />
+                            <span className="font-medium text-foreground">
+                              {booking.profiles?.full_name || 'Unknown Customer'}
+                            </span>
+                          </div>
+                          
+                          {booking.vehicles && (
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                              <Car className="h-4 w-4 flex-shrink-0" />
+                              <span>
+                                {booking.vehicles.make} {booking.vehicles.model} {booking.vehicles.year}
+                                {booking.vehicles.registration_no && ` • ${booking.vehicles.registration_no}`}
+                              </span>
+                            </div>
+                          )}
+                          
+                          <div className="flex items-center gap-2 text-muted-foreground">
+                            <Calendar className="h-4 w-4 flex-shrink-0" />
+                            <span>
+                              {new Date(booking.start_datetime).toLocaleDateString()} - {new Date(booking.end_datetime).toLocaleDateString()}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="text-right flex flex-col items-end gap-2">
+                        <div className="text-lg font-bold">
+                          AED {Number(booking.total_amount || 0).toFixed(2)}
+                        </div>
+                        <Badge variant="outline">
+                          {booking.status}
+                        </Badge>
+                      </div>
+                    </div>
+                    
+                    {selectedSourceId === booking.id && (
+                      <div className="mt-3 pt-3 border-t flex items-center gap-2 text-sm text-primary">
+                        <CheckCircle2 className="h-4 w-4" />
+                        <span className="font-medium">Selected for conversion</span>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
