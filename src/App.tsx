@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import { LocaleProvider } from "@/contexts/LocaleContext";
+import { WizardProvider } from "@/contexts/WizardContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import AppLayout from "@/components/layout/AppLayout";
 import PWAInstallPrompt from "@/components/ui/pwa-install-prompt";
@@ -125,11 +126,12 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <LocaleProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <PWAInstallPrompt />
-            <BrowserRouter>
+          <WizardProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <PWAInstallPrompt />
+              <BrowserRouter>
             <Routes>
               <Route path="/" element={<RootRedirect />} />
               <Route path="/auth" element={<Auth />} />
@@ -410,9 +412,10 @@ const App = () => {
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
-        </TooltipProvider>
-      </LocaleProvider>
-    </AuthProvider>
+            </TooltipProvider>
+          </WizardProvider>
+        </LocaleProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 };

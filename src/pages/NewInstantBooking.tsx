@@ -15,6 +15,7 @@ import AddOnsWithPricing from '@/components/instant-booking/wizard/AddOnsWithPri
 import WizardBookingConfirmation from '@/components/instant-booking/wizard/WizardBookingConfirmation';
 import { useInstantBooking } from '@/hooks/useInstantBooking';
 import { useLastBooking } from '@/hooks/useLastBooking';
+import { useWizardContext } from '@/contexts/WizardContext';
 
 export interface BookingWizardData {
   // Step 1: Reservation Type
@@ -73,6 +74,7 @@ const NewInstantBooking = () => {
   const [isRepeatBooking, setIsRepeatBooking] = useState(false);
   const { createInstantBooking } = useInstantBooking();
   const [isCreatingBooking, setIsCreatingBooking] = useState(false);
+  const { setWizardState } = useWizardContext();
   const [bookingData, setBookingData] = useState<BookingWizardData>({
     reservationType: null,
     customerId: '',
@@ -233,6 +235,26 @@ const NewInstantBooking = () => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [currentStep, bookingData, expressMode]);
+
+  // Update wizard context for AI Assistant
+  useEffect(() => {
+    setWizardState({
+      currentStep,
+      expressMode,
+      isRepeatBooking,
+    });
+  }, [currentStep, expressMode, isRepeatBooking, setWizardState]);
+
+  // Clean up wizard context when leaving the page
+  useEffect(() => {
+    return () => {
+      setWizardState({
+        currentStep: null,
+        expressMode: false,
+        isRepeatBooking: false,
+      });
+    };
+  }, [setWizardState]);
 
   // Handle express mode toggle
   const handleExpressModeToggle = (checked: boolean) => {

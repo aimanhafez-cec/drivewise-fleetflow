@@ -16,9 +16,18 @@ import {
 interface AIChatDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  wizardStep?: number;
+  expressMode?: boolean;
+  isRepeatBooking?: boolean;
 }
 
-export const AIChatDialog: React.FC<AIChatDialogProps> = ({ open, onOpenChange }) => {
+export const AIChatDialog: React.FC<AIChatDialogProps> = ({ 
+  open, 
+  onOpenChange,
+  wizardStep,
+  expressMode,
+  isRepeatBooking
+}) => {
   const { messages, isLoading, sendMessage, clearChat } = useAIAssistant();
   const [input, setInput] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -159,6 +168,72 @@ export const AIChatDialog: React.FC<AIChatDialogProps> = ({ open, onOpenChange }
     }
 
     if (path.startsWith('/instant-booking/new')) {
+      // Step-specific suggestions
+      if (wizardStep === 1) {
+        return [
+          'How do I create a new customer?',
+          'What is the Book Again feature?',
+          'Should I choose vehicle class or specific vehicle?',
+          'How do I search by Emirates ID or passport?',
+        ];
+      }
+      
+      if (wizardStep === 2) {
+        return [
+          'How do I handle one-way rentals?',
+          'What are the pickup location options?',
+          'How far in advance can I book?',
+          'Can I set custom pickup/return times?',
+        ];
+      }
+      
+      if (wizardStep === 3) {
+        return [
+          'What does "Most Flexible" mean for vehicle class?',
+          'How do I search for a specific vehicle?',
+          'What if no vehicles are available?',
+          'Can I see vehicle specifications?',
+        ];
+      }
+      
+      if (wizardStep === 4) {
+        return [
+          'How is pricing calculated?',
+          'What add-ons are available?',
+          'How do I apply discounts?',
+          'What is the down payment requirement?',
+        ];
+      }
+      
+      if (wizardStep === 5) {
+        return [
+          'How do I view the agreement details?',
+          'Can I print the agreement?',
+          'How do I process the payment?',
+          'What happens after booking confirmation?',
+        ];
+      }
+      
+      // Express mode or repeat booking specific suggestions
+      if (expressMode) {
+        return [
+          'What steps does Express Mode skip?',
+          'Can I still add services in Express Mode?',
+          'When should I use Express Mode?',
+          'How do I disable Express Mode?',
+        ];
+      }
+      
+      if (isRepeatBooking) {
+        return [
+          'What data is pre-filled from the last booking?',
+          'Can I modify the pre-filled information?',
+          'What are the benefits of repeat booking?',
+          'How do I start a fresh booking instead?',
+        ];
+      }
+      
+      // Default instant booking suggestions
       return [
         'How do I search for a customer?',
         'What is Express Mode and when should I use it?',
@@ -199,7 +274,9 @@ export const AIChatDialog: React.FC<AIChatDialogProps> = ({ open, onOpenChange }
               </DialogTitle>
               <DialogDescription className="text-white/80 text-xs">
                 {location.pathname !== '/' 
-                  ? `📍 Context: ${location.pathname.split('/')[1]?.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) || 'Home'}`
+                  ? `📍 Context: ${location.pathname.split('/')[1]?.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) || 'Home'}${
+                      wizardStep ? ` • Step ${wizardStep}/5` : ''
+                    }${expressMode ? ' • ⚡ Express Mode' : ''}${isRepeatBooking ? ' • 🔄 Repeat Booking' : ''}`
                   : 'Your AI guide for the car rental management system'
                 }
               </DialogDescription>

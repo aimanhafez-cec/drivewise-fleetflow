@@ -2,9 +2,26 @@ import React, { useState } from 'react';
 import { Bot } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AIChatDialog } from './AIChatDialog';
+import { useWizardContextSafe } from '@/contexts/WizardContext';
 
-export const AIAssistantButton: React.FC = () => {
+interface AIAssistantButtonProps {
+  wizardStep?: number;
+  expressMode?: boolean;
+  isRepeatBooking?: boolean;
+}
+
+export const AIAssistantButton: React.FC<AIAssistantButtonProps> = ({ 
+  wizardStep, 
+  expressMode, 
+  isRepeatBooking 
+}) => {
   const [isOpen, setIsOpen] = useState(false);
+  const wizardContext = useWizardContextSafe();
+
+  // Use props if provided, otherwise fall back to context
+  const effectiveStep = wizardStep ?? wizardContext?.currentStep ?? undefined;
+  const effectiveExpressMode = expressMode ?? wizardContext?.expressMode ?? false;
+  const effectiveRepeatBooking = isRepeatBooking ?? wizardContext?.isRepeatBooking ?? false;
 
   return (
     <>
@@ -19,7 +36,13 @@ export const AIAssistantButton: React.FC = () => {
         </span>
       </Button>
 
-      <AIChatDialog open={isOpen} onOpenChange={setIsOpen} />
+      <AIChatDialog 
+        open={isOpen} 
+        onOpenChange={setIsOpen}
+        wizardStep={effectiveStep}
+        expressMode={effectiveExpressMode}
+        isRepeatBooking={effectiveRepeatBooking}
+      />
     </>
   );
 };
