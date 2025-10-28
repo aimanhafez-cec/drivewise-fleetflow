@@ -162,14 +162,9 @@ export const AgreementListTable: React.FC<AgreementListTableProps> = ({ agreemen
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div>
-                        <p className="font-medium">
-                          {agreement.profiles?.full_name || 'Unknown'}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {agreement.profiles?.email}
-                        </p>
-                      </div>
+                      <p className="font-medium">
+                        {agreement.profiles?.full_name || 'Unknown'}
+                      </p>
                     </TableCell>
                     <TableCell>
                       {agreement.vehicles ? (
