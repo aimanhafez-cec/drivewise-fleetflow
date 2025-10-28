@@ -59,9 +59,9 @@ ${currentRoute ? `The user is currently on: ${currentRoute}
 
 ${getRouteContext(currentRoute)}` : "No specific page context available."}
 
-## Natural Language Booking Commands (Instant Booking Page)
+## Natural Language Booking Commands
 
-When the user is on the instant booking page (/instant-booking), you can help them create bookings using natural language:
+When the user is on the instant booking page (/instant-booking) or new reservation wizard (/reservations/new), you can help them create bookings using natural language:
 
 **Supported Commands:**
 - "weekend [customer name]" - Create a weekend booking (Fri-Sun) for the customer
