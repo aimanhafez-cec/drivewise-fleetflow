@@ -19,6 +19,15 @@ interface AIChatDialogProps {
   wizardStep?: number;
   expressMode?: boolean;
   isRepeatBooking?: boolean;
+  bookingContext?: {
+    customerName?: string;
+    reservationType?: 'vehicle_class' | 'specific_vehicle';
+    vehicleName?: string;
+    pickupDate?: string;
+    returnDate?: string;
+    hasVehicle?: boolean;
+    hasDates?: boolean;
+  };
 }
 
 export const AIChatDialog: React.FC<AIChatDialogProps> = ({ 
@@ -26,7 +35,8 @@ export const AIChatDialog: React.FC<AIChatDialogProps> = ({
   onOpenChange,
   wizardStep,
   expressMode,
-  isRepeatBooking
+  isRepeatBooking,
+  bookingContext
 }) => {
   const { messages, isLoading, sendMessage, clearChat } = useAIAssistant();
   const [input, setInput] = useState('');
@@ -168,53 +178,77 @@ export const AIChatDialog: React.FC<AIChatDialogProps> = ({
     }
 
     if (path.startsWith('/instant-booking/new')) {
-      // Step-specific suggestions
+      // Dynamic context-based suggestions
+      const suggestions: string[] = [];
+      
+      // Step-specific suggestions with context awareness
       if (wizardStep === 1) {
-        return [
-          'How do I create a new customer?',
-          'What is the Book Again feature?',
-          'Should I choose vehicle class or specific vehicle?',
-          'How do I search by Emirates ID or passport?',
-        ];
+        if (bookingContext?.customerName) {
+          suggestions.push(`I've selected ${bookingContext.customerName}, what's next?`);
+        } else {
+          suggestions.push('How do I create a new customer?');
+        }
+        suggestions.push('What is the Book Again feature?');
+        suggestions.push('Should I choose vehicle class or specific vehicle?');
+        suggestions.push('How do I search by Emirates ID or passport?');
+        return suggestions;
       }
       
       if (wizardStep === 2) {
-        return [
-          'How do I handle one-way rentals?',
-          'What are the pickup location options?',
-          'How far in advance can I book?',
-          'Can I set custom pickup/return times?',
-        ];
+        if (bookingContext?.hasDates) {
+          suggestions.push('My dates are set, what vehicle options do I have?');
+        }
+        suggestions.push('How do I handle one-way rentals?');
+        suggestions.push('What are the pickup location options?');
+        if (!bookingContext?.hasDates) {
+          suggestions.push('How far in advance can I book?');
+        }
+        suggestions.push('Can I set custom pickup/return times?');
+        return suggestions;
       }
       
       if (wizardStep === 3) {
-        return [
-          'What does "Most Flexible" mean for vehicle class?',
-          'How do I search for a specific vehicle?',
-          'What if no vehicles are available?',
-          'Can I see vehicle specifications?',
-        ];
+        if (bookingContext?.reservationType === 'vehicle_class') {
+          suggestions.push('What does "Most Flexible" mean for vehicle class?');
+          suggestions.push('Can I switch to selecting a specific vehicle?');
+        } else if (bookingContext?.reservationType === 'specific_vehicle') {
+          suggestions.push('How do I search for a specific vehicle?');
+          suggestions.push('Can I see vehicle specifications?');
+        }
+        
+        if (bookingContext?.hasVehicle && bookingContext?.vehicleName) {
+          suggestions.push(`I've selected ${bookingContext.vehicleName}, what are the next steps?`);
+        } else {
+          suggestions.push('What if no vehicles are available?');
+        }
+        
+        suggestions.push('How do I check vehicle availability for my dates?');
+        return suggestions;
       }
       
       if (wizardStep === 4) {
-        return [
-          'How is pricing calculated?',
-          'What add-ons are available?',
-          'How do I apply discounts?',
-          'What is the down payment requirement?',
-        ];
+        if (bookingContext?.vehicleName) {
+          suggestions.push(`What's included in the price for ${bookingContext.vehicleName}?`);
+        }
+        suggestions.push('How is pricing calculated?');
+        suggestions.push('What add-ons are available?');
+        suggestions.push('How do I apply discounts?');
+        suggestions.push('What is the down payment requirement?');
+        return suggestions;
       }
       
       if (wizardStep === 5) {
-        return [
-          'How do I view the agreement details?',
-          'Can I print the agreement?',
-          'How do I process the payment?',
-          'What happens after booking confirmation?',
-        ];
+        if (bookingContext?.customerName) {
+          suggestions.push(`How do I send the agreement to ${bookingContext.customerName}?`);
+        }
+        suggestions.push('How do I view the agreement details?');
+        suggestions.push('Can I print the agreement?');
+        suggestions.push('How do I process the payment?');
+        suggestions.push('What happens after booking confirmation?');
+        return suggestions;
       }
       
-      // Express mode or repeat booking specific suggestions
+      // Express mode specific suggestions
       if (expressMode) {
         return [
           'What steps does Express Mode skip?',
@@ -224,6 +258,7 @@ export const AIChatDialog: React.FC<AIChatDialogProps> = ({
         ];
       }
       
+      // Repeat booking specific suggestions
       if (isRepeatBooking) {
         return [
           'What data is pre-filled from the last booking?',
@@ -233,7 +268,16 @@ export const AIChatDialog: React.FC<AIChatDialogProps> = ({
         ];
       }
       
-      // Default instant booking suggestions
+      // Default instant booking suggestions with some context
+      if (bookingContext?.customerName) {
+        return [
+          `Continue booking for ${bookingContext.customerName}`,
+          'What is Express Mode and when should I use it?',
+          'How do I use the Book Again feature?',
+          'What\'s the difference between vehicle class and specific vehicle reservation?',
+        ];
+      }
+      
       return [
         'How do I search for a customer?',
         'What is Express Mode and when should I use it?',
@@ -274,9 +318,11 @@ export const AIChatDialog: React.FC<AIChatDialogProps> = ({
               </DialogTitle>
               <DialogDescription className="text-white/80 text-xs">
                 {location.pathname !== '/' 
-                  ? `📍 Context: ${location.pathname.split('/')[1]?.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) || 'Home'}${
+                  ? `📍 ${location.pathname.split('/')[1]?.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) || 'Home'}${
                       wizardStep ? ` • Step ${wizardStep}/5` : ''
-                    }${expressMode ? ' • ⚡ Express Mode' : ''}${isRepeatBooking ? ' • 🔄 Repeat Booking' : ''}`
+                    }${bookingContext?.customerName ? ` • ${bookingContext.customerName}` : ''}${
+                      bookingContext?.vehicleName ? ` • ${bookingContext.vehicleName}` : ''
+                    }${expressMode ? ' • ⚡' : ''}${isRepeatBooking ? ' • 🔄' : ''}`
                   : 'Your AI guide for the car rental management system'
                 }
               </DialogDescription>

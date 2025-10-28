@@ -242,8 +242,17 @@ const NewInstantBooking = () => {
       currentStep,
       expressMode,
       isRepeatBooking,
+      bookingContext: {
+        customerName: bookingData.customerName || undefined,
+        reservationType: bookingData.reservationType || undefined,
+        vehicleName: bookingData.makeModel || bookingData.vehicleClassName || undefined,
+        pickupDate: bookingData.pickupDate || undefined,
+        returnDate: bookingData.returnDate || undefined,
+        hasVehicle: !!(bookingData.specificVehicleId || bookingData.vehicleClassId),
+        hasDates: !!(bookingData.pickupDate && bookingData.returnDate),
+      },
     });
-  }, [currentStep, expressMode, isRepeatBooking, setWizardState]);
+  }, [currentStep, expressMode, isRepeatBooking, bookingData, setWizardState]);
 
   // Clean up wizard context when leaving the page
   useEffect(() => {

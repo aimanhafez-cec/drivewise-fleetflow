@@ -4,6 +4,15 @@ interface WizardContextType {
   currentStep: number | null;
   expressMode: boolean;
   isRepeatBooking: boolean;
+  bookingContext?: {
+    customerName?: string;
+    reservationType?: 'vehicle_class' | 'specific_vehicle';
+    vehicleName?: string;
+    pickupDate?: string;
+    returnDate?: string;
+    hasVehicle?: boolean;
+    hasDates?: boolean;
+  };
   setWizardState: (state: Partial<Omit<WizardContextType, 'setWizardState'>>) => void;
 }
 
@@ -13,15 +22,17 @@ export const WizardProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   const [currentStep, setCurrentStep] = useState<number | null>(null);
   const [expressMode, setExpressMode] = useState(false);
   const [isRepeatBooking, setIsRepeatBooking] = useState(false);
+  const [bookingContext, setBookingContext] = useState<WizardContextType['bookingContext']>(undefined);
 
   const setWizardState = (state: Partial<Omit<WizardContextType, 'setWizardState'>>) => {
     if (state.currentStep !== undefined) setCurrentStep(state.currentStep);
     if (state.expressMode !== undefined) setExpressMode(state.expressMode);
     if (state.isRepeatBooking !== undefined) setIsRepeatBooking(state.isRepeatBooking);
+    if (state.bookingContext !== undefined) setBookingContext(state.bookingContext);
   };
 
   return (
-    <WizardContext.Provider value={{ currentStep, expressMode, isRepeatBooking, setWizardState }}>
+    <WizardContext.Provider value={{ currentStep, expressMode, isRepeatBooking, bookingContext, setWizardState }}>
       {children}
     </WizardContext.Provider>
   );

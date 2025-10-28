@@ -8,12 +8,22 @@ interface AIAssistantButtonProps {
   wizardStep?: number;
   expressMode?: boolean;
   isRepeatBooking?: boolean;
+  bookingContext?: {
+    customerName?: string;
+    reservationType?: 'vehicle_class' | 'specific_vehicle';
+    vehicleName?: string;
+    pickupDate?: string;
+    returnDate?: string;
+    hasVehicle?: boolean;
+    hasDates?: boolean;
+  };
 }
 
 export const AIAssistantButton: React.FC<AIAssistantButtonProps> = ({ 
   wizardStep, 
   expressMode, 
-  isRepeatBooking 
+  isRepeatBooking,
+  bookingContext
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const wizardContext = useWizardContextSafe();
@@ -22,6 +32,7 @@ export const AIAssistantButton: React.FC<AIAssistantButtonProps> = ({
   const effectiveStep = wizardStep ?? wizardContext?.currentStep ?? undefined;
   const effectiveExpressMode = expressMode ?? wizardContext?.expressMode ?? false;
   const effectiveRepeatBooking = isRepeatBooking ?? wizardContext?.isRepeatBooking ?? false;
+  const effectiveBookingContext = bookingContext ?? wizardContext?.bookingContext;
 
   return (
     <>
@@ -42,6 +53,7 @@ export const AIAssistantButton: React.FC<AIAssistantButtonProps> = ({
         wizardStep={effectiveStep}
         expressMode={effectiveExpressMode}
         isRepeatBooking={effectiveRepeatBooking}
+        bookingContext={effectiveBookingContext}
       />
     </>
   );
