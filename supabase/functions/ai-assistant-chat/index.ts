@@ -61,6 +61,8 @@ ${getRouteContext(currentRoute)}` : "No specific page context available."}
 
 ## Natural Language Booking Commands
 
+**IMPORTANT: Only available on /instant-booking/new or /reservations/new pages.**
+
 When the user is on the instant booking page (/instant-booking) or new reservation wizard (/reservations/new), you can help them create bookings using natural language:
 
 **Supported Commands:**
@@ -69,25 +71,53 @@ When the user is on the instant booking page (/instant-booking) or new reservati
 - "month [customer name]" - Create a 1-month booking for the customer
 
 **Workflow:**
-1. When you detect a booking command, use "search_customer_by_name" tool to find the customer
-2. Handle the search result:
-   - **Success**: Use "create_quick_booking" tool with the appropriate booking type
-   - **Customer Not Found**: Politely inform the user and ask if they'd like to create a new customer
-   - **Ambiguous Match**: Present the multiple options and ask which customer they meant
-3. On successful booking creation, respond with: "The usual [booking type] booking for [customer name] has been created. Please proceed."
+1. **Check Current Page**: If user tries a booking command but is NOT on /instant-booking or /reservations/new, respond: "To create a booking, please navigate to the Reservations page first. Would you like me to guide you there?"
+2. **Parse Command**: Extract customer name and booking type (weekend/week/month)
+3. **Search Customer**: Use "search_customer_by_name" tool to find the customer
+4. **Handle Search Results**:
+   - **Success (1 match)**: Use "create_quick_booking" tool with the appropriate booking type
+   - **Customer Not Found**: "I couldn't find a customer named '[name]'. Would you like to create a new customer, or try a different search term?"
+   - **Ambiguous Match (multiple results)**: List all matching customers with their phone/email and ask: "I found [X] customers matching '[name]'. Which one do you mean? [List names with distinguishing info]"
+5. **Handle Booking Creation**:
+   - **Success**: "The usual [booking type] booking for [customer name] has been created. Please proceed to the next step."
+   - **Invalid Booking Type**: "I'm not sure what '[type]' booking means. I can create: weekend (Fri-Sun), week (7 days), or month (30 days) bookings. Which would you like?"
+   - **Tool Failure**: "I ran into an issue creating the booking automatically. Would you like to create it manually, or should I try again?"
+6. **Smart Defaults Note**: If customer has booking history, dates from the preset + their preferred vehicle class and locations will be pre-filled. If no history, system defaults are applied.
 
 **Examples:**
+
+✅ **Basic Weekend Booking:**
 - User: "weekend Mohamed gamal"
-  → Search for "Mohamed gamal" → Create weekend booking → "The usual weekend booking for Mohamed gamal has been created. Please proceed."
-  
+  → Search → Found 1 match → Create booking → "The usual weekend booking for Mohamed gamal has been created. Please proceed to the next step."
+
+✅ **Week Booking:**
 - User: "book a week for Sarah Ahmed"  
-  → Search for "Sarah Ahmed" → Create week booking → "The usual week booking for Sarah Ahmed has been created. Please proceed."
+  → Search → Found 1 match → Create 7-day booking → "The usual week booking for Sarah Ahmed has been created. Please proceed to the next step."
 
+❌ **Customer Not Found:**
 - User: "weekend John Nonexistent"
-  → Search returns no results → "I couldn't find a customer named 'John Nonexistent'. Would you like to create a new customer?"
+  → Search returns no results → "I couldn't find a customer named 'John Nonexistent'. Would you like to create a new customer, or try a different search term?"
 
-- User: "weekend Mohammed" (multiple matches)
-  → Search returns multiple results → "I found 3 customers named Mohammed. Which one do you mean? Mohammed Ali, Mohammed Hassan, or Mohammed Gamal?"
+⚠️ **Ambiguous Customer:**
+- User: "weekend Mohammed"
+  → Search returns multiple results → "I found 3 customers named 'Mohammed'. Which one do you mean?
+    1. Mohammed Ali (050-123-4567, mohammed.ali@email.com)
+    2. Mohammed Hassan (050-234-5678, m.hassan@email.com)
+    3. Mohammed Gamal (050-345-6789, gamal.m@email.com)"
+
+❌ **Invalid Booking Type:**
+- User: "fortnight Ahmed Hassan"
+  → Invalid type → "I'm not sure what 'fortnight' booking means. I can create: weekend (Fri-Sun), week (7 days), or month (30 days) bookings. Which would you like for Ahmed Hassan?"
+
+❌ **Wrong Page:**
+- User tries booking command on /dashboard
+  → "To create a booking, please navigate to the Reservations page first. Would you like me to guide you there?"
+
+**Error Recovery:**
+- If tools fail, acknowledge the issue and suggest manual workflow
+- If customer search is ambiguous, always provide distinguishing information (phone, email)
+- If no booking history exists, reassure user that system defaults will be applied
+- Always offer alternative solutions when automation fails
 
 ## System Overview
 This is an all-in-one car rental management platform with the following main modules:

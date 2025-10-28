@@ -104,53 +104,99 @@ export const useAIAssistant = (options?: AIAssistantOptions) => {
             const params = JSON.parse(call.function.arguments);
             console.log('[AIAssistant] Creating quick booking:', params);
             
-            // Convert smartDefaults to compatible format
-            const convertedDefaults: SmartDefaults | undefined = smartDefaults ? {
-              reservationType: smartDefaults.reservationType === 'vehicle_class' ? 'vehicle_class' : 
-                               smartDefaults.reservationType === 'make_model' ? 'make_model' : 
-                               'specific_vin',
-              vehicleClassId: smartDefaults.vehicleClassId,
-              pickupLocationId: smartDefaults.pickupLocation,
-              returnLocationId: smartDefaults.returnLocation,
-              insurancePackageId: smartDefaults.insurancePackage,
-              // Convert selectedAddOns from string[] to { id, name }[]
-              selectedAddOns: smartDefaults.selectedAddOns?.map(id => ({ id, name: id })),
-              // Convert addOnCharges from Record to Array
-              addOnCharges: Object.entries(smartDefaults.addOnCharges || {}).map(([addon_id, charge_amount]) => ({
-                addon_id,
-                charge_amount,
-              })),
-            } : undefined;
+            // Validate booking type
+            const validBookingTypes = ['weekend', 'week', 'month', 'custom'];
+            if (!validBookingTypes.includes(params.bookingType)) {
+              console.log(`[AIAssistant] Invalid booking type: ${params.bookingType}`);
+              return {
+                tool_call_id: call.id,
+                role: 'tool' as const,
+                content: JSON.stringify({
+                  success: false,
+                  error: 'invalid_booking_type',
+                  message: `"${params.bookingType}" is not a valid booking type. Valid options are: weekend, week, or month.`,
+                  validOptions: ['weekend', 'week', 'month']
+                })
+              };
+            }
             
-            // Apply booking preset with smart defaults
-            const bookingData = applyBookingPreset(
-              params.bookingType,
-              convertedDefaults
-            );
-            
-            // Merge with customer info
-            const fullBookingData: PartialBookingData = {
-              customerId: params.customerId,
-              customerName: params.customerName,
-              ...bookingData,
-            };
-            
-            // Trigger callback to update wizard
-            options?.onBookingUpdate?.(fullBookingData);
-            
-            return {
-              tool_call_id: call.id,
-              role: 'tool' as const,
-              content: JSON.stringify({
-                success: true,
-                bookingType: params.bookingType,
+            try {
+              // Convert smartDefaults to compatible format
+              const convertedDefaults: SmartDefaults | undefined = smartDefaults ? {
+                reservationType: smartDefaults.reservationType === 'vehicle_class' ? 'vehicle_class' : 
+                                 smartDefaults.reservationType === 'make_model' ? 'make_model' : 
+                                 'specific_vin',
+                vehicleClassId: smartDefaults.vehicleClassId,
+                pickupLocationId: smartDefaults.pickupLocation,
+                returnLocationId: smartDefaults.returnLocation,
+                insurancePackageId: smartDefaults.insurancePackage,
+                // Convert selectedAddOns from string[] to { id, name }[]
+                selectedAddOns: smartDefaults.selectedAddOns?.map(id => ({ id, name: id })),
+                // Convert addOnCharges from Record to Array
+                addOnCharges: Object.entries(smartDefaults.addOnCharges || {}).map(([addon_id, charge_amount]) => ({
+                  addon_id,
+                  charge_amount,
+                })),
+              } : undefined;
+              
+              // Apply booking preset with smart defaults
+              const bookingData = applyBookingPreset(
+                params.bookingType,
+                convertedDefaults
+              );
+              
+              // Merge with customer info
+              const fullBookingData: PartialBookingData = {
+                customerId: params.customerId,
                 customerName: params.customerName,
-                dates: {
-                  pickup: bookingData.pickupDate,
-                  return: bookingData.returnDate,
-                }
-              })
-            };
+                ...bookingData,
+              };
+              
+              console.log('[AIAssistant] Booking data prepared:', {
+                hasHistory: !!smartDefaults,
+                bookingType: params.bookingType,
+                customer: params.customerName,
+              });
+              
+              // Trigger callback to update wizard
+              if (options?.onBookingUpdate) {
+                options.onBookingUpdate(fullBookingData);
+                
+                // Show success toast
+                toast({
+                  title: 'Booking Created',
+                  description: `The usual ${params.bookingType} booking for ${params.customerName} has been created. Please proceed.`,
+                });
+              }
+              
+              return {
+                tool_call_id: call.id,
+                role: 'tool' as const,
+                content: JSON.stringify({
+                  success: true,
+                  bookingType: params.bookingType,
+                  customerName: params.customerName,
+                  hasHistory: !!smartDefaults,
+                  appliedDefaults: convertedDefaults ? 'smart_defaults' : 'system_defaults',
+                  dates: {
+                    pickup: bookingData.pickupDate,
+                    return: bookingData.returnDate,
+                  }
+                })
+              };
+            } catch (bookingError) {
+              console.error('[AIAssistant] Booking creation failed:', bookingError);
+              return {
+                tool_call_id: call.id,
+                role: 'tool' as const,
+                content: JSON.stringify({
+                  success: false,
+                  error: 'booking_creation_failed',
+                  message: 'Failed to create the booking automatically. Please try creating it manually.',
+                  details: bookingError instanceof Error ? bookingError.message : 'Unknown error'
+                })
+              };
+            }
           }
           
           // Unknown tool
