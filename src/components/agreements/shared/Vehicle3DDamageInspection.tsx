@@ -56,10 +56,12 @@ export const Vehicle3DDamageInspection: React.FC<Vehicle3DDamageInspectionProps>
   const handleDamageDrawerSave = (damageData: any) => {
     if (!clickPosition) return;
 
+    console.log('🔍 Damage data received:', damageData);
+
     // Map severity from DamageDrawer format to DamageMarker format
     const severityMap: Record<string, 'minor' | 'moderate' | 'major'> = {
       'LOW': 'minor',
-      'MEDIUM': 'moderate',
+      'MED': 'moderate',
       'HIGH': 'major'
     };
 
@@ -75,10 +77,13 @@ export const Vehicle3DDamageInspection: React.FC<Vehicle3DDamageInspectionProps>
       type: damageData.damage_type,
       photos: damageData.photos?.map((p: any) => p.url || '') || [],
       notes: damageData.notes || '',
-      side: damageData.side || 'GENERAL'
+      side: damageData.side || 'FRONT'
     };
 
+    console.log('✅ New marker created:', newMarker);
     onAddMarker(newMarker);
+    console.log('📊 Total markers after add:', markers.length + 1);
+    
     setClickPosition(null);
     setIsDamageDrawerOpen(false);
     setIsMarkingMode(false);
@@ -293,7 +298,7 @@ export const Vehicle3DDamageInspection: React.FC<Vehicle3DDamageInspectionProps>
           lineId: lineId,
           x: clickPosition.x,
           y: clickPosition.y,
-          side: 'GENERAL'
+          side: 'FRONT'
         } : null}
         onSave={handleDamageDrawerSave}
       />
