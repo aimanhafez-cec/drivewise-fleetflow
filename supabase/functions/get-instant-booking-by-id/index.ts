@@ -69,7 +69,7 @@ Deno.serve(async (req) => {
         ),
         vehicles(
           id,
-          registration_no,
+          registration_number,
           make_model,
           year,
           color,

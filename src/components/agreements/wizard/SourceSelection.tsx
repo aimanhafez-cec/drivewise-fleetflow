@@ -395,7 +395,7 @@ export const SourceSelection = ({
                                 <Car className="h-4 w-4 flex-shrink-0" />
                                 <span>
                                   {booking.vehicles.make_model || `${booking.vehicles.make} ${booking.vehicles.model}`} {booking.vehicles.year}
-                                  {booking.vehicles.registration_no && ` • ${booking.vehicles.registration_no}`}
+                                  {booking.vehicles.registration_number && ` • ${booking.vehicles.registration_number}`}
                                 </span>
                               </div>
                             )}
