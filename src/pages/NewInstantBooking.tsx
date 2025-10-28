@@ -16,6 +16,7 @@ import WizardBookingConfirmation from '@/components/instant-booking/wizard/Wizar
 import { useInstantBooking } from '@/hooks/useInstantBooking';
 import { useLastBooking } from '@/hooks/useLastBooking';
 import { useWizardContext } from '@/contexts/WizardContext';
+import { useSmartDefaults, useApplySmartDefaults } from '@/hooks/useSmartDefaults';
 
 export interface BookingWizardData {
   // Step 1: Reservation Type
