@@ -158,6 +158,24 @@ export const AIChatDialog: React.FC<AIChatDialogProps> = ({ open, onOpenChange }
       ];
     }
 
+    if (path.startsWith('/instant-booking/new')) {
+      return [
+        'How do I search for a customer?',
+        'What is Express Mode and when should I use it?',
+        'How do I use the Book Again feature?',
+        'What\'s the difference between vehicle class and specific vehicle reservation?',
+      ];
+    }
+
+    if (path.startsWith('/instant-booking')) {
+      return [
+        'How do I create a new instant booking?',
+        'What are instant booking analytics?',
+        'How do I configure instant booking settings?',
+        'What\'s the difference between instant booking and reservation?',
+      ];
+    }
+
     // Default actions for other pages
     return [
       'How do I create a new reservation?',
