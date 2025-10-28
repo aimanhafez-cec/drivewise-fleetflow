@@ -38,3 +38,10 @@ verify_jwt = false
 
 [functions.submit-master-agreement-customer-response]
 verify_jwt = false
+
+[functions.list-instant-bookings]
+verify_jwt = true
+
+[functions.get-instant-booking-by-id]
+verify_jwt = true
+

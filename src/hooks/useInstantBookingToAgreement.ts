@@ -70,7 +70,7 @@ interface InstantBookingData {
 }
 
 /**
- * Fetch instant booking data by ID
+ * Hook to fetch instant booking data by ID using edge function
  */
 export const useFetchInstantBooking = (instantBookingId?: string) => {
   return useQuery({
@@ -78,73 +78,27 @@ export const useFetchInstantBooking = (instantBookingId?: string) => {
     queryFn: async () => {
       if (!instantBookingId) return null;
 
-      const { data, error } = await supabase
-        .from('reservations')
-        .select(`
-          id,
-          ro_number,
-          booking_type,
-          instant_booking_score,
-          auto_approved,
-          start_datetime,
-          end_datetime,
-          pickup_location,
-          return_location,
-          total_amount,
-          status,
-          vehicle_id,
-          vehicle_class_id,
-          make_model,
-          rate_plan,
-          add_ons,
-          salik_package,
-          darb_package,
-          fuel_option,
-          mileage_package,
-          cross_border_permits,
-          special_requests,
-          price_list_id,
-          insurance_level_id,
-          insurance_group_id,
-          insurance_provider_id,
-          tax_level_id,
-          tax_code_id,
-          discount_value,
-          down_payment_amount,
-          down_payment_status,
-          down_payment_method,
-          down_payment_transaction_id,
-          advance_payment,
-          security_deposit_paid,
-          customer_id,
-          bill_to_type,
-          bill_to_meta,
-          business_unit_id,
-          profiles:customer_id (
-            full_name,
-            email,
-            phone
-          ),
-          vehicles:vehicle_id (
-            registration_no,
-            make,
-            model,
-            year,
-            color
-          )
-        `)
-        .eq('id', instantBookingId)
-        .eq('booking_type', 'INSTANT')
-        .single();
+      console.log('[useFetchInstantBooking] Fetching booking via edge function:', instantBookingId);
+
+      const { data, error } = await supabase.functions.invoke('get-instant-booking-by-id', {
+        body: { id: instantBookingId },
+      });
 
       if (error) {
-        console.error('[InstantBooking] Error fetching:', error);
-        throw error;
+        console.error('[useFetchInstantBooking] Error:', error);
+        throw new Error(error.message || 'Failed to fetch instant booking');
       }
 
-      return data as unknown as InstantBookingData;
+      if (!data) {
+        throw new Error('Instant booking not found');
+      }
+
+      console.log('[useFetchInstantBooking] Successfully fetched:', data.ro_number);
+      return data as InstantBookingData;
     },
     enabled: !!instantBookingId,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: 1,
   });
 };
 

@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Calendar, FileText, Users, Search, Car, CheckCircle2, AlertCircle, User } from 'lucide-react';
+import { Calendar, FileText, Users, Search, Car, CheckCircle2, AlertCircle, User, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 import type { AgreementSource } from '@/types/agreement-wizard';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -24,6 +24,34 @@ export const SourceSelection = ({
 }: SourceSelectionProps) => {
   const [source, setSource] = useState<AgreementSource | undefined>(selectedSource);
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 20;
+
+  // Debounce search query
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(searchQuery);
+      setCurrentPage(1); // Reset to first page on search
+    }, 250);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Debug: Check user session on mount
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { user }, error } = await supabase.auth.getUser();
+      if (error || !user) {
+        console.warn('[SourceSelection] No authenticated user found. Data may be restricted by RLS.');
+        toast.warning('Authentication', {
+          description: 'Please ensure you are logged in to see all available bookings.',
+        });
+      } else {
+        console.log('[SourceSelection] User authenticated:', user.id);
+      }
+    };
+    checkSession();
+  }, []);
 
   // Fetch available reservations
   const { data: reservations = [], isLoading: loadingReservations, error: reservationsError } = useQuery({
@@ -59,56 +87,39 @@ export const SourceSelection = ({
     },
   });
 
-  // Fetch available instant bookings
-  const { data: instantBookings = [], isLoading: loadingBookings, error: bookingsError } = useQuery({
-    queryKey: ['instant-bookings-for-conversion'],
+  // Fetch available instant bookings via edge function
+  const { 
+    data: instantBookingsData, 
+    isLoading: loadingBookings, 
+    error: bookingsError 
+  } = useQuery({
+    queryKey: ['instant-bookings', debouncedQuery, currentPage, pageSize],
     queryFn: async () => {
-      console.log('[SourceSelection] Fetching instant bookings for conversion...');
-      const { data, error } = await supabase
-        .from('reservations')
-        .select(`
-          id,
-          ro_number,
-          booking_type,
-          instant_booking_score,
-          auto_approved,
-          start_datetime,
-          end_datetime,
-          pickup_location,
-          return_location,
-          total_amount,
-          status,
-          vehicle_id,
-          vehicle_class_id,
-          make_model,
-          profiles:customer_id (
-            full_name,
-            email,
-            phone
-          ),
-          vehicles:vehicle_id (
-            registration_no,
-            make,
-            model,
-            year,
-            color
-          )
-        `)
-        .eq('booking_type', 'INSTANT')
-        .eq('status', 'confirmed')
-        .is('converted_agreement_id', null)
-        .order('created_at', { ascending: false })
-        .limit(20);
+      console.log(`[SourceSelection] Fetching instant bookings (page: ${currentPage}, query: "${debouncedQuery}")...`);
+      
+      const { data, error } = await supabase.functions.invoke('list-instant-bookings', {
+        body: {
+          q: debouncedQuery,
+          page: currentPage,
+          pageSize,
+        },
+      });
 
       if (error) {
         console.error('[SourceSelection] Error fetching instant bookings:', error);
         throw error;
       }
-      
-      console.log('[SourceSelection] Instant bookings fetched:', data?.length || 0, 'bookings');
-      return data || [];
+
+      console.log(`[SourceSelection] Fetched ${data?.items?.length || 0} instant bookings (total: ${data?.total || 0})`);
+      return data;
     },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: 1,
   });
+
+  const instantBookings = instantBookingsData?.items || [];
+  const totalInstantBookings = instantBookingsData?.total || 0;
+  const totalPages = Math.ceil(totalInstantBookings / pageSize);
 
   // Show error toast if fetching fails
   useEffect(() => {
@@ -148,17 +159,6 @@ export const SourceSelection = ({
       res.ro_number?.toLowerCase().includes(searchLower) ||
       res.profiles?.full_name?.toLowerCase().includes(searchLower) ||
       res.profiles?.email?.toLowerCase().includes(searchLower)
-    );
-  });
-
-  const filteredInstantBookings = instantBookings.filter((booking: any) => {
-    const searchLower = searchQuery.toLowerCase();
-    const vehicleInfo = `${booking.make_model || ''} ${booking.vehicles?.registration_no || ''}`.toLowerCase();
-    return (
-      booking.ro_number?.toLowerCase().includes(searchLower) ||
-      booking.profiles?.full_name?.toLowerCase().includes(searchLower) ||
-      booking.profiles?.email?.toLowerCase().includes(searchLower) ||
-      vehicleInfo.includes(searchLower)
     );
   });
 
@@ -221,11 +221,16 @@ export const SourceSelection = ({
                   <p className="text-xs text-muted-foreground">
                     Convert a paid instant booking
                   </p>
-                  {instantBookings.length > 0 && (
-                    <Badge variant="secondary" className="mt-2">
-                      {instantBookings.length} available
-                    </Badge>
-                  )}
+                  <Badge variant="secondary" className="mt-2">
+                    {loadingBookings ? (
+                      <>
+                        <Loader2 className="h-3 w-3 animate-spin mr-1" />
+                        Loading...
+                      </>
+                    ) : (
+                      `${totalInstantBookings} available`
+                    )}
+                  </Badge>
                 </div>
               </div>
             </div>
@@ -273,7 +278,7 @@ export const SourceSelection = ({
             {loadingReservations ? (
               <div className="text-center py-12 text-muted-foreground space-y-3">
                 <div className="flex justify-center">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                  <Loader2 className="h-8 w-8 animate-spin" />
                 </div>
                 <p className="text-sm">Loading available reservations...</p>
               </div>
@@ -321,26 +326,24 @@ export const SourceSelection = ({
         {/* Instant Booking Selection */}
         {source === 'instant_booking' && (
           <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search by RO#, customer name, or vehicle..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search by RO#, customer name, or vehicle..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
             </div>
 
             {loadingBookings ? (
               <div className="text-center py-12 text-muted-foreground space-y-3">
                 <div className="flex justify-center">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                  <Loader2 className="h-8 w-8 animate-spin" />
                 </div>
                 <p className="text-sm">Loading instant bookings...</p>
               </div>
-            ) : filteredInstantBookings.length === 0 ? (
+            ) : instantBookings.length === 0 ? (
               <div className="border border-amber-200 bg-amber-50 rounded-lg p-4 flex gap-3">
                 <AlertCircle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
                 <div className="flex-1">
@@ -348,7 +351,7 @@ export const SourceSelection = ({
                   <p className="text-sm text-amber-700 mt-1">
                     {searchQuery 
                       ? 'No instant bookings match your search criteria.'
-                      : 'There are no confirmed instant bookings available for conversion. Instant bookings must be confirmed, not already converted, and have booking_type = "INSTANT".'}
+                      : 'There are no confirmed instant bookings available for conversion.'}
                   </p>
                   <div className="mt-3 text-xs text-amber-600">
                     <p className="font-medium">Looking for instant bookings with:</p>
@@ -361,94 +364,102 @@ export const SourceSelection = ({
                 </div>
               </div>
             ) : (
-              <div className="space-y-2 max-h-96 overflow-y-auto">
-                {filteredInstantBookings.map((booking: any) => (
-                  <div
-                    key={booking.id}
-                    className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
-                      selectedSourceId === booking.id
-                        ? 'border-primary bg-primary/5'
-                        : 'border-input hover:border-primary/50'
-                    }`}
-                    onClick={() => handleReservationSelect(booking.id)}
-                  >
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1 space-y-2">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="font-semibold text-base">
-                            {booking.ro_number || 'N/A'}
-                          </span>
-                          <Badge className="bg-blue-500 hover:bg-blue-600">
-                            Instant Booking
-                          </Badge>
-                          {booking.auto_approved && (
-                            <Badge className="bg-green-500 hover:bg-green-600">
-                              Auto-Approved
-                            </Badge>
-                          )}
-                          {booking.instant_booking_score && (
-                            <Badge variant="outline">
-                              Score: {booking.instant_booking_score}
-                            </Badge>
-                          )}
-                        </div>
-                        
-                        <div className="space-y-1.5 text-sm">
-                          <div className="flex items-center gap-2 text-muted-foreground">
-                            <User className="h-4 w-4 flex-shrink-0" />
-                            <span className="font-medium text-foreground">
-                              {booking.profiles?.full_name || 'Unknown Customer'}
+              <>
+                <div className="space-y-2 max-h-96 overflow-y-auto">
+                  {instantBookings.map((booking: any) => (
+                    <div
+                      key={booking.id}
+                      className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
+                        selectedSourceId === booking.id
+                          ? 'border-primary bg-primary/5'
+                          : 'border-input hover:border-primary/50'
+                      }`}
+                      onClick={() => handleReservationSelect(booking.id)}
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1 space-y-2">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-semibold text-base">
+                              {booking.ro_number || 'N/A'}
                             </span>
+                            <Badge className="bg-blue-500 hover:bg-blue-600">
+                              Instant Booking
+                            </Badge>
                           </div>
                           
-                          {booking.vehicles && (
+                          <div className="space-y-1.5 text-sm">
                             <div className="flex items-center gap-2 text-muted-foreground">
-                              <Car className="h-4 w-4 flex-shrink-0" />
-                              <span>
-                                {booking.vehicles.make} {booking.vehicles.model} {booking.vehicles.year}
-                                {booking.vehicles.registration_no && ` • ${booking.vehicles.registration_no}`}
+                              <User className="h-4 w-4 flex-shrink-0" />
+                              <span className="font-medium text-foreground">
+                                {booking.profiles?.full_name || 'Unknown Customer'}
                               </span>
                             </div>
-                          )}
-                          
-                          <div className="flex items-center gap-2 text-muted-foreground">
-                            <Calendar className="h-4 w-4 flex-shrink-0" />
-                            <span>
-                              {new Date(booking.start_datetime).toLocaleDateString()} - {new Date(booking.end_datetime).toLocaleDateString()}
-                            </span>
+                            
+                            {booking.vehicles && (
+                              <div className="flex items-center gap-2 text-muted-foreground">
+                                <Car className="h-4 w-4 flex-shrink-0" />
+                                <span>
+                                  {booking.vehicles.make_model || `${booking.vehicles.make} ${booking.vehicles.model}`} {booking.vehicles.year}
+                                  {booking.vehicles.registration_no && ` • ${booking.vehicles.registration_no}`}
+                                </span>
+                              </div>
+                            )}
+                            
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                              <Calendar className="h-4 w-4 flex-shrink-0" />
+                              <span>
+                                {new Date(booking.pickup_datetime).toLocaleDateString()} - {new Date(booking.return_datetime).toLocaleDateString()}
+                              </span>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                      
-                      <div className="text-right flex flex-col items-end gap-2">
-                        <div className="text-lg font-bold">
-                          AED {Number(booking.total_amount || 0).toFixed(2)}
+                        
+                        <div className="text-right">
+                          <p className="font-semibold text-lg">
+                            AED {Number(booking.total_amount || 0).toFixed(2)}
+                          </p>
+                          {selectedSourceId === booking.id && (
+                            <Badge variant="default" className="mt-2">
+                              <CheckCircle2 className="h-3 w-3 mr-1" />
+                              Selected
+                            </Badge>
+                          )}
                         </div>
-                        <Badge variant="outline">
-                          {booking.status}
-                        </Badge>
                       </div>
                     </div>
-                    
-                    {selectedSourceId === booking.id && (
-                      <div className="mt-3 pt-3 border-t flex items-center gap-2 text-sm text-primary">
-                        <CheckCircle2 className="h-4 w-4" />
-                        <span className="font-medium">Selected for conversion</span>
-                      </div>
-                    )}
+                  ))}
+                </div>
+                
+                {/* Pagination Controls */}
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-between pt-4 border-t">
+                    <p className="text-sm text-muted-foreground">
+                      Page {currentPage} of {totalPages} ({totalInstantBookings} total)
+                    </p>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                        disabled={currentPage === 1}
+                      >
+                        <ChevronLeft className="h-4 w-4 mr-1" />
+                        Previous
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                        disabled={currentPage === totalPages}
+                      >
+                        Next
+                        <ChevronRight className="h-4 w-4 ml-1" />
+                      </Button>
+                    </div>
                   </div>
-                ))}
-              </div>
+                )}
+              </>
             )}
-          </div>
-        )}
-
-        {/* Direct Agreement Info */}
-        {source === 'direct' && (
-          <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
-            <p className="text-sm text-blue-700">
-              <strong>Direct Agreement:</strong> You'll select the customer and configure all details in the next steps.
-            </p>
           </div>
         )}
       </CardContent>
