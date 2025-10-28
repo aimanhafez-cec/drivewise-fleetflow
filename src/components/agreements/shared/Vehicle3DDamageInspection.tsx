@@ -10,6 +10,9 @@ import { Scene3D } from './Scene3D';
 import { DamageMarker } from '@/types/agreement-wizard';
 import { DamageDrawer } from '@/components/agreements/DamageDrawer';
 import { Vector3, Raycaster } from 'three';
+import { DamageMarkersTable } from '@/components/inspection/corporate/DamageMarkersTable';
+import type { DamageMarker as ApiDamageMarker } from '@/types/damage-marker';
+import { toast } from 'sonner';
 
 interface Vehicle3DDamageInspectionProps {
   markers: DamageMarker[];
@@ -92,6 +95,35 @@ export const Vehicle3DDamageInspection: React.FC<Vehicle3DDamageInspectionProps>
       default:
         return 'bg-gray-500';
     }
+  };
+
+  // Transform wizard markers to API format for the table
+  const transformMarkersForTable = (markers: DamageMarker[]): ApiDamageMarker[] => {
+    return markers.map(marker => ({
+      id: marker.id,
+      line_id: lineId,
+      event: 'OUT' as const,
+      side: (marker.side?.toUpperCase() || 'FRONT') as any,
+      x: marker.x,
+      y: marker.y,
+      damage_type: marker.type as any,
+      severity: marker.severity === 'minor' ? 'LOW' : marker.severity === 'moderate' ? 'MED' : 'HIGH',
+      notes: marker.notes || null,
+      photos: (marker.photos || []).map(url => ({
+        url,
+        filename: url.split('/').pop() || 'photo.jpg',
+        uploadedAt: new Date().toISOString()
+      })),
+      occurred_at: new Date().toISOString(),
+      created_by: null,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    }));
+  };
+
+  const handleAddPhoto = async (markerId: string, file: File) => {
+    // Photo upload integration - would need to be implemented with actual upload logic
+    toast.info('Photo upload feature coming soon');
   };
 
   return (
@@ -198,7 +230,7 @@ export const Vehicle3DDamageInspection: React.FC<Vehicle3DDamageInspectionProps>
         </CardContent>
       </Card>
 
-      {/* Damage Markers List */}
+      {/* Damage Markers Table */}
       {markers.length > 0 && (
         <Card>
           <CardContent className="p-4">
@@ -216,32 +248,11 @@ export const Vehicle3DDamageInspection: React.FC<Vehicle3DDamageInspectionProps>
                 </Button>
               </div>
               
-              <div className="grid gap-2">
-                {markers.map((marker) => (
-                  <div
-                    key={marker.id}
-                    className="flex items-center justify-between p-3 bg-muted/50 rounded-lg"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={`w-3 h-3 rounded-full ${getSeverityColor(marker.severity)}`} />
-                      <div>
-                        <div className="text-sm font-medium">{marker.type}</div>
-                        <div className="text-xs text-muted-foreground">
-                          {marker.severity} • {marker.notes || 'No notes'}
-                        </div>
-                      </div>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => onRemoveMarker(marker.id)}
-                      disabled={disabled}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
+              <DamageMarkersTable 
+                markers={transformMarkersForTable(markers)}
+                onAddPhoto={handleAddPhoto}
+                readOnly={disabled}
+              />
             </div>
           </CardContent>
         </Card>
