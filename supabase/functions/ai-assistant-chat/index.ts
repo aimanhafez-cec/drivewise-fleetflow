@@ -24,6 +24,7 @@ function getRouteContext(route: string): string {
     '/transactions': 'This is the Transactions page showing all financial transactions. Help with transaction tracking and reconciliation.',
     '/instant-booking': 'This is the Instant Booking portal for customer self-service reservations. Help with instant booking configuration and management.',
     '/manage-quotations': 'This is the Quotations management page for creating, tracking, and converting quotes to agreements. Focus on quotation workflows.',
+    '/reservations/new': 'This is the New Reservation Wizard where staff create bookings for customers. You can help create bookings with natural language commands like "weekend [customer name]", "week [customer name]", or "month [customer name]". The wizard will auto-fill with smart defaults based on the customer\'s last booking.',
   };
 
   // Find matching route or return default
