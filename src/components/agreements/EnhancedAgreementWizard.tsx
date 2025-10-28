@@ -12,6 +12,7 @@ import { useWizardKeyboardShortcuts } from '@/hooks/useWizardKeyboardShortcuts';
 import { useAgreementSmartDefaults, useApplyAgreementSmartDefaults } from '@/hooks/useAgreementSmartDefaults';
 import { useTouchGestures, useIsTouchDevice } from '@/hooks/useTouchGestures';
 import { useAgreementDataConsistency } from '@/hooks/useAgreementDataConsistency';
+import { useInstantBookingToAgreement } from '@/hooks/useInstantBookingToAgreement';
 import { validateStep } from '@/lib/validation/agreementSchema';
 import type { ValidationResult } from '@/lib/validation/agreementSchema';
 import { getAgreementStepGroups } from '@/lib/wizardLogic/agreementStepGroups';
@@ -33,6 +34,7 @@ import { TermsSignatureStep } from './wizard/TermsSignatureStep';
 import { FinalReviewStep } from './wizard/FinalReviewStep';
 import { FinancialSettlementStep } from './wizard/FinancialSettlementStep';
 import { DraftManagementBanner } from './wizard/DraftManagementBanner';
+import { InstantBookingSummary } from './wizard/InstantBookingSummary';
 import type { EnhancedWizardData, AgreementSource } from '@/types/agreement-wizard';
 
 const TOTAL_STEPS = 10; // 0-9
@@ -270,6 +272,16 @@ export const EnhancedAgreementWizard = () => {
   const { smartDefaults, hasHistory, isLoading: loadingDefaults } = useAgreementSmartDefaults(customerId);
   const { applyDefaults } = useApplyAgreementSmartDefaults();
 
+  // Instant booking data fetching and mapping
+  const { 
+    instantBooking, 
+    isLoading: loadingInstantBooking, 
+    error: instantBookingError,
+    mapToWizardData 
+  } = useInstantBookingToAgreement(
+    wizardData.source === 'instant_booking' ? wizardData.sourceId : undefined
+  );
+
   // Get step groups for sectioned layout
   const stepGroups = getAgreementStepGroups();
 
@@ -322,6 +334,39 @@ export const EnhancedAgreementWizard = () => {
       }
     }
   }, [customerId, smartDefaults, loadingDefaults]);
+
+  // Populate wizard data from instant booking when selected
+  useEffect(() => {
+    if (wizardData.source === 'instant_booking' && wizardData.sourceId && instantBooking && !loadingInstantBooking) {
+      console.log('[EnhancedWizard] Instant booking loaded, mapping to wizard data');
+      
+      const mappedData = mapToWizardData(wizardData);
+      
+      if (mappedData) {
+        // Apply mapped data to wizard
+        Object.keys(mappedData).forEach(key => {
+          if (key !== 'source' && key !== 'sourceId') {
+            updateWizardData(key as keyof EnhancedWizardData, mappedData[key as keyof typeof mappedData]);
+          }
+        });
+        
+        toast.success('Instant Booking Loaded', {
+          description: `RO# ${instantBooking.ro_number} - ${instantBooking.profiles?.full_name || 'Customer'}`,
+          duration: 4000,
+        });
+      }
+    }
+  }, [wizardData.source, wizardData.sourceId, instantBooking, loadingInstantBooking]);
+
+  // Handle instant booking loading error
+  useEffect(() => {
+    if (instantBookingError) {
+      console.error('[EnhancedWizard] Error loading instant booking:', instantBookingError);
+      toast.error('Failed to Load Instant Booking', {
+        description: 'Could not retrieve instant booking data. Please try again.',
+      });
+    }
+  }, [instantBookingError]);
 
   // Auto-save functionality
   useEffect(() => {
@@ -786,6 +831,11 @@ export const EnhancedAgreementWizard = () => {
                 onResumeDraft={handleResumeDraft}
                 onDiscardDraft={handleDiscardDraft}
               />
+            )}
+
+            {/* Instant Booking Summary */}
+            {wizardData.source === 'instant_booking' && instantBooking && (
+              <InstantBookingSummary instantBooking={instantBooking} />
             )}
 
             {/* Validation Banner - DISABLED FOR NOW */}
