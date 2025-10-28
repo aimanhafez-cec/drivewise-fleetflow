@@ -13,6 +13,7 @@ import { useAgreementSmartDefaults, useApplyAgreementSmartDefaults } from '@/hoo
 import { useTouchGestures, useIsTouchDevice } from '@/hooks/useTouchGestures';
 import { useAgreementDataConsistency } from '@/hooks/useAgreementDataConsistency';
 import { useInstantBookingToAgreement } from '@/hooks/useInstantBookingToAgreement';
+import { createAgreementFromWizard, validateInstantBookingForConversion } from '@/lib/api/createAgreementFromWizard';
 import { validateStep } from '@/lib/validation/agreementSchema';
 import type { ValidationResult } from '@/lib/validation/agreementSchema';
 import { getAgreementStepGroups } from '@/lib/wizardLogic/agreementStepGroups';
@@ -35,6 +36,7 @@ import { FinalReviewStep } from './wizard/FinalReviewStep';
 import { FinancialSettlementStep } from './wizard/FinancialSettlementStep';
 import { DraftManagementBanner } from './wizard/DraftManagementBanner';
 import { InstantBookingSummary } from './wizard/InstantBookingSummary';
+import { AgreementSubmissionSummary } from './wizard/AgreementSubmissionSummary';
 import type { EnhancedWizardData, AgreementSource } from '@/types/agreement-wizard';
 
 const TOTAL_STEPS = 10; // 0-9
@@ -516,41 +518,78 @@ export const EnhancedAgreementWizard = () => {
   const hasDraft = progress.lastSaved !== undefined && progress.visitedSteps.length > 1;
 
   const handleSubmit = async () => {
-    // VALIDATION DISABLED FOR NOW
-    // Ensure data integrity before validation
-    // const sanitizedData = ensureDataIntegrity(wizardData);
-    
-    // Use comprehensive validation
-    // const validationResult = validateBeforeSubmission(sanitizedData);
+    try {
+      // Validate instant booking if applicable
+      if (wizardData.source === 'instant_booking' && wizardData.sourceId) {
+        toast.info('Validating instant booking...', {
+          description: 'Checking conversion eligibility',
+        });
 
-    // if (!validationResult.isValid) {
-    //   setValidationResult(validationResult);
-    //   toast.error(`Please fix ${validationResult.errors.length} error(s) before submitting`);
-    //   
-    //   // Navigate to first step with errors
-    //   const firstErrorPath = validationResult.errors[0]?.path || '';
-    //   const stepMatch = firstErrorPath.match(/step(\d+)/);
-    //   if (stepMatch) {
-    //     const stepNum = parseInt(stepMatch[1]);
-    //     if (stepNum !== progress.currentStep) {
-    //       setCurrentStep(stepNum);
-    //       window.scrollTo({ top: 0, behavior: 'smooth' });
-    //     }
-    //   }
-    //   return;
-    // }
+        const validation = await validateInstantBookingForConversion(wizardData.sourceId);
+        if (!validation.valid) {
+          toast.error('Instant Booking Validation Failed', {
+            description: validation.error,
+            duration: 5000,
+          });
+          return;
+        }
+      }
 
-    // All steps complete - proceed with submission
-    console.log('[EnhancedWizard] Submitting agreement:', wizardData);
-    
-    // Get progress summary for logging
-    const summary = getProgressSummary();
-    console.log('[EnhancedWizard] Progress summary:', summary);
-    
-    // Simulate submission
-    toast.success('Agreement created successfully!');
-    clearProgress();
-    navigate('/agreements');
+      // Show loading toast
+      const loadingToast = toast.loading('Creating Agreement', {
+        description: 'Please wait while we process your agreement...',
+      });
+
+      console.log('[EnhancedWizard] Submitting agreement:', wizardData);
+      
+      // Get progress summary for logging
+      const summary = getProgressSummary();
+      console.log('[EnhancedWizard] Progress summary:', summary);
+      
+      // Create the agreement
+      const result = await createAgreementFromWizard(wizardData);
+
+      // Dismiss loading toast
+      toast.dismiss(loadingToast);
+
+      if (!result.success) {
+        toast.error('Agreement Creation Failed', {
+          description: result.error || 'An unexpected error occurred',
+          duration: 5000,
+        });
+        return;
+      }
+
+      // Success!
+      console.log('[EnhancedWizard] Agreement created successfully:', {
+        agreementId: result.agreementId,
+        agreementNo: result.agreementNo,
+      });
+
+      toast.success('Agreement Created Successfully!', {
+        description: `Agreement ${result.agreementNo || result.agreementId} has been created`,
+        duration: 5000,
+      });
+
+      // Clear the wizard progress
+      clearProgress();
+
+      // Navigate to the agreement details or list
+      setTimeout(() => {
+        if (result.agreementId) {
+          navigate(`/agreements/${result.agreementId}`);
+        } else {
+          navigate('/agreements');
+        }
+      }, 1000);
+
+    } catch (error) {
+      console.error('[EnhancedWizard] Unexpected error during submission:', error);
+      toast.error('Unexpected Error', {
+        description: error instanceof Error ? error.message : 'Failed to create agreement',
+        duration: 5000,
+      });
+    }
   };
 
   // Keyboard shortcuts - ENTER to advance, ESC to go back
@@ -770,11 +809,17 @@ export const EnhancedAgreementWizard = () => {
         );
       case 9:
         return (
-          <FinalReviewStep
-            wizardData={wizardData}
-            onChange={(field, value) => handleStepDataChange('step8', field, value)}
-            errors={errorMessages}
-          />
+          <div className="space-y-6">
+            <AgreementSubmissionSummary 
+              wizardData={wizardData}
+              instantBookingRoNumber={instantBooking?.ro_number}
+            />
+            <FinalReviewStep
+              wizardData={wizardData}
+              onChange={(field, value) => handleStepDataChange('step8', field, value)}
+              errors={errorMessages}
+            />
+          </div>
         );
       default:
         return null;
