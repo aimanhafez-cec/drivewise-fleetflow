@@ -73,7 +73,7 @@ export const leadSources: Record<string, LeadSource> = {
   // International Brokers - Purple variants (B2C focused)
   'eu_travel': {
     id: 'eu_travel',
-    name: 'EU Travel Partners',
+    name: 'EU travel',
     type: 'broker',
     color: '#9333EA',
     bgColor: 'bg-purple-100 dark:bg-purple-950',
@@ -93,7 +93,7 @@ export const leadSources: Record<string, LeadSource> = {
   },
   'mena_broker': {
     id: 'mena_broker',
-    name: 'MENA Travel Services',
+    name: 'mena travel',
     type: 'broker',
     color: '#7C3AED',
     bgColor: 'bg-purple-100 dark:bg-purple-950',
@@ -135,7 +135,7 @@ export const leadSources: Record<string, LeadSource> = {
   },
   'whatsapp': {
     id: 'whatsapp',
-    name: 'WhatsApp Business',
+    name: 'Wapp Business',
     type: 'direct',
     color: '#25D366',
     bgColor: 'bg-green-100 dark:bg-green-950',
