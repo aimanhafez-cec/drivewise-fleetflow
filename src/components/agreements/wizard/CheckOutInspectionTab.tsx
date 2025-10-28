@@ -294,15 +294,13 @@ export function CheckOutInspectionTab({ data, lineId, onUpdate }: CheckOutInspec
             </div>
           </AccordionTrigger>
           <AccordionContent>
-            <div className="h-[600px]">
-              <Vehicle3DDamageInspection
-                markers={data.damageMarkers}
-                onAddMarker={handleAddMarker}
-                onRemoveMarker={handleRemoveMarker}
-                agreementId="temp-checkout"
-                lineId={lineId}
-              />
-            </div>
+            <Vehicle3DDamageInspection
+              markers={data.damageMarkers}
+              onAddMarker={handleAddMarker}
+              onRemoveMarker={handleRemoveMarker}
+              agreementId="temp-checkout"
+              lineId={lineId}
+            />
           </AccordionContent>
         </AccordionItem>
 
