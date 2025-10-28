@@ -351,15 +351,10 @@ export const SourceSelection = ({
                   <p className="text-sm text-amber-700 mt-1">
                     {searchQuery 
                       ? 'No instant bookings match your search criteria.'
-                      : 'There are no confirmed instant bookings available for conversion.'}
+                      : 'There are no instant bookings available.'}
                   </p>
                   <div className="mt-3 text-xs text-amber-600">
-                    <p className="font-medium">Looking for instant bookings with:</p>
-                    <ul className="list-disc list-inside mt-1 space-y-1">
-                      <li>Status: confirmed</li>
-                      <li>Booking Type: INSTANT</li>
-                      <li>Not already converted to agreement</li>
-                    </ul>
+                    <p className="font-medium">Showing all instant bookings (Booking Type: INSTANT)</p>
                   </div>
                 </div>
               </div>

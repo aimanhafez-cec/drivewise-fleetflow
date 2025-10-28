@@ -68,8 +68,6 @@ Deno.serve(async (req) => {
         )
       `, { count: 'exact' })
       .eq('booking_type', 'INSTANT')
-      .eq('status', 'confirmed')
-      .is('converted_agreement_id', null)
       .order('created_at', { ascending: false });
 
     // Apply search filter if provided

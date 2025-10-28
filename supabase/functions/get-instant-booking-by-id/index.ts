@@ -82,7 +82,6 @@ Deno.serve(async (req) => {
       `)
       .eq('id', bookingId)
       .eq('booking_type', 'INSTANT')
-      .eq('status', 'confirmed')
       .single();
 
     if (error) {
@@ -95,19 +94,8 @@ Deno.serve(async (req) => {
 
     if (!data) {
       return new Response(
-        JSON.stringify({ error: 'Instant booking not found or not eligible' }),
+        JSON.stringify({ error: 'Instant booking not found' }),
         { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    // Check if already converted
-    if (data.converted_agreement_id) {
-      return new Response(
-        JSON.stringify({ 
-          error: 'This instant booking has already been converted to an agreement',
-          converted_agreement_id: data.converted_agreement_id
-        }),
-        { status: 409, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
