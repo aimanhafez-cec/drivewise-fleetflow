@@ -95,6 +95,21 @@ export const useWizardProgress = ({
     }));
   }, []);
 
+  // Set any top-level wizard field directly (for primitives like source, sourceId)
+  const setWizardField = useCallback(<K extends keyof EnhancedWizardData>(
+    key: K,
+    value: EnhancedWizardData[K]
+  ) => {
+    setWizardData(prev => ({
+      ...prev,
+      [key]: value as any,
+    }));
+    setProgress(prev => ({
+      ...prev,
+      lastModifiedAt: new Date().toISOString(),
+    }));
+  }, []);
+
   const setCurrentStep = useCallback((step: number) => {
     setProgress(prev => ({
       ...prev,
@@ -278,6 +293,7 @@ export const useWizardProgress = ({
     wizardData,
     progress,
     updateWizardData,
+    setWizardField,
     setCurrentStep,
     markStepComplete,
     markStepIncomplete,

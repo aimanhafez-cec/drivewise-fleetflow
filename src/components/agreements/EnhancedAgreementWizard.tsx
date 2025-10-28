@@ -255,6 +255,7 @@ export const EnhancedAgreementWizard = ({ initialSource, initialSourceId }: Enha
     wizardData,
     progress,
     updateWizardData,
+    setWizardField,
     setCurrentStep,
     markStepComplete,
     markStepIncomplete,
@@ -284,9 +285,9 @@ export const EnhancedAgreementWizard = ({ initialSource, initialSourceId }: Enha
   useEffect(() => {
     if (initialSource && initialSource !== wizardData.source) {
       console.log('[EnhancedWizard] Initializing from URL params:', { initialSource, initialSourceId });
-      updateWizardData('source', initialSource);
+      setWizardField('source', initialSource as any);
       if (initialSourceId) {
-        updateWizardData('sourceId', initialSourceId);
+        setWizardField('sourceId', initialSourceId as any);
       }
     }
   }, [initialSource, initialSourceId]);
@@ -783,8 +784,8 @@ export const EnhancedAgreementWizard = ({ initialSource, initialSourceId }: Enha
             selectedSourceId={wizardData.sourceId}
             onSelect={(source: AgreementSource, sourceId?: string) => {
               console.log('[EnhancedWizard] onSelect called', { source, sourceId });
-              updateWizardData('source', source as any);
-              updateWizardData('sourceId', sourceId as any);
+              setWizardField('source', source as any);
+              setWizardField('sourceId', sourceId as any);
             }}
           />
         );
@@ -979,8 +980,8 @@ export const EnhancedAgreementWizard = ({ initialSource, initialSourceId }: Enha
                           size="sm" 
                           className="mt-3"
                           onClick={() => {
-                            updateWizardData('source', 'direct');
-                            updateWizardData('sourceId', undefined);
+                            setWizardField('source', 'direct' as any);
+                            setWizardField('sourceId', undefined as any);
                             setCurrentStep(0);
                           }}
                         >
