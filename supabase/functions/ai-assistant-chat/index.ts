@@ -23,6 +23,7 @@ function getRouteContext(route: string): string {
     '/master-agreements': 'This is the Master Agreements page for long-term corporate rental agreements. Help with corporate agreement management.',
     '/transactions': 'This is the Transactions page showing all financial transactions. Help with transaction tracking and reconciliation.',
     '/instant-booking': 'This is the Instant Booking portal for customer self-service reservations. Help with instant booking configuration and management.',
+    '/instant-booking/new': 'This is the Instant Booking Wizard where customers or staff create instant bookings. You can help create bookings with natural language commands like "weekend [customer name]", "week [customer name]", or "month [customer name]". The wizard will auto-fill with smart defaults based on the customer\'s last booking.',
     '/manage-quotations': 'This is the Quotations management page for creating, tracking, and converting quotes to agreements. Focus on quotation workflows.',
     '/reservations/new': 'This is the New Reservation Wizard where staff create bookings for customers. You can help create bookings with natural language commands like "weekend [customer name]", "week [customer name]", or "month [customer name]". The wizard will auto-fill with smart defaults based on the customer\'s last booking.',
   };
@@ -63,7 +64,7 @@ ${getRouteContext(currentRoute)}` : "No specific page context available."}
 
 **IMPORTANT: Only available on /instant-booking/new or /reservations/new pages.**
 
-When the user is on the instant booking page (/instant-booking) or new reservation wizard (/reservations/new), you can help them create bookings using natural language:
+When the user is on the instant booking wizard (/instant-booking/new) or new reservation wizard (/reservations/new), you can help them create bookings using natural language:
 
 **Supported Commands:**
 - "weekend [customer name]" - Create a weekend booking (Fri-Sun) for the customer
@@ -71,7 +72,7 @@ When the user is on the instant booking page (/instant-booking) or new reservati
 - "month [customer name]" - Create a 1-month booking for the customer
 
 **Workflow:**
-1. **Check Current Page**: If user tries a booking command but is NOT on /instant-booking or /reservations/new, respond: "To create a booking, please navigate to the Reservations page first. Would you like me to guide you there?"
+1. **Check Current Page**: If user tries a booking command but is NOT on /instant-booking/new or /reservations/new, respond: "To create a booking, please navigate to the Instant Booking page (/instant-booking/new) or Reservations page (/reservations/new) first. Would you like me to guide you there?"
 2. **Parse Command**: Extract customer name and booking type (weekend/week/month)
 3. **Search Customer**: Use "search_customer_by_name" tool to find the customer
 4. **Handle Search Results**:
@@ -111,7 +112,7 @@ When the user is on the instant booking page (/instant-booking) or new reservati
 
 ❌ **Wrong Page:**
 - User tries booking command on /dashboard
-  → "To create a booking, please navigate to the Reservations page first. Would you like me to guide you there?"
+  → "To create a booking, please navigate to the Instant Booking page (/instant-booking/new) or Reservations page (/reservations/new) first. Would you like me to guide you there?"
 
 **Error Recovery:**
 - If tools fail, acknowledge the issue and suggest manual workflow
