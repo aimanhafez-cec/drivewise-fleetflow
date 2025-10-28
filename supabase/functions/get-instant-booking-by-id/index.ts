@@ -58,9 +58,9 @@ Deno.serve(async (req) => {
       );
     }
 
-    console.log(`[get-instant-booking-by-id] User: ${user.id}, Booking ID: ${bookingId}`);
+    console.log(`[get-instant-booking-by-id] Resolved booking ID: ${bookingId}`);
 
-    // Fetch detailed booking data with UI-compatible relation syntax
+    // Fetch reservation data (without embedded add-ons)
     const { data, error } = await supabaseClient
       .from('reservations')
       .select(`
@@ -86,19 +86,6 @@ Deno.serve(async (req) => {
           fuel_type,
           odometer,
           category_id
-        ),
-        reservation_addons(
-          id,
-          addon_id,
-          quantity,
-          rate,
-          total_amount,
-          addons(
-            id,
-            name,
-            type,
-            rate
-          )
         )
       `)
       .eq('id', bookingId)
@@ -106,7 +93,7 @@ Deno.serve(async (req) => {
       .single();
 
     if (error) {
-      console.error('[get-instant-booking-by-id] Query error:', error);
+      console.error('[get-instant-booking-by-id] Reservation query error:', error);
       return new Response(
         JSON.stringify({ error: error.message }),
         { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -114,16 +101,59 @@ Deno.serve(async (req) => {
     }
 
     if (!data) {
+      console.error('[get-instant-booking-by-id] Reservation not found');
       return new Response(
         JSON.stringify({ error: 'Instant booking not found' }),
         { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    console.log(`[get-instant-booking-by-id] Successfully fetched booking: ${data.ro_number}`);
+    console.log(`[get-instant-booking-by-id] Fetched reservation: ${data.ro_number}`);
+
+    // Fetch add-ons separately
+    const { data: addonsData, error: addonsError } = await supabaseClient
+      .from('reservation_addons')
+      .select(`
+        id,
+        addon_id,
+        quantity,
+        rate,
+        total_amount,
+        addons(
+          id,
+          name,
+          type,
+          rate
+        )
+      `)
+      .eq('reservation_id', bookingId);
+
+    if (addonsError) {
+      console.error('[get-instant-booking-by-id] Add-ons query error:', addonsError);
+      // Continue without add-ons rather than failing
+    }
+
+    // Transform add-ons to match wizard mapper expectations
+    const transformedAddons = (addonsData || []).map((addon: any) => ({
+      id: addon.id,
+      addonId: addon.addon_id,
+      quantity: addon.quantity,
+      unit_price: addon.rate,
+      total: addon.total_amount,
+      name: addon.addons?.name || 'Unknown Add-on',
+      category: addon.addons?.type || 'other',
+    }));
+
+    console.log(`[get-instant-booking-by-id] Fetched add-ons count: ${transformedAddons.length}`);
+
+    // Combine reservation with add-ons
+    const result = {
+      ...data,
+      add_ons: transformedAddons,
+    };
 
     return new Response(
-      JSON.stringify(data),
+      JSON.stringify(result),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
