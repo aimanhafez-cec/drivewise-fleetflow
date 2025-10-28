@@ -29,6 +29,7 @@ import {
   CheckCircle,
 } from 'lucide-react';
 import { BookingWizardData } from '@/pages/NewInstantBooking';
+import { PriceListSelect } from '@/components/ui/select-components';
 
 interface AddOnsWithPricingProps {
   bookingData: BookingWizardData;
@@ -41,6 +42,7 @@ const AddOnsWithPricing = ({ bookingData, onUpdate }: AddOnsWithPricingProps) =>
   const [promoCode, setPromoCode] = useState('');
   const [promoApplied, setPromoApplied] = useState(false);
   const [promoDiscount, setPromoDiscount] = useState(0);
+  const [selectedPriceList, setSelectedPriceList] = useState<string>('');
   
   const rentalDays = bookingData.pickupDate && bookingData.returnDate
     ? Math.ceil(
@@ -474,6 +476,21 @@ const AddOnsWithPricing = ({ bookingData, onUpdate }: AddOnsWithPricingProps) =>
                         <span className="font-medium">AED {pricing.oneWayFee.toFixed(2)}</span>
                       </div>
                     )}
+                  </div>
+
+                  <Separator />
+
+                  {/* Price List Selection */}
+                  <div className="space-y-3">
+                    <Label className="text-sm font-semibold flex items-center gap-2">
+                      <Receipt className="h-4 w-4" />
+                      Price List
+                    </Label>
+                    <PriceListSelect
+                      value={selectedPriceList}
+                      onChange={(value) => setSelectedPriceList(typeof value === 'string' ? value : value?.[0] || '')}
+                      placeholder="Select price list"
+                    />
                   </div>
 
                   <Separator />
