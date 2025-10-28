@@ -225,6 +225,7 @@ interface EnhancedAgreementWizardProps {
 }
 
 export const EnhancedAgreementWizard = ({ initialSource, initialSourceId }: EnhancedAgreementWizardProps = {}) => {
+  console.log('[EnhancedAgreementWizard] Component rendering', { initialSource, initialSourceId });
   const navigate = useNavigate();
   const [validationResult, setValidationResult] = useState<ValidationResult>({ 
     isValid: true, 

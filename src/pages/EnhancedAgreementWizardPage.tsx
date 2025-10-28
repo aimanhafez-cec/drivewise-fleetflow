@@ -21,6 +21,8 @@ import { toast } from 'sonner';
  * - ?source=reservation&reservationId=xxx - Pre-select a reservation
  */
 const EnhancedAgreementWizardPage = () => {
+  console.log('[EnhancedAgreementWizardPage] Component rendering');
+  
   const [searchParams] = useSearchParams();
   
   // Extract URL parameters
@@ -31,8 +33,11 @@ const EnhancedAgreementWizardPage = () => {
   // Determine sourceId based on source type
   const sourceId = source === 'instant_booking' ? bookingId : source === 'reservation' ? reservationId : undefined;
   
+  console.log('[EnhancedAgreementWizardPage] Params:', { source, bookingId, reservationId, sourceId });
+  
   // Show notification if coming from a specific source
   useEffect(() => {
+    console.log('[EnhancedAgreementWizardPage] useEffect triggered', { source, sourceId });
     if (source && sourceId) {
       const sourceLabel = source === 'instant_booking' ? 'Instant Booking' : 'Reservation';
       toast.info(`Loading ${sourceLabel}`, {
@@ -42,6 +47,7 @@ const EnhancedAgreementWizardPage = () => {
     }
   }, [source, sourceId]);
 
+  console.log('[EnhancedAgreementWizardPage] Rendering EnhancedAgreementWizard');
   return <EnhancedAgreementWizard initialSource={source || undefined} initialSourceId={sourceId || undefined} />;
 };
 
