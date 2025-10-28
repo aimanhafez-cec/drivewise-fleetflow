@@ -96,6 +96,10 @@ const NewInstantBooking = () => {
   // Fetch last booking data for the selected customer
   const { data: lastBooking, isLoading: loadingLastBooking } = useLastBooking(bookingData.customerId || null);
 
+  // Smart defaults for customer history
+  const { smartDefaults, hasHistory, isLoading: loadingDefaults } = useSmartDefaults(bookingData.customerId || undefined);
+  const { applyDefaults } = useApplySmartDefaults();
+
   const totalSteps = 5; // Reduced from 8 to 5
 
   const stepTitles = [
