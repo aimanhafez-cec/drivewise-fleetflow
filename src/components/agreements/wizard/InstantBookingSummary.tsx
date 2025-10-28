@@ -31,7 +31,7 @@ interface InstantBookingSummaryProps {
       phone: string;
     };
     vehicles?: {
-      registration_no: string;
+      registration_number: string;
       make: string;
       model: string;
       year: number;
@@ -111,7 +111,7 @@ export const InstantBookingSummary = ({ instantBooking }: InstantBookingSummaryP
                       {instantBooking.vehicles.make} {instantBooking.vehicles.model}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {instantBooking.vehicles.year} • {instantBooking.vehicles.registration_no}
+                      {instantBooking.vehicles.year} • {instantBooking.vehicles.registration_number}
                     </p>
                   </div>
                 </div>

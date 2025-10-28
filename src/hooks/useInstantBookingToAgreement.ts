@@ -61,7 +61,7 @@ interface InstantBookingData {
     phone: string;
   };
   vehicles?: {
-    registration_no: string;
+    registration_number: string;
     make: string;
     model: string;
     year: number;

@@ -40,7 +40,16 @@ Deno.serve(async (req) => {
     }
 
     const url = new URL(req.url);
-    const bookingId = url.pathname.split('/').pop() || url.searchParams.get('id');
+    let bookingId = url.pathname.split('/').pop() || url.searchParams.get('id') || '';
+
+    // Also accept ID from JSON body (when invoked via supabase.functions.invoke)
+    let body: any = null;
+    if (req.method !== 'GET') {
+      body = await req.json().catch(() => null);
+    }
+    if (!bookingId && body) {
+      bookingId = body.id || body.bookingId || '';
+    }
 
     if (!bookingId) {
       return new Response(
