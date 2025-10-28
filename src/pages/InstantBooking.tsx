@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
-import { Plus, BarChart3, Settings, MapPin, CreditCard } from 'lucide-react';
+import { Plus, BarChart3, Settings, MapPin, CreditCard, Medal } from 'lucide-react';
 import BookingStatsCards from '@/components/instant-booking/BookingStatsCards';
 import BookingsTable from '@/components/instant-booking/BookingsTable';
 import BookingFilters from '@/components/instant-booking/BookingFilters';
@@ -35,7 +35,10 @@ const InstantBooking = () => {
           <div>
             <div className="flex items-center gap-3">
               <h1 className="text-3xl font-bold text-foreground">Instant Booking Management</h1>
-              <Badge variant="secondary" className="text-xs">speed runner</Badge>
+              <Badge variant="secondary" className="text-xs bg-purple-600 text-white hover:bg-purple-700 border-purple-600 flex items-center gap-1">
+                <Medal className="h-3 w-3" />
+                speed runner
+              </Badge>
             </div>
             <p className="text-muted-foreground mt-1">
               Manage and monitor all instant bookings across your fleet
