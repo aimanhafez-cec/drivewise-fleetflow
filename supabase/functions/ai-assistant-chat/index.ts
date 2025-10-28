@@ -58,6 +58,27 @@ ${currentRoute ? `The user is currently on: ${currentRoute}
 
 ${getRouteContext(currentRoute)}` : "No specific page context available."}
 
+## Natural Language Booking Commands (Instant Booking Page)
+
+When the user is on the instant booking page (/instant-booking), you can help them create bookings using natural language:
+
+**Supported Commands:**
+- "weekend [customer name]" - Create a weekend booking (Fri-Sun) for the customer
+- "week [customer name]" - Create a 1-week booking for the customer  
+- "month [customer name]" - Create a 1-month booking for the customer
+
+**Workflow:**
+1. When you detect a booking command, use "search_customer_by_name" tool to find the customer
+2. Once found, use "create_quick_booking" tool with the appropriate booking type
+3. Respond with: "The usual [booking type] booking for [customer name] has been created. Please proceed."
+
+**Examples:**
+- User: "weekend Mohamed gamal"
+  → Search for "Mohamed gamal" → Create weekend booking → Respond with confirmation
+  
+- User: "book a week for Sarah Ahmed"  
+  → Search for "Sarah Ahmed" → Create week booking → Respond with confirmation
+
 ## System Overview
 This is an all-in-one car rental management platform with the following main modules:
 
@@ -230,6 +251,61 @@ Current page context has been provided above.
 
 How can I help you today?`;
 
+    // Define tools for booking commands
+    const tools = [
+      {
+        type: "function",
+        function: {
+          name: "search_customer_by_name",
+          description: "Search for a customer by their full name or partial name in the rental system",
+          parameters: {
+            type: "object",
+            properties: {
+              name: { 
+                type: "string", 
+                description: "Customer name to search for (full name or partial)" 
+              }
+            },
+            required: ["name"]
+          }
+        }
+      },
+      {
+        type: "function",
+        function: {
+          name: "create_quick_booking",
+          description: "Create or pre-fill a booking with smart defaults based on booking type and customer history",
+          parameters: {
+            type: "object",
+            properties: {
+              customerId: { 
+                type: "string", 
+                description: "Customer UUID from the search results" 
+              },
+              customerName: { 
+                type: "string", 
+                description: "Customer full name for display purposes" 
+              },
+              bookingType: { 
+                type: "string", 
+                enum: ["weekend", "week", "month", "custom"],
+                description: "Type of booking duration: weekend (Fri-Sun), week (7 days), month (30 days), or custom"
+              },
+              pickupDate: { 
+                type: "string", 
+                description: "ISO date string for pickup (optional, will use preset if not provided)" 
+              },
+              returnDate: { 
+                type: "string", 
+                description: "ISO date string for return (optional, will use preset if not provided)" 
+              }
+            },
+            required: ["customerId", "customerName", "bookingType"]
+          }
+        }
+      }
+    ];
+
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -242,6 +318,7 @@ How can I help you today?`;
           { role: "system", content: systemPrompt },
           ...messages,
         ],
+        tools: tools,
         stream: true,
       }),
     });
