@@ -79,7 +79,6 @@ export function DamageMarkersTable({ markers, onAddPhoto, readOnly = false }: Da
               <TableHead className="w-[100px]">Side</TableHead>
               <TableHead className="w-[140px]">Damage Type</TableHead>
               <TableHead className="w-[120px]">Severity</TableHead>
-              <TableHead className="min-w-[150px] max-w-[250px]">Description</TableHead>
               <TableHead className="w-[180px]">Attachments</TableHead>
             </TableRow>
           </TableHeader>
@@ -102,9 +101,6 @@ export function DamageMarkersTable({ markers, onAddPhoto, readOnly = false }: Da
                     >
                       {severityConfig.label}
                     </Badge>
-                  </TableCell>
-                  <TableCell className="min-w-[150px] max-w-[250px] truncate">
-                    {marker.notes || '-'}
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2 flex-wrap">
