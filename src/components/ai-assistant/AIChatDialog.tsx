@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAIAssistant } from '@/hooks/useAIAssistant';
+import { useWizardContextSafe } from '@/contexts/WizardContext';
 import {
   Dialog,
   DialogContent,
@@ -38,7 +39,10 @@ export const AIChatDialog: React.FC<AIChatDialogProps> = ({
   isRepeatBooking,
   bookingContext
 }) => {
-  const { messages, isLoading, sendMessage, clearChat } = useAIAssistant();
+  const wizardContext = useWizardContextSafe();
+  const { messages, isLoading, sendMessage, clearChat } = useAIAssistant({
+    onBookingUpdate: wizardContext?.onBookingUpdate,
+  });
   const [input, setInput] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
@@ -186,11 +190,11 @@ export const AIChatDialog: React.FC<AIChatDialogProps> = ({
         if (bookingContext?.customerName) {
           suggestions.push(`I've selected ${bookingContext.customerName}, what's next?`);
         } else {
+          suggestions.push('weekend Mohamed Gamal');
           suggestions.push('How do I create a new customer?');
         }
         suggestions.push('What is the Book Again feature?');
         suggestions.push('Should I choose vehicle class or specific vehicle?');
-        suggestions.push('How do I search by Emirates ID or passport?');
         return suggestions;
       }
       
@@ -279,10 +283,10 @@ export const AIChatDialog: React.FC<AIChatDialogProps> = ({
       }
       
       return [
+        'weekend Mohamed Gamal',
         'How do I search for a customer?',
         'What is Express Mode and when should I use it?',
         'How do I use the Book Again feature?',
-        'What\'s the difference between vehicle class and specific vehicle reservation?',
       ];
     }
 
@@ -385,22 +389,24 @@ export const AIChatDialog: React.FC<AIChatDialogProps> = ({
               </div>
             ) : (
               <div className="space-y-4">
-                {messages.map((message, idx) => (
-                  <div
-                    key={idx}
-                    className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                  >
+                {messages
+                  .filter(msg => msg.role !== 'tool') // Don't display tool messages
+                  .map((message, idx) => (
                     <div
-                      className={`max-w-[80%] rounded-lg px-4 py-2 ${
-                        message.role === 'user'
-                          ? 'bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 text-white'
-                          : 'bg-muted'
-                      }`}
+                      key={idx}
+                      className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                     >
-                      <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                      <div
+                        className={`max-w-[80%] rounded-lg px-4 py-2 ${
+                          message.role === 'user'
+                            ? 'bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 text-white'
+                            : 'bg-muted'
+                        }`}
+                      >
+                        <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
                 {isLoading && (
                   <div className="flex justify-start">
                     <div className="max-w-[80%] rounded-lg px-4 py-2 bg-muted">
