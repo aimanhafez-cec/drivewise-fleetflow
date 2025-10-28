@@ -365,11 +365,16 @@ export const SourceSelection = ({
                     <div
                       key={booking.id}
                       className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
-                        (selectedSource === 'instant_booking' && selectedSourceId === booking.id)
+                        selectedSourceId === booking.id
                           ? 'border-primary bg-primary/5'
                           : 'border-input hover:border-primary/50'
                       }`}
-                      onClick={() => onSelect('instant_booking', booking.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        console.log('[SourceSelection] Instant booking clicked', booking.id);
+                        setSource('instant_booking');
+                        onSelect('instant_booking', booking.id);
+                      }}
                     >
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex-1 space-y-2">

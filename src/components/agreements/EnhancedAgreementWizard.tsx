@@ -782,6 +782,7 @@ export const EnhancedAgreementWizard = ({ initialSource, initialSourceId }: Enha
             selectedSource={wizardData.source}
             selectedSourceId={wizardData.sourceId}
             onSelect={(source: AgreementSource, sourceId?: string) => {
+              console.log('[EnhancedWizard] onSelect called', { source, sourceId });
               updateWizardData('source', source as any);
               updateWizardData('sourceId', sourceId as any);
             }}
