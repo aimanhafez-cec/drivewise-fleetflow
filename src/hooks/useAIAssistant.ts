@@ -1,27 +1,177 @@
 import { useState, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { searchCustomerByName, findBestCustomerMatch } from '@/lib/api/customer-search';
+import { applyBookingPreset, type SmartDefaults, type PartialBookingData } from '@/lib/booking-presets';
+import { useLastBooking } from './useLastBooking';
 
 export type Message = {
-  role: 'user' | 'assistant';
+  role: 'user' | 'assistant' | 'tool';
   content: string;
+  tool_call_id?: string;
+  tool_calls?: ToolCall[];
 };
 
-export const useAIAssistant = () => {
+export interface ToolCall {
+  id: string;
+  type: 'function';
+  function: {
+    name: string;
+    arguments: string;
+  };
+}
+
+export interface AIAssistantOptions {
+  onBookingUpdate?: (updates: PartialBookingData) => void;
+}
+
+export const useAIAssistant = (options?: AIAssistantOptions) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [currentCustomerId, setCurrentCustomerId] = useState<string | null>(null);
   const { toast } = useToast();
+  const { data: smartDefaults } = useLastBooking(currentCustomerId);
+
+  // Execute AI tool calls
+  const executeToolCalls = useCallback(async (toolCalls: ToolCall[]) => {
+    console.log('[AIAssistant] Executing tool calls:', toolCalls);
+    
+    const toolResults = await Promise.all(
+      toolCalls.map(async (call) => {
+        try {
+          if (call.function.name === 'search_customer_by_name') {
+            const { name } = JSON.parse(call.function.arguments);
+            console.log(`[AIAssistant] Searching for customer: "${name}"`);
+            
+            const customer = await findBestCustomerMatch(name);
+            
+            if (customer) {
+              setCurrentCustomerId(customer.id);
+              return {
+                tool_call_id: call.id,
+                role: 'tool' as const,
+                content: JSON.stringify({
+                  success: true,
+                  customer: {
+                    id: customer.id,
+                    name: customer.full_name,
+                    phone: customer.phone,
+                    email: customer.email,
+                  }
+                })
+              };
+            } else {
+              return {
+                tool_call_id: call.id,
+                role: 'tool' as const,
+                content: JSON.stringify({
+                  success: false,
+                  error: 'No customer found with that name'
+                })
+              };
+            }
+          }
+          
+          if (call.function.name === 'create_quick_booking') {
+            const params = JSON.parse(call.function.arguments);
+            console.log('[AIAssistant] Creating quick booking:', params);
+            
+            // Convert smartDefaults to compatible format
+            const convertedDefaults: SmartDefaults | undefined = smartDefaults ? {
+              reservationType: smartDefaults.reservationType === 'vehicle_class' ? 'vehicle_class' : 
+                               smartDefaults.reservationType === 'make_model' ? 'make_model' : 
+                               'specific_vin',
+              vehicleClassId: smartDefaults.vehicleClassId,
+              pickupLocationId: smartDefaults.pickupLocation,
+              returnLocationId: smartDefaults.returnLocation,
+              insurancePackageId: smartDefaults.insurancePackage,
+              // Convert selectedAddOns from string[] to { id, name }[]
+              selectedAddOns: smartDefaults.selectedAddOns?.map(id => ({ id, name: id })),
+              // Convert addOnCharges from Record to Array
+              addOnCharges: Object.entries(smartDefaults.addOnCharges || {}).map(([addon_id, charge_amount]) => ({
+                addon_id,
+                charge_amount,
+              })),
+            } : undefined;
+            
+            // Apply booking preset with smart defaults
+            const bookingData = applyBookingPreset(
+              params.bookingType,
+              convertedDefaults
+            );
+            
+            // Merge with customer info
+            const fullBookingData: PartialBookingData = {
+              customerId: params.customerId,
+              customerName: params.customerName,
+              ...bookingData,
+            };
+            
+            // Trigger callback to update wizard
+            options?.onBookingUpdate?.(fullBookingData);
+            
+            return {
+              tool_call_id: call.id,
+              role: 'tool' as const,
+              content: JSON.stringify({
+                success: true,
+                bookingType: params.bookingType,
+                customerName: params.customerName,
+                dates: {
+                  pickup: bookingData.pickupDate,
+                  return: bookingData.returnDate,
+                }
+              })
+            };
+          }
+          
+          // Unknown tool
+          return {
+            tool_call_id: call.id,
+            role: 'tool' as const,
+            content: JSON.stringify({
+              success: false,
+              error: 'Unknown tool'
+            })
+          };
+          
+        } catch (error) {
+          console.error('[AIAssistant] Tool execution error:', error);
+          return {
+            tool_call_id: call.id,
+            role: 'tool' as const,
+            content: JSON.stringify({
+              success: false,
+              error: error instanceof Error ? error.message : 'Tool execution failed'
+            })
+          };
+        }
+      })
+    );
+    
+    return toolResults;
+  }, [options, smartDefaults]);
 
   const streamChat = useCallback(async (
     userMessage: string,
-    currentRoute?: string
+    currentRoute?: string,
+    previousToolResults?: Message[]
   ) => {
     const newUserMessage: Message = { role: 'user', content: userMessage };
-    setMessages(prev => [...prev, newUserMessage]);
+    
+    // Only add user message if not a tool result continuation
+    if (!previousToolResults) {
+      setMessages(prev => [...prev, newUserMessage]);
+    }
+    
     setIsLoading(true);
 
     const CHAT_URL = `https://tbmcmbldoaespjlhpfys.supabase.co/functions/v1/ai-assistant-chat`;
 
     try {
+      const messagesToSend = previousToolResults 
+        ? [...messages, ...previousToolResults]
+        : [...messages, newUserMessage];
+
       const resp = await fetch(CHAT_URL, {
         method: 'POST',
         headers: {
@@ -29,7 +179,7 @@ export const useAIAssistant = () => {
           'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRibWNtYmxkb2Flc3BqbGhwZnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4MTQzMzcsImV4cCI6MjA2OTM5MDMzN30.4uJ4xpyZENd15IPQ-ctaouZ0Q7HFNr-CsRtJ0O7bqNs`,
         },
         body: JSON.stringify({
-          messages: [...messages, newUserMessage],
+          messages: messagesToSend,
           currentRoute,
         }),
       });
@@ -69,6 +219,7 @@ export const useAIAssistant = () => {
       let textBuffer = '';
       let streamDone = false;
       let assistantContent = '';
+      let toolCalls: ToolCall[] = [];
 
       while (!streamDone) {
         const { done, value } = await reader.read();
@@ -94,7 +245,9 @@ export const useAIAssistant = () => {
 
           try {
             const parsed = JSON.parse(jsonStr);
-            const content = parsed.choices?.[0]?.delta?.content as string | undefined;
+            const delta = parsed.choices?.[0]?.delta;
+            const content = delta?.content as string | undefined;
+            const deltaToolCalls = delta?.tool_calls;
             
             if (content) {
               assistantContent += content;
@@ -112,6 +265,28 @@ export const useAIAssistant = () => {
                 } else {
                   // Create new assistant message
                   return [...prev, { role: 'assistant', content: assistantContent }];
+                }
+              });
+            }
+            
+            // Handle tool calls
+            if (deltaToolCalls) {
+              deltaToolCalls.forEach((tc: any) => {
+                const index = tc.index || 0;
+                if (!toolCalls[index]) {
+                  toolCalls[index] = {
+                    id: tc.id || '',
+                    type: 'function',
+                    function: {
+                      name: tc.function?.name || '',
+                      arguments: tc.function?.arguments || '',
+                    }
+                  };
+                } else {
+                  // Append to existing tool call
+                  if (tc.function?.arguments) {
+                    toolCalls[index].function.arguments += tc.function.arguments;
+                  }
                 }
               });
             }
@@ -159,6 +334,21 @@ export const useAIAssistant = () => {
         }
       }
 
+      // If AI made tool calls, execute them and continue conversation
+      if (toolCalls.length > 0) {
+        console.log('[AIAssistant] AI requested tool calls:', toolCalls);
+        
+        const toolResults = await executeToolCalls(toolCalls);
+        
+        // Add tool results to messages
+        setMessages(prev => [...prev, ...toolResults]);
+        
+        // Continue conversation with tool results
+        setIsLoading(false);
+        await streamChat('', currentRoute, toolResults);
+        return;
+      }
+
       setIsLoading(false);
     } catch (error) {
       console.error('Chat error:', error);
@@ -167,10 +357,12 @@ export const useAIAssistant = () => {
         description: 'Failed to get response from AI assistant. Please try again.',
         variant: 'destructive',
       });
-      setMessages(prev => prev.slice(0, -1)); // Remove user message on error
+      if (!previousToolResults) {
+        setMessages(prev => prev.slice(0, -1)); // Remove user message on error
+      }
       setIsLoading(false);
     }
-  }, [messages, toast]);
+  }, [messages, toast, executeToolCalls]);
 
   const clearChat = useCallback(() => {
     setMessages([]);
