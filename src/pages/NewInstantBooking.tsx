@@ -215,7 +215,7 @@ const NewInstantBooking = () => {
       }
 
       // Enter key - proceed to next step or complete booking
-      if (e.key === 'Enter' && canProceed() && currentStep < 5) {
+      if (e.key === 'Enter' && currentStep < 5) {
         e.preventDefault();
         // On step 4, create the booking instead of just moving to next step
         if (currentStep === 4) {
@@ -226,7 +226,7 @@ const NewInstantBooking = () => {
       }
 
       // Escape key - go back
-      if (e.key === 'Escape' && currentStep > 1 && currentStep < 5) {
+      if (e.key === 'Escape' && currentStep > 1) {
         e.preventDefault();
         handleBack();
       }
