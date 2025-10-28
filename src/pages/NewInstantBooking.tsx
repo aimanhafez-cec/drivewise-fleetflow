@@ -272,6 +272,27 @@ const NewInstantBooking = () => {
     };
   }, [setWizardState]);
 
+  // Apply smart defaults when customer is selected
+  useEffect(() => {
+    if (bookingData.customerId && smartDefaults && !loadingDefaults) {
+      const updates = applyDefaults(bookingData, smartDefaults, {
+        overwriteExisting: false, // Don't overwrite user-entered data
+      });
+      
+      if (Object.keys(updates).length > 0) {
+        console.log('[SmartDefaults] Applying smart defaults:', updates);
+        updateBookingData(updates);
+        
+        if (smartDefaults.hasHistory) {
+          toast({
+            title: 'Smart Defaults Applied',
+            description: 'Pre-filled with customer\'s preferences from previous bookings',
+          });
+        }
+      }
+    }
+  }, [bookingData.customerId, smartDefaults, loadingDefaults]);
+
   // Handle express mode toggle
   const handleExpressModeToggle = (checked: boolean) => {
     setExpressMode(checked);
