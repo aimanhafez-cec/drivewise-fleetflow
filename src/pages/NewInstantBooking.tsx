@@ -136,7 +136,7 @@ const NewInstantBooking = () => {
   };
 
   const handleNext = () => {
-    if (canProceed() && currentStep < totalSteps) {
+    if (currentStep < totalSteps) {
       // Skip add-ons step (step 4) if in express mode
       if (expressMode && currentStep === 3) {
         // Move directly to payment after vehicle selection
@@ -529,7 +529,7 @@ const NewInstantBooking = () => {
             
             <Button
               onClick={currentStep === 4 ? handlePaymentComplete : handleNext}
-              disabled={!canProceed() || isCreatingBooking}
+              disabled={isCreatingBooking}
               className="gap-2"
             >
               {currentStep === 4 ? (
