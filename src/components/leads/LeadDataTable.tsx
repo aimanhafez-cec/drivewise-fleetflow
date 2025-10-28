@@ -1,48 +1,26 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Card } from '@/components/ui/card';
 import { LeadSourceBadge } from './LeadSourceBadge';
 import { Lead } from '@/hooks/useLeadsRealtime';
 import { leadSources } from '@/data/leadSources';
-import { 
-  MoreVertical, 
-  Eye, 
-  CheckCircle2, 
-  Mail, 
-  Phone,
-  ArrowUpDown,
-  Calendar
-} from 'lucide-react';
+import { MoreVertical, Eye, CheckCircle2, Mail, Phone, ArrowUpDown, Calendar } from 'lucide-react';
 import { formatDistanceToNow, format } from 'date-fns';
-
 interface LeadDataTableProps {
   leads: Lead[];
 }
-
 type SortField = 'created_at' | 'estimated_value' | 'duration_days' | 'priority';
 type SortDirection = 'asc' | 'desc';
-
-export const LeadDataTable = ({ leads }: LeadDataTableProps) => {
+export const LeadDataTable = ({
+  leads
+}: LeadDataTableProps) => {
   const navigate = useNavigate();
   const [sortField, setSortField] = useState<SortField>('created_at');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
-
   const handleSort = (field: SortField) => {
     if (sortField === field) {
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
@@ -51,10 +29,8 @@ export const LeadDataTable = ({ leads }: LeadDataTableProps) => {
       setSortDirection('desc');
     }
   };
-
   const sortedLeads = [...leads].sort((a, b) => {
     let comparison = 0;
-    
     if (sortField === 'created_at') {
       comparison = new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
     } else if (sortField === 'estimated_value') {
@@ -62,54 +38,74 @@ export const LeadDataTable = ({ leads }: LeadDataTableProps) => {
     } else if (sortField === 'duration_days') {
       comparison = a.duration_days - b.duration_days;
     } else if (sortField === 'priority') {
-      const priorityOrder = { high: 3, medium: 2, low: 1 };
+      const priorityOrder = {
+        high: 3,
+        medium: 2,
+        low: 1
+      };
       comparison = priorityOrder[a.priority] - priorityOrder[b.priority];
     }
-    
     return sortDirection === 'asc' ? comparison : -comparison;
   });
-
   const getStatusBadge = (status: Lead['status']) => {
     const statusConfig = {
-      new: { label: 'New', className: 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300' },
-      contacted: { label: 'Contacted', className: 'bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300' },
-      quoted: { label: 'Quoted', className: 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300' },
-      confirmed: { label: 'Confirmed', className: 'bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-300' },
-      rejected: { label: 'Rejected', className: 'bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300' },
-      expired: { label: 'Expired', className: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300' },
+      new: {
+        label: 'New',
+        className: 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300'
+      },
+      contacted: {
+        label: 'Contacted',
+        className: 'bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300'
+      },
+      quoted: {
+        label: 'Quoted',
+        className: 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300'
+      },
+      confirmed: {
+        label: 'Confirmed',
+        className: 'bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-300'
+      },
+      rejected: {
+        label: 'Rejected',
+        className: 'bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300'
+      },
+      expired: {
+        label: 'Expired',
+        className: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'
+      }
     };
-
     const config = statusConfig[status];
     return <Badge className={`${config.className} border-0`}>{config.label}</Badge>;
   };
-
   const getPriorityBadge = (priority: Lead['priority']) => {
     const priorityConfig = {
-      high: { label: 'High', className: 'bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300' },
-      medium: { label: 'Medium', className: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300' },
-      low: { label: 'Low', className: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300' },
+      high: {
+        label: 'High',
+        className: 'bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300'
+      },
+      medium: {
+        label: 'Medium',
+        className: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300'
+      },
+      low: {
+        label: 'Low',
+        className: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'
+      }
     };
-
     const config = priorityConfig[priority];
     return <Badge variant="outline" className={config.className}>{config.label}</Badge>;
   };
-
   const handleQuickConfirm = (e: React.MouseEvent, leadId: string) => {
     e.stopPropagation();
     // TODO: Implement quick confirm logic
     console.log('Quick confirm lead:', leadId);
   };
-
   if (leads.length === 0) {
-    return (
-      <Card className="p-12 text-center">
+    return <Card className="p-12 text-center">
         <p className="text-muted-foreground">No leads found matching your filters.</p>
-      </Card>
-    );
+      </Card>;
   }
-
-  return (
-    <Card>
+  return <Card>
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
@@ -119,38 +115,26 @@ export const LeadDataTable = ({ leads }: LeadDataTableProps) => {
               <TableHead>Customer</TableHead>
               <TableHead>Vehicle</TableHead>
               <TableHead>Dates</TableHead>
-              <TableHead 
-                className="cursor-pointer hover:bg-muted/50"
-                onClick={() => handleSort('duration_days')}
-              >
+              <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('duration_days')}>
                 <div className="flex items-center gap-1">
                   Duration
                   <ArrowUpDown className="h-3 w-3" />
                 </div>
               </TableHead>
-              <TableHead 
-                className="cursor-pointer hover:bg-muted/50"
-                onClick={() => handleSort('estimated_value')}
-              >
+              <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('estimated_value')}>
                 <div className="flex items-center gap-1">
                   Est. Value
                   <ArrowUpDown className="h-3 w-3" />
                 </div>
               </TableHead>
-              <TableHead 
-                className="cursor-pointer hover:bg-muted/50"
-                onClick={() => handleSort('priority')}
-              >
+              <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('priority')}>
                 <div className="flex items-center gap-1">
                   Priority
                   <ArrowUpDown className="h-3 w-3" />
                 </div>
               </TableHead>
               <TableHead>Status</TableHead>
-              <TableHead 
-                className="cursor-pointer hover:bg-muted/50"
-                onClick={() => handleSort('created_at')}
-              >
+              <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('created_at')}>
                 <div className="flex items-center gap-1">
                   Created
                   <ArrowUpDown className="h-3 w-3" />
@@ -160,16 +144,11 @@ export const LeadDataTable = ({ leads }: LeadDataTableProps) => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {sortedLeads.map((lead) => (
-              <TableRow
-                key={lead.id}
-                className="cursor-pointer hover:bg-muted/50"
-                onClick={() => navigate(`/leads-intake/${lead.id}`)}
-              >
+            {sortedLeads.map(lead => <TableRow key={lead.id} className="cursor-pointer hover:bg-muted/50" onClick={() => navigate(`/leads-intake/${lead.id}`)}>
                 <TableCell className="font-mono text-sm">
                   {lead.lead_no}
                 </TableCell>
-            <TableCell>
+            <TableCell className="px-0 my-[11px] mx-0 py-0">
               <div className="min-w-[140px]">
                 <LeadSourceBadge sourceId={lead.source_name} />
               </div>
@@ -178,28 +157,16 @@ export const LeadDataTable = ({ leads }: LeadDataTableProps) => {
                   <div className="space-y-1">
                     <p className="font-medium">{lead.customer_name}</p>
                     <div className="flex items-center gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-6 w-6"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          window.location.href = `mailto:${lead.customer_email}`;
-                        }}
-                        title={lead.customer_email}
-                      >
+                      <Button variant="ghost" size="icon" className="h-6 w-6" onClick={e => {
+                    e.stopPropagation();
+                    window.location.href = `mailto:${lead.customer_email}`;
+                  }} title={lead.customer_email}>
                         <Mail className="h-3.5 w-3.5" />
                       </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-6 w-6"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          window.location.href = `tel:${lead.customer_phone}`;
-                        }}
-                        title={lead.customer_phone}
-                      >
+                      <Button variant="ghost" size="icon" className="h-6 w-6" onClick={e => {
+                    e.stopPropagation();
+                    window.location.href = `tel:${lead.customer_phone}`;
+                  }} title={lead.customer_phone}>
                         <Phone className="h-3.5 w-3.5" />
                       </Button>
                     </div>
@@ -208,11 +175,9 @@ export const LeadDataTable = ({ leads }: LeadDataTableProps) => {
                 <TableCell>
                   <div className="space-y-1">
                     <p className="font-medium text-sm">{lead.vehicle_category}</p>
-                    {lead.alternative_categories && (
-                      <p className="text-xs text-muted-foreground">
+                    {lead.alternative_categories && <p className="text-xs text-muted-foreground">
                         Alt: {lead.alternative_categories.join(', ')}
-                      </p>
-                    )}
+                      </p>}
                   </div>
                 </TableCell>
                 <TableCell>
@@ -236,42 +201,37 @@ export const LeadDataTable = ({ leads }: LeadDataTableProps) => {
                 <TableCell>{getStatusBadge(lead.status)}</TableCell>
                 <TableCell>
                   <p className="text-xs">
-                    {formatDistanceToNow(new Date(lead.created_at), { addSuffix: true })}
+                    {formatDistanceToNow(new Date(lead.created_at), {
+                  addSuffix: true
+                })}
                   </p>
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex items-center justify-end gap-2">
-                    {(lead.status === 'new' || lead.status === 'contacted' || lead.status === 'quoted') && (
-                      <Button
-                        size="sm"
-                        variant="default"
-                        onClick={(e) => handleQuickConfirm(e, lead.id)}
-                        className="gap-1"
-                      >
+                    {(lead.status === 'new' || lead.status === 'contacted' || lead.status === 'quoted') && <Button size="sm" variant="default" onClick={e => handleQuickConfirm(e, lead.id)} className="gap-1">
                         <CheckCircle2 className="h-3 w-3" />
                         Confirm
-                      </Button>
-                    )}
+                      </Button>}
                     
                     <DropdownMenu>
-                      <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                      <DropdownMenuTrigger asChild onClick={e => e.stopPropagation()}>
                         <Button variant="ghost" size="icon">
                           <MoreVertical className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={(e) => {
-                          e.stopPropagation();
-                          navigate(`/leads-intake/${lead.id}`);
-                        }}>
+                        <DropdownMenuItem onClick={e => {
+                      e.stopPropagation();
+                      navigate(`/leads-intake/${lead.id}`);
+                    }}>
                           <Eye className="mr-2 h-4 w-4" />
                           View Details
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
+                        <DropdownMenuItem onClick={e => e.stopPropagation()}>
                           <Mail className="mr-2 h-4 w-4" />
                           Send Email
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
+                        <DropdownMenuItem onClick={e => e.stopPropagation()}>
                           <Phone className="mr-2 h-4 w-4" />
                           Call Customer
                         </DropdownMenuItem>
@@ -279,11 +239,9 @@ export const LeadDataTable = ({ leads }: LeadDataTableProps) => {
                     </DropdownMenu>
                   </div>
                 </TableCell>
-              </TableRow>
-            ))}
+              </TableRow>)}
           </TableBody>
         </Table>
       </div>
-    </Card>
-  );
+    </Card>;
 };
