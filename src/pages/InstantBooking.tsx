@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
 import { Plus, BarChart3, Settings, MapPin, CreditCard } from 'lucide-react';
 import BookingStatsCards from '@/components/instant-booking/BookingStatsCards';
@@ -32,7 +33,10 @@ const InstantBooking = () => {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Instant Booking Management</h1>
+            <div className="flex items-center gap-3">
+              <h1 className="text-3xl font-bold text-foreground">Instant Booking Management</h1>
+              <Badge variant="secondary" className="text-xs">speed runner</Badge>
+            </div>
             <p className="text-muted-foreground mt-1">
               Manage and monitor all instant bookings across your fleet
             </p>
