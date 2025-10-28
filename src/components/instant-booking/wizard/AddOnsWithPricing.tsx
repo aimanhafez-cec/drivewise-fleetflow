@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import {
@@ -24,6 +25,8 @@ import {
   TrendingUp,
   DollarSign,
   ChevronDown,
+  Tag,
+  CheckCircle,
 } from 'lucide-react';
 import { BookingWizardData } from '@/pages/NewInstantBooking';
 
@@ -35,6 +38,9 @@ interface AddOnsWithPricingProps {
 const AddOnsWithPricing = ({ bookingData, onUpdate }: AddOnsWithPricingProps) => {
   const [pricing, setPricing] = useState<any>(null);
   const [showAllAddOns, setShowAllAddOns] = useState(false);
+  const [promoCode, setPromoCode] = useState('');
+  const [promoApplied, setPromoApplied] = useState(false);
+  const [promoDiscount, setPromoDiscount] = useState(0);
   
   const rentalDays = bookingData.pickupDate && bookingData.returnDate
     ? Math.ceil(
@@ -165,13 +171,47 @@ const AddOnsWithPricing = ({ bookingData, onUpdate }: AddOnsWithPricingProps) =>
     });
   };
 
+  // Apply promo code
+  const handleApplyPromo = () => {
+    // Mock promo codes for UAE car rental business
+    const validPromoCodes: Record<string, { discount: number; type: 'percentage' | 'fixed' }> = {
+      'WELCOME10': { discount: 10, type: 'percentage' },
+      'SUMMER20': { discount: 20, type: 'percentage' },
+      'VIP15': { discount: 15, type: 'percentage' },
+      'FIRST100': { discount: 100, type: 'fixed' },
+    };
+
+    const promo = validPromoCodes[promoCode.toUpperCase()];
+    if (promo) {
+      const baseRate = 250; // Mock daily rate
+      const baseAmount = baseRate * rentalDays;
+      
+      if (promo.type === 'percentage') {
+        setPromoDiscount((baseAmount * promo.discount) / 100);
+      } else {
+        setPromoDiscount(promo.discount);
+      }
+      setPromoApplied(true);
+    } else {
+      setPromoDiscount(0);
+      setPromoApplied(false);
+    }
+  };
+
+  const handleRemovePromo = () => {
+    setPromoCode('');
+    setPromoApplied(false);
+    setPromoDiscount(0);
+  };
+
   // Calculate pricing in real-time
   useEffect(() => {
     const baseRate = 250; // Mock daily rate
     const baseAmount = baseRate * rentalDays;
     const addOnsTotal = Object.values(bookingData.addOnCharges).reduce((sum: number, val) => sum + val, 0);
     const oneWayFee = bookingData.pickupLocation !== bookingData.returnLocation ? 100 : 0;
-    const subtotal = baseAmount + addOnsTotal + oneWayFee;
+    const subtotalBeforeDiscount = baseAmount + addOnsTotal + oneWayFee;
+    const subtotal = subtotalBeforeDiscount - promoDiscount;
     const taxAmount = subtotal * 0.05; // 5% VAT
     const totalAmount = subtotal + taxAmount;
     
@@ -183,6 +223,7 @@ const AddOnsWithPricing = ({ bookingData, onUpdate }: AddOnsWithPricingProps) =>
       baseAmount,
       addOnsTotal,
       oneWayFee,
+      promoDiscount,
       taxAmount,
       totalAmount,
       downPaymentRequired,
@@ -191,7 +232,7 @@ const AddOnsWithPricing = ({ bookingData, onUpdate }: AddOnsWithPricingProps) =>
 
     setPricing(calculatedPricing);
     onUpdate({ pricing: calculatedPricing });
-  }, [bookingData.addOnCharges, rentalDays, bookingData.pickupLocation, bookingData.returnLocation, bookingData.customerType]);
+  }, [bookingData.addOnCharges, rentalDays, bookingData.pickupLocation, bookingData.returnLocation, bookingData.customerType, promoDiscount]);
 
   const totalAddOns = Object.values(bookingData.addOnCharges).reduce((sum: number, val) => sum + val, 0);
 
@@ -437,11 +478,60 @@ const AddOnsWithPricing = ({ bookingData, onUpdate }: AddOnsWithPricingProps) =>
 
                   <Separator />
 
+                  {/* Promo Code Section */}
+                  <div className="space-y-3">
+                    <Label className="text-sm font-semibold flex items-center gap-2">
+                      <Tag className="h-4 w-4" />
+                      Promo Code
+                    </Label>
+                    {!promoApplied ? (
+                      <div className="flex gap-2">
+                        <Input
+                          placeholder="Enter promo code"
+                          value={promoCode}
+                          onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                          className="uppercase"
+                        />
+                        <Button 
+                          onClick={handleApplyPromo} 
+                          size="sm"
+                          disabled={!promoCode}
+                        >
+                          Apply
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-between p-3 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800">
+                        <div className="flex items-center gap-2">
+                          <CheckCircle className="h-4 w-4 text-emerald-600" />
+                          <span className="text-sm font-medium text-emerald-700 dark:text-emerald-400">{promoCode}</span>
+                        </div>
+                        <Button 
+                          onClick={handleRemovePromo} 
+                          variant="ghost" 
+                          size="sm"
+                          className="h-7 text-xs"
+                        >
+                          Remove
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+
+                  <Separator />
+
                   <div className="space-y-3">
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Subtotal</span>
                       <span className="font-medium">AED {(pricing.baseAmount + pricing.addOnsTotal + (pricing.oneWayFee || 0)).toFixed(2)}</span>
                     </div>
+                    
+                    {promoApplied && promoDiscount > 0 && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-emerald-600 dark:text-emerald-400">Promo Discount</span>
+                        <span className="font-medium text-emerald-600 dark:text-emerald-400">-AED {promoDiscount.toFixed(2)}</span>
+                      </div>
+                    )}
                     
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">VAT (5%)</span>
