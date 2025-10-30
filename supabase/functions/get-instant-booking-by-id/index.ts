@@ -40,7 +40,19 @@ Deno.serve(async (req) => {
     }
 
     const url = new URL(req.url);
-    let bookingId = url.pathname.split('/').pop() || url.searchParams.get('id') || '';
+    const pathParts = url.pathname.split('/').filter(Boolean);
+    const lastSegment = pathParts[pathParts.length - 1] || '';
+    let bookingId = '';
+
+    // Only use the last path segment as ID if it's not the function name
+    if (lastSegment && lastSegment !== 'get-instant-booking-by-id') {
+      bookingId = lastSegment;
+    }
+
+    // Fallback to query param ?id=
+    if (!bookingId) {
+      bookingId = url.searchParams.get('id') || '';
+    }
 
     // Also accept ID from JSON body (when invoked via supabase.functions.invoke)
     let body: any = null;
@@ -74,7 +86,7 @@ Deno.serve(async (req) => {
           date_of_birth,
           license_number,
           license_expiry,
-          nationality
+          national_id
         ),
         vehicles(
           id,
