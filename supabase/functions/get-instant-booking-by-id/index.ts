@@ -95,7 +95,6 @@ Deno.serve(async (req) => {
           model,
           year,
           color,
-          fuel_type,
           odometer,
           category_id
         )
