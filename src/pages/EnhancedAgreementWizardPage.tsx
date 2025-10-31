@@ -2,6 +2,7 @@ import { EnhancedAgreementWizard } from '@/components/agreements/EnhancedAgreeme
 import { useSearchParams } from 'react-router-dom';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
+import { ErrorBoundary } from '@/components/ui/error-boundary';
 
 /**
  * Enhanced Agreement Wizard Page
@@ -48,7 +49,11 @@ const EnhancedAgreementWizardPage = () => {
   }, [source, sourceId]);
 
   console.log('[EnhancedAgreementWizardPage] Rendering EnhancedAgreementWizard');
-  return <EnhancedAgreementWizard initialSource={source || undefined} initialSourceId={sourceId || undefined} />;
+  return (
+    <ErrorBoundary>
+      <EnhancedAgreementWizard initialSource={source || undefined} initialSourceId={sourceId || undefined} />
+    </ErrorBoundary>
+  );
 };
 
 export default EnhancedAgreementWizardPage;
