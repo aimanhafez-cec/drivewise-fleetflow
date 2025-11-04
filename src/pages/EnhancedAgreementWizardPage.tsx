@@ -36,17 +36,7 @@ const EnhancedAgreementWizardPage = () => {
   
   console.log('[EnhancedAgreementWizardPage] Params:', { source, bookingId, reservationId, sourceId });
   
-  // Show notification if coming from a specific source
-  useEffect(() => {
-    console.log('[EnhancedAgreementWizardPage] useEffect triggered', { source, sourceId });
-    if (source && sourceId) {
-      const sourceLabel = source === 'instant_booking' ? 'Instant Booking' : 'Reservation';
-      toast.info(`Loading ${sourceLabel}`, {
-        description: `Pre-populating agreement from ${sourceLabel.toLowerCase()}`,
-        duration: 3000,
-      });
-    }
-  }, [source, sourceId]);
+  // Notification removed as per user request
 
   console.log('[EnhancedAgreementWizardPage] Rendering EnhancedAgreementWizard');
   return (
