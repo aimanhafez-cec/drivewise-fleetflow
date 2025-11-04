@@ -351,13 +351,6 @@ const NewInstantBooking = () => {
       if (Object.keys(updates).length > 0) {
         console.log('[SmartDefaults] Applying smart defaults:', updates);
         updateBookingData(updates);
-        
-        if (smartDefaults.hasHistory) {
-          toast({
-            title: 'Smart Defaults Applied',
-            description: 'Pre-filled with customer\'s preferences from previous bookings',
-          });
-        }
       }
     }
   }, [bookingData.customerId, smartDefaults, loadingDefaults]);
